@@ -17,43 +17,43 @@ namespace Ui
 
 namespace gui{
 
-  // Main application window
-  class ApplicationGUI : public QMainWindow
-  {
-      Q_OBJECT
+// Main application window
+class ApplicationGUI : public QMainWindow
+{
+    Q_OBJECT
 
-  public:
+public:
 
-      // constructor
-      explicit ApplicationGUI(QWidget *parent = 0);
+    // constructor
+    explicit ApplicationGUI(QWidget *parent = 0);
 
-      // deconstructor
-      ~ApplicationGUI();
+    // deconstructor
+    ~ApplicationGUI();
 
-  public slots:
+public slots:
 
-  protected:
+protected:
 
-  private:
+private:
 
-    void initGui();
-    void initMenuBar();
-    void initTopBar();
-    void initSideBar();
+  void initGui();
+  void initMenuBar();
+  void initTopBar();
+  void initSideBar();
 
-    void loadSettings();
-    void saveSettings();
+  void loadSettings();
+  void saveSettings();
 
-    QString global_settings_fname_;
-    QToolBar *top_bar;
-    QToolBar *side_bar;
+  QString global_settings_fname_;
+  QToolBar *top_bar;
+  QToolBar *side_bar;
 
-    // functional widgets
-    gui::DesignWidget *design_wg;
-    gui::DialogPanel *dialog_wg;
-    gui::InfoPanel *info_wg;
+  // functional widgets
+  gui::DesignWidget *design_wg;
+  gui::DialogPanel *dialog_wg;
+  gui::InfoPanel *info_wg;
 
-  };
+};
 
 } // end namespace gui
 
