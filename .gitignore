@@ -1,5 +1,6 @@
 # specific patterns
 moc_*
+db-sim
 
 # compiled source
 *.o
