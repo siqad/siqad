@@ -1,0 +1,10 @@
+# specific patterns
+moc_*
+
+# compiled source
+*.o
+*.pyc
+
+# logs and databases
+*.log
+Makefile
