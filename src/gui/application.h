@@ -1,32 +1,62 @@
 #ifndef _UI_APPLICATION_H_
 #define _UI_APPLICATION_H_
 
+// Qt inclusions
 #include <QMainWindow>
+#include <QObject>
+
+// Widget inclusions
+#include "widgets/design_widget.h"
+#include "widgets/dialog_panel.h"
+#include "widgets/info_panel.h"
 
 namespace Ui
 {
     class ApplicationGUI;
-}
+} // end namespace Ui
 
-// Main application window
-class ApplicationGUI : public QMainWindow
-{
-    Q_OBJECT
+namespace gui{
 
-public:
+  // Main application window
+  class ApplicationGUI : public QMainWindow
+  {
+      Q_OBJECT
 
-    // constructor
-    explicit ApplicationGUI(QWidget *parant = 0);
+  public:
 
-    // deconstructor
-    ~ApplicationGUI();
+      // constructor
+      explicit ApplicationGUI(QWidget *parent = 0);
 
-public slots:
+      // deconstructor
+      ~ApplicationGUI();
 
-protected:
+  public slots:
 
-private:
+  protected:
+
+  private:
+
+    void initGui();
+    void initMenuBar();
+    void initTopBar();
+    void initSideBar();
+
+    void loadSettings();
+    void saveSettings();
+
+    QString global_settings_fname_;
+    QToolBar *top_bar;
+    QToolBar *side_bar;
+
+    // functional widgets
+    gui::DesignWidget *design_wg;
+    gui::DialogPanel *dialog_wg;
+    gui::InfoPanel *info_wg;
+
+  };
+
+} // end namespace gui
 
 
-};
+
 #endif
