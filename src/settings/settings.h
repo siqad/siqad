@@ -23,7 +23,11 @@ public:
 class LatticeSettings: public QSettings
 {
 public:
+  // constructors
   LatticeSettings();
+  LatticeSettings(const QString& fname);
+
+  //destructor
   ~LatticeSettings();
 };
 
