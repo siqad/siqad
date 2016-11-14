@@ -14,3 +14,10 @@ settings::GUISettings::GUISettings()
 
 settings::GUISettings::~GUISettings()
 {}
+
+settings::LatticeSettings::LatticeSettings()
+  :QSettings("src/settings/lattices/si_100_2x1.ini", QSettings::IniFormat)
+{}
+
+settings::LatticeSettings::~LatticeSettings()
+{}

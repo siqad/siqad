@@ -20,6 +20,13 @@ public:
   ~GUISettings();
 };
 
+class LatticeSettings: public QSettings
+{
+public:
+  LatticeSettings();
+  ~LatticeSettings();
+};
+
 } // end settings namespace
 
 #endif
