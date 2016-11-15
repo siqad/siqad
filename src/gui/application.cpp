@@ -19,6 +19,10 @@
 #include <iostream>
 
 
+// initialise dialog panel to NULL until built in constructor
+gui::DialogPanel *gui::ApplicationGUI::dialog_wg = 0;
+
+
 gui::ApplicationGUI::ApplicationGUI(QWidget *parent)
   : QMainWindow(parent)
 {
@@ -27,7 +31,6 @@ gui::ApplicationGUI::ApplicationGUI(QWidget *parent)
 
   // load settings
   loadSettings();
-
 }
 
 gui::ApplicationGUI::~ApplicationGUI()

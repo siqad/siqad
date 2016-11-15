@@ -12,7 +12,7 @@
 
 namespace Ui
 {
-    class ApplicationGUI;
+  class ApplicationGUI;
 } // end namespace Ui
 
 namespace gui{
@@ -20,15 +20,18 @@ namespace gui{
 // Main application window
 class ApplicationGUI : public QMainWindow
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
 
-    // constructor
-    explicit ApplicationGUI(QWidget *parent = 0);
+  // constructor
+  explicit ApplicationGUI(QWidget *parent = 0);
 
-    // deconstructor
-    ~ApplicationGUI();
+  // deconstructor
+  ~ApplicationGUI();
+
+  // static declaration of DialogPanel for dialogstream
+  static gui::DialogPanel *dialog_wg;
 
 public slots:
 
@@ -50,9 +53,7 @@ private:
 
   // functional widgets
   gui::DesignWidget *design_wg;
-  gui::DialogPanel *dialog_wg;
   gui::InfoPanel *info_wg;
-
 };
 
 } // end namespace gui

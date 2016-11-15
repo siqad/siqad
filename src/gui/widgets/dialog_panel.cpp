@@ -2,6 +2,7 @@
 #include "src/settings/settings.h"
 
 #include <iostream>
+#include <QDebug>
 
 
 gui::DialogPanel::DialogPanel(QWidget *parent)
@@ -31,5 +32,5 @@ void gui::DialogPanel::echo(const QString& s)
 
 void gui::DialogPanel::mousePressEvent(QMouseEvent *e)
 {
-  echo("mouse clicked");
+  qWarning("mouse clicked");
 }
