@@ -16,7 +16,8 @@ HEADERS += \
 	src/settings/settings.h \
 	src/gui/widgets/design_widget.h \
 	src/gui/widgets/dialog_panel.h \
-	src/gui/widgets/info_panel.h
+	src/gui/widgets/info_panel.h \
+	src/gui/widgets/primitives/layer.h
 
 SOURCES += \
 	src/main.cpp \
@@ -24,4 +25,5 @@ SOURCES += \
 	src/settings/settings.cpp \
 	src/gui/widgets/design_widget.cpp \
 	src/gui/widgets/dialog_panel.cpp \
-	src/gui/widgets/info_panel.cpp
+	src/gui/widgets/info_panel.cpp \
+	src/gui/widgets/primitives/layer.cpp
