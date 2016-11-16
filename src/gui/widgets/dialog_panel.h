@@ -7,6 +7,7 @@
 #include <QPlainTextEdit>
 #include <QString>
 #include <QMouseEvent>
+#include <QFile>
 
 namespace gui{
 
@@ -25,11 +26,14 @@ public:
   // public methods
   void echo(const QString& s);
 
-private:
+protected:
 
   // interrupts
   void mousePressEvent(QMouseEvent *e);
 
+private:
+
+  QFile *file;
 };
 
 

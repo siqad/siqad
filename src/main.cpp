@@ -1,8 +1,11 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QResource>
+#include <QDebug>
 
 #include "gui/application.h"
+#include "settings/settings.h"
+
 
 
 static void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -50,8 +53,13 @@ static void messageHandler(QtMsgType type, const QMessageLogContext &context, co
 
 int main(int argc, char **argv){
 
-  qInstallMessageHandler(messageHandler);
-  
+  settings::Settings app_settings;
+
+  if(app_settings.value("log/override").toBool())
+    qInstallMessageHandler(messageHandler);
+  else
+    qDebug("Using default qdebug target");
+
   QApplication app(argc, argv);
 
   // Main Window
