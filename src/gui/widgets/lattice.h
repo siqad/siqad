@@ -22,7 +22,7 @@ public:
 
 private:
 
-  void construct_assist(settings::LatticeSettings lattice_settings);
+  void construct(settings::LatticeSettings &lattice_settings);
 
   QString lattice_name;
 

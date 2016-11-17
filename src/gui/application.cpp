@@ -106,7 +106,7 @@ void gui::ApplicationGUI::initTopBar()
   top_bar->setMovable(false);
 
   // size policy
-  top_bar->setMinimumHeight(gui_settings.value("TBAR/mh").toInt());
+  top_bar->setMinimumHeight(gui_settings.get<int>("TBAR/mh"));
   top_bar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
   addToolBar(Qt::TopToolBarArea, top_bar);
@@ -120,7 +120,7 @@ void gui::ApplicationGUI::initSideBar()
   // recall or initialise side bar location
   Qt::ToolBarArea area;
   if(gui_settings.contains("SBAR/loc"))
-    area = static_cast<Qt::ToolBarArea>(gui_settings.value("SBAR/loc").toInt());
+    area = static_cast<Qt::ToolBarArea>(gui_settings.get<int>("SBAR/loc"));
   else
     area = Qt::LeftToolBarArea;
 
@@ -131,7 +131,7 @@ void gui::ApplicationGUI::initSideBar()
   side_bar->setFloatable(false);
 
   // size policy
-  side_bar->setMinimumWidth(gui_settings.value("SBAR/mw").toInt());
+  side_bar->setMinimumWidth(gui_settings.get<int>("SBAR/mw"));
 
   addToolBar(area, side_bar);
 }
@@ -140,17 +140,15 @@ void gui::ApplicationGUI::initSideBar()
 
 void gui::ApplicationGUI::loadSettings()
 {
-  std::cout << "Loading settings" << std::endl;
+  qDebug("Loading settings");
   settings::GUISettings gui_settings;
 
-  resize(gui_settings.value("MWIN/winx").toInt(),
-         gui_settings.value("MWIN/winy").toInt());
-
+  resize(gui_settings.get<QSize>("MWIN/size"));
 }
 
 void gui::ApplicationGUI::saveSettings()
 {
-  std::cout << "Saving settings" << std::endl;
+  qDebug("Saving settings");
   settings::GUISettings gui_settings;
 
   gui_settings.setValue("SBAR/loc", (int)toolBarArea(side_bar));

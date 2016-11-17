@@ -53,9 +53,9 @@ static void messageHandler(QtMsgType type, const QMessageLogContext &context, co
 
 int main(int argc, char **argv){
 
-  settings::Settings app_settings;
+  settings::AppSettings app_settings;
 
-  if(app_settings.value("log/override").toBool())
+  if(app_settings.get<bool>("log/override"))
     qInstallMessageHandler(messageHandler);
   else
     qDebug("Using default qdebug target");

@@ -17,6 +17,7 @@ void gui::Lattice::construct(settings::LatticeSettings &lattice_settings)
 {
   settings::GUISettings gui_settings;
 
+  // determine dimension of lattice canvas
 
 }
 

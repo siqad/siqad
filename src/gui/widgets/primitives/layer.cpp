@@ -1,12 +1,23 @@
 #include "layer.h"
 #include <QDebug>
 
+uint prim::Layer::layer_cnt = 0;
 
 prim::Layer::Layer()
 {
   // initialise control parameters
   visible=true;
   active=true;
+  name = QString("Layer %1").arg(layer_cnt++);
+}
+
+prim::Layer::Layer(const QString &nm)
+{
+  // initialise control parameters
+  visible=true;
+  active=true;
+  name = nm;
+  layer_cnt++;
 }
 
 prim::Layer::~Layer()
@@ -17,25 +28,25 @@ prim::Layer::~Layer()
 
 
 
-void prim::Layer::add_item(QGraphicsItem *item)
+void prim::Layer::addItem(QGraphicsItem *item)
 {
   // add item if not already in items list
   if(!items.contains(item))
-    items->append(item);
+    items.append(item);
   else
     qDebug("item already contained in layer...");
 }
 
 
-void prim::Layer::remove_item(QGraphicsItem *item)
+void prim::Layer::removeItem(QGraphicsItem *item)
 {
-  bool found = items->removeOne(item);
+  bool found = items.removeOne(item);
   if(!found)
     qDebug("item not found in layer...");
 }
 
 
-void prim::Layer::set_visible(bool vis)
+void prim::Layer::setVisible(bool vis)
 {
   if(vis!=visible){
     visible=vis;
@@ -46,12 +57,12 @@ void prim::Layer::set_visible(bool vis)
 }
 
 
-bool prim::Layer::is_visible()
+bool prim::Layer::isVisible()
 {
   return visible;
 }
 
-void prim::Layer::set_active(bool act)
+void prim::Layer::setActive(bool act)
 {
   if(act!=active){
     active=act;
@@ -62,7 +73,13 @@ void prim::Layer::set_active(bool act)
 }
 
 
-bool prim::Layer::is_active()
+bool prim::Layer::isActive()
 {
   return active;
+}
+
+
+const QString prim::Layer::getName()
+{
+  return name;
 }
