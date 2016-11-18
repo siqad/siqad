@@ -136,7 +136,7 @@ void gui::Lattice::buildUnitCell(QPoint ind)
   QPointF lattice_loc = a[0]*ind.x()+a[1]*ind.y();
 
   for(int n=0; n<n_cell; n++){
-    prim::DBDot *dot = new prim::DBDot(lattice_loc+b.at(n));
+    prim::DBDot *dot = new prim::DBDot(lattice_loc+b.at(n), true);
     addItem(dot);
   }
 }

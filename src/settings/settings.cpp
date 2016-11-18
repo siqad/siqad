@@ -48,6 +48,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("view/zoom_max", 10);     // maximum scale factor
   S->setValue("view/wheel_pan_step", 20);
   S->setValue("view/wheel_pan_boost", 5);
+  S->setValue("view/padding", .1);
 
   // dangling bond
   S->setValue("dbdot/scale_fact", 10);  // fixed: pixels per angstrom for dot locations
@@ -55,6 +56,9 @@ QSettings* settings::GUISettings::m_defs()
 
   S->setValue("dbdot/edge_width", .1);  // relative pen width
   S->setValue("dbdot/edge_col", QColor(255,255,255));
+
+  S->setValue("dbdot/lattice_edge_width", .05);
+  S->setValue("dbdot/lattice_edge_col", QColor(255,255,255,50));
 
   S->setValue("dbdot/fill_col", QColor(200,200,200));
 

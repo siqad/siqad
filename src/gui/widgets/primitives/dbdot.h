@@ -14,7 +14,7 @@ class DBDot: public QGraphicsItem
 public:
 
   // constructor
-  DBDot(QPointF p_loc);
+  DBDot(QPointF p_loc, bool lattice=false);
 
   // destructor
   ~DBDot();
@@ -46,6 +46,8 @@ private:
   qreal scale_fact; // pixels per angstrom for dot locations
   qreal diameter;   // diameter of dot in pixels
   qreal edge_width; // edge pen width in pixels
+
+  bool lattice;
 };
 
 

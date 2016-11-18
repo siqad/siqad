@@ -5,21 +5,29 @@
 #include <QSizeF>
 
 
-prim::DBDot::DBDot(QPointF p_loc)
+prim::DBDot::DBDot(QPointF p_loc, bool lat)
 {
   settings::GUISettings gui_settings;
 
   scale_fact = gui_settings.get<qreal>("dbdot/scale_fact");
   diameter = gui_settings.get<qreal>("dbdot/diameter")*scale_fact;
-  edge_width = gui_settings.get<qreal>("dbdot/edge_width")*diameter;
 
   setPos(p_loc*scale_fact);
 
   phys_loc = p_loc;
+  lattice = lat;
 
-  edge_col = gui_settings.get<QColor>("dbdot/edge_col");
+  if(lattice){
+    edge_width = gui_settings.get<qreal>("dbdot/lattice_edge_width")*diameter;
+    edge_col = gui_settings.get<QColor>("dbdot/lattice_edge_col");
+    fill_fact = 0;
+  }
+  else{
+    edge_width = gui_settings.get<qreal>("dbdot/edge_width")*diameter;
+    edge_col = gui_settings.get<QColor>("dbdot/edge_col");
+    fill_fact = .1;
+  }
 
-  fill_fact = .1;
   fill_col = gui_settings.get<QColor>("dbdot/fill_col");
 }
 

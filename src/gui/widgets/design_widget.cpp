@@ -34,6 +34,7 @@ gui::DesignWidget::DesignWidget(QWidget *parent)
   // color scheme
   QColor col;
   setBackgroundBrush(QBrush(gui_settings.get<QColor>("view/bg_col")));
+  setFrameShadow(QFrame::Raised);
 
   // make lattice and surface layer
   buildLattice();
@@ -156,6 +157,8 @@ void gui::DesignWidget::setLayer(int n)
 
 void gui::DesignWidget::buildLattice(const QString fname)
 {
+  settings::GUISettings gui_settings;
+
   // destroy all layers if they exist
   while(layers.count()>0)
     removeLayer(0);
@@ -183,6 +186,12 @@ void gui::DesignWidget::buildLattice(const QString fname)
 
   // set surface as top layer
   top_layer = layers.at(1);
+
+  // resize the scene with padding
+  QRectF rect = scene->sceneRect();
+  qreal pad = qMin(rect.width(), rect.height())*gui_settings.get<qreal>("view/padding");
+  rect.adjust(-.5*pad, -.5*pad, pad, pad);
+  scene->setSceneRect(rect);
 }
 
 
