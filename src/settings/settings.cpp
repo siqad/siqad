@@ -39,8 +39,18 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("LATTICE/fname", QString("src/settings/lattices/si_100_2x1.ini"));
   S->setValue("LATTICE/xy", QPoint(10,10));
 
-  // colors
-  S->setValue("view/bg_col", QColor(0,0,0));
+  // QGraphicsView
+  S->setValue("view/bg_col", QColor(40,50,60));
+  S->setValue("view/zoom_factor", 0.1);
+
+  // dangling bond
+  S->setValue("dbdot/scale_fact", 20);  // fixed: pixels per angstrom for dot locations
+  S->setValue("dbdot/diameter", .8);    // diameter relative to scale_fact
+
+  S->setValue("dbdot/edge_width", .1);  // relative pen width
+  S->setValue("dbdot/edge_col", QColor(255,255,255));
+
+  S->setValue("dbdot/fill_col", QColor(200,200,200));
 
   return S;
 }

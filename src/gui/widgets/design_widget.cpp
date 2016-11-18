@@ -1,11 +1,14 @@
 #include "design_widget.h"
 
+#include <QApplication>
 #include <QDebug>
 #include <QString>
+#include <QPointF>
 
 #include <QVariant>
 #include <QColor>
 #include <QBrush>
+#include <QPainter>
 
 #include "src/settings/settings.h"
 
@@ -19,11 +22,13 @@ gui::DesignWidget::DesignWidget(QWidget *parent)
 
   // setup flags
   clicked = false;
-  zoom = 1.;
 
   // set view behaviour
-  setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-  setResizeAnchor(QGraphicsView::AnchorUnderMouse);
+  setTransformationAnchor(QGraphicsView::NoAnchor);
+  setResizeAnchor(QGraphicsView::AnchorViewCenter);
+
+  setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing |
+          QPainter::HighQualityAntialiasing | QPainter::SmoothPixmapTransform);
 
   // color scheme
   QColor col;
@@ -130,7 +135,7 @@ void gui::DesignWidget::setLayer(int n)
 void gui::DesignWidget::addDB(qreal x, qreal y)
 {
   qDebug() << QString("Adding DB at x=%1, y=%2...").arg(QString::number(x), QString::number(y));
-  prim::DBDot *db = new prim::DBDot(x, y);
+  prim::DBDot *db = new prim::DBDot(QPointF(x,y));
   qDebug("dot created...");
   scene->addItem(db);
   qDebug("dot added to scene");
@@ -160,6 +165,8 @@ void gui::DesignWidget::mousePressEvent(QMouseEvent *e)
 void gui::DesignWidget::mouseMoveEvent(QMouseEvent *e)
 {
   QPoint delta_mouse_pos;
+  QTransform trans = transform();
+  qreal dx, dy;
 
   if(clicked){
     switch(e->buttons()){
@@ -168,9 +175,10 @@ void gui::DesignWidget::mouseMoveEvent(QMouseEvent *e)
         break;
       case Qt::MidButton:
         delta_mouse_pos = e->pos()-old_mouse_pos;
-        translate(-delta_mouse_pos.x(), -delta_mouse_pos.y());
+        dx = delta_mouse_pos.x()/trans.m11();
+        dy = delta_mouse_pos.y()/trans.m22();
+        translate(dx, dy);
         old_mouse_pos = e->pos();
-        qDebug() << QString("delta: (%1,%2)").arg(QString::number(delta_mouse_pos.x()), QString::number(delta_mouse_pos.y()));
         break;
       case Qt::RightButton:
         // currently no behaviour for right click drag
@@ -199,10 +207,62 @@ void gui::DesignWidget::mouseReleaseEvent(QMouseEvent *e)
 
   if(e->button()==Qt::LeftButton){
     qDebug() << QString("left clicked at: (%1,%2)").arg(QString::number(e->x()), QString::number(e->y()));
-    addDB(e->x(), e->y());
+    addDB(scene_pos.x(), scene_pos.y());
   }
   else if(e->button()==Qt::RightButton){
     qDebug() << QString("mouse position: (%1,%2)").arg(QString::number(e->x()), QString::number(e->y()));
     qDebug() << QString("scene position: (%1,%2)").arg(QString::number(scene_pos.x()), QString::number(scene_pos.y()));
+  }
+}
+
+
+
+void gui::DesignWidget::wheelEvent(QWheelEvent *e)
+{
+
+  // allow for different scroll types. Note both x and y scrolling
+  QPoint pix_del = e->pixelDelta();
+  QPoint deg_del = e->angleDelta();
+
+  // accumulate scroll value
+  if(!pix_del.isNull())
+    wheel_deg += pix_del;
+  else if(~deg_del.isNull())
+    wheel_deg += deg_del;
+
+  // if enough scroll achieved, act and reset wheel_deg
+  if(qMax(qAbs(wheel_deg.x()),qAbs(wheel_deg.y())) >= 120) {
+    switch(QApplication::queryKeyboardModifiers()){
+      case Qt::ControlModifier:
+        wheelZoom(e);
+        break;
+      default:
+        QGraphicsView::wheelEvent(e);
+        break;
+    }
+
+    // reset scroll
+    wheel_deg.setX(0);
+    wheel_deg.setY(0);
+  }
+}
+
+
+void gui::DesignWidget::wheelZoom(QWheelEvent *e)
+{
+  settings::GUISettings gui_settings;
+
+  if(wheel_deg.y()!=0){
+    qreal s;
+    if(wheel_deg.y()>0)
+      s = 1+gui_settings.get<float>("view/zoom_factor");
+    else
+      s = 1-gui_settings.get<float>("view/zoom_factor");
+
+    // zoom under mouse, should be indep of transformationAchor
+    QPointF old_pos = mapToScene(e->pos());
+    scale(s,s);
+    QPointF delta = mapToScene(e->pos()) - old_pos;
+    translate(delta.x(), delta.y());
   }
 }

@@ -2,6 +2,7 @@
 #define _GUI_PR_DBDOT_H_
 
 #include <QObject>
+#include <QPointF>
 #include <QPainter>
 #include <QGraphicsItem>
 
@@ -13,7 +14,7 @@ class DBDot: public QGraphicsItem
 public:
 
   // constructor
-  DBDot(qreal x, qreal y);
+  DBDot(QPointF p_loc);
 
   // destructor
   ~DBDot();
@@ -35,7 +36,16 @@ protected:
 
 private:
 
+  QPointF phys_loc;
 
+  QColor edge_col;
+  qreal fill_fact; // area proportion of dot filled
+  QColor fill_col;
+
+  // immutable parameters
+  qreal scale_fact; // pixels per angstrom for dot locations
+  qreal diameter;   // diameter of dot in pixels
+  qreal edge_width; // edge pen width in pixels
 };
 
 

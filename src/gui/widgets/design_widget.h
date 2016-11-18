@@ -10,6 +10,7 @@
 
 // interrupts
 #include <QMouseEvent>
+#include <QWheelEvent>
 
 #include "primitives/layer.h"
 #include "primitives/dbdot.h"
@@ -57,6 +58,9 @@ protected:
   void mouseMoveEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
   void mouseReleaseEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
 
+  void wheelEvent(QWheelEvent *e) Q_DECL_OVERRIDE;
+  void wheelZoom(QWheelEvent *e);
+
 
 private:
 
@@ -67,7 +71,7 @@ private:
 
   bool clicked;
   QPoint old_mouse_pos;
-  qreal zoom;
+  QPoint wheel_deg;
 
 };
 
