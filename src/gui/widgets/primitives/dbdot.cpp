@@ -13,13 +13,13 @@ prim::DBDot::DBDot(QPointF p_loc)
   diameter = gui_settings.get<qreal>("dbdot/diameter")*scale_fact;
   edge_width = gui_settings.get<qreal>("dbdot/edge_width")*diameter;
 
-  setPos(p_loc);
+  setPos(p_loc*scale_fact);
 
   phys_loc = p_loc;
 
   edge_col = gui_settings.get<QColor>("dbdot/edge_col");
 
-  fill_fact = 0;
+  fill_fact = .1;
   fill_col = gui_settings.get<QColor>("dbdot/fill_col");
 }
 
@@ -53,7 +53,7 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
   if(fill_fact>0){
     QPointF center = rect.center();
     QSizeF size(diameter, diameter);
-    rect.setSize(size*sqrt(fill_fact));
+    rect.setSize(size*fill_fact);
     rect.moveCenter(center);
 
     painter->setPen(Qt::NoPen);

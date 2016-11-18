@@ -83,3 +83,8 @@ const QString prim::Layer::getName()
 {
   return name;
 }
+
+QList<QGraphicsItem*> *prim::Layer::getItems()
+{
+  return &items;
+}

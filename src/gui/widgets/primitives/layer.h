@@ -44,6 +44,7 @@ public:
   bool isActive();
 
   const QString getName();
+  QList<QGraphicsItem*> *getItems();
 
 
 private:

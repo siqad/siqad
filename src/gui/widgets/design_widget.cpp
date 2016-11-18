@@ -11,6 +11,7 @@
 #include <QPainter>
 
 #include "src/settings/settings.h"
+#include "lattice.h"
 
 gui::DesignWidget::DesignWidget(QWidget *parent)
   :QGraphicsView(parent)
@@ -34,8 +35,11 @@ gui::DesignWidget::DesignWidget(QWidget *parent)
   QColor col;
   setBackgroundBrush(QBrush(gui_settings.get<QColor>("view/bg_col")));
 
-  addLayer("Surface");
-  top_layer = layers.at(0);
+  // make lattice and surface layer
+  buildLattice();
+
+  // surface layer active on init
+  top_layer = layers.at(1);
 }
 
 gui::DesignWidget::~DesignWidget()
@@ -62,7 +66,7 @@ void gui::DesignWidget::removeLayer(const QString &name)
   bool removed=false;
   for(int i=0; i<layers.count(); i++){
     if(layers.at(i)->getName() == name){
-      layers.removeAt(i);
+      removeLayer(i);
       removed=true;
       break;
     }
@@ -76,8 +80,27 @@ void gui::DesignWidget::removeLayer(int n)
 {
   if(n<0 || n>= layers.count())
     qWarning("Layer index out of bounds...");
-  else
+  else{
+    // remove all items in the layer from the scene and delete
+    QList<QGraphicsItem*> *items = layers.at(n)->getItems();
+    for(int i=0; i<items->count(); i++){
+      scene->removeItem(items->at(i));
+      delete items->at(i);
+    }
+
+    // delete layer
+    delete layers.at(n);
     layers.removeAt(n);
+
+    // if top_layer was removed, default to surface if available else NULL
+    if(top_layer==layers.at(n)){
+      if(layers.count()<2)
+        top_layer = 0;
+      else
+        top_layer = layers.at(1);
+    }
+
+  }
 }
 
 
@@ -128,6 +151,38 @@ void gui::DesignWidget::setLayer(int n)
     qWarning("Layer index out of bounds...");
   else
     top_layer = layers.at(n);
+}
+
+
+void gui::DesignWidget::buildLattice(const QString fname)
+{
+  // destroy all layers if they exist
+  while(layers.count()>0)
+    removeLayer(0);
+
+  // build the new lattice
+  gui::Lattice *lattice=0;
+  if(fname.isEmpty())
+    lattice = new Lattice();
+  else
+    lattice = new Lattice(fname);
+
+  // add lattice dots to the scene
+  QGraphicsItem *item=0;
+  QList<QGraphicsItem*> *items = lattice->getItems();
+  for(int i=0; i<items->count(); i++){
+    item = items->at(i);
+    scene->addItem(item);
+  }
+
+  // add the lattice to the layers
+  layers.append(lattice);
+
+  // add in the sb-surface layer
+  addLayer("Surface");
+
+  // set surface as top layer
+  top_layer = layers.at(1);
 }
 
 

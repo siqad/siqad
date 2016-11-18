@@ -47,6 +47,10 @@ public:
   void setLayer(const QString &name);
   void setLayer(int n);
 
+  // resets the drawing layer and build a lattice from the given file.
+  // If no file is given, the default lattice is used
+  void buildLattice(const QString fname=QString());
+
   // add a new dangling bond to the current layer
   void addDB(qreal x, qreal y);
 
@@ -67,8 +71,9 @@ private:
 
   QGraphicsScene *scene;
 
+  // functional layers: order {lattice, db-surface, electrode1, electrode2, ...}
   QList<prim::Layer*> layers;
-  prim::Layer *top_layer;
+  prim::Layer *top_layer;     // new items added to this layer
 
   bool clicked;
   QPoint old_mouse_pos;

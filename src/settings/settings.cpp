@@ -3,6 +3,7 @@
 #include <QSize>
 #include <QColor>
 #include <QPoint>
+#include <QString>
 
 // initialize default settings
 QSettings *settings::AppSettings::defs = settings::AppSettings::m_defs();
@@ -12,7 +13,7 @@ QSettings *settings::LatticeSettings::defs = settings::LatticeSettings::m_defs()
 
 QSettings* settings::AppSettings::m_defs()
 {
-  qDebug("Loading defaults app settings...");
+  qDebug("Loading default app settings...");
   QSettings *S = new QSettings("src/settings/defaults/app_settings.ini", QSettings::IniFormat);
 
   // overwrites existing default values with same keys... no check
@@ -26,7 +27,7 @@ QSettings* settings::AppSettings::m_defs()
 
 QSettings* settings::GUISettings::m_defs()
 {
-  qDebug("Loading defaults gui settings...");
+  qDebug("Loading default gui settings...");
   QSettings *S = new QSettings("src/settings/defaults/gui_settings.ini", QSettings::IniFormat);
 
   S->setValue("MWIN/size", QSize(1400, 800));
@@ -36,8 +37,8 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("Panel/logw", 400);
   S->setValue("Panel/maxh", 150);
 
-  S->setValue("LATTICE/fname", QString("src/settings/lattices/si_100_2x1.ini"));
-  S->setValue("LATTICE/xy", QPoint(10,10));
+  S->setValue("lattice/fname", QString("src/settings/lattices/si_100_2x1.ini"));
+  S->setValue("lattice/xy", QPoint(10,10));
 
   // QGraphicsView
   S->setValue("view/bg_col", QColor(40,50,60));
@@ -47,7 +48,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("view/wheel_pan_boost", 5);
 
   // dangling bond
-  S->setValue("dbdot/scale_fact", 20);  // fixed: pixels per angstrom for dot locations
+  S->setValue("dbdot/scale_fact", 10);  // fixed: pixels per angstrom for dot locations
   S->setValue("dbdot/diameter", .8);    // diameter relative to scale_fact
 
   S->setValue("dbdot/edge_width", .1);  // relative pen width
@@ -60,7 +61,7 @@ QSettings* settings::GUISettings::m_defs()
 
 QSettings* settings::LatticeSettings::m_defs()
 {
-  qDebug("Loading defaults lattice settings...");
+  qDebug("Loading default lattice settings...");
   QSettings *S = new QSettings("src/settings/defaults/lattices/si_100_2x1.ini", QSettings::IniFormat);
 
   S->setValue("cell/N", 2);
@@ -69,7 +70,7 @@ QSettings* settings::LatticeSettings::m_defs()
   S->setValue("cell/b2", QPointF(2.4, 0));
 
   S->setValue("lattice/a1", QPointF(7.68, 0));
-  S->setValue("lattice/a2", QPointF(0, 3.84));
+  S->setValue("lattice/a2", QPointF(1, 3.84));
 
   return S;
 }

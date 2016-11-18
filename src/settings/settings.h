@@ -30,12 +30,14 @@ public:
     QVariant var = this->value(key);
     T val;
     // if key not found, get value from defaults
-    if(var.isNull() && defaults != 0){
+    if(!var.isValid() && defaults != 0){
       var = defaults->value(key);
 
       // if key not in defaults, prompt and abort
-      if(var.isNull()) // terminate
+      if(!var.isValid()){ // terminate
+        qDebug() << QString("Searching for key: %1").arg(key);
         qFatal("Requested key missing in defaults... terminating");
+      }
       else
         val = var.value<T>();
 
@@ -55,6 +57,9 @@ protected:
   QSettings *defaults;
 };
 
+
+
+
 class AppSettings: public Settings
 {
 public:
@@ -66,6 +71,8 @@ public:
   static QSettings* m_defs();
 };
 
+
+
 class GUISettings: public Settings
 {
 public:
@@ -76,6 +83,8 @@ public:
   static QSettings *defs;
   static QSettings* m_defs();
 };
+
+
 
 class LatticeSettings: public Settings
 {
