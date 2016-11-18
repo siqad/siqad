@@ -79,6 +79,9 @@ private:
   QPoint old_mouse_pos;
   QPoint wheel_deg;
 
+  // assist methods
+  void boundZoom(qreal *ds);
+
 };
 
 } // end gui namespace

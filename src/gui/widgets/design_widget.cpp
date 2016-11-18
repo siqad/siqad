@@ -262,7 +262,6 @@ void gui::DesignWidget::mouseReleaseEvent(QMouseEvent *e)
 
   if(e->button()==Qt::LeftButton){
     qDebug() << QString("left clicked at: (%1,%2)").arg(QString::number(e->x()), QString::number(e->y()));
-    addDB(scene_pos.x(), scene_pos.y());
   }
   else if(e->button()==Qt::RightButton){
     qDebug() << QString("mouse position: (%1,%2)").arg(QString::number(e->x()), QString::number(e->y()));
@@ -299,6 +298,7 @@ void gui::DesignWidget::wheelEvent(QWheelEvent *e)
 void gui::DesignWidget::wheelZoom(QWheelEvent *e, bool boost)
 {
   settings::GUISettings gui_settings;
+  QTransform trans = transform();
 
   if(qAbs(wheel_deg.y())>=120){
     qreal ds;
@@ -311,11 +311,16 @@ void gui::DesignWidget::wheelZoom(QWheelEvent *e, bool boost)
     if(boost)
       ds *= gui_settings.get<qreal>("view/zoom_boost");
 
-    // zoom under mouse, should be indep of transformationAchor
-    QPointF old_pos = mapToScene(e->pos());
-    scale(1+ds,1+ds);
-    QPointF delta = mapToScene(e->pos()) - old_pos;
-    translate(delta.x(), delta.y());
+    // assert scale limitations
+    boundZoom(&ds);
+
+    if(ds!=0){
+      // zoom under mouse, should be indep of transformationAnchor
+      QPointF old_pos = mapToScene(e->pos());
+      scale(1+ds,1+ds);
+      QPointF delta = mapToScene(e->pos()) - old_pos;
+      translate(delta.x(), delta.y());
+    }
   }
 
   // reset both scrolls (avoid repeat from |x|>=120)
@@ -357,4 +362,16 @@ void gui::DesignWidget::wheelPan(QWheelEvent *e, bool boost)
   }
 
   translate(dx/trans.m11(), dy/trans.m22());
+}
+
+void gui::DesignWidget::boundZoom(qreal *ds)
+{
+  settings::GUISettings gui_settings;
+  qreal m = transform().m11();  //m = m11 = m22
+
+  // need zoom_min <= m11*(1+ds) <= zoom_max
+  if(*ds<0)
+    *ds = qMax(*ds, gui_settings.get<qreal>("view/zoom_min")/m-1);
+  else
+    *ds = qMin(*ds, gui_settings.get<qreal>("view/zoom_max")/m-1);
 }

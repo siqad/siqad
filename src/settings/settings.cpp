@@ -38,18 +38,20 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("Panel/maxh", 150);
 
   S->setValue("lattice/fname", QString("src/settings/lattices/si_100_2x1.ini"));
-  S->setValue("lattice/xy", QPoint(10,10));
+  S->setValue("lattice/xy", QPoint(20,20));
 
   // QGraphicsView
   S->setValue("view/bg_col", QColor(40,50,60));
   S->setValue("view/zoom_factor", 0.1);
   S->setValue("view/zoom_boost", 2);    // must have factor*boost < 1
+  S->setValue("view/zoom_min", .1);     // minimum scale factor
+  S->setValue("view/zoom_max", 10);     // maximum scale factor 
   S->setValue("view/wheel_pan_step", 20);
   S->setValue("view/wheel_pan_boost", 5);
 
   // dangling bond
   S->setValue("dbdot/scale_fact", 10);  // fixed: pixels per angstrom for dot locations
-  S->setValue("dbdot/diameter", .8);    // diameter relative to scale_fact
+  S->setValue("dbdot/diameter", 1.3);    // diameter relative to scale_fact
 
   S->setValue("dbdot/edge_width", .1);  // relative pen width
   S->setValue("dbdot/edge_col", QColor(255,255,255));
@@ -70,7 +72,7 @@ QSettings* settings::LatticeSettings::m_defs()
   S->setValue("cell/b2", QPointF(2.4, 0));
 
   S->setValue("lattice/a1", QPointF(7.68, 0));
-  S->setValue("lattice/a2", QPointF(1, 3.84));
+  S->setValue("lattice/a2", QPointF(0, 3.84));
 
   return S;
 }
