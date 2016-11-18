@@ -7,6 +7,8 @@
 
 #include <QVariant>
 
+#define DEFAULT_OVERRIDE true // always use default settings
+
 namespace settings{
 
 // default settings .ini files
@@ -27,7 +29,7 @@ public:
   template<typename T>
   T get(QString key)
   {
-    QVariant var = this->value(key);
+    QVariant var = DEFAULT_OVERRIDE ? defaults->value(key) : this->value(key);
     T val;
     // if key not found, get value from defaults
     if(!var.isValid() && defaults != 0){

@@ -45,7 +45,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("view/zoom_factor", 0.1);
   S->setValue("view/zoom_boost", 2);    // must have factor*boost < 1
   S->setValue("view/zoom_min", .1);     // minimum scale factor
-  S->setValue("view/zoom_max", 10);     // maximum scale factor 
+  S->setValue("view/zoom_max", 10);     // maximum scale factor
   S->setValue("view/wheel_pan_step", 20);
   S->setValue("view/wheel_pan_boost", 5);
 
