@@ -232,35 +232,33 @@ void gui::DesignWidget::wheelEvent(QWheelEvent *e)
 
   // if enough scroll achieved, act and reset wheel_deg
   if(qMax(qAbs(wheel_deg.x()),qAbs(wheel_deg.y())) >= 120) {
-    switch(QApplication::queryKeyboardModifiers()){
-      case Qt::ControlModifier:
-        wheelZoom(e);
-        break;
-      default:
-        wheelPan(e);
-        break;
-    }
-
-    // reset scroll
-
+    Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
+    if(keymods & Qt::ControlModifier)
+      wheelZoom(e, keymods & Qt::ShiftModifier);
+    else
+      wheelPan(e, keymods & Qt::ShiftModifier);
   }
 }
 
 
-void gui::DesignWidget::wheelZoom(QWheelEvent *e)
+void gui::DesignWidget::wheelZoom(QWheelEvent *e, bool boost)
 {
   settings::GUISettings gui_settings;
 
   if(qAbs(wheel_deg.y())>=120){
-    qreal s;
+    qreal ds;
     if(wheel_deg.y()>0)
-      s = 1+gui_settings.get<float>("view/zoom_factor");
+      ds = gui_settings.get<float>("view/zoom_factor");
     else
-      s = 1-gui_settings.get<float>("view/zoom_factor");
+      ds = -gui_settings.get<float>("view/zoom_factor");
+
+    // apply boost
+    if(boost)
+      ds *= gui_settings.get<qreal>("view/zoom_boost");
 
     // zoom under mouse, should be indep of transformationAchor
     QPointF old_pos = mapToScene(e->pos());
-    scale(s,s);
+    scale(1+ds,1+ds);
     QPointF delta = mapToScene(e->pos()) - old_pos;
     translate(delta.x(), delta.y());
   }
@@ -270,7 +268,7 @@ void gui::DesignWidget::wheelZoom(QWheelEvent *e)
   wheel_deg.setY(0);
 }
 
-void gui::DesignWidget::wheelPan(QWheelEvent *e)
+void gui::DesignWidget::wheelPan(QWheelEvent *e, bool boost)
 {
   settings::GUISettings gui_settings;
 
@@ -294,6 +292,13 @@ void gui::DesignWidget::wheelPan(QWheelEvent *e)
     else
       dx -= gui_settings.get<qreal>("view/wheel_pan_step");
     wheel_deg.setX(0);
+  }
+
+  // apply boost
+  if(boost){
+    qreal boost_fact = gui_settings.get<qreal>("view/wheel_pan_boost");
+    dx *= boost_fact;
+    dy *= boost_fact;
   }
 
   translate(dx/trans.m11(), dy/trans.m22());

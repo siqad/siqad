@@ -59,8 +59,8 @@ protected:
   void mouseReleaseEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
 
   void wheelEvent(QWheelEvent *e) Q_DECL_OVERRIDE;
-  void wheelZoom(QWheelEvent *e);
-  void wheelPan(QWheelEvent *e);
+  void wheelZoom(QWheelEvent *e, bool boost);
+  void wheelPan(QWheelEvent *e, bool boost);
 
 
 private:
