@@ -60,6 +60,7 @@ protected:
 
   void wheelEvent(QWheelEvent *e) Q_DECL_OVERRIDE;
   void wheelZoom(QWheelEvent *e);
+  void wheelPan(QWheelEvent *e);
 
 
 private:

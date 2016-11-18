@@ -237,13 +237,12 @@ void gui::DesignWidget::wheelEvent(QWheelEvent *e)
         wheelZoom(e);
         break;
       default:
-        QGraphicsView::wheelEvent(e);
+        wheelPan(e);
         break;
     }
 
     // reset scroll
-    wheel_deg.setX(0);
-    wheel_deg.setY(0);
+
   }
 }
 
@@ -252,7 +251,7 @@ void gui::DesignWidget::wheelZoom(QWheelEvent *e)
 {
   settings::GUISettings gui_settings;
 
-  if(wheel_deg.y()!=0){
+  if(qAbs(wheel_deg.y())>=120){
     qreal s;
     if(wheel_deg.y()>0)
       s = 1+gui_settings.get<float>("view/zoom_factor");
@@ -265,4 +264,37 @@ void gui::DesignWidget::wheelZoom(QWheelEvent *e)
     QPointF delta = mapToScene(e->pos()) - old_pos;
     translate(delta.x(), delta.y());
   }
+
+  // reset both scrolls (avoid repeat from |x|>=120)
+  wheel_deg.setX(0);
+  wheel_deg.setY(0);
+}
+
+void gui::DesignWidget::wheelPan(QWheelEvent *e)
+{
+  settings::GUISettings gui_settings;
+
+  QTransform trans = transform();
+  qreal dx = 0;
+  qreal dy = 0;
+
+  // y scrolling
+  if(qAbs(wheel_deg.y())>=120){
+    if(wheel_deg.y()>0)
+      dy += gui_settings.get<qreal>("view/wheel_pan_step");
+    else
+      dy -= gui_settings.get<qreal>("view/wheel_pan_step");
+    wheel_deg.setY(0);
+  }
+
+  // x scrolling
+  if(qAbs(wheel_deg.x())>=120){
+    if(wheel_deg.x()>0)
+      dx += gui_settings.get<qreal>("view/wheel_pan_step");
+    else
+      dx -= gui_settings.get<qreal>("view/wheel_pan_step");
+    wheel_deg.setX(0);
+  }
+
+  translate(dx/trans.m11(), dy/trans.m22());
 }

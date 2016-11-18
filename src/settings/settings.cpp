@@ -42,6 +42,7 @@ QSettings* settings::GUISettings::m_defs()
   // QGraphicsView
   S->setValue("view/bg_col", QColor(40,50,60));
   S->setValue("view/zoom_factor", 0.1);
+  S->setValue("view/wheel_pan_step", 40);
 
   // dangling bond
   S->setValue("dbdot/scale_fact", 20);  // fixed: pixels per angstrom for dot locations
