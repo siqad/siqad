@@ -283,10 +283,10 @@ void gui::DesignWidget::mouseMoveEvent(QMouseEvent *e)
         // currently no behaviour for right click drag
         break;
       case Qt::NoButton:
-        // do nothing if no button pressed
+        // do nothing if no button pressed... display coords?
         break;
       default:
-        qWarning("No multi-button mouse behaviour implemented");
+        // multi button behaviour not implemented
         break;
     }
   }
@@ -295,21 +295,26 @@ void gui::DesignWidget::mouseMoveEvent(QMouseEvent *e)
 
 void gui::DesignWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-  if(!clicked){
-    qWarning("clicked flag was not initialised... doing nothing");
-    return;
-  }
-  clicked=false;
 
   QGraphicsView::mouseReleaseEvent(e);
   QPointF scene_pos = mapToScene(e->pos());
 
-  if(e->button()==Qt::LeftButton){
-    qDebug() << QString("left clicked at: (%1,%2)").arg(QString::number(e->x()), QString::number(e->y()));
+  if(clicked){
+    switch(e->button()){
+      case Qt::LeftButton:
+        QGraphicsView::mouseReleaseEvent(e);
+        break;
+      case Qt::MidButton:
+        break;
+      case Qt::RightButton:
+        break;
+      default:
+        // multi button behaviour not implemented
+        break;
+    }
   }
-  else if(e->button()==Qt::RightButton){
-    qDebug() << QString("mouse position: (%1,%2)").arg(QString::number(e->x()), QString::number(e->y()));
-    qDebug() << QString("scene position: (%1,%2)").arg(QString::number(scene_pos.x()), QString::number(scene_pos.y()));
+  else{
+    qWarning("clicked flag was not initialized... going nothing");
   }
 }
 

@@ -52,9 +52,9 @@ QSettings* settings::GUISettings::m_defs()
 
   // dangling bond
   S->setValue("dbdot/scale_fact", 10);  // fixed: pixels per angstrom for dot locations
-  S->setValue("dbdot/diameter", 1.3);    // diameter relative to scale_fact
+  S->setValue("dbdot/diameter", 1.3);    // diameter in angstroms
 
-  S->setValue("dbdot/edge_width", .1);  // relative pen width
+  S->setValue("dbdot/edge_width", .1);  // edge width rel. to diameter
   S->setValue("dbdot/edge_col", QColor(255,255,255));
 
   S->setValue("dbdot/lattice_edge_width", .05);
