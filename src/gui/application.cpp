@@ -10,6 +10,8 @@
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QIcon>
+#include <QPushButton>
 
 // ---------------------------------------------------------------------
 // GUI inclusions
@@ -133,6 +135,13 @@ void gui::ApplicationGUI::initSideBar()
   // size policy
   side_bar->setMinimumWidth(gui_settings.get<int>("SBAR/mw"));
 
+  // actions
+  action_select_tool = side_bar->addAction(QIcon(":/ico/select.svg"), tr("&Select tool"));
+  action_drag_tool = side_bar->addAction(QIcon(":/ico/drag.svg"), tr("&Drag tool"));
+
+  connect(action_select_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolSelect);
+  connect(action_drag_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolDrag);
+
   addToolBar(area, side_bar);
 }
 
@@ -152,4 +161,21 @@ void gui::ApplicationGUI::saveSettings()
   settings::GUISettings gui_settings;
 
   gui_settings.setValue("SBAR/loc", (int)toolBarArea(side_bar));
+}
+
+
+
+
+// SLOTS
+
+void gui::ApplicationGUI::setToolSelect()
+{
+  qDebug("selecting select tool");
+  design_wg->setTool(gui::DesignWidget::SelectTool);
+}
+
+void gui::ApplicationGUI::setToolDrag()
+{
+  qDebug("selecting drag tool");
+  design_wg->setTool(gui::DesignWidget::DragTool);
 }

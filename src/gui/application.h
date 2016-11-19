@@ -35,6 +35,9 @@ public:
 
 public slots:
 
+  void setToolSelect();
+  void setToolDrag();
+
 protected:
 
 private:
@@ -54,6 +57,10 @@ private:
   // functional widgets
   gui::DesignWidget *design_wg;
   gui::InfoPanel *info_wg;
+
+  // action pointers
+  QAction *action_select_tool;
+  QAction *action_drag_tool;
 };
 
 } // end namespace gui

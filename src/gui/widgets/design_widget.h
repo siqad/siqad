@@ -23,6 +23,8 @@ class DesignWidget : public QGraphicsView
 
 public:
 
+  enum ToolType{SelectTool, DragTool};
+
   // constructor
   DesignWidget(QWidget *parent = 0);
 
@@ -54,6 +56,8 @@ public:
   // add a new dangling bond to the current layer
   void addDB(qreal x, qreal y);
 
+  void setTool(ToolType tool);
+
 protected:
 
   // interrupts
@@ -78,6 +82,8 @@ private:
   bool clicked;
   QPoint old_mouse_pos;
   QPoint wheel_deg;
+
+  ToolType tool_type;
 
   // assist methods
   void boundZoom(qreal *ds);

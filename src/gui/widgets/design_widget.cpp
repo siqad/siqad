@@ -23,6 +23,11 @@ gui::DesignWidget::DesignWidget(QWidget *parent)
 
   // setup flags
   clicked = false;
+  tool_type = gui::DesignWidget::SelectTool;
+
+  setDragMode(QGraphicsView::RubberBandDrag);
+  setRubberBandSelectionMode(Qt::ContainsItemBoundingRect);
+  setStyleSheet("selection-background-color: rgba(100, 100, 255, 10)");
 
   // set view behaviour
   setTransformationAnchor(QGraphicsView::NoAnchor);
@@ -206,6 +211,36 @@ void gui::DesignWidget::addDB(qreal x, qreal y)
   top_layer->addItem(db);
 }
 
+void gui::DesignWidget::setTool(gui::DesignWidget::ToolType tool)
+{
+  // if tool is already being used, do nothing
+  if(tool==tool_type)
+    return;
+
+  switch(tool){
+    case gui::DesignWidget::SelectTool:
+      setDragMode(QGraphicsView::RubberBandDrag);
+      break;
+    case gui::DesignWidget::DragTool:
+      setDragMode(QGraphicsView::ScrollHandDrag);
+      break;
+    default:
+      qCritical("Invalid ToolType... should not have happened");
+      return;
+      break;
+  }
+
+  tool_type=tool;
+}
+
+
+
+
+
+
+
+
+
 // INTERRUPTS
 
 void gui::DesignWidget::mousePressEvent(QMouseEvent *e)
@@ -307,7 +342,6 @@ void gui::DesignWidget::wheelEvent(QWheelEvent *e)
 void gui::DesignWidget::wheelZoom(QWheelEvent *e, bool boost)
 {
   settings::GUISettings gui_settings;
-  QTransform trans = transform();
 
   if(qAbs(wheel_deg.y())>=120){
     qreal ds;

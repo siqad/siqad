@@ -10,6 +10,8 @@ TEMPLATE = app
 TARGET = db-sim
 INCLUDEPATH += .
 
+RESOURCES = resources/application.qrc
+
 # Input
 HEADERS += \
 	src/gui/application.h \
