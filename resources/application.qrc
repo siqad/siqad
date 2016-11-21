@@ -2,5 +2,6 @@
 <qresource>
 	<file>ico/select.svg</file>
 	<file>ico/drag.svg</file>
+	<file>ico/dbgen.svg</file>
 </qresource>
 </RCC>
