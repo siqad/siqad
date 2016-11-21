@@ -5,7 +5,7 @@
 #include <QSizeF>
 
 
-prim::DBDot::DBDot(QPointF p_loc, bool lat, DBDot *source)
+prim::DBDot::DBDot(QPointF p_loc, bool lat, DBDot *src)
 {
   settings::GUISettings gui_settings;
 
@@ -15,7 +15,7 @@ prim::DBDot::DBDot(QPointF p_loc, bool lat, DBDot *source)
   setPos(p_loc*scale_fact);
 
   phys_loc = p_loc;
-  source=source;
+  source = src;
   lattice = lat;
 
   if(lattice){
@@ -35,7 +35,21 @@ prim::DBDot::DBDot(QPointF p_loc, bool lat, DBDot *source)
 }
 
 prim::DBDot::~DBDot()
-{}
+{
+}
+
+
+prim::DBDot *prim::DBDot::clone() const
+{
+  prim::DBDot *dot = new DBDot(phys_loc, lattice, 0);
+
+  dot->setFlags(flags());
+  dot->setPos(pos());
+  dot->setZValue(zValue());
+
+  return dot;
+}
+
 
 
 QRectF prim::DBDot::boundingRect() const
@@ -77,3 +91,9 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     painter->drawEllipse(rect);
   }
 }
+
+
+
+
+
+// INTERRUPTS

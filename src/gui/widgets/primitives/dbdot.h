@@ -7,6 +7,8 @@
 #include <QPointF>
 #include <QPainter>
 
+#include <QGraphicsSceneMouseEvent>
+
 namespace prim{
 
 
@@ -16,18 +18,21 @@ class DBDot: public QGraphicsItem
 public:
 
   // constructor
-  DBDot(QPointF p_loc, bool lattice=false, DBDot *source=0);
+  DBDot(QPointF p_loc, bool lattice=false, DBDot *src=0);
 
   // destructor
   ~DBDot();
-
-  // geometry
-  QRectF boundingRect() const;
 
   // ACCESSORS
   bool inLattice(){return lattice;}
   QPointF getPhysLoc(){return phys_loc;}
   DBDot *getSource(){return source;}
+
+  // construct a deep copy of the dot
+  DBDot *clone() const;
+
+  // geometry
+  QRectF boundingRect() const;
 
   // painting
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -37,8 +42,8 @@ protected:
 
   // events
 
-  // void mousePressEvent(QGraphicsSceneMouseEvent *e);
-  // void mouseReleaseEvent(QGraphicsSceneMouseEvent *e);
+  //void mousePressEvent(QGraphicsSceneMouseEvent *e);
+  //void mouseReleaseEvent(QGraphicsSceneMouseEvent *e);
 
 
 private:
