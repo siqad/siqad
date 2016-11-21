@@ -13,6 +13,7 @@
 #include "src/settings/settings.h"
 #include "lattice.h"
 
+
 gui::DesignWidget::DesignWidget(QWidget *parent)
   :QGraphicsView(parent)
 {
@@ -338,6 +339,15 @@ void gui::DesignWidget::mouseReleaseEvent(QMouseEvent *e)
 }
 
 
+void gui::DesignWidget::mouseDoubleClickEvent(QMouseEvent *e)
+{
+  QGraphicsView::mouseDoubleClickEvent(e);
+}
+
+
+
+
+
 
 void gui::DesignWidget::wheelEvent(QWheelEvent *e)
 {
@@ -358,7 +368,7 @@ void gui::DesignWidget::wheelEvent(QWheelEvent *e)
     if(keymods & Qt::ControlModifier)
       wheelZoom(e, keymods & Qt::ShiftModifier);
     else
-      wheelPan(e, keymods & Qt::ShiftModifier);
+      wheelPan(keymods & Qt::ShiftModifier);
   }
 }
 
@@ -388,13 +398,14 @@ void gui::DesignWidget::keyReleaseEvent(QKeyEvent *e)
         // destroy all selected groups
         destroyGroups();
       }
-      case Qt::Key_Delete:
-        if(tool_type == gui::DesignWidget::SelectTool)
-          deleteSelected();
-        break;
-      default:
-        QGraphicsView::keyReleaseEvent(e);
-        break;
+      break;
+    case Qt::Key_Delete:
+      if(tool_type == gui::DesignWidget::SelectTool)
+        deleteSelected();
+      break;
+    default:
+      QGraphicsView::keyReleaseEvent(e);
+      break;
   }
 
 }
@@ -439,7 +450,7 @@ void gui::DesignWidget::wheelZoom(QWheelEvent *e, bool boost)
   wheel_deg.setY(0);
 }
 
-void gui::DesignWidget::wheelPan(QWheelEvent *e, bool boost)
+void gui::DesignWidget::wheelPan(bool boost)
 {
   settings::GUISettings gui_settings;
 
@@ -542,6 +553,7 @@ void gui::DesignWidget::createDB(prim::DBDot *dot)
   prim::DBDot *db = new prim::DBDot(loc, false, dot);
   dot->setFlag(QGraphicsItem::ItemIsSelectable, false);
 
+
   // set initial flags for the surface dot
   db->setFlag(QGraphicsItem::ItemIsSelectable, true);
 
@@ -599,18 +611,38 @@ void gui::DesignWidget::destroyGroups()
 
 void gui::DesignWidget::deleteSelected()
 {
-  QGraphicsItem *item;
+  QList<QGraphicsItem*> items = scene->selectedItems();
+
+  qDebug() << QString("Deleting %1 items").arg(items.count());
+  for(int i=0; i<items.count(); i++)
+    deleteItem(items.at(i));
 }
 
 // recursively delete all children of a graphics item
 void gui::DesignWidget::deleteItem(QGraphicsItem *item)
 {
   QList<QGraphicsItem*> children = item->childItems();
-  if(children.count()==0){
+  prim::DBDot *dot = 0;
 
+  if(children.count()==0){
+    // item is a DBDot
+    dot = (prim::DBDot *)item;
+
+    // remove dot from layer
+    layers.at(1)->removeItem(dot);
+
+    // make reserved lattice site selectable
+    dot->getSource()->setFlag(QGraphicsItem::ItemIsSelectable, true);
+
+    // delete item
+    scene->removeItem(dot);
+    delete dot;
   }
   else{
     for(int i=0; i<children.count(); i++)
       deleteItem(children.at(i));
+
+    // delete item
+    scene->destroyItemGroup((QGraphicsItemGroup*) item);
   }
 }

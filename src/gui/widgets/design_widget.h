@@ -17,6 +17,7 @@
 
 #include "primitives/layer.h"
 #include "primitives/dbdot.h"
+#include "primitives/ghost.h"
 
 namespace gui{
 
@@ -68,10 +69,11 @@ protected:
   void mousePressEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
   void mouseMoveEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
   void mouseReleaseEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
+  void mouseDoubleClickEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
 
   void wheelEvent(QWheelEvent *e) Q_DECL_OVERRIDE;
   void wheelZoom(QWheelEvent *e, bool boost);
-  void wheelPan(QWheelEvent *e, bool boost);
+  void wheelPan(bool boost);
 
   void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
   void keyReleaseEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
@@ -81,11 +83,17 @@ private:
 
   QGraphicsScene *scene;
 
+  QGraphicsItemGroup *ghost;      // temporary item (moving and paste)
+  QGraphicsItemGroup *clipboard;  // deep copy storage for copy/paste
+
   // functional layers: order {lattice, db-surface, electrode1, electrode2, ...}
   QList<prim::Layer*> layers;
   prim::Layer *top_layer;     // new items added to this layer
 
+  // interrupt parameters
   bool clicked;
+  QGraphicsItem *clicked_item;
+
   QPoint old_mouse_pos;
   QPoint wheel_deg;
 
@@ -95,6 +103,8 @@ private:
 
   // assert bounds on zoom range
   void boundZoom(qreal *ds);
+
+  void mousePress();
 
   // filter items selected by the scene depending on wthe tool_type. If true,
   // rejects all items in the lattice layer, otherwise includes only items in
@@ -116,6 +126,8 @@ private:
 
   void deleteSelected();
   void deleteItem(QGraphicsItem *item);
+
+  void createGhost(QList<QGraphicsItem*> items);
 
 };
 
