@@ -1,26 +1,33 @@
 #ifndef _GUI_PR_DBDOT_H_
 #define _GUI_PR_DBDOT_H_
 
+#include <QGraphicsItem>
 #include <QObject>
+
 #include <QPointF>
 #include <QPainter>
-#include <QGraphicsItem>
 
 namespace prim{
 
 
 class DBDot: public QGraphicsItem
 {
+
 public:
 
   // constructor
-  DBDot(QPointF p_loc, bool lattice=false);
+  DBDot(QPointF p_loc, bool lattice=false, DBDot *source=0);
 
   // destructor
   ~DBDot();
 
   // geometry
   QRectF boundingRect() const;
+
+  // ACCESSORS
+  bool inLattice(){return lattice;}
+  QPointF getPhysLoc(){return phys_loc;}
+  DBDot *getSource(){return source;}
 
   // painting
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -36,9 +43,12 @@ protected:
 
 private:
 
-  QPointF phys_loc;
+  QPointF phys_loc; // Physical location of dot in angstroms.
+  DBDot *source;    // Lattice site beneath dot
 
   QColor edge_col;
+  QColor selected_col;
+
   qreal fill_fact; // area proportion of dot filled
   QColor fill_col;
 

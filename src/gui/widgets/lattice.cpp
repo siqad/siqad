@@ -4,6 +4,7 @@
 #include <QVariant>
 #include <QDebug>
 #include <QStringList>
+#include <QGraphicsItem>
 
 #include <algorithm>
 
@@ -136,6 +137,7 @@ void gui::Lattice::buildUnitCell(QPoint ind)
 
   for(int n=0; n<n_cell; n++){
     prim::DBDot *dot = new prim::DBDot(lattice_loc+b.at(n), true);
+    dot->setFlag(QGraphicsItem::ItemIsSelectable, true);
     addItem(dot);
   }
 }

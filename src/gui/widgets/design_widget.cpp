@@ -217,12 +217,18 @@ void gui::DesignWidget::setTool(gui::DesignWidget::ToolType tool)
   if(tool==tool_type)
     return;
 
+  // reset selected items
+  scene->clearSelection();
+
   switch(tool){
     case gui::DesignWidget::SelectTool:
       setDragMode(QGraphicsView::RubberBandDrag);
       break;
     case gui::DesignWidget::DragTool:
       setDragMode(QGraphicsView::ScrollHandDrag);
+      break;
+    case gui::DesignWidget::DBGenTool:
+      setDragMode(QGraphicsView::RubberBandDrag);
       break;
     default:
       qCritical("Invalid ToolType... should not have happened");
@@ -240,14 +246,15 @@ void gui::DesignWidget::setTool(gui::DesignWidget::ToolType tool)
 
 
 
-
 // INTERRUPTS
 
 void gui::DesignWidget::mousePressEvent(QMouseEvent *e)
 {
   // set clicked flag and store current mouse position for move behaviour
-  if(clicked)
-    qWarning("clicked flag was not reset... possible undesired behaviour");
+
+  // if(clicked)
+  //   qWarning("clicked flag was not reset... possible undesired behaviour");
+
   clicked=true;
   old_mouse_pos = e->pos();
 
@@ -303,6 +310,18 @@ void gui::DesignWidget::mouseReleaseEvent(QMouseEvent *e)
     switch(e->button()){
       case Qt::LeftButton:
         QGraphicsView::mouseReleaseEvent(e);
+        // filter selected items depending on the current tool
+        switch(tool_type){
+          case gui::DesignWidget::SelectTool:
+            filterSelection(true);
+            break;
+          case gui::DesignWidget::DBGenTool:
+            filterSelection(false);
+            createDBs();
+            break;
+          default:
+            break;
+        }
         break;
       case Qt::MidButton:
         break;
@@ -342,6 +361,50 @@ void gui::DesignWidget::wheelEvent(QWheelEvent *e)
       wheelPan(e, keymods & Qt::ShiftModifier);
   }
 }
+
+
+void gui::DesignWidget::keyPressEvent(QKeyEvent *e)
+{
+  // for now, just use the default functionality
+  QGraphicsView::keyPressEvent(e);
+}
+
+
+void gui::DesignWidget::keyReleaseEvent(QKeyEvent *e)
+{
+  Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
+  QGraphicsItemGroup *group = 0;
+
+  switch(e->key()){
+    case Qt::Key_G:
+      // only do grouping behaviour for surface items
+      if(tool_type != gui::DesignWidget::SelectTool)
+        break;
+      if(keymods == Qt::ControlModifier){
+        // create a group from selected
+        createGroup();
+      }
+      else if(keymods == (Qt::ShiftModifier + Qt::ControlModifier)){
+        // destroy all selected groups
+        destroyGroups();
+      }
+      case Qt::Key_Delete:
+        if(tool_type == gui::DesignWidget::SelectTool)
+          deleteSelected();
+        break;
+      default:
+        QGraphicsView::keyReleaseEvent(e);
+        break;
+  }
+
+}
+
+
+
+
+
+
+// ASSIST METHODS
 
 
 void gui::DesignWidget::wheelZoom(QWheelEvent *e, bool boost)
@@ -422,4 +485,132 @@ void gui::DesignWidget::boundZoom(qreal *ds)
     *ds = qMax(*ds, gui_settings.get<qreal>("view/zoom_min")/m-1);
   else
     *ds = qMin(*ds, gui_settings.get<qreal>("view/zoom_max")/m-1);
+}
+
+
+void gui::DesignWidget::filterSelection(bool select_flag)
+{
+    // should only be here if tool_type is either select or dbgen
+    if(tool_type != gui::DesignWidget::SelectTool && tool_type != gui::DesignWidget::DBGenTool){
+      qCritical("Filtering selection with invalid tool type...");
+      return;
+    }
+
+    QList<QGraphicsItem *> items = scene->selectedItems();
+    QGraphicsItem *item=0;
+
+    // if select, reject items in the lattice, otherwise keep only items in the lattice
+    for(int i=0; i<items.count(); i++){
+      item = items.at(i);
+      if(inLattice(item) == select_flag)
+        item->setSelected(false);
+    }
+
+    qDebug() << QString("%1 items selected").arg(scene->selectedItems().count());
+}
+
+// Items in the lattice will always be DBDots not belonging to a group
+// for now, assume items not in groups are DBDots
+bool gui::DesignWidget::inLattice(QGraphicsItem *item)
+{
+  prim::DBDot *dot = 0;
+  if(item->childItems().count()==0){
+    dot = (prim::DBDot*)item;
+    if(dot->inLattice())
+      return true;
+  }
+  return false;
+}
+
+
+void gui::DesignWidget::createDBs()
+{
+  prim::DBDot *dot=0;
+  QList<QGraphicsItem*> items = scene->selectedItems();
+  for(int i=0; i<items.count(); i++){
+    dot = (prim::DBDot*) items.at(i);
+    createDB(dot);
+  }
+}
+
+
+void gui::DesignWidget::createDB(prim::DBDot *dot)
+{
+  QPointF loc = dot->getPhysLoc();
+
+  // create new db and set lattice site as non-selectable
+  prim::DBDot *db = new prim::DBDot(loc, false, dot);
+  dot->setFlag(QGraphicsItem::ItemIsSelectable, false);
+
+  // set initial flags for the surface dot
+  db->setFlag(QGraphicsItem::ItemIsSelectable, true);
+
+  layers.at(1)->addItem(db);
+  scene->addItem(db);
+  qDebug() << QString("DB added at (%1 , %2)").arg(QString::number(loc.x()), QString::number(loc.y()));
+}
+
+void gui::DesignWidget::destroyDB(prim::DBDot *dot)
+{
+  // make source lattice site selectable again
+  dot->getSource()->setFlag(QGraphicsItem::ItemIsSelectable, true);
+
+  // destroy dot
+  layers.at(1)->removeItem(dot);;
+  scene->removeItem(dot);
+}
+
+
+void gui::DesignWidget::createGroup()
+{
+  QGraphicsItemGroup *group=0;
+  QList<QGraphicsItem*> items=scene->selectedItems();
+
+  if(items.count()>0){
+    group = scene->createItemGroup(items);
+    group->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    group->setSelected(true);
+  }
+}
+
+void gui::DesignWidget::destroyGroups()
+{
+  QGraphicsItemGroup *group=0;
+  QList<QGraphicsItem *> new_selected;
+  QList<QGraphicsItem *> items = scene->selectedItems();
+
+  for(int i=0; i<items.count(); i++){
+    if(items.at(i)->childItems().count()>0){
+      group = (QGraphicsItemGroup *) items.at(i);
+      new_selected.append(group->childItems());
+      scene->destroyItemGroup(group);
+    }
+    else
+      new_selected.append(items.at(i));
+  }
+
+  // update selected flags
+  for(int i=0; i<new_selected.count(); i++){
+    new_selected.at(i)->setSelected(false);
+    qDebug() << QString("Item %1 set to selected").arg(i);
+  }
+}
+
+
+void gui::DesignWidget::deleteSelected()
+{
+  QGraphicsItem *item;
+}
+
+// recursively delete all children of a graphics item
+void gui::DesignWidget::deleteItem(QGraphicsItem *item)
+{
+  QList<QGraphicsItem*> children = item->childItems();
+  if(children.count()==0){
+
+  }
+  else{
+    for(int i=0; i<children.count(); i++)
+      deleteItem(children.at(i));
+  }
 }

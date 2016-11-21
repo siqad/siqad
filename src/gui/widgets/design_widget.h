@@ -7,10 +7,13 @@
 // graphics
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QGraphicsItem>
+#include <QGraphicsItemGroup>
 
 // interrupts
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QKeyEvent>
 
 #include "primitives/layer.h"
 #include "primitives/dbdot.h"
@@ -58,10 +61,6 @@ public:
 
   void setTool(ToolType tool);
 
-public slots:
-
-  void createDB(prim::DBDot *dot);
-
 protected:
 
   // interrupts
@@ -73,6 +72,9 @@ protected:
   void wheelEvent(QWheelEvent *e) Q_DECL_OVERRIDE;
   void wheelZoom(QWheelEvent *e, bool boost);
   void wheelPan(QWheelEvent *e, bool boost);
+
+  void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
+  void keyReleaseEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
 
 
 private:
@@ -89,8 +91,31 @@ private:
 
   ToolType tool_type;
 
-  // assist methods
+  // ASSIST METHODS
+
+  // assert bounds on zoom range
   void boundZoom(qreal *ds);
+
+  // filter items selected by the scene depending on wthe tool_type. If true,
+  // rejects all items in the lattice layer, otherwise includes only items in
+  // the lattice layer.
+  void filterSelection(bool select_flag);
+  bool inLattice(QGraphicsItem *item);
+
+  // create DBDots in the surface on top of all lattice dots in selected
+  void createDBs();
+
+  // create a dangling bond in the surface with the same physical location as
+  // the given dot.
+  void createDB(prim::DBDot *dot);
+  void destroyDB(prim::DBDot *dot);
+
+
+  void createGroup();
+  void destroyGroups();
+
+  void deleteSelected();
+  void deleteItem(QGraphicsItem *item);
 
 };
 

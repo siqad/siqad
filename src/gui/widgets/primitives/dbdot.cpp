@@ -5,7 +5,7 @@
 #include <QSizeF>
 
 
-prim::DBDot::DBDot(QPointF p_loc, bool lat)
+prim::DBDot::DBDot(QPointF p_loc, bool lat, DBDot *source)
 {
   settings::GUISettings gui_settings;
 
@@ -15,17 +15,20 @@ prim::DBDot::DBDot(QPointF p_loc, bool lat)
   setPos(p_loc*scale_fact);
 
   phys_loc = p_loc;
+  source=source;
   lattice = lat;
 
   if(lattice){
     edge_width = gui_settings.get<qreal>("dbdot/lattice_edge_width")*diameter;
     edge_col = gui_settings.get<QColor>("dbdot/lattice_edge_col");
-    fill_fact = 0;
+    selected_col = edge_col;
+    fill_fact = 0.;
   }
   else{
     edge_width = gui_settings.get<qreal>("dbdot/edge_width")*diameter;
     edge_col = gui_settings.get<QColor>("dbdot/edge_col");
-    fill_fact = .1;
+    selected_col = gui_settings.get<QColor>("dbdot/selected_col");
+    fill_fact = 0.;
   }
 
   fill_col = gui_settings.get<QColor>("dbdot/fill_col");
@@ -53,7 +56,12 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
   // draw outer circle
   QRectF rect = boundingRect();
 
-  painter->setPen(QPen(edge_col, edge_width));
+  if(isSelected()){
+    painter->setPen(QPen(selected_col, edge_width));
+  }
+  else{
+    painter->setPen(QPen(edge_col, edge_width));
+  }
   //painter->setBrush(Qt::NoBrush);
   painter->drawEllipse(rect);
 
