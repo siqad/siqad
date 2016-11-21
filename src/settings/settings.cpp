@@ -33,6 +33,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("MWIN/size", QSize(1400, 800));
   S->setValue("TBAR/mh", 60);
   S->setValue("SBAR/mw", 60);
+  S->setValue("SBAR/ico", 0.7); // icon size, relative to mw
   S->setValue("SBAR/loc", 1);
   S->setValue("Panel/logw", 400);
   S->setValue("Panel/maxh", 150);

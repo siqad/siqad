@@ -5,7 +5,13 @@ db-sim
 # compiled source
 *.o
 *.pyc
+qrc_application.cpp
 
 # logs and databases
+src/log/
 *.log
 Makefile
+
+# other
+*.swp
+
