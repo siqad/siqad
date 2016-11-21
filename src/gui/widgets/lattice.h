@@ -2,6 +2,7 @@
 #define _GUI_LATTICE_H_
 
 #include "primitives/layer.h"
+#include "primitives/dbdot.h"
 #include "src/settings/settings.h"
 
 #include <QString>
@@ -21,6 +22,7 @@ public:
 
   // destructor
   ~Lattice();
+
 
 private:
 

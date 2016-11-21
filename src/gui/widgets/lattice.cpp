@@ -1,5 +1,4 @@
 #include "lattice.h"
-#include "primitives/dbdot.h"
 
 #include <QtMath>
 #include <QVariant>

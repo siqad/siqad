@@ -23,7 +23,7 @@ class DesignWidget : public QGraphicsView
 
 public:
 
-  enum ToolType{SelectTool, DragTool};
+  enum ToolType{SelectTool, DragTool, DBGenTool};
 
   // constructor
   DesignWidget(QWidget *parent = 0);
@@ -57,6 +57,10 @@ public:
   void addDB(qreal x, qreal y);
 
   void setTool(ToolType tool);
+
+public slots:
+
+  void createDB(prim::DBDot *dot);
 
 protected:
 
