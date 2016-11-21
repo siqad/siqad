@@ -133,14 +133,20 @@ void gui::ApplicationGUI::initSideBar()
   side_bar->setFloatable(false);
 
   // size policy
+  qreal ico_scale = gui_settings.get<qreal>("SBAR/mw");
+  ico_scale *= gui_settings.get<qreal>("SBAR/ico");
+
   side_bar->setMinimumWidth(gui_settings.get<int>("SBAR/mw"));
+  side_bar->setIconSize(QSize(ico_scale, ico_scale));
 
   // actions
   action_select_tool = side_bar->addAction(QIcon(":/ico/select.svg"), tr("&Select tool"));
   action_drag_tool = side_bar->addAction(QIcon(":/ico/drag.svg"), tr("&Drag tool"));
+  action_dbgen_tool = side_bar->addAction(QIcon(":/ico/dbgen.svg"), tr("&DB tool"));
 
   connect(action_select_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolSelect);
   connect(action_drag_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolDrag);
+  connect(action_dbgen_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolDBGen);
 
   addToolBar(area, side_bar);
 }
@@ -178,4 +184,10 @@ void gui::ApplicationGUI::setToolDrag()
 {
   qDebug("selecting drag tool");
   design_wg->setTool(gui::DesignWidget::DragTool);
+}
+
+void gui::ApplicationGUI::setToolDBGen()
+{
+  qDebug("selecting dbgen tool");
+  design_wg->setTool(gui::DesignWidget::DBGenTool);
 }

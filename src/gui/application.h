@@ -37,6 +37,7 @@ public slots:
 
   void setToolSelect();
   void setToolDrag();
+  void setToolDBGen();
 
 protected:
 
@@ -61,6 +62,7 @@ private:
   // action pointers
   QAction *action_select_tool;
   QAction *action_drag_tool;
+  QAction *action_dbgen_tool;
 };
 
 } // end namespace gui
