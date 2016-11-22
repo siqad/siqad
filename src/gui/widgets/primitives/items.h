@@ -17,7 +17,7 @@ class MyItem : public QGraphicsItem
 public:
 
   // constructor
-  MyItem(QGraphicsItem *parent=0) : QGraphicsItem(parent), clicked(false){}
+  MyItem(QGraphicsItem *parent=0) : QGraphicsItem(parent){}
 
   // destructor
   ~MyItem(){}
@@ -29,7 +29,6 @@ protected:
   //void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
 private:
-  bool clicked;
 };
 
 
