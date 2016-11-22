@@ -18,12 +18,21 @@ gui::DesignWidget::DesignWidget(QWidget *parent)
   :QGraphicsView(parent)
 {
   settings::GUISettings gui_settings;
+  settings::AppSettings app_settings;
 
   scene = new QGraphicsScene(this);
   setScene(scene);
 
   // setup flags
   clicked = false;
+  ghosting = false;
+
+  // initialise parameters
+  qreal scale_fact = gui_settings.get<qreal>("dbdot/scale_fact");
+  snap_diameter = app_settings.get<qreal>("snap/diameter")*scale_fact;
+  snap_target = 0;
+  ghost = 0;
+
   tool_type = gui::DesignWidget::SelectTool;
 
   setDragMode(QGraphicsView::RubberBandDrag);
@@ -262,7 +271,13 @@ void gui::DesignWidget::mousePressEvent(QMouseEvent *e)
   clicked=true;
   old_mouse_pos = e->pos();
 
-  QGraphicsView::mousePressEvent(e);
+  if(ghosting){
+    QPointF scene_pos = mapToScene(e->pos());
+    ghost->setPos(scene_pos);
+  }
+  else{
+    QGraphicsView::mousePressEvent(e);
+  }
 
 }
 
@@ -273,7 +288,13 @@ void gui::DesignWidget::mouseMoveEvent(QMouseEvent *e)
   QTransform trans = transform();
   qreal dx, dy;
 
-  if(clicked){
+  if(ghosting){
+    QPointF scene_pos = mapToScene(e->pos());
+    QPointF offset;
+    if(snapGhost(scene_pos, &offset))
+      ghost->setPos(scene_pos+offset);
+  }
+  else if(clicked){
     switch(e->buttons()){
       case Qt::LeftButton:
         QGraphicsView::mouseMoveEvent(e);
@@ -305,7 +326,11 @@ void gui::DesignWidget::mouseReleaseEvent(QMouseEvent *e)
   QGraphicsView::mouseReleaseEvent(e);
   QPointF scene_pos = mapToScene(e->pos());
 
-  if(clicked){
+  if(ghosting){
+    // plant ghost and end ghosting
+    destroyGhost();
+  }
+  else if(clicked){
     switch(e->button()){
       case Qt::LeftButton:
         QGraphicsView::mouseReleaseEvent(e);
@@ -383,29 +408,45 @@ void gui::DesignWidget::keyReleaseEvent(QKeyEvent *e)
   Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
   QGraphicsItemGroup *group = 0;
 
-  switch(e->key()){
-    case Qt::Key_G:
-      // only do grouping behaviour for surface items
-      if(tool_type != gui::DesignWidget::SelectTool)
+  if(ghosting){
+    switch(e->key()){
+      case Qt::Key_H:
+        ghost->flip(true);
         break;
-      if(keymods == Qt::ControlModifier){
-        // create a group from selected
-        createAggregate();
-      }
-      else if(keymods == (Qt::ShiftModifier + Qt::ControlModifier)){
-        // destroy all selected groups
-        destroyAggregates();
-      }
-      break;
-    case Qt::Key_Delete:
-      if(tool_type == gui::DesignWidget::SelectTool)
-        deleteSelected();
-      break;
-    default:
-      QGraphicsView::keyReleaseEvent(e);
-      break;
+      case Qt::Key_V:
+        ghost->flip(false);
+        break;
+      case Qt::Key_R:
+        ghost->rotate(keymods & Qt::ControlModifier);
+        break;
+      default:
+        break;
+    }
   }
-
+  else{
+    switch(e->key()){
+      case Qt::Key_G:
+        // only do grouping behaviour for surface items
+        if(tool_type != gui::DesignWidget::SelectTool)
+          break;
+        if(keymods == Qt::ControlModifier)
+          createAggregate();
+        else if(keymods == (Qt::ShiftModifier + Qt::ControlModifier))
+          destroyAggregates();
+        break;
+      case Qt::Key_C:
+        if((tool_type == gui::DesignWidget::SelectTool) && (keymods == Qt::ControlModifier))
+          createGhost(true);
+        break;
+      case Qt::Key_Delete:
+        if(tool_type == gui::DesignWidget::SelectTool)
+          deleteSelected();
+        break;
+      default:
+        QGraphicsView::keyReleaseEvent(e);
+        break;
+    }
+  }
 }
 
 
@@ -645,4 +686,85 @@ void gui::DesignWidget::deleteItem(QGraphicsItem *item)
     // delete item
     scene->destroyItemGroup((QGraphicsItemGroup*) item);
   }
+}
+
+
+
+
+void gui::DesignWidget::createGhost(bool selected)
+{
+  // delete old ghost if it exists
+  destroyGhost();
+
+  // build ghost if valid source items
+  if(selected){
+    QList<QGraphicsItem*> items = scene->selectedItems();
+    if(items.count()>0){
+      ghost = new prim::Ghost(scene);
+      ghost->prepare(items);
+    }
+  }
+  else if(clipboard != 0){
+    ghost = new prim::Ghost(scene);
+    ghost->prepare(clipboard);
+  }
+
+  // if ghost was successfully created, enter ghosting mode
+  if(ghost != 0){
+    qDebug("Beginning ghosting...");
+    ghosting = true;
+    snap_target = 0;
+  }
+}
+
+
+void gui::DesignWidget::destroyGhost()
+{
+  if(ghost != 0){
+    scene->removeItem(ghost);
+    delete ghost;
+    ghost = 0;
+    ghosting = false;
+  }
+}
+
+
+
+
+bool gui::DesignWidget::snapGhost(QPointF scene_pos, QPointF *offset)
+{
+  QGraphicsItem *new_target = 0;
+
+  QRectF rect;
+  QPointF scene_anchor = scene_pos+ghost->getAnchor();
+  rect.moveCenter(scene_anchor);
+  rect.setSize(QSize(snap_diameter, snap_diameter));
+  QList<QGraphicsItem*> near_items = scene->items(rect);
+
+  // select the nearest lattice point to the anchor
+  QPointF delta, min_delta;
+  qreal dist, min_dist=-1;
+
+  if(near_items.count()>0){
+    for(int i=0; i<near_items.count(); i++){
+      if(inLattice(near_items.at(i)) && (near_items.at(i)->flags() & QGraphicsItem::ItemIsSelectable)){
+        delta = near_items.at(i)->pos() - scene_anchor;
+        dist = delta.manhattanLength();
+        if(min_dist < 0 || dist < min_dist){
+          min_delta = delta;
+          min_dist = dist;
+          new_target = near_items.at(i);
+        }
+      }
+    }
+  }
+
+  // register if snap target has changed and update
+  bool change_flag = (new_target != snap_target);
+
+  snap_target = new_target;
+  *offset = min_delta;
+
+  return change_flag;
+
 }

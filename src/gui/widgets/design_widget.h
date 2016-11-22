@@ -84,7 +84,7 @@ private:
 
   QGraphicsScene *scene;
 
-  QGraphicsItemGroup *ghost;      // temporary item (moving and paste)
+  prim::Ghost *ghost;      // temporary item (moving and paste)
   QGraphicsItemGroup *clipboard;  // deep copy storage for copy/paste
 
   // functional layers: order {lattice, db-surface, electrode1, electrode2, ...}
@@ -93,7 +93,12 @@ private:
 
   // interrupt parameters
   bool clicked;
-  QGraphicsItem *clicked_item;
+  bool ghosting;
+
+  qreal snap_diameter;
+  QGraphicsItem *snap_target;
+
+  //QGraphicsItem *clicked_item;
 
   QPoint old_mouse_pos;
   QPoint wheel_deg;
@@ -128,7 +133,13 @@ private:
   void deleteSelected();
   void deleteItem(QGraphicsItem *item);
 
-  void createGhost(QList<QGraphicsItem*> items);
+  void createGhost(bool selected);
+  void destroyGhost();
+
+  // snap the ghost to nearest matching lattice site, returns true if the snap_target
+  // was updated (need to change ghost location), *offset will be the offset
+  // between the offset of the snap ghost location
+  bool snapGhost(QPointF scene_pos, QPointF *offset);
 
 };
 

@@ -22,6 +22,8 @@ QSettings* settings::AppSettings::m_defs()
   S->setValue("log/tofile", false);
   S->setValue("log/logfile", QString("src/log/log.txt"));
 
+  S->setValue("snap/diameter", 5.); //relative to scale_fact
+
   return S;
 }
 
@@ -64,8 +66,8 @@ QSettings* settings::GUISettings::m_defs()
 
   S->setValue("dbdot/fill_col", QColor(200,200,200));
 
-  S->setValue("ghost/dot_diameter", 1);
-  S->setValue("ghost/col", QColor(200, 50, 50, 50));
+  S->setValue("ghost/dot_diameter", .6);
+  S->setValue("ghost/col", QColor(0, 255, 0, 255));
 
   return S;
 }
