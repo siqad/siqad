@@ -9,10 +9,13 @@
 
 #include <QGraphicsSceneMouseEvent>
 
+#include "items.h"
+
+
 namespace prim{
 
 
-class DBDot: public QGraphicsItem
+class DBDot: public prim::MyItem
 {
 
 public:
@@ -40,10 +43,6 @@ public:
 
 protected:
 
-  // events
-
-  //void mousePressEvent(QGraphicsSceneMouseEvent *e);
-  //void mouseReleaseEvent(QGraphicsSceneMouseEvent *e);
 
 
 private:

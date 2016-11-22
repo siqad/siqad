@@ -18,6 +18,7 @@
 #include "primitives/layer.h"
 #include "primitives/dbdot.h"
 #include "primitives/ghost.h"
+#include "primitives/items.h"
 
 namespace gui{
 
@@ -121,8 +122,8 @@ private:
   void destroyDB(prim::DBDot *dot);
 
 
-  void createGroup();
-  void destroyGroups();
+  void createAggregate();
+  void destroyAggregates();
 
   void deleteSelected();
   void deleteItem(QGraphicsItem *item);

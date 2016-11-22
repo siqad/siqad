@@ -224,12 +224,15 @@ void gui::DesignWidget::setTool(gui::DesignWidget::ToolType tool)
   switch(tool){
     case gui::DesignWidget::SelectTool:
       setDragMode(QGraphicsView::RubberBandDrag);
+      setInteractive(true);
       break;
     case gui::DesignWidget::DragTool:
       setDragMode(QGraphicsView::ScrollHandDrag);
+      setInteractive(false);
       break;
     case gui::DesignWidget::DBGenTool:
       setDragMode(QGraphicsView::RubberBandDrag);
+      setInteractive(true);
       break;
     default:
       qCritical("Invalid ToolType... should not have happened");
@@ -259,13 +262,8 @@ void gui::DesignWidget::mousePressEvent(QMouseEvent *e)
   clicked=true;
   old_mouse_pos = e->pos();
 
-  switch(e->button()){
-    case Qt::LeftButton:
-      QGraphicsView::mousePressEvent(e);
-      break;
-    default:
-      break;
-  }
+  QGraphicsView::mousePressEvent(e);
+
 }
 
 
@@ -392,11 +390,11 @@ void gui::DesignWidget::keyReleaseEvent(QKeyEvent *e)
         break;
       if(keymods == Qt::ControlModifier){
         // create a group from selected
-        createGroup();
+        createAggregate();
       }
       else if(keymods == (Qt::ShiftModifier + Qt::ControlModifier)){
         // destroy all selected groups
-        destroyGroups();
+        destroyAggregates();
       }
       break;
     case Qt::Key_Delete:
@@ -573,19 +571,21 @@ void gui::DesignWidget::destroyDB(prim::DBDot *dot)
 }
 
 
-void gui::DesignWidget::createGroup()
+void gui::DesignWidget::createAggregate()
 {
-  QGraphicsItemGroup *group=0;
+  prim::Aggregate *aggregate = new prim::Aggregate();
   QList<QGraphicsItem*> items=scene->selectedItems();
 
   if(items.count()>0){
-    group = scene->createItemGroup(items);
-    group->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    group->setSelected(true);
+    for(int i=0; i<items.count(); i++)
+      aggregate->addToGroup(items.at(i));
+    scene->addItem(aggregate);
+    aggregate->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    aggregate->setSelected(true);
   }
 }
 
-void gui::DesignWidget::destroyGroups()
+void gui::DesignWidget::destroyAggregates()
 {
   QGraphicsItemGroup *group=0;
   QList<QGraphicsItem *> new_selected;

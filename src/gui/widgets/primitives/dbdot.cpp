@@ -5,7 +5,8 @@
 #include <QSizeF>
 
 
-prim::DBDot::DBDot(QPointF p_loc, bool lat, DBDot *src)
+prim::DBDot::DBDot(QPointF p_loc, bool lat, DBDot *src):
+  prim::MyItem()
 {
   settings::GUISettings gui_settings;
 
