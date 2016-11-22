@@ -18,7 +18,7 @@ QSettings* settings::AppSettings::m_defs()
 
   // overwrites existing default values with same keys... no check
 
-  S->setValue("log/override", true);
+  S->setValue("log/override", false);
   S->setValue("log/tofile", false);
   S->setValue("log/logfile", QString("src/log/log.txt"));
 
@@ -57,11 +57,15 @@ QSettings* settings::GUISettings::m_defs()
 
   S->setValue("dbdot/edge_width", .1);  // edge width rel. to diameter
   S->setValue("dbdot/edge_col", QColor(255,255,255));
+  S->setValue("dbdot/selected_col", QColor(0, 100, 255));
 
   S->setValue("dbdot/lattice_edge_width", .05);
   S->setValue("dbdot/lattice_edge_col", QColor(255,255,255,50));
 
   S->setValue("dbdot/fill_col", QColor(200,200,200));
+
+  S->setValue("ghost/dot_diameter", 1);
+  S->setValue("ghost/col", QColor(200, 50, 50, 50));
 
   return S;
 }
