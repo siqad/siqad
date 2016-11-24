@@ -8,25 +8,33 @@
 
 #include <QGraphicsSceneMouseEvent>
 
+#include "emitter.h"
+
 
 namespace prim{
-
 
 class MyItem : public QGraphicsItem
 {
 public:
 
+  enum ItemType{DotType, Text};
+
   // constructor
-  MyItem(QGraphicsItem *parent=0) : QGraphicsItem(parent){}
+  MyItem(Emitter *em, QGraphicsItem *parent=0)
+    : QGraphicsItem(parent), emitter(em), item_type(DotType) {}
 
   // destructor
   ~MyItem(){}
+
+  ItemType item_type;
 
 protected:
 
   void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
   //void mouseMoveEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
   //void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
+
+  prim::Emitter *emitter;
 
 private:
 };
@@ -39,7 +47,8 @@ class Aggregate : public QGraphicsItemGroup
 public:
 
   // constructor
-  Aggregate(QGraphicsItem *parent=0) : QGraphicsItemGroup(parent) {}
+  Aggregate(Emitter *em, QGraphicsItem *parent=0)
+    : QGraphicsItemGroup(parent), emitter(em) {}
 
   // destructor
   ~Aggregate(){}
@@ -50,7 +59,10 @@ protected:
   //void mouseMoveEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
   //void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
+  prim::Emitter *emitter;
+
 private:
+
 };
 
 

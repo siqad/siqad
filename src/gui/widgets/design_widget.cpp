@@ -23,6 +23,9 @@ gui::DesignWidget::DesignWidget(QWidget *parent)
   scene = new QGraphicsScene(this);
   setScene(scene);
 
+  emitter = new prim::Emitter();
+  connect(emitter, &prim::Emitter::sig_selectClicked, this, &gui::DesignWidget::selectClicked);
+
   // setup flags
   clicked = false;
   ghosting = false;
@@ -59,19 +62,22 @@ gui::DesignWidget::DesignWidget(QWidget *parent)
 }
 
 gui::DesignWidget::~DesignWidget()
-{}
+{
+  delete emitter;
+  delete scene;
+}
 
 
 
 void gui::DesignWidget::addLayer()
 {
-  prim::Layer *layer = new prim::Layer();
+  prim::Layer *layer = new prim::Layer(emitter);
   layers.append(layer);
 }
 
 void gui::DesignWidget::addLayer(const QString &name)
 {
-  prim::Layer *layer = new prim::Layer(name);
+  prim::Layer *layer = new prim::Layer(emitter, name);
   layers.append(layer);
 }
 
@@ -98,10 +104,10 @@ void gui::DesignWidget::removeLayer(int n)
     qWarning("Layer index out of bounds...");
   else{
     // remove all items in the layer from the scene and delete
-    QList<QGraphicsItem*> *items = layers.at(n)->getItems();
-    for(int i=0; i<items->count(); i++){
-      scene->removeItem(items->at(i));
-      delete items->at(i);
+    QList<QGraphicsItem*> items = layers.at(n)->getItems();
+    for(int i=0; i<items.count(); i++){
+      scene->removeItem(items.at(i));
+      delete items.at(i);
     }
 
     // delete layer
@@ -146,6 +152,20 @@ prim::Layer *gui::DesignWidget::getLayer(int n)
   return layer;
 }
 
+QList<prim::DBDot*> gui::DesignWidget::getSurfaceDBs()
+{
+  if(layers.count()<2){
+    qWarning("requesting non-existant surface...");
+    return QList<prim::DBDot*>();
+  }
+
+  QList<QGraphicsItem*> items = layers.at(1)->getItems();
+  QList<prim::DBDot*> dbs;
+  for(int i=0; i<items.count(); i++)
+    dbs.append((prim::DBDot*)items.at(i));
+  return dbs;
+}
+
 void gui::DesignWidget::setLayer(const QString &name)
 {
   top_layer = 0;
@@ -181,15 +201,15 @@ void gui::DesignWidget::buildLattice(const QString fname)
   // build the new lattice
   gui::Lattice *lattice=0;
   if(fname.isEmpty())
-    lattice = new Lattice();
+    lattice = new Lattice(emitter);
   else
-    lattice = new Lattice(fname);
+    lattice = new Lattice(emitter, fname);
 
   // add lattice dots to the scene
   QGraphicsItem *item=0;
-  QList<QGraphicsItem*> *items = lattice->getItems();
-  for(int i=0; i<items->count(); i++){
-    item = items->at(i);
+  QList<QGraphicsItem*> items = lattice->getItems();
+  for(int i=0; i<items.count(); i++){
+    item = items.at(i);
     scene->addItem(item);
   }
 
@@ -209,17 +229,6 @@ void gui::DesignWidget::buildLattice(const QString fname)
   scene->setSceneRect(rect);
 }
 
-
-
-void gui::DesignWidget::addDB(qreal x, qreal y)
-{
-  qDebug() << QString("Adding DB at x=%1, y=%2...").arg(QString::number(x), QString::number(y));
-  prim::DBDot *db = new prim::DBDot(QPointF(x,y));
-  qDebug("dot created...");
-  scene->addItem(db);
-  qDebug("dot added to scene");
-  top_layer->addItem(db);
-}
 
 void gui::DesignWidget::setTool(gui::DesignWidget::ToolType tool)
 {
@@ -253,10 +262,28 @@ void gui::DesignWidget::setTool(gui::DesignWidget::ToolType tool)
 }
 
 
+void gui::DesignWidget::setFills(float *fills)
+{
+  QList<prim::DBDot*> dbs = getSurfaceDBs();
+  for(int i=0; i<dbs.count(); i++)
+    dbs.at(i)->setFill(fills[i]);
+}
 
 
 
+// SLOTS
 
+
+void gui::DesignWidget::selectClicked(QGraphicsItem *item)
+{
+  if(tool_type == gui::DesignWidget::SelectTool){
+    // create ghost of selected items
+    createGhost(true);
+
+    // set ghosting type
+    moving = true;
+  }
+}
 
 
 // INTERRUPTS
@@ -328,6 +355,9 @@ void gui::DesignWidget::mouseReleaseEvent(QMouseEvent *e)
 
   if(ghosting){
     // plant ghost and end ghosting
+    plantGhost();
+    if(moving)
+      deleteSelected();
     destroyGhost();
   }
   else if(clicked){
@@ -556,7 +586,7 @@ void gui::DesignWidget::filterSelection(bool select_flag)
         item->setSelected(false);
     }
 
-    qDebug() << QString("%1 items selected").arg(scene->selectedItems().count());
+    //qDebug() << QString("%1 items selected").arg(scene->selectedItems().count());
 }
 
 // Items in the lattice will always be DBDots not belonging to a group
@@ -589,7 +619,7 @@ void gui::DesignWidget::createDB(prim::DBDot *dot)
   QPointF loc = dot->getPhysLoc();
 
   // create new db and set lattice site as non-selectable
-  prim::DBDot *db = new prim::DBDot(loc, false, dot);
+  prim::DBDot *db = new prim::DBDot(emitter, loc, false, dot);
   dot->setFlag(QGraphicsItem::ItemIsSelectable, false);
 
 
@@ -598,7 +628,7 @@ void gui::DesignWidget::createDB(prim::DBDot *dot)
 
   layers.at(1)->addItem(db);
   scene->addItem(db);
-  qDebug() << QString("DB added at (%1 , %2)").arg(QString::number(loc.x()), QString::number(loc.y()));
+  //qDebug() << QString("DB added at (%1 , %2)").arg(QString::number(loc.x()), QString::number(loc.y()));
 }
 
 void gui::DesignWidget::destroyDB(prim::DBDot *dot)
@@ -614,7 +644,7 @@ void gui::DesignWidget::destroyDB(prim::DBDot *dot)
 
 void gui::DesignWidget::createAggregate()
 {
-  prim::Aggregate *aggregate = new prim::Aggregate();
+  prim::Aggregate *aggregate = new prim::Aggregate(emitter);
   QList<QGraphicsItem*> items=scene->selectedItems();
 
   if(items.count()>0){
@@ -645,7 +675,7 @@ void gui::DesignWidget::destroyAggregates()
   // update selected flags
   for(int i=0; i<new_selected.count(); i++){
     new_selected.at(i)->setSelected(false);
-    qDebug() << QString("Item %1 set to selected").arg(i);
+    //qDebug() << QString("Item %1 set to selected").arg(i);
   }
 }
 
@@ -711,21 +741,39 @@ void gui::DesignWidget::createGhost(bool selected)
 
   // if ghost was successfully created, enter ghosting mode
   if(ghost != 0){
-    qDebug("Beginning ghosting...");
+    //qDebug("Beginning ghosting...");
     ghosting = true;
     snap_target = 0;
   }
 }
 
 
+
+void gui::DesignWidget::plantGhost()
+{
+  QList<prim::DBDot*> targets = ghost->getTargets();
+  QList<QGraphicsItem*> source = ghost->getSource();
+
+  // create dots on all non-null targets
+  for(int i=0; i<targets.count(); i++){
+    if(targets.at(i) != 0)
+      createDB(targets.at(i));
+  }
+
+}
+
 void gui::DesignWidget::destroyGhost()
 {
+  // delete old ghost
   if(ghost != 0){
     scene->removeItem(ghost);
     delete ghost;
     ghost = 0;
-    ghosting = false;
   }
+
+  // default flags
+  moving = false;
+  ghosting = false;
 }
 
 

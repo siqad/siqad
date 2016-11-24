@@ -5,8 +5,8 @@
 #include <QSizeF>
 
 
-prim::DBDot::DBDot(QPointF p_loc, bool lat, DBDot *src):
-  prim::MyItem()
+prim::DBDot::DBDot(prim::Emitter *em, QPointF p_loc, bool lat, DBDot *src):
+  prim::MyItem(em)
 {
   settings::GUISettings gui_settings;
 
@@ -42,7 +42,7 @@ prim::DBDot::~DBDot()
 
 prim::DBDot *prim::DBDot::clone() const
 {
-  prim::DBDot *dot = new DBDot(phys_loc, lattice, 0);
+  prim::DBDot *dot = new DBDot(emitter, phys_loc, lattice, 0);
 
   dot->setFlags(flags());
   dot->setPos(pos());

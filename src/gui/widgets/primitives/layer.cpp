@@ -3,17 +3,19 @@
 
 uint prim::Layer::layer_cnt = 0;
 
-prim::Layer::Layer()
+prim::Layer::Layer(prim::Emitter *em)
 {
   // initialise control parameters
-  visible=true;
+  emitter = em;
+  visible = true;
   active=true;
   name = QString("Layer %1").arg(layer_cnt++);
 }
 
-prim::Layer::Layer(const QString &nm)
+prim::Layer::Layer(prim::Emitter *em, const QString &nm)
 {
   // initialise control parameters
+  emitter = em;
   visible=true;
   active=true;
   name = nm;
@@ -84,7 +86,7 @@ const QString prim::Layer::getName()
   return name;
 }
 
-QList<QGraphicsItem*> *prim::Layer::getItems()
+QList<QGraphicsItem*> prim::Layer::getItems()
 {
-  return &items;
+  return items;
 }

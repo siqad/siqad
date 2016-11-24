@@ -20,6 +20,8 @@
 #include "primitives/ghost.h"
 #include "primitives/items.h"
 
+#include "primitives/emitter.h"
+
 namespace gui{
 
 class DesignWidget : public QGraphicsView
@@ -50,6 +52,7 @@ public:
   // returns a pointer to a requested layer if it exists.
   prim::Layer *getLayer(const QString &name);
   prim::Layer *getLayer(int n);
+  QList<prim::DBDot*> getSurfaceDBs();
 
   void setLayer(const QString &name);
   void setLayer(int n);
@@ -58,10 +61,17 @@ public:
   // If no file is given, the default lattice is used
   void buildLattice(const QString fname=QString());
 
-  // add a new dangling bond to the current layer
-  void addDB(qreal x, qreal y);
-
   void setTool(ToolType tool);
+
+  void setFills(float *fills);
+
+
+  // preparing for physical simulation
+
+
+public slots:
+
+  void selectClicked(QGraphicsItem *item);
 
 protected:
 
@@ -83,6 +93,7 @@ protected:
 private:
 
   QGraphicsScene *scene;
+  prim::Emitter *emitter;
 
   prim::Ghost *ghost;      // temporary item (moving and paste)
   QGraphicsItemGroup *clipboard;  // deep copy storage for copy/paste
@@ -94,6 +105,7 @@ private:
   // interrupt parameters
   bool clicked;
   bool ghosting;
+  bool moving;
 
   qreal snap_diameter;
   QGraphicsItem *snap_target;
@@ -133,7 +145,18 @@ private:
   void deleteSelected();
   void deleteItem(QGraphicsItem *item);
 
+
+  // create a deep copy of given items and store in clipboard
+  void saveToClipBoard(QList<QGraphicsItem*> items);
+  void saveToClipBoard(QGraphicsItem *item);
+
+  // create a mobile image of either the selected item or the clipboard
   void createGhost(bool selected);
+
+  // make a deep copy of the ghost source in place
+  void plantGhost();
+
+  // destroy the ghost
   void destroyGhost();
 
   // snap the ghost to nearest matching lattice site, returns true if the snap_target

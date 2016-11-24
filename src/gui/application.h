@@ -4,11 +4,16 @@
 // Qt inclusions
 #include <QMainWindow>
 #include <QObject>
+#include <QFileDialog>
 
 // Widget inclusions
 #include "widgets/design_widget.h"
 #include "widgets/dialog_panel.h"
 #include "widgets/info_panel.h"
+
+// solver engines
+#include "src/engines/core/problem.h"
+//#include "src/engines/simulated_annealer.h"
 
 namespace Ui
 {
@@ -39,6 +44,9 @@ public slots:
   void setToolDrag();
   void setToolDBGen();
 
+  void changeLattice();
+  void runSimulation();
+
 protected:
 
 private:
@@ -63,6 +71,11 @@ private:
   QAction *action_select_tool;
   QAction *action_drag_tool;
   QAction *action_dbgen_tool;
+  QAction *action_run_simulation;
+
+
+  // problem and solver parameters
+  core::Problem *problem;
 };
 
 } // end namespace gui

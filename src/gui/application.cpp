@@ -17,6 +17,8 @@
 // GUI inclusions
 #include "application.h"
 #include "src/settings/settings.h"
+#include "widgets/primitives/dbdot.h"
+
 
 #include <iostream>
 
@@ -33,6 +35,9 @@ gui::ApplicationGUI::ApplicationGUI(QWidget *parent)
 
   // load settings
   loadSettings();
+
+  // setup problem and solver parameters
+  problem = new  core::Problem();
 }
 
 gui::ApplicationGUI::~ApplicationGUI()
@@ -43,6 +48,7 @@ gui::ApplicationGUI::~ApplicationGUI()
   // delete tool bars... may not be needed
   delete top_bar;
   delete side_bar;
+  delete problem;
 }
 
 void gui::ApplicationGUI::initGui()
@@ -94,7 +100,11 @@ void gui::ApplicationGUI::initMenuBar()
   quit->setShortcut(tr("CTRL+Q"));
   file->addAction(quit);
 
+  QAction *change_lattice = new QAction("&Change Lattice...", this);
+  tools->addAction(change_lattice);
+
   connect(quit, &QAction::triggered, qApp, QApplication::quit);
+  connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
 }
 
 void gui::ApplicationGUI::initTopBar()
@@ -108,9 +118,16 @@ void gui::ApplicationGUI::initTopBar()
   top_bar->setMovable(false);
 
   // size policy
+  qreal ico_scale = gui_settings.get<qreal>("SBAR/mw");
+  ico_scale *= gui_settings.get<qreal>("SBAR/ico");
+
   top_bar->setMinimumHeight(gui_settings.get<int>("TBAR/mh"));
   top_bar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+  top_bar->setIconSize(QSize(ico_scale, ico_scale));
 
+  action_run_simulation = top_bar->addAction(QIcon(":/ico/runsim.svg"), tr("&Run Simulation..."));
+
+  connect(action_run_simulation, &QAction::triggered, this, &gui::ApplicationGUI::runSimulation);
   addToolBar(Qt::TopToolBarArea, top_bar);
 }
 
@@ -190,4 +207,40 @@ void gui::ApplicationGUI::setToolDBGen()
 {
   qDebug("selecting dbgen tool");
   design_wg->setTool(gui::DesignWidget::DBGenTool);
+}
+
+void gui::ApplicationGUI::changeLattice()
+{
+  settings::AppSettings app_settings;
+
+  QString dir = app_settings.get<QString>("dir/lattice");
+  QString fname = QFileDialog::getOpenFileName(
+    this, tr("Select lattice file"), dir, tr("INI (*.ini)"));
+
+  design_wg->buildLattice(fname);
+}
+
+void gui::ApplicationGUI::runSimulation()
+{
+
+  if(problem==0)
+    qFatal("Problem instance not initialised");
+
+  QList<prim::DBDot*> dbs = design_wg->getSurfaceDBs();
+  if(dbs.count()==0){
+    qWarning("No dangling bonds on the surface...");
+    return;
+  }
+
+  problem->setSurface(dbs);
+
+  // engines::SimulatedAnnealer SA;
+  //
+  // SA.loadProblem(problem);
+  // SA.solve();
+  //
+  // float *occs = new float[problem->N];
+  // SA.getOccs(occs);
+
+  // set dot fill factors
 }

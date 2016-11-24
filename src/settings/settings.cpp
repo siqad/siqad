@@ -24,6 +24,11 @@ QSettings* settings::AppSettings::m_defs()
 
   S->setValue("snap/diameter", 5.); //relative to scale_fact
 
+  S->setValue("dir/lattice", QString("src/settings/lattices"));
+
+  S->setValue("phys/debye_length", 50);
+  S->setValue("phys/epsr", 10);
+
   return S;
 }
 
@@ -84,6 +89,7 @@ QSettings* settings::LatticeSettings::m_defs()
 
   S->setValue("lattice/a1", QPointF(7.68, 0));
   S->setValue("lattice/a2", QPointF(0, 3.84));
+
 
   return S;
 }

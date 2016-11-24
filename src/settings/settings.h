@@ -7,7 +7,7 @@
 
 #include <QVariant>
 
-#define DEFAULT_OVERRIDE true // always use default settings
+#define DEFAULT_OVERRIDE false // always use default settings
 
 namespace settings{
 

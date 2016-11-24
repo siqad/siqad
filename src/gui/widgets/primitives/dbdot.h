@@ -10,6 +10,7 @@
 #include <QGraphicsSceneMouseEvent>
 
 #include "items.h"
+#include "emitter.h"
 
 
 namespace prim{
@@ -21,7 +22,7 @@ class DBDot: public prim::MyItem
 public:
 
   // constructor
-  DBDot(QPointF p_loc, bool lattice=false, DBDot *src=0);
+  DBDot(prim::Emitter *em, QPointF p_loc, bool lattice=false, DBDot *src=0);
 
   // destructor
   ~DBDot();
@@ -30,6 +31,8 @@ public:
   bool inLattice(){return lattice;}
   QPointF getPhysLoc(){return phys_loc;}
   DBDot *getSource(){return source;}
+
+  void setFill(float fill){fill_fact = fill;}
 
   // construct a deep copy of the dot
   DBDot *clone() const;

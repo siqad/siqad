@@ -3,6 +3,7 @@
 
 #include "primitives/layer.h"
 #include "primitives/dbdot.h"
+#include "primitives/emitter.h"
 #include "src/settings/settings.h"
 
 #include <QString>
@@ -17,8 +18,8 @@ class Lattice : public prim::Layer
 public:
 
   // constructor
-  Lattice();
-  Lattice(const QString &fname);
+  Lattice(prim::Emitter *em);
+  Lattice(prim::Emitter *em, const QString &fname);
 
   // destructor
   ~Lattice();

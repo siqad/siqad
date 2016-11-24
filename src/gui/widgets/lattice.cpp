@@ -9,14 +9,15 @@
 #include <algorithm>
 
 
-gui::Lattice::Lattice()
-  : Layer("Lattice")
+gui::Lattice::Lattice(prim::Emitter *em)
+  : Layer(em, "Lattice")
 {
   settings::LatticeSettings lattice_settings;
   construct(lattice_settings);
 }
-gui::Lattice::Lattice(const QString &fname)
-  : Layer("Lattice")
+
+gui::Lattice::Lattice(prim::Emitter *em, const QString &fname)
+  : Layer(em, "Lattice")
 {
   settings::LatticeSettings lattice_settings(fname);
   construct(lattice_settings);
@@ -136,7 +137,7 @@ void gui::Lattice::buildUnitCell(QPoint ind)
   QPointF lattice_loc = a[0]*ind.x()+a[1]*ind.y();
 
   for(int n=0; n<n_cell; n++){
-    prim::DBDot *dot = new prim::DBDot(lattice_loc+b.at(n), true);
+    prim::DBDot *dot = new prim::DBDot(emitter, lattice_loc+b.at(n), true);
     dot->setFlag(QGraphicsItem::ItemIsSelectable, true);
     addItem(dot);
   }

@@ -6,6 +6,8 @@
 #include "gui/application.h"
 #include "settings/settings.h"
 
+#include <cstdlib>
+#include <ctime>
 
 
 static void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -52,6 +54,9 @@ static void messageHandler(QtMsgType type, const QMessageLogContext &context, co
 }
 
 int main(int argc, char **argv){
+
+  // initialise rand
+  srand(time(NULL));
 
   settings::AppSettings app_settings;
 

@@ -13,6 +13,8 @@ void prim::MyItem::mousePressEvent(QGraphicsSceneMouseEvent *e)
     case Qt::LeftButton:
       if(keymods & Qt::ControlModifier)
         e->setAccepted(false);
+      else if(isSelected())
+        emitter->selectClicked(this);
       break;
     default:
       break;
@@ -31,6 +33,8 @@ void prim::Aggregate::mousePressEvent(QGraphicsSceneMouseEvent *e)
     case Qt::LeftButton:
       if(keymods & Qt::ControlModifier)
         e->setAccepted(false);
+      else if(isSelected())
+        emitter->selectClicked(this);
       break;
     default:
       break;
