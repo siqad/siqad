@@ -12,7 +12,7 @@ INCLUDEPATH += .
 
 RESOURCES = resources/application.qrc
 
-# Input
+# Input GUI Headers and SOURCE
 HEADERS += \
 	src/gui/application.h \
 	src/settings/settings.h \
@@ -20,7 +20,8 @@ HEADERS += \
 	src/gui/widgets/dialog_panel.h \
 	src/gui/widgets/info_panel.h \
 	src/gui/widgets/lattice.h \
-	src/gui/widgets/primitives.h \
+	src/gui/widgets/primitives/emitter.h \
+	src/gui/widgets/primitives/items.h \
 	src/gui/widgets/primitives/layer.h \
 	src/gui/widgets/primitives/dbdot.h \
 	src/gui/widgets/primitives/ghost.h
@@ -33,7 +34,21 @@ SOURCES += \
 	src/gui/widgets/dialog_panel.cpp \
 	src/gui/widgets/info_panel.cpp \
 	src/gui/widgets/lattice.cpp \
+	src/gui/widgets/primitives/emitter.cpp \
 	src/gui/widgets/primitives/items.cpp \
 	src/gui/widgets/primitives/layer.cpp \
 	src/gui/widgets/primitives/dbdot.cpp \
 	src/gui/widgets/primitives/ghost.cpp
+
+
+#HEADERS += \
+#	src/engines/core/constants.h \
+#	src/engines/core/common.h \
+#	src/engines/core/classes.h \
+#	src/engines/core/problem.h \
+#	src/engines/core/base_engine.h
+
+#SOURCES += \
+#	src/engines/core/common.cpp \
+#	src/engines/core/problem.cpp \
+#	src/engines/core/base_engine.cpp
