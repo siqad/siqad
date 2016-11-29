@@ -1,0 +1,12 @@
+WORK ON GHOSTING BEHAVIOUR
+
+Problems:
+	- cannot move draged object back to itself
+	- should only allow snapping to valid ghost locations (all lattice sites)
+	- color differently for valid ghosts
+	- deep copy for copy/paste
+	- copy group hierarchy
+	- need a more useful way to determine object type
+
+Steps
+	- change object types
