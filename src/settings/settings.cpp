@@ -72,7 +72,8 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("dbdot/fill_col", QColor(200,200,200));
 
   S->setValue("ghost/dot_diameter", .6);
-  S->setValue("ghost/col", QColor(0, 255, 0, 255));
+  S->setValue("ghost/valid_col", QColor(0, 255, 0, 255));
+  S->setValue("ghost/invalid_col", QColor(255, 0, 0, 255));
 
   return S;
 }

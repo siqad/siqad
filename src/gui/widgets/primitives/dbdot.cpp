@@ -5,8 +5,8 @@
 #include <QSizeF>
 
 
-prim::DBDot::DBDot(prim::Emitter *em, QPointF p_loc, bool lat, DBDot *src):
-  prim::MyItem(em)
+prim::DBDot::DBDot(QPointF p_loc, int layer, DBDot *src):
+  prim::MyItem(prim::MyItem::DBDotType, layer)
 {
   settings::GUISettings gui_settings;
 
@@ -17,9 +17,9 @@ prim::DBDot::DBDot(prim::Emitter *em, QPointF p_loc, bool lat, DBDot *src):
 
   phys_loc = p_loc;
   source = src;
-  lattice = lat;
 
-  if(lattice){
+  // if layer == 0, in lattice
+  if(layer==0){
     edge_width = gui_settings.get<qreal>("dbdot/lattice_edge_width")*diameter;
     edge_col = gui_settings.get<QColor>("dbdot/lattice_edge_col");
     selected_col = edge_col;
@@ -42,7 +42,7 @@ prim::DBDot::~DBDot()
 
 prim::DBDot *prim::DBDot::clone() const
 {
-  prim::DBDot *dot = new DBDot(emitter, phys_loc, lattice, 0);
+  prim::DBDot *dot = new DBDot(phys_loc, layer, 0);
 
   dot->setFlags(flags());
   dot->setPos(pos());
@@ -64,7 +64,7 @@ QRectF prim::DBDot::boundingRect() const
 }
 
 
-void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
   settings::GUISettings gui_settings;
 

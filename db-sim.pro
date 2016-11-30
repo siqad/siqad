@@ -41,14 +41,14 @@ SOURCES += \
 	src/gui/widgets/primitives/ghost.cpp
 
 
-#HEADERS += \
-#	src/engines/core/constants.h \
-#	src/engines/core/common.h \
-#	src/engines/core/classes.h \
-#	src/engines/core/problem.h \
-#	src/engines/core/base_engine.h
+HEADERS += \
+	src/engines/core/constants.h \
+	src/engines/core/common.h \
+	src/engines/core/classes.h \
+	src/engines/core/problem.h \
+	src/engines/core/base_engine.h
 
-#SOURCES += \
-#	src/engines/core/common.cpp \
-#	src/engines/core/problem.cpp \
-#	src/engines/core/base_engine.cpp
+SOURCES += \
+	src/engines/core/common.cpp \
+	src/engines/core/problem.cpp \
+	src/engines/core/base_engine.cpp

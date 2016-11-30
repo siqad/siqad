@@ -18,19 +18,19 @@
 
 namespace prim{
 
-class GhostDot : public QGraphicsItem
+class GhostDot : public prim::MyItem
 {
 public:
 
-  GhostDot(QGraphicsItemGroup *parent, QGraphicsItem *item);
+  GhostDot(QGraphicsItemGroup *parent, QGraphicsItem *item, QColor *col);
 
   QRectF boundingRect() const;
-  void paint(QPainter *painter, const QStyleOptionGraphicsItem *options, QWidget *widget);
+  void paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*);
 
 private:
 
   qreal diameter;
-  QColor col;
+  QColor *pcol;
 };
 
 class Ghost : public QGraphicsItemGroup
@@ -66,10 +66,24 @@ public:
   // get the location of the first item in the Ghost (arb.)
   QPointF getAnchor() const;
 
+  // update the dot coloring and the valid flag for the ghost
+  void updateValid();
+  void setValid(bool flag);
+
+  // check if the ghost is valid after a given offset
+  bool checkValid(QPointF offset = QPointF());
+
+  // return the lattice dbdot beneath each ghost dot. If a ghost dot is not above
+  // a lattice site, append a null pointer.
+  QList<prim::DBDot*> getLattice(QPointF offset = QPointF());
+
 private:
 
   QList<QGraphicsItem*> source;   // target DBDot for each GhostDot
   QList<GhostDot*> dots;          // list of GhostDots
+
+  QColor col;   // current dot color
+  bool valid;   // true if all dots are above available lattice sites.
 
   void createGhostDot(QGraphicsItem *item);
 
@@ -80,6 +94,7 @@ private:
   void zeroGhost();
 
 
+  // check whether a given item is a dot in the lattice
   bool inLattice(QGraphicsItem *item);
 
 };

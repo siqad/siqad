@@ -14,7 +14,7 @@ void prim::MyItem::mousePressEvent(QGraphicsSceneMouseEvent *e)
       if(keymods & Qt::ControlModifier)
         e->setAccepted(false);
       else if(isSelected())
-        emitter->selectClicked(this);
+        prim::Emitter::instance()->selectClicked(this);
       break;
     default:
       break;
@@ -34,7 +34,7 @@ void prim::Aggregate::mousePressEvent(QGraphicsSceneMouseEvent *e)
       if(keymods & Qt::ControlModifier)
         e->setAccepted(false);
       else if(isSelected())
-        emitter->selectClicked(this);
+        prim::Emitter::instance()->selectClicked(this);
       break;
     default:
       break;

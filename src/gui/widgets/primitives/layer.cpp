@@ -3,19 +3,17 @@
 
 uint prim::Layer::layer_cnt = 0;
 
-prim::Layer::Layer(prim::Emitter *em)
+prim::Layer::Layer()
 {
   // initialise control parameters
-  emitter = em;
   visible = true;
   active=true;
   name = QString("Layer %1").arg(layer_cnt++);
 }
 
-prim::Layer::Layer(prim::Emitter *em, const QString &nm)
+prim::Layer::Layer(const QString &nm)
 {
   // initialise control parameters
-  emitter = em;
   visible=true;
   active=true;
   name = nm;

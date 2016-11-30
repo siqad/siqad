@@ -83,8 +83,6 @@ protected:
   void mouseDoubleClickEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
 
   void wheelEvent(QWheelEvent *e) Q_DECL_OVERRIDE;
-  void wheelZoom(QWheelEvent *e, bool boost);
-  void wheelPan(bool boost);
 
   void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
   void keyReleaseEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
@@ -93,7 +91,6 @@ protected:
 private:
 
   QGraphicsScene *scene;
-  prim::Emitter *emitter;
 
   prim::Ghost *ghost;      // temporary item (moving and paste)
   QGraphicsItemGroup *clipboard;  // deep copy storage for copy/paste
@@ -118,6 +115,9 @@ private:
   ToolType tool_type;
 
   // ASSIST METHODS
+
+  void wheelZoom(QWheelEvent *e, bool boost);
+  void wheelPan(bool boost);
 
   // assert bounds on zoom range
   void boundZoom(qreal *ds);
@@ -150,6 +150,9 @@ private:
   void saveToClipBoard(QList<QGraphicsItem*> items);
   void saveToClipBoard(QGraphicsItem *item);
 
+
+  // GHOST METHODS
+
   // create a mobile image of either the selected item or the clipboard
   void createGhost(bool selected);
 
@@ -163,6 +166,10 @@ private:
   // was updated (need to change ghost location), *offset will be the offset
   // between the offset of the snap ghost location
   bool snapGhost(QPointF scene_pos, QPointF *offset);
+
+  // moving routine
+  void initMove();
+  void completeMove();
 
 };
 

@@ -6,8 +6,6 @@
 #include <QGraphicsItemGroup>
 #include <QString>
 
-#include "emitter.h"
-
 namespace prim{
 
 // Base class for design layers
@@ -16,8 +14,8 @@ class Layer
 public:
 
   // constructor
-  Layer(prim::Emitter *emitter);
-  Layer(prim::Emitter *emitter, const QString &name);
+  Layer();
+  Layer(const QString &name);
 
   // destructor
   ~Layer();
@@ -47,10 +45,6 @@ public:
 
   const QString getName();
   QList<QGraphicsItem*> getItems();
-
-protected:
-
-  prim::Emitter *emitter;
 
 private:
 

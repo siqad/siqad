@@ -23,8 +23,7 @@ gui::DesignWidget::DesignWidget(QWidget *parent)
   scene = new QGraphicsScene(this);
   setScene(scene);
 
-  emitter = new prim::Emitter();
-  connect(emitter, &prim::Emitter::sig_selectClicked, this, &gui::DesignWidget::selectClicked);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked, this, &gui::DesignWidget::selectClicked);
 
   // setup flags
   clicked = false;
@@ -63,7 +62,6 @@ gui::DesignWidget::DesignWidget(QWidget *parent)
 
 gui::DesignWidget::~DesignWidget()
 {
-  delete emitter;
   delete scene;
 }
 
@@ -71,13 +69,13 @@ gui::DesignWidget::~DesignWidget()
 
 void gui::DesignWidget::addLayer()
 {
-  prim::Layer *layer = new prim::Layer(emitter);
+  prim::Layer *layer = new prim::Layer();
   layers.append(layer);
 }
 
 void gui::DesignWidget::addLayer(const QString &name)
 {
-  prim::Layer *layer = new prim::Layer(emitter, name);
+  prim::Layer *layer = new prim::Layer(name);
   layers.append(layer);
 }
 
@@ -201,9 +199,9 @@ void gui::DesignWidget::buildLattice(const QString fname)
   // build the new lattice
   gui::Lattice *lattice=0;
   if(fname.isEmpty())
-    lattice = new Lattice(emitter);
+    lattice = new Lattice();
   else
-    lattice = new Lattice(emitter, fname);
+    lattice = new Lattice(fname);
 
   // add lattice dots to the scene
   QGraphicsItem *item=0;
@@ -276,13 +274,8 @@ void gui::DesignWidget::setFills(float *fills)
 
 void gui::DesignWidget::selectClicked(QGraphicsItem *item)
 {
-  if(tool_type == gui::DesignWidget::SelectTool){
-    // create ghost of selected items
-    createGhost(true);
-
-    // set ghosting type
-    moving = true;
-  }
+  if(tool_type == gui::DesignWidget::SelectTool)
+    initMove();
 }
 
 
@@ -319,7 +312,7 @@ void gui::DesignWidget::mouseMoveEvent(QMouseEvent *e)
     QPointF scene_pos = mapToScene(e->pos());
     QPointF offset;
     if(snapGhost(scene_pos, &offset))
-      ghost->setPos(scene_pos+offset);
+      ghost->setPos(ghost->pos()+offset);
   }
   else if(clicked){
     switch(e->buttons()){
@@ -580,23 +573,20 @@ void gui::DesignWidget::filterSelection(bool select_flag)
     QGraphicsItem *item=0;
 
     // if select, reject items in the lattice, otherwise keep only items in the lattice
-    for(int i=0; i<items.count(); i++){
-      item = items.at(i);
-      if(inLattice(item) == select_flag)
-        item->setSelected(false);
+    for(QList<QGraphicsItem*>::iterator it=items.begin(); it!=items.end(); ++it){
+      if(inLattice(*it)==select_flag)
+        (*it)->setSelected(false);
     }
-
-    //qDebug() << QString("%1 items selected").arg(scene->selectedItems().count());
 }
 
 // Items in the lattice will always be DBDots not belonging to a group
 // for now, assume items not in groups are DBDots
 bool gui::DesignWidget::inLattice(QGraphicsItem *item)
 {
-  prim::DBDot *dot = 0;
+  prim::MyItem *p = 0;
   if(item->childItems().count()==0){
-    dot = (prim::DBDot*)item;
-    if(dot->inLattice())
+    p = (prim::MyItem*)item;
+    if(p->layer==0)
       return true;
   }
   return false;
@@ -619,7 +609,7 @@ void gui::DesignWidget::createDB(prim::DBDot *dot)
   QPointF loc = dot->getPhysLoc();
 
   // create new db and set lattice site as non-selectable
-  prim::DBDot *db = new prim::DBDot(emitter, loc, false, dot);
+  prim::DBDot *db = new prim::DBDot(loc, 1, dot);
   dot->setFlag(QGraphicsItem::ItemIsSelectable, false);
 
 
@@ -644,7 +634,7 @@ void gui::DesignWidget::destroyDB(prim::DBDot *dot)
 
 void gui::DesignWidget::createAggregate()
 {
-  prim::Aggregate *aggregate = new prim::Aggregate(emitter);
+  prim::Aggregate *aggregate = new prim::Aggregate();
   QList<QGraphicsItem*> items=scene->selectedItems();
 
   if(items.count()>0){
@@ -762,6 +752,7 @@ void gui::DesignWidget::plantGhost()
 
 }
 
+
 void gui::DesignWidget::destroyGhost()
 {
   // delete old ghost
@@ -784,35 +775,68 @@ bool gui::DesignWidget::snapGhost(QPointF scene_pos, QPointF *offset)
   QGraphicsItem *new_target = 0;
 
   QRectF rect;
-  QPointF scene_anchor = scene_pos+ghost->getAnchor();
-  rect.moveCenter(scene_anchor);
+  QPointF old_anchor = ghost->pos()+ghost->getAnchor();
+  QPointF free_anchor = scene_pos+ghost->getAnchor();
+
+  // get all possible new anchors near the free_anchor
+  rect.moveCenter(free_anchor);
   rect.setSize(QSize(snap_diameter, snap_diameter));
   QList<QGraphicsItem*> near_items = scene->items(rect);
+
+  // if no items nearby, change nothing
+  if(near_items.count()==0)
+    return false;
 
   // select the nearest lattice point to the anchor
   QPointF delta, min_delta;
   qreal dist, min_dist=-1;
 
-  if(near_items.count()>0){
-    for(int i=0; i<near_items.count(); i++){
-      if(inLattice(near_items.at(i)) && (near_items.at(i)->flags() & QGraphicsItem::ItemIsSelectable)){
-        delta = near_items.at(i)->pos() - scene_anchor;
-        dist = delta.manhattanLength();
+  for(QList<QGraphicsItem*>::iterator it=near_items.begin(); it!=near_items.end(); ++it){
+    if(inLattice(*it) && ((*it)->flags() & QGraphicsItem::ItemIsSelectable)){
+      // want nearest snap point to cursor which gives a valid ghost
+      delta = (*it)->pos() - old_anchor;
+      if(ghost->checkValid(delta)){
+        // distance measured from cursor to snap point, not from old ghost
+        dist = ((*it)->pos()-free_anchor).manhattanLength();
         if(min_dist < 0 || dist < min_dist){
           min_delta = delta;
           min_dist = dist;
-          new_target = near_items.at(i);
+          new_target = *it;
         }
       }
     }
   }
 
-  // register if snap target has changed and update
-  bool change_flag = (new_target != snap_target);
 
-  snap_target = new_target;
-  *offset = min_delta;
+  // register if snap target has changed and update
+  bool change_flag = dist >= 0 && (new_target != snap_target);
+
+  if(change_flag){
+    snap_target = new_target;
+    *offset = min_delta;
+    ghost->updateValid();
+  }
 
   return change_flag;
+}
 
+
+
+void gui::DesignWidget::initMove()
+{
+
+  // create ghost
+  createGhost(true);
+
+  // set lattice sites of object to be moved as selectable
+  QList<prim::DBDot*> dbs = ghost->getLattice();
+  for(QList<prim::DBDot*>::iterator it=dbs.begin(); it!=dbs.end(); ++it)
+    (*it)->setFlag(QGraphicsItem::ItemIsSelectable, true);
+
+  // set moving flag
+  moving=true;
+}
+
+void gui::DesignWidget::completeMove()
+{
 }

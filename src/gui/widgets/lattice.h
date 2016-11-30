@@ -18,8 +18,8 @@ class Lattice : public prim::Layer
 public:
 
   // constructor
-  Lattice(prim::Emitter *em);
-  Lattice(prim::Emitter *em, const QString &fname);
+  Lattice();
+  Lattice(const QString &fname);
 
   // destructor
   ~Lattice();
@@ -38,7 +38,6 @@ private:
   // construct the QGraphicsItems for the unit cell corresponding to the given
   // lattice vector indices
   void buildUnitCell(QPoint ind);
-
 
 
   QPointF a[2];     // lattice vectors

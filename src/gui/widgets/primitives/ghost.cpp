@@ -4,14 +4,13 @@
 // GHOSTDOT
 
 
-prim::GhostDot::GhostDot(QGraphicsItemGroup *parent, QGraphicsItem *item)
-  : QGraphicsItem()
+prim::GhostDot::GhostDot(QGraphicsItemGroup *parent, QGraphicsItem *item, QColor *col)
+  : prim::MyItem(prim::MyItem::GhostDotType, -1), pcol(col)
 {
   settings::GUISettings gui_settings;
 
   qreal scale_fact = gui_settings.get<qreal>("dbdot/scale_fact");
   diameter = gui_settings.get<qreal>("ghost/dot_diameter")*scale_fact;
-  col = gui_settings.get<QColor>("ghost/col");
 
   setPos(item->pos());
   parent->addToGroup(this);
@@ -23,12 +22,11 @@ QRectF prim::GhostDot::boundingRect() const
 }
 
 
-void prim::GhostDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void prim::GhostDot::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
   painter->setPen(Qt::NoPen);
-  painter->setBrush(col);
+  painter->setBrush(*pcol);
   painter->drawEllipse(boundingRect());
-
 }
 
 
@@ -42,8 +40,14 @@ void prim::GhostDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 prim::Ghost::Ghost(QGraphicsScene *scene)
   : QGraphicsItemGroup()
 {
+  settings::GUISettings gui_settings;
+
   if(scene != 0)
     scene->addItem(this);
+
+  // don't make any asusmption that initial location is valid
+  col = gui_settings.get<QColor>("ghost/invalid_col");
+  valid=false;
 }
 
 
@@ -63,6 +67,9 @@ void prim::Ghost::prepare(const QList<QGraphicsItem*> &items)
     prepareItem(items.at(i));
 
   zeroGhost();
+
+  // set valid to false until snapping begins
+  valid = false;
 }
 
 
@@ -71,6 +78,9 @@ void prim::Ghost::prepare(QGraphicsItem *item)
   cleanGhost();
   prepareItem(item);
   zeroGhost();
+
+  // set valid to false until snapping begins
+  valid = false;
 }
 
 QList<prim::DBDot*> prim::Ghost::getTargets()
@@ -106,7 +116,6 @@ QList<QGraphicsItem*> prim::Ghost::getSource() const
   return source;
 }
 
-
 void prim::Ghost::flip(bool horiz)
 {
   QGraphicsItem *item = 0;
@@ -118,18 +127,58 @@ void prim::Ghost::flip(bool horiz)
     else
       item->setY(-item->y());
   }
+
+  updateValid();
 }
 
 void prim::Ghost::rotate(bool cw)
 {
   qreal deg = cw ? -90 : 90;
   setRotation(rotation() + deg);
+
+  updateValid();
 }
 
 
 QPointF prim::Ghost::getAnchor() const
 {
   return dots.at(0)->pos();
+}
+
+
+void prim::Ghost::updateValid()
+{
+  if(checkValid()!=valid)
+    setValid(!valid);
+}
+
+void prim::Ghost::setValid(bool flag)
+{
+  settings::GUISettings gui_settings;
+
+  if(valid != flag){
+    valid = flag;
+    if(valid)
+      col = gui_settings.get<QColor>("ghost/valid_col");
+    else
+      col = gui_settings.get<QColor>("ghost/invalid_col");
+  }
+}
+
+bool prim::Ghost::checkValid(QPointF offset)
+{
+
+  // get lattice beneath ghost dots
+  QList<prim::DBDot*> dbs = getLattice(offset);
+
+  // ghost is invalid if there is a ghost dot which does not correspond to a
+  // selectable lattice db.
+  for(QList<prim::DBDot*>::iterator it=dbs.begin(); it!=dbs.end(); ++it){
+    if(!(*it) || !((*it)->flags() & QGraphicsItem::ItemIsSelectable))
+      return false;
+  }
+
+  return true;
 }
 
 
@@ -143,7 +192,7 @@ QPointF prim::Ghost::getAnchor() const
 void prim::Ghost::createGhostDot(QGraphicsItem *item)
 {
   settings::GUISettings gui_settings;
-  prim::GhostDot *dot = new prim::GhostDot(this, item);
+  prim::GhostDot *dot = new prim::GhostDot(this, item, &col);
 
   dots.append(dot);
   source.append(item);
@@ -152,7 +201,6 @@ void prim::Ghost::createGhostDot(QGraphicsItem *item)
 
 void prim::Ghost::prepareItem(QGraphicsItem *item)
 {
-  QGraphicsItem *cp=0;
   if(item->childItems().count()==0)
     createGhostDot(item);
   else{
@@ -174,6 +222,8 @@ void prim::Ghost::cleanGhost()
   // free dots and source lists... dots should have already been deleted
   source.clear();
   dots.clear();
+
+  valid = false;
 }
 
 void prim::Ghost::zeroGhost()
@@ -192,18 +242,44 @@ void prim::Ghost::zeroGhost()
 }
 
 
-
-
 bool prim::Ghost::inLattice(QGraphicsItem *item)
 {
   prim::MyItem *p;
-  prim::DBDot *db;
   if(item->childItems().count()==0){
     p = (prim::MyItem *)item;
-    if(p->item_type == prim::MyItem::DotType){
-      db = (prim::DBDot *)p;
-      return db->inLattice();
-    }
+    return p->layer==0;
   }
   return false;
+}
+
+
+// for each ghost dot, check if there is a lattice dot which intersects the
+// location of the ghost dot. If true, append that dot, else append a null pointer
+QList<prim::DBDot*> prim::Ghost::getLattice(QPointF offset)
+{
+  QList<prim::DBDot*> lattice;
+  prim::MyItem *p=0;
+
+  // for each ghost dot
+  for(int i=0; i<dots.count(); i++){
+
+    // get list of items which intersect the ghost dot
+    QPointF pos = mapToScene(dots.at(i)->pos());
+    QList<QGraphicsItem*> cands = scene()->items(pos+offset);
+
+    // check for lattice dbdot in candidates
+    prim::DBDot *db=0;
+    for(QList<QGraphicsItem*>::iterator it=cands.begin(); it != cands.end(); ++it){
+      if((*it)->childItems().count()==0){
+        p = (prim::MyItem*)*it;
+        if(p->layer==0){
+          db = (prim::DBDot*)*it;
+          break;
+        }
+      }
+    }
+    lattice.append(db);
+  }
+
+  return lattice;
 }

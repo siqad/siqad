@@ -4,18 +4,19 @@
 #include <QObject>
 #include <QGraphicsItem>
 
+
+
 namespace prim{
 
+// singleton class
 class Emitter : public QObject
 {
   Q_OBJECT
 
 public:
+  // get or create static instance of Emitter object
+  static Emitter *instance();
 
-  //constructor
-  Emitter() : QObject(){}
-
-  //destructor
   ~Emitter() {}
 
   void selectClicked(QGraphicsItem *item)
@@ -28,6 +29,11 @@ signals:
   void sig_selectClicked(QGraphicsItem *item);
 
 private:
+
+  // constructor private: singleton
+  Emitter() : QObject(){}
+
+  static Emitter *inst;   // static pointer to instance
 
 };
 

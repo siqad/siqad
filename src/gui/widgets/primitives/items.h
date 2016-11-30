@@ -17,16 +17,17 @@ class MyItem : public QGraphicsItem
 {
 public:
 
-  enum ItemType{DotType, Text};
+  enum ItemType{DBDotType, GhostDotType, Text};
 
   // constructor
-  MyItem(Emitter *em, QGraphicsItem *parent=0)
-    : QGraphicsItem(parent), emitter(em), item_type(DotType) {}
+  MyItem(ItemType type = DBDotType, int lay = -1, QGraphicsItem *parent=0)
+    : QGraphicsItem(parent), item_type(type), layer(lay) {}
 
   // destructor
   ~MyItem(){}
 
-  ItemType item_type;
+  ItemType item_type;   // describes the type of the item.
+  int layer;           // current layer containing the item.
 
 protected:
 
@@ -34,12 +35,9 @@ protected:
   //void mouseMoveEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
   //void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
-  prim::Emitter *emitter;
-
 private:
+
 };
-
-
 
 
 class Aggregate : public QGraphicsItemGroup
@@ -47,8 +45,8 @@ class Aggregate : public QGraphicsItemGroup
 public:
 
   // constructor
-  Aggregate(Emitter *em, QGraphicsItem *parent=0)
-    : QGraphicsItemGroup(parent), emitter(em) {}
+  Aggregate(QGraphicsItem *parent=0)
+    : QGraphicsItemGroup(parent) {}
 
   // destructor
   ~Aggregate(){}
@@ -58,8 +56,6 @@ protected:
   void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
   //void mouseMoveEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
   //void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
-
-  prim::Emitter *emitter;
 
 private:
 
