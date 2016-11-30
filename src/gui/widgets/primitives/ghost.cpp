@@ -167,7 +167,7 @@ void prim::Ghost::setValid(bool flag)
 
 bool prim::Ghost::checkValid(QPointF offset)
 {
-
+  return true;
   // get lattice beneath ghost dots
   QList<prim::DBDot*> dbs = getLattice(offset);
 

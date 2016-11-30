@@ -5,6 +5,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QList>
+#include <QHash>
 
 #include <QRectF>
 #include <QPointF>
@@ -36,6 +37,8 @@ private:
 class Ghost : public QGraphicsItemGroup
 {
 public:
+
+  QHash<prim::DBDot*, bool> valid_hash; // hash table for valid snap points
 
   // constructor
   Ghost(QGraphicsScene *scene=0);

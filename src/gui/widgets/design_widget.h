@@ -105,7 +105,7 @@ private:
   bool moving;
 
   qreal snap_diameter;
-  QGraphicsItem *snap_target;
+  prim::DBDot *snap_target;
 
   //QGraphicsItem *clicked_item;
 

@@ -787,34 +787,49 @@ bool gui::DesignWidget::snapGhost(QPointF scene_pos, QPointF *offset)
   if(near_items.count()==0)
     return false;
 
-  // select the nearest lattice point to the anchor
-  QPointF delta, min_delta;
+  // SPEED UP:
+  // - only consider nearest selectable lattice site (don't pick minimum)
+  // - don't need to check validity of sites checked before (hash table?)
+  //
+
+  // select the nearest lattice point to the free_anchor
+  prim::DBDot *target=0;
   qreal dist, min_dist=-1;
 
   for(QList<QGraphicsItem*>::iterator it=near_items.begin(); it!=near_items.end(); ++it){
     if(inLattice(*it) && ((*it)->flags() & QGraphicsItem::ItemIsSelectable)){
-      // want nearest snap point to cursor which gives a valid ghost
-      delta = (*it)->pos() - old_anchor;
-      if(ghost->checkValid(delta)){
-        // distance measured from cursor to snap point, not from old ghost
-        dist = ((*it)->pos()-free_anchor).manhattanLength();
-        if(min_dist < 0 || dist < min_dist){
-          min_delta = delta;
-          min_dist = dist;
-          new_target = *it;
-        }
+      dist = ((*it)->pos()-free_anchor).manhattanLength();
+      if(min_dist < 0 || dist < min_dist){
+        target = (prim::DBDot*)(*it);
+        min_dist = dist;
       }
     }
   }
 
+  // if there is no valid target or the target hasn't changed, change nothing
+  if(!target || (target == snap_target))
+    return false;
 
-  // register if snap target has changed and update
-  bool change_flag = dist >= 0 && (new_target != snap_target);
-
-  if(change_flag){
-    snap_target = new_target;
-    *offset = min_delta;
-    ghost->updateValid();
+  bool change_flag = false;
+  *offset = target->pos() - old_anchor;
+  if(ghost->valid_hash.contains(target)){
+    // if target known to be valid, update ghost
+    if(ghost->valid_hash[target]){
+      snap_target = target;
+      ghost->setValid(true);
+      change_flag = true;
+    }
+  }
+  else{
+    // determine if target is valid
+    bool valid = ghost->checkValid(*offset);
+    if(valid){
+      snap_target = target;
+      ghost->setValid(true);
+      change_flag = true;
+    }
+    // insert new key into hash table
+    ghost->valid_hash[target] = valid;
   }
 
   return change_flag;
