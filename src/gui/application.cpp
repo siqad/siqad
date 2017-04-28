@@ -37,7 +37,7 @@ gui::ApplicationGUI::ApplicationGUI(QWidget *parent)
   loadSettings();
 
   // setup problem and solver parameters
-  problem = new  core::Problem();
+  //problem = new  core::Problem();
 }
 
 gui::ApplicationGUI::~ApplicationGUI()
@@ -48,7 +48,7 @@ gui::ApplicationGUI::~ApplicationGUI()
   // delete tool bars... may not be needed
   delete top_bar;
   delete side_bar;
-  delete problem;
+  //delete problem;
 }
 
 void gui::ApplicationGUI::initGui()
@@ -223,8 +223,8 @@ void gui::ApplicationGUI::changeLattice()
 void gui::ApplicationGUI::runSimulation()
 {
 
-  if(problem==0)
-    qFatal("Problem instance not initialised");
+  // if(problem==0)
+  //   qFatal("Problem instance not initialised");
 
   QList<prim::DBDot*> dbs = design_wg->getSurfaceDBs();
   if(dbs.count()==0){
@@ -232,7 +232,7 @@ void gui::ApplicationGUI::runSimulation()
     return;
   }
 
-  problem->setSurface(dbs);
+  //problem->setSurface(dbs);
 
   // engines::SimulatedAnnealer SA;
   //

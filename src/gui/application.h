@@ -12,7 +12,7 @@
 #include "widgets/info_panel.h"
 
 // solver engines
-#include "src/engines/core/problem.h"
+//#include "src/engines/core/problem.h"
 //#include "src/engines/simulated_annealer.h"
 
 namespace Ui
@@ -75,7 +75,7 @@ private:
 
 
   // problem and solver parameters
-  core::Problem *problem;
+  //core::Problem *problem;
 };
 
 } // end namespace gui
