@@ -1,3 +1,13 @@
+// @file:     application.cpp
+// @author:   Jake
+// @created:  2016.10.31
+// @editted:  2017.05.01  - Jake
+// @license:  GNU LGPL v3
+//
+// @desc:     Definitions of the Application functions
+
+
+
 // ---------------------------------------------------------------------
 // Qt inclusions
 #include <QApplication>

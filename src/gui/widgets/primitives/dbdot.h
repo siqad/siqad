@@ -1,3 +1,11 @@
+// @file:     dbdot.h
+// @author:   Jake
+// @created:  2016.11.15
+// @editted:  2017.05.01  - Jake
+// @license:  GNU LGPL v3
+//
+// @desc:     DBDot Widget for functionality of dangling bonds
+
 #ifndef _GUI_PR_DBDOT_H_
 #define _GUI_PR_DBDOT_H_
 

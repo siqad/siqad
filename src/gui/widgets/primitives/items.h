@@ -1,7 +1,14 @@
+// @file:     items.h
+// @author:   Jake
+// @created:  2016.11.21
+// @editted:  2017.05.01  - Jake
+// @license:  GNU LGPL v3
+//
+// @desc:     Base classes for item and itemgroup types with custom signals
+
 #ifndef _PRIM_ITEMS_H_
 #define _PRIM_ITEMS_H_
 
-// BASE CLASSES FOR ITEM AND ITEMGROUP TYPES WITH CUSTOM SIGNALS
 
 #include <QGraphicsItem>
 #include <QGraphicsItemGroup>

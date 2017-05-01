@@ -1,3 +1,11 @@
+// @file:     emitter.cpp
+// @author:   Jake
+// @created:  2016.11.24
+// @editted:  2017.05.01  - Jake
+// @license:  GNU LGPL v3
+//
+// @desc:     Emitter definitions
+
 #include "emitter.h"
 
 

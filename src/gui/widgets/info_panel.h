@@ -1,3 +1,13 @@
+// @file:     info_panel.h
+// @author:   Jake
+// @created:  2016.11.02
+// @editted:  2017.05.01  - Jake
+// @license:  GNU LGPL v3
+//
+// @desc:     unimplemented: Container for discribing information about
+//            current selection/simulations/settings/etc.
+
+
 #ifndef _GUI_INFO_PANEL_H_
 #define _GUI_INFO_PANEL_H_
 
@@ -9,7 +19,7 @@ namespace gui{
 class InfoPanel : public QWidget
 {
   Q_OBJECT
-  
+
 public:
 
   // constructor

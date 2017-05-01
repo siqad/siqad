@@ -1,3 +1,12 @@
+// @file:     layer.cpp
+// @author:   Jake
+// @created:  2016.11.15
+// @editted:  2017.05.01  - Jake
+// @license:  GNU LGPL v3
+//
+// @desc:     Layer definitions.
+
+
 #include "layer.h"
 #include <QDebug>
 

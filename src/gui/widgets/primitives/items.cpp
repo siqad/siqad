@@ -1,3 +1,11 @@
+// @file:     items.cpp
+// @author:   Jake
+// @created:  2016.11.21
+// @editted:  2017.05.01  - Jake
+// @license:  GNU LGPL v3
+//
+// @desc:     Definitions for Item classes
+
 #include "items.h"
 
 #include <QApplication>

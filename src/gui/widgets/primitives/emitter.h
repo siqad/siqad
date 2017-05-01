@@ -1,3 +1,12 @@
+// @file:     emitter.h
+// @author:   Jake
+// @created:  2016.11.24
+// @editted:  2017.05.01  - Jake
+// @license:  GNU LGPL v3
+//
+// @desc:     Assistance class Emitter which allows non QWidget object to trigger
+//            an interrupt to the DesignWidet when clicked.
+
 #ifndef _PRIM_EMITTER_H_
 #define _PRIM_EMITTER_H_
 

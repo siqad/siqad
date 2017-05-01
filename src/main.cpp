@@ -1,3 +1,12 @@
+// @file:     main.cpp
+// @author:   Jake
+// @created:  2016.10.31
+// @editted:  2017.05.01  - Jake
+// @license:  GNU LGPL v3
+//
+// @desc:     Top level preamble and initialization of the ApplicationGUI.
+//            Modify only if you know what you are doing.
+
 #include <QApplication>
 #include <QMainWindow>
 #include <QResource>

@@ -1,3 +1,11 @@
+// @file:     application.h
+// @author:   Jake
+// @created:  2016.10.31
+// @editted:  2017.05.01  - Jake
+// @license:  GNU LGPL v3
+//
+// @desc:     Customized QMainWindow class, ApplicationGUI, for the GUI.
+
 #ifndef _UI_APPLICATION_H_
 #define _UI_APPLICATION_H_
 

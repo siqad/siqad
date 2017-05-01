@@ -1,3 +1,11 @@
+// @file:     dialog_panel.cpp
+// @author:   Jake
+// @created:  2016.11.02
+// @editted:  2017.05.01  - Jake
+// @license:  GNU LGPL v3
+//
+// @desc:     DialogPanel definitinos.
+
 #include "dialog_panel.h"
 #include "src/settings/settings.h"
 

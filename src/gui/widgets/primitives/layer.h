@@ -1,3 +1,12 @@
+// @file:     layer.h
+// @author:   Jake
+// @created:  2016.11.15
+// @editted:  2017.05.01  - Jake
+// @license:  GNU LGPL v3
+//
+// @desc:     Container class for different layers of the design. The surface
+//            and subtrate lattice are special cases.
+
 #ifndef _GUI_PR_LAYER_H_
 #define _GUI_PR_LAYER_H_
 

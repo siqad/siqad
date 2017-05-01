@@ -1,3 +1,13 @@
+// @file:     lattice.h
+// @author:   Jake
+// @created:  2016.11.15
+// @editted:  2017.05.01  - Jake
+// @license:  GNU LGPL v3
+//
+// @desc:     Specialized Layer class, Lattice, which details the dangling
+//            bond locations.
+
+
 #ifndef _GUI_LATTICE_H_
 #define _GUI_LATTICE_H_
 

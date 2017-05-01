@@ -1,3 +1,13 @@
+// @file:     design_widget.cpp
+// @author:   Jake
+// @created:  2016.11.02
+// @editted:  2017.05.01  - Jake
+// @license:  GNU LGPL v3
+//
+// @desc:     Top level widget for the design window. Contains all layers and
+//            functionality for reating, selecting, moving, etc. object in the
+//            design.
+
 #ifndef _GUI_DESIGN_WIDGET_H_
 #define _GUI_DESIGN_WIDGET_H_
 
@@ -24,6 +34,10 @@
 
 namespace gui{
 
+/*
+Highest level of the design window visualization. Contains all functionality
+for creating and viewing dangling bonds.
+*/
 class DesignWidget : public QGraphicsView
 {
   Q_OBJECT
