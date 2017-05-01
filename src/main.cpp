@@ -19,6 +19,8 @@
 #include <ctime>
 
 
+// If the ApplicationGUI DialogPanel is defined, redirects the standard
+// outputs to display in the panel (calls DialogPanel::echo).
 static void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
   if(gui::ApplicationGUI::dialog_wg==0){
@@ -69,18 +71,19 @@ int main(int argc, char **argv){
 
   settings::AppSettings app_settings;
 
+  // call the message handler only if the override flag is set
   if(app_settings.get<bool>("log/override"))
     qInstallMessageHandler(messageHandler);
   else
     qDebug("Using default qdebug target");
 
+  // initialise QApplication
   QApplication app(argc, argv);
 
   // Main Window
   gui::ApplicationGUI w;
 
   w.setWindowTitle("Dangling Bond Simulator");
-
   w.show();
 
   return app.exec();

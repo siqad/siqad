@@ -48,11 +48,19 @@ public:
 
 public slots:
 
+  // Update the current tool functinality of the cursor
   void setToolSelect();
   void setToolDrag();
   void setToolDBGen();
 
+  // Change the active lattice
   void changeLattice();
+
+  // Start current simulation method
+  // ... it might be worth modifyin the work-flow such that instead of running
+  // the simulation method we push the problem onto a working stack to be run
+  // in the background: will need to be able to display results on request
+  // after job finished.
   void runSimulation();
 
 protected:
