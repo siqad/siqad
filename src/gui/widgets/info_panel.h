@@ -25,7 +25,7 @@ public:
   // constructor
   InfoPanel(QWidget *parent = 0);
 
-  // deconstructor
+  // destructor
   ~InfoPanel();
 
 private:

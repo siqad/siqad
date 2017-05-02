@@ -79,6 +79,9 @@ void gui::ApplicationGUI::initGui()
   // dialog panel
   dialog_wg = new gui::DialogPanel(this);
 
+  // input field
+  input_field = new gui::InputField(this);
+
   // info panel
   info_wg = new gui::InfoPanel(this);
 
@@ -86,8 +89,12 @@ void gui::ApplicationGUI::initGui()
   QWidget *main_widget = new QWidget(this);
   QVBoxLayout *vbl = new QVBoxLayout();
   QHBoxLayout *hbl = new QHBoxLayout();
+  QVBoxLayout *vbl_l = new QVBoxLayout();
 
-  hbl->addWidget(dialog_wg, 1);
+  vbl_l->addWidget(dialog_wg, 1);
+  vbl_l->addWidget(input_field, 0);
+
+  hbl->addLayout(vbl_l, 1);
   hbl->addWidget(info_wg, 1);
 
   vbl->addWidget(design_wg, 2);
@@ -95,6 +102,13 @@ void gui::ApplicationGUI::initGui()
 
   main_widget->setLayout(vbl);
   setCentralWidget(main_widget);
+
+  // special cases for connections
+
+  connect(input_field, &gui::InputField::returnPressed,
+            this, &gui::ApplicationGUI::parseInputField);
+
+
 }
 
 void gui::ApplicationGUI::initMenuBar()
@@ -240,6 +254,20 @@ void gui::ApplicationGUI::selectColor()
   QColor col = QColorDialog::getColor(Qt::white, this,
     tr("Select a color"), QColorDialog::ShowAlphaChannel);
 }
+
+
+void gui::ApplicationGUI::parseInputField()
+{
+  // get input from input_field, remove leading/trailing whitespace
+  QString input = input_field->pop();
+
+  // if input string is not empty, do something
+  if(!input.isEmpty()){
+    // for now, just echo input to stdout
+    qDebug() << input;
+  }
+}
+
 
 void gui::ApplicationGUI::runSimulation()
 {

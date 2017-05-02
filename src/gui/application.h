@@ -17,7 +17,9 @@
 // Widget inclusions
 #include "widgets/design_panel.h"
 #include "widgets/dialog_panel.h"
+#include "widgets/input_field.h"
 #include "widgets/info_panel.h"
+
 
 // solver engines
 //#include "src/engines/core/problem.h"
@@ -59,6 +61,9 @@ public slots:
   // Tool for converting colors into QVariant strings
   void selectColor();
 
+  // Parse input field and act accordingly
+  void parseInputField();
+
   // Start current simulation method
   // ... it might be worth modifyin the work-flow such that instead of running
   // the simulation method we push the problem onto a working stack to be run
@@ -85,6 +90,7 @@ private:
   // functional widgets
   gui::DesignPanel *design_wg;
   gui::InfoPanel *info_wg;
+  gui::InputField *input_field;
 
   // action pointers
   QAction *action_select_tool;

@@ -23,6 +23,7 @@ HEADERS += \
 	src/settings/settings.h \
 	src/gui/widgets/design_panel.h \
 	src/gui/widgets/dialog_panel.h \
+	src/gui/widgets/input_field.h \
 	src/gui/widgets/info_panel.h \
 	src/gui/widgets/lattice.h \
 	src/gui/widgets/primitives/emitter.h \
@@ -37,6 +38,7 @@ SOURCES += \
 	src/settings/settings.cpp \
 	src/gui/widgets/design_panel.cpp \
 	src/gui/widgets/dialog_panel.cpp \
+	src/gui/widgets/input_field.cpp \
 	src/gui/widgets/info_panel.cpp \
 	src/gui/widgets/lattice.cpp \
 	src/gui/widgets/primitives/emitter.cpp \

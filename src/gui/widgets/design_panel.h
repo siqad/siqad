@@ -1,4 +1,4 @@
-// @file:     design_panel.cpp
+// @file:     design_panel.h
 // @author:   Jake
 // @created:  2016.11.02
 // @editted:  2017.05.01  - Jake
