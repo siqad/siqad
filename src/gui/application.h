@@ -1,7 +1,7 @@
 // @file:     application.h
 // @author:   Jake
 // @created:  2016.10.31
-// @editted:  2017.05.01  - Jake
+// @editted:  2017.05.02  - Jake
 // @license:  GNU LGPL v3
 //
 // @desc:     Customized QMainWindow class, ApplicationGUI, for the GUI.
@@ -15,7 +15,7 @@
 #include <QFileDialog>
 
 // Widget inclusions
-#include "widgets/design_widget.h"
+#include "widgets/design_panel.h"
 #include "widgets/dialog_panel.h"
 #include "widgets/info_panel.h"
 
@@ -56,6 +56,9 @@ public slots:
   // Change the active lattice
   void changeLattice();
 
+  // Tool for converting colors into QVariant strings
+  void selectColor();
+
   // Start current simulation method
   // ... it might be worth modifyin the work-flow such that instead of running
   // the simulation method we push the problem onto a working stack to be run
@@ -80,7 +83,7 @@ private:
   QToolBar *side_bar;
 
   // functional widgets
-  gui::DesignWidget *design_wg;
+  gui::DesignPanel *design_wg;
   gui::InfoPanel *info_wg;
 
   // action pointers

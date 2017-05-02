@@ -1,15 +1,15 @@
-// @file:     design_widget.cpp
+// @file:     design_panel.cpp
 // @author:   Jake
 // @created:  2016.11.02
 // @editted:  2017.05.01  - Jake
 // @license:  GNU LGPL v3
 //
-// @desc:     Top level widget for the design window. Contains all layers and
+// @desc:     Top level widget for the design panel. Contains all layers and
 //            functionality for reating, selecting, moving, etc. object in the
 //            design.
 
-#ifndef _GUI_DESIGN_WIDGET_H_
-#define _GUI_DESIGN_WIDGET_H_
+#ifndef _GUI_DESIGN_PANEL_H_
+#define _GUI_DESIGN_PANEL_H_
 
 #include <QObject>
 #include <QWidget>
@@ -38,7 +38,7 @@ namespace gui{
 Highest level of the design window visualization. Contains all functionality
 for creating and viewing dangling bonds.
 */
-class DesignWidget : public QGraphicsView
+class DesignPanel : public QGraphicsView
 {
   Q_OBJECT
 
@@ -47,10 +47,10 @@ public:
   enum ToolType{SelectTool, DragTool, DBGenTool};
 
   // constructor
-  DesignWidget(QWidget *parent = 0);
+  DesignPanel(QWidget *parent = 0);
 
   // deconstructor
-  ~DesignWidget();
+  ~DesignPanel();
 
   // accessors
 

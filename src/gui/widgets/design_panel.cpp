@@ -1,12 +1,12 @@
-// @file:     design_widget.cpp
+// @file:     design_panel.cpp
 // @author:   Jake
 // @created:  2016.11.02
-// @editted:  2017.05.01  - Jake
+// @editted:  2017.05.02  - Jake
 // @license:  GNU LGPL v3
 //
-// @desc:     DesignWidget definitions
+// @desc:     DesignPanel definitions
 
-#include "design_widget.h"
+#include "design_panel.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -22,7 +22,7 @@
 #include "lattice.h"
 
 
-gui::DesignWidget::DesignWidget(QWidget *parent)
+gui::DesignPanel::DesignPanel(QWidget *parent)
   :QGraphicsView(parent)
 {
   settings::GUISettings gui_settings;
@@ -31,7 +31,7 @@ gui::DesignWidget::DesignWidget(QWidget *parent)
   scene = new QGraphicsScene(this);
   setScene(scene);
 
-  connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked, this, &gui::DesignWidget::selectClicked);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked, this, &gui::DesignPanel::selectClicked);
 
   // setup flags
   clicked = false;
@@ -43,7 +43,7 @@ gui::DesignWidget::DesignWidget(QWidget *parent)
   snap_target = 0;
   ghost = 0;
 
-  tool_type = gui::DesignWidget::SelectTool;
+  tool_type = gui::DesignPanel::SelectTool;
 
   setDragMode(QGraphicsView::RubberBandDrag);
   setRubberBandSelectionMode(Qt::ContainsItemBoundingRect);
@@ -68,20 +68,20 @@ gui::DesignWidget::DesignWidget(QWidget *parent)
   top_layer = layers.at(1);
 }
 
-gui::DesignWidget::~DesignWidget()
+gui::DesignPanel::~DesignPanel()
 {
   delete scene;
 }
 
 
 
-void gui::DesignWidget::addLayer()
+void gui::DesignPanel::addLayer()
 {
   prim::Layer *layer = new prim::Layer();
   layers.append(layer);
 }
 
-void gui::DesignWidget::addLayer(const QString &name)
+void gui::DesignPanel::addLayer(const QString &name)
 {
   prim::Layer *layer = new prim::Layer(name);
   layers.append(layer);
@@ -89,7 +89,7 @@ void gui::DesignWidget::addLayer(const QString &name)
 
 
 
-void gui::DesignWidget::removeLayer(const QString &name)
+void gui::DesignPanel::removeLayer(const QString &name)
 {
   bool removed=false;
   for(int i=0; i<layers.count(); i++){
@@ -104,7 +104,7 @@ void gui::DesignWidget::removeLayer(const QString &name)
     qWarning() << QString("Failed to remove layer : %1").arg(name);
 }
 
-void gui::DesignWidget::removeLayer(int n)
+void gui::DesignPanel::removeLayer(int n)
 {
   if(n<0 || n>= layers.count())
     qWarning("Layer index out of bounds...");
@@ -132,7 +132,7 @@ void gui::DesignWidget::removeLayer(int n)
 }
 
 
-prim::Layer *gui::DesignWidget::getLayer(const QString &name)
+prim::Layer *gui::DesignPanel::getLayer(const QString &name)
 {
   prim::Layer *layer=0;
   for(int i=0; i<layers.count(); i++){
@@ -148,7 +148,7 @@ prim::Layer *gui::DesignWidget::getLayer(const QString &name)
   return layer;
 }
 
-prim::Layer *gui::DesignWidget::getLayer(int n)
+prim::Layer *gui::DesignPanel::getLayer(int n)
 {
   prim::Layer *layer=0;
   if(n<0 || n>= layers.count())
@@ -158,7 +158,7 @@ prim::Layer *gui::DesignWidget::getLayer(int n)
   return layer;
 }
 
-QList<prim::DBDot*> gui::DesignWidget::getSurfaceDBs()
+QList<prim::DBDot*> gui::DesignPanel::getSurfaceDBs()
 {
   if(layers.count()<2){
     qWarning("requesting non-existant surface...");
@@ -172,7 +172,7 @@ QList<prim::DBDot*> gui::DesignWidget::getSurfaceDBs()
   return dbs;
 }
 
-void gui::DesignWidget::setLayer(const QString &name)
+void gui::DesignPanel::setLayer(const QString &name)
 {
   top_layer = 0;
   for(int i=0; i<layers.count(); i++){
@@ -186,7 +186,7 @@ void gui::DesignWidget::setLayer(const QString &name)
     qWarning("Failed to find layer: top_layer set to NULL");
 }
 
-void gui::DesignWidget::setLayer(int n)
+void gui::DesignPanel::setLayer(int n)
 {
   top_layer=0;
   if(n<0 || n>= layers.count())
@@ -196,7 +196,7 @@ void gui::DesignWidget::setLayer(int n)
 }
 
 
-void gui::DesignWidget::buildLattice(const QString fname)
+void gui::DesignPanel::buildLattice(const QString fname)
 {
   settings::GUISettings gui_settings;
 
@@ -236,7 +236,7 @@ void gui::DesignWidget::buildLattice(const QString fname)
 }
 
 
-void gui::DesignWidget::setTool(gui::DesignWidget::ToolType tool)
+void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
 {
   // if tool is already being used, do nothing
   if(tool==tool_type)
@@ -246,15 +246,15 @@ void gui::DesignWidget::setTool(gui::DesignWidget::ToolType tool)
   scene->clearSelection();
 
   switch(tool){
-    case gui::DesignWidget::SelectTool:
+    case gui::DesignPanel::SelectTool:
       setDragMode(QGraphicsView::RubberBandDrag);
       setInteractive(true);
       break;
-    case gui::DesignWidget::DragTool:
+    case gui::DesignPanel::DragTool:
       setDragMode(QGraphicsView::ScrollHandDrag);
       setInteractive(false);
       break;
-    case gui::DesignWidget::DBGenTool:
+    case gui::DesignPanel::DBGenTool:
       setDragMode(QGraphicsView::RubberBandDrag);
       setInteractive(true);
       break;
@@ -268,7 +268,7 @@ void gui::DesignWidget::setTool(gui::DesignWidget::ToolType tool)
 }
 
 
-void gui::DesignWidget::setFills(float *fills)
+void gui::DesignPanel::setFills(float *fills)
 {
   QList<prim::DBDot*> dbs = getSurfaceDBs();
   for(int i=0; i<dbs.count(); i++)
@@ -280,16 +280,16 @@ void gui::DesignWidget::setFills(float *fills)
 // SLOTS
 
 
-void gui::DesignWidget::selectClicked(QGraphicsItem *item)
+void gui::DesignPanel::selectClicked(QGraphicsItem *item)
 {
-  if(tool_type == gui::DesignWidget::SelectTool)
+  if(tool_type == gui::DesignPanel::SelectTool)
     initMove();
 }
 
 
 // INTERRUPTS
 
-void gui::DesignWidget::mousePressEvent(QMouseEvent *e)
+void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 {
   // set clicked flag and store current mouse position for move behaviour
 
@@ -310,7 +310,7 @@ void gui::DesignWidget::mousePressEvent(QMouseEvent *e)
 }
 
 
-void gui::DesignWidget::mouseMoveEvent(QMouseEvent *e)
+void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
   QPoint delta_mouse_pos;
   QTransform trans = transform();
@@ -348,7 +348,7 @@ void gui::DesignWidget::mouseMoveEvent(QMouseEvent *e)
 
 }
 
-void gui::DesignWidget::mouseReleaseEvent(QMouseEvent *e)
+void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
 {
 
   QGraphicsView::mouseReleaseEvent(e);
@@ -367,10 +367,10 @@ void gui::DesignWidget::mouseReleaseEvent(QMouseEvent *e)
         QGraphicsView::mouseReleaseEvent(e);
         // filter selected items depending on the current tool
         switch(tool_type){
-          case gui::DesignWidget::SelectTool:
+          case gui::DesignPanel::SelectTool:
             filterSelection(true);
             break;
-          case gui::DesignWidget::DBGenTool:
+          case gui::DesignPanel::DBGenTool:
             filterSelection(false);
             createDBs();
             break;
@@ -393,7 +393,7 @@ void gui::DesignWidget::mouseReleaseEvent(QMouseEvent *e)
 }
 
 
-void gui::DesignWidget::mouseDoubleClickEvent(QMouseEvent *e)
+void gui::DesignPanel::mouseDoubleClickEvent(QMouseEvent *e)
 {
   QGraphicsView::mouseDoubleClickEvent(e);
 }
@@ -403,7 +403,7 @@ void gui::DesignWidget::mouseDoubleClickEvent(QMouseEvent *e)
 
 
 
-void gui::DesignWidget::wheelEvent(QWheelEvent *e)
+void gui::DesignPanel::wheelEvent(QWheelEvent *e)
 {
 
   // allow for different scroll types. Note both x and y scrolling
@@ -427,14 +427,14 @@ void gui::DesignWidget::wheelEvent(QWheelEvent *e)
 }
 
 
-void gui::DesignWidget::keyPressEvent(QKeyEvent *e)
+void gui::DesignPanel::keyPressEvent(QKeyEvent *e)
 {
   // for now, just use the default functionality
   QGraphicsView::keyPressEvent(e);
 }
 
 
-void gui::DesignWidget::keyReleaseEvent(QKeyEvent *e)
+void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
 {
   Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
   QGraphicsItemGroup *group = 0;
@@ -458,7 +458,7 @@ void gui::DesignWidget::keyReleaseEvent(QKeyEvent *e)
     switch(e->key()){
       case Qt::Key_G:
         // only do grouping behaviour for surface items
-        if(tool_type != gui::DesignWidget::SelectTool)
+        if(tool_type != gui::DesignPanel::SelectTool)
           break;
         if(keymods == Qt::ControlModifier)
           createAggregate();
@@ -466,11 +466,11 @@ void gui::DesignWidget::keyReleaseEvent(QKeyEvent *e)
           destroyAggregates();
         break;
       case Qt::Key_C:
-        if((tool_type == gui::DesignWidget::SelectTool) && (keymods == Qt::ControlModifier))
+        if((tool_type == gui::DesignPanel::SelectTool) && (keymods == Qt::ControlModifier))
           createGhost(true);
         break;
       case Qt::Key_Delete:
-        if(tool_type == gui::DesignWidget::SelectTool)
+        if(tool_type == gui::DesignPanel::SelectTool)
           deleteSelected();
         break;
       default:
@@ -488,7 +488,7 @@ void gui::DesignWidget::keyReleaseEvent(QKeyEvent *e)
 // ASSIST METHODS
 
 
-void gui::DesignWidget::wheelZoom(QWheelEvent *e, bool boost)
+void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
 {
   settings::GUISettings gui_settings;
 
@@ -520,7 +520,7 @@ void gui::DesignWidget::wheelZoom(QWheelEvent *e, bool boost)
   wheel_deg.setY(0);
 }
 
-void gui::DesignWidget::wheelPan(bool boost)
+void gui::DesignPanel::wheelPan(bool boost)
 {
   settings::GUISettings gui_settings;
 
@@ -556,7 +556,7 @@ void gui::DesignWidget::wheelPan(bool boost)
   translate(dx/trans.m11(), dy/trans.m22());
 }
 
-void gui::DesignWidget::boundZoom(qreal *ds)
+void gui::DesignPanel::boundZoom(qreal *ds)
 {
   settings::GUISettings gui_settings;
   qreal m = transform().m11();  //m = m11 = m22
@@ -569,10 +569,10 @@ void gui::DesignWidget::boundZoom(qreal *ds)
 }
 
 
-void gui::DesignWidget::filterSelection(bool select_flag)
+void gui::DesignPanel::filterSelection(bool select_flag)
 {
     // should only be here if tool_type is either select or dbgen
-    if(tool_type != gui::DesignWidget::SelectTool && tool_type != gui::DesignWidget::DBGenTool){
+    if(tool_type != gui::DesignPanel::SelectTool && tool_type != gui::DesignPanel::DBGenTool){
       qCritical("Filtering selection with invalid tool type...");
       return;
     }
@@ -589,7 +589,7 @@ void gui::DesignWidget::filterSelection(bool select_flag)
 
 // Items in the lattice will always be DBDots not belonging to a group
 // for now, assume items not in groups are DBDots
-bool gui::DesignWidget::inLattice(QGraphicsItem *item)
+bool gui::DesignPanel::inLattice(QGraphicsItem *item)
 {
   prim::MyItem *p = 0;
   if(item->childItems().count()==0){
@@ -601,7 +601,7 @@ bool gui::DesignWidget::inLattice(QGraphicsItem *item)
 }
 
 
-void gui::DesignWidget::createDBs()
+void gui::DesignPanel::createDBs()
 {
   prim::DBDot *dot=0;
   QList<QGraphicsItem*> items = scene->selectedItems();
@@ -612,7 +612,7 @@ void gui::DesignWidget::createDBs()
 }
 
 
-void gui::DesignWidget::createDB(prim::DBDot *dot)
+void gui::DesignPanel::createDB(prim::DBDot *dot)
 {
   QPointF loc = dot->getPhysLoc();
 
@@ -629,7 +629,7 @@ void gui::DesignWidget::createDB(prim::DBDot *dot)
   //qDebug() << QString("DB added at (%1 , %2)").arg(QString::number(loc.x()), QString::number(loc.y()));
 }
 
-void gui::DesignWidget::destroyDB(prim::DBDot *dot)
+void gui::DesignPanel::destroyDB(prim::DBDot *dot)
 {
   // make source lattice site selectable again
   dot->getSource()->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -640,7 +640,7 @@ void gui::DesignWidget::destroyDB(prim::DBDot *dot)
 }
 
 
-void gui::DesignWidget::createAggregate()
+void gui::DesignPanel::createAggregate()
 {
   prim::Aggregate *aggregate = new prim::Aggregate();
   QList<QGraphicsItem*> items=scene->selectedItems();
@@ -654,7 +654,7 @@ void gui::DesignWidget::createAggregate()
   }
 }
 
-void gui::DesignWidget::destroyAggregates()
+void gui::DesignPanel::destroyAggregates()
 {
   QGraphicsItemGroup *group=0;
   QList<QGraphicsItem *> new_selected;
@@ -678,7 +678,7 @@ void gui::DesignWidget::destroyAggregates()
 }
 
 
-void gui::DesignWidget::deleteSelected()
+void gui::DesignPanel::deleteSelected()
 {
   QList<QGraphicsItem*> items = scene->selectedItems();
 
@@ -688,7 +688,7 @@ void gui::DesignWidget::deleteSelected()
 }
 
 // recursively delete all children of a graphics item
-void gui::DesignWidget::deleteItem(QGraphicsItem *item)
+void gui::DesignPanel::deleteItem(QGraphicsItem *item)
 {
   QList<QGraphicsItem*> children = item->childItems();
   prim::DBDot *dot = 0;
@@ -719,7 +719,7 @@ void gui::DesignWidget::deleteItem(QGraphicsItem *item)
 
 
 
-void gui::DesignWidget::createGhost(bool selected)
+void gui::DesignPanel::createGhost(bool selected)
 {
   // delete old ghost if it exists
   destroyGhost();
@@ -747,7 +747,7 @@ void gui::DesignWidget::createGhost(bool selected)
 
 
 
-void gui::DesignWidget::plantGhost()
+void gui::DesignPanel::plantGhost()
 {
   QList<prim::DBDot*> targets = ghost->getTargets();
   QList<QGraphicsItem*> source = ghost->getSource();
@@ -761,7 +761,7 @@ void gui::DesignWidget::plantGhost()
 }
 
 
-void gui::DesignWidget::destroyGhost()
+void gui::DesignPanel::destroyGhost()
 {
   // delete old ghost
   if(ghost != 0){
@@ -778,7 +778,7 @@ void gui::DesignWidget::destroyGhost()
 
 
 
-bool gui::DesignWidget::snapGhost(QPointF scene_pos, QPointF *offset)
+bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF *offset)
 {
   QGraphicsItem *new_target = 0;
 
@@ -845,7 +845,7 @@ bool gui::DesignWidget::snapGhost(QPointF scene_pos, QPointF *offset)
 
 
 
-void gui::DesignWidget::initMove()
+void gui::DesignPanel::initMove()
 {
 
   // create ghost
@@ -860,6 +860,6 @@ void gui::DesignWidget::initMove()
   moving=true;
 }
 
-void gui::DesignWidget::completeMove()
+void gui::DesignPanel::completeMove()
 {
 }

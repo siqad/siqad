@@ -22,6 +22,7 @@
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QPushButton>
+#include <QColorDialog>
 
 // ---------------------------------------------------------------------
 // GUI inclusions
@@ -73,7 +74,7 @@ void gui::ApplicationGUI::initGui()
   initSideBar();
 
   // design widget
-  design_wg = new gui::DesignWidget(this);
+  design_wg = new gui::DesignPanel(this);
 
   // dialog panel
   dialog_wg = new gui::DialogPanel(this);
@@ -111,10 +112,13 @@ void gui::ApplicationGUI::initMenuBar()
   file->addAction(quit);
 
   QAction *change_lattice = new QAction("&Change Lattice...", this);
+  QAction *select_color = new QAction("&Select Color...", this);
   tools->addAction(change_lattice);
+  tools->addAction(select_color);
 
   connect(quit, &QAction::triggered, qApp, QApplication::quit);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
+  connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
 }
 
 void gui::ApplicationGUI::initTopBar()
@@ -204,19 +208,19 @@ void gui::ApplicationGUI::saveSettings()
 void gui::ApplicationGUI::setToolSelect()
 {
   qDebug("selecting select tool");
-  design_wg->setTool(gui::DesignWidget::SelectTool);
+  design_wg->setTool(gui::DesignPanel::SelectTool);
 }
 
 void gui::ApplicationGUI::setToolDrag()
 {
   qDebug("selecting drag tool");
-  design_wg->setTool(gui::DesignWidget::DragTool);
+  design_wg->setTool(gui::DesignPanel::DragTool);
 }
 
 void gui::ApplicationGUI::setToolDBGen()
 {
   qDebug("selecting dbgen tool");
-  design_wg->setTool(gui::DesignWidget::DBGenTool);
+  design_wg->setTool(gui::DesignPanel::DBGenTool);
 }
 
 void gui::ApplicationGUI::changeLattice()
@@ -228,6 +232,13 @@ void gui::ApplicationGUI::changeLattice()
     this, tr("Select lattice file"), dir, tr("INI (*.ini)"));
 
   design_wg->buildLattice(fname);
+}
+
+
+void gui::ApplicationGUI::selectColor()
+{
+  QColor col = QColorDialog::getColor(Qt::white, this,
+    tr("Select a color"), QColorDialog::ShowAlphaChannel);
 }
 
 void gui::ApplicationGUI::runSimulation()

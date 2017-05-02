@@ -72,6 +72,8 @@ int main(int argc, char **argv){
   settings::AppSettings app_settings;
 
   // call the message handler only if the override flag is set
+  // note that if the override is set and the log file is suppresed there will
+  // be no way to get error messages if the app crashes.
   if(app_settings.get<bool>("log/override"))
     qInstallMessageHandler(messageHandler);
   else

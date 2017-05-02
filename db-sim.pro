@@ -21,7 +21,7 @@ RESOURCES = resources/application.qrc
 HEADERS += \
 	src/gui/application.h \
 	src/settings/settings.h \
-	src/gui/widgets/design_widget.h \
+	src/gui/widgets/design_panel.h \
 	src/gui/widgets/dialog_panel.h \
 	src/gui/widgets/info_panel.h \
 	src/gui/widgets/lattice.h \
@@ -35,7 +35,7 @@ SOURCES += \
 	src/main.cpp \
 	src/gui/application.cpp \
 	src/settings/settings.cpp \
-	src/gui/widgets/design_widget.cpp \
+	src/gui/widgets/design_panel.cpp \
 	src/gui/widgets/dialog_panel.cpp \
 	src/gui/widgets/info_panel.cpp \
 	src/gui/widgets/lattice.cpp \
