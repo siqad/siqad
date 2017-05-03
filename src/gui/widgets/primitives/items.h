@@ -15,16 +15,24 @@
 
 #include <QGraphicsSceneMouseEvent>
 
+#include <QRectF>
+#include <QPainter>
+
 #include "emitter.h"
 
 
 namespace prim{
 
+// Customized QGraphicsItem subclass. All items in the Layers must inherit
+// this class and should be distinguished by the item_type member. Both
+// boundingRect and paint must be redefined in any derived classes.
 class MyItem : public QGraphicsItem
 {
 public:
 
-  enum ItemType{DBDotType, GhostDotType, Text};
+  // need an enumerated label for every new item subclass. Sub-classes can be
+  // implemented elsewhere as long as they are defined before use
+  enum ItemType{DBDotType, GhostDotType, Text, Electrode};
 
   // constructor
   MyItem(ItemType type = DBDotType, int lay = -1, QGraphicsItem *parent=0)
@@ -33,8 +41,13 @@ public:
   // destructor
   ~MyItem(){}
 
+  // inherited abstract member functions
+  virtual QRectF boundingRect() const = 0;
+  virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) = 0;
+
+
   ItemType item_type;   // describes the type of the item.
-  int layer;           // current layer containing the item.
+  int layer;            // current layer containing the item.
 
 protected:
 

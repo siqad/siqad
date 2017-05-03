@@ -64,10 +64,13 @@ public:
   void removeLayer(int n);
 
   // returns a pointer to a requested layer if it exists.
-  prim::Layer *getLayer(const QString &name);
-  prim::Layer *getLayer(int n);
+  prim::Layer* getLayer(const QString &name);
+  prim::Layer* getLayer(int n);
+
+  // get a list of all the surface dangling bonds
   QList<prim::DBDot*> getSurfaceDBs();
 
+  // change the top layer to the requested layer
   void setLayer(const QString &name);
   void setLayer(int n);
 
@@ -75,12 +78,11 @@ public:
   // If no file is given, the default lattice is used
   void buildLattice(const QString fname=QString());
 
+  // update the tool type
   void setTool(ToolType tool);
 
+  // update the fill values for the surface dangling bonds
   void setFills(float *fills);
-
-
-  // preparing for physical simulation
 
 
 public slots:

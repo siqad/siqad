@@ -4,8 +4,7 @@
 // @editted:  2017.05.02  - Jake
 // @license:  GNU LGPL v3
 //
-// @desc:     Input line for taking customized commands, inputs must pass a mask
-//            to avoid unwanted commands
+// @desc:     Input line for taking customized commands.
 
 #ifndef _GUI_INPUT_FIELD_H
 #define _GUI_INPUT_FIELD_H
@@ -17,6 +16,13 @@
 #include <QRegExpValidator>
 #include <QLineEdit>
 
+
+// NOTE:
+//  Under NO circumstances should the user be allowed to execute arbitrary
+//  commands. If a future implementation includes a serial port to allow for
+//  more general terminal-like functionality, ALL commands must be white-listed
+//  by the Validator. If you don't know what that means, don't implement/modify
+//  a serial port.
 
 
 namespace gui{
