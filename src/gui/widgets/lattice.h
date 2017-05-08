@@ -12,7 +12,7 @@
 #define _GUI_LATTICE_H_
 
 #include "primitives/layer.h"
-#include "primitives/dbdot.h"
+#include "primitives/latdot.h"
 #include "primitives/emitter.h"
 #include "src/settings/settings.h"
 
@@ -37,6 +37,9 @@ public:
 
 private:
 
+  // methods for constructing lattice from unit cell parameters
+
+  // construct lattice from lattice settings
   void construct(settings::LatticeSettings &lattice_settings);
 
   // n == 0: finds all pairs (m,l) s.t m*a1+l*a2 is in the drawing region.

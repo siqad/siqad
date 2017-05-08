@@ -61,6 +61,8 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   setBackgroundBrush(QBrush(gui_settings.get<QColor>("view/bg_col")));
   setFrameShadow(QFrame::Raised);
 
+  setCacheMode(QGraphicsView::CacheBackground);
+
   // make lattice and surface layer
   buildLattice();
 
@@ -388,7 +390,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
     }
   }
   else{
-    qWarning("clicked flag was not initialized... going nothing");
+    qWarning("clicked flag was not initialized... doing nothing");
   }
 }
 

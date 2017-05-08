@@ -9,9 +9,22 @@
 #include "items.h"
 
 #include <QApplication>
+#include "src/settings/settings.h"
 
+
+qreal prim::MyItem::scale_factor = 0;
 
 // MyItem CLASS
+
+prim::MyItem::MyItem(prim::MyItem::ItemType type, int lay, QGraphicsItem *parent):
+  QGraphicsItem(parent), item_type(type), layer(lay)
+{
+  settings::GUISettings gui_settings;
+
+  if(this->scale_factor == 0)
+    this->scale_factor = gui_settings.get<qreal>("view/scale_fact")
+}
+
 
 void prim::MyItem::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {

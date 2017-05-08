@@ -13,13 +13,20 @@
 #include <QSizeF>
 
 
+qreal prim::DBDot::diameter = 0;
+qreal prim::DBDot::edge_width = 0;
+
 prim::DBDot::DBDot(QPointF p_loc, int layer, DBDot *src):
   prim::MyItem(prim::MyItem::DBDotType, layer)
 {
   settings::GUISettings gui_settings;
 
-  scale_fact = gui_settings.get<qreal>("dbdot/scale_fact");
-  diameter = gui_settings.get<qreal>("dbdot/diameter")*scale_fact;
+
+  // prepare static variable if uninitialised
+  if(diameter==0)
+    diameter = gui_settings.get<qreal>("dbdot/diameter")*scale_fact;
+  if(edge_width==0)
+    edge_width = gui_settings.get<qreal>("dbdot/edge_width")*diameter;
 
   setPos(p_loc*scale_fact);
 

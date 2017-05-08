@@ -32,11 +32,10 @@ public:
 
   // need an enumerated label for every new item subclass. Sub-classes can be
   // implemented elsewhere as long as they are defined before use
-  enum ItemType{DBDotType, GhostDotType, Text, Electrode};
+  enum ItemType{DBDotType, GhostDotType, LatticeDotType, Text, Electrode};
 
   // constructor
-  MyItem(ItemType type = DBDotType, int lay = -1, QGraphicsItem *parent=0)
-    : QGraphicsItem(parent), item_type(type), layer(lay) {}
+  MyItem(ItemType type = DBDotType, int lay = -1, QGraphicsItem *parent=0);
 
   // destructor
   ~MyItem(){}
@@ -45,9 +44,8 @@ public:
   virtual QRectF boundingRect() const = 0;
   virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) = 0;
 
-
   ItemType item_type;   // describes the type of the item.
-  int layer;            // current layer containing the item.
+  int layer;            // index of current layer containing the item.
 
 protected:
 
@@ -56,6 +54,9 @@ protected:
   //void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
 private:
+
+  // static class variables
+  static qreal scale_factor;  // pixels/angstrom scaling factor
 
 };
 

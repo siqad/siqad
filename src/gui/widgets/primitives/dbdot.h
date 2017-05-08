@@ -18,6 +18,7 @@
 #include <QGraphicsSceneMouseEvent>
 
 #include "items.h"
+#include "latdot.h"
 #include "emitter.h"
 
 
@@ -30,7 +31,7 @@ class DBDot: public prim::MyItem
 public:
 
   // constructor
-  DBDot(QPointF p_loc, int layer, DBDot *src=0);
+  DBDot(QPointF p_loc, int layer, prim::LatticeDot *src=0);
 
   // destructor
   ~DBDot();
@@ -53,19 +54,22 @@ public:
 
 private:
 
-  QPointF phys_loc; // Physical location of dot in angstroms.
-  DBDot *source;    // Lattice site beneath dot
+  QPointF phys_loc;         // Physical location of dot in angstroms.
+  prim::LatticeDot *source; // Lattice site beneath dot
 
-  QColor edge_col;
-  QColor selected_col;
 
-  qreal fill_fact; // area proportion of dot filled
-  QColor fill_col;
+  // instance specific painting parameters
 
-  // immutable parameters
-  qreal scale_fact; // pixels per angstrom for dot locations
-  qreal diameter;   // diameter of dot in pixels
-  qreal edge_width; // edge pen width in pixels
+  qreal fill_fact;  // area proportion of dot filled
+  QColor fill_col;  // color of fill
+
+  // static class parameters for painting
+
+  static qreal diameter;   // diameter of dot in pixels
+  static qreal edge_width; // edge pen width in pixels
+
+  static QColor edge_col;     // edge colour when unselected
+  static QColor selected_col; // edge colour when selected
 };
 
 

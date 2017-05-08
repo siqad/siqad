@@ -124,7 +124,6 @@ void gui::Lattice::findBounds(int *low, int *high, int n)
     std::swap(sy, ty);
 
   // select tight bounds
-
   if(a[1].x()==0){
     *low = qCeil(sy);
     *high = qFloor(ty);
@@ -146,7 +145,7 @@ void gui::Lattice::buildUnitCell(QPoint ind)
   QPointF lattice_loc = a[0]*ind.x()+a[1]*ind.y();
 
   for(int n=0; n<n_cell; n++){
-    prim::DBDot *dot = new prim::DBDot(lattice_loc+b.at(n), 0);
+    prim::LatticeDot *dot = new prim::LatticeDot(lattice_loc+b.at(n));
     dot->setFlag(QGraphicsItem::ItemIsSelectable, true);
     addItem(dot);
   }

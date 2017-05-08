@@ -46,34 +46,36 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("Panel/maxh", 150);
 
   S->setValue("lattice/fname", QString("src/settings/lattices/si_100_2x1.ini"));
-  S->setValue("lattice/xy", QPoint(20,20));
+  S->setValue("lattice/xy", QPoint(60,60));
 
   // QGraphicsView
-  S->setValue("view/bg_col", QColor(40,50,60));
-  S->setValue("view/zoom_factor", 0.1);
-  S->setValue("view/zoom_boost", 2);    // must have factor*boost < 1
-  S->setValue("view/zoom_min", .1);     // minimum scale factor
-  S->setValue("view/zoom_max", 10);     // maximum scale factor
-  S->setValue("view/wheel_pan_step", 20);
-  S->setValue("view/wheel_pan_boost", 5);
-  S->setValue("view/padding", .1);
+  S->setValue("view/scale_fact", 10);           // pixels/angstrom in the main view
+  S->setValue("view/bg_col", QColor(40,50,60)); // background color
+  S->setValue("view/zoom_factor", 0.1);         // scaling factor for zoom operations
+  S->setValue("view/zoom_boost", 2);            // must have factor*boost < 1
+  S->setValue("view/zoom_min", .1);             // minimum zoom factor
+  S->setValue("view/zoom_max", 10);             // maximum zoom factor
+  S->setValue("view/wheel_pan_step", 20);       // screen pan per wheel tick
+  S->setValue("view/wheel_pan_boost", 5);       // shift-boost factor
+  S->setValue("view/padding", .1);              // additional space around draw region
 
-  // dangling bond
-  S->setValue("dbdot/scale_fact", 10);  // fixed: pixels per angstrom for dot locations
-  S->setValue("dbdot/diameter", 1.3);    // diameter in angstroms
+  // dangling bond parameters
+  S->setValue("dbdot/diameter", 1.3);                     // dot diameter
+  S->setValue("dbdot/edge_width", .1);                    // edge width rel. to diameter
+  S->setValue("dbdot/edge_col", QColor(255,255,255));     // edge color, unselected
+  S->setValue("dbdot/selected_col", QColor(0, 100, 255)); // edge color, selected
+  S->setValue("dbdot/fill_col", QColor(200,200,200));     // dot fill color
 
-  S->setValue("dbdot/edge_width", .1);  // edge width rel. to diameter
-  S->setValue("dbdot/edge_col", QColor(255,255,255));
-  S->setValue("dbdot/selected_col", QColor(0, 100, 255));
+  // lattice dot parameters
+  S->setValue("latdot/diameter");                         // dot diameter
+  S->setValue("latdot/edge_width", .05);                  // edge width rel. to diameter
+  S->setValue("latdot/edge_col", QColor(255,255,255,50)); // edge color
+  S->setValue("latdot/fill_col", QColor(10,10,10));       // fill color
 
-  S->setValue("dbdot/lattice_edge_width", .05);
-  S->setValue("dbdot/lattice_edge_col", QColor(255,255,255,50));
-
-  S->setValue("dbdot/fill_col", QColor(200,200,200));
-
-  S->setValue("ghost/dot_diameter", .6);
-  S->setValue("ghost/valid_col", QColor(0, 255, 0, 255));
-  S->setValue("ghost/invalid_col", QColor(255, 0, 0, 255));
+  // ghost parameters
+  S->setValue("ghost/dot_diameter", .6);                    //
+  S->setValue("ghost/valid_col", QColor(0, 255, 0, 255));   //
+  S->setValue("ghost/invalid_col", QColor(255, 0, 0, 255)); //
 
   return S;
 }
