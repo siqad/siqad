@@ -115,18 +115,18 @@ void gui::ApplicationGUI::initMenuBar()
 {
   // initialise menus
 
-  QMenu *file = menuBar()->addMenu("&File");
-  QMenu *edit = menuBar()->addMenu("&Edit");
-  QMenu *view = menuBar()->addMenu("&View");
-  QMenu *tools = menuBar()->addMenu("&Tools");
+  QMenu *file = menuBar()->addMenu(tr("&File"));
+  QMenu *edit = menuBar()->addMenu(tr("&Edit"));
+  QMenu *view = menuBar()->addMenu(tr("&View"));
+  QMenu *tools = menuBar()->addMenu(tr("&Tools"));
 
   // file menu actions
-  QAction *quit = new QAction("&Quit", this);
+  QAction *quit = new QAction(tr("&Quit"), this);
   quit->setShortcut(tr("CTRL+Q"));
   file->addAction(quit);
 
-  QAction *change_lattice = new QAction("&Change Lattice...", this);
-  QAction *select_color = new QAction("&Select Color...", this);
+  QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
+  QAction *select_color = new QAction(tr("Select Color..."), this);
   tools->addAction(change_lattice);
   tools->addAction(select_color);
 
@@ -153,10 +153,14 @@ void gui::ApplicationGUI::initTopBar()
   top_bar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
   top_bar->setIconSize(QSize(ico_scale, ico_scale));
 
-  action_run_simulation = top_bar->addAction(QIcon(":/ico/runsim.svg"), tr("&Run Simulation..."));
+  action_run_simulation = top_bar->addAction(QIcon(":/ico/runsim.svg"), tr("Run Simulation..."));
 
   connect(action_run_simulation, &QAction::triggered, this, &gui::ApplicationGUI::runSimulation);
   addToolBar(Qt::TopToolBarArea, top_bar);
+
+  //NOTE should have a dropdown menu which lists all Layers in the DesinPanel.
+  // the order of items need/should not have anything to do with the order in
+  // the Layer* stack in the DesignPanel.
 }
 
 

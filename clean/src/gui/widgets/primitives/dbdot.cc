@@ -37,6 +37,9 @@ prim::DBDot::DBDot(prim::Layer *layer, prim::LatticeDot *src)
 
   fill_fact = 0.;
   fill_col = gui_settings->get<QColor>("dbdot/fill_col");
+
+  // flags
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
 
 

@@ -138,8 +138,6 @@ private:
   // assert bounds on zoom range
   void boundZoom(qreal *ds);
 
-  void mousePress();
-
   // filter items selected by the scene depending on wthe tool_type. If true,
   // rejects all items in the lattice layer, otherwise includes only items in
   // the lattice layer.

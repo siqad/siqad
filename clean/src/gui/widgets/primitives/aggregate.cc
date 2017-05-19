@@ -11,7 +11,7 @@
 QColor prim::Aggregate::edge_col;
 
 prim::Aggregate::Aggregate(prim::Layer *layer, QList<Item*> items, QGraphicsItem *parent)
-  : prim::Item(prim::Item::Aggregate, layer, parent)
+  : prim::Item(prim::Item::Aggregate, layer, parent), items(items)
 {
   // set all given items as children
   for(prim::Item *item : items)
@@ -25,22 +25,8 @@ prim::Aggregate::Aggregate(prim::Layer *layer, QList<Item*> items, QGraphicsItem
 prim::Aggregate::~Aggregate()
 {
   // migrate children to Aggregate's parent Item
-  prim::Item *item=0;
-  for(QGraphicsItem *gitem : childItems()){
-    item = (prim::Item*)gitem;
+  for(prim::Item *item : items)
     item->setParentItem(parentItem());
-  }
-}
-
-QList<prim::Item*> prim::Aggregate::getChildren() const
-{
-  QList<prim::Item*> items;
-
-  // this step can be dangerous: EVERY item in the DesignPanel MUST be a prim::Item
-  for(QGraphicsItem *gitem : childItems())
-    items.append((prim::Item*) gitem);
-
-  return items;
 }
 
 QRectF prim::Aggregate::boundingRect() const

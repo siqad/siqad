@@ -263,7 +263,6 @@ void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
     default:
       qCritical("Invalid ToolType... should not have happened");
       return;
-      break;
   }
 
   tool_type=tool;
@@ -496,7 +495,16 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
 
   if(qAbs(wheel_deg.y())>=120){
     qreal ds;
-    if(wheel_deg.y()>0)
+    if(wheel_deg.y()>0)// filter selected items based on current tool
+        switch(tool_type){
+          case gui::DesignPanel::SelectTool:
+            //
+            break;
+          case gui::DesignPanel::DBGenTool:
+            break;
+          default:
+            break;
+        }
       ds = gui_settings.get<float>("view/zoom_factor");
     else
       ds = -gui_settings.get<float>("view/zoom_factor");

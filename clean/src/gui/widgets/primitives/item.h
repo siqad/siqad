@@ -15,6 +15,7 @@
 #include "src/settings/settings.h"
 
 namespace prim{
+  
   // forward declaration for prim::Layer
   class Layer;
 

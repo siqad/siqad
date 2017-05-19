@@ -40,9 +40,9 @@ namespace prim{
 
     // add a new Item to the current layer. If the Item is already in the layer,
     // do nothing.
-    void addItem(prim::Item *item);
+    void addItem(prim::Item *item, int index=-1);
 
-    // attempt to removethe given Item from the layer. Returns true if the Item
+    // attempt to remove the given Item from the layer. Returns true if the Item
     // is found and remove, false otherwise.
     bool removeItem(prim::Item *item);
 
@@ -62,8 +62,12 @@ namespace prim{
     // get the Layer name, possibly change return to const QString&
     const QString& getName() const {return name;}
 
+    // if i is within bounds, return a pointer to the indexed item in the Layer
+    // item stack; otherwise, return 0
+    prim::Item *getItem(int i) { return i >= 0 && i<items.size() ? items.at(i) : 0;}
+
     // get the Layer's items
-    QList<prim::Item*>& getItems() {return items;}
+    QStack<prim::Item*>& getItems() {return items;}
 
   private:
 
@@ -71,8 +75,8 @@ namespace prim{
 
     QString name;   // arbitrary layer name, layers can be selected by name
 
-    // list of items, grouping should be handled by the design widget.
-    QList<prim::Item*> items;
+    // list of items in order of insertion, should probably be a linked list
+    QStack<prim::Item*> items;
 
     // flags
     bool visible; // layer is shown. If false, active should aso be false

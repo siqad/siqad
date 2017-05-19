@@ -10,21 +10,21 @@
 #ifndef _GUI_PR_LAYER_H_
 #define _GUI_PR_LAYER_H_
 
-#include <QList>
-#include <QGraphicsItem>
-#include <QGraphicsItemGroup>
-#include <QString>
+#include <QtWidgets>
+#include <QtCore>
 
 namespace prim{
 
 // Base class for design layers
-class Layer
+class Layer : public QObject
 {
+  Q_OBJECT
+
 public:
 
   // constructor
-  Layer();
-  Layer(const QString &name);
+  Layer(QObject *parent=0);
+  Layer(const QString &name, QObject *parent=0);
 
   // destructor
   ~Layer();
@@ -43,17 +43,17 @@ public:
   void setVisible(bool vis);
 
   // returns true if the Layer is visible
-  bool isVisible();
+  bool isVisible(){return visible;}
 
 
   // calls setActive(act) for all QGraphicsItems in the Layer
   void setActive(bool act);
 
   // return true if the Layer is active.
-  bool isActive();
+  bool isActive(){return active;}
 
-  const QString getName();
-  QList<QGraphicsItem*> getItems();
+  const QString getName(){return name;}
+  QList<QGraphicsItem*> getItems(){return items;}
 
 private:
 

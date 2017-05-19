@@ -45,7 +45,7 @@ prim::LatticeDot::~LatticeDot()
 QRectF prim::LatticeDot::boundingRect() const
 {
   qreal width = diameter+edge_width;
-  return QRectF(-.5*width, -.5*width, width, width);
+  return QRectF(-.5*widthedge_col, -.5*width, width, width);
 }
 
 // NOTE: nothing in this paint method changes.. possibly cache background as

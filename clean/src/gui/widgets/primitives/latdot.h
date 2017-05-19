@@ -38,8 +38,8 @@ namespace prim{
     // accessors
 
     QPointF getPhysLoc() const {return phys_loc;}   // get the dots physical location
-    prim::DBDot *getDBDot() const {return dbdot;}         // get the created dangling bond
-    void setDBDot(prim::DBDot *dot=0) {dbdot = dot;}      // set the created dangling bond
+    prim::DBDot *getDBDot() const {return dbdot;}   // get the created dangling bond
+    void setDBDot(prim::DBDot *dot=0);              // set the created dangling bond
 
     // inherited abstract method implementations
 

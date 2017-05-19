@@ -12,6 +12,7 @@
 #define _GUI_DESIGN_PANEL_H_
 
 #include <QtWidgets>
+#include <QtCore>
 
 #include "primitives/layer.h"
 #include "primitives/lattice.h"
@@ -38,6 +39,14 @@ namespace gui{
 
     // ACCESSORS
 
+    // add a new Item to the Layer at the given index of the stack. If layer_index==-1,
+    // add the new item to the top_layer. If ind != -1, inserts the Item into the given
+    // location of the Layer Item stack.
+    void addItem(prim::Item *item, int layer_index=-1, int ind=-1);
+
+    // remove the given Item from the given Layer if possible
+    void removeItem(prim::Item *item, prim::Layer* layer);
+
     // add a new layer with the given name. If no name is given, a default scheme
     // is used. Checks if the layer already exists.
     void addLayer(const QString &name = QString());
@@ -51,7 +60,7 @@ namespace gui{
     prim::Layer* getLayer(int n) const;
 
     // get the top_layer index
-    int getTopLayerIndex() const;
+    int getLayerIndex(prim::Layer *layer=0) const;
 
     // get a list of all the surface dangling bonds
     QList<prim::DBDot *> getSurfaceDBs() const;
@@ -97,8 +106,8 @@ namespace gui{
 
     // copy/paste and item dragging
 
-    QList<prim::Layer*> layers; // list of all layers
-    prim::Layer *top_layer;     // new items added to this layer
+    QStack<prim::Layer*> layers;  // stack of all layers, order immutable
+    prim::Layer *top_layer;       // new items added to this layer
 
     // flags, change later to bit flags
     bool clicked;   // mouse left button is clicked
@@ -129,11 +138,15 @@ namespace gui{
     // filter selected items
     void filterSelection(bool select_flag);
 
-    // fundamental undo/redo command classes
+    // fundamental undo/redo command classes, keep memory requirement small
 
     class CreateDB;         // create a dangling bond at a given lattice dot
     class CreateAggregate;  // create an aggregate from a list of Items
+
     class DeleteItem;       // delete a given Item
+
+    class CreateLayer;      // create a new layer
+    class DeleteLayer;      // delete an existing layer
 
     // create dangling bonds in the surface at all selected lattice dots
     void createDBs();
@@ -150,15 +163,19 @@ namespace gui{
     // destroy an aggregate with all contained item
     void destroyAggregate(prim::Aggregate *aggregate);
 
-
-
   };
+
+
+
+
+  // Details for QUndoCommand derived classes
 
   class DesignPanel::CreateDB : public QUndoCommand
   {
   public:
-    // create a dangling bond at the given lattice dot
-    CreateDB(prim::LatticeDot *dot, prim::Layer *layer, QGraphicsScene *scene, QUndoCommand *parent=0);
+    // create a dangling bond at the given lattice dot, set invert if deleting DB
+    CreateDB(prim::LatticeDot *ldot, int layer_index, DesignPanel *dp,
+                              bool invert=false, QUndoCommand *parent=0);
 
     // destroy the dangling bond and update the lattice dot
     virtual void undo();
@@ -168,21 +185,32 @@ namespace gui{
 
   private:
 
+    void create();  // create the dangling bond
+    void destroy(); // destroy the dangling bond
+
     // destroy the dangling bond and update the lattice dot
     void cleanDB();
 
-    QGraphicsScene *scene;
+    bool invert;      // swaps create/delete on redo/undo
 
-    prim::Layer *layer;
-    prim::LatticeDot *ldot;
-    prim::DBDot *dbdot;
+    DesignPanel *dp;  // DesignPanel pointer
+    int layer_index;  // index of layer in dp->layers stack
+
+    // internals
+    int index;              // index of DBDot item in the layer item stack
+    prim::LatticeDot *ldot; // Lattice dot beneath dangling bond
+    prim::DBDot *dbdot;     // Created DBDot
   };
 
+
+  // NOTE: How would we recreate an aggregate if the contained items were destroyed
+  // and then recreated? Can't rely on the pointers being the stored items list is
+  // useless.
   class DesignPanel::CreateAggregate : public QUndoCommand
   {
   public:
     // group selected items into an aggregate
-    CreateAggregate(QList<prim::Item *> items, prim::Layer *layer, QUndoCommand *parent=0);
+    CreateAggregate(QList<prim::Item *> &items, DesignPanel *dp, QUndoCommand *parent=0);
 
     // split the aggregate
     virtual void undo();
@@ -192,18 +220,17 @@ namespace gui{
 
   private:
 
-    // split and delete the aggregate
-    void cleanAgg();
+    DesignPanel *dp;
+    int layer_index;
 
-    prim::Layer *layer;
-
-    QList<prim::Item *> items;
+    // internals
+    QVector<int> item_inds;
     prim::Aggregate *agg;
 
   };
 
-  //NOTE: need to think about how to do this.... don't want to make a deepcopy
-  //      of the delete Item in order to re-create...
+  //NOTE: need to make sure items are destroyed and re-create without changin their
+  // order on the Item stacks.
   class DesignPanel::DeleteItem : public QUndoCommand
   {
   public:

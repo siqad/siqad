@@ -12,6 +12,8 @@
 #include "design_panel.h"
 #include "src/settings/settings.h"
 
+#include <algorithm>
+
 // constructor
 gui::DesignPanel::DesignPanel(QWidget *parent)
   : QGraphicsView(parent)
@@ -66,11 +68,43 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 gui::DesignPanel::~DesignPanel()
 {
   delete undo_stack;
-  delete scene;
+  delete scene;       // will NOT delete all contained QGraphicsItem objects.
 }
 
 
 // ACCESSORS
+
+void gui::DesignPanel::addItem(prim::Item *item, int layer_index, int ind)
+{
+  // check valid layer index, should not allow access to lattice layer
+  if(layer_index == 0 || layer_index >= layers.count()){
+    qCritical() << tr("Invalid layer index");
+    return;
+  }
+
+  prim::Layer *layer = layer_index > 0 ? layers.at(layer_index) : top_layer;
+
+  if(ind > layer->getItems().count()){
+    qCritical() << tr("Invalid item index");
+    return;
+  }
+
+  // add Item
+  layer->addItem(item, ind);
+  scene->addItem(item);
+}
+
+
+void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
+{
+  if(layer->removeItem(item)){
+    scene->removeItem(item);
+    delete item;
+  }
+}
+
+
+
 
 void gui::DesignPanel::addLayer(const QString &name)
 {
@@ -112,19 +146,17 @@ void gui::DesignPanel::removeLayer(int n)
   if(n<0 ||  n>= layers.count())
     qWarning() << tr("Layer index out of bounds...");
   else{
-    // remove all items in the layer from the scene and delete
-    QList<prim::Item *> items = layers.at(n)->getItems();
-    for(int i=0; i<items.count();i++){
-      scene->removeItem(items.at(i));
-      delete items.at(i);
-    }
+    // delete all items in the layer
+    prim::Layer *layer = layers.at(n);
+    for(prim::Item *item : layer->getItems())
+      removeItem(item, layer);
 
     // delete layer
-    delete layers.at(n);
+    delete layer;
     layers.removeAt(n);
 
-    // if top_layer was remove, default to surface if available else NULL
-    if(top_layer==layers.at(n))
+    // if top_layer was removed, default to surface if available else NULL
+    if(top_layer==layer)
       top_layer = layers.count() > 1 ? layers.at(1) : 0;
   }
 
@@ -154,9 +186,9 @@ prim::Layer* gui::DesignPanel::getLayer(int n) const
 }
 
 
-int gui::DesignPanel::getTopLayerIndex() const
+int gui::DesignPanel::getLayerIndex(prim::Layer *layer) const
 {
-  return top_layer==0 ? -1 : layers.indexOf(top_layer);
+  return layer==0 ? layers.indexOf(top_layer) : layers.indexOf(layer);
 }
 
 
@@ -440,7 +472,7 @@ void gui::DesignPanel::keyPressEvent(QKeyEvent *e)
 // use by higher level widgets
 void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
 {
-  // Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
+  Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
 
   if(ghosting){
     // only allowed actions are for manipulating the ghost
@@ -469,8 +501,18 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
       case Qt::Key_V:
         // create ghost for clipboard if any
         break;
+      case Qt::Key_Z:{
+        // undo/redo based on keymods
+        if(keymods == (Qt::ControlModifier | Qt::ShiftModifier))
+          undo_stack->redo();
+        else if(keymods == Qt::ControlModifier)
+          undo_stack->undo();
+        }
+        break;
       case Qt::Key_Delete:
         // delete selected items
+        if(tool_type == gui::DesignPanel::SelectTool)
+          deleteSelection();
         break;
       default:
         QGraphicsView::keyReleaseEvent(e);
@@ -573,6 +615,8 @@ void gui::DesignPanel::filterSelection(bool select_flag)
     return;
   }
 
+  // NOTE need to make sure than only active layers are selectable
+
   // if select_flag, deselect all items in the lattice. Otherwise, keep only items in the lattice
   for(QGraphicsItem *gitem : scene->selectedItems()){
     if( ( ((prim::Item*) gitem)->layer == layers.at(0)) == select_flag)
@@ -585,80 +629,141 @@ void gui::DesignPanel::filterSelection(bool select_flag)
 
 // CreateDB class
 
-gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *dot, prim::Layer *layer,
-                                            QGraphicsScene *scene, QUndoCommand *parent)
-  : QUndoCommand(parent), scene(scene), layer(layer), ldot(dot), dbdot(0)
-{}
+gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
+                        gui::DesignPanel *dp, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), ldot(ldot)
+{
+  prim::DBDot *dbdot = ldot->getDBDot();
+
+  // dbdot should be 0 if invert is false else non-zero
+  if( !(invert ^ (dbdot==0)) )
+    qFatal("Either trying to delete a non-existing DB or overwrite an existing one");
+
+  // dbdot index in layer
+  prim::Layer *layer = dp->getLayer(layer_index);
+  index = invert ? layer->getItems().indexOf(dbdot) : layer->getItems().size();
+}
 
 void gui::DesignPanel::CreateDB::undo()
 {
-  cleanDB();
+  invert ? create() : destroy();
 }
 
 void gui::DesignPanel::CreateDB::redo()
 {
-  // clean the dangling bond... should do nothing
-  cleanDB();
-
-  // create the new dangling bond
-  dbdot = new prim::DBDot(layer, ldot);
-  ldot->setFlag(QGraphicsItem::ItemIsSelectable, false);
-  dbdot->setFlag(QGraphicsItem::ItemIsSelectable, true);
-
-  // add dangling bond to layer and scene
-  layer->addItem(dbdot);
-  scene->addItem(dbdot);
-
-  // debug echo
-  QPointF ploc = dbdot->getPhysLoc();
-  qDebug() << tr("DB added at (%1 , %2)").arg(ploc.x()).arg(ploc.y());
+  invert ? destroy() : create();
 }
 
-void gui::DesignPanel::CreateDB::cleanDB()
+void gui::DesignPanel::CreateDB::create()
 {
+  qDebug() << tr("Creating dangling bond: %1::%2 ").arg(layer_index).arg(index);
+
+  // add dangling bond to layer and scene, index in layer item stack will be
+  // equal to layer->getItems().size()
+  dp->addItem(new prim::DBDot(dp->getLayer(layer_index), ldot), layer_index, index);
+}
+
+void gui::DesignPanel::CreateDB::destroy()
+{
+  prim::DBDot *dbdot = (prim::DBDot*)dp->getLayer(layer_index)->getItem(index);
+
   if(dbdot != 0){
+
+    qDebug() << tr("Destroying dangling bond: %1::%2").arg(layer_index).arg(index);
     // make source lattice site selectable again
-    dbdot->getSource()->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    // destroy dot
-    layer->removeItem(dbdot);
-    scene->removeItem(dbdot); // should call free dbdot
+    dbdot->getSource()->setDBDot(0);
+
+    // destroy dbdot
+    dp->removeItem(dbdot, dbdot->layer);  // deletes dbdot
     dbdot = 0;
   }
 }
 
 
+
+
 // CreateAggregate class
 
-gui::DesignPanel::CreateAggregate::CreateAggregate(QList<prim::Item *> items,
-                                            prim::Layer *layer, QUndoCommand *parent)
-  : QUndoCommand(parent), items(items), layer(layer), agg(0)
-{}
+gui::DesignPanel::CreateAggregate::CreateAggregate(QList<prim::Item *> &items,
+                                            DesignPanel *dp, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), agg(0)
+{
+  if(items.count()==0){
+    qWarning() << tr("Aggregate contains no items");
+    return;
+  }
 
+  prim::Layer *layer = items.at(0)->layer;
+
+  // get layer_index, and check that it is the same for all items
+  for(prim::Item *item : items)
+    if(item->layer != layer){
+      qWarning() << tr("Aggregates can only be formed from items in the same layer");
+      return;
+    }
+
+  layer_index = dp->getLayerIndex(layer);
+
+  // format the input items to a pointer invariant form, could be done more efficiently
+  for(prim::Item *item : items)
+    item_inds.append(layer->getItems().indexOf(item));
+  std::sort(item_inds.begin(), item_inds.end());
+}
+
+// split the aggregate
 void gui::DesignPanel::CreateAggregate::undo()
 {
-  cleanAgg();
+  prim::Layer *layer = dp->getLayer(layer_index);
+
+  // aggregate should be on the top of the layer Item stack, pop it and check
+  if(agg != layer->getItems().pop())
+    qFatal("Undo/Redo mismatch... something went wrong");
+
+  // remove aggregate and all children from the scene
+  agg->scene()->removeItem(agg);
+
+  // destroy the aggregate
+  QList<prim::Item*> items = agg->getChildren();
+  delete agg;
+
+  // re-insert the component items into the Layer in ascending index order
+  int i=0;
+  for(prim::Item *item : items)
+    dp->addItem(item, layer_index, item_inds.at(i++));
 }
 
+// form the aggregate
 void gui::DesignPanel::CreateAggregate::redo()
 {
-  // should only create aggregates out of items with no parents
-  for(prim::Item *item : items)
-    if(item->parentItem())
-      qCritical() << tr("Item already has a parent...");
+  prim::Layer *layer = dp->getLayer(layer_index);
 
+  // all items should be in the same layer as the aggregate was and have no parents
+  prim::Item *item=0;
+  for(const int &ind : item_inds){
+    if(ind >= layer->getItems().size())
+      qFatal("Undo/Redo mismatch... something went wrong");
+    item = layer->getItems().at(ind);
+    if(item->layer != layer || item->parentItem() != 0)
+      qFatal("Undo/Redo mismatch... something went wrong");
+  }
+
+  // remove the items from the Layer stack in reverse order
+  QList<prim::Item*> items;
+  for(int i=item_inds.count()-1; i>=0; i--){
+    items.append(layer->getItems().takeAt(item_inds.at(i)));
+  }
+
+  // remove all Items from the scene
+  for(prim::Item *item : items)
+    item->scene()->removeItem(item);
+
+  // create new aggregate
   agg = new prim::Aggregate(layer, items);
 
-  // other stuff to make sure scene and layers is informed
+  // add aggregate to system
+  dp->addItem(agg, layer_index);
 }
 
-void gui::DesignPanel::CreateAggregate::cleanAgg()
-{
-  if(agg!=0){
-    // reassign children's parent to aggregate's parent
-
-    // inform scene and layers
-  }
-}
 
 // Methods
 
@@ -676,8 +781,30 @@ void gui::DesignPanel::createDBs()
   }
 
   // push actions onto the QUndoStack
+  int layer_index = layers.indexOf(top_layer);
   undo_stack->beginMacro(tr("create dangling bonds at selected sites"));
   for(QGraphicsItem *gitem : scene->selectedItems())
-    undo_stack->push(new CreateDB((prim::LatticeDot *)gitem, top_layer, scene));
+    undo_stack->push(new CreateDB((prim::LatticeDot *)gitem, layer_index, this));
   undo_stack->endMacro();
+}
+
+void gui::DesignPanel::deleteSelection()
+{
+  QList<QGraphicsItem*> items = scene->selectedItems();
+  qDebug() << tr("Deleting %1 items").arg(items.count());
+
+  undo_stack->beginMacro(tr("delete %1 items").arg(items.count()));
+  for(QGraphicsItem *gitem : items){
+    prim::Item *item = (prim::Item*) gitem;
+    switch(item->item_type){
+      case prim::Item::DBDot:
+        undo_stack->push(new CreateDB( ((prim::DBDot*)item)->getSource(),
+                                      getLayerIndex(item->layer), this, true));
+        break;
+      default:
+        break;
+    }
+  }
+  undo_stack->endMacro();
+
 }

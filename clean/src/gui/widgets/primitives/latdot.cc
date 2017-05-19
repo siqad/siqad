@@ -31,6 +31,15 @@ prim::LatticeDot::LatticeDot(prim::Layer *layer, QPointF p_loc):
 
   // set dot location in pixels
   setPos(p_loc*scale_factor);
+
+  // flags
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
+}
+
+void prim::LatticeDot::setDBDot(prim::DBDot *dot)
+{
+  setFlag(QGraphicsItem::ItemIsSelectable, dot==0);
+  dbdot=dot;
 }
 
 
@@ -50,7 +59,7 @@ void prim::LatticeDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     // draw outer circle
     painter->setPen(QPen(edge_col, edge_width));
-    painter->setBrush(fill_col);
+    painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
     painter->drawEllipse(rect);
   }
 }

@@ -77,7 +77,7 @@ QSettings *settings::AppSettings::m_defs()
 
   // overwrites existing default values with same keys... no check
 
-  S->setValue("log/override", false);
+  S->setValue("log/override", true);
   S->setValue("log/tofile", false);
   S->setValue("log/logfile", QString("src/log/log.txt"));
 
@@ -129,7 +129,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("latdot/diameter", 1.0);                    // dot diameter
   S->setValue("latdot/edge_width", .05);                  // edge width rel. to diameter
   S->setValue("latdot/edge_col", QColor(255,255,255,50)); // edge color
-  S->setValue("latdot/fill_col", QColor(100,100,100));       // fill color
+  S->setValue("latdot/fill_col", QColor(0,0,0,0));       // fill color
 
   // ghost parameters
   S->setValue("ghost/dot_diameter", .6);                    // ghost dot diameter

@@ -23,10 +23,19 @@ prim::Layer::Layer(const QString &nm, QObject *parent)
 // NOTE: in future, it might be worth keeping the items in a binary tree, sorted
 // by pointer address (which should not be modifiable).
 
-void prim::Layer::addItem(prim::Item *item)
+void prim::Layer::addItem(prim::Item *item, int index)
 {
-  if(!items.contains(item))
-    items.append(item);
+  if(!items.contains(item)){
+    if(index <= items.size()){
+      items.insert(index < 0 ? items.size() : index, item);
+
+      // set item flags to agree with layer
+      item->setActive(active);
+      item->setVisible(visible);
+    }
+    else
+      qCritical() << tr("Layer item index invalid");
+  }
   else
     qDebug() << tr("item aleady contained in layer...");
 }

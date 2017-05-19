@@ -60,5 +60,5 @@ void gui::DialogPanel::echo(const QString& s)
 }
 
 
-void gui::DialogPanel::mousePressEvent(QMouseEvent *e)
+void gui::DialogPanel::mousePressEvent(QMouseEvent *)
 {}

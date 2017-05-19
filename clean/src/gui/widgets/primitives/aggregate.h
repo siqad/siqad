@@ -25,7 +25,7 @@ namespace prim{
     // destructor, makes all children belong to Aggregates parent
     ~Aggregate();
 
-    QList<prim::Item*> getChildren() const;
+    QList<prim::Item*> &getChildren() {return items;}
 
     // necessary derived class member functions
     virtual QRectF boundingRect() const;
@@ -34,6 +34,8 @@ namespace prim{
     static QColor edge_col;
 
   private:
+
+    QList<prim::Item*> items;
 
     // initialise the static class variables
     void prepareStatics();
