@@ -17,8 +17,9 @@
 prim::Lattice::Lattice(const QString &fname)
   : Layer(tr("Lattice"))
 {
-  if(fname.isEmpty())
-    settings::LatticeSettings::updateLattice(fname);
+  settings::LatticeSettings::updateLattice(fname);
+  // if(fname.isEmpty())
+  //   settings::LatticeSettings::updateLattice(fname);
 
   construct();
 }

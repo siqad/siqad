@@ -230,6 +230,14 @@ void gui::DesignPanel::setLayer(int n)
 
 void gui::DesignPanel::buildLattice(const QString &fname)
 {
+
+  if(!fname.isEmpty() && DEFAULT_OVERRIDE){
+    qWarning() << tr("Cannot change lattice when DEFAULT_OVERRIDE set");
+    // do nothing is the lattce has previously been defined
+    if(!layers.isEmpty())
+      return;
+  }
+
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
   // NOTE: probably want a prompt to make sure user want to change the lattice
@@ -237,6 +245,8 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   // destroy all layers if they exist
   while(layers.count()>0)
     removeLayer(0);
+
+    qDebug() << tr("Building lattice : %1").arg(fname);
 
   // build the new lattice
   prim::Lattice *lattice = new prim::Lattice(fname);

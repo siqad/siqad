@@ -66,8 +66,8 @@ namespace prim{
     // item stack; otherwise, return 0
     prim::Item *getItem(int i) { return i >= 0 && i<items.size() ? items.at(i) : 0;}
 
-    // get the Layer's items
-    QStack<prim::Item*>& getItems() {return items;}
+    // get the Layer's items, needs to be a copy rather than a reference for Layer removal
+    QStack<prim::Item*> getItems() {return items;}
 
   private:
 
