@@ -199,7 +199,6 @@ namespace gui{
     // internals
     int index;              // index of DBDot item in the layer item stack
     prim::LatticeDot *ldot; // Lattice dot beneath dangling bond
-    prim::DBDot *dbdot;     // Created DBDot
   };
 
 
