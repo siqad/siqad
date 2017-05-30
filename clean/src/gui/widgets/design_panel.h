@@ -141,7 +141,8 @@ namespace gui{
     // fundamental undo/redo command classes, keep memory requirement small
 
     class CreateDB;         // create a dangling bond at a given lattice dot
-    class CreateAggregate;  // create an aggregate from a list of Items
+    class FormAggregate;    // form an aggregate from a list of Items
+    class DestroyAggregate; // destroy an aggregate and its contained items
 
     class DeleteItem;       // delete a given Item
 
@@ -155,10 +156,10 @@ namespace gui{
     void deleteSelection();
 
     // create an aggregate from the selected surface Items
-    prim::Aggregate *createAggregate(int layer, QList<prim::Item*> items);
+    void formAggregate();
 
-    // split an aggregate without deleting the contained items
-    void splitAggregate(prim::Aggregate *aggregate);
+    // split all selected aggregates without deleting the contained items
+    void splitAggregates();
 
     // destroy an aggregate with all contained item
     void destroyAggregate(prim::Aggregate *aggregate);
@@ -188,9 +189,6 @@ namespace gui{
     void create();  // create the dangling bond
     void destroy(); // destroy the dangling bond
 
-    // destroy the dangling bond and update the lattice dot
-    void cleanDB();
-
     bool invert;      // swaps create/delete on redo/undo
 
     DesignPanel *dp;  // DesignPanel pointer
@@ -205,11 +203,15 @@ namespace gui{
   // NOTE: How would we recreate an aggregate if the contained items were destroyed
   // and then recreated? Can't rely on the pointers being the stored items list is
   // useless.
-  class DesignPanel::CreateAggregate : public QUndoCommand
+  class DesignPanel::FormAggregate : public QUndoCommand
   {
   public:
     // group selected items into an aggregate
-    CreateAggregate(QList<prim::Item *> &items, DesignPanel *dp, QUndoCommand *parent=0);
+    FormAggregate(QList<prim::Item *> &items, DesignPanel *dp, QUndoCommand *parent=0);
+
+    // split given aggregate into first layer of child items, offset keeps stack
+    // indexing consistent when multiple aggregates are split at the same time
+    FormAggregate(prim::Aggregate *agg, int offset, DesignPanel *dp, QUndoCommand *parent=0);
 
     // split the aggregate
     virtual void undo();
@@ -219,12 +221,18 @@ namespace gui{
 
   private:
 
-    DesignPanel *dp;
-    int layer_index;
+    void form();
+    void split();
+
+    bool invert;
+
+    DesignPanel *dp;        // pointer to parent DesignPanel
+    int layer_index;        // index of layer in Layer stack
 
     // internals
-    QVector<int> item_inds;
-    prim::Aggregate *agg;
+    QVector<int> item_inds; // list of indices of items in the Layer item stack
+    prim::Aggregate *agg;   // pointer to corresponding Aggregate
+    int agg_index;          // index of agg in Layer item stack
 
   };
 

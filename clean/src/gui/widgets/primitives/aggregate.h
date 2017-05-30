@@ -20,12 +20,12 @@ namespace prim{
   public:
 
     // constructor, takes a list of children Items
-    Aggregate(prim::Layer *layer, QList<Item*> items, QGraphicsItem *parent=0);
+    Aggregate(prim::Layer *layer, QStack<Item*> items, QGraphicsItem *parent=0);
 
     // destructor, makes all children belong to Aggregates parent
     ~Aggregate();
 
-    QList<prim::Item*> &getChildren() {return items;}
+    QStack<prim::Item*> getChildren() {return items;}
 
     // necessary derived class member functions
     virtual QRectF boundingRect() const;
@@ -35,7 +35,9 @@ namespace prim{
 
   private:
 
-    QList<prim::Item*> items;
+    QPointF p0; // center position
+
+    QStack<prim::Item*> items;
 
     // initialise the static class variables
     void prepareStatics();

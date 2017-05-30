@@ -246,8 +246,6 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   while(layers.count()>0)
     removeLayer(0);
 
-    qDebug() << tr("Building lattice : %1").arg(fname);
-
   // build the new lattice
   prim::Lattice *lattice = new prim::Lattice(fname);
 
@@ -317,10 +315,10 @@ void gui::DesignPanel::setFills(float *fills)
 
 void gui::DesignPanel::selectClicked(prim::Item *item)
 {
-  item=item;
+  // for now, if an item is clicked in selection mode, act as though the highest
+  // level aggregate was clicked
   if(tool_type == gui::DesignPanel::SelectTool){
-    // initialise move
-    // initMove();
+
   }
 }
 
@@ -504,6 +502,10 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
     switch(e->key()){
       case Qt::Key_G:
         // grouping behaviour for selecting surface dangling bonds
+        if(keymods == (Qt::ControlModifier | Qt::ShiftModifier))
+          splitAggregates();
+        else if(keymods == Qt::ControlModifier)
+          formAggregate();
         break;
       case Qt::Key_C:
         // copy selected items to the clipboard
@@ -666,8 +668,6 @@ void gui::DesignPanel::CreateDB::redo()
 
 void gui::DesignPanel::CreateDB::create()
 {
-  qDebug() << tr("Creating dangling bond: %1::%2 ").arg(layer_index).arg(index);
-
   // add dangling bond to layer and scene, index in layer item stack will be
   // equal to layer->getItems().size()
   dp->addItem(new prim::DBDot(dp->getLayer(layer_index), ldot), layer_index, index);
@@ -678,8 +678,6 @@ void gui::DesignPanel::CreateDB::destroy()
   prim::DBDot *dbdot = (prim::DBDot*)dp->getLayer(layer_index)->getItem(index);
 
   if(dbdot != 0){
-
-    qDebug() << tr("Destroying dangling bond: %1::%2").arg(layer_index).arg(index);
     // make source lattice site selectable again
     dbdot->getSource()->setDBDot(0);
 
@@ -692,90 +690,134 @@ void gui::DesignPanel::CreateDB::destroy()
 
 
 
-// CreateAggregate class
-
-gui::DesignPanel::CreateAggregate::CreateAggregate(QList<prim::Item *> &items,
+// FromAggregate class
+gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
                                             DesignPanel *dp, QUndoCommand *parent)
-  : QUndoCommand(parent), dp(dp), agg(0)
+  : QUndoCommand(parent), invert(false), dp(dp), agg(0), agg_index(-1)
 {
   if(items.count()==0){
     qWarning() << tr("Aggregate contains no items");
     return;
   }
 
-  prim::Layer *layer = items.at(0)->layer;
-
   // get layer_index, and check that it is the same for all items
+  prim::Layer *layer = items.at(0)->layer;
+  layer_index = dp->getLayerIndex(layer);
   for(prim::Item *item : items)
     if(item->layer != layer){
       qWarning() << tr("Aggregates can only be formed from items in the same layer");
       return;
     }
 
+  // format the input items to a pointer invariant form, could be done more efficiently
+  QStack<prim::Item*> layer_items = layer->getItems();
+  for(prim::Item *item : items)
+    item_inds.append(layer_items.indexOf(item));
+  std::sort(item_inds.begin(), item_inds.end());
+
+  qDebug() << tr("Aggregate items:");
+  for(const int &ind : item_inds)
+    qDebug() << tr("  item %1").arg(ind);
+}
+
+gui::DesignPanel::FormAggregate::FormAggregate(prim::Aggregate *agg, int offset,
+                                          DesignPanel *dp, QUndoCommand *parent)
+  : QUndoCommand(parent), invert(true), dp(dp), agg(agg)
+{
+  // get layer index, assumes aggregate was formed using FormAggregate
+  prim::Layer *layer = agg->layer;
   layer_index = dp->getLayerIndex(layer);
 
-  // format the input items to a pointer invariant form, could be done more efficiently
-  for(prim::Item *item : items)
-    item_inds.append(layer->getItems().indexOf(item));
-  std::sort(item_inds.begin(), item_inds.end());
+  // aggregate index
+  QStack<prim::Item*> layer_items = layer->getItems();
+  agg_index = layer_items.indexOf(agg);
+
+  // doesn't really matter where we add the items from the aggregate to the layer
+  // item stack... add to the end
+  for(int i=layer_items.count()-1, j=0; j < agg->getChildren().count(); j++)
+    item_inds.append(i+j+offset);
+
+  qDebug() << tr("Splitting Agg :: Layer index: %1").arg(layer_index);
+  for(const int& ind : item_inds)
+    qDebug() << tr("   item %1").arg(ind);
 }
 
 // split the aggregate
-void gui::DesignPanel::CreateAggregate::undo()
+void gui::DesignPanel::FormAggregate::undo()
+{
+  invert ? form() : split();
+}
+
+// form the aggregate
+void gui::DesignPanel::FormAggregate::redo()
+{
+  invert ? split() : form();
+}
+
+
+void gui::DesignPanel::FormAggregate::form()
 {
   prim::Layer *layer = dp->getLayer(layer_index);
 
-  // aggregate should be on the top of the layer Item stack, pop it and check
-  if(agg != layer->getItems().pop())
+  // all items should be in the same layer as the aggregate was and have no parents
+  prim::Item *item=0;
+  QStack<prim::Item*> layer_items = layer->getItems();
+  for(const int &ind : item_inds){
+    if(ind >= layer_items.size())
+      qFatal("Undo/Redo mismatch... something went wrong");
+    item = layer_items.at(ind);
+    if(item->layer != layer || item->parentItem() != 0)
+      qFatal("Undo/Redo mismatch... something went wrong");
+  }
+
+  // remove the items from the Layer stack in reverse order
+  QStack<prim::Item*> items;
+  for(int i=item_inds.count()-1; i>=0; i--)
+    items.push(layer->takeItem(item_inds.at(i)));
+
+  // remove all Items from the scene
+  for(prim::Item *item : items)
+    if(item != 0)
+      item->scene()->removeItem(item);
+
+  // create new aggregate
+  agg = new prim::Aggregate(layer, items);
+
+  // add aggregate to system
+  dp->addItem(agg, layer_index, agg_index);
+}
+
+
+void gui::DesignPanel::FormAggregate::split()
+{
+  prim::Layer *layer = dp->getLayer(layer_index);
+
+  prim::Item *item = layer->takeItem(agg_index);
+
+  if(item->item_type == prim::Item::Aggregate)
+    agg = (prim::Aggregate*)item;
+  else
     qFatal("Undo/Redo mismatch... something went wrong");
 
   // remove aggregate and all children from the scene
   agg->scene()->removeItem(agg);
 
   // destroy the aggregate
-  QList<prim::Item*> items = agg->getChildren();
+  QStack<prim::Item*> items = agg->getChildren();
   delete agg;
 
-  // re-insert the component items into the Layer in ascending index order
-  int i=0;
-  for(prim::Item *item : items)
-    dp->addItem(item, layer_index, item_inds.at(i++));
-}
-
-// form the aggregate
-void gui::DesignPanel::CreateAggregate::redo()
-{
-  prim::Layer *layer = dp->getLayer(layer_index);
-
-  // all items should be in the same layer as the aggregate was and have no parents
-  prim::Item *item=0;
-  for(const int &ind : item_inds){
-    if(ind >= layer->getItems().size())
-      qFatal("Undo/Redo mismatch... something went wrong");
-    item = layer->getItems().at(ind);
-    if(item->layer != layer || item->parentItem() != 0)
-      qFatal("Undo/Redo mismatch... something went wrong");
-  }
-
-  // remove the items from the Layer stack in reverse order
-  QList<prim::Item*> items;
-  for(int i=item_inds.count()-1; i>=0; i--){
-    items.append(layer->getItems().takeAt(item_inds.at(i)));
-  }
-
-  // remove all Items from the scene
-  for(prim::Item *item : items)
-    item->scene()->removeItem(item);
-
-  // create new aggregate
-  agg = new prim::Aggregate(layer, items);
-
-  // add aggregate to system
-  dp->addItem(agg, layer_index);
+  // re-insert the component items into the Layer from the item stack
+  for(const int& ind : item_inds)
+    dp->addItem(items.pop(), layer_index, ind);
 }
 
 
-// Methods
+
+
+
+
+
+// Undo/Redo Methods
 
 void gui::DesignPanel::createDBs()
 {
@@ -816,5 +858,50 @@ void gui::DesignPanel::deleteSelection()
     }
   }
   undo_stack->endMacro();
+}
 
+
+void gui::DesignPanel::formAggregate()
+{
+  // get selected items as prim::Item pointers
+  QList<prim::Item*> items;
+  for(QGraphicsItem *gitem : scene->selectedItems()){
+    items.append((prim::Item*)gitem);
+    if(items.last()->layer != layers.at(1)){
+      qCritical() << tr("Selected aggregate item not in the surface...");
+      return;
+    }
+  }
+
+  if(items.count()<2){
+    qWarning() << tr("Must select multiple items to form an aggregate");
+    return;
+  }
+  // reversably create the aggregate
+  undo_stack->push(new FormAggregate(items, this));
+}
+
+void gui::DesignPanel::splitAggregates()
+{
+  // get selected aggregates
+  QList<prim::Aggregate*> aggs;
+  prim::Item *item=0;
+  for(QGraphicsItem *gitem : scene->selectedItems()){
+    item = (prim::Item*)gitem;
+    if(item->item_type == prim::Item::Aggregate)
+      aggs.append((prim::Aggregate*)item);
+  }
+
+  if(aggs.count()==0){
+    qWarning() << tr("No aggregates selected to ungroup");
+    return;
+  }
+
+  undo_stack->beginMacro(tr("Split %1 aggregates").arg(aggs.count()));
+  int offset=0;
+  for(prim::Aggregate *agg : aggs){
+    undo_stack->push(new FormAggregate(agg, offset, this));
+    offset += agg->getChildren().count()-1;
+  }
+  undo_stack->endMacro();
 }

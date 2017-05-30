@@ -26,6 +26,14 @@ prim::Item::Item(ItemType type, prim::Layer *lay, QGraphicsItem *parent)
 }
 
 
+
+bool prim::Item::upSelected()
+{
+  prim::Item *parent = (prim::Item*) parentItem();
+  return parent==0 ? isSelected() : parent->upSelected();
+}
+
+
 // current functionality:
 // items that are selected emit a signal when left clicked if control not pressed
 void prim::Item::mousePressEvent(QGraphicsSceneMouseEvent *e)
@@ -36,10 +44,12 @@ void prim::Item::mousePressEvent(QGraphicsSceneMouseEvent *e)
     case Qt::LeftButton:
       if(keymods & Qt::ControlModifier)
         e->setAccepted(false);
-      else if(isSelected())
+      else if(upSelected())
         prim::Emitter::instance()->selectClicked(this);
       break;
     default:
       break;
   }
+
+  qDebug() << QObject::tr("Item clicked: %1 :: (%2 , %3)").arg((size_t)this).arg(x()).arg(y());
 }

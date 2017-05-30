@@ -43,8 +43,11 @@ namespace prim{
     void addItem(prim::Item *item, int index=-1);
 
     // attempt to remove the given Item from the layer. Returns true if the Item
-    // is found and remove, false otherwise.
+    // is found and removed, false otherwise.
     bool removeItem(prim::Item *item);
+
+    // pop the Item given by the index. Returns 0 if invalid index.
+    prim::Item *takeItem(int ind=-1);
 
     // update the layer visibility, calls setVisible(vis) for all Items in the
     // layer. If vis==visibility, do nothing.

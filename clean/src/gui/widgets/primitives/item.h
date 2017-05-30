@@ -15,7 +15,7 @@
 #include "src/settings/settings.h"
 
 namespace prim{
-  
+
   // forward declaration for prim::Layer
   class Layer;
 
@@ -42,6 +42,9 @@ namespace prim{
     // abstract member functions for derived classes
     virtual QRectF boundingRect() const = 0;
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) = 0;
+
+    // true if the item or its parent has been seleted, recursive to highest level parent
+    bool upSelected();
 
     // securing the item type and layer as private isn't worth the copy
     // constructor calls for accessors, make public

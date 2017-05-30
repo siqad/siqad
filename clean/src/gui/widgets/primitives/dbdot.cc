@@ -55,7 +55,7 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
   QRectF rect = boundingRect();
 
   // draw outer circle
-  painter->setPen(QPen(isSelected() ? selected_col : edge_col, edge_width));
+  painter->setPen(QPen(upSelected() ? selected_col : edge_col, edge_width));
   painter->drawEllipse(rect);
 
   // draw inner fill

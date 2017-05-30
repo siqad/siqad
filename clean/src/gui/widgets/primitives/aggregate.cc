@@ -10,12 +10,17 @@
 
 QColor prim::Aggregate::edge_col;
 
-prim::Aggregate::Aggregate(prim::Layer *layer, QList<Item*> items, QGraphicsItem *parent)
+prim::Aggregate::Aggregate(prim::Layer *layer, QStack<Item*> items, QGraphicsItem *parent)
   : prim::Item(prim::Item::Aggregate, layer, parent), items(items)
 {
   // set all given items as children
-  for(prim::Item *item : items)
+  for(prim::Item *item : items){
     item->setParentItem(this);
+    item->setFlag(QGraphicsItem::ItemIsSelectable, false);
+  }
+
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
+  setSelected(true);
 
   // set up static edge color if invalid
   if(!edge_col.isValid())
@@ -25,36 +30,45 @@ prim::Aggregate::Aggregate(prim::Layer *layer, QList<Item*> items, QGraphicsItem
 prim::Aggregate::~Aggregate()
 {
   // migrate children to Aggregate's parent Item
-  for(prim::Item *item : items)
+  for(prim::Item *item : items){
     item->setParentItem(parentItem());
+    item->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    item->setSelected(true);
+  }
 }
 
 QRectF prim::Aggregate::boundingRect() const
 {
   // smallest bounding box around all children items
-  qreal xmin=-1, xmax=-1, ymin=-1, ymax=-1;
+  bool unset = true;
+  qreal xmin=-1, ymin=-1, xmax=-1, ymax=-1;
   for(QGraphicsItem *item : childItems()){
     QRectF rect = item->boundingRect();
-    xmin = xmin<0 ? rect.left() : qMin(xmin, rect.left());
-    xmax = qMax(xmax, rect.right());
-    ymin = ymin<0 ? rect.top() : qMin(ymin, rect.top());
-    ymax = qMax(ymax, rect.bottom());
+    QPointF pos = item->pos();
+    if(unset){
+      unset=false;
+      xmin = pos.x()+rect.left();
+      ymin = pos.y()+rect.top();
+      xmax = pos.x()+rect.right();
+      ymax = pos.y()+rect.bottom();
+    }
+    else{
+      xmin = qMin(xmin, pos.x()+rect.left());
+      ymin = qMin(ymin, pos.y()+rect.top());
+      xmax = qMax(xmax, pos.x()+rect.right());
+      ymax = qMax(ymax, pos.y()+rect.bottom());
+    }
   }
 
   qreal width = xmax-xmin;
   qreal height = ymax-ymin;
-  return QRectF(-.5*width, -.5*height, width, height);
+  return QRectF(.5*(xmax+xmin-width), .5*(ymax+ymin-height), width, height);
 }
 
 void prim::Aggregate::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
-  // draw each child object
-
-  for(QGraphicsItem *item : childItems())
-    item->paint(painter, option);
-
-  // draw bounding box
-  if(isSelected()){
+  // Scene will handle drawing the children, just draw the bounding box
+  if(upSelected()){
     QRectF rect = boundingRect();
 
     painter->setPen(QPen(edge_col));
@@ -71,9 +85,10 @@ void prim::Aggregate::prepareStatics()
 }
 
 
-void prim::Aggregate::mousePressEvent(QGraphicsSceneMouseEvent *)
+void prim::Aggregate::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
+  // QGraphicsItem order precedence will trigger the children before the Aggregate
+  // The following will only be triggered if the children pass the event up.
   qDebug() << QObject::tr("Aggregate has seen the mousePressEvent");
-  // do nothing,
-  // ignore();
+  prim::Item::mousePressEvent(e);
 }

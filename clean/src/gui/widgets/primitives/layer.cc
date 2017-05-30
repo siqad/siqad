@@ -51,6 +51,16 @@ bool prim::Layer::removeItem(prim::Item *item)
 }
 
 
+prim::Item *prim::Layer::takeItem(int ind)
+{
+  if(ind==-1 && !items.isEmpty())
+    return items.takeLast();
+  if(ind < 0 || ind >= items.count()){
+    qCritical() << tr("Invalid item index...");
+    return 0;
+  }
+  return items.takeAt(ind);
+}
 
 void prim::Layer::setVisible(bool vis)
 {
