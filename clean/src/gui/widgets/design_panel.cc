@@ -683,6 +683,7 @@ void gui::DesignPanel::clearGhost()
   ghosting=false;
 }
 
+
 bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
 {
   // don't need to recheck snap target unless the cursor has moved significantly
@@ -974,6 +975,8 @@ void gui::DesignPanel::deleteSelection()
         undo_stack->push(new CreateDB( static_cast<prim::DBDot*>(item)->getSource(),
                                       getLayerIndex(item->layer), this, true));
         break;
+      case prim::Item::Aggregate:
+        destroyAggregate(static_cast<prim::Aggregate*>(item));
       default:
         break;
     }
@@ -1027,7 +1030,28 @@ void gui::DesignPanel::splitAggregates()
   undo_stack->endMacro();
 }
 
-void gui::DesignPanel::destroyAggregate(prim::Aggregate *aggregate)
+void gui::DesignPanel::destroyAggregate(prim::Aggregate *agg)
 {
+  undo_stack->beginMacro(tr("Split the aggregate"));
 
+  // break the Aggregate
+  QStack<prim::Item*> items = agg->getChildren();
+  undo_stack->push(new FormAggregate(agg, 0, this));
+
+  // recursively destroy all children using undo/redo enabled methods
+  for(prim::Item* item : items){
+    switch(item->item_type){
+      case prim::Item::DBDot:
+        undo_stack->push(new CreateDB(static_cast<prim::DBDot*>(item)->getSource(),
+                                      getLayerIndex(item->layer), this, true));
+        break;
+      case prim::Item::Aggregate:
+        destroyAggregate(static_cast<prim::Aggregate*>(item));
+        break;
+      default:
+        break;
+    }
+  }
+
+  undo_stack->endMacro();
 }

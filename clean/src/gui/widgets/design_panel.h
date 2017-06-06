@@ -173,7 +173,6 @@ namespace gui{
 
     class CreateDB;         // create a dangling bond at a given lattice dot
     class FormAggregate;    // form an aggregate from a list of Items
-    class DestroyAggregate; // destroy an aggregate and its contained items
 
     class DeleteItem;       // delete a given Item
 
@@ -197,7 +196,7 @@ namespace gui{
     void splitAggregates();
 
     // destroy an aggregate with all contained item
-    void destroyAggregate(prim::Aggregate *aggregate);
+    void destroyAggregate(prim::Aggregate *agg);
 
   };
 
@@ -270,6 +269,8 @@ namespace gui{
     int agg_index;          // index of agg in Layer item stack
 
   };
+
+
 
   //NOTE: need to make sure items are destroyed and re-create without changin their
   // order on the Item stacks.
