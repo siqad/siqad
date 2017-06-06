@@ -1,7 +1,7 @@
 // @file:     design_panel.h
 // @author:   Jake
 // @created:  2016.11.02
-// @editted:  2017.05.11  - Jake
+// @editted:  2017.05.31  - Jake
 // @license:  GNU LGPL v3
 //
 // @desc:     Top level widget for the design panel. Contains all layers and
@@ -115,13 +115,19 @@ namespace gui{
     bool moving;    // moving an existing group
 
     // snapping
-    qreal snap_diameter;
-    prim::LatticeDot *snap_target;
+    qreal snap_diameter;            // size of region to search for snap points
+    prim::LatticeDot *snap_target;  // current snap target, LatticeDot
+    QPointF snap_cache;             // cursor position of last snap update
 
     // mouse functionality
     QPoint mouse_pos_old;     // old mouse position in pixels
     QPoint mouse_pos_cached;  // parameter for caching relevant mouse positions, in pixels
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
+
+
+    // testing
+    QGraphicsEllipseItem *tdot;
+    QGraphicsRectItem *trect;
 
 
     // INTERNAL METHODS
@@ -138,6 +144,31 @@ namespace gui{
     // filter selected items
     void filterSelection(bool select_flag);
 
+
+    // GHOSTING
+
+    // create a Ghost for the current selection
+    void createGhost();
+
+    // clear the current Ghost
+    void clearGhost();
+
+    // snap the ghost to the nearest possible lattive position. Returns true if
+    // the snap_target was update (need to change the ghost location).
+    bool snapGhost(QPointF scene_pos, QPointF &offset);
+
+    // initialize an item move
+    void initMove();
+
+    // complete an item move
+    void completeMove();
+
+
+
+
+
+    // UNDO/REDO FUNCTIONALITY
+
     // fundamental undo/redo command classes, keep memory requirement small
 
     class CreateDB;         // create a dangling bond at a given lattice dot
@@ -149,10 +180,14 @@ namespace gui{
     class CreateLayer;      // create a new layer
     class DeleteLayer;      // delete an existing layer
 
+    class MoveItem;         // move a single Item
+
+    // functions including undo/redo behaviour
+
     // create dangling bonds in the surface at all selected lattice dots
     void createDBs();
 
-    // delete all selection items
+    // delete all selected items
     void deleteSelection();
 
     // create an aggregate from the selected surface Items

@@ -16,20 +16,23 @@ qreal prim::Item::scale_factor = -1;
 
 // CLASS::Item
 
+void prim::Item::init()
+{
+  scale_factor = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
+}
+
 prim::Item::Item(ItemType type, prim::Layer *lay, QGraphicsItem *parent)
   : QGraphicsItem(parent), item_type(type), layer(lay)
 {
-  settings::GUISettings *gui_settings = settings::GUISettings::instance();
-
   if(scale_factor<0)
-    scale_factor = gui_settings->get<qreal>("view/scale_fact");
+    init();
 }
 
 
 
 bool prim::Item::upSelected()
 {
-  prim::Item *parent = (prim::Item*) parentItem();
+  prim::Item *parent = static_cast<prim::Item*>(parentItem());
   return parent==0 ? isSelected() : parent->upSelected();
 }
 

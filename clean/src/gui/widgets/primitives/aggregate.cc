@@ -65,7 +65,7 @@ QRectF prim::Aggregate::boundingRect() const
   return QRectF(.5*(xmax+xmin-width), .5*(ymax+ymin-height), width, height);
 }
 
-void prim::Aggregate::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
+void prim::Aggregate::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
   // Scene will handle drawing the children, just draw the bounding box
   if(upSelected()){

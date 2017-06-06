@@ -1,7 +1,7 @@
 // @file:     design_panel.cc
 // @author:   Jake
 // @created:  2016.11.02
-// @editted:  2017.05.11  - Jake
+// @editted:  2017.05.31  - Jake
 // @license:  GNU LGPL v3
 //
 // @desc:     DesignPanel implementation
@@ -18,6 +18,9 @@
 gui::DesignPanel::DesignPanel(QWidget *parent)
   : QGraphicsView(parent)
 {
+  // set-up scale_factor in prim::Item
+  prim::Item::init();
+
   undo_stack = new QUndoStack();
 
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
@@ -34,6 +37,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 
   // initialising parameters
   snap_diameter = app_settings->get<qreal>("snap/diameter")*prim::Item::scale_factor;
+  qDebug() << tr("SD: %1").arg(snap_diameter);
   snap_target = 0;
 
   tool_type = gui::DesignPanel::None;     // now setTool will update the tool
@@ -62,6 +66,16 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 
   // surface layer active on init
   top_layer = layers.at(1);
+
+  // initialise the Ghost and set the scene
+  prim::Ghost::instance()->setScene(scene);
+
+  // set up test objects
+  tdot = new QGraphicsEllipseItem();
+  trect = new QGraphicsRectItem();
+
+  scene->addItem(tdot);
+  scene->addItem(trect);
 }
 
 // destructor
@@ -203,7 +217,7 @@ QList<prim::DBDot *> gui::DesignPanel::getSurfaceDBs() const
   QList<prim::DBDot *> dbs;
   for(prim::Item *item : layers.at(1)->getItems())
     if(item->item_type==prim::Item::DBDot)
-      dbs.append((prim::DBDot *)item);
+      dbs.append(static_cast<prim::DBDot *>(item));
 
   return dbs;
 }
@@ -363,6 +377,10 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 
   if(ghosting){
     // update snap
+    QPointF scene_pos = mapToScene(e->pos());
+    QPointF offset;
+    if(snapGhost(scene_pos, offset))
+      prim::Ghost::instance()->moveBy(offset.x(), offset.y());
   }
   else if(clicked){
     // not ghosting, mouse dragging of some sort
@@ -406,6 +424,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
   // case specific behaviour
   if(ghosting){
     // plant ghost and end ghosting
+    clearGhost();
   }
   else if(clicked){
     switch(e->button()){
@@ -442,6 +461,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
   }
 }
 
+
 void gui::DesignPanel::mouseDoubleClickEvent(QMouseEvent *e)
 {
   QGraphicsView::mouseDoubleClickEvent(e);
@@ -469,6 +489,7 @@ void gui::DesignPanel::wheelEvent(QWheelEvent *e)
       wheelPan(keymods & Qt::ShiftModifier);
   }
 }
+
 
 // don't typically do anything on key press.
 void gui::DesignPanel::keyPressEvent(QKeyEvent *e)
@@ -512,6 +533,7 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
         break;
       case Qt::Key_V:
         // create ghost for clipboard if any
+        createGhost();
         break;
       case Qt::Key_Z:{
         // undo/redo based on keymods
@@ -618,7 +640,6 @@ void gui::DesignPanel::boundZoom(qreal &ds)
 }
 
 
-
 void gui::DesignPanel::filterSelection(bool select_flag)
 {
   // should only be here if tool type is either select or dbgen
@@ -631,10 +652,110 @@ void gui::DesignPanel::filterSelection(bool select_flag)
 
   // if select_flag, deselect all items in the lattice. Otherwise, keep only items in the lattice
   for(QGraphicsItem *gitem : scene->selectedItems()){
-    if( ( ((prim::Item*) gitem)->layer == layers.at(0)) == select_flag)
+    if( ( static_cast<prim::Item*>(gitem)->layer == layers.at(0)) == select_flag)
       gitem->setSelected(false);
   }
 }
+
+
+void gui::DesignPanel::createGhost()
+{
+  qDebug() << tr("Creating ghost...");
+
+  prim::Ghost *ghost = prim::Ghost::instance();
+
+  //get QList of selected Item object
+  filterSelection(true);
+  QList<prim::Item*> items;
+  for(QGraphicsItem *qitem : scene->selectedItems())
+    items.append(static_cast<prim::Item*>(qitem));
+
+  ghost->prepare(items);
+  ghosting=true;
+  snap_cache = QPointF();
+}
+
+
+void gui::DesignPanel::clearGhost()
+{
+  qDebug() << tr("Clearing ghost...");
+  prim::Ghost::instance()->cleanGhost();
+  ghosting=false;
+}
+
+bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
+{
+  // don't need to recheck snap target unless the cursor has moved significantly
+  if((scene_pos-snap_cache).manhattanLength()<.3*snap_diameter)
+    return false;
+  snap_cache = scene_pos;
+
+  prim::Ghost *ghost = prim::Ghost::instance();
+  prim::GhostDot *anchor = ghost->snapAnchor();
+
+  // if no anchor, allow free movement of the ghost
+  if(anchor==0){
+    offset = QPointF();
+    return true;
+  }
+
+  // otherwise restrict possible ghost position to lattice sites
+
+  QPointF old_anchor = anchor->scenePos();
+  QPointF free_anchor = ghost->freeAnchor(scene_pos);
+
+  // get nearest lattice site to free anchor
+  QRectF rect;
+  rect.setSize(QSize(snap_diameter, snap_diameter));
+  rect.moveCenter(free_anchor);
+  QList<QGraphicsItem*> near_items = scene->items(rect);
+
+  // tdot->setPos(free_anchor);
+  // trect->setRect(rect);
+
+  // if no items nearby, change nothing
+  if(near_items.count()==0)
+    return false;
+
+  // select the nearest lattice point to the free_anchor
+  prim::LatticeDot *target=0;
+  qreal mdist=-1, dist;
+
+  for(QGraphicsItem *gitem : near_items){
+    // lattice dot and selectable (not occupied by a dangling bond)
+    if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::LatticeDot &&
+        (gitem->flags() & QGraphicsItem::ItemIsSelectable)){
+      dist = (gitem->pos()-free_anchor).manhattanLength();
+      if(mdist<0 || dist<mdist){
+        target = static_cast<prim::LatticeDot*>(gitem);
+        mdist=dist;
+      }
+    }
+  }
+
+  // if no valid target or target has not changed, do nothing
+  if(!target || (target==snap_target))
+    return false;
+
+  // move ghost and update validity hash table.
+  offset = target->scenePos()-old_anchor;
+  if(!ghost->valid_hash.contains(target))
+    ghost->valid_hash[target] = ghost->checkValid(offset);
+  snap_target = target;
+  ghost->setValid(ghost->valid_hash[target]);
+
+  return true;
+}
+
+
+void gui::DesignPanel::initMove()
+{
+  moving = true;
+}
+
+
+
+
 
 
 // UNDO/REDO STACK METHODS
@@ -675,7 +796,7 @@ void gui::DesignPanel::CreateDB::create()
 
 void gui::DesignPanel::CreateDB::destroy()
 {
-  prim::DBDot *dbdot = (prim::DBDot*)dp->getLayer(layer_index)->getItem(index);
+  prim::DBDot *dbdot = static_cast<prim::DBDot*>(dp->getLayer(layer_index)->getItem(index));
 
   if(dbdot != 0){
     // make source lattice site selectable again
@@ -795,7 +916,7 @@ void gui::DesignPanel::FormAggregate::split()
   prim::Item *item = layer->takeItem(agg_index);
 
   if(item->item_type == prim::Item::Aggregate)
-    agg = (prim::Aggregate*)item;
+    agg = static_cast<prim::Aggregate*>(item);
   else
     qFatal("Undo/Redo mismatch... something went wrong");
 
@@ -825,7 +946,7 @@ void gui::DesignPanel::createDBs()
   // check that the selection is valid
   prim::Item *item=0;
   for(QGraphicsItem *gitem : scene->selectedItems()){
-    item = (prim::Item*)gitem;
+    item = static_cast<prim::Item*>(gitem);
     if(item->item_type != prim::Item::LatticeDot){
       qCritical() << tr("Dangling bond target is not a lattice dot...");
       return;
@@ -836,7 +957,7 @@ void gui::DesignPanel::createDBs()
   int layer_index = layers.indexOf(top_layer);
   undo_stack->beginMacro(tr("create dangling bonds at selected sites"));
   for(QGraphicsItem *gitem : scene->selectedItems())
-    undo_stack->push(new CreateDB((prim::LatticeDot *)gitem, layer_index, this));
+    undo_stack->push(new CreateDB(static_cast<prim::LatticeDot *>(gitem), layer_index, this));
   undo_stack->endMacro();
 }
 
@@ -847,10 +968,10 @@ void gui::DesignPanel::deleteSelection()
 
   undo_stack->beginMacro(tr("delete %1 items").arg(items.count()));
   for(QGraphicsItem *gitem : items){
-    prim::Item *item = (prim::Item*) gitem;
+    prim::Item *item = static_cast<prim::Item*>(gitem);
     switch(item->item_type){
       case prim::Item::DBDot:
-        undo_stack->push(new CreateDB( ((prim::DBDot*)item)->getSource(),
+        undo_stack->push(new CreateDB( static_cast<prim::DBDot*>(item)->getSource(),
                                       getLayerIndex(item->layer), this, true));
         break;
       default:
@@ -866,7 +987,7 @@ void gui::DesignPanel::formAggregate()
   // get selected items as prim::Item pointers
   QList<prim::Item*> items;
   for(QGraphicsItem *gitem : scene->selectedItems()){
-    items.append((prim::Item*)gitem);
+    items.append(static_cast<prim::Item*>(gitem));
     if(items.last()->layer != layers.at(1)){
       qCritical() << tr("Selected aggregate item not in the surface...");
       return;
@@ -887,9 +1008,9 @@ void gui::DesignPanel::splitAggregates()
   QList<prim::Aggregate*> aggs;
   prim::Item *item=0;
   for(QGraphicsItem *gitem : scene->selectedItems()){
-    item = (prim::Item*)gitem;
+    item = static_cast<prim::Item*>(gitem);
     if(item->item_type == prim::Item::Aggregate)
-      aggs.append((prim::Aggregate*)item);
+      aggs.append(static_cast<prim::Aggregate*>(item));
   }
 
   if(aggs.count()==0){
@@ -904,4 +1025,9 @@ void gui::DesignPanel::splitAggregates()
     offset += agg->getChildren().count()-1;
   }
   undo_stack->endMacro();
+}
+
+void gui::DesignPanel::destroyAggregate(prim::Aggregate *aggregate)
+{
+
 }
