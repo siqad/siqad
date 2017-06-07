@@ -44,7 +44,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   setTool(gui::DesignPanel::SelectTool);
 
   // rubber band selection
-  setRubberBandSelectionMode(Qt::ContainsItemBoundingRect);
+  setRubberBandSelectionMode(Qt::IntersectsItemBoundingRect);
   setStyleSheet("selection-background-color: rgba(100, 100, 255, 10)");
 
   // set view behaviour
@@ -424,6 +424,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
   // case specific behaviour
   if(ghosting){
     // plant ghost and end ghosting
+    moveToGhost();
     clearGhost();
   }
   else if(clicked){
@@ -723,9 +724,8 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
   qreal mdist=-1, dist;
 
   for(QGraphicsItem *gitem : near_items){
-    // lattice dot and selectable (not occupied by a dangling bond)
-    if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::LatticeDot &&
-        (gitem->flags() & QGraphicsItem::ItemIsSelectable)){
+    // lattice dot
+    if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::LatticeDot){
       dist = (gitem->pos()-free_anchor).manhattanLength();
       if(mdist<0 || dist<mdist){
         target = static_cast<prim::LatticeDot*>(gitem);
@@ -836,10 +836,6 @@ gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
   for(prim::Item *item : items)
     item_inds.append(layer_items.indexOf(item));
   std::sort(item_inds.begin(), item_inds.end());
-
-  qDebug() << tr("Aggregate items:");
-  for(const int &ind : item_inds)
-    qDebug() << tr("  item %1").arg(ind);
 }
 
 gui::DesignPanel::FormAggregate::FormAggregate(prim::Aggregate *agg, int offset,
@@ -934,7 +930,94 @@ void gui::DesignPanel::FormAggregate::split()
 }
 
 
+// MoveItem class
+gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
+                                      DesignPanel *dp, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), offset(offset)
+{
+  layer_index = dp->getLayerIndex(item->layer);
+  item_index = item->layer->getItems().indexOf(item);
+}
 
+
+void gui::DesignPanel::MoveItem::undo()
+{
+  move(true);
+}
+
+
+void gui::DesignPanel::MoveItem::redo()
+{
+  move(false);
+}
+
+
+
+void gui::DesignPanel::MoveItem::move(bool invert)
+{
+  prim::Layer *layer = dp->getLayer(layer_index);
+  prim::Item *item = layer->getItem(item_index);
+
+  QPointF delta = invert ? -offset : offset;
+
+  // should update original boundingRect after move to handle residual artifacts
+  QRectF old_rect = item->boundingRect();
+
+  switch(item->item_type){
+    case prim::Item::DBDot:
+      moveDBDot(static_cast<prim::DBDot*>(item), delta);
+      break;
+    case prim::Item::Aggregate:
+      moveAggregate(static_cast<prim::Aggregate*>(item), delta);
+      break;
+    default:
+      item->moveBy(delta.x(), delta.y());
+      break;
+  }
+
+  // redraw old and new bounding rects to handle artifacts
+  item->scene()->update(old_rect);
+  item->scene()->update(item->boundingRect());
+}
+
+
+void gui::DesignPanel::MoveItem::moveDBDot(prim::DBDot *dot, const QPointF &delta)
+{
+  // get the target LatticeDot
+  QList<QGraphicsItem*> cands = dot->scene()->items(dot->scenePos()+delta);
+  prim::LatticeDot *ldot=0;
+  for(QGraphicsItem *cand : cands){
+    if(static_cast<prim::Item*>(cand)->item_type == prim::Item::LatticeDot){
+      ldot=static_cast<prim::LatticeDot*>(cand);
+      break;
+    }
+  }
+
+  if(ldot==0)
+    qCritical() << tr("Failed to move DBDot");
+  else{
+    dot->setSource(ldot);
+  }
+}
+
+
+void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPointF &delta)
+{
+  // for Aggregates, move only the contained Items
+  for(prim::Item *item : agg->getChildren()){
+    switch(item->item_type){
+      case prim::Item::DBDot:
+        moveDBDot(static_cast<prim::DBDot*>(item), delta);
+        break;
+      case prim::Item::Aggregate:
+        moveAggregate(static_cast<prim::Aggregate*>(item), delta);
+        break;
+      default:
+        item->moveBy(delta.x(), delta.y());
+        break;
+    }
+  }
+}
 
 
 
@@ -943,10 +1026,14 @@ void gui::DesignPanel::FormAggregate::split()
 
 void gui::DesignPanel::createDBs()
 {
+  // do something only if there is a selection
+  QList<QGraphicsItem*> selection = scene->selectedItems();
+  if(selection.isEmpty())
+    return;
 
   // check that the selection is valid
   prim::Item *item=0;
-  for(QGraphicsItem *gitem : scene->selectedItems()){
+  for(QGraphicsItem *gitem : selection){
     item = static_cast<prim::Item*>(gitem);
     if(item->item_type != prim::Item::LatticeDot){
       qCritical() << tr("Dangling bond target is not a lattice dot...");
@@ -957,18 +1044,22 @@ void gui::DesignPanel::createDBs()
   // push actions onto the QUndoStack
   int layer_index = layers.indexOf(top_layer);
   undo_stack->beginMacro(tr("create dangling bonds at selected sites"));
-  for(QGraphicsItem *gitem : scene->selectedItems())
+  for(QGraphicsItem *gitem : selection)
     undo_stack->push(new CreateDB(static_cast<prim::LatticeDot *>(gitem), layer_index, this));
   undo_stack->endMacro();
 }
 
 void gui::DesignPanel::deleteSelection()
 {
-  QList<QGraphicsItem*> items = scene->selectedItems();
-  qDebug() << tr("Deleting %1 items").arg(items.count());
+  // do something only if there is a selection
+  QList<QGraphicsItem*> selection = scene->selectedItems();
+  if(selection.isEmpty())
+    return;
 
-  undo_stack->beginMacro(tr("delete %1 items").arg(items.count()));
-  for(QGraphicsItem *gitem : items){
+  qDebug() << tr("Deleting %1 items").arg(selection.count());
+
+  undo_stack->beginMacro(tr("delete %1 items").arg(selection.count()));
+  for(QGraphicsItem *gitem : selection){
     prim::Item *item = static_cast<prim::Item*>(gitem);
     switch(item->item_type){
       case prim::Item::DBDot:
@@ -987,9 +1078,14 @@ void gui::DesignPanel::deleteSelection()
 
 void gui::DesignPanel::formAggregate()
 {
+  // do something only if there is a selection
+  QList<QGraphicsItem*> selection = scene->selectedItems();
+  if(selection.isEmpty())
+    return;
+
   // get selected items as prim::Item pointers
   QList<prim::Item*> items;
-  for(QGraphicsItem *gitem : scene->selectedItems()){
+  for(QGraphicsItem *gitem : selection){
     items.append(static_cast<prim::Item*>(gitem));
     if(items.last()->layer != layers.at(1)){
       qCritical() << tr("Selected aggregate item not in the surface...");
@@ -997,20 +1093,26 @@ void gui::DesignPanel::formAggregate()
     }
   }
 
-  if(items.count()<2){
+  if(selection.count()<2){
     qWarning() << tr("Must select multiple items to form an aggregate");
     return;
   }
+
   // reversably create the aggregate
   undo_stack->push(new FormAggregate(items, this));
 }
 
 void gui::DesignPanel::splitAggregates()
 {
+  // do something only if there is a selection
+  QList<QGraphicsItem*> selection = scene->selectedItems();
+  if(selection.isEmpty())
+    return;
+
   // get selected aggregates
   QList<prim::Aggregate*> aggs;
   prim::Item *item=0;
-  for(QGraphicsItem *gitem : scene->selectedItems()){
+  for(QGraphicsItem *gitem : selection){
     item = static_cast<prim::Item*>(gitem);
     if(item->item_type == prim::Item::Aggregate)
       aggs.append(static_cast<prim::Aggregate*>(item));
@@ -1054,4 +1156,33 @@ void gui::DesignPanel::destroyAggregate(prim::Aggregate *agg)
   }
 
   undo_stack->endMacro();
+}
+
+bool gui::DesignPanel::pasteAtGhost()
+{
+  return false;
+}
+
+// NOTE: currently item move relies on there being a snap target (i.e. at least
+//       one dangling bond is being moved). Should modify in future to be more
+//       general.
+bool gui::DesignPanel::moveToGhost()
+{
+  prim::Ghost *ghost = prim::Ghost::instance();
+
+  // return False if move is invalid
+  if(!ghost->valid_hash[snap_target])
+    return false;
+
+  // otherwise move is valid, get offset
+  QPointF offset = ghost->moveOffset();
+
+  undo_stack->beginMacro(tr("Move items"));
+
+  // move each source item by the offset.
+  for(prim::Item *item : ghost->getTopItems())
+    undo_stack->push(new MoveItem(item, offset, this));
+
+  undo_stack->endMacro();
+  return true;
 }

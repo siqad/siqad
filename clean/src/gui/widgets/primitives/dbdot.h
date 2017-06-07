@@ -36,6 +36,8 @@ namespace prim{
 
     // accessors
     QPointF getPhysLoc() const {return phys_loc;}
+
+    void setSource(prim::LatticeDot *src);
     prim::LatticeDot *getSource() const {return source;}
 
     void setFill(float fill){fill_fact = fill;}

@@ -13,8 +13,25 @@
 #include "items.h"
 #include "src/settings/settings.h"
 
-
 namespace prim{
+
+  // node structure for describing which sources belong to which aggregate
+  struct AggNode{
+    int index;              // index of source if not an Aggregate
+    QList<AggNode*> nodes;  // children of the Aggregate if any
+
+    AggNode(int index=-1) : index(index) {}
+    ~AggNode() {for(AggNode* node : nodes) delete node;}
+
+    void reset()
+    {
+      index=-1;
+      for(AggNode *node : nodes)
+        delete node;
+      nodes.clear();
+    }
+
+  };
 
   class GhostDot : public Item
   {
@@ -63,6 +80,16 @@ namespace prim{
     // move center of Ghost to the given position
     void moveTo(QPointF pos);
 
+    QList<prim::Item*>& getSources() {return sources;}
+    QList<prim::GhostDot*> getDots() {return dots;}
+
+    // get a list of the highest level Items associated with the sources
+    QList<prim::Item*> getTopItems() const;
+
+    // get a nested list of the items included in each high level item, must
+    // free IndexList pointer after use
+    prim::AggNode &getTopIndices(){return aggnode;}
+
     // get a list corresponding to the LatticeDot associated with each GhostDot.
     // If the Item associated with the GhostDot is not a dangling bond the list
     // will contain a 0.
@@ -87,11 +114,18 @@ namespace prim{
     // check if the current position is valid.
     bool checkValid(const QPointF &offset = QPointF());
 
+    // change in position between the first source and GhostDot, for moving Items
+    QPointF moveOffset() const;
+
 
     // virtual methods
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*) Q_DECL_OVERRIDE;
 
+
+    // testing
+    void echoTopIndices();
+    void echoNode(QString &s, AggNode *node);
 
   private:
 
@@ -105,7 +139,7 @@ namespace prim{
     void createGhostDot(Item *item);
 
     // prepare a single item. If item is an Aggregate, recursively prepare children
-    void prepareItem(Item *item);
+    void prepareItem(Item *item, prim::AggNode *node);
 
     // check the current position for validity and set if changed
     void updateValid();
@@ -118,8 +152,12 @@ namespace prim{
     // the Ghost. If there is no Dangling Bond GhostDot, returns 0
     void setAnchor();
 
-    QList<Item*> sources;   // list of Item objects for each GhostDot
+    // get the Item associated with the given AggNode
+    prim::Item *getNodeItem(prim::AggNode *node) const;
+
+    QList<Item*> sources;         // list of Item objects for each GhostDot
     QList<prim::GhostDot*> dots;  // list of GhostDots
+    prim::AggNode aggnode;        // nested structure of sources
 
     QColor col;             // current dot color
     bool valid;             // current placement is valid

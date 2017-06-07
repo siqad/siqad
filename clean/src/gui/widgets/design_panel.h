@@ -163,6 +163,9 @@ namespace gui{
     // complete an item move
     void completeMove();
 
+    // deep copy the current selection to the clipboard
+    void copySelection();
+
 
 
 
@@ -173,8 +176,6 @@ namespace gui{
 
     class CreateDB;         // create a dangling bond at a given lattice dot
     class FormAggregate;    // form an aggregate from a list of Items
-
-    class DeleteItem;       // delete a given Item
 
     class CreateLayer;      // create a new layer
     class DeleteLayer;      // delete an existing layer
@@ -197,6 +198,12 @@ namespace gui{
 
     // destroy an aggregate with all contained item
     void destroyAggregate(prim::Aggregate *agg);
+
+    // paste the current Ghost, returns True if successful
+    bool pasteAtGhost();
+
+    // move the selected items to the current Ghost, returns True if successful
+    bool moveToGhost();
 
   };
 
@@ -271,23 +278,35 @@ namespace gui{
   };
 
 
-
-  //NOTE: need to make sure items are destroyed and re-create without changin their
-  // order on the Item stacks.
-  class DesignPanel::DeleteItem : public QUndoCommand
+  class DesignPanel::MoveItem : public QUndoCommand
   {
   public:
-    DeleteItem(prim::Item *item, QUndoCommand *parent=0);
+    MoveItem(prim::Item *item, const QPointF &offset, DesignPanel *dp, QUndoCommand *parent=0);
 
-    // re-create all the deleted items
+    // move the Item back (by the negative of the offset)
     virtual void undo();
 
-    // delete all the specified items
+    // move the Item by the offset
     virtual void redo();
 
   private:
-    prim::Item *item;
+
+    // move the item either by offset or -offset
+    void move(bool invert=false);
+
+    // move a DBDot by the given delta to a new LatticeDot
+    void moveDBDot(prim::DBDot *dot, const QPointF &delta);
+
+    // move an Aggregate by the given amount
+    void moveAggregate(prim::Aggregate *agg, const QPointF &delta);
+
+    DesignPanel *dp;
+
+    QPointF offset;   // amount by which to move the Item
+    int layer_index;  // index of layer containing the Item
+    int item_index;   // index of item in Layer imte stack
   };
+
 
 } // end gui namespace
 

@@ -72,6 +72,8 @@ void prim::Ghost::cleanGhost()
   anchor=0;
   valid_hash.clear();
 
+  aggnode.reset();
+
   hide();
 }
 
@@ -80,7 +82,7 @@ void prim::Ghost::prepare(const QList<prim::Item*> &items)
 {
   cleanGhost();
   for(prim::Item *item : items)
-    prepareItem(item);
+    prepareItem(item, &aggnode);
   zeroGhost();
   setAnchor();
   show();
@@ -100,6 +102,17 @@ void prim::Ghost::moveTo(QPointF pos)
   setPos(pos-zero_offset);
 }
 
+
+QList<prim::Item*> prim::Ghost::getTopItems() const
+{
+  // each top item corresponds to one of the top level nodes in aggnode
+  QList<prim::Item*> items;
+  for(prim::AggNode *node : aggnode.nodes)
+    items.append(getNodeItem(node));
+  return items;
+}
+
+
 QList<prim::LatticeDot*> prim::Ghost::getLattice(const QPointF &offset) const
 {
   QList<prim::LatticeDot*> ldots;
@@ -112,7 +125,8 @@ QList<prim::LatticeDot*> prim::Ghost::getLattice(const QPointF &offset) const
       // use first LatticeDot candidate
       prim::LatticeDot *ldot=0;
       for(QGraphicsItem *cand : cands)
-        if(static_cast<prim::Item*>(cand)->item_type == prim::Item::LatticeDot){
+        if(static_cast<prim::Item*>(cand)->item_type == prim::Item::LatticeDot &&
+            cand->flags() & QGraphicsItem::ItemIsSelectable){
           ldot = static_cast<prim::LatticeDot*>(cand);
           break;
         }
@@ -147,7 +161,7 @@ bool prim::Ghost::checkValid(const QPointF &offset)
 {
   QList<prim::LatticeDot*> ldots = getLattice(offset);
 
-  // invalid if a dangling bond is associated with no lattice dot
+  // invalid if a dangling bond is associated with no selectable lattice dot
   for(int i=0; i<sources.count(); i++)
     if(sources.at(i)->item_type == prim::Item::DBDot && ldots.at(i)==0)
       return false;
@@ -155,6 +169,14 @@ bool prim::Ghost::checkValid(const QPointF &offset)
   return true;
 }
 
+
+QPointF prim::Ghost::moveOffset() const
+{
+  if(sources.count())
+    return dots.first()->scenePos()-sources.first()->scenePos();
+  else
+    return QPointF();
+}
 
 
 QRectF prim::Ghost::boundingRect() const
@@ -164,6 +186,33 @@ QRectF prim::Ghost::boundingRect() const
 
 void prim::Ghost::paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)
 {}
+
+
+
+void prim::Ghost::echoTopIndices()
+{
+  QString s;
+  echoNode(s, &aggnode);
+  qDebug() << s;
+}
+
+void prim::Ghost::echoNode(QString &s, prim::AggNode *node)
+{
+  qDebug() << QObject::tr("Entering node: ind=%1 :: count=%2").arg(node->index).arg((node->nodes).count());
+  if(node->index<0){
+    // new Aggregate
+    s += '[';
+    for(prim::AggNode *n : node->nodes)
+      echoNode(s, n);
+    s += ']';
+  }
+  else
+    s += QString("%1,").arg(node->index);
+}
+
+
+// PRIVATE METHODS
+
 
 prim::Ghost::Ghost()
  : Item(prim::Item::Ghost)
@@ -183,15 +232,25 @@ void prim::Ghost::createGhostDot(prim::Item *item)
   sources.append(item);
 }
 
-void prim::Ghost::prepareItem(prim::Item *item)
+void prim::Ghost::prepareItem(prim::Item *item, prim::AggNode *node)
 {
+  prim::AggNode *new_node;
   if(item->item_type == prim::Item::Aggregate){
+    // add a new list-type IndexList
+    new_node = new prim::AggNode();
+    node->nodes.append(new_node);
+    // add each item in the Aggregate to the new list
     prim::Aggregate *agg = static_cast<prim::Aggregate*>(item);
     for(prim::Item *it : agg->getChildren())
-      prepareItem(it);
+      prepareItem(it, new_node);
   }
-  else
+  else{
+    // add a new index-type IndexList
+    new_node = new prim::AggNode(sources.count());
+    node->nodes.append(new_node);
+    // create a GhostDot for the Item
     createGhostDot(item);
+  }
 }
 
 
@@ -245,5 +304,16 @@ void prim::Ghost::setAnchor()
   }
 
   anchor_offset = anchor==0 ? QPointF() : anchor->scenePos() - zero_offset - pos();
-  qDebug() << QObject::tr("anchor_offset: %1 :: %2").arg(anchor_offset.x()).arg(anchor_offset.y());
+}
+
+
+prim::Item *prim::Ghost::getNodeItem(prim::AggNode *node) const
+{
+  if(node->index<0){
+    // node corresponds to an Aggregate, the parent of the first item in the Aggregate
+    return static_cast<prim::Item*>(getNodeItem(node->nodes.first())->parentItem());
+  }
+  else{
+    return sources.at(node->index);
+  }
 }

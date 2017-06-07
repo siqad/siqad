@@ -43,6 +43,20 @@ prim::DBDot::DBDot(prim::Layer *layer, prim::LatticeDot *src)
 }
 
 
+void prim::DBDot::setSource(prim::LatticeDot *src)
+{
+  // unset the previous LatticeDot
+  if(source)
+    source->setDBDot(0);
+
+  // move to new LatticeDot
+  src->setDBDot(this);
+  source=src;
+  phys_loc = src->getPhysLoc();
+  setPos(src->pos());
+}
+
+
 QRectF prim::DBDot::boundingRect() const
 {
   qreal width = diameter+edge_width;
