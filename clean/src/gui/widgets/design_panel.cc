@@ -327,12 +327,12 @@ void gui::DesignPanel::setFills(float *fills)
 
 // SLOTS
 
-void gui::DesignPanel::selectClicked(prim::Item *item)
+void gui::DesignPanel::selectClicked(prim::Item *)
 {
   // for now, if an item is clicked in selection mode, act as though the highest
   // level aggregate was clicked
   if(tool_type == gui::DesignPanel::SelectTool){
-
+    initMove();
   }
 }
 
@@ -761,6 +761,17 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
 
 void gui::DesignPanel::initMove()
 {
+  // create ghost
+  createGhost(false);
+
+  prim::Ghost *ghost = prim::Ghost::instance();
+
+  // set lattice sites of object to be moved as selectable
+  for(prim::LatticeDot *ldot : ghost->getLattice()){
+    if(ldot)
+      ldot->setFlag(QGraphicsItem::ItemIsSelectable, true);
+  }
+
   moving = true;
 }
 
