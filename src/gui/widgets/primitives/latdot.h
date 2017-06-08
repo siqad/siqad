@@ -7,63 +7,67 @@
 // @desc:     Base graphical item for possible dangling bond locations on the
 //            surface lattice.
 
+
 #ifndef _GUI_PR_LATDOT_H_
 #define _GUI_PR_LATDOT_H_
 
 
-#include "items.h"
-#include "emitter.h"
+#include "item.h"
 
 namespace prim{
 
+  // forard declarations
+  class Layer;
+  class DBDot;
 
-// Specific MyItem derived class for showing the possible dangling bond
-// location on the surface lattice. For now, this class has very similar
-// characteristics to the DBDot but will be kept a separate class to allow for
-// future distinction in properties and avoid overbloating the functionality of
-// either class.
+  // Specific Item derived class for showing the possible dangling bond
+  // location on the surface lattice. For now, this class has very similar
+  // characteristics to the DBDot but will be kept a separate class to allow for
+  // future distinction in properties and avoid overbloating the functionality of
+  // either class.
+  class LatticeDot: public Item
+  {
+  public:
 
-class LatticeDot: public prim::MyItem
-{
-public:
+    // constructor, create a lattice dot at the given location in physical units
+    LatticeDot(prim::Layer *layer, QPointF p_loc);
 
-  // constructor, create a lattice dot at the given location in physical units
-  LatticeDot(QPointF p_loc);
+    // destructor
+    ~LatticeDot(){}
 
-  // destructor
-  ~LatticeDot();
+    // accessors
 
-  // accessors
+    QPointF getPhysLoc() const {return phys_loc;}   // get the dots physical location
+    prim::DBDot *getDBDot() const {return dbdot;}   // get the created dangling bond
+    void setDBDot(prim::DBDot *dot=0);              // set the created dangling bond
 
-  QPointF getPhysLoc(){return phys_loc;}
+    // inherited abstract method implementations
 
-  // inherited abstract method implementations
+    QRectF boundingRect() const Q_DECL_OVERRIDE;
+    void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
 
-  QRectF boundingRect() const;
-  void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+    Item *deepCopy() const;
 
-private:
+  private:
 
-  // construct the statics
-  void constructStatics();
+    // construct static variables
+    void constructStatics();
 
 
-  // VARIABLES
+    // VARIABLES
 
-  QPointF phys_loc;   // physical location of the dot in angstroms
+    QPointF phys_loc;   // physical location of the dot in angstroms
+    prim::DBDot *dbdot; // dangling bond at the lattice dot
 
-  // static class parameters for painting
+    // static class parameters for painting
 
-  static qreal diameter;    // dot diameter in angstroms
-  static qreal edge_width;  // proportional width of dot boudary edge
+    static qreal diameter;    // dot diameter in angstroms
+    static qreal edge_width;  // proportional width of dot boundary edge
 
-  static QColor edge_col;   // boundary edge color
-  static QColor fill_col;   // dot fill color (same for all lattice dots)
-
-};
+    static QColor edge_col;   // boundary edge color
+    static QColor fill_col;   // dot fill color (same for all lattice dots)
+  };
 
 } // end prim namespace
-
-
 
 #endif

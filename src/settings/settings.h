@@ -1,13 +1,21 @@
+// @file:     settings.h
+// @author:   Jake
+// @created:  2016.10.31
+// @editted:  2017.05.08  - Jake
+// @license:  GNU LGPL v3
+//
+// @desc:     Custom classes for storing persistent and temporary settings.
+//            Most instances will be singletons and hence there is no load
+//            time for accessing settings.
+
+
 #ifndef _SETTINGS_H_
 #define _SETTINGS_H_
 
-#include <QSettings>
-#include <QString>
-#include <QDebug>
+#include "QtWidgets"
+#include <QtCore>
 
-#include <QVariant>
-
-#define DEFAULT_OVERRIDE false // always use default settings
+#define DEFAULT_OVERRIDE true // always use default settings
 
 namespace settings{
 
@@ -16,6 +24,11 @@ const QString app_settings_default = "src/settings/app_settings.ini";
 const QString gui_settings_default = "src/settings/gui_settings.ini";
 const QString lattice_settings_default = "src/settings/lattices/si_100_2x1.ini";
 
+
+// abstract container class for settings with a templated accessor function.
+// The typical use case is through implemeting derived singleton classes.settings
+// Each settings object should have a pointer to s default version with default
+// values for all parameters. For now, assert .ini format for OS compatability.
 class Settings: public QSettings
 {
 public:
@@ -31,23 +44,24 @@ public:
   {
     QVariant var = DEFAULT_OVERRIDE ? defaults->value(key) : this->value(key);
     T val;
+
     // if key not found, get value from defaults
     if(!var.isValid() && defaults != 0){
       var = defaults->value(key);
 
       // if key not in defaults, prompt and abort
-      if(!var.isValid()){ // terminate
-        qDebug() << QString("Searching for key: %1").arg(key);
-        qFatal("Requested key missing in defaults... terminating");
+      if(!var.isValid()){   // terminate
+        qDebug() << tr("Searching for key: %1").arg(key);
+        qFatal(tr("Requested key missing in defaults... terminating").toLatin1().constData(),0);
       }
       else
         val = var.value<T>();
 
-      // save default value to current settings
+      // save default value to current local settings
       this->setValue(key, val);
     }
-    else if(defaults==0) // terminate
-      qFatal("No default settings available... terminating");
+    else if(defaults==0)    // terminate if no defaults
+      qFatal(tr("No default settings available... terminating").toLatin1().constData(),0);
     else
       val = var.value<T>();
 
@@ -56,51 +70,84 @@ public:
 
 protected:
 
+  // pointer to defaults, no special considerations for derived classes
   QSettings *defaults;
 };
 
 
 
-
+// Application settings, singleton
 class AppSettings: public Settings
 {
 public:
-  AppSettings() : Settings(app_settings_default){defaults = defs;}
+  // get or create static instance of Emitter object
+  static AppSettings *instance();
+
+  // destructor, should possibly free and reset the default settings pointer
   ~AppSettings() {}
 
+private:
+
+  static AppSettings *inst;   // static pointer to the instance
+
+  // constructor private: singleton
+  AppSettings() : Settings(app_settings_default){defaults = defs;}
+
   // default values
-  static QSettings *defs;
-  static QSettings* m_defs();
+  static QSettings *defs;     // pointer to default settings, initalized before first call
+  static QSettings* m_defs(); // constructs the defaults settings
 };
 
 
 
+// GUI settings, singleton
 class GUISettings: public Settings
 {
 public:
-  GUISettings() : Settings(gui_settings_default){defaults = defs;}
+  // get or create static instance of Emitter object
+  static GUISettings *instance();
+
+  // destructor, should possibly free and reset the default settings pointer
   ~GUISettings() {}
 
+private:
+
+  static GUISettings *inst;   // static pointer to the instance
+
+  // constructor private: singleton
+  GUISettings() : Settings(gui_settings_default){defaults = defs;}
+
   // default values
-  static QSettings *defs;
-  static QSettings* m_defs();
+  static QSettings *defs;     // pointer to default settings, initalized before first call
+  static QSettings* m_defs(); // constructs the defaults settings
 };
 
 
-
+// Settings describing the unit cell structure of the surface lattice, singleton
+// It may be better to remove the singleton constraint in future.
 class LatticeSettings: public Settings
 {
 public:
-  // constructors
-  LatticeSettings() : Settings(lattice_settings_default){defaults = defs;}
-  LatticeSettings(const QString& fname) : Settings(fname){defaults = defs;}
+  // get or create static instance of Emitter object
+  static LatticeSettings *instance();
 
-  //destructor
+  // destructor, should possibly free and reset the default settings pointer
   ~LatticeSettings() {}
 
+  // update to a new lattice settings file
+  static void updateLattice(const QString &fname = QString());
+
+private:
+
+  static LatticeSettings *inst;   // static pointer to the instance
+
+  // constructors private: singleton
+  LatticeSettings() : Settings(lattice_settings_default){defaults = defs;}
+  LatticeSettings(const QString &fname) : Settings(fname){defaults = defs;}
+
   // default values
-  static QSettings *defs;
-  static QSettings* m_defs();
+  static QSettings *defs;     // pointer to default settings, initalized before first call
+  static QSettings* m_defs(); // constructs the defaults settings
 };
 
 } // end settings namespace

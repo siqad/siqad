@@ -1,7 +1,7 @@
 // @file:     info_panel.h
 // @author:   Jake
 // @created:  2016.11.02
-// @editted:  2017.05.01  - Jake
+// @editted:  2017.05.11  - Jake
 // @license:  GNU LGPL v3
 //
 // @desc:     unimplemented: Container for discribing information about
@@ -11,8 +11,7 @@
 #ifndef _GUI_INFO_PANEL_H_
 #define _GUI_INFO_PANEL_H_
 
-#include <QObject>
-#include <QWidget>
+#include <QtWidgets>
 
 namespace gui{
 

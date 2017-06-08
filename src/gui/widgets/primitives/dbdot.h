@@ -1,7 +1,7 @@
 // @file:     dbdot.h
 // @author:   Jake
 // @created:  2016.11.15
-// @editted:  2017.05.01  - Jake
+// @editted:  2017.05.09  - Jake
 // @license:  GNU LGPL v3
 //
 // @desc:     DBDot Widget for functionality of dangling bonds
@@ -9,71 +9,71 @@
 #ifndef _GUI_PR_DBDOT_H_
 #define _GUI_PR_DBDOT_H_
 
-#include <QGraphicsItem>
-#include <QObject>
 
-#include <QPointF>
-#include <QPainter>
+#include <QtWidgets>
 
-#include <QGraphicsSceneMouseEvent>
-
-#include "items.h"
+#include "item.h"
 #include "latdot.h"
-#include "emitter.h"
+
 
 
 namespace prim{
 
+  // Specific Item derived class for a dangling bond on the lattice. Each
+  // dangling bond should correspond to a source lattice dot. For
+  // generality, each DBDot has its own physical location that will typically
+  // be the same as the source LatticeDot.
 
-class DBDot: public prim::MyItem
-{
+  class DBDot: public prim::Item
+  {
+  public:
 
-public:
+    // constructor
+    DBDot(prim::Layer *layer, prim::LatticeDot *src=0);
 
-  // constructor
-  DBDot(QPointF p_loc, int layer, prim::LatticeDot *src=0);
+    // destructor
+    ~DBDot(){}
 
-  // destructor
-  ~DBDot();
+    // accessors
+    QPointF getPhysLoc() const {return phys_loc;}
 
-  // ACCESSORS
-  bool inLattice(){return layer==0;}
-  QPointF getPhysLoc(){return phys_loc;}
-  DBDot *getSource(){return source;}
+    void setSource(prim::LatticeDot *src);
+    prim::LatticeDot *getSource() const {return source;}
 
-  void setFill(float fill){fill_fact = fill;}
+    void setFill(float fill){fill_fact = fill;}
+    void setFillCol(QColor col){fill_col = col;}
 
-  // construct a deep copy of the dot untied to a lattice src dot
-  DBDot *clone() const;
+    // inherited abstract method implementations
 
-  // geometry
-  QRectF boundingRect() const;
+    QRectF boundingRect() const Q_DECL_OVERRIDE;
+    void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
 
-  // painting
-  void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+    prim::Item *deepCopy() const;
 
-private:
+  private:
 
-  QPointF phys_loc;         // Physical location of dot in angstroms.
-  prim::LatticeDot *source; // Lattice site beneath dot
+    // construct static variables
+    void constructStatics();
 
+    // VARIABLES
 
-  // instance specific painting parameters
+    QPointF phys_loc;         // physical location of dot in angstroms
+    prim::LatticeDot *source; // lattice site beneath dot
 
-  qreal fill_fact;  // area proportion of dot filled
-  QColor fill_col;  // color of fill
+    qreal fill_fact;  // area proportional of dot filled
+    QColor fill_col;  // color of fill
 
-  // static class parameters for painting
+    // static class parameters for painting
 
-  static qreal diameter;   // diameter of dot in pixels
-  static qreal edge_width; // edge pen width in pixels
+    static qreal diameter;      // dot diameter in angstroms
+    static qreal edge_width;    // proportional width of dot boundary edge
 
-  static QColor edge_col;     // edge colour when unselected
-  static QColor selected_col; // edge colour when selected
-};
-
+    static QColor edge_col;     // edge colour, unselected
+    static QColor selected_col; // edge colour, selected
+  };
 
 } // end prim namespace
+
 
 
 #endif

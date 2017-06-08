@@ -1,7 +1,7 @@
 // @file:     ghost.cc
 // @author:   Jake
 // @created:  2016.11.24
-// @editted:  2017.06.07  - Jake
+// @editted:  2017.06.02  - Jake
 // @license:  GNU LGPL v3
 //
 // @desc:     Implementation of GhostDot and Ghost

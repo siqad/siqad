@@ -1,7 +1,7 @@
 // @file:     latdot.h
 // @author:   Jake
 // @created:  2017.05.03
-// @editted:  2017.05.03  - Jake
+// @editted:  2017.06.07  - Jake
 // @license:  GNU LGPL v3
 //
 // @desc:     Base graphical item for possible dangling bond locations on the

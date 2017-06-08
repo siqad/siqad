@@ -1,7 +1,7 @@
 // @file:     input_field.h
 // @author:   Jake
 // @created:  2017.05.02
-// @editted:  2017.05.02  - Jake
+// @editted:  2017.05.11  - Jake
 // @license:  GNU LGPL v3
 //
 // @desc:     Input line for taking customized commands.

@@ -1,7 +1,7 @@
 // @file:     latdot.cc
 // @author:   Jake
 // @created:  2017.05.03
-// @editted:  2017.06.07  - Jake
+// @editted:  2017.05.09  - Jake
 // @license:  GNU LGPL v3
 //
 // @desc:     Implementation of LatticeDot class
