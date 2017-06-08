@@ -71,11 +71,11 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   prim::Ghost::instance()->setScene(scene);
 
   // set up test objects
-  tdot = new QGraphicsEllipseItem();
-  trect = new QGraphicsRectItem();
-
-  scene->addItem(tdot);
-  scene->addItem(trect);
+  // tdot = new QGraphicsEllipseItem();
+  // trect = new QGraphicsRectItem();
+  //
+  // scene->addItem(tdot);
+  // scene->addItem(trect);
 }
 
 // destructor
@@ -424,7 +424,10 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
   // case specific behaviour
   if(ghosting){
     // plant ghost and end ghosting
-    moveToGhost();
+    if(moving)
+      moveToGhost();
+    else
+      pasteAtGhost();
     clearGhost();
   }
   else if(clicked){
@@ -531,11 +534,14 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
         break;
       case Qt::Key_C:
         // copy selected items to the clipboard
+        copySelection();
         break;
-      case Qt::Key_V:
+      case Qt::Key_V:{
         // create ghost for clipboard if any
-        createGhost();
+        if(!clipboard.isEmpty())
+          createGhost(true);
         break;
+      }
       case Qt::Key_Z:{
         // undo/redo based on keymods
         if(keymods == (Qt::ControlModifier | Qt::ShiftModifier))
@@ -659,19 +665,23 @@ void gui::DesignPanel::filterSelection(bool select_flag)
 }
 
 
-void gui::DesignPanel::createGhost()
+void gui::DesignPanel::createGhost(bool paste)
 {
   qDebug() << tr("Creating ghost...");
 
   prim::Ghost *ghost = prim::Ghost::instance();
 
-  //get QList of selected Item object
-  filterSelection(true);
-  QList<prim::Item*> items;
-  for(QGraphicsItem *qitem : scene->selectedItems())
-    items.append(static_cast<prim::Item*>(qitem));
+  if(paste)
+    ghost->prepare(clipboard);
+  else{
+    //get QList of selected Item object
+    filterSelection(true);
+    QList<prim::Item*> items;
+    for(QGraphicsItem *qitem : scene->selectedItems())
+      items.append(static_cast<prim::Item*>(qitem));
+    ghost->prepare(items);
+  }
 
-  ghost->prepare(items);
   ghosting=true;
   snap_cache = QPointF();
 }
@@ -752,6 +762,32 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
 void gui::DesignPanel::initMove()
 {
   moving = true;
+}
+
+
+void gui::DesignPanel::copySelection()
+{
+  QList<QGraphicsItem*> selection = scene->selectedItems();
+  if(selection.isEmpty())
+    return;
+
+  // empty the previous clipboard
+  for(prim::Item *item : clipboard)
+    delete item;
+  clipboard.clear();
+
+  for(QGraphicsItem *gitem : selection)
+    clipboard.append(static_cast<prim::Item*>(gitem)->deepCopy());
+
+  qDebug() << tr("Clipboard: %1 items").arg(clipboard.count());
+  for(prim::Item *item : clipboard){
+    if(item->item_type == prim::Item::Aggregate){
+      qDebug() << tr("  aggregate");
+    }
+    else
+      qDebug() << tr("  item at: %1,%2").arg(item->x()).arg(item->y());
+
+  }
 }
 
 
@@ -1160,8 +1196,66 @@ void gui::DesignPanel::destroyAggregate(prim::Aggregate *agg)
 
 bool gui::DesignPanel::pasteAtGhost()
 {
-  return false;
+  prim::Ghost *ghost = prim::Ghost::instance();
+
+  // do nothing if clipboard empty
+  if(clipboard.isEmpty() || !ghost->valid_hash[snap_target])
+    return false;
+
+  undo_stack->beginMacro(tr("Paste %1 items").arg(clipboard.count()));
+
+  // paste each item in the clipboard, same as ghost top items (preferred order)
+  for(prim::Item *item : ghost->getTopItems())
+    pasteItem(ghost, item);
+
+  undo_stack->endMacro();
+  return true;
 }
+
+void gui::DesignPanel::pasteItem(prim::Ghost *ghost, prim::Item *item)
+{
+  switch(item->item_type){
+    case prim::Item::DBDot:
+      pasteDBDot(ghost, static_cast<prim::DBDot*>(item));
+      break;
+    case prim::Item::Aggregate:
+      pasteAggregate(ghost, static_cast<prim::Aggregate*>(item));
+      break;
+    default:
+      qCritical() << tr("No functionality for pasting given item... update pasteItem");
+      break;
+  }
+}
+
+void gui::DesignPanel::pasteDBDot(prim::Ghost *ghost, prim::DBDot *db)
+{
+  // get the target lattice dor
+  prim::LatticeDot *ldot = ghost->getLatticeDot(db);
+  if(ldot){
+    undo_stack->push(new CreateDB(ldot, getLayerIndex(top_layer), this));
+  }
+
+}
+
+void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)
+{
+  undo_stack->beginMacro("Paste an aggregate");
+
+  // paste all the children items
+  QList<prim::Item*> items;
+  for(prim::Item *item : agg->getChildren()){
+    pasteItem(ghost, item);
+    // new item will be at the top of the Layer Item stack
+    items.append(top_layer->getItems().top());
+  }
+
+  // form Aggregate from Items
+  undo_stack->push(new FormAggregate(items, this));
+
+  undo_stack->endMacro();
+
+}
+
 
 // NOTE: currently item move relies on there being a snap target (i.e. at least
 //       one dangling bond is being moved). Should modify in future to be more
@@ -1169,6 +1263,7 @@ bool gui::DesignPanel::pasteAtGhost()
 bool gui::DesignPanel::moveToGhost()
 {
   prim::Ghost *ghost = prim::Ghost::instance();
+  moving = false;
 
   // return False if move is invalid
   if(!ghost->valid_hash[snap_target])

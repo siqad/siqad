@@ -64,6 +64,11 @@ void prim::LatticeDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *
   }
 }
 
+prim::Item *prim::LatticeDot::deepCopy() const
+{
+  return new prim::LatticeDot(layer, phys_loc);
+}
+
 
 void prim::LatticeDot::constructStatics()
 {

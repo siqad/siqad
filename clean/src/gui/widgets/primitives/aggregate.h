@@ -25,11 +25,13 @@ namespace prim{
     // destructor, makes all children belong to Aggregates parent
     ~Aggregate();
 
-    QStack<prim::Item*> getChildren() {return items;}
+    QStack<prim::Item*> getChildren() const {return items;}
 
     // necessary derived class member functions
     virtual QRectF boundingRect() const;
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
+
+    virtual Item *deepCopy() const;
 
     static QColor edge_col;
 

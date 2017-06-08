@@ -47,6 +47,8 @@ namespace prim{
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*) Q_DECL_OVERRIDE;
 
+    Item* deepCopy() const {return 0;}
+
   private:
 
     void constructStatics();
@@ -95,6 +97,10 @@ namespace prim{
     // will contain a 0.
     QList<prim::LatticeDot*> getLattice(const QPointF &offset = QPointF()) const;
 
+    // attempt to get the lattice dot under the GhostDot correponding to the given
+    // DBDot item.
+    prim::LatticeDot* getLatticeDot(prim::DBDot *db);
+
     // get the GhostDot nearest to the center of the Ghost. If db is set, will
     // return the neatest dangling bond GhostDot if any exists else 0.
     prim::GhostDot *snapAnchor() {return anchor;}
@@ -121,6 +127,8 @@ namespace prim{
     // virtual methods
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*) Q_DECL_OVERRIDE;
+
+    prim::Item *deepCopy() const {return 0;}
 
 
     // testing

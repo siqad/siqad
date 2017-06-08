@@ -31,9 +31,11 @@ prim::DBDot::DBDot(prim::Layer *layer, prim::LatticeDot *src)
     constructStatics();
 
   // set dot location in pixels
-  phys_loc = src->getPhysLoc();
-  setPos(phys_loc*scale_factor);
-  src->setDBDot(this);
+  if(src){
+    phys_loc = src->getPhysLoc();
+    setPos(phys_loc*scale_factor);
+    src->setDBDot(this);
+  }
 
   fill_fact = 0.;
   fill_col = gui_settings->get<QColor>("dbdot/fill_col");
@@ -72,7 +74,7 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
   painter->setPen(QPen(upSelected() ? selected_col : edge_col, edge_width));
   painter->drawEllipse(rect);
 
-  // draw inner fill
+  // draw inner fillcene->selectedItems()
   if(fill_fact>0){
     QPointF center = rect.center();
     QSizeF size(diameter, diameter);
@@ -84,6 +86,14 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
     painter->drawEllipse(rect);
   }
 
+}
+
+
+prim::Item *prim::DBDot::deepCopy() const
+{
+  prim::DBDot *cp = new DBDot(layer, 0);
+  cp->setPos(pos());
+  return cp;
 }
 
 

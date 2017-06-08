@@ -136,6 +136,23 @@ QList<prim::LatticeDot*> prim::Ghost::getLattice(const QPointF &offset) const
   return ldots;
 }
 
+prim::LatticeDot *prim::Ghost::getLatticeDot(prim::DBDot *db)
+{
+  // get index of source
+  int index = sources.indexOf(static_cast<prim::Item*>(db));
+  if(index==-1)
+    return 0;
+
+  // search for LatticeDot under GhostDot
+  for(QGraphicsItem *cand : scene()->items(dots.at(index)->scenePos()))
+    if(static_cast<prim::Item*>(cand)->item_type == prim::Item::LatticeDot &&
+      cand->flags() & QGraphicsItem::ItemIsSelectable){
+        return static_cast<prim::LatticeDot*>(cand);
+      }
+
+  // no valid LatticeDot found, return 0
+  return 0;
+}
 
 QPointF prim::Ghost::freeAnchor(QPointF scene_pos)
 {
@@ -226,7 +243,7 @@ void prim::Ghost::createGhostDot(prim::Item *item)
   if(item->item_type == prim::Item::Aggregate)
     qWarning() << QObject::tr("Creating a ghost dot for an aggregate...");
 
-  prim::GhostDot *dot = new prim::GhostDot(item, this,&col);
+  prim::GhostDot *dot = new prim::GhostDot(item, this, &col);
 
   dots.append(dot);
   sources.append(item);

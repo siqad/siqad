@@ -46,6 +46,8 @@ namespace prim{
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
 
+    Item *deepCopy() const;
+
   private:
 
     // construct static variables

@@ -104,7 +104,9 @@ namespace gui{
     ToolType tool_type;     // current cursor tool type
     QUndoStack *undo_stack; // undo stack
 
-    // copy/paste and item dragging
+    // copy/paste
+    QList<prim::Item*> clipboard;  // cached deep copy of a set of items for pasting
+
 
     QStack<prim::Layer*> layers;  // stack of all layers, order immutable
     prim::Layer *top_layer;       // new items added to this layer
@@ -147,8 +149,8 @@ namespace gui{
 
     // GHOSTING
 
-    // create a Ghost for the current selection
-    void createGhost();
+    // create a Ghost for the current selection or clipboard
+    void createGhost(bool paste);
 
     // clear the current Ghost
     void clearGhost();
@@ -159,9 +161,6 @@ namespace gui{
 
     // initialize an item move
     void initMove();
-
-    // complete an item move
-    void completeMove();
 
     // deep copy the current selection to the clipboard
     void copySelection();
@@ -202,6 +201,12 @@ namespace gui{
     // paste the current Ghost, returns True if successful
     bool pasteAtGhost();
 
+    // helper functions for pasting specific items
+    void pasteItem(prim::Ghost *ghost, prim::Item *item);
+    void pasteDBDot(prim::Ghost *ghost, prim::DBDot *db);
+    void pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg);
+
+
     // move the selected items to the current Ghost, returns True if successful
     bool moveToGhost();
 
@@ -241,9 +246,6 @@ namespace gui{
   };
 
 
-  // NOTE: How would we recreate an aggregate if the contained items were destroyed
-  // and then recreated? Can't rely on the pointers being the stored items list is
-  // useless.
   class DesignPanel::FormAggregate : public QUndoCommand
   {
   public:
