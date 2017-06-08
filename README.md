@@ -31,3 +31,7 @@ If you are going to load the source as a project in Qt Creator, make a copy of t
 ## Licensing
 
 The open source version of Qt5 falls under the GNU LGPL v3 license, as does the GUI code. Qt5 includes some packages which include third-party content under different licenses. If these are used their specific licenses must be considered. Refer to http://doc.qt.io/qt-5/licenses-used-in-qt.html for a list of third-party licensed libraries.
+
+
+# TODO
+
