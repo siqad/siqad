@@ -178,9 +178,12 @@ bool prim::Ghost::checkValid(const QPointF &offset)
 {
   QList<prim::LatticeDot*> ldots = getLattice(offset);
 
-  // invalid if a dangling bond is associated with no selectable lattice dot
+  // invalid if a dangling bond is associated with no selectable lattice dot or
+  // an unselectable lattice dot
   for(int i=0; i<sources.count(); i++)
-    if(sources.at(i)->item_type == prim::Item::DBDot && ldots.at(i)==0)
+    if(sources.at(i)->item_type != prim::Item::DBDot)
+      continue;
+    else if(ldots.at(i)==0 || ldots.at(i)->flags()^QGraphicsItem::ItemIsSelectable)
       return false;
 
   return true;

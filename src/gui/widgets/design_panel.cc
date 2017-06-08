@@ -28,6 +28,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 
   scene = new QGraphicsScene(this);
   setScene(scene);
+  setMouseTracking(true);
 
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
             this, &gui::DesignPanel::selectClicked);
@@ -780,17 +781,34 @@ void gui::DesignPanel::initMove()
   // create ghost
   createGhost(false);
 
-  prim::Ghost *ghost = prim::Ghost::instance();
-
-  // set lattice sites of object to be moved as selectable
-  for(prim::LatticeDot *ldot : ghost->getLattice()){
-    if(ldot)
-      ldot->setFlag(QGraphicsItem::ItemIsSelectable, true);
-  }
+  // set lattice dots of objects to be moved as selectable
+  for(QGraphicsItem *gitem : scene->selectedItems())
+    setLatticeDotSelectability(static_cast<prim::Item*>(gitem), true);
 
   moving = true;
 }
 
+
+void gui::DesignPanel::setLatticeDotSelectability(prim::Item *item, bool flag)
+{
+  prim::LatticeDot *ldot=0;
+  switch(item->item_type){
+    case prim::Item::DBDot:
+      ldot = static_cast<prim::DBDot*>(item)->getSource();
+      ldot->setFlag(QGraphicsItem::ItemIsSelectable, flag);
+      break;
+    case prim::Item::Aggregate:
+      for(prim::Item *it : static_cast<prim::Aggregate*>(item)->getChildren())
+        setLatticeDotSelectability(it, flag);
+      break;
+    case prim::Item::LatticeDot:
+      ldot = static_cast<prim::LatticeDot*>(item);
+      ldot->setFlag(QGraphicsItem::ItemIsSelectable, flag);
+      break;
+    default:
+      break;
+  }
+}
 
 void gui::DesignPanel::copySelection()
 {
@@ -1286,18 +1304,21 @@ void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)
 
 // NOTE: currently item move relies on there being a snap target (i.e. at least
 //       one dangling bond is being moved). Should modify in future to be more
-//       general.
+//       general. If no move is made, need to make originial lattice dots
+//       unselectable again.
 bool gui::DesignPanel::moveToGhost()
 {
   prim::Ghost *ghost = prim::Ghost::instance();
   moving = false;
 
-  // return False if move is invalid
-  if(!ghost->valid_hash[snap_target])
-    return false;
+  // get the move offset
+  QPointF offset = ghost->valid_hash[snap_target] ? ghost->moveOffset() : QPointF();
 
-  // otherwise move is valid, get offset
-  QPointF offset = ghost->moveOffset();
+  if(offset.isNull()){
+    // reset the original lattice dot selectability and return false
+    for(QGraphicsItem *gitem : scene->selectedItems())
+      setLatticeDotSelectability(static_cast<prim::Item*>(gitem), false);
+  }
 
   undo_stack->beginMacro(tr("Move items"));
 
