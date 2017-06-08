@@ -1318,6 +1318,7 @@ bool gui::DesignPanel::moveToGhost()
     // reset the original lattice dot selectability and return false
     for(QGraphicsItem *gitem : scene->selectedItems())
       setLatticeDotSelectability(static_cast<prim::Item*>(gitem), false);
+    return false;
   }
 
   undo_stack->beginMacro(tr("Move items"));
