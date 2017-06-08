@@ -1,7 +1,7 @@
 // @file:     lattice.cc
 // @author:   Jake
 // @created:  2016.11.15
-// @editted:  2017.05.11  - Jake
+// @editted:  2017.06.07  - Jake
 // @license:  GNU LGPL v3
 //
 // @desc:     Lattice definitions

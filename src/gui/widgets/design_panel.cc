@@ -1,7 +1,7 @@
 // @file:     design_panel.cc
 // @author:   Jake
 // @created:  2016.11.02
-// @editted:  2017.05.31  - Jake
+// @editted:  2017.06.07  - Jake
 // @license:  GNU LGPL v3
 //
 // @desc:     DesignPanel implementation

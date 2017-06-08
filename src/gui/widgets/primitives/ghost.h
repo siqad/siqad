@@ -1,7 +1,7 @@
 // @file:     ghost.h
 // @author:   Jake
 // @created:  2016.11.24
-// @editted:  2017.05.31  - Jake
+// @editted:  2017.06.07  - Jake
 // @license:  GNU LGPL v3
 //
 // @desc:     Graphical objects for moving Items and copy/paste

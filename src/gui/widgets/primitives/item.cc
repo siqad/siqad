@@ -1,7 +1,7 @@
 // @file:     item.cc
 // @author:   Jake
 // @created:  2016.11.21
-// @editted:  2017.05.09  - Jake
+// @editted:  2017.06.07  - Jake
 // @license:  GNU LGPL v3
 //
 // @desc:     Definitions for Item classes
