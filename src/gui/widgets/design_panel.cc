@@ -563,6 +563,15 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
           undo_stack->redo();
         break;
       }
+      case Qt::Key_X:{
+        if(keymods == Qt::ControlModifier){
+          // copy current selection
+          copySelection();
+          // delete current selection
+          deleteSelection();
+        }
+        break;
+      }
       case Qt::Key_Delete:
         // delete selected items
         if(tool_type == gui::DesignPanel::SelectTool)
