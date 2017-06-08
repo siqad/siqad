@@ -34,7 +34,9 @@ gui::InputField::InputField(QWidget *parent)
 
 
 gui::InputField::~InputField()
-{}
+{
+  delete validator;
+}
 
 
 QString gui::InputField::pop()

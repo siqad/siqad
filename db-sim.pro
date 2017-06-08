@@ -8,6 +8,7 @@
 
 # support of c++ range-based loops
 CONFIG += c++11
+CONFIG += debug
 
 QT += core gui widgets
 

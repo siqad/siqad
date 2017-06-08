@@ -40,9 +40,13 @@ gui::ApplicationGUI::~ApplicationGUI()
   // save current settings
   saveSettings();
 
-  // free memory
-  // parents will delete all child widgets so nothing may be needed here
+  // free memory, parent delete child Widgets so Graphical Items are already
+  // handled. Still need to free Settings
 
+  delete settings::AppSettings::instance();
+  delete settings::GUISettings::instance();
+  delete settings::LatticeSettings::instance();
+  delete prim::Emitter::instance();
 }
 
 

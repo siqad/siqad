@@ -10,9 +10,7 @@
 #define _UI_APPLICATION_H_
 
 // Qt includes
-#include <QMainWindow>
-#include <QObject>
-#include <QFileDialog>
+#include <QtWidgets>
 
 // Widget includes
 #include "widgets/design_panel.h"

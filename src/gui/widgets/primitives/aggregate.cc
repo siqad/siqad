@@ -81,7 +81,7 @@ void prim::Aggregate::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 prim::Item *prim::Aggregate::deepCopy() const
 {
   QStack<prim::Item*> cp_items;
-  for(prim::Item *item : getChildren())
+  for(prim::Item *item : items)
     cp_items.append(item->deepCopy());
   return new prim::Aggregate(layer, cp_items, 0);
 }

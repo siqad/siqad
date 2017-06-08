@@ -69,20 +69,27 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 
   // initialise the Ghost and set the scene
   prim::Ghost::instance()->setScene(scene);
-
-  // set up test objects
-  // tdot = new QGraphicsEllipseItem();
-  // trect = new QGraphicsRectItem();
-  //
-  // scene->addItem(tdot);
-  // scene->addItem(trect);
 }
 
 // destructor
 gui::DesignPanel::~DesignPanel()
 {
+  // delete all graphical items from the scene
+  scene->clear();
+  delete scene;   // does not delete contained items on its own
+
+  // purge the clipboard
+  for(prim::Item *item : clipboard)
+    delete item;
+  clipboard.clear();
+
+  // delete all the layers
+  for(prim::Layer *layer : layers)
+    delete layer;
+  layers.clear();
+
   delete undo_stack;
-  delete scene;       // will NOT delete all contained QGraphicsItem objects.
+
 }
 
 
@@ -550,6 +557,11 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
           undo_stack->undo();
         }
         break;
+      case Qt::Key_Y:{
+        if(keymods == Qt::ControlModifier)
+          undo_stack->redo();
+        break;
+      }
       case Qt::Key_Delete:
         // delete selected items
         if(tool_type == gui::DesignPanel::SelectTool)
@@ -671,8 +683,15 @@ void gui::DesignPanel::createGhost(bool paste)
 
   prim::Ghost *ghost = prim::Ghost::instance();
 
-  if(paste)
+  ghosting=true;
+  snap_cache = QPointF();
+
+  if(paste){
     ghost->prepare(clipboard);
+    QPointF offset;
+    if(snapGhost(mapToScene(mapFromGlobal(QCursor::pos())), offset))
+      ghost->moveBy(offset.x(), offset.y());
+  }
   else{
     //get QList of selected Item object
     filterSelection(true);
@@ -681,9 +700,6 @@ void gui::DesignPanel::createGhost(bool paste)
       items.append(static_cast<prim::Item*>(qitem));
     ghost->prepare(items);
   }
-
-  ghosting=true;
-  snap_cache = QPointF();
 }
 
 

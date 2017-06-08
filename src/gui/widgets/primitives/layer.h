@@ -22,7 +22,7 @@
 
 namespace prim{
 
-  // Base Class for design layers
+  // Base Class for design layers, layers do not delete their items when destroyed
   class Layer : public QObject
   {
     Q_OBJECT  // enables tr without using QObject::tr
@@ -70,7 +70,7 @@ namespace prim{
     prim::Item *getItem(int i) { return i >= 0 && i<items.size() ? items.at(i) : 0;}
 
     // get the Layer's items, needs to be a copy rather than a reference for Layer removal
-    QStack<prim::Item*> getItems() {return items;}
+    QStack<prim::Item*> &getItems() {return items;}
 
   private:
 

@@ -127,11 +127,6 @@ namespace gui{
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
 
 
-    // testing
-    QGraphicsEllipseItem *tdot;
-    QGraphicsRectItem *trect;
-
-
     // INTERNAL METHODS
 
     // perform scene zoom based on wheel rotation

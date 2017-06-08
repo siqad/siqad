@@ -15,9 +15,12 @@
 #include "QtWidgets"
 #include <QtCore>
 
-#define DEFAULT_OVERRIDE true // always use default settings
+#define DEFAULT_OVERRIDE false // always use default settings
 
 namespace settings{
+
+// TODO: should move the default settings .ini files into the resources and the
+//      .qrc to make the path more reobust.
 
 // default settings .ini files
 const QString app_settings_default = "src/settings/app_settings.ini";
@@ -84,7 +87,7 @@ public:
   static AppSettings *instance();
 
   // destructor, should possibly free and reset the default settings pointer
-  ~AppSettings() {}
+  ~AppSettings() {delete defs; defs=0;}
 
 private:
 
@@ -108,7 +111,7 @@ public:
   static GUISettings *instance();
 
   // destructor, should possibly free and reset the default settings pointer
-  ~GUISettings() {}
+  ~GUISettings() {delete defs; defs=0;}
 
 private:
 
@@ -132,7 +135,7 @@ public:
   static LatticeSettings *instance();
 
   // destructor, should possibly free and reset the default settings pointer
-  ~LatticeSettings() {}
+  ~LatticeSettings() {delete defs; defs=0;}
 
   // update to a new lattice settings file
   static void updateLattice(const QString &fname = QString());

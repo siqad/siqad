@@ -9,6 +9,16 @@
 #include "settings.h"
 
 
+// TODO: Don't like that there is all this messy manual creation of the default
+//      settings files here... but should still allow for the contingency that
+//      some idiot will delete their default settings files from the resources
+//      directory. Have a hidden '.default_gen.py' script which generates the
+//      default "factory" settings files.
+
+// TODO: Add a processing layer for reading/writting particulary types of data
+//      from the .ini files: QColor and QPointF get mapped to QVariant hex strings
+//      which aren't very edittable.
+
 // initialize default settings
 QSettings *settings::AppSettings::defs = settings::AppSettings::m_defs();
 QSettings *settings::GUISettings::defs = settings::GUISettings::m_defs();

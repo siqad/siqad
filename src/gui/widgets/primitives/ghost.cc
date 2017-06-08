@@ -234,6 +234,7 @@ void prim::Ghost::echoNode(QString &s, prim::AggNode *node)
 prim::Ghost::Ghost()
  : Item(prim::Item::Ghost)
 {
+  valid=false;
   cleanGhost();
   setVisible(false);
 }
