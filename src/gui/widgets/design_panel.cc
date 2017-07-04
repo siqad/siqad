@@ -119,6 +119,8 @@ void gui::DesignPanel::addItem(prim::Item *item, int layer_index, int ind)
 
 void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
 {
+  // if layer contains the item, delete and remove froms scene, otherwise
+  // do nothing
   if(layer->removeItem(item)){
     scene->removeItem(item);
     delete item;
@@ -339,9 +341,9 @@ void gui::DesignPanel::selectClicked(prim::Item *)
 {
   // for now, if an item is clicked in selection mode, act as though the highest
   // level aggregate was clicked
-  if(tool_type == gui::DesignPanel::SelectTool){
+  if(tool_type == gui::DesignPanel::SelectTool)
     initMove();
-  }
+
 }
 
 
@@ -360,10 +362,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   switch(e->button()){
     case Qt::LeftButton:
       clicked = true;
-      if(ghosting){
-        // when ghosting, show the ghost at the cursor position on the click
-      }
-      else
+      if(!ghosting)
         QGraphicsView::mousePressEvent(e);
       break;
     default:
@@ -905,7 +904,7 @@ void gui::DesignPanel::CreateDB::destroy()
 // FromAggregate class
 gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
                                             DesignPanel *dp, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(false), dp(dp), agg(0), agg_index(-1)
+  : QUndoCommand(parent), invert(false), dp(dp), agg_index(-1)
 {
   if(items.count()==0){
     qWarning() << tr("Aggregate contains no items");
@@ -922,7 +921,7 @@ gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
     }
 
   // format the input items to a pointer invariant form, could be done more efficiently
-  QStack<prim::Item*> layer_items = layer->getItems();
+  QStack<prim::Item*> &layer_items = layer->getItems();
   for(prim::Item *item : items)
     item_inds.append(layer_items.indexOf(item));
   std::sort(item_inds.begin(), item_inds.end());
@@ -930,7 +929,7 @@ gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
 
 gui::DesignPanel::FormAggregate::FormAggregate(prim::Aggregate *agg, int offset,
                                           DesignPanel *dp, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(true), dp(dp), agg(agg)
+  : QUndoCommand(parent), invert(true), dp(dp)
 {
   // get layer index, assumes aggregate was formed using FormAggregate
   prim::Layer *layer = agg->layer;
@@ -944,10 +943,6 @@ gui::DesignPanel::FormAggregate::FormAggregate(prim::Aggregate *agg, int offset,
   // item stack... add to the end
   for(int i=layer_items.count()-1, j=0; j < agg->getChildren().count(); j++)
     item_inds.append(i+j+offset);
-
-  qDebug() << tr("Splitting Agg :: Layer index: %1").arg(layer_index);
-  for(const int& ind : item_inds)
-    qDebug() << tr("   item %1").arg(ind);
 }
 
 // split the aggregate
@@ -988,35 +983,39 @@ void gui::DesignPanel::FormAggregate::form()
     if(item != 0)
       item->scene()->removeItem(item);
 
-  // create new aggregate
-  agg = new prim::Aggregate(layer, items);
-
-  // add aggregate to system
-  dp->addItem(agg, layer_index, agg_index);
+  // add new aggregate to system
+  dp->addItem(new prim::Aggregate(layer, items), layer_index, agg_index);
 }
 
 
 void gui::DesignPanel::FormAggregate::split()
 {
   prim::Layer *layer = dp->getLayer(layer_index);
-
   prim::Item *item = layer->takeItem(agg_index);
 
-  if(item->item_type == prim::Item::Aggregate)
-    agg = static_cast<prim::Aggregate*>(item);
-  else
+  if(item->item_type != prim::Item::Aggregate)
     qFatal("Undo/Redo mismatch... something went wrong");
+
+  prim::Aggregate *agg = static_cast<prim::Aggregate*>(item);
 
   // remove aggregate and all children from the scene
   agg->scene()->removeItem(agg);
 
-  // destroy the aggregate
-  QStack<prim::Item*> items = agg->getChildren();
-  delete agg;
+  // TODO: hate this, need to figure out why the delete agg causes problems
+  //      after moving and move the "temp" stuff into the destructor.
 
   // re-insert the component items into the Layer from the item stack
-  for(const int& ind : item_inds)
-    dp->addItem(items.pop(), layer_index, ind);
+  QStack<prim::Item*> items = agg->getChildren();
+  for(const int& ind : item_inds){
+    prim::Item *temp = items.pop();
+    dp->addItem(temp, layer_index, ind);
+    temp->setParentItem(agg->parentItem());
+    temp->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    temp->setSelected(true);
+  }
+
+  // destroy the aggregate
+  // delete agg;
 }
 
 
@@ -1053,6 +1052,17 @@ void gui::DesignPanel::MoveItem::move(bool invert)
   // should update original boundingRect after move to handle residual artifacts
   QRectF old_rect = item->boundingRect();
 
+  // move the item
+  moveItem(item, delta);
+
+  // redraw old and new bounding rects to handle artifacts
+  item->scene()->update(old_rect);
+  item->scene()->update(item->boundingRect());
+}
+
+
+void gui::DesignPanel::MoveItem::moveItem(prim::Item *item, const QPointF &delta)
+{
   switch(item->item_type){
     case prim::Item::DBDot:
       moveDBDot(static_cast<prim::DBDot*>(item), delta);
@@ -1064,10 +1074,6 @@ void gui::DesignPanel::MoveItem::move(bool invert)
       item->moveBy(delta.x(), delta.y());
       break;
   }
-
-  // redraw old and new bounding rects to handle artifacts
-  item->scene()->update(old_rect);
-  item->scene()->update(item->boundingRect());
 }
 
 
@@ -1085,28 +1091,16 @@ void gui::DesignPanel::MoveItem::moveDBDot(prim::DBDot *dot, const QPointF &delt
 
   if(ldot==0)
     qCritical() << tr("Failed to move DBDot");
-  else{
+  else
     dot->setSource(ldot);
-  }
 }
 
 
 void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPointF &delta)
 {
   // for Aggregates, move only the contained Items
-  for(prim::Item *item : agg->getChildren()){
-    switch(item->item_type){
-      case prim::Item::DBDot:
-        moveDBDot(static_cast<prim::DBDot*>(item), delta);
-        break;
-      case prim::Item::Aggregate:
-        moveAggregate(static_cast<prim::Aggregate*>(item), delta);
-        break;
-      default:
-        item->moveBy(delta.x(), delta.y());
-        break;
-    }
-  }
+  for(prim::Item *item : agg->getChildren())
+    moveItem(item, delta);
 }
 
 
@@ -1208,16 +1202,15 @@ void gui::DesignPanel::splitAggregates()
       aggs.append(static_cast<prim::Aggregate*>(item));
   }
 
-  if(aggs.count()==0){
-    qWarning() << tr("No aggregates selected to ungroup");
+  if(aggs.count()==0)
     return;
-  }
 
   undo_stack->beginMacro(tr("Split %1 aggregates").arg(aggs.count()));
   int offset=0;
   for(prim::Aggregate *agg : aggs){
+    int temp = agg->getChildren().count()-1;
     undo_stack->push(new FormAggregate(agg, offset, this));
-    offset += agg->getChildren().count()-1;
+    offset += temp;
   }
   undo_stack->endMacro();
 }

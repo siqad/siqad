@@ -272,7 +272,6 @@ namespace gui{
 
     // internals
     QVector<int> item_inds; // list of indices of items in the Layer item stack
-    prim::Aggregate *agg;   // pointer to corresponding Aggregate
     int agg_index;          // index of agg in Layer item stack
 
   };
@@ -293,6 +292,9 @@ namespace gui{
 
     // move the item either by offset or -offset
     void move(bool invert=false);
+
+    // handler for moving an Item by a given delta
+    void moveItem(prim::Item *item, const QPointF &delta);
 
     // move a DBDot by the given delta to a new LatticeDot
     void moveDBDot(prim::DBDot *dot, const QPointF &delta);

@@ -66,6 +66,11 @@ namespace gui{
 
     void selectColor(); // tool for converting colors into QVariant strings
 
+    void screenshot();  // take an svg capture of the GUI
+    void designScreenshot();         // take an svg capture ofthe design window
+
+  protected:
+
 
   private:
 
@@ -82,8 +87,10 @@ namespace gui{
     void loadSettings();  // load mainwindow settings from the settings instance
     void saveSettings();  // save mainwindow settings to the settings instance
 
-
     // VARIABLES
+
+    // directory path persistence
+    QDir img_dir;
 
     // purely graphics widgets
     QToolBar *top_bar;

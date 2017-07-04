@@ -15,7 +15,7 @@
 #include "QtWidgets"
 #include <QtCore>
 
-#define DEFAULT_OVERRIDE false // always use default settings
+#define DEFAULT_OVERRIDE true // always use default settings
 
 namespace settings{
 
@@ -29,9 +29,7 @@ const QString lattice_settings_default = "src/settings/lattices/si_100_2x1.ini";
 
 
 // abstract container class for settings with a templated accessor function.
-// The typical use case is through implemeting derived singleton classes.settings
-// Each settings object should have a pointer to s default version with default
-// values for all parameters. For now, assert .ini format for OS compatability.
+// The typical use case is throintoor now, assert .ini format for OS compatability.
 class Settings: public QSettings
 {
 public:

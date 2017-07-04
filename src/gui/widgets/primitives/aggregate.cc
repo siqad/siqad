@@ -10,7 +10,7 @@
 
 QColor prim::Aggregate::edge_col;
 
-prim::Aggregate::Aggregate(prim::Layer *layer, QStack<Item*> items, QGraphicsItem *parent)
+prim::Aggregate::Aggregate(prim::Layer *layer, QStack<Item*> &items, QGraphicsItem *parent)
   : prim::Item(prim::Item::Aggregate, layer, parent), items(items)
 {
   // set all given items as children
@@ -30,11 +30,11 @@ prim::Aggregate::Aggregate(prim::Layer *layer, QStack<Item*> items, QGraphicsIte
 prim::Aggregate::~Aggregate()
 {
   // migrate children to Aggregate's parent Item
-  for(prim::Item *item : items){
-    item->setParentItem(parentItem());
-    item->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    item->setSelected(true);
-  }
+  // for(prim::Item *item : items){
+  //   //item->setParentItem(parentItem());
+  //   // item->setFlag(QGraphicsItem::ItemIsSelectable, true);
+  //   // item->setSelected(true);
+  // }
 }
 
 QRectF prim::Aggregate::boundingRect() const

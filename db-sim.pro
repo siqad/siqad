@@ -10,7 +10,7 @@
 CONFIG += c++11
 CONFIG += debug
 
-QT += core gui widgets
+QT += core gui widgets svg
 
 greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 

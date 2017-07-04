@@ -33,7 +33,7 @@ prim::DBDot::DBDot(prim::Layer *layer, prim::LatticeDot *src)
   // set dot location in pixels
   if(src){
     phys_loc = src->getPhysLoc();
-    setPos(phys_loc*scale_factor);
+    setPos(src->pos());
     src->setDBDot(this);
   }
 
@@ -74,7 +74,7 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
   painter->setPen(QPen(upSelected() ? selected_col : edge_col, edge_width));
   painter->drawEllipse(rect);
 
-  // draw inner fillcene->selectedItems()
+  // draw inner fill
   if(fill_fact>0){
     QPointF center = rect.center();
     QSizeF size(diameter, diameter);

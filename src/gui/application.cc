@@ -9,7 +9,7 @@
 
 
 // Qt includes
-#include <QtWidgets>
+#include <QtSvg>
 
 // gui includes
 #include "application.h"
@@ -100,9 +100,6 @@ void gui::ApplicationGUI::initMenuBar()
   menuBar()->addMenu(tr("&View"));
   QMenu *tools = menuBar()->addMenu(tr("&Tools"));
 
-
-
-
   // file menu actions
   QAction *quit = new QAction(tr("&Quit"), this);
   quit->setShortcut(tr("CTRL+Q"));
@@ -110,12 +107,19 @@ void gui::ApplicationGUI::initMenuBar()
 
   QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
   QAction *select_color = new QAction(tr("Select Color..."), this);
+  QAction *screenshot = new QAction(tr("Full Screenshot..."), this);
+  QAction *design_screenshot = new QAction(tr("Design Screenshot..."), this);
+
   tools->addAction(change_lattice);
   tools->addAction(select_color);
+  tools->addAction(screenshot);
+  tools->addAction(design_screenshot);
 
   connect(quit, &QAction::triggered, qApp, QApplication::quit);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
+  connect(screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
+  connect(design_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::designScreenshot);
 
 }
 
@@ -272,4 +276,67 @@ void gui::ApplicationGUI::selectColor()
 {
   QColorDialog::getColor(Qt::white, this,
     tr("Select a color"), QColorDialog::ShowAlphaChannel);
+}
+
+
+void gui::ApplicationGUI::screenshot()
+{
+  // get save path
+  QString fname = QFileDialog::getSaveFileName(this, tr("Save File"), img_dir.path(),
+                      tr("SVG files (*.svg)"));
+
+  if(fname.isEmpty())
+    return;
+  img_dir = QDir(fname);
+
+  gui::ApplicationGUI *widget = this;
+  QRect rect = widget->rect();
+
+  QSvgGenerator gen;
+  gen.setFileName(fname);
+  gen.setSize(rect.size());
+  gen.setViewBox(rect);
+
+  QPainter painter;
+  painter.begin(&gen);
+  widget->render(&painter);
+
+  // render menus
+  QRect r; QString s;
+  for(QAction *act : menuBar()->actions()){
+    r = menuBar()->actionGeometry(act);
+    s = act->text();
+    while(s.startsWith("&"))
+      s.remove(0,1);
+    painter.drawText(r, Qt::AlignCenter, s);
+  }
+
+  painter.end();
+}
+
+
+void gui::ApplicationGUI::designScreenshot()
+{
+  // get save path
+  QString fname = QFileDialog::getSaveFileName(this, tr("Save File"), img_dir.path(),
+                      tr("SVG files (*.svg)"));
+
+  if(fname.isEmpty())
+    return;
+  img_dir = QDir(fname);
+
+  gui::DesignPanel *widget = this->design_pan;
+  QRect rect = widget->rect();
+  rect.setHeight(rect.height() - widget->horizontalScrollBar()->height());
+  rect.setWidth(rect.width() - widget->verticalScrollBar()->width());
+
+  QSvgGenerator gen;
+  gen.setFileName(fname);
+  gen.setSize(rect.size());
+  gen.setViewBox(rect);
+
+  QPainter painter;
+  painter.begin(&gen);
+  widget->render(&painter);
+  painter.end();
 }
