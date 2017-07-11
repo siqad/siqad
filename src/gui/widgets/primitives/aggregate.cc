@@ -106,15 +106,15 @@ void prim::Aggregate::mousePressEvent(QGraphicsSceneMouseEvent *e)
   prim::Item::mousePressEvent(e);
 }
 
-void prim::Aggregate::hoverEnterEvent(QGraphicsSceneHoverEvent *e)
+void prim::Aggregate::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
   qDebug() << QObject::tr("Aggregate has seen the hoverEnterEvent");
   //prim::Item::hoverEnterEvent(e);
   // TODO set a flag that indicates mouse has entered, hence aggregate border should be highlighted
 }
 
-void prim::Aggregate::hoverLeaveEvent(QGraphicsSceneHoverEvent *e)
+void prim::Aggregate::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
   qDebug() << QObject::tr("Aggregate has seen the hoverLeaveEvent");
   // TODO unset the aggregate highlight flag
-}  
+}

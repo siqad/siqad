@@ -416,9 +416,12 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
         break;
       default:
         // multi button behavour not implemented
+
         break;
     }
   }
+
+  QGraphicsView::mouseMoveEvent(e);
 }
 
 
@@ -442,6 +445,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
     clearGhost();
   }
   else if(clicked){
+    clicked=false;
     switch(e->button()){
       case Qt::LeftButton:
         // action based on chosen tool
