@@ -38,15 +38,25 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 > content directly related to the GUI and not any solver or physics functionality
 ## GUI
 
-* 
+* Highlight group boundaries when mouse over aggregates
+* Make config file paths configurable
+* Periodic autosave
+* Don't deselect cells when panning
+* Background lattice sites -> change to bitmap for efficiency
+* User-readable config file, custom functions in QSettings to read from config to QSetting's own structure / writeback changed settings to user-readable file
+* Component library
+* Tight aggregate boundaries (instead of the current sqaure, taking up too much space)
+
 
 > solvers, physics engine, and I/O formatting
 ## Physics Engine
 
+* Simple estimation tool of electron distribution
+
 > general bugs
 ## Bugs
 
-
+* Segfault when undoing aggregates then moving dots
 
 
 
