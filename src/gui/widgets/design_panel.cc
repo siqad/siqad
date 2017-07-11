@@ -362,8 +362,14 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   switch(e->button()){
     case Qt::LeftButton:
       clicked = true;
-      if(!ghosting)
+      if(ghosting){
+        // TODO remove?
+        // when ghosting, show the ghost at the cursor position on the click
+      }
+      else
         QGraphicsView::mousePressEvent(e);
+      break;
+    case Qt::MiddleButton:
       break;
     default:
       QGraphicsView::mousePressEvent(e);
@@ -415,6 +421,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
         break;
     }
   }
+  QGraphicsView::mouseMoveEvent(e);
 }
 
 
@@ -438,6 +445,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
     clearGhost();
   }
   else if(clicked){
+    clicked=false;
     switch(e->button()){
       case Qt::LeftButton:
         // action based on chosen tool
@@ -518,13 +526,13 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
     // only allowed actions are for manipulating the ghost
     switch(e->key()){
       case Qt::Key_H:
-        // flip ghost horizontally
+        // TODO flip ghost horizontally
         break;
       case Qt::Key_V:
-        // flip ghost vertically
+        // TODO flip ghost vertically
         break;
       case Qt::Key_R:
-        // rotate based on whether the control modifiers is pressed
+        // TODO rotate based on whether the control modifiers is pressed
         break;
       default:
         break;
@@ -920,8 +928,8 @@ gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
       return;
     }
 
-  // format the input items to a pointer invariant form, could be done more efficiently
-  QStack<prim::Item*> &layer_items = layer->getItems();
+  // format the input items to a pointer invariant form, TODO could be done more efficiently
+  QStack<prim::Item*> layer_items = layer->getItems();
   for(prim::Item *item : items)
     item_inds.append(layer_items.indexOf(item));
   std::sort(item_inds.begin(), item_inds.end());

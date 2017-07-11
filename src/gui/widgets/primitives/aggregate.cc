@@ -22,6 +22,8 @@ prim::Aggregate::Aggregate(prim::Layer *layer, QStack<Item*> &items, QGraphicsIt
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setSelected(true);
 
+  setAcceptHoverEvents(true);
+
   // set up static edge color if invalid
   if(!edge_col.isValid())
     prepareStatics();
@@ -102,4 +104,17 @@ void prim::Aggregate::mousePressEvent(QGraphicsSceneMouseEvent *e)
   // The following will only be triggered if the children pass the event up.
   qDebug() << QObject::tr("Aggregate has seen the mousePressEvent");
   prim::Item::mousePressEvent(e);
+}
+
+void prim::Aggregate::hoverEnterEvent(QGraphicsSceneHoverEvent *)
+{
+  qDebug() << QObject::tr("Aggregate has seen the hoverEnterEvent");
+  //prim::Item::hoverEnterEvent(e);
+  // TODO set a flag that indicates mouse has entered, hence aggregate border should be highlighted
+}
+
+void prim::Aggregate::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
+{
+  qDebug() << QObject::tr("Aggregate has seen the hoverLeaveEvent");
+  // TODO unset the aggregate highlight flag
 }
