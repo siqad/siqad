@@ -688,7 +688,7 @@ void gui::DesignPanel::filterSelection(bool select_flag)
 
 void gui::DesignPanel::createGhost(bool paste)
 {
-  qDebug() << tr("Creating ghost...");
+  //qDebug() << tr("Creating ghost...");
 
   prim::Ghost *ghost = prim::Ghost::instance();
 
@@ -714,7 +714,7 @@ void gui::DesignPanel::createGhost(bool paste)
 
 void gui::DesignPanel::clearGhost()
 {
-  qDebug() << tr("Clearing ghost...");
+  ///qDebug() << tr("Clearing ghost...");
   prim::Ghost::instance()->cleanGhost();
   ghosting=false;
 }

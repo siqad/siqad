@@ -35,3 +35,18 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 
 # TODO
 
+> content directly related to the GUI and not any solver or physics functionality
+## GUI
+
+* 
+
+> solvers, physics engine, and I/O formatting
+## Physics Engine
+
+> general bugs
+## Bugs
+
+
+
+
+
