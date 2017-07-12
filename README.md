@@ -38,14 +38,31 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 > content directly related to the GUI and not any solver or physics functionality
 ## GUI
 
-* Highlight group boundaries when mouse over aggregates
-* Make config file paths configurable
+### Generic
+* Save DB layouts and load from save
+* "You have unsaved changes..."
 * Periodic autosave
 * Don't deselect cells when panning
-* Background lattice sites -> change to bitmap for efficiency
-* User-readable config file, custom functions in QSettings to read from config to QSetting's own structure / writeback changed settings to user-readable file
+* Esc cancels paste operation
+* Esc cancels DB Tool
+* Visual feedback on which tool is currently in use (e.g. changed background of the button)
+* When using DB Tool, show ghosts indicating where DBs will be created
+
+### Aggregates
+* ~~Highlight group boundaries when mouse over aggregates~~ Implemented 170712
+* Offset of moving aggregates - ghost should not be centered to the cursor, instead centered at the same offset as the starting point
+* Select parent aggregate when clicking on child aggregate
 * Component library
 * Tight aggregate boundaries (instead of the current sqaure, taking up too much space)
+* Multiple aggregate boundary algorithms, so we can choose the one that ensures the highest accuracy depending for the standard library.
+* Right click on object to change the aggregate boundary algorithm, give out warning if they're attempting to do this on an aggregate that came from a library
+
+### Config
+* Make config file paths configurable
+* User-friendly config file, custom functions in QSettings to read from config to QSetting's own structure / writeback changed settings to user-readable file
+
+### Lattice
+* Background lattice sites -> change to bitmap for efficiency
 
 
 > solvers, physics engine, and I/O formatting
