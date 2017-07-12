@@ -148,6 +148,7 @@ QSettings* settings::GUISettings::m_defs()
 
   // aggregate parameters
   S->setValue("aggregate/edge_col", QColor(9, 255, 200, 150));  // bounding box color
+  S->setValue("aggregate/edge_col_hovered", QColor(9, 255, 200, 150));  // bounding box color
 
   return S;
 }

@@ -34,6 +34,7 @@ namespace prim{
     virtual Item *deepCopy() const;
 
     static QColor edge_col;
+    static QColor edge_col_hovered;
 
   private:
 

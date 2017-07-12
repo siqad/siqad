@@ -22,7 +22,7 @@ void prim::Item::init()
 }
 
 prim::Item::Item(ItemType type, prim::Layer *lay, QGraphicsItem *parent)
-  : QGraphicsItem(parent), item_type(type), layer(lay)
+  : QGraphicsItem(parent), item_type(type), layer(lay), hovered(false)
 {
   if(scale_factor<0)
     init();
@@ -34,6 +34,12 @@ bool prim::Item::upSelected()
 {
   prim::Item *parent = static_cast<prim::Item*>(parentItem());
   return parent==0 ? isSelected() : parent->upSelected();
+}
+
+bool prim::Item::upHovered()
+{
+  prim::Item *parent = static_cast<prim::Item*>(parentItem());
+  return parent==0 ? isHovered() : parent->upHovered();
 }
 
 
