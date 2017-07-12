@@ -42,7 +42,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * Save DB layouts and load from save
 * "You have unsaved changes..."
 * Periodic autosave
-* Don't deselect cells when panning
+* Don't deselect cells when entering Panning mode
 * Esc cancels paste operation
 * Esc cancels DB Tool
 * Visual feedback on which tool is currently in use (e.g. changed background of the button)
