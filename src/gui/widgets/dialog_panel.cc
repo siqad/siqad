@@ -1,7 +1,7 @@
 // @file:     dialog_panel.cc
 // @author:   Jake
 // @created:  2016.11.02
-// @editted:  2017.05.15  - Jake
+// @editted:  2017.07.11  - Jake
 // @license:  GNU LGPL v3
 //
 // @desc:     DialogPanel definitinos.

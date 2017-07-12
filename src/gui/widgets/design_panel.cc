@@ -1,7 +1,7 @@
 // @file:     design_panel.cc
 // @author:   Jake
 // @created:  2016.11.02
-// @editted:  2017.06.07  - Jake
+// @editted:  2017.07.11  - Jake
 // @license:  GNU LGPL v3
 //
 // @desc:     DesignPanel implementation
@@ -359,9 +359,9 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   mouse_pos_old = e->pos();
   mouse_pos_cached = e->pos(); // this might be a referencing clash, check.
 
+  clicked = true;
   switch(e->button()){
     case Qt::LeftButton:
-      clicked = true;
       if(ghosting){
         // TODO remove?
         // when ghosting, show the ghost at the cursor position on the click
@@ -445,7 +445,6 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
     clearGhost();
   }
   else if(clicked){
-    clicked=false;
     switch(e->button()){
       case Qt::LeftButton:
         // action based on chosen tool
@@ -478,6 +477,8 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
         break;
     }
   }
+
+  clicked=false;
 }
 
 
