@@ -9,6 +9,7 @@
 #include "aggregate.h"
 
 QColor prim::Aggregate::edge_col;
+QColor prim::Aggregate::edge_col_hovered;
 
 prim::Aggregate::Aggregate(prim::Layer *layer, QStack<Item*> &items, QGraphicsItem *parent)
   : prim::Item(prim::Item::Aggregate, layer, parent), items(items)
@@ -77,6 +78,13 @@ void prim::Aggregate::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     painter->setBrush(Qt::NoBrush);
     painter->drawRect(rect);
   }
+  else if(upHovered()){
+    QRectF rect = boundingRect();
+
+    painter->setPen(QPen(edge_col_hovered));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawRect(rect);
+  }
 }
 
 
@@ -95,6 +103,7 @@ void prim::Aggregate::prepareStatics()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   edge_col = gui_settings->get<QColor>("aggregate/edge_col");
+  edge_col_hovered = gui_settings->get<QColor>("aggregate/edge_col_hovered");
 }
 
 
@@ -108,13 +117,14 @@ void prim::Aggregate::mousePressEvent(QGraphicsSceneMouseEvent *e)
 
 void prim::Aggregate::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
-  qDebug() << QObject::tr("Aggregate has seen the hoverEnterEvent");
-  //prim::Item::hoverEnterEvent(e);
-  // TODO set a flag that indicates mouse has entered, hence aggregate border should be highlighted
+  //qDebug() << QObject::tr("Aggregate has seen the hoverEnterEvent");
+  setHovered(true);
+  update();
 }
 
 void prim::Aggregate::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
-  qDebug() << QObject::tr("Aggregate has seen the hoverLeaveEvent");
-  // TODO unset the aggregate highlight flag
+  //qDebug() << QObject::tr("Aggregate has seen the hoverLeaveEvent");
+  setHovered(false);
+  update();
 }

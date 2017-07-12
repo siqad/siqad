@@ -51,6 +51,12 @@ namespace prim{
     // true if the item or its parent has been seleted, recursive to highest level parent
     bool upSelected();
 
+    // set/get hovered state
+    void setHovered(bool flag) {hovered = flag;}
+    bool isHovered() {return hovered;}
+    // true if the item or its parent has been hovered, recursive to highest level parent
+    bool upHovered();
+
     // securing the item type and layer as private isn't worth the copy
     // constructor calls for accessors, make public
 
@@ -62,6 +68,8 @@ namespace prim{
     static void init();
 
   protected:
+
+    bool hovered; // manipulated through setHovered(bool) and hovered()
 
     // optional overridable mousePressEvent interrupt
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
