@@ -54,8 +54,8 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * Select parent aggregate when clicking on child aggregate
 * Component library
 * Tight aggregate boundaries (instead of the current sqaure, taking up too much space)
-* Multiple aggregate boundary algorithms, so we can choose the one that ensures the highest accuracy depending for the standard library.
-* Right click on object to change the aggregate boundary algorithm, give out warning if they're attempting to do this on an aggregate that came from a library
+** Multiple aggregate boundary algorithms, so we can choose the one that ensures the highest accuracy depending for the standard library.
+** Right click on object to change the aggregate boundary algorithm, give out warning if they're attempting to do this on an aggregate that came from a library
 
 ### Config
 * Make config file paths configurable
