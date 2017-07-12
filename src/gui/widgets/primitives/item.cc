@@ -52,11 +52,18 @@ void prim::Item::mousePressEvent(QGraphicsSceneMouseEvent *e)
   switch(e->buttons()){
     case Qt::LeftButton:
       if(keymods & Qt::ControlModifier)
-        e->setAccepted(false);
+        e->ignore();
       else if(upSelected())
         prim::Emitter::instance()->selectClicked(this);
+      else{
+        if(parentItem()==0)
+          QGraphicsItem::mousePressEvent(e);
+        else
+          e->ignore();
+      }
       break;
     default:
+      e->ignore();
       break;
   }
 
