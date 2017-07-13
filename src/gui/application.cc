@@ -87,6 +87,9 @@ void gui::ApplicationGUI::initGUI()
 
   // additional actions
   initActions();
+
+  // prepare initial GUI state
+  initState();
 }
 
 
@@ -203,6 +206,16 @@ void gui::ApplicationGUI::initActions()
   // input field
   connect(input_field, &gui::InputField::returnPressed,
             this, &gui::ApplicationGUI::parseInputField);
+
+  // set tool
+  connect(design_pan, &gui::DesignPanel::sig_toolChange,
+            this, &gui::ApplicationGUI::setTool);
+}
+
+
+void gui::ApplicationGUI::initState()
+{
+  setTool(gui::DesignPanel::SelectTool);
 }
 
 
@@ -231,6 +244,25 @@ void gui::ApplicationGUI::saveSettings()
 
 // PUBLIC SLOTS
 
+void gui::ApplicationGUI::setTool(gui::DesignPanel::ToolType tool)
+{
+  switch(tool){
+    case gui::DesignPanel::SelectTool:
+      action_select_tool->setChecked(true);
+      setToolSelect();
+      break;
+    case gui::DesignPanel::DragTool:
+      action_drag_tool->setChecked(true);
+      setToolDrag();
+      break;
+    case gui::DesignPanel::DBGenTool:
+      action_dbgen_tool->setChecked(true);
+      setToolDBGen();
+      break;
+    default:
+      break;
+  }
+}
 
 void gui::ApplicationGUI::setToolSelect()
 {

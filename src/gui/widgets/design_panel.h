@@ -29,7 +29,7 @@ namespace gui{
 
   public:
 
-    enum ToolType{None, SelectTool, DragTool, DBGenTool, MeasureTool};
+    enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool};
 
     // constructor
     DesignPanel(QWidget *parent=0);
@@ -83,6 +83,9 @@ namespace gui{
   public slots:
 
     void selectClicked(prim::Item *item);
+
+  signals:
+    void sig_toolChange(ToolType tool);
 
   protected:
 
@@ -206,7 +209,7 @@ namespace gui{
 
 
     // move the selected items to the current Ghost, returns True if successful
-    bool moveToGhost();
+    bool moveToGhost(bool kill=false);
 
   };
 

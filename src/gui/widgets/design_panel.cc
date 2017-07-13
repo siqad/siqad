@@ -41,8 +41,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   qDebug() << tr("SD: %1").arg(snap_diameter);
   snap_target = 0;
 
-  tool_type = gui::DesignPanel::None;     // now setTool will update the tool
-  setTool(gui::DesignPanel::SelectTool);
+  tool_type = gui::DesignPanel::NoneTool;     // now setTool will update the tool
 
   // rubber band selection
   setRubberBandSelectionMode(Qt::IntersectsItemBoundingRect);
@@ -526,6 +525,12 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
   if(ghosting){
     // only allowed actions are for manipulating the ghost
     switch(e->key()){
+      case Qt::Key_Escape:
+        // stop ghosting
+        if(moving)
+          moveToGhost(true);
+        clearGhost();
+        break;
       case Qt::Key_H:
         // TODO flip ghost horizontally
         break;
@@ -541,11 +546,13 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
   }
   else{
     switch(e->key()){
-      case Qt::Key_Escape:
         // deactivate current tool
-        if(tool_type == gui::DesignPanel::DBGenTool || tool_type == gui::DesignPanel::DragTool)
-          setTool(gui::DesignPanel::SelectTool);
+        if(tool_type != gui::DesignPanel::SelectTool){
+          // emit signal to be picked up by application.cc
+          emit sig_toolChange(gui::DesignPanel::SelectTool);
+          //setTool(gui::DesignPanel::SelectTool);
           qDebug() << tr("Esc pressed, drop back to select tool");
+        }
         break;
       case Qt::Key_G:
         // grouping behaviour for selecting surface dangling bonds
@@ -1323,13 +1330,13 @@ void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)
 //       one dangling bond is being moved). Should modify in future to be more
 //       general. If no move is made, need to make originial lattice dots
 //       unselectable again.
-bool gui::DesignPanel::moveToGhost()
+bool gui::DesignPanel::moveToGhost(bool kill)
 {
   prim::Ghost *ghost = prim::Ghost::instance();
   moving = false;
 
   // get the move offset
-  QPointF offset = ghost->valid_hash[snap_target] ? ghost->moveOffset() : QPointF();
+  QPointF offset = (!kill && ghost->valid_hash[snap_target]) ? ghost->moveOffset() : QPointF();
 
   if(offset.isNull()){
     // reset the original lattice dot selectability and return false

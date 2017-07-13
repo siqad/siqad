@@ -43,19 +43,19 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * "You have unsaved changes..."
 * Periodic autosave
 * Don't deselect cells when entering Panning mode
-* Esc cancels paste operation
-* Esc cancels DB Tool
-* Visual feedback on which tool is currently in use (e.g. changed background of the button)
-* When using DB Tool, show ghosts indicating where DBs will be created
+* When using DBGen Tool, show ghosts indicating where DBs will be created
+* ~~Esc cancels paste operation~~ Implemented 17.07.13
+* ~~Esc cancels DB Tool~~ Implemented 17.07.13
+* ~~Visual feedback on which tool is currently in use (e.g. changed background of the button)~~ Implemented 17.07.12
 
 ### Aggregates
-* ~~Highlight group boundaries when mouse over aggregates~~ Implemented 170712
 * Offset of moving aggregates - ghost should not be centered to the cursor, instead centered at the same offset as the starting point
-* Select parent aggregate when clicking on child aggregate
 * Component library
 * Tight aggregate boundaries (instead of the current sqaure, taking up too much space)
   * Multiple aggregate boundary algorithms, so we can choose the one that ensures the highest accuracy depending for the standard library.
   * Right click on object to change the aggregate boundary algorithm, give out warning if they're attempting to do this on an aggregate that came from a library
+* ~~Highlight group boundaries when mouse over aggregates~~ Implemented 17.07.12
+* ~~Select parent aggregate when clicking on child aggregate~~ Implemented 17.07.12
 
 ### Config
 * Make config file paths configurable
@@ -68,6 +68,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 > solvers, physics engine, and I/O formatting
 ## Physics Engine
 
+* Interface with solvers (standards for passing DB configuration to them, and taking results back)
 * Simple estimation tool of electron distribution
 
 > general bugs
