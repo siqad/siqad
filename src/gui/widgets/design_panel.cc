@@ -541,6 +541,12 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
   }
   else{
     switch(e->key()){
+      case Qt::Key_Escape:
+        // deactivate current tool
+        if(tool_type == gui::DesignPanel::DBGenTool || tool_type == gui::DesignPanel::DragTool)
+          setTool(gui::DesignPanel::SelectTool);
+          qDebug() << tr("Esc pressed, drop back to select tool");
+        break;
       case Qt::Key_G:
         // grouping behaviour for selecting surface dangling bonds
         if(keymods == (Qt::ControlModifier | Qt::ShiftModifier))
