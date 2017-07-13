@@ -300,6 +300,9 @@ void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
   // reset selected items
   scene->clearSelection();
 
+  // inform all items of select mode
+  prim::Item::select_mode = tool==gui::DesignPanel::SelectTool;
+
   switch(tool){
     case gui::DesignPanel::SelectTool:
       setDragMode(QGraphicsView::RubberBandDrag);

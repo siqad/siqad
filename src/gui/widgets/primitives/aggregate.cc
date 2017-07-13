@@ -71,7 +71,7 @@ QRectF prim::Aggregate::boundingRect() const
 void prim::Aggregate::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
   // Scene will handle drawing the children, just draw the bounding box
-  if(upSelected()){
+  if(select_mode && upSelected()){
     QRectF rect = boundingRect();
 
     painter->setPen(QPen(edge_col));
@@ -97,8 +97,6 @@ prim::Item *prim::Aggregate::deepCopy() const
 }
 
 
-
-
 void prim::Aggregate::prepareStatics()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
@@ -112,8 +110,8 @@ void prim::Aggregate::mousePressEvent(QGraphicsSceneMouseEvent *e)
   // QGraphicsItem order precedence will trigger the children before the Aggregate
   // The following will only be triggered if the children pass the event up.
   qDebug() << QObject::tr("Aggregate has seen the mousePressEvent");
-  
-  if(parentItem() != 0) 
+
+  if(parentItem() != 0)
     e->ignore();
   else
     prim::Item::mousePressEvent(e);

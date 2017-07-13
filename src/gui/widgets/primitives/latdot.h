@@ -66,6 +66,9 @@ namespace prim{
 
     static QColor edge_col;   // boundary edge color
     static QColor fill_col;   // dot fill color (same for all lattice dots)
+
+    static qreal in_fill;       // fil factor for inner circle
+    static QColor in_fill_col;  // colour of inner circle
   };
 
 } // end prim namespace

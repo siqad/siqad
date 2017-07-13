@@ -12,6 +12,7 @@
 
 
 qreal prim::Item::scale_factor = -1;
+bool prim::Item::select_mode = false;
 
 
 // CLASS::Item

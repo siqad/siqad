@@ -139,7 +139,9 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("latdot/diameter", 1.0);                    // dot diameter
   S->setValue("latdot/edge_width", .05);                  // edge width rel. to diameter
   S->setValue("latdot/edge_col", QColor(255,255,255,50)); // edge color
-  S->setValue("latdot/fill_col", QColor(0,0,0,0));       // fill color
+  S->setValue("latdot/fill_col", QColor(0,0,0,0));        // fill color
+  S->setValue("latdot/inner_fill", .5);                   // inner fill factor
+  S->setValue("latdot/inner_fill_col", QColor(255, 255, 0));  // inner colour
 
   // ghost parameters
   S->setValue("ghost/dot_diameter", .6);                    // ghost dot diameter

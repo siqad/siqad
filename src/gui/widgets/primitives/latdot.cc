@@ -20,6 +20,9 @@ qreal prim::LatticeDot::edge_width = -1;
 QColor prim::LatticeDot::edge_col;
 QColor prim::LatticeDot::fill_col;
 
+qreal prim::LatticeDot::in_fill;
+QColor prim::LatticeDot::in_fill_col;
+
 
 // the surface lattice will always be layer 0
 prim::LatticeDot::LatticeDot(prim::Layer *layer, QPointF p_loc):
@@ -61,6 +64,18 @@ void prim::LatticeDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->setPen(QPen(edge_col, edge_width));
     painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
     painter->drawEllipse(rect);
+
+    // draw inner circle
+    if(!select_mode && isSelected()){
+        QPointF center = rect.center();
+        QSizeF size(diameter, diameter);
+        rect.setSize(size*in_fill);
+        rect.moveCenter(center);
+
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(in_fill_col);
+        painter->drawEllipse(rect);
+    }
   }
 }
 
@@ -78,5 +93,6 @@ void prim::LatticeDot::constructStatics()
   edge_width = gui_settings->get<qreal>("latdot/edge_width")*diameter;
   edge_col= gui_settings->get<QColor>("latdot/edge_col");
   fill_col= gui_settings->get<QColor>("latdot/fill_col");
-
+  in_fill = gui_settings->get<qreal>("latdot/inner_fill");
+  in_fill_col = gui_settings->get<QColor>("latdot/inner_fill_col");
 }
