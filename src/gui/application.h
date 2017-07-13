@@ -45,6 +45,7 @@ namespace gui{
   public slots:
 
     // cursor tool updating
+    void setTool(gui::DesignPanel::ToolType tool);
     void setToolSelect();
     void setToolDrag();
     void setToolDBGen();
@@ -82,6 +83,9 @@ namespace gui{
 
     // prepare any extra actions not attched to an icon or meny
     void initActions();
+    
+    // prepare the initial GUI state
+    void initState();
 
     // application settings
     void loadSettings();  // load mainwindow settings from the settings instance

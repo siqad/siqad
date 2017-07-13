@@ -43,9 +43,9 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * "You have unsaved changes..."
 * Periodic autosave
 * Don't deselect cells when entering Panning mode
-* Esc cancels paste operation
-* Esc cancels DB Tool
-* Visual feedback on which tool is currently in use (e.g. changed background of the button)
+* ~~Esc cancels paste operation~~ Implemented 17.07.13
+* ~~Esc cancels DB Tool~~ Implemented 17.07.13
+* ~~Visual feedback on which tool is currently in use (e.g. changed background of the button)~~ Implemented 17.07.12
 * When using DB Tool, show ghosts indicating where DBs will be created
 
 ### Aggregates
