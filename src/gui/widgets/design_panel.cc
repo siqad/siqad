@@ -549,6 +549,7 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
   }
   else{
     switch(e->key()){
+      case Qt::Key_Escape:
         // deactivate current tool
         if(tool_type != gui::DesignPanel::SelectTool){
           // emit signal to be picked up by application.cc
