@@ -174,9 +174,21 @@ void gui::ApplicationGUI::initSideBar()
   side_bar->setIconSize(QSize(ico_scale, ico_scale));
 
   // actions
+  QActionGroup *action_group = new QActionGroup(side_bar);
+
   action_select_tool = side_bar->addAction(QIcon(":/ico/select.svg"), tr("Select tool"));
   action_drag_tool = side_bar->addAction(QIcon(":/ico/drag.svg"), tr("Drag tool"));
   action_dbgen_tool = side_bar->addAction(QIcon(":/ico/dbgen.svg"), tr("DB tool"));
+
+  action_group->addAction(action_select_tool);
+  action_group->addAction(action_drag_tool);
+  action_group->addAction(action_dbgen_tool);
+
+  action_select_tool->setCheckable(true);
+  action_drag_tool->setCheckable(true);
+  action_dbgen_tool->setCheckable(true);
+
+  action_select_tool->setChecked(true);
 
   connect(action_select_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolSelect);
   connect(action_drag_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolDrag);
