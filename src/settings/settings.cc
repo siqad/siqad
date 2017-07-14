@@ -105,6 +105,7 @@ QSettings* settings::GUISettings::m_defs()
 {
   qDebug("Loading default gui settings...");
   QSettings *S = new QSettings("src/settings/defaults/gui_settings.ini", QSettings::IniFormat);
+  QSettings *S = new QSettings("tmp/settings/defaults/gui_settings.ini", QSettings::IniFormat);
 
   S->setValue("MWIN/size", QSize(1400, 800));
   S->setValue("TBAR/mh", 60);

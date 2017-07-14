@@ -39,7 +39,6 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 ## GUI
 
 ### Generic
-* When attempting to select DBs using rubberband but clicked on a DB/aggregate as the starting location, the object at the starting position takes the press event and rubberband fails to show
 * Save DB layouts and load from save
   * "You have unsaved changes..."
   * Periodic autosave
@@ -77,6 +76,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 ## Bugs
 
 * Segfault when undoing aggregates then moving dots
+* When attempting to select DBs using rubberband but clicked on a DB/aggregate as the starting location, the object at the starting position takes the press event and rubberband fails to show
 
 
 

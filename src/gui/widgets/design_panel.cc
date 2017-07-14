@@ -397,10 +397,12 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     if(snapGhost(scene_pos, offset))
       prim::Ghost::instance()->moveBy(offset.x(), offset.y());
   }
-  else if(tool_type == gui::DesignPanel::DBGenTool){
-    //QPointF scene_pos = mapToScene(e->pos());
-    //snapDB(scene_pos);
-  }
+  /* DB ghosting when DBGen tool is in use - deal with this later
+    else if(tool_type == gui::DesignPanel::DBGenTool){
+     show "ghost" of new DB
+    QPointF scene_pos = mapToScene(e->pos());
+    snapDB(scene_pos);
+  }*/
   else if(clicked){
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
@@ -556,10 +558,9 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
       case Qt::Key_Escape:
         // deactivate current tool
         if(tool_type != gui::DesignPanel::SelectTool){
+          //qDebug() << tr("Esc pressed, drop back to select tool");
           // emit signal to be picked up by application.cc
           emit sig_toolChange(gui::DesignPanel::SelectTool);
-          //setTool(gui::DesignPanel::SelectTool);
-          qDebug() << tr("Esc pressed, drop back to select tool");
         }
         break;
       case Qt::Key_G:
