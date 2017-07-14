@@ -397,6 +397,10 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     if(snapGhost(scene_pos, offset))
       prim::Ghost::instance()->moveBy(offset.x(), offset.y());
   }
+  else if(tool_type == gui::DesignPanel::DBGenTool){
+    //QPointF scene_pos = mapToScene(e->pos());
+    //snapDB(scene_pos);
+  }
   else if(clicked){
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
@@ -743,6 +747,7 @@ void gui::DesignPanel::clearGhost()
   ///qDebug() << tr("Clearing ghost...");
   prim::Ghost::instance()->cleanGhost();
   ghosting=false;
+  snap_target=0;
 }
 
 
@@ -869,6 +874,53 @@ void gui::DesignPanel::copySelection()
   }
 }
 
+void gui::DesignPanel::snapDB(QPointF scene_pos)
+{
+  // don't need to recheck snap target unless the cursor has moved significantly
+  if(snap_target != 0 && (scene_pos-snap_cache).manhattanLength()<.1*snap_diameter)
+    return;
+  snap_cache = scene_pos;
+
+  // get nearest lattice site to cursor position
+  QRectF rect;
+  rect.setSize(QSize(snap_diameter, snap_diameter));
+  rect.moveCenter(scene_pos);
+  QList<QGraphicsItem*> near_items = scene->items(rect);
+
+  // if no items nearby, change nothing
+  if(near_items.count()==0){
+    if(snap_target){
+      snap_target->setSelected(false); // unselect the previous target
+      snap_target = 0;
+    }
+    return;
+  }
+
+  // select the nearest db to cursor position
+  prim::LatticeDot *target=0;
+  qreal mdist=-1, dist;
+
+  for(QGraphicsItem *gitem : near_items) {
+    // lattice dot
+    dist = (gitem->pos()-scene_pos).manhattanLength();
+    if(mdist<0 || dist<mdist){
+      target = static_cast<prim::LatticeDot*>(gitem);
+      mdist=dist;
+    }
+  }
+
+  // if no valid target or target has not changed, do nothing
+  if(!target || target==snap_target)
+    return;
+
+  // move db indicator
+  if(snap_target)
+    snap_target->setSelected(false); // unselect the previous target
+  snap_target = target;
+  snap_target->setSelected(true); // select the new target
+
+  return;
+}
 
 
 

@@ -153,7 +153,7 @@ namespace gui{
     // clear the current Ghost
     void clearGhost();
 
-    // snap the ghost to the nearest possible lattive position. Returns true if
+    // snap the ghost to the nearest possible lattice position. Returns true if
     // the snap_target was update (need to change the ghost location).
     bool snapGhost(QPointF scene_pos, QPointF &offset);
 
@@ -166,7 +166,8 @@ namespace gui{
     // deep copy the current selection to the clipboard
     void copySelection();
 
-
+    // dbgen Location Indicator
+    void snapDB(QPointF scene_pos);
 
 
 

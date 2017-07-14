@@ -39,9 +39,10 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 ## GUI
 
 ### Generic
+* When attempting to select DBs using rubberband but clicked on a DB/aggregate as the starting location, the object at the starting position takes the press event and rubberband fails to show
 * Save DB layouts and load from save
-* "You have unsaved changes..."
-* Periodic autosave
+  * "You have unsaved changes..."
+  * Periodic autosave
 * Don't deselect cells when entering Panning mode
 * When using DBGen Tool, show ghosts indicating where DBs will be created
 * ~~Esc cancels paste operation~~ Implemented 17.07.13
@@ -49,6 +50,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * ~~Visual feedback on which tool is currently in use (e.g. changed background of the button)~~ Implemented 17.07.12
 
 ### Aggregates
+* Disallow creation of new dots inside aggregates
 * Offset of moving aggregates - ghost should not be centered to the cursor, instead centered at the same offset as the starting point
 * Component library
 * Tight aggregate boundaries (instead of the current sqaure, taking up too much space)
