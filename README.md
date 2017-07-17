@@ -57,6 +57,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
   * Possibly implement Chan's algorithm for faster convex hull computation
   * Right click on object to change the aggregate boundary algorithm, give out warning if they're attempting to do this on an aggregate that came from a library
   * Associate hull computation wit changes to the aggregate rather than the ::shape function (recomputes every time the boundary is painted/checked).
+* "flattenAggregate" function: for each selected aggregate, for each child of that aggregate, split if an aggregate and add children to parent.
 * ~~Highlight group boundaries when mouse over aggregates~~ Implemented 17.07.12
 * ~~Select parent aggregate when clicking on child aggregate~~ Implemented 17.07.12
 
