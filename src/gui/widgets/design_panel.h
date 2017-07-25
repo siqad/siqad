@@ -152,6 +152,7 @@ namespace gui{
     QRubberBand *rb=0;  // rubber band object
     QPoint rb_start; // starting point of rubber band (scene)
     QPoint rb_cache; // cached to compare mouse movement (view)
+    QList<QGraphicsItem*> rb_shift_selected; // list of previously selected items, for shift select
 
     // update rubberband during mouse movement
     void rubberBandUpdate(QPoint);

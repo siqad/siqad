@@ -44,6 +44,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   tool_type = gui::DesignPanel::NoneTool;     // now setTool will update the tool
 
   // rubber band selection
+  // replaced with custom rubberBandUpdate, delete this later
   //setRubberBandSelectionMode(Qt::IntersectsItemBoundingRect);
   //setStyleSheet("selection-background-color: rgba(100, 100, 255, 10)");
 
@@ -305,16 +306,18 @@ void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
 
   switch(tool){
     case gui::DesignPanel::SelectTool:
+      // replaced with custom rubberBandUpdate, delete this later
       //setDragMode(QGraphicsView::RubberBandDrag);
-      //setInteractive(true);
+      setInteractive(true);
       break;
     case gui::DesignPanel::DragTool:
       setDragMode(QGraphicsView::ScrollHandDrag);
       setInteractive(false);
       break;
     case gui::DesignPanel::DBGenTool:
+      // replaced with custom rubberBandUpdate, delete this later
       //setDragMode(QGraphicsView::RubberBandDrag);
-      //setInteractive(true);
+      setInteractive(true);
       break;
     default:
       qCritical() << tr("Invalid ToolType... should not have happened");
@@ -357,6 +360,8 @@ void gui::DesignPanel::selectClicked(prim::Item *)
 // press
 void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 {
+  Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
+
   // set clicked flag and store current mouse position for move behaviour
   mouse_pos_old = e->pos();
   mouse_pos_cached = e->pos(); // this might be a referencing clash, check.
@@ -368,9 +373,16 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   clicked = true;
   switch(e->button()){
     case Qt::LeftButton:
+      // rubber band variables
       rb_start = mapToScene(e->pos()).toPoint();
       rb_cache = e->pos();
-      QGraphicsView::mousePressEvent(e);
+
+      // save current selection if Shift is pressed
+      if(keymods & Qt::ShiftModifier)
+        rb_shift_selected = scene->selectedItems();
+      else
+        QGraphicsView::mousePressEvent(e);
+
       break;
     case Qt::MiddleButton:
       break;
@@ -739,7 +751,7 @@ void gui::DesignPanel::rubberBandUpdate(QPoint pos){
   rb_cache = pos;
 
   if(!rb){
-    // TODO if shift is pressed, store currently selected list
+    // make rubber band
     rb = new QRubberBand(QRubberBand::Rectangle, this);
     rb->setGeometry(QRect(mapFromScene(rb_start), QSize()));
     rb->show();
@@ -755,15 +767,20 @@ void gui::DesignPanel::rubberBandUpdate(QPoint pos){
     // deselect items that are no longer contained
     QList<QGraphicsItem*> selected_items = scene->selectedItems();
     for(QGraphicsItem* selected_item : selected_items){
-      // TODO also check SHIFT list
-      if(!rb_rect_scene.intersects(selected_item->boundingRect().toRect()))
-        selected_item->setSelected(false);
+      // NOTE foregone the check code for now since it doesn't seem to be more efficient
+      //if(!rb_shift_selected.contains(selected_item)
+      //    || !rb_rect_scene.intersects(selected_item->boundingRect().toRect()))
+      selected_item->setSelected(false);
     }
 
     // select the new items
     QList<QGraphicsItem*> rb_items = scene->items(QRect(rb_start,mapToScene(pos).toPoint()).normalized());
     for(QGraphicsItem* rb_item : rb_items)
       rb_item->setSelected(true);
+
+    // select shift list items
+    for(QGraphicsItem* shift_selected_item : rb_shift_selected)
+      shift_selected_item->setSelected(true);
   }
 }
 
@@ -772,6 +789,7 @@ void gui::DesignPanel::rubberBandEnd(){
   if(rb){
     rb->hide();
     rb = 0;
+    rb_shift_selected.clear();
   }
 }
 
