@@ -44,6 +44,9 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
   * Periodic autosave
 * Don't deselect cells when entering Panning mode
 * When using DBGen Tool, show ghosts indicating where DBs will be created
+* Labels (input, output, other arbitrary labels)
+* Screen capture tool options (light background mode, capture area)
+* CMI mode (e.g. single command to run batch simulations)
 * ~~Esc cancels paste operation~~ Implemented 17.07.13
 * ~~Esc cancels DB Tool~~ Implemented 17.07.13
 * ~~Visual feedback on which tool is currently in use (e.g. changed background of the button)~~ Implemented 17.07.12
@@ -55,6 +58,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * Tight aggregate boundaries (instead of the current sqaure, taking up too much space)
   * Multiple aggregate boundary algorithms, so we can choose the one that ensures the highest accuracy depending for the standard library.
   * Right click on object to change the aggregate boundary algorithm, give out warning if they're attempting to do this on an aggregate that came from a library
+* Save and load aggregates
 * ~~Highlight group boundaries when mouse over aggregates~~ Implemented 17.07.12
 * ~~Select parent aggregate when clicking on child aggregate~~ Implemented 17.07.12
 
@@ -71,6 +75,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 
 * Interface with solvers (standards for passing DB configuration to them, and taking results back)
 * Simple estimation tool of electron distribution
+* Static or animated display of charge (like the AFM images)
 
 > general bugs
 ## Bugs
