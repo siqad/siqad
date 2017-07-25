@@ -47,6 +47,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * Labels (input, output, other arbitrary labels)
 * Screen capture tool options (light background mode, capture area)
 * CMI mode (e.g. single command to run batch simulations)
+* Shift + middle click drag "zoom to region"
 * ~~Esc cancels paste operation~~ Implemented 17.07.13
 * ~~Esc cancels DB Tool~~ Implemented 17.07.13
 * ~~Visual feedback on which tool is currently in use (e.g. changed background of the button)~~ Implemented 17.07.12
@@ -57,10 +58,20 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * Component library
 * Tight aggregate boundaries (instead of the current sqaure, taking up too much space)
   * Multiple aggregate boundary algorithms, so we can choose the one that ensures the highest accuracy depending for the standard library.
+  * Possibly implement Chan's algorithm for faster convex hull computation
   * Right click on object to change the aggregate boundary algorithm, give out warning if they're attempting to do this on an aggregate that came from a library
+  * Associate hull computation wit changes to the aggregate rather than the ::shape function (recomputes every time the boundary is painted/checked).
+* "flattenAggregate" function: for each selected aggregate, for each child of that aggregate, split if an aggregate and add children to parent.
+* Enter aggregate to make changes inside the aggregate - aggregate layers (like entering group in Inkscape)
 * Save and load aggregates
 * ~~Highlight group boundaries when mouse over aggregates~~ Implemented 17.07.12
 * ~~Select parent aggregate when clicking on child aggregate~~ Implemented 17.07.12
+
+### Electrode Design
+* Side view of vertical electrode stack
+* Top view of electrode layers
+* Creating, moving, and deleting electrodes
+* Snapping, aligning and distributing like Inkscape
 
 ### Config
 * Make config file paths configurable
