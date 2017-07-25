@@ -130,6 +130,7 @@ namespace gui{
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
 
 
+
     // INTERNAL METHODS
 
     // perform scene zoom based on wheel rotation
@@ -144,6 +145,21 @@ namespace gui{
     // filter selected items
     void filterSelection(bool select_flag);
 
+
+
+    // RUBBER BAND
+
+    QRubberBand *rb=0;  // rubber band object
+    QPoint rb_start; // starting point of rubber band (scene)
+    QPoint rb_cache; // cached to compare mouse movement (view)
+
+    // update rubberband during mouse movement
+    void rubberBandUpdate(QPoint);
+
+    // hide rubberband and reset flags
+    void rubberBandEnd();
+
+    
 
     // GHOSTING
 

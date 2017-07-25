@@ -44,8 +44,8 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   tool_type = gui::DesignPanel::NoneTool;     // now setTool will update the tool
 
   // rubber band selection
-  setRubberBandSelectionMode(Qt::IntersectsItemBoundingRect);
-  setStyleSheet("selection-background-color: rgba(100, 100, 255, 10)");
+  //setRubberBandSelectionMode(Qt::IntersectsItemBoundingRect);
+  //setStyleSheet("selection-background-color: rgba(100, 100, 255, 10)");
 
   // set view behaviour
   setTransformationAnchor(QGraphicsView::NoAnchor);
@@ -305,16 +305,16 @@ void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
 
   switch(tool){
     case gui::DesignPanel::SelectTool:
-      setDragMode(QGraphicsView::RubberBandDrag);
-      setInteractive(true);
+      //setDragMode(QGraphicsView::RubberBandDrag);
+      //setInteractive(true);
       break;
     case gui::DesignPanel::DragTool:
       setDragMode(QGraphicsView::ScrollHandDrag);
       setInteractive(false);
       break;
     case gui::DesignPanel::DBGenTool:
-      setDragMode(QGraphicsView::RubberBandDrag);
-      setInteractive(true);
+      //setDragMode(QGraphicsView::RubberBandDrag);
+      //setInteractive(true);
       break;
     default:
       qCritical() << tr("Invalid ToolType... should not have happened");
@@ -361,15 +361,16 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   mouse_pos_old = e->pos();
   mouse_pos_cached = e->pos(); // this might be a referencing clash, check.
 
+  // if other buttons are clicked during rubber band selection, end selection
+  if(rb)
+    rubberBandEnd();
+
   clicked = true;
   switch(e->button()){
     case Qt::LeftButton:
-      if(ghosting){
-        // TODO remove?
-        // when ghosting, show the ghost at the cursor position on the click
-      }
-      else
-        QGraphicsView::mousePressEvent(e);
+      rb_start = mapToScene(e->pos()).toPoint();
+      rb_cache = e->pos();
+      QGraphicsView::mousePressEvent(e);
       break;
     case Qt::MiddleButton:
       break;
@@ -386,6 +387,9 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 // the middle mouse button to always pan and right click for context menus.
 void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
+  if(clicked)
+    rubberBandUpdate(e->pos());
+
   QPoint mouse_pos_del;
   QTransform trans = transform();
   qreal dx, dy;
@@ -442,6 +446,10 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
   QGraphicsView::mouseReleaseEvent(e);
   // QPointF scene_pos = mapToScene(e->pos());
   QTransform trans = transform();
+
+  // end rubber band if active
+  if(rb)
+    rubberBandEnd();
 
   // case specific behaviour
   if(ghosting){
@@ -713,6 +721,57 @@ void gui::DesignPanel::filterSelection(bool select_flag)
   for(QGraphicsItem *gitem : scene->selectedItems()){
     if( ( static_cast<prim::Item*>(gitem)->layer == layers.at(0)) == select_flag)
       gitem->setSelected(false);
+  }
+}
+
+
+void gui::DesignPanel::rubberBandUpdate(QPoint pos){
+  // stop rubber band if moving item
+  if(moving){
+    rubberBandEnd();
+    return;
+  }
+
+  // do nothing if mouse hasn't moved much
+  // TODO change snap_diameter to a separate variable
+  if((pos-rb_cache).manhattanLength()<.1*snap_diameter)
+    return;
+  rb_cache = pos;
+
+  if(!rb){
+    // TODO if shift is pressed, store currently selected list
+    rb = new QRubberBand(QRubberBand::Rectangle, this);
+    rb->setGeometry(QRect(mapFromScene(rb_start), QSize()));
+    rb->show();
+  }
+  else{
+    // update rubberband rectangle
+    rb->setGeometry(QRect(mapFromScene(rb_start), pos).normalized());
+    QRect rb_rect_scene;
+    rb_rect_scene.setTopLeft(mapFromScene(rb_start));
+    rb_rect_scene.setBottomRight(pos);
+    rb_rect_scene = rb_rect_scene.normalized();
+
+    // deselect items that are no longer contained
+    QList<QGraphicsItem*> selected_items = scene->selectedItems();
+    for(QGraphicsItem* selected_item : selected_items){
+      // TODO also check SHIFT list
+      if(!rb_rect_scene.intersects(selected_item->boundingRect().toRect()))
+        selected_item->setSelected(false);
+    }
+
+    // select the new items
+    QList<QGraphicsItem*> rb_items = scene->items(QRect(rb_start,mapToScene(pos).toPoint()).normalized());
+    for(QGraphicsItem* rb_item : rb_items)
+      rb_item->setSelected(true);
+  }
+}
+
+
+void gui::DesignPanel::rubberBandEnd(){
+  if(rb){
+    rb->hide();
+    rb = 0;
   }
 }
 

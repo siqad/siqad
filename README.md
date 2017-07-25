@@ -41,7 +41,14 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 ### Generic
 * Save DB layouts and load from save
   * "You have unsaved changes..."
-  * Periodic autosave
+  * C-s C-Shift-s shortcuts
+  * Periodic autosave (and recovery)
+    * tmp folder, 3-5 files saved per minute or so
+    * on startup, check tmp folder for autosaved files
+    * on shutdown, remove those files
+  * Save undo stack (maybe)
+  * Save load script for each class
+    * Each item has a unique ID? Aggregates save those ID instead of pointer?
 * Don't deselect cells when entering Panning mode
 * When using DBGen Tool, show ghosts indicating where DBs will be created
 * Labels (input, output, other arbitrary labels)
@@ -53,6 +60,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * ~~Visual feedback on which tool is currently in use (e.g. changed background of the button)~~ Implemented 17.07.12
 
 ### Aggregates
+* Save and load aggregates
 * Disallow creation of new dots inside aggregates
 * Offset of moving aggregates - ghost should not be centered to the cursor, instead centered at the same offset as the starting point
 * Component library
@@ -63,7 +71,6 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
   * Associate hull computation wit changes to the aggregate rather than the ::shape function (recomputes every time the boundary is painted/checked).
 * "flattenAggregate" function: for each selected aggregate, for each child of that aggregate, split if an aggregate and add children to parent.
 * Enter aggregate to make changes inside the aggregate - aggregate layers (like entering group in Inkscape)
-* Save and load aggregates
 * ~~Highlight group boundaries when mouse over aggregates~~ Implemented 17.07.12
 * ~~Select parent aggregate when clicking on child aggregate~~ Implemented 17.07.12
 
