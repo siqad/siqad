@@ -307,7 +307,7 @@ void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
   switch(tool){
     case gui::DesignPanel::SelectTool:
       // replaced with custom rubberBandUpdate, delete this later
-      //setDragMode(QGraphicsView::RubberBandDrag);
+      setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
       break;
     case gui::DesignPanel::DragTool:
@@ -316,7 +316,7 @@ void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
       break;
     case gui::DesignPanel::DBGenTool:
       // replaced with custom rubberBandUpdate, delete this later
-      //setDragMode(QGraphicsView::RubberBandDrag);
+      setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
       break;
     default:
@@ -373,15 +373,20 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   clicked = true;
   switch(e->button()){
     case Qt::LeftButton:
-      // rubber band variables
-      rb_start = mapToScene(e->pos()).toPoint();
-      rb_cache = e->pos();
+      if(tool_type == SelectTool || tool_type == DBGenTool){
+        // rubber band variables
+        rb_start = mapToScene(e->pos()).toPoint();
+        rb_cache = e->pos();
 
-      // save current selection if Shift is pressed
-      if(keymods & Qt::ShiftModifier)
-        rb_shift_selected = scene->selectedItems();
-      else
+        // save current selection if Shift is pressed
+        if(keymods & Qt::ShiftModifier)
+          rb_shift_selected = scene->selectedItems();
+        else
+          QGraphicsView::mousePressEvent(e);
+      }
+      else{
         QGraphicsView::mousePressEvent(e);
+      }
 
       break;
     case Qt::MiddleButton:
@@ -399,9 +404,6 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 // the middle mouse button to always pan and right click for context menus.
 void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
-  if(clicked)
-    rubberBandUpdate(e->pos());
-
   QPoint mouse_pos_del;
   QTransform trans = transform();
   qreal dx, dy;
@@ -423,6 +425,9 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
       case Qt::LeftButton:
+        if(clicked && (tool_type == SelectTool || tool_type == DBGenTool))
+          rubberBandUpdate(e->pos());
+
         // use default behaviour for left mouse button
         QGraphicsView::mouseMoveEvent(e);
         break;
