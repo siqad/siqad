@@ -40,15 +40,19 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 
 ### Generic
 * Save DB layouts and load from save
+  * Save load script for each class
+    * Each item has a unique ID? Aggregates save those ID instead of pointer?
+    * Things that need to be saved:
+      * Layers (future-proof with electrodes and all)
+      * Aggregate structures
+      * DBDots
+      * (Optional) Undo stack
   * "You have unsaved changes..."
   * C-s C-Shift-s shortcuts
   * Periodic autosave (and recovery)
     * tmp folder, 3-5 files saved per minute or so
     * on startup, check tmp folder for autosaved files
     * on shutdown, remove those files
-  * Save undo stack (maybe)
-  * Save load script for each class
-    * Each item has a unique ID? Aggregates save those ID instead of pointer?
 * Don't deselect cells when entering Panning mode
 * When using DBGen Tool, show ghosts indicating where DBs will be created
 * Labels (input, output, other arbitrary labels)
