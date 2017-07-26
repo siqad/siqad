@@ -69,6 +69,8 @@ QRectF prim::DBDot::boundingRect() const
 void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
   QRectF rect = boundingRect();
+  qreal dxy = .5*edge_width;
+  rect.adjust(dxy,dxy,-dxy,-dxy);
 
   // draw outer circle
   painter->setPen(QPen((select_mode && upSelected()) ? selected_col : edge_col, edge_width));

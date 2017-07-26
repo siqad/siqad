@@ -59,6 +59,8 @@ void prim::LatticeDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 {
   if(dbdot==0){
     QRectF rect = boundingRect();
+    qreal dxy = .5*edge_width;
+    rect.adjust(dxy,dxy,-dxy,-dxy);
 
     // draw outer circle
     painter->setPen(QPen(edge_col, edge_width));
