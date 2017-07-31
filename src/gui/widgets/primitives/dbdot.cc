@@ -99,6 +99,64 @@ prim::Item *prim::DBDot::deepCopy() const
 }
 
 
+void saveToFile(QXmlStreamWriter *stream)
+{
+  stream.writeStartElement("dbdot");
+
+  // TODO parent ID
+  // TODO self ID
+
+  // physical location
+  stream.writeEmptyElement("physloc");
+  stream.writeAttribute("x", phys_loc.x());
+  stream.writeAttribute("y", phys_loc.y());
+
+  stream.writeEndElement();
+}
+
+
+prim::DBDot* loadFromFile(QXmlStreamReader *stream, prim::Layer *layer);
+//ALT: prim::DBDot* loadFromFile(QXmlStreamReader *stream, gui::SaveLoad *saveload);
+{
+  QPointF p_loc; // physical location from file
+  
+
+  while(!stream.atEnd()){
+    if(stream.isStartElement()){
+      if(stream.name() == "parentid"){
+        // TODO
+        // figure out the layer pointer from here?
+      }
+      else if(stream.name() == "itemid"){
+        // TODO
+      }
+      else if(stream.name() == "physloc"){
+        for(QXmlStreamAttribute &attr, stream.attributes()){
+          if(attr.name().toString() == QLatin1String("x")){
+            p_loc.setX(attr.value().toFloat()); // TODO probably issue with type
+          }
+          else if(attr.name().toString() == QLatin1String("y")){
+            p_loc.setY(attr.value().toFloat()); // TODO probably issue with type
+          }
+        }
+      }
+    }
+    else if(stream.isEndElement())
+      stream.readNext();
+  }
+
+  if(stream.hasError()){
+    qCritical() << tr("XML error: ") << stream.errorString().data();
+  }
+
+  // TODO find the lattice dot located at p_loc
+  // prim::LatticeDot latdot = ??
+
+  return new prim::DBDot(layer, latdot);
+  //ALT: return new prim::DBDot(saveload->getCurrLayer(), latdot);
+}
+
+
 void prim::DBDot::constructStatics()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();

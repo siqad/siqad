@@ -70,6 +70,10 @@ namespace prim{
 
   protected:
 
+    // SAVE LOAD
+    virtual void saveToFile(QXmlStreamWriter *) const {}
+    virtual void loadFromFile(QXmlStreamReader *) {}
+
     bool hovered; // manipulated through setHovered(bool) and hovered()
 
     // optional overridable mousePressEvent interrupt

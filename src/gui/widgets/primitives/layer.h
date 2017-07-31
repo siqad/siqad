@@ -74,6 +74,10 @@ namespace prim{
 
   private:
 
+    // SAVE LOAD
+    virtual void saveToFile(QXmlStreamWriter *) const;
+    virtual prim::Layer* loadFromFile(QXmlStreamReader *);
+
     static uint layer_count;  // number of created Layer() objects, does not decrement
 
     QString name;   // arbitrary layer name, layers can be selected by name

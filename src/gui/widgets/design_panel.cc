@@ -75,6 +75,9 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 // destructor
 gui::DesignPanel::~DesignPanel()
 {
+  // TODO autosave
+
+
   // delete all graphical items from the scene
   scene->clear();
   delete scene;   // does not delete contained items on its own

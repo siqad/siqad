@@ -80,3 +80,56 @@ void prim::Layer::setActive(bool act)
       item->setActive(act);
   }
 }
+
+void saveToFile(QXmlStreamWriter *stream)
+{
+  stream.writeStartElement("layer");
+
+  // TODO layer ID
+
+  stream.writeTextElement("name", name);
+  stream.writeTextElement("visible", QString::number(visible));
+  stream.writeTextElement("active", QString::number(active));
+
+  // TODO contained item ids (might actually not need this for layers?)
+
+  stream.writeEndElement();
+}
+
+
+prim::Layer* loadFromFile(QXmlStreamReader *stream, QObject *parent);
+{
+  QString name_ld; //name
+  bool visible_ld, active_ld;
+
+  while(!stream.atEnd()){
+    if(stream.isStartElement()){
+      if(stream.name() == "id"){
+        // TODO add layer id to id -> pointer conversion table
+      }
+      else if(stream.name() == "name"){
+        name_ld = stream.readElementText();
+      }
+      else if(stream.name() == "visible"){
+        visible_ld = (stream.readElementText == "1")?1:0;
+      }
+      else if(stream.name() == "active"){
+        active_ld = (stream.readElementText == "1")?1:0;
+      }
+    }
+    else if(stream.isEndElement())
+      stream.readNext();
+  }
+  // TODO this code might keep reading past the end of the intended element, look at the logic again
+
+  if(stream.hasError()){
+    qCritical() << tr("XML error: ") << stream.errorString().data();
+  }
+
+  // make layer object using loaded information
+  prim::Layer* layer_ld = new prim::Layer(name_ld, parent);
+  layer_ld.setVisible(visible_ld);
+  layer_ld.setActive(active_ld);
+
+  return layer_ld;
+}

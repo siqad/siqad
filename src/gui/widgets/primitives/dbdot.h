@@ -52,6 +52,10 @@ namespace prim{
 
   private:
 
+    // SAVE LOAD
+    virtual void saveToFile(QXmlStreamWriter *) const;
+    virtual prim::DBDot* loadFromFile(QXmlStreamReader *);
+
     // construct static variables
     void constructStatics();
 
