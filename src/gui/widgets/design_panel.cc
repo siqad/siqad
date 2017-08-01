@@ -148,7 +148,7 @@ void gui::DesignPanel::addLayer(const QString &name)
     return;
   }
 
-  prim::Layer *layer = new prim::Layer(name);
+  prim::Layer *layer = new prim::Layer(name, layers.size());
   layers.append(layer);
 }
 
@@ -274,7 +274,7 @@ void gui::DesignPanel::buildLattice(const QString &fname)
     removeLayer(0);
 
   // build the new lattice
-  prim::Lattice *lattice = new prim::Lattice(fname);
+  prim::Lattice *lattice = new prim::Lattice(fname, layers.size());
 
   // add the lattice dots to the scene
   for(prim::Item *const item : lattice->getItems())
@@ -739,7 +739,9 @@ void gui::DesignPanel::filterSelection(bool select_flag)
 
   // if select_flag, deselect all items in the lattice. Otherwise, keep only items in the lattice
   for(QGraphicsItem *gitem : scene->selectedItems()){
-    if( ( static_cast<prim::Item*>(gitem)->layer == layers.at(0)) == select_flag)
+    //if( ( static_cast<prim::Item*>(gitem)->layer == layers.at(0)) == select_flag)
+    if( ( static_cast<prim::Item*>(gitem)->layer_id == 0) == select_flag)
+    //if( ( layers.at(static_cast<prim::Item*>(gitem)->layer_id) == layers.at(0)) == select_flag) SEG FAULTS
       gitem->setSelected(false);
   }
 }
@@ -1045,7 +1047,7 @@ void gui::DesignPanel::CreateDB::create()
 {
   // add dangling bond to layer and scene, index in layer item stack will be
   // equal to layer->getItems().size()
-  dp->addItem(new prim::DBDot(dp->getLayer(layer_index), ldot), layer_index, index);
+  dp->addItem(new prim::DBDot(layer_index, ldot), layer_index, index);
 }
 
 void gui::DesignPanel::CreateDB::destroy()
@@ -1057,7 +1059,7 @@ void gui::DesignPanel::CreateDB::destroy()
     dbdot->getSource()->setDBDot(0);
 
     // destroy dbdot
-    dp->removeItem(dbdot, dbdot->layer);  // deletes dbdot
+    dp->removeItem(dbdot, dp->getLayer(dbdot->layer_id));  // deletes dbdot
     dbdot = 0;
   }
 }
@@ -1076,10 +1078,10 @@ gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
   }
 
   // get layer_index, and check that it is the same for all items
-  prim::Layer *layer = items.at(0)->layer;
-  layer_index = dp->getLayerIndex(layer);
+  layer_index = items.at(0)->layer_id;
+  prim::Layer *layer = dp->getLayer(layer_index);
   for(prim::Item *item : items)
-    if(item->layer != layer){
+    if(item->layer_id != layer_index){
       qWarning() << tr("Aggregates can only be formed from items in the same layer");
       return;
     }
@@ -1096,8 +1098,10 @@ gui::DesignPanel::FormAggregate::FormAggregate(prim::Aggregate *agg, int offset,
   : QUndoCommand(parent), invert(true), dp(dp)
 {
   // get layer index, assumes aggregate was formed using FormAggregate
-  prim::Layer *layer = agg->layer;
-  layer_index = dp->getLayerIndex(layer);
+  //prim::Layer *layer = agg->layer;
+  //layer_index = dp->getLayerIndex(layer);
+  layer_index = agg->layer_id;
+  prim::Layer *layer = dp->getLayer(layer_index);
 
   // aggregate index
   QStack<prim::Item*> layer_items = layer->getItems();
@@ -1133,7 +1137,7 @@ void gui::DesignPanel::FormAggregate::form()
     if(ind >= layer_items.size())
       qFatal("Undo/Redo mismatch... something went wrong");
     item = layer_items.at(ind);
-    if(item->layer != layer || item->parentItem() != 0)
+    if(item->layer_id != layer_index || item->parentItem() != 0)
       qFatal("Undo/Redo mismatch... something went wrong");
   }
 
@@ -1148,7 +1152,7 @@ void gui::DesignPanel::FormAggregate::form()
       item->scene()->removeItem(item);
 
   // add new aggregate to system
-  dp->addItem(new prim::Aggregate(layer, items), layer_index, agg_index);
+  dp->addItem(new prim::Aggregate(layer_index, items), layer_index, agg_index);
 }
 
 
@@ -1188,8 +1192,8 @@ gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
                                       DesignPanel *dp, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), offset(offset)
 {
-  layer_index = dp->getLayerIndex(item->layer);
-  item_index = item->layer->getItems().indexOf(item);
+  layer_index = item->layer_id;
+  item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
 }
 
 
@@ -1312,7 +1316,7 @@ void gui::DesignPanel::deleteSelection()
     switch(item->item_type){
       case prim::Item::DBDot:
         undo_stack->push(new CreateDB( static_cast<prim::DBDot*>(item)->getSource(),
-                                      getLayerIndex(item->layer), this, true));
+                                      item->layer_id, this, true));
         break;
       case prim::Item::Aggregate:
         destroyAggregate(static_cast<prim::Aggregate*>(item));
@@ -1335,7 +1339,8 @@ void gui::DesignPanel::formAggregate()
   QList<prim::Item*> items;
   for(QGraphicsItem *gitem : selection){
     items.append(static_cast<prim::Item*>(gitem));
-    if(items.last()->layer != layers.at(1)){
+    // if(items.last()->layer != layers.at(1)){ DOUBLE CHECK WITH JAKE
+    if(items.last()->layer_id != 1){
       qCritical() << tr("Selected aggregate item not in the surface...");
       return;
     }
@@ -1392,7 +1397,7 @@ void gui::DesignPanel::destroyAggregate(prim::Aggregate *agg)
     switch(item->item_type){
       case prim::Item::DBDot:
         undo_stack->push(new CreateDB(static_cast<prim::DBDot*>(item)->getSource(),
-                                      getLayerIndex(item->layer), this, true));
+                                      item->layer_id, this, true));
         break;
       case prim::Item::Aggregate:
         destroyAggregate(static_cast<prim::Aggregate*>(item));

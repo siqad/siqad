@@ -20,7 +20,7 @@ namespace prim{
   public:
 
     // constructor, takes a list of children Items
-    Aggregate(prim::Layer *layer, QStack<Item*> &items, QGraphicsItem *parent=0);
+    Aggregate(int lay_id, QStack<Item*> &items, QGraphicsItem *parent=0);
 
     // destructor, makes all children belong to Aggregates parent
     ~Aggregate();

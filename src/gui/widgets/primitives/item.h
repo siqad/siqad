@@ -34,7 +34,7 @@ namespace prim{
 
     // constructor, layer = 0 should indicate temporary objects that do not
     // belong to any particular layer
-    Item(ItemType type, Layer *lay=0, QGraphicsItem *parent=0);
+    Item(ItemType type, int lay_id=-1, QGraphicsItem *parent=0);
 
     // destructor
     ~Item(){}
@@ -61,18 +61,18 @@ namespace prim{
     // constructor calls for accessors, make public
 
     ItemType item_type;   // the ItemType of the Item
-    Layer *layer;            // the layer of the Item
+    int layer_id;            // the layer id of the Item
 
     // static class variables
     static qreal scale_factor;  // pixels/angstrom scaling factor
     static bool select_mode;    // Application is in select mode
     static void init();
 
-  protected:
-
     // SAVE LOAD
     virtual void saveToFile(QXmlStreamWriter *) const {}
     virtual void loadFromFile(QXmlStreamReader *) {}
+
+  protected:
 
     bool hovered; // manipulated through setHovered(bool) and hovered()
 

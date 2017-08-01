@@ -29,7 +29,7 @@ namespace prim{
   public:
 
     // constructor
-    DBDot(prim::Layer *layer, prim::LatticeDot *src=0);
+    DBDot(int lay_id, prim::LatticeDot *src=0);
 
     // destructor
     ~DBDot(){}
@@ -50,11 +50,11 @@ namespace prim{
 
     prim::Item *deepCopy() const;
 
-  private:
-
     // SAVE LOAD
     virtual void saveToFile(QXmlStreamWriter *) const;
-    virtual prim::DBDot* loadFromFile(QXmlStreamReader *);
+    virtual void loadFromFile(QXmlStreamReader *);
+
+  private:
 
     // construct static variables
     void constructStatics();

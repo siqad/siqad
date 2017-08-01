@@ -14,9 +14,10 @@
 #include <algorithm>
 
 
-prim::Lattice::Lattice(const QString &fname)
+prim::Lattice::Lattice(const QString &fname, int lay_id)
   : Layer(tr("Lattice"))
 {
+  layer_id = lay_id;
   settings::LatticeSettings::updateLattice(fname);
   // if(fname.isEmpty())
   //   settings::LatticeSettings::updateLattice(fname);
@@ -130,7 +131,7 @@ void prim::Lattice::buildUnitCell(const QPoint &ind)
   QPointF lattice_loc = a[0]*ind.x()+a[1]*ind.y();
 
   for(int n=0; n<n_cell; n++){
-    prim::LatticeDot *dot = new prim::LatticeDot(this, lattice_loc+b.at(n));
+    prim::LatticeDot *dot = new prim::LatticeDot(layer_id, lattice_loc+b.at(n));
     dot->setFlag(QGraphicsItem::ItemIsSelectable, true);
     addItem(dot);
   }

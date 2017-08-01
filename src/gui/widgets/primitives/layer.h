@@ -31,12 +31,15 @@ namespace prim{
 
     // constructor, create a Layer with the given name. If no name is given,
     // use the default naming scheme with layer_count.
-    Layer(const QString &nm = QString(), QObject *parent=0);
+    Layer(const QString &nm = QString(), int lay_id=-1, QObject *parent=0);
 
     // destructor
     // ~Layer();
 
     // accessors
+    
+    // set layer index
+    void setLayerIndex(int lay_id) {layer_id = lay_id;}
 
     // add a new Item to the current layer. If the Item is already in the layer,
     // do nothing.
@@ -72,12 +75,13 @@ namespace prim{
     // get the Layer's items, needs to be a copy rather than a reference for Layer removal
     QStack<prim::Item*> &getItems() {return items;}
 
-  private:
-
     // SAVE LOAD
     virtual void saveToFile(QXmlStreamWriter *) const;
-    virtual prim::Layer* loadFromFile(QXmlStreamReader *);
+    virtual void loadFromFile(QXmlStreamReader *);
 
+  private:
+
+    int layer_id;   // layer index in design panel's layers stack
     static uint layer_count;  // number of created Layer() objects, does not decrement
 
     QString name;   // arbitrary layer name, layers can be selected by name

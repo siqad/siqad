@@ -11,8 +11,8 @@
 QColor prim::Aggregate::edge_col;
 QColor prim::Aggregate::edge_col_hovered;
 
-prim::Aggregate::Aggregate(prim::Layer *layer, QStack<Item*> &items, QGraphicsItem *parent)
-  : prim::Item(prim::Item::Aggregate, layer, parent), items(items)
+prim::Aggregate::Aggregate(int lay_id, QStack<Item*> &items, QGraphicsItem *parent)
+  : prim::Item(prim::Item::Aggregate, lay_id, parent), items(items)
 {
   // set all given items as children
   for(prim::Item *item : items){
@@ -93,7 +93,7 @@ prim::Item *prim::Aggregate::deepCopy() const
   QStack<prim::Item*> cp_items;
   for(prim::Item *item : items)
     cp_items.append(item->deepCopy());
-  return new prim::Aggregate(layer, cp_items, 0);
+  return new prim::Aggregate(layer_id, cp_items, 0);
 }
 
 
