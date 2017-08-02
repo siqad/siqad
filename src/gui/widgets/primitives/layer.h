@@ -38,8 +38,8 @@ namespace prim{
 
     // accessors
     
-    // set layer index
-    void setLayerIndex(int lay_id) {layer_id = lay_id;}
+    // set layer index and update layer_id of contained items
+    void setLayerIndex(int lay_id);
 
     // add a new Item to the current layer. If the Item is already in the layer,
     // do nothing.

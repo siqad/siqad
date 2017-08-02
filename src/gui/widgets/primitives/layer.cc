@@ -21,6 +21,12 @@ prim::Layer::Layer(const QString &nm, int lay_id, QObject *parent)
 }
 
 
+void prim::Layer::setLayerIndex(int lay_id){
+  layer_id = lay_id;
+  for(prim::Item *item : items)
+    item->setLayerIndex(lay_id);
+}
+
 // NOTE: in future, it might be worth keeping the items in a binary tree, sorted
 // by pointer address (which should not be modifiable).
 

@@ -148,6 +148,7 @@ void gui::DesignPanel::addLayer(const QString &name)
     return;
   }
 
+  // layer is added to the end of layers stack, so ID = layers.size() before it was added
   prim::Layer *layer = new prim::Layer(name, layers.size());
   layers.append(layer);
 }
@@ -181,6 +182,10 @@ void gui::DesignPanel::removeLayer(int n)
     // delete layer
     delete layer;
     layers.removeAt(n);
+
+    // update layer_id for subsequent layers in the stack and their contained items
+    for(int i=n; i<layers.count(); i++)
+      layers.at(i)->setLayerIndex(i);
 
     // if top_layer was removed, default to surface if available else NULL
     if(top_layer==layer)
@@ -739,9 +744,7 @@ void gui::DesignPanel::filterSelection(bool select_flag)
 
   // if select_flag, deselect all items in the lattice. Otherwise, keep only items in the lattice
   for(QGraphicsItem *gitem : scene->selectedItems()){
-    //if( ( static_cast<prim::Item*>(gitem)->layer == layers.at(0)) == select_flag)
     if( ( static_cast<prim::Item*>(gitem)->layer_id == 0) == select_flag)
-    //if( ( layers.at(static_cast<prim::Item*>(gitem)->layer_id) == layers.at(0)) == select_flag) SEG FAULTS
       gitem->setSelected(false);
   }
 }

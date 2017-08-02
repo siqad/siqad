@@ -106,4 +106,9 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * When attempting to select DBs using rubberband but clicked on a DB/aggregate as the starting location, the object at the starting position takes the press event and rubberband fails to show
 
 
+> keep track of remaining tasks on ongoing work
+### ONGOING
 
+* ~~Change items to store layer id instead of layer pointer~~
+* ~~Add functionality to change layer id stored in layers and in child items when the layer's index changes in the stack~~
+* Clean up design panel code for layer id (make it less 'hacked-together', get rid of unnecessary converions)

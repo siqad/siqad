@@ -39,6 +39,9 @@ namespace prim{
     // destructor
     ~Item(){}
 
+    // update layer_id
+    void setLayerIndex(int lay_id) {layer_id = lay_id;}
+
     // abstract member functions for derived classes
     virtual QRectF boundingRect() const = 0;
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) = 0;
