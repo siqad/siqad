@@ -15,10 +15,11 @@ prim::Aggregate::Aggregate(int lay_id, QStack<Item*> &items, QGraphicsItem *pare
   : prim::Item(prim::Item::Aggregate, lay_id, parent), items(items)
 {
   // set all given items as children
-  for(prim::Item *item : items){
+  addChildren(items);
+  /*for(prim::Item *item : items){
     item->setParentItem(this);
     item->setFlag(QGraphicsItem::ItemIsSelectable, false);
-  }
+  }*/
 
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setSelected(true);
@@ -30,6 +31,11 @@ prim::Aggregate::Aggregate(int lay_id, QStack<Item*> &items, QGraphicsItem *pare
     prepareStatics();
 }
 
+//prim::Aggregate::Aggregate(QXmlStreamReader *stream)
+//{
+  
+//}
+
 prim::Aggregate::~Aggregate()
 {
   // migrate children to Aggregate's parent Item
@@ -38,6 +44,15 @@ prim::Aggregate::~Aggregate()
   //   // item->setFlag(QGraphicsItem::ItemIsSelectable, true);
   //   // item->setSelected(true);
   // }
+}
+
+void prim::Aggregate::addChildren(QStack<Item*> &items)
+{
+  // set all given items as children
+  for(prim::Item *item : items){
+    item->setParentItem(this);
+    item->setFlag(QGraphicsItem::ItemIsSelectable, false);
+  }
 }
 
 QRectF prim::Aggregate::boundingRect() const
@@ -94,6 +109,20 @@ prim::Item *prim::Aggregate::deepCopy() const
   for(prim::Item *item : items)
     cp_items.append(item->deepCopy());
   return new prim::Aggregate(layer_id, cp_items, 0);
+}
+
+
+void prim::Aggregate::saveItems(QXmlStreamWriter *stream) const {
+  // write open tag
+  stream->writeStartElement("aggregate");
+
+  // write child items
+  for(prim::Item *item : items){
+    item->saveItems(stream);
+  }
+
+  // write close tag
+  stream->writeEndElement();
 }
 
 

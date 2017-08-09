@@ -105,7 +105,13 @@ void gui::ApplicationGUI::initMenuBar()
 
   // file menu actions
   QAction *quit = new QAction(tr("&Quit"), this);
+  QAction *save = new QAction(tr("&Save"), this);
+  QAction *save_as = new QAction(tr("Save As..."), this);
   quit->setShortcut(tr("CTRL+Q"));
+  save->setShortcut(tr("CTRL+S"));
+  save_as->setShortcut(tr("CTRL+SHIFT+S"));
+  file->addAction(save);
+  file->addAction(save_as);
   file->addAction(quit);
 
   QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
@@ -119,6 +125,8 @@ void gui::ApplicationGUI::initMenuBar()
   tools->addAction(design_screenshot);
 
   connect(quit, &QAction::triggered, qApp, QApplication::quit);
+  connect(save, &QAction::triggered, this, &gui::ApplicationGUI::save_default);
+  connect(save_as, &QAction::triggered, this, &gui::ApplicationGUI::save_new);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
@@ -383,4 +391,30 @@ void gui::ApplicationGUI::designScreenshot()
   painter.begin(&gen);
   widget->render(&painter);
   painter.end();
+}
+
+
+// SAVE
+void gui::ApplicationGUI::saveToFile(bool new_file)
+{
+  if(file.fileName()=="" || new_file){
+    working_path = QFileDialog::getSaveFileName(this, tr("Save File"), "untitled.xml", tr("XML files (*.xml)"));
+    file.setFileName(working_path);
+  }
+
+  file.open(QIODevice::WriteOnly);
+
+  QXmlStreamWriter stream(&file);
+  stream.setAutoFormatting(true);
+  stream.writeStartDocument();
+
+  stream.writeStartElement("dbdesigner");
+
+  design_pan->saveToFile(&stream);
+
+  stream.writeEndElement();
+
+  file.close();
+
+  qDebug() << tr("Saved to %1").arg(file.fileName());
 }

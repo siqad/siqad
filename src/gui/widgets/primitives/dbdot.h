@@ -30,6 +30,8 @@ namespace prim{
 
     // constructor
     DBDot(int lay_id, prim::LatticeDot *src=0);
+    DBDot(QXmlStreamReader *);
+    void initDBDot(int lay_id, prim::LatticeDot *src=0);
 
     // destructor
     ~DBDot(){}
@@ -51,8 +53,7 @@ namespace prim{
     prim::Item *deepCopy() const;
 
     // SAVE LOAD
-    virtual void saveToFile(QXmlStreamWriter *) const;
-    virtual void loadFromFile(QXmlStreamReader *);
+    virtual void saveItems(QXmlStreamWriter *) const;
 
   private:
 

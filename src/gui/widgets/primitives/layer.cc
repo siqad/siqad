@@ -88,17 +88,24 @@ void prim::Layer::setActive(bool act)
   }
 }
 
-void prim::Layer::saveToFile(QXmlStreamWriter *stream) const
+void prim::Layer::saveLayer(QXmlStreamWriter *stream) const
 {
-  stream->writeStartElement("layer");
-
-  // TODO layer ID
+  stream->writeStartElement("layer_prop");
 
   stream->writeTextElement("name", name);
   stream->writeTextElement("visible", QString::number(visible));
   stream->writeTextElement("active", QString::number(active));
 
-  // TODO contained item ids (might actually not need this for layers?)
+  stream->writeEndElement();
+}
+
+void prim::Layer::saveItems(QXmlStreamWriter *stream) const
+{
+  stream->writeStartElement("layer");
+
+  for(prim::Item *item : items){
+    item->saveItems(stream);
+  }
 
   stream->writeEndElement();
 }
@@ -106,13 +113,14 @@ void prim::Layer::saveToFile(QXmlStreamWriter *stream) const
 
 void prim::Layer::loadFromFile(QXmlStreamReader *stream)
 {
-  QString name_ld; //name
+  int lay_id;
+  QString name_ld;
   bool visible_ld, active_ld;
 
   while(!stream->atEnd()){
     if(stream->isStartElement()){
       if(stream->name() == "id"){
-        // TODO add layer id to id -> pointer conversion table
+        lay_id = stream->readElementText().toInt();
       }
       else if(stream->name() == "name"){
         name_ld = stream->readElementText();
@@ -134,9 +142,10 @@ void prim::Layer::loadFromFile(QXmlStreamReader *stream)
   }
 
   // make layer object using loaded information
-  prim::Layer *layer_ld = new prim::Layer(name_ld);
+  prim::Layer *layer_ld = new prim::Layer(name_ld, lay_id);
   layer_ld->setVisible(visible_ld);
-  layer_ld->setActive(active_ld);
+  if(visible_ld)
+    layer_ld->setActive(active_ld); // layer can't be active if not visible
 
   // TODO add it to scene or whatever
 }

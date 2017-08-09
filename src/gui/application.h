@@ -70,6 +70,11 @@ namespace gui{
     void screenshot();  // take an svg capture of the GUI
     void designScreenshot();         // take an svg capture ofthe design window
 
+    // SAVE
+    void save_default(){saveToFile(0);}
+    void save_new(){saveToFile(1);}
+    void saveToFile(bool new_file=0);
+
   protected:
 
 
@@ -110,6 +115,10 @@ namespace gui{
     QAction *action_drag_tool;    // change cursor tool to drag
     QAction *action_dbgen_tool;   // change cursor tool to gen
     QAction *action_run_sim;      // run the current simulation method
+
+    // save file
+    QFile file;                   // file that saveToFile writes to
+    QString working_path;         // path currently in use
   };
 
 } // end gui namespace

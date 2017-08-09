@@ -25,6 +25,8 @@ namespace prim{
     // destructor, makes all children belong to Aggregates parent
     ~Aggregate();
 
+    void addChildren(QStack<Item*> &items);
+
     QStack<prim::Item*> &getChildren() {return items;}
 
     // necessary derived class member functions
@@ -35,6 +37,9 @@ namespace prim{
 
     static QColor edge_col;
     static QColor edge_col_hovered;
+
+    // save to file
+    virtual void saveItems(QXmlStreamWriter *) const;
 
   private:
 

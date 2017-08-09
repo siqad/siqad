@@ -72,8 +72,8 @@ namespace prim{
     static void init();
 
     // SAVE LOAD
-    virtual void saveToFile(QXmlStreamWriter *) const {}
-    virtual void loadFromFile(QXmlStreamReader *) {}
+    virtual void saveItems(QXmlStreamWriter *) const {}
+    virtual void loadFromFile(QXmlStreamReader *) {} // TODO instead of using this function, switch to using constructor
 
   protected:
 

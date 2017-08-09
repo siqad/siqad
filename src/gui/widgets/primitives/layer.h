@@ -76,7 +76,8 @@ namespace prim{
     QStack<prim::Item*> &getItems() {return items;}
 
     // SAVE LOAD
-    virtual void saveToFile(QXmlStreamWriter *) const;
+    virtual void saveLayer(QXmlStreamWriter *) const;
+    virtual void saveItems(QXmlStreamWriter *) const;
     virtual void loadFromFile(QXmlStreamReader *);
 
   private:

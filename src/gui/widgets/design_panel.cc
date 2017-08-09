@@ -347,6 +347,29 @@ void gui::DesignPanel::setFills(float *fills)
 }
 
 
+// SAVE
+
+void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream) const{
+  // save gui flags
+  stream->writeComment("GUI Flags");
+  stream->writeStartElement("gui");
+  // TODO gui flags
+  stream->writeEndElement();
+  
+  // save layer properties
+  stream->writeComment("Layer Properties");
+  stream->writeComment("NOTE: Layer ID is intrinsic to the layer order");
+  for(prim::Layer *layer : layers)
+    layer->saveLayer(stream);
+  
+  // save item hierarchy
+  stream->writeComment("Item Hierarchy");
+  for(prim::Layer *layer : layers){
+    stream->writeComment(layer->getName());
+    layer->saveItems(stream);
+  }
+}
+
 
 // SLOTS
 
@@ -639,6 +662,11 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
         // delete selected items
         if(tool_type == gui::DesignPanel::SelectTool)
           deleteSelection();
+        break;
+      case Qt::Key_S:
+        if(keymods == Qt::ControlModifier){
+          //gui::ApplicationGUI::saveToFile();
+        }
         break;
       default:
         QGraphicsView::keyReleaseEvent(e);

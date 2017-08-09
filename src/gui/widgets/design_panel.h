@@ -80,6 +80,9 @@ namespace gui{
     // array size/contents.
     void setFills(float *fills);
 
+    // SAVE
+    void saveToFile(QXmlStreamWriter *) const;
+
   public slots:
 
     void selectClicked(prim::Item *item);

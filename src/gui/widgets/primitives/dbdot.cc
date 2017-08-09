@@ -22,9 +22,86 @@ QColor prim::DBDot::selected_col;
 
 
 prim::DBDot::DBDot(int lay_id, prim::LatticeDot *src)
-  : prim::Item(prim::Item::DBDot, lay_id), source(src)
+  : prim::Item(prim::Item::DBDot)
+{
+  initDBDot(lay_id, src);
+  /*settings::GUISettings *gui_settings = settings::GUISettings::instance();
+
+  // construct static class variables
+  if(diameter<0)
+    constructStatics();
+
+  // set dot location in pixels
+  if(src){
+    phys_loc = src->getPhysLoc();
+    setPos(src->pos());
+    src->setDBDot(this);
+  }
+
+  fill_fact = 0.;
+  fill_col = gui_settings->get<QColor>("dbdot/fill_col");
+
+  // flags
+  setFlag(QGraphicsItem::ItemIsSelectable, true);*/
+}
+
+
+prim::DBDot::DBDot(QXmlStreamReader *stream)
+  : prim::Item(prim::Item::DBDot)
+{
+  QPointF p_loc; // physical location from file
+  int lay_id; // layer id from file
+
+  while(!stream->atEnd()){
+    if(stream->isStartElement()){
+      if(stream->name() == "layer_id"){
+        lay_id = stream->readElementText().toInt();
+      }
+      else if(stream->name() == "physloc"){
+        for(QXmlStreamAttribute &attr : stream->attributes()){
+          if(attr.name().toString() == QLatin1String("x")){
+            p_loc.setX(attr.value().toFloat()); // TODO probably issue with type
+          }
+          else if(attr.name().toString() == QLatin1String("y")){
+            p_loc.setY(attr.value().toFloat()); // TODO probably issue with type
+          }
+        }
+      }
+      else{
+        // TODO throw warning saying unidentified element encountered
+      }
+    }
+    else if(stream->isEndElement()){
+      // break out of stream if the end of this element has been reached
+      if(stream->name() == "dbdot")
+        stream->readNext();
+        break;
+
+      stream->readNext();
+    }
+    // NOTE code for proceeding to next read is iffy, search more to find out
+  }
+
+  if(stream->hasError()){
+    qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
+  }
+
+  // find the lattice dot located at p_loc
+  //prim::LatticeDot src_latdot = scene()->itemAt(p_loc);
+
+  // TODO make another construct function and call that
+
+  // Update appropriate parameters
+  //setSource(src_latdot);
+  //setLayerIndex(lay_id);
+}
+
+
+void prim::DBDot::initDBDot(int lay_id, prim::LatticeDot *src)
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  setLayerIndex(lay_id);
+  setSource(src);
 
   // construct static class variables
   if(diameter<0)
@@ -99,13 +176,12 @@ prim::Item *prim::DBDot::deepCopy() const
 }
 
 
-void prim::DBDot::saveToFile(QXmlStreamWriter *stream) const
+void prim::DBDot::saveItems(QXmlStreamWriter *stream) const
 {
   stream->writeStartElement("dbdot");
 
-  // TODO layer id
-  // TODO parent id (maybe not)
-  // TODO self id
+  // layer id
+  stream->writeTextElement("layer_id", QString::number(layer_id));
 
   // physical location
   stream->writeEmptyElement("physloc");
@@ -113,46 +189,6 @@ void prim::DBDot::saveToFile(QXmlStreamWriter *stream) const
   stream->writeAttribute("y", QString::number(getPhysLoc().y()));
 
   stream->writeEndElement();
-}
-
-
-void prim::DBDot::loadFromFile(QXmlStreamReader *stream)
-{
-  QPointF p_loc; // physical location from file
-  
-
-  while(!stream->atEnd()){
-    if(stream->isStartElement()){
-      if(stream->name() == "parentid"){
-        // TODO
-        // figure out the layer pointer from here?
-      }
-      else if(stream->name() == "itemid"){
-        // TODO
-      }
-      else if(stream->name() == "physloc"){
-        for(QXmlStreamAttribute &attr : stream->attributes()){
-          if(attr.name().toString() == QLatin1String("x")){
-            p_loc.setX(attr.value().toFloat()); // TODO probably issue with type
-          }
-          else if(attr.name().toString() == QLatin1String("y")){
-            p_loc.setY(attr.value().toFloat()); // TODO probably issue with type
-          }
-        }
-      }
-    }
-    else if(stream->isEndElement())
-      stream->readNext();
-  }
-
-  if(stream->hasError()){
-    qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
-  }
-
-  // TODO find the lattice dot located at p_loc
-  // prim::LatticeDot latdot = ??
-
-  //return new prim::DBDot(layer, latdot);
 }
 
 
