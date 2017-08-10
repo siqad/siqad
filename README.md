@@ -159,6 +159,7 @@ All tasks described here contribute to save/load functionality
     * while inside while implementation?
     * Right now lots of repeated code, try to reuse code when possible
     * Potential of not being able to find latdot for creating dbdot?
+    * CLEAN UP THE CODE
 * writing to save file
   * SaveLoad class
     * File write handling and XML stream handling

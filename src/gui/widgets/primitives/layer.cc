@@ -31,26 +31,17 @@ prim::Layer::Layer(QXmlStreamReader *stream)
 
   while(!stream->atEnd()){
     if(stream->isStartElement()){
-      if(stream->name() == "id"){
+      if(stream->name() == "id")
         lay_id = stream->readElementText().toInt();
-        stream->readNext();
-      }
-      else if(stream->name() == "name"){
+      else if(stream->name() == "name")
         name_ld = stream->readElementText();
-        stream->readNext();
-      }
-      else if(stream->name() == "visible"){
+      else if(stream->name() == "visible")
         visible_ld = (stream->readElementText() == "1")?1:0;
-        stream->readNext();
-      }
-      else if(stream->name() == "active"){
+      else if(stream->name() == "active")
         active_ld = (stream->readElementText() == "1")?1:0;
-        stream->readNext();
-      }
-      else{
-        // TODO throw warning saying unidentified element encountered
-        stream->readNext();
-      }
+      else
+        qDebug() << QObject::tr("Layer: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
+      stream->readNext();
     }
     else if(stream->isEndElement()){
       // break out of stream if the end of this element has been reached
@@ -58,10 +49,8 @@ prim::Layer::Layer(QXmlStreamReader *stream)
         stream->readNext();
         break;
       }
-      stream->readNext();
     }
-    else
-      stream->readNext();
+    stream->readNext();
   }
 
   if(stream->hasError()){
@@ -173,16 +162,14 @@ void prim::Layer::loadItems(QXmlStreamReader *stream, QGraphicsScene *scene)
     if(stream->isStartElement()){
       if(stream->name() == "dbdot"){
         stream->readNext();
-        qDebug() << QObject::tr("About to enter DBDot constructor");
         addItem(new prim::DBDot(stream, scene));
       }
       else if(stream->name() == "aggregate"){
         stream->readNext();
-        qDebug() << QObject::tr("About to enter Aggregate constructor");
         addItem(new prim::Aggregate(stream, scene));
       }
       else{
-        qDebug() << QObject::tr("Unidentified element encountered");
+        qDebug() << QObject::tr("Layer: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
         stream->readNext();
       }
     }

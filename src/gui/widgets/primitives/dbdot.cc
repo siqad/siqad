@@ -31,46 +31,40 @@ prim::DBDot::DBDot(int lay_id, prim::LatticeDot *src)
 prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
   : prim::Item(prim::Item::DBDot)
 {
-  qDebug() << QObject::tr("Constructing DBDot from XML");
-  QPointF p_loc; // physical location from file
+  //qDebug() << QObject::tr("Constructing DBDot from XML");
+  QPointF scene_loc; // physical location from file
   int lay_id; // layer id from file
 
   while(!stream->atEnd()){
     if(stream->isStartElement()){
       if(stream->name() == "layer_id"){
         lay_id = stream->readElementText().toInt();
-        qDebug() << QObject::tr("DBDot: layer id is %1").arg(lay_id);
+        //qDebug() << QObject::tr("DBDot: layer id is %1").arg(lay_id);
         stream->readNext();
       }
       else if(stream->name() == "physloc"){
         for(QXmlStreamAttribute &attr : stream->attributes()){
-          if(attr.name().toString() == QLatin1String("x")){
-            p_loc.setX(scale_factor*attr.value().toFloat()); // TODO probably issue with type
-          }
-          else if(attr.name().toString() == QLatin1String("y")){
-            p_loc.setY(scale_factor*attr.value().toFloat()); // TODO probably issue with type
-          }
+          if(attr.name().toString() == QLatin1String("x"))
+            scene_loc.setX(scale_factor*attr.value().toFloat());
+          else if(attr.name().toString() == QLatin1String("y"))
+            scene_loc.setY(scale_factor*attr.value().toFloat());
         }
-        qDebug() << QObject::tr("DBDot: physical location (%1,%2)").arg(p_loc.x()).arg(p_loc.y());
+        //qDebug() << QObject::tr("DBDot: physical location (%1,%2)").arg(scene_loc.x()).arg(scene_loc.y());
         stream->readNext();
       }
       else{
-        // TODO throw warning saying unidentified element encountered
+        qDebug() << QObject::tr("DBDot: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
         stream->readNext();
       }
     }
     else if(stream->isEndElement()){
       // break out of stream if the end of this element has been reached
       if(stream->name() == "dbdot"){
-        qDebug() << QObject::tr("DBDot: finished reading DBDot");
         stream->readNext();
         break;
       }
-      stream->readNext();
     }
-    else{
-      stream->readNext();
-    }
+    stream->readNext();
   }
 
   // show error if any
@@ -78,19 +72,16 @@ prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
     qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
   }
 
-  // find the lattice dot located at p_loc
-  //QGraphicsItem *search_latdot = scene()->itemAt(p_loc, QTransform());
-  prim::LatticeDot *src_latdot = static_cast<prim::LatticeDot*>(scene->itemAt(p_loc, QTransform()));
+  // find the lattice dot located at scene_loc
+  prim::LatticeDot *src_latdot = static_cast<prim::LatticeDot*>(scene->itemAt(scene_loc, QTransform()));
 
-  if(!src_latdot)
-    qCritical() << QObject::tr("No lattice dot at %1, %2").arg(p_loc.x()).arg(p_loc.y());
-  else
-    qDebug() << QObject::tr("Lattice dot found: %1").arg((size_t)src_latdot);
+  if(!src_latdot){
+    qCritical() << QObject::tr("No lattice dot at %1, %2").arg(scene_loc.x()).arg(scene_loc.y());
+    // TODO raise some sort of load failure?
+  }
 
   // initialize
   initDBDot(lay_id, src_latdot);
-
-  qDebug() << QObject::tr("DBDot: finished construction");
 
   scene->addItem(this);
 }

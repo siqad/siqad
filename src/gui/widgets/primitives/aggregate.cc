@@ -21,7 +21,7 @@ prim::Aggregate::Aggregate(int lay_id, QStack<Item*> &items, QGraphicsItem *pare
 prim::Aggregate::Aggregate(QXmlStreamReader *stream, QGraphicsScene *scene)
   : prim::Item(prim::Item::Aggregate)
 {
-  qDebug() << QObject::tr("Aggregate: constructing aggregate from XML");
+  //qDebug() << QObject::tr("Aggregate: constructing aggregate from XML");
   QStack<Item*> ld_children;
   
   // NOTE for now, all aggregates are in DB layer. 
@@ -40,7 +40,7 @@ prim::Aggregate::Aggregate(QXmlStreamReader *stream, QGraphicsScene *scene)
         ld_children.push(new prim::Aggregate(stream, scene));
       }
       else{
-        // TODO throw warning saying unidentified element encountered
+        qDebug() << QObject::tr("Aggregate: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
         stream->readNext();
       }
     }
@@ -50,11 +50,8 @@ prim::Aggregate::Aggregate(QXmlStreamReader *stream, QGraphicsScene *scene)
         stream->readNext();
         break;
       }
-      stream->readNext();
     }
-    else{
-      stream->readNext();
-    }
+    stream->readNext();
   }
 
   // show error if any
@@ -66,8 +63,6 @@ prim::Aggregate::Aggregate(QXmlStreamReader *stream, QGraphicsScene *scene)
   setLayerIndex(lay_id);
   items = ld_children;
   initAggregate(ld_children);
-
-  qDebug() << QObject::tr("Aggregate: finished construction");
 
   scene->addItem(this);
 }

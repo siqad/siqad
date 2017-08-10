@@ -429,6 +429,8 @@ void gui::ApplicationGUI::openFromFile()
 {
   // TODO prompt the user to save current work
 
+
+
   // file dialog
   working_path = QFileDialog::getOpenFileName(this, tr("Open File"), ".", tr("XML files (*.xml)"));
   file.setFileName(working_path);

@@ -265,7 +265,7 @@ void gui::DesignPanel::buildLattice(const QString &fname)
 
   if(!fname.isEmpty() && DEFAULT_OVERRIDE){
     qWarning() << tr("Cannot change lattice when DEFAULT_OVERRIDE set");
-    // do nothing is the lattce has previously been defined
+    // do nothing if the lattice has previously been defined
     if(!layers.isEmpty())
       return;
   }
