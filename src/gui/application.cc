@@ -107,11 +107,14 @@ void gui::ApplicationGUI::initMenuBar()
   QAction *quit = new QAction(tr("&Quit"), this);
   QAction *save = new QAction(tr("&Save"), this);
   QAction *save_as = new QAction(tr("Save As..."), this);
+  QAction *open_save = new QAction(tr("&Open..."), this);
   quit->setShortcut(tr("CTRL+Q"));
   save->setShortcut(tr("CTRL+S"));
   save_as->setShortcut(tr("CTRL+SHIFT+S"));
+  open_save->setShortcut(tr("CTRL+O"));
   file->addAction(save);
   file->addAction(save_as);
+  file->addAction(open_save);
   file->addAction(quit);
 
   QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
@@ -125,8 +128,9 @@ void gui::ApplicationGUI::initMenuBar()
   tools->addAction(design_screenshot);
 
   connect(quit, &QAction::triggered, qApp, QApplication::quit);
-  connect(save, &QAction::triggered, this, &gui::ApplicationGUI::save_default);
-  connect(save_as, &QAction::triggered, this, &gui::ApplicationGUI::save_new);
+  connect(save, &QAction::triggered, this, &gui::ApplicationGUI::saveDefault);
+  connect(save_as, &QAction::triggered, this, &gui::ApplicationGUI::saveNew);
+  connect(open_save, &QAction::triggered, this, &gui::ApplicationGUI::openFromFile);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
@@ -394,16 +398,18 @@ void gui::ApplicationGUI::designScreenshot()
 }
 
 
-// SAVE
+// SAVE/LOAD
 void gui::ApplicationGUI::saveToFile(bool new_file)
 {
-  if(file.fileName()=="" || new_file){
+  // determine target file
+  if(file.fileName().isEmpty() || new_file){
     working_path = QFileDialog::getSaveFileName(this, tr("Save File"), "untitled.xml", tr("XML files (*.xml)"));
     file.setFileName(working_path);
   }
 
   file.open(QIODevice::WriteOnly);
 
+  // write to XML stream
   QXmlStreamWriter stream(&file);
   stream.setAutoFormatting(true);
   stream.writeStartDocument();
@@ -417,4 +423,26 @@ void gui::ApplicationGUI::saveToFile(bool new_file)
   file.close();
 
   qDebug() << tr("Saved to %1").arg(file.fileName());
+}
+
+void gui::ApplicationGUI::openFromFile()
+{
+  // TODO prompt the user to save current work
+
+  // file dialog
+  working_path = QFileDialog::getOpenFileName(this, tr("Open File"), ".", tr("XML files (*.xml)"));
+  file.setFileName(working_path);
+
+  if(!file.open(QFile::ReadOnly | QFile::Text)){
+    // TODO throw error that file can't be opened
+  }
+
+  // read from XML stream
+  QXmlStreamReader stream(&file);
+  qDebug() << tr("Beginning load from XML...");
+  design_pan->loadFromFile(&stream);
+
+  file.close();
+
+  qDebug() << tr("Loaded from %1").arg(file.fileName());
 }

@@ -7,6 +7,7 @@
 // @desc:     Base class for Aggregate Item type
 
 #include "aggregate.h"
+#include "dbdot.h"
 
 QColor prim::Aggregate::edge_col;
 QColor prim::Aggregate::edge_col_hovered;
@@ -14,12 +15,70 @@ QColor prim::Aggregate::edge_col_hovered;
 prim::Aggregate::Aggregate(int lay_id, QStack<Item*> &items, QGraphicsItem *parent)
   : prim::Item(prim::Item::Aggregate, lay_id, parent), items(items)
 {
+  initAggregate(items, parent);
+}
+
+prim::Aggregate::Aggregate(QXmlStreamReader *stream, QGraphicsScene *scene)
+  : prim::Item(prim::Item::Aggregate)
+{
+  qDebug() << QObject::tr("Aggregate: constructing aggregate from XML");
+  QStack<Item*> ld_children;
+  
+  // NOTE for now, all aggregates are in DB layer. 
+  // More sophisticated method of determination needed in the future.
+  int lay_id=1; 
+  
+  // read from XML stream (children will be created recursively, add those children to stack)
+  while(!stream->atEnd()){
+    if(stream->isStartElement()){
+      if(stream->name() == "dbdot"){
+        stream->readNext();
+        ld_children.push(new prim::DBDot(stream, scene));
+      }
+      else if(stream->name() == "aggregate"){
+        stream->readNext();
+        ld_children.push(new prim::Aggregate(stream, scene));
+      }
+      else{
+        // TODO throw warning saying unidentified element encountered
+        stream->readNext();
+      }
+    }
+    else if(stream->isEndElement()){
+      // break out of stream if the end of this element has been reached
+      if(stream->name() == "aggregate"){
+        stream->readNext();
+        break;
+      }
+      stream->readNext();
+    }
+    else{
+      stream->readNext();
+    }
+  }
+
+  // show error if any
+  if(stream->hasError()){
+    qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
+  }
+
+  // fill in aggregate properties
+  setLayerIndex(lay_id);
+  items = ld_children;
+  initAggregate(ld_children);
+
+  qDebug() << QObject::tr("Aggregate: finished construction");
+
+  scene->addItem(this);
+}
+
+void prim::Aggregate::initAggregate(QStack<Item*> &items, QGraphicsItem *parent)
+{
+  // set parent
+  setParentItem(parent);
+
   // set all given items as children
   addChildren(items);
-  /*for(prim::Item *item : items){
-    item->setParentItem(this);
-    item->setFlag(QGraphicsItem::ItemIsSelectable, false);
-  }*/
 
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setSelected(true);
@@ -30,11 +89,6 @@ prim::Aggregate::Aggregate(int lay_id, QStack<Item*> &items, QGraphicsItem *pare
   if(!edge_col.isValid())
     prepareStatics();
 }
-
-//prim::Aggregate::Aggregate(QXmlStreamReader *stream)
-//{
-  
-//}
 
 prim::Aggregate::~Aggregate()
 {

@@ -25,30 +25,13 @@ prim::DBDot::DBDot(int lay_id, prim::LatticeDot *src)
   : prim::Item(prim::Item::DBDot)
 {
   initDBDot(lay_id, src);
-  /*settings::GUISettings *gui_settings = settings::GUISettings::instance();
-
-  // construct static class variables
-  if(diameter<0)
-    constructStatics();
-
-  // set dot location in pixels
-  if(src){
-    phys_loc = src->getPhysLoc();
-    setPos(src->pos());
-    src->setDBDot(this);
-  }
-
-  fill_fact = 0.;
-  fill_col = gui_settings->get<QColor>("dbdot/fill_col");
-
-  // flags
-  setFlag(QGraphicsItem::ItemIsSelectable, true);*/
 }
 
 
-prim::DBDot::DBDot(QXmlStreamReader *stream)
+prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
   : prim::Item(prim::Item::DBDot)
 {
+  qDebug() << QObject::tr("Constructing DBDot from XML");
   QPointF p_loc; // physical location from file
   int lay_id; // layer id from file
 
@@ -56,44 +39,60 @@ prim::DBDot::DBDot(QXmlStreamReader *stream)
     if(stream->isStartElement()){
       if(stream->name() == "layer_id"){
         lay_id = stream->readElementText().toInt();
+        qDebug() << QObject::tr("DBDot: layer id is %1").arg(lay_id);
+        stream->readNext();
       }
       else if(stream->name() == "physloc"){
         for(QXmlStreamAttribute &attr : stream->attributes()){
           if(attr.name().toString() == QLatin1String("x")){
-            p_loc.setX(attr.value().toFloat()); // TODO probably issue with type
+            p_loc.setX(scale_factor*attr.value().toFloat()); // TODO probably issue with type
           }
           else if(attr.name().toString() == QLatin1String("y")){
-            p_loc.setY(attr.value().toFloat()); // TODO probably issue with type
+            p_loc.setY(scale_factor*attr.value().toFloat()); // TODO probably issue with type
           }
         }
+        qDebug() << QObject::tr("DBDot: physical location (%1,%2)").arg(p_loc.x()).arg(p_loc.y());
+        stream->readNext();
       }
       else{
         // TODO throw warning saying unidentified element encountered
+        stream->readNext();
       }
     }
     else if(stream->isEndElement()){
       // break out of stream if the end of this element has been reached
-      if(stream->name() == "dbdot")
+      if(stream->name() == "dbdot"){
+        qDebug() << QObject::tr("DBDot: finished reading DBDot");
         stream->readNext();
         break;
-
+      }
       stream->readNext();
     }
-    // NOTE code for proceeding to next read is iffy, search more to find out
+    else{
+      stream->readNext();
+    }
   }
 
+  // show error if any
   if(stream->hasError()){
     qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
   }
 
   // find the lattice dot located at p_loc
-  //prim::LatticeDot src_latdot = scene()->itemAt(p_loc);
+  //QGraphicsItem *search_latdot = scene()->itemAt(p_loc, QTransform());
+  prim::LatticeDot *src_latdot = static_cast<prim::LatticeDot*>(scene->itemAt(p_loc, QTransform()));
 
-  // TODO make another construct function and call that
+  if(!src_latdot)
+    qCritical() << QObject::tr("No lattice dot at %1, %2").arg(p_loc.x()).arg(p_loc.y());
+  else
+    qDebug() << QObject::tr("Lattice dot found: %1").arg((size_t)src_latdot);
 
-  // Update appropriate parameters
-  //setSource(src_latdot);
-  //setLayerIndex(lay_id);
+  // initialize
+  initDBDot(lay_id, src_latdot);
+
+  qDebug() << QObject::tr("DBDot: finished construction");
+
+  scene->addItem(this);
 }
 
 
@@ -101,18 +100,13 @@ void prim::DBDot::initDBDot(int lay_id, prim::LatticeDot *src)
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   setLayerIndex(lay_id);
-  setSource(src);
 
   // construct static class variables
   if(diameter<0)
     constructStatics();
 
   // set dot location in pixels
-  if(src){
-    phys_loc = src->getPhysLoc();
-    setPos(src->pos());
-    src->setDBDot(this);
-  }
+  setSource(src);
 
   fill_fact = 0.;
   fill_col = gui_settings->get<QColor>("dbdot/fill_col");
@@ -124,15 +118,17 @@ void prim::DBDot::initDBDot(int lay_id, prim::LatticeDot *src)
 
 void prim::DBDot::setSource(prim::LatticeDot *src)
 {
-  // unset the previous LatticeDot
-  if(source)
-    source->setDBDot(0);
+  if(src){
+    // unset the previous LatticeDot
+    if(source)
+      source->setDBDot(0);
 
-  // move to new LatticeDot
-  src->setDBDot(this);
-  source=src;
-  phys_loc = src->getPhysLoc();
-  setPos(src->pos());
+    // move to new LatticeDot
+    src->setDBDot(this);
+    source=src;
+    phys_loc = src->getPhysLoc();
+    setPos(src->pos());
+  }
 }
 
 

@@ -70,10 +70,11 @@ namespace gui{
     void screenshot();  // take an svg capture of the GUI
     void designScreenshot();         // take an svg capture ofthe design window
 
-    // SAVE
-    void save_default(){saveToFile(0);}
-    void save_new(){saveToFile(1);}
+    // SAVE/LOAD
+    void saveDefault(){saveToFile(0);}
+    void saveNew(){saveToFile(1);}
     void saveToFile(bool new_file=0);
+    void openFromFile();
 
   protected:
 

@@ -7,6 +7,8 @@
 // @desc:     Layer implementations
 
 #include "layer.h"
+#include "aggregate.h"
+#include "dbdot.h"
 
 
 // statics
@@ -18,6 +20,59 @@ prim::Layer::Layer(const QString &nm, int lay_id, QObject *parent)
 {
   layer_id = lay_id;
   name = nm.isEmpty() ? nm : QString("Layer %1").arg(layer_count++);
+}
+
+
+prim::Layer::Layer(QXmlStreamReader *stream)
+{
+  int lay_id;
+  QString name_ld;
+  bool visible_ld, active_ld;
+
+  while(!stream->atEnd()){
+    if(stream->isStartElement()){
+      if(stream->name() == "id"){
+        lay_id = stream->readElementText().toInt();
+        stream->readNext();
+      }
+      else if(stream->name() == "name"){
+        name_ld = stream->readElementText();
+        stream->readNext();
+      }
+      else if(stream->name() == "visible"){
+        visible_ld = (stream->readElementText() == "1")?1:0;
+        stream->readNext();
+      }
+      else if(stream->name() == "active"){
+        active_ld = (stream->readElementText() == "1")?1:0;
+        stream->readNext();
+      }
+      else{
+        // TODO throw warning saying unidentified element encountered
+        stream->readNext();
+      }
+    }
+    else if(stream->isEndElement()){
+      // break out of stream if the end of this element has been reached
+      if(stream->name() == "layer_prop"){
+        stream->readNext();
+        break;
+      }
+      stream->readNext();
+    }
+    else
+      stream->readNext();
+  }
+
+  if(stream->hasError()){
+    qCritical() << tr("XML error: ") << stream->errorString().data();
+  }
+
+  // make layer object using loaded information
+  layer_id = lay_id;
+  name = name_ld.isEmpty() ? name_ld : QString("Layer %1").arg(layer_count++);
+  setVisible(visible_ld);
+  setActive(active_ld);
 }
 
 
@@ -110,42 +165,42 @@ void prim::Layer::saveItems(QXmlStreamWriter *stream) const
   stream->writeEndElement();
 }
 
-
-void prim::Layer::loadFromFile(QXmlStreamReader *stream)
+void prim::Layer::loadItems(QXmlStreamReader *stream, QGraphicsScene *scene)
 {
-  int lay_id;
-  QString name_ld;
-  bool visible_ld, active_ld;
-
+  qDebug() << QObject::tr("Loading layer items for %1").arg(name);
+  // create items according to hierarchy
   while(!stream->atEnd()){
     if(stream->isStartElement()){
-      if(stream->name() == "id"){
-        lay_id = stream->readElementText().toInt();
+      if(stream->name() == "dbdot"){
+        stream->readNext();
+        qDebug() << QObject::tr("About to enter DBDot constructor");
+        addItem(new prim::DBDot(stream, scene));
       }
-      else if(stream->name() == "name"){
-        name_ld = stream->readElementText();
+      else if(stream->name() == "aggregate"){
+        stream->readNext();
+        qDebug() << QObject::tr("About to enter Aggregate constructor");
+        addItem(new prim::Aggregate(stream, scene));
       }
-      else if(stream->name() == "visible"){
-        visible_ld = (stream->readElementText() == "1")?1:0;
-      }
-      else if(stream->name() == "active"){
-        active_ld = (stream->readElementText() == "1")?1:0;
+      else{
+        qDebug() << QObject::tr("Unidentified element encountered");
+        stream->readNext();
       }
     }
-    else if(stream->isEndElement())
+    else if(stream->isEndElement()){
+      // break out of stream if the end of this element has been reached
+      if(stream->name() == "layer"){
+        stream->readNext();
+        break;
+      }
       stream->readNext();
+    }
+    else{
+      stream->readNext();
+    }
   }
-  // TODO this code might keep reading past the end of the intended element, look at the logic again
-
+  
+  // show error if any
   if(stream->hasError()){
-    qCritical() << tr("XML error: ") << stream->errorString().data();
+    qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
   }
-
-  // make layer object using loaded information
-  prim::Layer *layer_ld = new prim::Layer(name_ld, lay_id);
-  layer_ld->setVisible(visible_ld);
-  if(visible_ld)
-    layer_ld->setActive(active_ld); // layer can't be active if not visible
-
-  // TODO add it to scene or whatever
 }

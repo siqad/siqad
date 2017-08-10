@@ -32,6 +32,7 @@ namespace prim{
     // constructor, create a Layer with the given name. If no name is given,
     // use the default naming scheme with layer_count.
     Layer(const QString &nm = QString(), int lay_id=-1, QObject *parent=0);
+    Layer(QXmlStreamReader *stream);
 
     // destructor
     // ~Layer();
@@ -78,7 +79,7 @@ namespace prim{
     // SAVE LOAD
     virtual void saveLayer(QXmlStreamWriter *) const;
     virtual void saveItems(QXmlStreamWriter *) const;
-    virtual void loadFromFile(QXmlStreamReader *);
+    virtual void loadItems(QXmlStreamReader *, QGraphicsScene *);
 
   private:
 

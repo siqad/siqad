@@ -21,6 +21,8 @@ namespace prim{
 
     // constructor, takes a list of children Items
     Aggregate(int lay_id, QStack<Item*> &items, QGraphicsItem *parent=0);
+    Aggregate(QXmlStreamReader *stream, QGraphicsScene *scene);
+    void initAggregate(QStack<Item*> &items, QGraphicsItem *parent=0);
 
     // destructor, makes all children belong to Aggregates parent
     ~Aggregate();

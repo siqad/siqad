@@ -370,6 +370,85 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream) const{
   }
 }
 
+void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
+  int i=0;
+  int layer_id=0;
+  QString layer_nm;
+  bool layer_visible, layer_active;
+
+  qDebug() << tr("Beginning load in design panel...");
+  
+  // TODO remove existing layers
+
+  // read from XML stream (children will be created recursively, add those children to stack)
+  while(!stream->atEnd()){
+    if(stream->isStartElement()){
+      //qDebug() << tr("line %1").arg(i++);
+      /*if(stream->name() == "gui"){
+        // TODO read GUI flags (none so far)
+        stream->readNext();
+      }
+      else if(stream->name() == "layer_prop"){
+        // construct layers
+        stream->readNext();
+        while(!stream->name() == "layer_prop"){
+          bool visible_ld, active_ld;
+
+          if(stream->isStartElement()){
+            if(stream->name() == "name"){
+              layer_nm = stream->readElementText();
+              stream->readNext();
+            }
+            else if(stream->name() == "visible"){
+              layer_visible = (stream->readElementText() == "1")?1:0;
+              stream->readNext();
+            }
+            else if(stream->name() == "active"){
+              layer_active = (stream->readElementText() == "1")?1:0;
+              stream->readNext();
+            }
+            else{
+              // TODO throw warning saying unidentified element encountered
+              stream->readNext();
+            }
+          }
+          else if(stream->isEndElement()){
+            stream->readNext();
+          }
+
+          // make layer object using loaded information
+          addLayer(layer_nm);
+          getLayer(layer_id)->setVisible(visible_ld);
+          getLayer(layer_id)->setActive(active_ld);
+          layer_id++;
+        }
+      }
+      else if(stream->name() == "layer"){*/
+      if(stream->name() == "layer"){
+        // recursively populate layer with items
+        stream->readNext();
+        getLayer(layer_id)->loadItems(stream, scene);
+        layer_id++;
+      }
+      else{
+        // TODO throw warning saying unidentified element encountered
+        stream->readNext();
+      }
+    }
+    else if(stream->isEndElement()){
+      stream->readNext();
+    }
+    else{
+      stream->readNext();
+    }
+  }
+
+  // show error if any
+  if(stream->hasError()){
+    qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
+  }
+}
+
 
 // SLOTS
 

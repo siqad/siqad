@@ -82,6 +82,7 @@ namespace gui{
 
     // SAVE
     void saveToFile(QXmlStreamWriter *) const;
+    void loadFromFile(QXmlStreamReader *);
 
   public slots:
 

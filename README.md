@@ -119,7 +119,7 @@ All tasks described here contribute to save/load functionality
   * NOTE: e.g. when an aggregate is deleted, all items in subsequent aggregates have to update their IDs
   * NOTE: What about only assigning an ID when saving, and keep using pointers otherwise?
   * Saving
-    * Nested saving - recursive
+    * ~~Nested saving - recursive~~ Implemented 17.08.09
     * Escape names properly
     * Example:
     <dbdesigner>
@@ -155,6 +155,9 @@ All tasks described here contribute to save/load functionality
     </dbdesigner>
     
   * Loading
+    * Nested loading - recursive
+    * while inside while implementation?
+    * Right now lots of repeated code, try to reuse code when possible
     * Potential of not being able to find latdot for creating dbdot?
 * writing to save file
   * SaveLoad class
