@@ -69,7 +69,7 @@ namespace prim{
     static Ghost *instance();
 
     // destructor, potentially useful later
-    ~Ghost(){}
+    ~Ghost(){inst=0;}
 
     void cleanGhost();  // reset Ghost to its empty state
 

@@ -411,6 +411,7 @@ void gui::ApplicationGUI::saveToFile(bool new_file)
 
   // write to XML stream
   QXmlStreamWriter stream(&file);
+  qDebug() << tr("Beginning save to %1").arg(file.fileName());
   stream.setAutoFormatting(true);
   stream.writeStartDocument();
 
@@ -422,15 +423,11 @@ void gui::ApplicationGUI::saveToFile(bool new_file)
 
   file.close();
 
-  qDebug() << tr("Saved to %1").arg(file.fileName());
+  qDebug() << tr("Save complete");
 }
 
 void gui::ApplicationGUI::openFromFile()
 {
-  // TODO prompt the user to save current work
-
-
-
   // file dialog
   working_path = QFileDialog::getOpenFileName(this, tr("Open File"), ".", tr("XML files (*.xml)"));
   file.setFileName(working_path);
@@ -441,10 +438,8 @@ void gui::ApplicationGUI::openFromFile()
 
   // read from XML stream
   QXmlStreamReader stream(&file);
-  qDebug() << tr("Beginning load from XML...");
+  qDebug() << tr("Beginning load from %1").arg(file.fileName());
   design_pan->loadFromFile(&stream);
-
+  qDebug() << tr("Load complete");
   file.close();
-
-  qDebug() << tr("Loaded from %1").arg(file.fileName());
 }

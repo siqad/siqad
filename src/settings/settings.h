@@ -12,7 +12,7 @@
 #ifndef _SETTINGS_H_
 #define _SETTINGS_H_
 
-#include "QtWidgets"
+#include <QtWidgets>
 #include <QtCore>
 
 #define DEFAULT_OVERRIDE true // always use default settings
@@ -43,9 +43,11 @@ public:
   template<typename T>
   T get(QString key)
   {
+    qDebug() << tr("Getting key %1, defaults pointer %2").arg(key).arg((size_t)defaults);
     QVariant var = DEFAULT_OVERRIDE ? defaults->value(key) : this->value(key);
     T val;
-
+    qDebug() << tr("Valid? %1").arg(var.isValid());
+    qDebug() << var.typeName();
     // if key not found, get value from defaults
     if(!var.isValid() && defaults != 0){
       var = defaults->value(key);
@@ -63,8 +65,10 @@ public:
     }
     else if(defaults==0)    // terminate if no defaults
       qFatal(tr("No default settings available... terminating").toLatin1().constData(),0);
-    else
+    else if(var.isValid())
       val = var.value<T>();
+    else
+      qFatal(tr("Unexpected key in Settings::get").toLatin1().constData(),0);
 
     return val;
   }

@@ -65,8 +65,13 @@ settings::LatticeSettings *settings::LatticeSettings::instance()
 void settings::LatticeSettings::updateLattice(const QString &fname)
 {
   // delete old lattice settings
-  if(inst)
+  if(inst){
     delete inst;
+    inst = 0;
+  }
+  
+  // reconstruct defaults
+  defs = settings::LatticeSettings::m_defs();
 
   // create new instance of lattice settings
   if(fname.isEmpty())

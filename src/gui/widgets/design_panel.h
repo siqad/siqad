@@ -37,6 +37,9 @@ namespace gui{
     // destructor
     ~DesignPanel();
 
+    // reset
+    void resetDesignPanel();
+
     // ACCESSORS
 
     // add a new Item to the Layer at the given index of the stack. If layer_index==-1,

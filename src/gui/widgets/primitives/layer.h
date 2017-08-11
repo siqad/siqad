@@ -37,6 +37,10 @@ namespace prim{
     // destructor
     // ~Layer();
 
+    // RESET
+    // reset layers for new document
+    static void resetLayers();
+
     // accessors
     
     // set layer index and update layer_id of contained items

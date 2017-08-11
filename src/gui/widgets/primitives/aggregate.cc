@@ -50,8 +50,10 @@ prim::Aggregate::Aggregate(QXmlStreamReader *stream, QGraphicsScene *scene)
         stream->readNext();
         break;
       }
+      stream->readNext();
     }
-    stream->readNext();
+    else
+      stream->readNext();
   }
 
   // show error if any

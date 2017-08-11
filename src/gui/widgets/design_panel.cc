@@ -96,6 +96,47 @@ gui::DesignPanel::~DesignPanel()
 
 }
 
+// reset
+void gui::DesignPanel::resetDesignPanel()
+{
+  // delete all graphical items from the scene
+  scene->clear();
+  qDebug() << tr("Scene cleared");
+
+  // purge the clipboard
+  for(prim::Item *item : clipboard)
+    delete item;
+  clipboard.clear();
+  qDebug() << tr("Clipboard cleared");
+
+  // delete all the layers
+  for(prim::Layer *layer : layers)
+    delete layer;
+  layers.clear();
+  prim::Layer::resetLayers();
+  qDebug() << tr("Layers cleared");
+
+  delete undo_stack;
+  qDebug() << tr("Undo stack deleted");
+
+
+  // REBUILD
+  // reset flags
+  clicked = ghosting = moving = false;
+  tool_type = gui::DesignPanel::NoneTool;     // now setTool will update the tool
+  qDebug() << tr("flags reset");
+
+  undo_stack = new QUndoStack();
+  qDebug() << tr("New undo stack made");
+
+  buildLattice();
+  top_layer = layers.at(1);
+  qDebug() << tr("Lattice rebuilt");
+
+  prim::Ghost::instance()->setScene(scene);
+  qDebug() << tr("Ghost instantiated");
+}
+
 
 // ACCESSORS
 
@@ -270,27 +311,35 @@ void gui::DesignPanel::buildLattice(const QString &fname)
       return;
   }
 
+  qDebug() << tr("before gui_settings");
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
   // NOTE: probably want a prompt to make sure user want to change the lattice
 
+  qDebug() << tr("Before layer destruction");
   // destroy all layers if they exist
   while(layers.count()>0)
     removeLayer(0);
 
+  qDebug() << tr("Before new lattice, size %1").arg(layers.size());
   // build the new lattice
   prim::Lattice *lattice = new prim::Lattice(fname, layers.size());
+
+  qDebug() << tr("Built new lattice");
 
   // add the lattice dots to the scene
   for(prim::Item *const item : lattice->getItems())
     scene->addItem(item);
+  qDebug() << tr("Added lattice dots to scene");
 
   // add the lattice to the layers, as layer 0
   layers.append(lattice);
+  qDebug() << tr("Appended lattice to layer 0");
 
   // add in the dangling bond surface
   addLayer(tr("Surface"));
   top_layer = layers.at(1);
+  qDebug() << tr("Created surface");
 
   // resize the scene with padding
   QRectF rect = scene->sceneRect();
@@ -354,6 +403,7 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream) const{
   stream->writeComment("GUI Flags");
   stream->writeStartElement("gui");
   // TODO gui flags
+  // lattice type
   stream->writeEndElement();
   
   // save layer properties
@@ -371,27 +421,24 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream) const{
 }
 
 void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
-  int i=0;
   int layer_id=0;
   QString layer_nm;
   bool layer_visible, layer_active;
 
-  qDebug() << tr("Beginning load in design panel...");
-  
-  // TODO remove existing layers
+  // reset the design panel state
+  resetDesignPanel();
 
   // read from XML stream (children will be created recursively, add those children to stack)
   while(!stream->atEnd()){
     if(stream->isStartElement()){
-      //qDebug() << tr("line %1").arg(i++);
-      /*if(stream->name() == "gui"){
+      if(stream->name() == "gui"){
         // TODO read GUI flags (none so far)
         stream->readNext();
       }
       else if(stream->name() == "layer_prop"){
         // construct layers
         stream->readNext();
-        while(!stream->name() == "layer_prop"){
+        /*while(!stream->name() == "layer_prop"){
           bool visible_ld, active_ld;
 
           if(stream->isStartElement()){
@@ -421,26 +468,21 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
           getLayer(layer_id)->setVisible(visible_ld);
           getLayer(layer_id)->setActive(active_ld);
           layer_id++;
-        }
+        }*/
       }
-      else if(stream->name() == "layer"){*/
-      if(stream->name() == "layer"){
+      else if(stream->name() == "layer"){
         // recursively populate layer with items
         stream->readNext();
         getLayer(layer_id)->loadItems(stream, scene);
         layer_id++;
       }
       else{
-        // TODO throw warning saying unidentified element encountered
+        qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
         stream->readNext();
       }
     }
-    else if(stream->isEndElement()){
+    else
       stream->readNext();
-    }
-    else{
-      stream->readNext();
-    }
   }
 
   // show error if any
