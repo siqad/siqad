@@ -70,11 +70,16 @@ namespace gui{
     void screenshot();  // take an svg capture of the GUI
     void designScreenshot();         // take an svg capture ofthe design window
 
-    // SAVE/LOAD
-    void saveDefault(){saveToFile(0);}
-    void saveNew(){saveToFile(1);}
-    void saveToFile(bool new_file=0);
-    void openFromFile();
+    
+    // FILE HANDLING
+    bool resolveUnsavedChanges();       // returns whether to proceed or not
+    void newFile();                     // create a new file
+    bool saveToFile(bool force_file_chooser=0, QString save_to_path=QString());   // actual save function
+    void saveDefault();                 // save normally (calls saveToFile)
+    void saveNew();                     // save as a new file (calls saveToFile)
+    void autoSave();                    // perform autosave at specified interval (ms)
+    void openFromFile();                // open a previous save
+    void closeFile();                   // close the file when quitting the program
 
   protected:
 
@@ -118,8 +123,10 @@ namespace gui{
     QAction *action_run_sim;      // run the current simulation method
 
     // save file
+    QTimer *auto_save_timer;
     QFile file;                   // file that saveToFile writes to
     QString working_path;         // path currently in use
+
   };
 
 } // end gui namespace

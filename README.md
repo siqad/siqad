@@ -113,67 +113,24 @@ All tasks described here contribute to save/load functionality
   * ~~Change items to store layer id instead of layer pointer~~ Implemented 17.08.01
   * ~~Add functionality to change layer id stored in layers and in child items when the layer's index changes in the stack~~ Implemented 17.08.02
   * Clean up design panel code for layer id (make it less 'hacked-together', get rid of unnecessary converions)
-* aggregate related
-  * NOTE: Top level aggregates are still just items inside the layer
-  * NOTE: Inefficient to have items refer to an aggregate id or something like that
-  * NOTE: e.g. when an aggregate is deleted, all items in subsequent aggregates have to update their IDs
-  * NOTE: What about only assigning an ID when saving, and keep using pointers otherwise?
-  * Saving
-    * ~~Nested saving - recursive~~ Implemented 17.08.09
-    * Escape names properly
-    * Example:
-    <dbdesigner>
-      <!-- gui flags -->
-      <gui>
-        <lattice>si_100_2x1</lattice> <!-- DO NOT CHANGE FROM HERE -->
-      </gui>
-
-      <layer_prop>
-        <name>DB Main</name>
-        <visible>1</visible>
-        <active>1</active>
-      </layer_prop>
-
-      <layer>
-        <aggregate>
-          <aggregate>
-            <dbdot>
-              <layer_id>1</layer_id>
-              <phys_loc x="1" y="1" />
-            </dbdot>
-            <dbdot>
-              <layer_id>1</layer_id>
-              <phys_loc x="3" y="1" />
-            </dbdot>
-          </aggregate>
-          <dbdot>
-            <layer_id>1</layer_id>
-            <phys_loc x="2" y="2" />
-          </dbdot>
-        </aggregate>
-      </layer>
-    </dbdesigner>
-    
-  * Loading
-    * Nested loading - recursive
-    * while inside while implementation?
-    * Right now lots of repeated code, try to reuse code when possible
-    * Potential of not being able to find latdot for creating dbdot?
-    * CLEAN UP THE CODE
-* writing to save file
-  * SaveLoad class
-    * File write handling and XML stream handling
-  * saveToFile function in design panel (layer stack)
-  * saveToFile function in each primitive class
-* loading from save file
-  * SaveLoad class
-    * File read handling and XML stream handling
-  * loadFromFile function in each primitive class
-  * debug message if there are errors in the XML file, or even an automatic fixer
-* autosaving per x minutes
-  * Detect changes in program. If no changes (maybe undo/redo stack could help?), don't autosave.
-  * Autosave to some temp directory. Write to autosave-yymmdd-hhmmss_in-progress.xml, then mv to autosave-yymmdd-hhmmss.xml when finished.
-  * If program exited normally and user doesn't want the autosave, keep the autosave as autosave-yymmdd-hhmmss_discarded.xml just in case the user regrets...
-  * When the user saves manually, discard autosaves
+* Undo/Redo stack indexing
+  * ~~Make base class that always increments for each item added to the stack~~ Implemented 17.08.15
+  * ~~Each item stores the undo/redo stack ID~~ Implemented 17.08.15
+  * ~~When autosave/manual save are performed, store the stack id at which it was performed~~ Implemented 17.08.16
+* Saving
+  * ~~Nested saving - recursive~~ Implemented 17.08.09
+  * Escape names properly
+  * ~~Write error handling~~ Implemented 17.08.16
+* Loading
+  * ~~Nested loading of items - recursive~~ Implemented 17.08.11
+  * Load screen offset, zoom and rotation **issues with qtransform, investigate later**
+  * Load layers with appropriate properties
+  * Error alert dialog if latdot cannot be found during dbdot generation
+  * Clean up the XML read write code to have a consistent style
+* Dialog when quitting
+* Autosaving per x minutes
+  * ~~Detect changes in program. If no changes, don't run autosave.~~ Implemented 17.08.15
+  * Number of saves (setting)
+  * Rotational save in a folder dedicated to that program instance
 * autorecovery
-  * Check for autosave-yymmdd-hhmmss.xml, ask the user whether (s)he wants to recover the latest autosave.
+  * Check for existing autosaves, ask the user whether they want to recover the latest autosave.

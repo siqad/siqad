@@ -43,11 +43,8 @@ public:
   template<typename T>
   T get(QString key)
   {
-    qDebug() << tr("Getting key %1, defaults pointer %2").arg(key).arg((size_t)defaults);
     QVariant var = DEFAULT_OVERRIDE ? defaults->value(key) : this->value(key);
     T val;
-    qDebug() << tr("Valid? %1").arg(var.isValid());
-    qDebug() << var.typeName();
     // if key not found, get value from defaults
     if(!var.isValid() && defaults != 0){
       var = defaults->value(key);

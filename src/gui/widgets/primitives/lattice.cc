@@ -28,39 +28,28 @@ prim::Lattice::Lattice(const QString &fname, int lay_id)
 
 void prim::Lattice::construct()
 {
-  int i=0;
-  qDebug() << QObject::tr("%1").arg(i++);
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   settings::LatticeSettings *lattice_settings = settings::LatticeSettings::instance();
 
-  qDebug() << QObject::tr("%1").arg(i++);
-  qDebug() << QObject::tr("Lattice settings pointer %1").arg(reinterpret_cast<size_t>(lattice_settings));
   // get values from the lattice_settings
   n_cell = lattice_settings->get<int>("cell/N");
-  // ^^^^^^^^^^^^^^^^^^^^^^^^^ Segfaults here ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  qDebug() << QObject::tr("%1").arg(i++);
   for(int i=0;i<n_cell;i++)
     b.append(lattice_settings->get<QPointF>(QString("cell/b%1").arg(i+1)));
-  qDebug() << QObject::tr("%1").arg(i++);
   for(int i=0;i<2;i++)
     a[i] = lattice_settings->get<QPointF>(QString("lattice/a%1").arg(i+1));
 
-  qDebug() << QObject::tr("%1").arg(i++);
   // construct bounds for lattice vectors
   qreal dx = qMax(qAbs(a[0].x()),qAbs(a[1].x()));
   qreal dy = qMax(qAbs(a[0].y()),qAbs(a[1].y()));
   QPoint nxy = gui_settings->get<QPoint>("lattice/xy");
 
-  qDebug() << QObject::tr("%1").arg(i++);
   Lx = dx*nxy.x();
   Ly = dy*nxy.y();
 
-  qDebug() << QObject::tr("%1").arg(i++);
   // find all lattice vector indices within the bounding region
   QList<QPoint> inds;
   getLatticeInds(inds);
 
-  qDebug() << QObject::tr("%1").arg(i++);
   // for each set of indices, create the associated unit cell
   for(int i=0; i<inds.count(); i++)
     buildUnitCell(inds.at(i));

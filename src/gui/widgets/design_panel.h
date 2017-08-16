@@ -37,7 +37,8 @@ namespace gui{
     // destructor
     ~DesignPanel();
 
-    // reset
+    // clear and reset
+    void clearDesignPanel(bool reset=false);
     void resetDesignPanel();
 
     // ACCESSORS
@@ -75,6 +76,7 @@ namespace gui{
     // resets the drawing layer and builds a lattice from the given <lattice>.ini
     // file. If no file is given, the default lattice is used
     void buildLattice(const QString &fname=QString());
+    void setScenePadding();
 
     // update the tool type
     void setTool(ToolType tool);
@@ -83,8 +85,17 @@ namespace gui{
     // array size/contents.
     void setFills(float *fills);
 
+    // get the current index of the undo stack
+    int getUndoStackIndex(){return undo_stack->index();}
+
     // SAVE
-    void saveToFile(QXmlStreamWriter *) const;
+    
+    // flag if actions are performed after last saved
+    bool changed_since_save;
+    int auto_save_command_ind=0;
+    int manual_save_command_ind=0;
+
+    void saveToFile(QXmlStreamWriter *);
     void loadFromFile(QXmlStreamReader *);
 
   public slots:
@@ -197,6 +208,10 @@ namespace gui{
 
     // UNDO/REDO FUNCTIONALITY
 
+    // undo/redo base class
+
+    class UndoCommand;
+
     // fundamental undo/redo command classes, keep memory requirement small
 
     class CreateDB;         // create a dangling bond at a given lattice dot
@@ -239,11 +254,21 @@ namespace gui{
   };
 
 
+  // bass class for undo/redo
+  class DesignPanel::UndoCommand : public QUndoCommand
+  {
+    public:
+      UndoCommand(QUndoCommand *parent=0) : QUndoCommand(parent) {command_index = class_counter++;}
+    private:
+      static int class_counter;
+      int command_index;
+  };
+
 
 
   // Details for QUndoCommand derived classes
 
-  class DesignPanel::CreateDB : public QUndoCommand
+  class DesignPanel::CreateDB : public UndoCommand
   {
   public:
     // create a dangling bond at the given lattice dot, set invert if deleting DB
@@ -272,7 +297,7 @@ namespace gui{
   };
 
 
-  class DesignPanel::FormAggregate : public QUndoCommand
+  class DesignPanel::FormAggregate : public UndoCommand
   {
   public:
     // group selected items into an aggregate
@@ -305,7 +330,7 @@ namespace gui{
   };
 
 
-  class DesignPanel::MoveItem : public QUndoCommand
+  class DesignPanel::MoveItem : public UndoCommand
   {
   public:
     MoveItem(prim::Item *item, const QPointF &offset, DesignPanel *dp, QUndoCommand *parent=0);

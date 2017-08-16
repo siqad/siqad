@@ -34,7 +34,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
             this, &gui::DesignPanel::selectClicked);
 
   // setup flags
-  clicked = ghosting = moving = false;
+  clicked = ghosting = moving = changed_since_save = false;
 
   // initialising parameters
   snap_diameter = app_settings->get<qreal>("snap/diameter")*prim::Item::scale_factor;
@@ -64,6 +64,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 
   // make lattice and surface layer
   buildLattice();
+  setScenePadding();
 
   // surface layer active on init
   top_layer = layers.at(1);
@@ -75,12 +76,15 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 // destructor
 gui::DesignPanel::~DesignPanel()
 {
-  // TODO autosave
+  clearDesignPanel(false);
+}
 
-
+// clear design panel
+void gui::DesignPanel::clearDesignPanel(bool reset)
+{
   // delete all graphical items from the scene
   scene->clear();
-  delete scene;   // does not delete contained items on its own
+  if(!reset) delete scene;
 
   // purge the clipboard
   for(prim::Item *item : clipboard)
@@ -91,50 +95,30 @@ gui::DesignPanel::~DesignPanel()
   for(prim::Layer *layer : layers)
     delete layer;
   layers.clear();
+  if(reset) prim::Layer::resetLayers();
 
   delete undo_stack;
-
 }
 
 // reset
 void gui::DesignPanel::resetDesignPanel()
 {
-  // delete all graphical items from the scene
-  scene->clear();
-  qDebug() << tr("Scene cleared");
-
-  // purge the clipboard
-  for(prim::Item *item : clipboard)
-    delete item;
-  clipboard.clear();
-  qDebug() << tr("Clipboard cleared");
-
-  // delete all the layers
-  for(prim::Layer *layer : layers)
-    delete layer;
-  layers.clear();
-  prim::Layer::resetLayers();
-  qDebug() << tr("Layers cleared");
-
-  delete undo_stack;
-  qDebug() << tr("Undo stack deleted");
-
+  clearDesignPanel(true);
 
   // REBUILD
   // reset flags
-  clicked = ghosting = moving = false;
+  clicked = ghosting = moving = changed_since_save = false;
   tool_type = gui::DesignPanel::NoneTool;     // now setTool will update the tool
-  qDebug() << tr("flags reset");
 
   undo_stack = new QUndoStack();
-  qDebug() << tr("New undo stack made");
+  // TODO reset undo stack counter
 
   buildLattice();
   top_layer = layers.at(1);
-  qDebug() << tr("Lattice rebuilt");
 
   prim::Ghost::instance()->setScene(scene);
-  qDebug() << tr("Ghost instantiated");
+
+  qDebug() << tr("Design Panel reset complete");
 }
 
 
@@ -311,35 +295,30 @@ void gui::DesignPanel::buildLattice(const QString &fname)
       return;
   }
 
-  qDebug() << tr("before gui_settings");
-  settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
   // NOTE: probably want a prompt to make sure user want to change the lattice
 
-  qDebug() << tr("Before layer destruction");
   // destroy all layers if they exist
   while(layers.count()>0)
     removeLayer(0);
 
-  qDebug() << tr("Before new lattice, size %1").arg(layers.size());
   // build the new lattice
   prim::Lattice *lattice = new prim::Lattice(fname, layers.size());
-
-  qDebug() << tr("Built new lattice");
 
   // add the lattice dots to the scene
   for(prim::Item *const item : lattice->getItems())
     scene->addItem(item);
-  qDebug() << tr("Added lattice dots to scene");
 
   // add the lattice to the layers, as layer 0
   layers.append(lattice);
-  qDebug() << tr("Appended lattice to layer 0");
 
   // add in the dangling bond surface
   addLayer(tr("Surface"));
   top_layer = layers.at(1);
-  qDebug() << tr("Created surface");
+}
+
+void gui::DesignPanel::setScenePadding(){
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
   // resize the scene with padding
   QRectF rect = scene->sceneRect();
@@ -398,26 +377,44 @@ void gui::DesignPanel::setFills(float *fills)
 
 // SAVE
 
-void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream) const{
+void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream){
+  int layer_ind;
+
   // save gui flags
   stream->writeComment("GUI Flags");
   stream->writeStartElement("gui");
-  // TODO gui flags
-  // lattice type
+  
+  // save QTransform - determines zoom, rotation and offset
+  stream->writeEmptyElement("qtransform");
+  stream->writeAttribute("m11", QString::number(transform().m11()));
+  stream->writeAttribute("m12", QString::number(transform().m12()));
+  stream->writeAttribute("m21", QString::number(transform().m21()));
+  stream->writeAttribute("m22", QString::number(transform().m22()));
+  stream->writeAttribute("dx", QString::number(transform().dx()));
+  stream->writeAttribute("dy", QString::number(transform().dy()));
+
+  // TODO lattice type
+  
   stream->writeEndElement();
   
   // save layer properties
   stream->writeComment("Layer Properties");
-  stream->writeComment("NOTE: Layer ID is intrinsic to the layer order");
-  for(prim::Layer *layer : layers)
+  stream->writeComment("Layer ID is intrinsic to the layer order");
+  stream->writeComment("Layer 0 is omitted as it is always the lattice layer");
+  for(layer_ind=1; layer_ind<layers.size(); layer_ind++){
+    prim::Layer *layer = getLayer(layer_ind);
     layer->saveLayer(stream);
+  }
   
   // save item hierarchy
   stream->writeComment("Item Hierarchy");
-  for(prim::Layer *layer : layers){
+  for(layer_ind=1; layer_ind<layers.size(); layer_ind++){
+    prim::Layer *layer = getLayer(layer_ind);
     stream->writeComment(layer->getName());
     layer->saveItems(stream);
   }
+
+  changed_since_save = false;
 }
 
 void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
@@ -431,14 +428,44 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
   // read from XML stream (children will be created recursively, add those children to stack)
   while(!stream->atEnd()){
     if(stream->isStartElement()){
+      // read GUI flags
       if(stream->name() == "gui"){
-        // TODO read GUI flags (none so far)
         stream->readNext();
+        // keep reading until end of gui tag
+        while(stream->name() != "gui"){
+          if(stream->isStartElement()){
+            if(stream->name() == "qtransform"){
+              qreal m11,m12,m21,m22,dx,dy;
+              for(QXmlStreamAttribute &attr : stream->attributes()){
+                if(attr.name().toString() == QLatin1String("m11"))
+                  m11 = attr.value().toDouble();
+                else if(attr.name().toString() == QLatin1String("m12"))
+                  m12 = attr.value().toDouble();
+                else if(attr.name().toString() == QLatin1String("m21"))
+                  m21 = attr.value().toDouble();
+                else if(attr.name().toString() == QLatin1String("m22"))
+                  m22 = attr.value().toDouble();
+                else if(attr.name().toString() == QLatin1String("dx"))
+                  dx = attr.value().toDouble();
+                else if(attr.name().toString() == QLatin1String("dy"))
+                  dy = attr.value().toDouble();
+              }
+              //setTransform(QTransform(m11,m12,m21,m22,dx,dy));
+              //qDebug() << tr("Loaded qtransform with m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(m11).arg(m12).arg(m21).arg(m22).arg(dx).arg(dy);
+            }
+            else{
+              qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
+              stream->readNext();
+            }
+          }
+          stream->readNext();
+        }
       }
       else if(stream->name() == "layer_prop"){
         // construct layers
         stream->readNext();
-        /*while(!stream->name() == "layer_prop"){
+        // keep reading until end of layer_prop tag
+        while(stream->name() != "layer_prop"){
           bool visible_ld, active_ld;
 
           if(stream->isStartElement()){
@@ -455,20 +482,20 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
               stream->readNext();
             }
             else{
-              // TODO throw warning saying unidentified element encountered
+              qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
               stream->readNext();
             }
           }
-          else if(stream->isEndElement()){
+          else{
             stream->readNext();
           }
 
           // make layer object using loaded information
-          addLayer(layer_nm);
+          /*addLayer(layer_nm);
           getLayer(layer_id)->setVisible(visible_ld);
           getLayer(layer_id)->setActive(active_ld);
-          layer_id++;
-        }*/
+          layer_id++;*/
+        }
       }
       else if(stream->name() == "layer"){
         // recursively populate layer with items
@@ -829,6 +856,8 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
   // reset both scrolls (avoid repeat from |x|>=120)
   wheel_deg.setX(0);
   wheel_deg.setY(0);
+
+  qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
 }
 
 
@@ -865,6 +894,8 @@ void gui::DesignPanel::wheelPan(bool boost)
   }
 
   translate(dx/trans.m11(), dy/trans.m22());
+
+  qDebug() << tr("Scroll: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
 }
 
 
@@ -1168,11 +1199,14 @@ void gui::DesignPanel::snapDB(QPointF scene_pos)
 
 // UNDO/REDO STACK METHODS
 
+int gui::DesignPanel::UndoCommand::class_counter = 0;
+
+
 // CreateDB class
 
 gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
                         gui::DesignPanel *dp, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), ldot(ldot)
+  : UndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), ldot(ldot)
 {
   prim::DBDot *dbdot = ldot->getDBDot();
 
@@ -1187,11 +1221,13 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
 
 void gui::DesignPanel::CreateDB::undo()
 {
+  dp->changed_since_save = true;
   invert ? create() : destroy();
 }
 
 void gui::DesignPanel::CreateDB::redo()
 {
+  dp->changed_since_save = true;
   invert ? destroy() : create();
 }
 
@@ -1222,7 +1258,7 @@ void gui::DesignPanel::CreateDB::destroy()
 // FromAggregate class
 gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
                                             DesignPanel *dp, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(false), dp(dp), agg_index(-1)
+  : UndoCommand(parent), invert(false), dp(dp), agg_index(-1)
 {
   if(items.count()==0){
     qWarning() << tr("Aggregate contains no items");
@@ -1247,7 +1283,7 @@ gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
 
 gui::DesignPanel::FormAggregate::FormAggregate(prim::Aggregate *agg, int offset,
                                           DesignPanel *dp, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(true), dp(dp)
+  : UndoCommand(parent), invert(true), dp(dp)
 {
   // get layer index, assumes aggregate was formed using FormAggregate
   //prim::Layer *layer = agg->layer;
@@ -1268,12 +1304,14 @@ gui::DesignPanel::FormAggregate::FormAggregate(prim::Aggregate *agg, int offset,
 // split the aggregate
 void gui::DesignPanel::FormAggregate::undo()
 {
+  dp->changed_since_save = true;
   invert ? form() : split();
 }
 
 // form the aggregate
 void gui::DesignPanel::FormAggregate::redo()
 {
+  dp->changed_since_save = true;
   invert ? split() : form();
 }
 
@@ -1342,7 +1380,7 @@ void gui::DesignPanel::FormAggregate::split()
 // MoveItem class
 gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
                                       DesignPanel *dp, QUndoCommand *parent)
-  : QUndoCommand(parent), dp(dp), offset(offset)
+  : UndoCommand(parent), dp(dp), offset(offset)
 {
   layer_index = item->layer_id;
   item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
@@ -1351,12 +1389,14 @@ gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
 
 void gui::DesignPanel::MoveItem::undo()
 {
+  dp->changed_since_save = true;
   move(true);
 }
 
 
 void gui::DesignPanel::MoveItem::redo()
 {
+  dp->changed_since_save = true;
   move(false);
 }
 

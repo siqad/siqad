@@ -25,7 +25,7 @@ gui::DialogPanel *gui::ApplicationGUI::dialog_pan = 0;
 
 // constructor
 gui::ApplicationGUI::ApplicationGUI(QWidget *parent)
- : QMainWindow(parent)
+  : QMainWindow(parent)
 {
   // initialise GUI
   initGUI();
@@ -104,6 +104,7 @@ void gui::ApplicationGUI::initMenuBar()
   QMenu *tools = menuBar()->addMenu(tr("&Tools"));
 
   // file menu actions
+  QAction *new_file = new QAction(tr("&New"), this);
   QAction *quit = new QAction(tr("&Quit"), this);
   QAction *save = new QAction(tr("&Save"), this);
   QAction *save_as = new QAction(tr("Save As..."), this);
@@ -112,6 +113,7 @@ void gui::ApplicationGUI::initMenuBar()
   save->setShortcut(tr("CTRL+S"));
   save_as->setShortcut(tr("CTRL+SHIFT+S"));
   open_save->setShortcut(tr("CTRL+O"));
+  file->addAction(new_file);
   file->addAction(save);
   file->addAction(save_as);
   file->addAction(open_save);
@@ -127,7 +129,9 @@ void gui::ApplicationGUI::initMenuBar()
   tools->addAction(screenshot);
   tools->addAction(design_screenshot);
 
-  connect(quit, &QAction::triggered, qApp, QApplication::quit);
+  connect(new_file, &QAction::triggered, this, &gui::ApplicationGUI::newFile);
+  //connect(quit, &QAction::triggered, qApp, QApplication::quit);
+  connect(quit, &QAction::triggered, this, &gui::ApplicationGUI::closeFile);
   connect(save, &QAction::triggered, this, &gui::ApplicationGUI::saveDefault);
   connect(save_as, &QAction::triggered, this, &gui::ApplicationGUI::saveNew);
   connect(open_save, &QAction::triggered, this, &gui::ApplicationGUI::openFromFile);
@@ -222,6 +226,12 @@ void gui::ApplicationGUI::initActions()
   // set tool
   connect(design_pan, &gui::DesignPanel::sig_toolChange,
             this, &gui::ApplicationGUI::setTool);
+
+  // auto save
+  auto_save_timer = new QTimer(this);
+  connect(auto_save_timer, SIGNAL(timeout()), this, SLOT(autoSave()));
+  auto_save_timer->start(10000);
+  // TODO change above time to setting
 }
 
 
@@ -398,16 +408,77 @@ void gui::ApplicationGUI::designScreenshot()
 }
 
 
-// SAVE/LOAD
-void gui::ApplicationGUI::saveToFile(bool new_file)
+// FILE HANDLING
+// unsaved changes prompt
+bool gui::ApplicationGUI::resolveUnsavedChanges()
 {
+  bool proceed = false;
+
+  QMessageBox msgBox;
+  msgBox.setText("The document contains unsaved changes.");
+  msgBox.setInformativeText("Would you like to save?");
+  msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+  msgBox.setDefaultButton(QMessageBox::Save);
+  int usr_select = msgBox.exec();
+
+  switch(usr_select) {
+    case QMessageBox::Save:
+      if(saveToFile()) proceed = true;
+      break;
+    case QMessageBox::Discard:
+      proceed = true;
+      break;
+    case QMessageBox::Cancel:
+      proceed = false;
+      break;
+    default:
+      proceed = false;
+      break;
+  }
+  
+  return proceed;
+}
+
+// make new file
+void gui::ApplicationGUI::newFile()
+{
+  // prompt user to resolve unsaved changes if program has been modified
+  if(design_pan->getUndoStackIndex() != design_pan->auto_save_command_ind){
+    if(!resolveUnsavedChanges())
+      return;
+  }
+
+  design_pan->resetDesignPanel();
+  initState();
+}
+
+
+// save/load
+bool gui::ApplicationGUI::saveToFile(bool force_file_chooser, QString save_to_path)
+{
+  QString prompt_path;
+  QFile file;
+
   // determine target file
-  if(file.fileName().isEmpty() || new_file){
-    working_path = QFileDialog::getSaveFileName(this, tr("Save File"), "untitled.xml", tr("XML files (*.xml)"));
+  if(!save_to_path.isEmpty()){
+    if(!save_to_path.endsWith(".xml", Qt::CaseInsensitive))
+      save_to_path.append(".xml");
+    file.setFileName(save_to_path);
+  }
+  else if(file.fileName().isEmpty() || force_file_chooser){
+    prompt_path = QFileDialog::getSaveFileName(this, tr("Save File"), "untitled.xml", tr("XML files (*.xml)"));
+    if(prompt_path.isEmpty())
+      return false;
+    if(!prompt_path.endsWith(".xml", Qt::CaseInsensitive))
+      prompt_path.append(".xml");
+    working_path = prompt_path;
     file.setFileName(working_path);
   }
 
-  file.open(QIODevice::WriteOnly);
+  if(!file.open(QIODevice::WriteOnly)){
+    qDebug() << tr("Error when opening file to save: %1").arg(file.errorString());
+    return;
+  }
 
   // write to XML stream
   QXmlStreamWriter stream(&file);
@@ -415,25 +486,82 @@ void gui::ApplicationGUI::saveToFile(bool new_file)
   stream.setAutoFormatting(true);
   stream.writeStartDocument();
 
+  // call the save functions for each relevant class
   stream.writeStartElement("dbdesigner");
-
   design_pan->saveToFile(&stream);
-
   stream.writeEndElement();
+
+  // other classes that require saving goes below
 
   file.close();
 
   qDebug() << tr("Save complete");
+
+  return true;
 }
+
+
+void gui::ApplicationGUI::saveDefault()
+{
+  // default manual save without forcing file chooser
+  if(saveToFile(0))
+    design_pan->manual_save_command_ind = design_pan->getUndoStackIndex();
+}
+
+
+void gui::ApplicationGUI::saveNew()
+{
+  // save to new file path with file chooser
+  if(saveToFile(1))
+    design_pan->manual_save_command_ind = design_pan->getUndoStackIndex();
+}
+
+
+void gui::ApplicationGUI::autoSave()
+{
+  // return if the program has not been modified
+  if(design_pan->getUndoStackIndex() == design_pan->auto_save_command_ind){
+    return;
+  }
+
+  // TODO revise the path
+  QString autosave_path = tr("./.autosave_%1_").arg(QDateTime::currentDateTime().toString("yyMMdd-HHmmss"));
+
+  // save to working path's directory if exists, some tmp directory if not
+  if(file.fileName().isEmpty())
+    autosave_path.append("untitled.xml");
+  else
+    autosave_path.append(QFileInfo(file.fileName()).fileName());
+
+  saveToFile(false, autosave_path);
+
+  design_pan->auto_save_command_ind = design_pan->getUndoStackIndex();
+
+  qDebug() << tr("Autosave complete");
+}
+
 
 void gui::ApplicationGUI::openFromFile()
 {
+  // prompt user to resolve unsaved changes if program has been modified
+  if(design_pan->getUndoStackIndex() != design_pan->auto_save_command_ind){
+    if(!resolveUnsavedChanges())
+      return;
+  }
+
   // file dialog
-  working_path = QFileDialog::getOpenFileName(this, tr("Open File"), ".", tr("XML files (*.xml)"));
+  QString prompt_path = QFileDialog::getOpenFileName(this, tr("Open File"), ".", tr("XML files (*.xml)"));
+
+  if(prompt_path.isEmpty())
+    return;
+
+  working_path = prompt_path;
   file.setFileName(working_path);
 
   if(!file.open(QFile::ReadOnly | QFile::Text)){
     // TODO throw error that file can't be opened
+    qDebug() << tr("Error when opening file to read: %1").arg(file.errorString());
+    return;
   }
 
   // read from XML stream
@@ -442,4 +570,16 @@ void gui::ApplicationGUI::openFromFile()
   design_pan->loadFromFile(&stream);
   qDebug() << tr("Load complete");
   file.close();
+}
+
+
+void gui::ApplicationGUI::closeFile()
+{
+  // prompt user to resolve unsaved changes if program has been modified
+  if(design_pan->getUndoStackIndex() != design_pan->auto_save_command_ind){
+    if(!resolveUnsavedChanges())
+      return;
+  }
+
+  QApplication::quit();
 }

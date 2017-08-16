@@ -79,7 +79,7 @@ prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
 
   if(!src_latdot){
     qCritical() << QObject::tr("No lattice dot at %1, %2").arg(scene_loc.x()).arg(scene_loc.y());
-    // TODO raise some sort of load failure?
+    // TODO error alert dialog?
   }
 
   // initialize
