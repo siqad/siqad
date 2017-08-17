@@ -27,6 +27,9 @@ gui::DialogPanel *gui::ApplicationGUI::dialog_pan = 0;
 gui::ApplicationGUI::ApplicationGUI(QWidget *parent)
   : QMainWindow(parent)
 {
+  // save start time for instance recognition
+  start_time = QDateTime::currentDateTime();
+
   // initialise GUI
   initGUI();
 
@@ -226,12 +229,6 @@ void gui::ApplicationGUI::initActions()
   // set tool
   connect(design_pan, &gui::DesignPanel::sig_toolChange,
             this, &gui::ApplicationGUI::setTool);
-
-  // auto save
-  auto_save_timer = new QTimer(this);
-  connect(auto_save_timer, SIGNAL(timeout()), this, SLOT(autoSave()));
-  auto_save_timer->start(10000);
-  // TODO change above time to setting
 }
 
 
@@ -250,6 +247,17 @@ void gui::ApplicationGUI::loadSettings()
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
   resize(gui_settings->get<QSize>("MWIN/size"));
+
+  // autosave related settings
+  settings::AppSettings *app_settings = settings::AppSettings::instance();
+  autosave_num = app_settings->get<int>("save/autosavenum");
+  autosave_root = app_settings->get<QString>("save/autosaveroot");
+  autosave_dir = autosave_root + tr("/instance-%1").arg(start_time.toString("yyMMdd-HHmmss"));
+  
+  // auto save
+  autosave_timer = new QTimer(this);
+  connect(autosave_timer, SIGNAL(timeout()), this, SLOT(autoSave()));
+  autosave_timer->start(app_settings->get<int>("save/autosaveinterval"));
 }
 
 
@@ -259,6 +267,18 @@ void gui::ApplicationGUI::saveSettings()
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
   gui_settings->setValue("SBAR/loc", (int) toolBarArea(side_bar));
+
+  // remove autosave during peaceful termination
+  QDir adir(autosave_dir);
+  adir.setNameFilters(QStringList() << "*.*");
+  adir.setFilter(QDir::Files);
+  for(QString dirFile : adir.entryList())
+    adir.remove(dirFile);
+  adir.setPath(QDir::currentPath());
+  if(adir.rmdir(autosave_dir))
+    qDebug() << tr("Removed autosave directory: %1").arg(autosave_dir);
+  else
+    qDebug() << tr("Failed to remove autosave directory: %1").arg(adir.path());
 }
 
 
@@ -409,7 +429,7 @@ void gui::ApplicationGUI::designScreenshot()
 
 
 // FILE HANDLING
-// unsaved changes prompt
+// unsaved changes prompt, returns whether to proceed with operation or not
 bool gui::ApplicationGUI::resolveUnsavedChanges()
 {
   bool proceed = false;
@@ -443,7 +463,7 @@ bool gui::ApplicationGUI::resolveUnsavedChanges()
 void gui::ApplicationGUI::newFile()
 {
   // prompt user to resolve unsaved changes if program has been modified
-  if(design_pan->getUndoStackIndex() != design_pan->auto_save_command_ind){
+  if(design_pan->getUndoStackIndex() != design_pan->manual_save_command_ind){
     if(!resolveUnsavedChanges())
       return;
   }
@@ -454,30 +474,30 @@ void gui::ApplicationGUI::newFile()
 
 
 // save/load
-bool gui::ApplicationGUI::saveToFile(bool force_file_chooser, QString save_to_path)
+bool gui::ApplicationGUI::saveToFile(bool force_file_chooser, bool update_working_path, QString save_to_path)
 {
   QString prompt_path;
+  QString write_path;
   QFile file;
 
   // determine target file
   if(!save_to_path.isEmpty()){
-    if(!save_to_path.endsWith(".xml", Qt::CaseInsensitive))
-      save_to_path.append(".xml");
-    file.setFileName(save_to_path);
+    write_path = save_to_path;
   }
   else if(file.fileName().isEmpty() || force_file_chooser){
-    prompt_path = QFileDialog::getSaveFileName(this, tr("Save File"), "untitled.xml", tr("XML files (*.xml)"));
-    if(prompt_path.isEmpty())
+    write_path = QFileDialog::getSaveFileName(this, tr("Save File"), "untitled.xml", tr("XML files (*.xml)"));
+    if(write_path.isEmpty())
       return false;
-    if(!prompt_path.endsWith(".xml", Qt::CaseInsensitive))
-      prompt_path.append(".xml");
-    working_path = prompt_path;
-    file.setFileName(working_path);
   }
+
+  if(!write_path.endsWith(".xml", Qt::CaseInsensitive))
+    write_path.append(".xml");
+
+  file.setFileName(write_path+".writing");
 
   if(!file.open(QIODevice::WriteOnly)){
     qDebug() << tr("Error when opening file to save: %1").arg(file.errorString());
-    return;
+    return false;
   }
 
   // write to XML stream
@@ -493,9 +513,18 @@ bool gui::ApplicationGUI::saveToFile(bool force_file_chooser, QString save_to_pa
 
   // other classes that require saving goes below
 
+  // close the file
   file.close();
 
+  // delete the existing file and rename the new one to it
+  QFile::remove(write_path);
+  file.rename(write_path);
+
   qDebug() << tr("Save complete");
+
+  // update working path if needed
+  if(update_working_path)
+    working_path = write_path;
 
   return true;
 }
@@ -504,7 +533,7 @@ bool gui::ApplicationGUI::saveToFile(bool force_file_chooser, QString save_to_pa
 void gui::ApplicationGUI::saveDefault()
 {
   // default manual save without forcing file chooser
-  if(saveToFile(0))
+  if(saveToFile(false,true))
     design_pan->manual_save_command_ind = design_pan->getUndoStackIndex();
 }
 
@@ -512,7 +541,7 @@ void gui::ApplicationGUI::saveDefault()
 void gui::ApplicationGUI::saveNew()
 {
   // save to new file path with file chooser
-  if(saveToFile(1))
+  if(saveToFile(true,true))
     design_pan->manual_save_command_ind = design_pan->getUndoStackIndex();
 }
 
@@ -520,22 +549,23 @@ void gui::ApplicationGUI::saveNew()
 void gui::ApplicationGUI::autoSave()
 {
   // return if the program has not been modified
-  if(design_pan->getUndoStackIndex() == design_pan->auto_save_command_ind){
+  if(design_pan->getUndoStackIndex() == design_pan->autosave_command_ind){
     return;
   }
 
-  // TODO revise the path
-  QString autosave_path = tr("./.autosave_%1_").arg(QDateTime::currentDateTime().toString("yyMMdd-HHmmss"));
 
-  // save to working path's directory if exists, some tmp directory if not
-  if(file.fileName().isEmpty())
-    autosave_path.append("untitled.xml");
-  else
-    autosave_path.append(QFileInfo(file.fileName()).fileName());
+  QDir dir_man;
+  if(! dir_man.mkpath(autosave_dir)){
+    qCritical() << tr("Autosave: unable to create tmp instance directory at %1").arg(autosave_dir);
+  }
 
-  saveToFile(false, autosave_path);
+  QString autosave_path = autosave_dir + tr("/autosave-%1.xml").arg(autosave_ind++);
+  if(autosave_ind >= autosave_num) 
+    autosave_ind = 0;
 
-  design_pan->auto_save_command_ind = design_pan->getUndoStackIndex();
+  saveToFile(false, false, autosave_path);
+
+  design_pan->autosave_command_ind = design_pan->getUndoStackIndex();
 
   qDebug() << tr("Autosave complete");
 }
@@ -544,7 +574,7 @@ void gui::ApplicationGUI::autoSave()
 void gui::ApplicationGUI::openFromFile()
 {
   // prompt user to resolve unsaved changes if program has been modified
-  if(design_pan->getUndoStackIndex() != design_pan->auto_save_command_ind){
+  if(design_pan->getUndoStackIndex() != design_pan->manual_save_command_ind){
     if(!resolveUnsavedChanges())
       return;
   }
@@ -559,7 +589,6 @@ void gui::ApplicationGUI::openFromFile()
   file.setFileName(working_path);
 
   if(!file.open(QFile::ReadOnly | QFile::Text)){
-    // TODO throw error that file can't be opened
     qDebug() << tr("Error when opening file to read: %1").arg(file.errorString());
     return;
   }
@@ -576,7 +605,7 @@ void gui::ApplicationGUI::openFromFile()
 void gui::ApplicationGUI::closeFile()
 {
   // prompt user to resolve unsaved changes if program has been modified
-  if(design_pan->getUndoStackIndex() != design_pan->auto_save_command_ind){
+  if(design_pan->getUndoStackIndex() != design_pan->manual_save_command_ind){
     if(!resolveUnsavedChanges())
       return;
   }

@@ -59,6 +59,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * Screen capture tool options (light background mode, capture area)
 * CMI mode (e.g. single command to run batch simulations)
 * Shift + middle click drag "zoom to region"
+* Dialog panel add HTML color processing (and regex remove HTML tags when writing to log)
 * ~~Esc cancels paste operation~~ Implemented 17.07.13
 * ~~Esc cancels DB Tool~~ Implemented 17.07.13
 * ~~Visual feedback on which tool is currently in use (e.g. changed background of the button)~~ Implemented 17.07.12
@@ -96,6 +97,10 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 ## Physics Engine
 
 * Interface with solvers (standards for passing DB configuration to them, and taking results back)
+  * Singleton
+  * Custom class containing physical structure
+    * Location, dimensions, etc
+  * Custom class containing properties
 * Simple estimation tool of electron distribution
 * Static or animated display of charge (like the AFM images)
 
@@ -113,7 +118,7 @@ All tasks described here contribute to save/load functionality
   * ~~Change items to store layer id instead of layer pointer~~ Implemented 17.08.01
   * ~~Add functionality to change layer id stored in layers and in child items when the layer's index changes in the stack~~ Implemented 17.08.02
   * Clean up design panel code for layer id (make it less 'hacked-together', get rid of unnecessary converions)
-* Undo/Redo stack indexing
+* ~~Undo/Redo stack indexing~~ Implemented 17.08.16
   * ~~Make base class that always increments for each item added to the stack~~ Implemented 17.08.15
   * ~~Each item stores the undo/redo stack ID~~ Implemented 17.08.15
   * ~~When autosave/manual save are performed, store the stack id at which it was performed~~ Implemented 17.08.16
@@ -131,6 +136,7 @@ All tasks described here contribute to save/load functionality
 * Autosaving per x minutes
   * ~~Detect changes in program. If no changes, don't run autosave.~~ Implemented 17.08.15
   * Number of saves (setting)
-  * Rotational save in a folder dedicated to that program instance
+  * ~~Rotational save in a folder dedicated to that program instance~~ Implemented 17.08.16
+  * Put tmp directory to system tmp?
 * autorecovery
   * Check for existing autosaves, ask the user whether they want to recover the latest autosave.

@@ -74,7 +74,7 @@ namespace gui{
     // FILE HANDLING
     bool resolveUnsavedChanges();       // returns whether to proceed or not
     void newFile();                     // create a new file
-    bool saveToFile(bool force_file_chooser=0, QString save_to_path=QString());   // actual save function
+    bool saveToFile(bool force_file_chooser=0, bool update_working_path=0, QString save_to_path=QString());   // actual save function
     void saveDefault();                 // save normally (calls saveToFile)
     void saveNew();                     // save as a new file (calls saveToFile)
     void autoSave();                    // perform autosave at specified interval (ms)
@@ -103,6 +103,9 @@ namespace gui{
     void saveSettings();  // save mainwindow settings to the settings instance
 
     // VARIABLES
+    
+    // save start time for instance recognition
+    QDateTime start_time;
 
     // directory path persistence
     QDir img_dir;
@@ -123,7 +126,11 @@ namespace gui{
     QAction *action_run_sim;      // run the current simulation method
 
     // save file
-    QTimer *auto_save_timer;
+    int autosave_ind=0;
+    QString autosave_root;        // the root of autosaves
+    QString autosave_dir;         // directory of autosave
+    int autosave_num;             // number of autosaves to keep
+    QTimer *autosave_timer;
     QFile file;                   // file that saveToFile writes to
     QString working_path;         // path currently in use
 

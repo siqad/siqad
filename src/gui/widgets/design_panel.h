@@ -92,7 +92,7 @@ namespace gui{
     
     // flag if actions are performed after last saved
     bool changed_since_save;
-    int auto_save_command_ind=0;
+    int autosave_command_ind=0;
     int manual_save_command_ind=0;
 
     void saveToFile(QXmlStreamWriter *);

@@ -103,6 +103,10 @@ QSettings *settings::AppSettings::m_defs()
   S->setValue("phys/debye_length", 50);
   S->setValue("phys/epsr", 10);
 
+  S->setValue("save/autosaveroot", QString("tmp/autosave"));
+  S->setValue("save/autosavenum", 3);
+  S->setValue("save/autosaveinterval", 1200000); // 20 minutes = 1200000 ms
+
   return S;
 }
 
