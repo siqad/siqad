@@ -464,10 +464,11 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
             }
             else{
               qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
-              stream->readNext();
             }
+            stream->readNext();
           }
-          stream->readNext();
+          else
+            stream->readNext();
         }
       }
       else if(stream->name() == "layer_prop"){
