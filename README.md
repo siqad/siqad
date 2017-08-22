@@ -142,5 +142,5 @@ All tasks described here contribute to save/load functionality
   * Check for existing autosaves, ask the user whether they want to recover the latest autosave.
 
 * Code improvement
-  * saveToFile function: change from multiple bools to single char flag
-  * remove changed_since_save variable
+  * QLockFile for locking instance folder during creation
+    * Or, get the process ID and use that as part of the directory name - QCoreApplication::applicationPid()

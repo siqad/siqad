@@ -409,16 +409,13 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream){
   // save layer properties
   stream->writeComment("Layer Properties");
   stream->writeComment("Layer ID is intrinsic to the layer order");
-  stream->writeComment("Layer 0 is omitted as it is always the lattice layer");
-  for(layer_ind=1; layer_ind<layers.size(); layer_ind++){
-    prim::Layer *layer = getLayer(layer_ind);
+  for(prim::Layer *layer : layers){
     layer->saveLayer(stream);
   }
   
   // save item hierarchy
   stream->writeComment("Item Hierarchy");
-  for(layer_ind=1; layer_ind<layers.size(); layer_ind++){
-    prim::Layer *layer = getLayer(layer_ind);
+  for(prim::Layer *layer : layers){
     stream->writeComment(layer->getName());
     layer->saveItems(stream);
   }
@@ -796,11 +793,14 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
       }
       case Qt::Key_Z:{
         // undo/redo based on keymods
+        //qDebug() << tr("Index before undo/redo: %1").arg(undo_stack->index());
         if(keymods == (Qt::ControlModifier | Qt::ShiftModifier))
           undo_stack->redo();
         else if(keymods == Qt::ControlModifier)
           undo_stack->undo();
         }
+        //qDebug() << tr("Index after undo/redo: %1").arg(undo_stack->index());
+        //qDebug() << tr("ptr %1").arg((size_t)undo_stack->command(undo_stack->index()));
         break;
       case Qt::Key_Y:{
         if(keymods == Qt::ControlModifier)
