@@ -106,4 +106,14 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * When attempting to select DBs using rubberband but clicked on a DB/aggregate as the starting location, the object at the starting position takes the press event and rubberband fails to show
 
 
+> Todo list for the current branch
+## Ongoing
 
+* Interface with solvers (standards for passing DB configuration to them, and taking results back)
+  * Write data structure to xml or something like that, instead of passing a C++ class structure. The former method allows compiled binaries of physics engines to read the file to run the simulation, the latter method requires the source code.
+    * Material, material parameters/properties (that can be overidden by the simulator), DB locations
+    * (optional for now?) Aggregates with predetermined simulation parameters
+* Simple estimation tool of electron distribution
+  * Simulated annealing algorithm with 1. electron population determined by bulk-DB interaction and 2. inter-DB electron hopping.
+  * Export results to file for gui to read - time, charge distribution, etc
+* Static or animated display of charge (like the AFM images)
