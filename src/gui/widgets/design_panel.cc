@@ -34,7 +34,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
             this, &gui::DesignPanel::selectClicked);
 
   // setup flags
-  clicked = ghosting = moving = changed_since_save = false;
+  clicked = ghosting = moving = false;
 
   // initialising parameters
   snap_diameter = app_settings->get<qreal>("snap/diameter")*prim::Item::scale_factor;
@@ -107,7 +107,7 @@ void gui::DesignPanel::resetDesignPanel()
 
   // REBUILD
   // reset flags
-  clicked = ghosting = moving = changed_since_save = false;
+  clicked = ghosting = moving = false;
   tool_type = gui::DesignPanel::NoneTool;     // now setTool will update the tool
 
   undo_stack = new QUndoStack();
@@ -383,7 +383,7 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream){
   // save program flags
   stream->writeComment("Program Flags");
   stream->writeStartElement("program");
-  
+
   stream->writeTextElement("version", "I don't know yet");
   stream->writeTextElement("date", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
 
@@ -392,7 +392,7 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream){
   // save gui flags
   stream->writeComment("GUI Flags");
   stream->writeStartElement("gui");
-  
+
   // save QTransform - determines zoom, rotation and offset
   stream->writeEmptyElement("qtransform");
   stream->writeAttribute("m11", QString::number(transform().m11()));
@@ -403,9 +403,9 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream){
   stream->writeAttribute("dy", QString::number(transform().dy()));
 
   // TODO lattice type
-  
+
   stream->writeEndElement();
-  
+
   // save layer properties
   stream->writeComment("Layer Properties");
   stream->writeComment("Layer ID is intrinsic to the layer order");
@@ -414,7 +414,7 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream){
     prim::Layer *layer = getLayer(layer_ind);
     layer->saveLayer(stream);
   }
-  
+
   // save item hierarchy
   stream->writeComment("Item Hierarchy");
   for(layer_ind=1; layer_ind<layers.size(); layer_ind++){
@@ -422,8 +422,6 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream){
     stream->writeComment(layer->getName());
     layer->saveItems(stream);
   }
-
-  changed_since_save = false;
 }
 
 void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
@@ -1208,14 +1206,12 @@ void gui::DesignPanel::snapDB(QPointF scene_pos)
 
 // UNDO/REDO STACK METHODS
 
-int gui::DesignPanel::UndoCommand::class_counter = 0;
-
 
 // CreateDB class
 
 gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
                         gui::DesignPanel *dp, bool invert, QUndoCommand *parent)
-  : UndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), ldot(ldot)
+  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), ldot(ldot)
 {
   prim::DBDot *dbdot = ldot->getDBDot();
 
@@ -1230,13 +1226,11 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
 
 void gui::DesignPanel::CreateDB::undo()
 {
-  dp->changed_since_save = true;
   invert ? create() : destroy();
 }
 
 void gui::DesignPanel::CreateDB::redo()
 {
-  dp->changed_since_save = true;
   invert ? destroy() : create();
 }
 
@@ -1267,7 +1261,7 @@ void gui::DesignPanel::CreateDB::destroy()
 // FromAggregate class
 gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
                                             DesignPanel *dp, QUndoCommand *parent)
-  : UndoCommand(parent), invert(false), dp(dp), agg_index(-1)
+  : QUndoCommand(parent), invert(false), dp(dp), agg_index(-1)
 {
   if(items.count()==0){
     qWarning() << tr("Aggregate contains no items");
@@ -1292,7 +1286,7 @@ gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
 
 gui::DesignPanel::FormAggregate::FormAggregate(prim::Aggregate *agg, int offset,
                                           DesignPanel *dp, QUndoCommand *parent)
-  : UndoCommand(parent), invert(true), dp(dp)
+  : QUndoCommand(parent), invert(true), dp(dp)
 {
   // get layer index, assumes aggregate was formed using FormAggregate
   //prim::Layer *layer = agg->layer;
@@ -1313,14 +1307,12 @@ gui::DesignPanel::FormAggregate::FormAggregate(prim::Aggregate *agg, int offset,
 // split the aggregate
 void gui::DesignPanel::FormAggregate::undo()
 {
-  dp->changed_since_save = true;
   invert ? form() : split();
 }
 
 // form the aggregate
 void gui::DesignPanel::FormAggregate::redo()
 {
-  dp->changed_since_save = true;
   invert ? split() : form();
 }
 
@@ -1389,7 +1381,7 @@ void gui::DesignPanel::FormAggregate::split()
 // MoveItem class
 gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
                                       DesignPanel *dp, QUndoCommand *parent)
-  : UndoCommand(parent), dp(dp), offset(offset)
+  : QUndoCommand(parent), dp(dp), offset(offset)
 {
   layer_index = item->layer_id;
   item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
@@ -1398,18 +1390,14 @@ gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
 
 void gui::DesignPanel::MoveItem::undo()
 {
-  dp->changed_since_save = true;
   move(true);
 }
 
 
 void gui::DesignPanel::MoveItem::redo()
 {
-  dp->changed_since_save = true;
   move(false);
 }
-
-
 
 void gui::DesignPanel::MoveItem::move(bool invert)
 {
