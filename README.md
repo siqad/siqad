@@ -140,3 +140,7 @@ All tasks described here contribute to save/load functionality
   * Put tmp directory to system tmp?
 * autorecovery
   * Check for existing autosaves, ask the user whether they want to recover the latest autosave.
+
+* Code improvement
+  * QLockFile for locking instance folder during creation
+    * Or, get the process ID and use that as part of the directory name - QCoreApplication::applicationPid()
