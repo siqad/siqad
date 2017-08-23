@@ -69,7 +69,7 @@ void settings::LatticeSettings::updateLattice(const QString &fname)
     delete inst;
     inst = 0;
   }
-  
+
   // reconstruct defaults
   defs = settings::LatticeSettings::m_defs();
 
@@ -103,9 +103,9 @@ QSettings *settings::AppSettings::m_defs()
   S->setValue("phys/debye_length", 50);
   S->setValue("phys/epsr", 10);
 
-  S->setValue("save/autosaveroot", QString("tmp/autosave"));
+  S->setValue("save/autosaveroot", QString("tmp/autosave/"));
   S->setValue("save/autosavenum", 3);
-  S->setValue("save/autosaveinterval", 1200000); // 20 minutes = 1200000 ms
+  S->setValue("save/autosaveinterval", 300); // in seconds
 
   return S;
 }
