@@ -393,14 +393,11 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream){
   stream->writeComment("GUI Flags");
   stream->writeStartElement("gui");
   
-  // save QTransform - determines zoom, rotation and offset
-  stream->writeEmptyElement("qtransform");
-  stream->writeAttribute("m11", QString::number(transform().m11()));
-  stream->writeAttribute("m12", QString::number(transform().m12()));
-  stream->writeAttribute("m21", QString::number(transform().m21()));
-  stream->writeAttribute("m22", QString::number(transform().m22()));
-  stream->writeAttribute("dx", QString::number(transform().dx()));
-  stream->writeAttribute("dy", QString::number(transform().dy()));
+  // save zoom and scroll bar position
+  stream->writeTextElement("zoom", QString::number(transform().m11())); // m11 of qtransform
+  stream->writeEmptyElement("scroll");
+  stream->writeAttribute("x", QString::number(verticalScrollBar()->value()));
+  stream->writeAttribute("y", QString::number(horizontalScrollBar()->value()));
 
   // TODO lattice type
   
@@ -440,8 +437,21 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
         // keep reading until end of gui tag
         while(stream->name() != "gui"){
           if(stream->isStartElement()){
-            if(stream->name() == "qtransform"){
-              qreal m11,m12,m21,m22,dx,dy;
+            qreal zoom,scroll_v,scroll_h;
+            if(stream->name() == "zoom"){
+              zoom = stream->readElementText().toDouble();
+            }
+            else if(stream->name() == "scroll"){
+              for(QXmlStreamAttribute &attr : stream->attributes()){
+                if(attr.name().toString() == QLatin1String("x"))
+                  scroll_v = attr.value().toInt();
+                else if(attr.name().toString() == QLatin1String("y"))
+                  scroll_h = attr.value().toInt();
+              }
+              setTransform(QTransform(zoom,0,0,zoom,0,0));
+              verticalScrollBar()->setValue(scroll_v);
+              horizontalScrollBar()->setValue(scroll_h);
+              /*qreal m11,m12,m21,m22,dx,dy;
               for(QXmlStreamAttribute &attr : stream->attributes()){
                 if(attr.name().toString() == QLatin1String("m11"))
                   m11 = attr.value().toDouble();
@@ -455,7 +465,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
                   dx = attr.value().toDouble();
                 else if(attr.name().toString() == QLatin1String("dy"))
                   dy = attr.value().toDouble();
-              }
+              }*/
               //setTransform(QTransform(m11,m12,m21,m22,dx,dy));
               //qDebug() << tr("Loaded qtransform with m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(m11).arg(m12).arg(m21).arg(m22).arg(dx).arg(dy);
             }
@@ -591,7 +601,9 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
   QPoint mouse_pos_del;
-  QTransform trans = transform();
+  //QTransform trans = transform();
+  QScrollBar *vsb = verticalScrollBar();
+  QScrollBar *hsb = horizontalScrollBar();
   qreal dx, dy;
 
   if(ghosting){
@@ -620,9 +632,10 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
       case Qt::MidButton:
         // middle button always pans
         mouse_pos_del = e->pos()-mouse_pos_old;
-        dx = mouse_pos_del.x()/trans.m11();
-        dy = mouse_pos_del.y()/trans.m22();
-        translate(dx, dy);
+        dx = mouse_pos_del.x();
+        dy = mouse_pos_del.y();
+        vsb->setValue(vsb->value()-dy);
+        hsb->setValue(hsb->value()-dx);
         mouse_pos_old = e->pos();
         break;
       case Qt::RightButton:
@@ -859,7 +872,8 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
       QPointF old_pos = mapToScene(e->pos());
       scale(1+ds,1+ds);
       QPointF delta = mapToScene(e->pos()) - old_pos;
-      translate(delta.x(), delta.y());
+      verticalScrollBar()->setValue(verticalScrollBar()->value()-delta.y()*transform().m11());
+      horizontalScrollBar()->setValue(horizontalScrollBar()->value()-delta.x()*transform().m22());
     }
   }
 
@@ -867,32 +881,33 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
   wheel_deg.setX(0);
   wheel_deg.setY(0);
 
-  qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
+  //qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
 }
 
 
 void gui::DesignPanel::wheelPan(bool boost)
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
-
-  QTransform trans = transform();
+  
   qreal dx=0, dy=0;
+  QScrollBar *vsb = verticalScrollBar();
+  QScrollBar *hsb = horizontalScrollBar();
 
   // y scrolling
   if(qAbs(wheel_deg.y())>=120){
     if(wheel_deg.y()>0)
-      dy += gui_settings->get<qreal>("view/wheel_pan_step");
-    else
       dy -= gui_settings->get<qreal>("view/wheel_pan_step");
+    else
+      dy += gui_settings->get<qreal>("view/wheel_pan_step");
     wheel_deg.setY(0);
   }
 
   // x scrolling
   if(qAbs(wheel_deg.x())>=120){
     if(wheel_deg.x()>0)
-      dx += gui_settings->get<qreal>("view/wheel_pan_step");
-    else
       dx -= gui_settings->get<qreal>("view/wheel_pan_step");
+    else
+      dx += gui_settings->get<qreal>("view/wheel_pan_step");
     wheel_deg.setX(0);
   }
 
@@ -903,9 +918,8 @@ void gui::DesignPanel::wheelPan(bool boost)
     dy *= boost_fact;
   }
 
-  translate(dx/trans.m11(), dy/trans.m22());
-
-  qDebug() << tr("Scroll: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
+  vsb->setValue(vsb->value()+dy);
+  hsb->setValue(hsb->value()+dx);
 }
 
 

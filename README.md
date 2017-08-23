@@ -124,7 +124,6 @@ All tasks described here contribute to save/load functionality
   * ~~When autosave/manual save are performed, store the stack id at which it was performed~~ Implemented 17.08.16
 * Saving
   * ~~Nested saving - recursive~~ Implemented 17.08.09
-  * Escape names properly
   * ~~Write error handling~~ Implemented 17.08.16
 * Loading
   * ~~Nested loading of items - recursive~~ Implemented 17.08.11
@@ -132,10 +131,10 @@ All tasks described here contribute to save/load functionality
   * Load layers with appropriate properties
   * Error alert dialog if latdot cannot be found during dbdot generation
   * Clean up the XML read write code to have a consistent style
-* Dialog when quitting
+* ~~Save dialog when quitting~~ Implemented 17.08.16
 * Autosaving per x minutes
   * ~~Detect changes in program. If no changes, don't run autosave.~~ Implemented 17.08.15
-  * Number of saves (setting)
+  * ~~Number of saves~~ Implemented 17.08.16
   * ~~Rotational save in a folder dedicated to that program instance~~ Implemented 17.08.16
   * Put tmp directory to system tmp?
 * autorecovery
