@@ -118,6 +118,12 @@ void gui::DesignPanel::resetDesignPanel()
 
   prim::Ghost::instance()->setScene(scene);
 
+  resetMatrix(); // resets QTransform, which undoes the zoom
+  QScrollBar *vsb = verticalScrollBar();
+  QScrollBar *hsb = horizontalScrollBar();
+  vsb->setValue(vsb->minimum());
+  hsb->setValue(hsb->minimum());
+
   qDebug() << tr("Design Panel reset complete");
 }
 
