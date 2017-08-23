@@ -18,15 +18,17 @@
 #include <iostream>
 
 
-
 // init the DialogPanel to NULL until build in constructor
 gui::DialogPanel *gui::ApplicationGUI::dialog_pan = 0;
 
 
 // constructor
 gui::ApplicationGUI::ApplicationGUI(QWidget *parent)
- : QMainWindow(parent)
+  : QMainWindow(parent)
 {
+  // save start time for instance recognition
+  start_time = QDateTime::currentDateTime();
+
   // initialise GUI
   initGUI();
 
@@ -104,8 +106,19 @@ void gui::ApplicationGUI::initMenuBar()
   QMenu *tools = menuBar()->addMenu(tr("&Tools"));
 
   // file menu actions
+  QAction *new_file = new QAction(tr("&New"), this);
   QAction *quit = new QAction(tr("&Quit"), this);
+  QAction *save = new QAction(tr("&Save"), this);
+  QAction *save_as = new QAction(tr("Save As..."), this);
+  QAction *open_save = new QAction(tr("&Open..."), this);
   quit->setShortcut(tr("CTRL+Q"));
+  save->setShortcut(tr("CTRL+S"));
+  save_as->setShortcut(tr("CTRL+SHIFT+S"));
+  open_save->setShortcut(tr("CTRL+O"));
+  file->addAction(new_file);
+  file->addAction(save);
+  file->addAction(save_as);
+  file->addAction(open_save);
   file->addAction(quit);
 
   QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
@@ -118,7 +131,12 @@ void gui::ApplicationGUI::initMenuBar()
   tools->addAction(screenshot);
   tools->addAction(design_screenshot);
 
-  connect(quit, &QAction::triggered, qApp, QApplication::quit);
+  connect(new_file, &QAction::triggered, this, &gui::ApplicationGUI::newFile);
+  //connect(quit, &QAction::triggered, qApp, QApplication::quit);
+  connect(quit, &QAction::triggered, this, &gui::ApplicationGUI::closeFile);
+  connect(save, &QAction::triggered, this, &gui::ApplicationGUI::saveDefault);
+  connect(save_as, &QAction::triggered, this, &gui::ApplicationGUI::saveNew);
+  connect(open_save, &QAction::triggered, this, &gui::ApplicationGUI::openFromFile);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
@@ -215,7 +233,11 @@ void gui::ApplicationGUI::initActions()
 
 void gui::ApplicationGUI::initState()
 {
+  settings::AppSettings *app_settings = settings::AppSettings::instance();
+
   setTool(gui::DesignPanel::SelectTool);
+  working_path.clear();
+  autosave_timer.start(1000*app_settings->get<int>("save/autosaveinterval"));
 }
 
 
@@ -228,6 +250,32 @@ void gui::ApplicationGUI::loadSettings()
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
   resize(gui_settings->get<QSize>("MWIN/size"));
+
+  // autosave related settings
+  settings::AppSettings *app_settings = settings::AppSettings::instance();
+  autosave_num = app_settings->get<int>("save/autosavenum");
+  autosave_root.setPath(app_settings->get<QString>("save/autosaveroot"));
+
+  // autosave directory for current instance
+  qint64 tag = QCoreApplication::applicationPid();
+  //QString tag = start_time.toString("yyMMdd-HHmmss")
+  autosave_dir.setPath(autosave_root.filePath(tr("instance-%1").arg(tag)));
+  autosave_dir.setNameFilters(QStringList() << "*.*");
+  autosave_dir.setFilter(QDir::Files);
+
+  // create the autosave directory
+  if(!autosave_dir.exists()){
+    if(autosave_dir.mkpath("."))
+      qDebug() << tr("Successfully created autosave directory");
+    else
+      qCritical() << tr("Failed to create autosave direcrory");
+  }
+
+  // auto save signal
+  connect(&autosave_timer, &QTimer::timeout, this, &gui::ApplicationGUI::autoSave);
+
+  // reset state
+  initState();
 }
 
 
@@ -237,6 +285,17 @@ void gui::ApplicationGUI::saveSettings()
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
   gui_settings->setValue("SBAR/loc", (int) toolBarArea(side_bar));
+
+  // remove autosave during peaceful termination
+  for(const QString &dirFile : autosave_dir.entryList())
+    autosave_dir.remove(dirFile); // remove autosave files
+
+  qDebug() << tr("Test: %1").arg(autosave_dir.absolutePath());
+
+  if(autosave_dir.removeRecursively())
+    qDebug() << tr("Removed autosave directory: %1").arg(autosave_dir.path());
+  else
+    qDebug() << tr("Failed to remove autosave directory: %1").arg(autosave_dir.path());
 }
 
 
@@ -335,6 +394,7 @@ void gui::ApplicationGUI::screenshot()
 
   gui::ApplicationGUI *widget = this;
   QRect rect = widget->rect();
+  initState();
 
   QSvgGenerator gen;
   gen.setFileName(fname);
@@ -383,4 +443,172 @@ void gui::ApplicationGUI::designScreenshot()
   painter.begin(&gen);
   widget->render(&painter);
   painter.end();
+}
+
+
+// FILE HANDLING
+
+
+// unsaved changes prompt, returns whether to proceed with operation or not
+bool gui::ApplicationGUI::resolveUnsavedChanges()
+{
+  QMessageBox msg_box;
+  msg_box.setText("The document contains unsaved changes.");
+  msg_box.setInformativeText("Would you like to save?");
+  msg_box.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+  msg_box.setDefaultButton(QMessageBox::Save);
+
+  // proceed only if either 'Save' or 'Discard'
+  int usr_sel = msg_box.exec();
+  return (usr_sel==QMessageBox::Save) ? saveToFile() : usr_sel==QMessageBox::Discard;
+}
+
+
+// make new file
+void gui::ApplicationGUI::newFile()
+{
+  // prompt user to resolve unsaved changes if program has been modified
+  if(design_pan->stateChanged())
+    if(!resolveUnsavedChanges())
+      return;
+
+  // reset widgets and reinitialize GUI state
+  design_pan->resetDesignPanel();
+  initState();
+}
+
+
+// save/load:
+bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const QString &path)
+{
+  QString write_path;
+
+  // determine target file
+  if(!path.isEmpty())
+    write_path = path;
+  else if(working_path.isEmpty() || flag==SaveAs){
+    write_path = QFileDialog::getSaveFileName(this, tr("Save File"),
+                  save_dir.filePath("cooldbdesign.xml"), tr("XML files (*.xml)"));
+    if(write_path.isEmpty())
+      return false;
+  }
+  else
+    write_path = working_path;
+
+  // add .xml extension if there isn't
+  if(!write_path.endsWith(".xml", Qt::CaseInsensitive))
+    write_path.append(".xml");
+
+  // set file name of [whatevername].writing while writing to prevent loss of previous save if this save fails
+  QFile file(write_path+".writing");
+
+  qDebug() << write_path;
+
+  if(!file.open(QIODevice::WriteOnly)){
+    qDebug() << tr("Save: Error when opening file to save: %1").arg(file.errorString());
+    return false;
+  }
+
+  // write to XML stream
+  QXmlStreamWriter stream(&file);
+  qDebug() << tr("Save: Beginning write to %1").arg(file.fileName());
+  stream.setAutoFormatting(true);
+  stream.writeStartDocument();
+
+  // call the save functions for each relevant class
+  stream.writeStartElement("dbdesigner");
+  design_pan->saveToFile(&stream);
+  stream.writeEndElement();
+
+  // close the file
+  file.close();
+
+  // delete the existing file and rename the new one to it
+  QFile::remove(write_path);
+  file.rename(write_path);
+
+  qDebug() << tr("Save: Write completed for %1").arg(file.fileName());
+
+  // update working path if needed
+  if(flag != AutoSave){
+    save_dir.setPath(write_path);
+    working_path = write_path;
+  }
+
+  return true;
+}
+
+
+void gui::ApplicationGUI::saveDefault()
+{
+  // default manual save without forcing file chooser
+  if(saveToFile(Save))
+    design_pan->stateSet();
+}
+
+
+void gui::ApplicationGUI::saveNew()
+{
+  // save to new file path with file chooser
+  if(saveToFile(SaveAs))
+    design_pan->stateSet();
+}
+
+
+void gui::ApplicationGUI::autoSave()
+{
+  // no check for changes in state... unneccesary complexity
+
+  qDebug() << tr("Autosave: %1").arg(autosave_dir.absolutePath());
+  if(!autosave_dir.exists()){
+    qCritical() << tr("Autosave: unable to create tmp instance directory at %1").arg(autosave_dir.path());
+    return;
+  }
+
+  autosave_ind = (autosave_ind+1) % autosave_num;
+  QString autosave_path = autosave_dir.filePath(tr("autosave-%1.xml").arg(autosave_ind));
+  saveToFile(AutoSave, autosave_path);
+
+  qDebug() << tr("Autosave complete");
+}
+
+
+void gui::ApplicationGUI::openFromFile()
+{
+  // prompt user to resolve unsaved changes if program has been modified
+  if(design_pan->stateChanged())
+    if(!resolveUnsavedChanges())
+      return;
+
+  // file dialog
+  QString prompt_path = QFileDialog::getOpenFileName(this, tr("Open File"), ".", tr("XML files (*.xml)"));
+
+  if(prompt_path.isEmpty())
+    return;
+
+  working_path = prompt_path;
+  QFile file(working_path);
+
+  if(!file.open(QFile::ReadOnly | QFile::Text)){
+    qDebug() << tr("Error when opening file to read: %1").arg(file.errorString());
+    return;
+  }
+
+  // read from XML stream
+  QXmlStreamReader stream(&file);
+  qDebug() << tr("Beginning load from %1").arg(file.fileName());
+  design_pan->loadFromFile(&stream);
+  qDebug() << tr("Load complete");
+  file.close();
+}
+
+
+void gui::ApplicationGUI::closeFile()
+{
+  // prompt user to resolve unsaved changes if program has been modified
+  if(design_pan->stateChanged())
+    if(!resolveUnsavedChanges())
+      return;
+
+  QApplication::quit();
 }

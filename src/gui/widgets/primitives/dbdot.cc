@@ -21,21 +21,85 @@ QColor prim::DBDot::selected_col;
 
 
 
-prim::DBDot::DBDot(prim::Layer *layer, prim::LatticeDot *src)
-  : prim::Item(prim::Item::DBDot, layer), source(src)
+prim::DBDot::DBDot(int lay_id, prim::LatticeDot *src)
+  : prim::Item(prim::Item::DBDot)
+{
+  initDBDot(lay_id, src);
+}
+
+
+prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
+  : prim::Item(prim::Item::DBDot)
+{
+  //qDebug() << QObject::tr("Constructing DBDot from XML");
+  QPointF scene_loc; // physical location from file
+  int lay_id; // layer id from file
+
+  while(!stream->atEnd()){
+    if(stream->isStartElement()){
+      if(stream->name() == "layer_id"){
+        lay_id = stream->readElementText().toInt();
+        //qDebug() << QObject::tr("DBDot: layer id is %1").arg(lay_id);
+        stream->readNext();
+      }
+      else if(stream->name() == "physloc"){
+        for(QXmlStreamAttribute &attr : stream->attributes()){
+          if(attr.name().toString() == QLatin1String("x"))
+            scene_loc.setX(scale_factor*attr.value().toFloat());
+          else if(attr.name().toString() == QLatin1String("y"))
+            scene_loc.setY(scale_factor*attr.value().toFloat());
+        }
+        //qDebug() << QObject::tr("DBDot: physical location (%1,%2)").arg(scene_loc.x()).arg(scene_loc.y());
+        stream->readNext();
+      }
+      else{
+        qDebug() << QObject::tr("DBDot: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
+        stream->readNext();
+      }
+    }
+    else if(stream->isEndElement()){
+      // break out of stream if the end of this element has been reached
+      if(stream->name() == "dbdot"){
+        stream->readNext();
+        break;
+      }
+      stream->readNext();
+    }
+    else
+      stream->readNext();
+  }
+
+  // show error if any
+  if(stream->hasError()){
+    qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
+  }
+
+  // find the lattice dot located at scene_loc
+  prim::LatticeDot *src_latdot = static_cast<prim::LatticeDot*>(scene->itemAt(scene_loc, QTransform()));
+
+  if(!src_latdot){
+    qCritical() << QObject::tr("No lattice dot at %1, %2").arg(scene_loc.x()).arg(scene_loc.y());
+    // TODO error alert dialog?
+  }
+
+  // initialize
+  initDBDot(lay_id, src_latdot);
+
+  scene->addItem(this);
+}
+
+
+void prim::DBDot::initDBDot(int lay_id, prim::LatticeDot *src)
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  setLayerIndex(lay_id);
 
   // construct static class variables
   if(diameter<0)
     constructStatics();
 
   // set dot location in pixels
-  if(src){
-    phys_loc = src->getPhysLoc();
-    setPos(src->pos());
-    src->setDBDot(this);
-  }
+  setSource(src);
 
   fill_fact = 0.;
   fill_col = gui_settings->get<QColor>("dbdot/fill_col");
@@ -47,15 +111,17 @@ prim::DBDot::DBDot(prim::Layer *layer, prim::LatticeDot *src)
 
 void prim::DBDot::setSource(prim::LatticeDot *src)
 {
-  // unset the previous LatticeDot
-  if(source)
-    source->setDBDot(0);
+  if(src){
+    // unset the previous LatticeDot
+    if(source)
+      source->setDBDot(0);
 
-  // move to new LatticeDot
-  src->setDBDot(this);
-  source=src;
-  phys_loc = src->getPhysLoc();
-  setPos(src->pos());
+    // move to new LatticeDot
+    src->setDBDot(this);
+    source=src;
+    phys_loc = src->getPhysLoc();
+    setPos(src->pos());
+  }
 }
 
 
@@ -93,9 +159,25 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
 
 prim::Item *prim::DBDot::deepCopy() const
 {
-  prim::DBDot *cp = new DBDot(layer, 0);
+  prim::DBDot *cp = new DBDot(layer_id, 0);
   cp->setPos(pos());
   return cp;
+}
+
+
+void prim::DBDot::saveItems(QXmlStreamWriter *stream) const
+{
+  stream->writeStartElement("dbdot");
+
+  // layer id
+  stream->writeTextElement("layer_id", QString::number(layer_id));
+
+  // physical location
+  stream->writeEmptyElement("physloc");
+  stream->writeAttribute("x", QString::number(getPhysLoc().x()));
+  stream->writeAttribute("y", QString::number(getPhysLoc().y()));
+
+  stream->writeEndElement();
 }
 
 

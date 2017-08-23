@@ -25,8 +25,8 @@ QColor prim::LatticeDot::in_fill_col;
 
 
 // the surface lattice will always be layer 0
-prim::LatticeDot::LatticeDot(prim::Layer *layer, QPointF p_loc):
-  prim::Item(prim::Item::LatticeDot, layer), phys_loc(p_loc), dbdot(0)
+prim::LatticeDot::LatticeDot(int lay_id, QPointF p_loc):
+  prim::Item(prim::Item::LatticeDot, lay_id), phys_loc(p_loc), dbdot(0)
 {
   // construct static class variables
   if(diameter < 0)
@@ -83,7 +83,7 @@ void prim::LatticeDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 prim::Item *prim::LatticeDot::deepCopy() const
 {
-  return new prim::LatticeDot(layer, phys_loc);
+  return new prim::LatticeDot(layer_id, phys_loc);
 }
 
 

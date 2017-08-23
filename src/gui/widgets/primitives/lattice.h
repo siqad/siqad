@@ -21,12 +21,14 @@ namespace prim{
   public:
 
     // constructor
-    Lattice(const QString &fname = QString());
+    Lattice(const QString &fname = QString(), int lay_id=-1);
 
     // destructor
     ~Lattice() {}
 
   private:
+
+    int layer_id;       // index of this layer in design panel's stack
 
     int n_cell;         // number of atoms in unit cell
 
