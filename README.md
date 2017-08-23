@@ -40,19 +40,11 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 
 ### Generic
 * Save DB layouts and load from save
-  * Save load script for each class
-    * Each item has a unique ID? Aggregates save those ID instead of pointer?
-    * Things that need to be saved:
-      * Layers (future-proof with electrodes and all)
-      * Aggregate structures
-      * DBDots
-      * (Optional) Undo stack
-  * "You have unsaved changes..."
-  * C-s C-Shift-s shortcuts
-  * Periodic autosave (and recovery)
-    * tmp folder, 3-5 files saved per minute or so
-    * on startup, check tmp folder for autosaved files
-    * on shutdown, remove those files
+  * ~~Save load script for each class~~ Implemented 17.08.09
+  * ~~"You have unsaved changes..."~~ Implemented 17.08.22
+  * ~~C-s C-Shift-s shortcuts~~ Implemented
+  * ~~Periodic autosave~~ 17.08.22
+  * Autorecovery
 * Don't deselect cells when entering Panning mode
 * When using DBGen Tool, show ghosts indicating where DBs will be created
 * Labels (input, output, other arbitrary labels)
@@ -111,8 +103,10 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * When attempting to select DBs using rubberband but clicked on a DB/aggregate as the starting location, the object at the starting position takes the press event and rubberband fails to show
 
 
-> keep track of remaining tasks on ongoing work
-### ONGOING
+> Past TODOs for implementations of major features
+## Past detailed TODOs
+
+### save-load branch
 All tasks described here contribute to save/load functionality
 * layer id related
   * ~~Change items to store layer id instead of layer pointer~~ Implemented 17.08.01
@@ -124,10 +118,10 @@ All tasks described here contribute to save/load functionality
   * ~~When autosave/manual save are performed, store the stack id at which it was performed~~ Implemented 17.08.16
 * Saving
   * ~~Nested saving - recursive~~ Implemented 17.08.09
-  * ~~Write error handling~~ Implemented 17.08.16
+  * ~~File write error handling~~ Implemented 17.08.16
 * Loading
   * ~~Nested loading of items - recursive~~ Implemented 17.08.11
-  * Load screen offset, zoom and rotation **issues with qtransform, investigate later**
+  * ~~Load screen offset, zoom and rotation~~ Implemented 17.08.23
   * Load layers with appropriate properties
   * Error alert dialog if latdot cannot be found during dbdot generation
   * Clean up the XML read write code to have a consistent style
