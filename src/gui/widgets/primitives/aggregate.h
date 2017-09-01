@@ -20,10 +20,14 @@ namespace prim{
   public:
 
     // constructor, takes a list of children Items
-    Aggregate(prim::Layer *layer, QStack<Item*> &items, QGraphicsItem *parent=0);
+    Aggregate(int lay_id, QStack<Item*> &items, QGraphicsItem *parent=0);
+    Aggregate(QXmlStreamReader *stream, QGraphicsScene *scene);
+    void initAggregate(QStack<Item*> &items, QGraphicsItem *parent=0);
 
     // destructor, makes all children belong to Aggregates parent
     ~Aggregate();
+
+    void addChildren(QStack<Item*> &items);
 
     QStack<prim::Item*> &getChildren() {return items;}
 
@@ -35,6 +39,9 @@ namespace prim{
 
     static QColor edge_col;
     static QColor edge_col_hovered;
+
+    // save to file
+    virtual void saveItems(QXmlStreamWriter *) const;
 
   private:
 

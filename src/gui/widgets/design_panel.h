@@ -30,12 +30,17 @@ namespace gui{
   public:
 
     enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool};
+    class UndoCommand;
 
     // constructor
     DesignPanel(QWidget *parent=0);
 
     // destructor
     ~DesignPanel();
+
+    // clear and reset
+    void clearDesignPanel(bool reset=false);
+    void resetDesignPanel();
 
     // ACCESSORS
 
@@ -72,6 +77,7 @@ namespace gui{
     // resets the drawing layer and builds a lattice from the given <lattice>.ini
     // file. If no file is given, the default lattice is used
     void buildLattice(const QString &fname=QString());
+    void setScenePadding();
 
     // update the tool type
     void setTool(ToolType tool);
@@ -79,6 +85,21 @@ namespace gui{
     // update the fill values for the surface dangling bonds, no check for
     // array size/contents.
     void setFills(float *fills);
+
+    // set the undo stack as clean at the current index
+    void stateSet() {undo_stack->setClean();}
+
+    // check if the contents of the DesignPanel have changed
+    bool stateChanged() const {return !undo_stack->isClean();}
+
+    // SAVE
+
+    // flag if actions are performed after last saved
+    int autosave_ind=0;
+    int save_ind=0;
+
+    void saveToFile(QXmlStreamWriter *);
+    void loadFromFile(QXmlStreamReader *);
 
   public slots:
 
@@ -160,11 +181,9 @@ namespace gui{
     // hide rubberband and reset flags
     void rubberBandEnd();
 
-    
 
-    // GHOSTING
 
-    // create a Ghost for the current selection or clipboard
+    // GHOSTclass UndoCommand;e a Ghost for the current selection or clipboard
     void createGhost(bool paste);
 
     // clear the current Ghost
@@ -188,7 +207,7 @@ namespace gui{
 
 
 
-    // UNDO/REDO FUNCTIONALITY
+    // UNDO/class UndoCommand;redo base class
 
     // fundamental undo/redo command classes, keep memory requirement small
 
@@ -230,7 +249,6 @@ namespace gui{
     bool moveToGhost(bool kill=false);
 
   };
-
 
 
 

@@ -22,8 +22,9 @@ void prim::Item::init()
   scale_factor = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
 }
 
-prim::Item::Item(ItemType type, prim::Layer *lay, QGraphicsItem *parent)
-  : QGraphicsItem(parent), item_type(type), layer(lay), hovered(false)
+//prim::Item::Item(ItemType type, prim::Layer *lay, QGraphicsItem *parent)
+prim::Item::Item(ItemType type, int lay_id, QGraphicsItem *parent)
+  : QGraphicsItem(parent), item_type(type), layer_id(lay_id), hovered(false)
 {
   if(scale_factor<0)
     init();

@@ -7,18 +7,75 @@
 // @desc:     Base class for Aggregate Item type
 
 #include "aggregate.h"
+#include "dbdot.h"
 
 QColor prim::Aggregate::edge_col;
 QColor prim::Aggregate::edge_col_hovered;
 
-prim::Aggregate::Aggregate(prim::Layer *layer, QStack<Item*> &items, QGraphicsItem *parent)
-  : prim::Item(prim::Item::Aggregate, layer, parent), items(items)
+prim::Aggregate::Aggregate(int lay_id, QStack<Item*> &items, QGraphicsItem *parent)
+  : prim::Item(prim::Item::Aggregate, lay_id, parent), items(items)
 {
-  // set all given items as children
-  for(prim::Item *item : items){
-    item->setParentItem(this);
-    item->setFlag(QGraphicsItem::ItemIsSelectable, false);
+  initAggregate(items, parent);
+}
+
+prim::Aggregate::Aggregate(QXmlStreamReader *stream, QGraphicsScene *scene)
+  : prim::Item(prim::Item::Aggregate)
+{
+  //qDebug() << QObject::tr("Aggregate: constructing aggregate from XML");
+  QStack<Item*> ld_children;
+  
+  // NOTE for now, all aggregates are in DB layer. 
+  // More sophisticated method of determination needed in the future.
+  int lay_id=1; 
+  
+  // read from XML stream (children will be created recursively, add those children to stack)
+  while(!stream->atEnd()){
+    if(stream->isStartElement()){
+      if(stream->name() == "dbdot"){
+        stream->readNext();
+        ld_children.push(new prim::DBDot(stream, scene));
+      }
+      else if(stream->name() == "aggregate"){
+        stream->readNext();
+        ld_children.push(new prim::Aggregate(stream, scene));
+      }
+      else{
+        qDebug() << QObject::tr("Aggregate: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
+        stream->readNext();
+      }
+    }
+    else if(stream->isEndElement()){
+      // break out of stream if the end of this element has been reached
+      if(stream->name() == "aggregate"){
+        stream->readNext();
+        break;
+      }
+      stream->readNext();
+    }
+    else
+      stream->readNext();
   }
+
+  // show error if any
+  if(stream->hasError()){
+    qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
+  }
+
+  // fill in aggregate properties
+  setLayerIndex(lay_id);
+  items = ld_children;
+  initAggregate(ld_children);
+
+  scene->addItem(this);
+}
+
+void prim::Aggregate::initAggregate(QStack<Item*> &items, QGraphicsItem *parent)
+{
+  // set parent
+  setParentItem(parent);
+
+  // set all given items as children
+  addChildren(items);
 
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setSelected(true);
@@ -38,6 +95,15 @@ prim::Aggregate::~Aggregate()
   //   // item->setFlag(QGraphicsItem::ItemIsSelectable, true);
   //   // item->setSelected(true);
   // }
+}
+
+void prim::Aggregate::addChildren(QStack<Item*> &items)
+{
+  // set all given items as children
+  for(prim::Item *item : items){
+    item->setParentItem(this);
+    item->setFlag(QGraphicsItem::ItemIsSelectable, false);
+  }
 }
 
 QRectF prim::Aggregate::boundingRect() const
@@ -93,7 +159,21 @@ prim::Item *prim::Aggregate::deepCopy() const
   QStack<prim::Item*> cp_items;
   for(prim::Item *item : items)
     cp_items.append(item->deepCopy());
-  return new prim::Aggregate(layer, cp_items, 0);
+  return new prim::Aggregate(layer_id, cp_items, 0);
+}
+
+
+void prim::Aggregate::saveItems(QXmlStreamWriter *stream) const {
+  // write open tag
+  stream->writeStartElement("aggregate");
+
+  // write child items
+  for(prim::Item *item : items){
+    item->saveItems(stream);
+  }
+
+  // write close tag
+  stream->writeEndElement();
 }
 
 

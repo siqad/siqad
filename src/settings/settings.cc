@@ -65,8 +65,13 @@ settings::LatticeSettings *settings::LatticeSettings::instance()
 void settings::LatticeSettings::updateLattice(const QString &fname)
 {
   // delete old lattice settings
-  if(inst)
+  if(inst){
     delete inst;
+    inst = 0;
+  }
+
+  // reconstruct defaults
+  defs = settings::LatticeSettings::m_defs();
 
   // create new instance of lattice settings
   if(fname.isEmpty())
@@ -87,7 +92,7 @@ QSettings *settings::AppSettings::m_defs()
 
   // overwrites existing default values with same keys... no check
 
-  S->setValue("log/override", true);
+  S->setValue("log/override", false);
   S->setValue("log/tofile", true);
   S->setValue("log/logfile", QString("src/log/log.txt"));
 
@@ -97,6 +102,10 @@ QSettings *settings::AppSettings::m_defs()
 
   S->setValue("phys/debye_length", 50);
   S->setValue("phys/epsr", 10);
+
+  S->setValue("save/autosaveroot", QString("tmp/autosave/"));
+  S->setValue("save/autosavenum", 3);
+  S->setValue("save/autosaveinterval", 300); // in seconds
 
   return S;
 }

@@ -40,25 +40,18 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 
 ### Generic
 * Save DB layouts and load from save
-  * Save load script for each class
-    * Each item has a unique ID? Aggregates save those ID instead of pointer?
-    * Things that need to be saved:
-      * Layers (future-proof with electrodes and all)
-      * Aggregate structures
-      * DBDots
-      * (Optional) Undo stack
-  * "You have unsaved changes..."
-  * C-s C-Shift-s shortcuts
-  * Periodic autosave (and recovery)
-    * tmp folder, 3-5 files saved per minute or so
-    * on startup, check tmp folder for autosaved files
-    * on shutdown, remove those files
+  * ~~Save load script for each class~~ Implemented 17.08.09
+  * ~~"You have unsaved changes..."~~ Implemented 17.08.22
+  * ~~C-s C-Shift-s shortcuts~~ Implemented
+  * ~~Periodic autosave~~ 17.08.22
+  * Autorecovery
 * Don't deselect cells when entering Panning mode
 * When using DBGen Tool, show ghosts indicating where DBs will be created
 * Labels (input, output, other arbitrary labels)
 * Screen capture tool options (light background mode, capture area)
 * CMI mode (e.g. single command to run batch simulations)
 * Shift + middle click drag "zoom to region"
+* Dialog panel add HTML color processing (and regex remove HTML tags when writing to log)
 * ~~Esc cancels paste operation~~ Implemented 17.07.13
 * ~~Esc cancels DB Tool~~ Implemented 17.07.13
 * ~~Visual feedback on which tool is currently in use (e.g. changed background of the button)~~ Implemented 17.07.12
@@ -96,6 +89,10 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 ## Physics Engine
 
 * Interface with solvers (standards for passing DB configuration to them, and taking results back)
+  * Singleton
+  * Custom class containing physical structure
+    * Location, dimensions, etc
+  * Custom class containing properties
 * Simple estimation tool of electron distribution
 * Static or animated display of charge (like the AFM images)
 
@@ -110,10 +107,49 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 ## Ongoing
 
 * Interface with solvers (standards for passing DB configuration to them, and taking results back)
-  * Write data structure to xml or something like that, instead of passing a C++ class structure. The former method allows compiled binaries of physics engines to read the file to run the simulation, the latter method requires the source code.
+  * Write data structure to xml
+    * Use normal save xml for now
+    * Temperarily use an available xml parser for now, might change later (rapidxml?)
     * Material, material parameters/properties (that can be overidden by the simulator), DB locations
-    * (optional for now?) Aggregates with predetermined simulation parameters
+    * Aggregates (in the future: predetermined simulation parameters for aggregates can be stored)
+* Classes completely unrelated to Qt - physics engine entirely written in C++
 * Simple estimation tool of electron distribution
   * Simulated annealing algorithm with 1. electron population determined by bulk-DB interaction and 2. inter-DB electron hopping.
   * Export results to file for gui to read - time, charge distribution, etc
 * Static or animated display of charge (like the AFM images)
+
+
+> Past TODOs for implementations of major features
+## Past detailed TODOs
+
+### save-load branch
+All tasks described here contribute to save/load functionality
+* layer id related
+  * ~~Change items to store layer id instead of layer pointer~~ Implemented 17.08.01
+  * ~~Add functionality to change layer id stored in layers and in child items when the layer's index changes in the stack~~ Implemented 17.08.02
+  * Clean up design panel code for layer id (make it less 'hacked-together', get rid of unnecessary converions)
+* ~~Undo/Redo stack indexing~~ Implemented 17.08.16
+  * ~~Make base class that always increments for each item added to the stack~~ Implemented 17.08.15
+  * ~~Each item stores the undo/redo stack ID~~ Implemented 17.08.15
+  * ~~When autosave/manual save are performed, store the stack id at which it was performed~~ Implemented 17.08.16
+* Saving
+  * ~~Nested saving - recursive~~ Implemented 17.08.09
+  * ~~File write error handling~~ Implemented 17.08.16
+* Loading
+  * ~~Nested loading of items - recursive~~ Implemented 17.08.11
+  * ~~Load screen offset, zoom and rotation~~ Implemented 17.08.23
+  * Load layers with appropriate properties
+  * Error alert dialog if latdot cannot be found during dbdot generation
+  * Clean up the XML read write code to have a consistent style
+* ~~Save dialog when quitting~~ Implemented 17.08.16
+* Autosaving per x minutes
+  * ~~Detect changes in program. If no changes, don't run autosave.~~ Implemented 17.08.15
+  * ~~Number of saves~~ Implemented 17.08.16
+  * ~~Rotational save in a folder dedicated to that program instance~~ Implemented 17.08.16
+  * Put tmp directory to system tmp?
+* autorecovery
+  * Check for existing autosaves, ask the user whether they want to recover the latest autosave.
+
+* Code improvement
+  * QLockFile for locking instance folder during creation
+    * Or, get the process ID and use that as part of the directory name - QCoreApplication::applicationPid()

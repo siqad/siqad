@@ -64,6 +64,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 
   // make lattice and surface layer
   buildLattice();
+  setScenePadding();
 
   // surface layer active on init
   top_layer = layers.at(1);
@@ -75,9 +76,15 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 // destructor
 gui::DesignPanel::~DesignPanel()
 {
+  clearDesignPanel(false);
+}
+
+// clear design panel
+void gui::DesignPanel::clearDesignPanel(bool reset)
+{
   // delete all graphical items from the scene
   scene->clear();
-  delete scene;   // does not delete contained items on its own
+  if(!reset) delete scene;
 
   // purge the clipboard
   for(prim::Item *item : clipboard)
@@ -88,9 +95,36 @@ gui::DesignPanel::~DesignPanel()
   for(prim::Layer *layer : layers)
     delete layer;
   layers.clear();
+  if(reset) prim::Layer::resetLayers();
 
   delete undo_stack;
+}
 
+// reset
+void gui::DesignPanel::resetDesignPanel()
+{
+  clearDesignPanel(true);
+
+  // REBUILD
+  // reset flags
+  clicked = ghosting = moving = false;
+  tool_type = gui::DesignPanel::NoneTool;     // now setTool will update the tool
+
+  undo_stack = new QUndoStack();
+  // TODO reset undo stack counter
+
+  buildLattice();
+  top_layer = layers.at(1);
+
+  prim::Ghost::instance()->setScene(scene);
+
+  resetMatrix(); // resets QTransform, which undoes the zoom
+  QScrollBar *vsb = verticalScrollBar();
+  QScrollBar *hsb = horizontalScrollBar();
+  vsb->setValue(vsb->minimum());
+  hsb->setValue(hsb->minimum());
+
+  qDebug() << tr("Design Panel reset complete");
 }
 
 
@@ -145,7 +179,8 @@ void gui::DesignPanel::addLayer(const QString &name)
     return;
   }
 
-  prim::Layer *layer = new prim::Layer(name);
+  // layer is added to the end of layers stack, so ID = layers.size() before it was added
+  prim::Layer *layer = new prim::Layer(name, layers.size());
   layers.append(layer);
 }
 
@@ -178,6 +213,10 @@ void gui::DesignPanel::removeLayer(int n)
     // delete layer
     delete layer;
     layers.removeAt(n);
+
+    // update layer_id for subsequent layers in the stack and their contained items
+    for(int i=n; i<layers.count(); i++)
+      layers.at(i)->setLayerIndex(i);
 
     // if top_layer was removed, default to surface if available else NULL
     if(top_layer==layer)
@@ -257,12 +296,11 @@ void gui::DesignPanel::buildLattice(const QString &fname)
 
   if(!fname.isEmpty() && DEFAULT_OVERRIDE){
     qWarning() << tr("Cannot change lattice when DEFAULT_OVERRIDE set");
-    // do nothing is the lattce has previously been defined
+    // do nothing if the lattice has previously been defined
     if(!layers.isEmpty())
       return;
   }
 
-  settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
   // NOTE: probably want a prompt to make sure user want to change the lattice
 
@@ -271,7 +309,7 @@ void gui::DesignPanel::buildLattice(const QString &fname)
     removeLayer(0);
 
   // build the new lattice
-  prim::Lattice *lattice = new prim::Lattice(fname);
+  prim::Lattice *lattice = new prim::Lattice(fname, layers.size());
 
   // add the lattice dots to the scene
   for(prim::Item *const item : lattice->getItems())
@@ -283,6 +321,10 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   // add in the dangling bond surface
   addLayer(tr("Surface"));
   top_layer = layers.at(1);
+}
+
+void gui::DesignPanel::setScenePadding(){
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
   // resize the scene with padding
   QRectF rect = scene->sceneRect();
@@ -338,6 +380,164 @@ void gui::DesignPanel::setFills(float *fills)
   }
 }
 
+
+// SAVE
+
+void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream){
+  int layer_ind;
+
+  // save program flags
+  stream->writeComment("Program Flags");
+  stream->writeStartElement("program");
+
+  stream->writeTextElement("version", "I don't know yet");
+  stream->writeTextElement("date", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+
+  stream->writeEndElement();
+
+  // save gui flags
+  stream->writeComment("GUI Flags");
+  stream->writeStartElement("gui");
+  
+  // save zoom and scroll bar position
+  stream->writeTextElement("zoom", QString::number(transform().m11())); // m11 of qtransform
+  stream->writeEmptyElement("scroll");
+  stream->writeAttribute("x", QString::number(verticalScrollBar()->value()));
+  stream->writeAttribute("y", QString::number(horizontalScrollBar()->value()));
+
+  // TODO lattice type
+
+  stream->writeEndElement();
+
+  // save layer properties
+  stream->writeComment("Layer Properties");
+  stream->writeComment("Layer ID is intrinsic to the layer order");
+  for(prim::Layer *layer : layers){
+    layer->saveLayer(stream);
+  }
+
+  // save item hierarchy
+  stream->writeComment("Item Hierarchy");
+  for(prim::Layer *layer : layers){
+    stream->writeComment(layer->getName());
+    layer->saveItems(stream);
+  }
+}
+
+void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
+  int layer_id=0;
+  QString layer_nm;
+  bool layer_visible, layer_active;
+
+  // reset the design panel state
+  resetDesignPanel();
+
+  // read from XML stream (children will be created recursively, add those children to stack)
+  while(!stream->atEnd()){
+    if(stream->isStartElement()){
+      // read GUI flags
+      if(stream->name() == "gui"){
+        stream->readNext();
+        // keep reading until end of gui tag
+        while(stream->name() != "gui"){
+          if(stream->isStartElement()){
+            qreal zoom,scroll_v,scroll_h;
+            if(stream->name() == "zoom"){
+              zoom = stream->readElementText().toDouble();
+            }
+            else if(stream->name() == "scroll"){
+              for(QXmlStreamAttribute &attr : stream->attributes()){
+                if(attr.name().toString() == QLatin1String("x"))
+                  scroll_v = attr.value().toInt();
+                else if(attr.name().toString() == QLatin1String("y"))
+                  scroll_h = attr.value().toInt();
+              }
+              setTransform(QTransform(zoom,0,0,zoom,0,0));
+              verticalScrollBar()->setValue(scroll_v);
+              horizontalScrollBar()->setValue(scroll_h);
+              /*qreal m11,m12,m21,m22,dx,dy;
+              for(QXmlStreamAttribute &attr : stream->attributes()){
+                if(attr.name().toString() == QLatin1String("m11"))
+                  m11 = attr.value().toDouble();
+                else if(attr.name().toString() == QLatin1String("m12"))
+                  m12 = attr.value().toDouble();
+                else if(attr.name().toString() == QLatin1String("m21"))
+                  m21 = attr.value().toDouble();
+                else if(attr.name().toString() == QLatin1String("m22"))
+                  m22 = attr.value().toDouble();
+                else if(attr.name().toString() == QLatin1String("dx"))
+                  dx = attr.value().toDouble();
+                else if(attr.name().toString() == QLatin1String("dy"))
+                  dy = attr.value().toDouble();
+              }*/
+              //setTransform(QTransform(m11,m12,m21,m22,dx,dy));
+              //qDebug() << tr("Loaded qtransform with m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(m11).arg(m12).arg(m21).arg(m22).arg(dx).arg(dy);
+            }
+            else{
+              qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
+            }
+            stream->readNext();
+          }
+          else
+            stream->readNext();
+        }
+      }
+      else if(stream->name() == "layer_prop"){
+        // construct layers
+        stream->readNext();
+        // keep reading until end of layer_prop tag
+        while(stream->name() != "layer_prop"){
+          bool visible_ld, active_ld;
+
+          if(stream->isStartElement()){
+            if(stream->name() == "name"){
+              layer_nm = stream->readElementText();
+              stream->readNext();
+            }
+            else if(stream->name() == "visible"){
+              layer_visible = (stream->readElementText() == "1")?1:0;
+              stream->readNext();
+            }
+            else if(stream->name() == "active"){
+              layer_active = (stream->readElementText() == "1")?1:0;
+              stream->readNext();
+            }
+            else{
+              qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
+              stream->readNext();
+            }
+          }
+          else{
+            stream->readNext();
+          }
+
+          // make layer object using loaded information
+          /*addLayer(layer_nm);
+          getLayer(layer_id)->setVisible(visible_ld);
+          getLayer(layer_id)->setActive(active_ld);
+          layer_id++;*/
+        }
+      }
+      else if(stream->name() == "layer"){
+        // recursively populate layer with items
+        stream->readNext();
+        getLayer(layer_id)->loadItems(stream, scene);
+        layer_id++;
+      }
+      else{
+        qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
+        stream->readNext();
+      }
+    }
+    else
+      stream->readNext();
+  }
+
+  // show error if any
+  if(stream->hasError()){
+    qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
+  }
+}
 
 
 // SLOTS
@@ -405,7 +605,9 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
   QPoint mouse_pos_del;
-  QTransform trans = transform();
+  //QTransform trans = transform();
+  QScrollBar *vsb = verticalScrollBar();
+  QScrollBar *hsb = horizontalScrollBar();
   qreal dx, dy;
 
   if(ghosting){
@@ -434,9 +636,10 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
       case Qt::MidButton:
         // middle button always pans
         mouse_pos_del = e->pos()-mouse_pos_old;
-        dx = mouse_pos_del.x()/trans.m11();
-        dy = mouse_pos_del.y()/trans.m22();
-        translate(dx, dy);
+        dx = mouse_pos_del.x();
+        dy = mouse_pos_del.y();
+        vsb->setValue(vsb->value()-dy);
+        hsb->setValue(hsb->value()-dx);
         mouse_pos_old = e->pos();
         break;
       case Qt::RightButton:
@@ -607,11 +810,14 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
       }
       case Qt::Key_Z:{
         // undo/redo based on keymods
+        //qDebug() << tr("Index before undo/redo: %1").arg(undo_stack->index());
         if(keymods == (Qt::ControlModifier | Qt::ShiftModifier))
           undo_stack->redo();
         else if(keymods == Qt::ControlModifier)
           undo_stack->undo();
         }
+        //qDebug() << tr("Index after undo/redo: %1").arg(undo_stack->index());
+        //qDebug() << tr("ptr %1").arg((size_t)undo_stack->command(undo_stack->index()));
         break;
       case Qt::Key_Y:{
         if(keymods == Qt::ControlModifier)
@@ -631,6 +837,11 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
         // delete selected items
         if(tool_type == gui::DesignPanel::SelectTool)
           deleteSelection();
+        break;
+      case Qt::Key_S:
+        if(keymods == Qt::ControlModifier){
+          //gui::ApplicationGUI::saveToFile();
+        }
         break;
       default:
         QGraphicsView::keyReleaseEvent(e);
@@ -665,38 +876,42 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
       QPointF old_pos = mapToScene(e->pos());
       scale(1+ds,1+ds);
       QPointF delta = mapToScene(e->pos()) - old_pos;
-      translate(delta.x(), delta.y());
+      verticalScrollBar()->setValue(verticalScrollBar()->value()-delta.y()*transform().m11());
+      horizontalScrollBar()->setValue(horizontalScrollBar()->value()-delta.x()*transform().m22());
     }
   }
 
   // reset both scrolls (avoid repeat from |x|>=120)
   wheel_deg.setX(0);
   wheel_deg.setY(0);
+
+  //qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
 }
 
 
 void gui::DesignPanel::wheelPan(bool boost)
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
-
-  QTransform trans = transform();
+  
   qreal dx=0, dy=0;
+  QScrollBar *vsb = verticalScrollBar();
+  QScrollBar *hsb = horizontalScrollBar();
 
   // y scrolling
   if(qAbs(wheel_deg.y())>=120){
     if(wheel_deg.y()>0)
-      dy += gui_settings->get<qreal>("view/wheel_pan_step");
-    else
       dy -= gui_settings->get<qreal>("view/wheel_pan_step");
+    else
+      dy += gui_settings->get<qreal>("view/wheel_pan_step");
     wheel_deg.setY(0);
   }
 
   // x scrolling
   if(qAbs(wheel_deg.x())>=120){
     if(wheel_deg.x()>0)
-      dx += gui_settings->get<qreal>("view/wheel_pan_step");
-    else
       dx -= gui_settings->get<qreal>("view/wheel_pan_step");
+    else
+      dx += gui_settings->get<qreal>("view/wheel_pan_step");
     wheel_deg.setX(0);
   }
 
@@ -707,7 +922,8 @@ void gui::DesignPanel::wheelPan(bool boost)
     dy *= boost_fact;
   }
 
-  translate(dx/trans.m11(), dy/trans.m22());
+  vsb->setValue(vsb->value()+dy);
+  hsb->setValue(hsb->value()+dx);
 }
 
 
@@ -736,7 +952,7 @@ void gui::DesignPanel::filterSelection(bool select_flag)
 
   // if select_flag, deselect all items in the lattice. Otherwise, keep only items in the lattice
   for(QGraphicsItem *gitem : scene->selectedItems()){
-    if( ( static_cast<prim::Item*>(gitem)->layer == layers.at(0)) == select_flag)
+    if( ( static_cast<prim::Item*>(gitem)->layer_id == 0) == select_flag)
       gitem->setSelected(false);
   }
 }
@@ -1011,6 +1227,7 @@ void gui::DesignPanel::snapDB(QPointF scene_pos)
 
 // UNDO/REDO STACK METHODS
 
+
 // CreateDB class
 
 gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
@@ -1042,7 +1259,7 @@ void gui::DesignPanel::CreateDB::create()
 {
   // add dangling bond to layer and scene, index in layer item stack will be
   // equal to layer->getItems().size()
-  dp->addItem(new prim::DBDot(dp->getLayer(layer_index), ldot), layer_index, index);
+  dp->addItem(new prim::DBDot(layer_index, ldot), layer_index, index);
 }
 
 void gui::DesignPanel::CreateDB::destroy()
@@ -1054,7 +1271,7 @@ void gui::DesignPanel::CreateDB::destroy()
     dbdot->getSource()->setDBDot(0);
 
     // destroy dbdot
-    dp->removeItem(dbdot, dbdot->layer);  // deletes dbdot
+    dp->removeItem(dbdot, dp->getLayer(dbdot->layer_id));  // deletes dbdot
     dbdot = 0;
   }
 }
@@ -1073,10 +1290,10 @@ gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
   }
 
   // get layer_index, and check that it is the same for all items
-  prim::Layer *layer = items.at(0)->layer;
-  layer_index = dp->getLayerIndex(layer);
+  layer_index = items.at(0)->layer_id;
+  prim::Layer *layer = dp->getLayer(layer_index);
   for(prim::Item *item : items)
-    if(item->layer != layer){
+    if(item->layer_id != layer_index){
       qWarning() << tr("Aggregates can only be formed from items in the same layer");
       return;
     }
@@ -1093,8 +1310,10 @@ gui::DesignPanel::FormAggregate::FormAggregate(prim::Aggregate *agg, int offset,
   : QUndoCommand(parent), invert(true), dp(dp)
 {
   // get layer index, assumes aggregate was formed using FormAggregate
-  prim::Layer *layer = agg->layer;
-  layer_index = dp->getLayerIndex(layer);
+  //prim::Layer *layer = agg->layer;
+  //layer_index = dp->getLayerIndex(layer);
+  layer_index = agg->layer_id;
+  prim::Layer *layer = dp->getLayer(layer_index);
 
   // aggregate index
   QStack<prim::Item*> layer_items = layer->getItems();
@@ -1130,7 +1349,7 @@ void gui::DesignPanel::FormAggregate::form()
     if(ind >= layer_items.size())
       qFatal("Undo/Redo mismatch... something went wrong");
     item = layer_items.at(ind);
-    if(item->layer != layer || item->parentItem() != 0)
+    if(item->layer_id != layer_index || item->parentItem() != 0)
       qFatal("Undo/Redo mismatch... something went wrong");
   }
 
@@ -1145,7 +1364,7 @@ void gui::DesignPanel::FormAggregate::form()
       item->scene()->removeItem(item);
 
   // add new aggregate to system
-  dp->addItem(new prim::Aggregate(layer, items), layer_index, agg_index);
+  dp->addItem(new prim::Aggregate(layer_index, items), layer_index, agg_index);
 }
 
 
@@ -1185,8 +1404,8 @@ gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
                                       DesignPanel *dp, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), offset(offset)
 {
-  layer_index = dp->getLayerIndex(item->layer);
-  item_index = item->layer->getItems().indexOf(item);
+  layer_index = item->layer_id;
+  item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
 }
 
 
@@ -1200,8 +1419,6 @@ void gui::DesignPanel::MoveItem::redo()
 {
   move(false);
 }
-
-
 
 void gui::DesignPanel::MoveItem::move(bool invert)
 {
@@ -1309,7 +1526,7 @@ void gui::DesignPanel::deleteSelection()
     switch(item->item_type){
       case prim::Item::DBDot:
         undo_stack->push(new CreateDB( static_cast<prim::DBDot*>(item)->getSource(),
-                                      getLayerIndex(item->layer), this, true));
+                                      item->layer_id, this, true));
         break;
       case prim::Item::Aggregate:
         destroyAggregate(static_cast<prim::Aggregate*>(item));
@@ -1332,7 +1549,8 @@ void gui::DesignPanel::formAggregate()
   QList<prim::Item*> items;
   for(QGraphicsItem *gitem : selection){
     items.append(static_cast<prim::Item*>(gitem));
-    if(items.last()->layer != layers.at(1)){
+    // if(items.last()->layer != layers.at(1)){ DOUBLE CHECK WITH JAKE
+    if(items.last()->layer_id != 1){
       qCritical() << tr("Selected aggregate item not in the surface...");
       return;
     }
@@ -1389,7 +1607,7 @@ void gui::DesignPanel::destroyAggregate(prim::Aggregate *agg)
     switch(item->item_type){
       case prim::Item::DBDot:
         undo_stack->push(new CreateDB(static_cast<prim::DBDot*>(item)->getSource(),
-                                      getLayerIndex(item->layer), this, true));
+                                      item->layer_id, this, true));
         break;
       case prim::Item::Aggregate:
         destroyAggregate(static_cast<prim::Aggregate*>(item));

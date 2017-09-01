@@ -42,7 +42,7 @@ HEADERS += \
 	src/gui/widgets/primitives/ghost.h \
 	src/gui/widgets/primitives/items.h \
 	src/gui/widgets/primitives/layer.h \
-	src/gui/widgets/primitives/lattice.h
+	src/gui/widgets/primitives/lattice.h \
 
 SOURCES += \
 	src/gui/widgets/primitives/emitter.cc \
@@ -70,6 +70,17 @@ SOURCES += \
 	src/gui/widgets/input_field.cc \
 	src/gui/widgets/info_panel.cc
 
+# physics engine
+
+#HEADERS += \
+#    src/phys/phys_engine.h \
+#    src/phys/problem.h \
+#    src/phys/sim_anneal.h
+#
+#SOURCES += \
+#    src/phys/phys_engine.cc \
+#    src/phys/problem.cc \
+#    src/phys/sim_anneal.cc
 
 
 #####################

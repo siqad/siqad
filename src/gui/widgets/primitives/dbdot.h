@@ -29,7 +29,9 @@ namespace prim{
   public:
 
     // constructor
-    DBDot(prim::Layer *layer, prim::LatticeDot *src=0);
+    DBDot(int lay_id, prim::LatticeDot *src=0);
+    DBDot(QXmlStreamReader *, QGraphicsScene *);
+    void initDBDot(int lay_id, prim::LatticeDot *src=0);
 
     // destructor
     ~DBDot(){}
@@ -50,6 +52,9 @@ namespace prim{
 
     prim::Item *deepCopy() const;
 
+    // SAVE LOAD
+    virtual void saveItems(QXmlStreamWriter *) const;
+
   private:
 
     // construct static variables
@@ -58,7 +63,7 @@ namespace prim{
     // VARIABLES
 
     QPointF phys_loc;         // physical location of dot in angstroms
-    prim::LatticeDot *source; // lattice site beneath dot
+    prim::LatticeDot *source=0; // lattice site beneath dot
 
     qreal fill_fact;  // area proportional of dot filled
     QColor fill_col;  // color of fill

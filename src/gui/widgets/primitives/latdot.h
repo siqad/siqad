@@ -30,7 +30,7 @@ namespace prim{
   public:
 
     // constructor, create a lattice dot at the given location in physical units
-    LatticeDot(prim::Layer *layer, QPointF p_loc);
+    LatticeDot(int layer_id, QPointF p_loc);
 
     // destructor
     ~LatticeDot(){}
