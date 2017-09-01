@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<db_problem>
+    <material_prop>
+        <silicon>
+            <smell>good</smell>
+            <taste>decent</taste>
+            <goes_well_with>beer</goes_well_with>
+        </silicon>
+        <copper>
+            <smell>money-like</smell>
+            <taste>money-like</taste>
+            <goes_well_with>beer</goes_well_with>
+        </copper>
+    </material_prop>
+    <sim_param>
+        <strength>5</strength>
+        <perception>6</perception>
+        <endurance>3</endurance>
+        <charisma>7</charisma>
+        <intelligence>9</intelligence>
+        <agility>3</agility>
+        <luck>9</luck>
+    </sim_param>
+    <db_tree>
+        <aggregate>
+            <dbdot x="0" y="4" />
+            <dbdot x="1" y="5" />
+            <dbdot x="2" y="6" />
+            <dbdot x="3" y="7" />
+        </aggregate>
+    </db_tree>
+</db_problem>

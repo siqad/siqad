@@ -1,0 +1,5 @@
+physeng
+.depend
+*.o
+build/
+bin/
