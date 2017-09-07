@@ -11,7 +11,7 @@
 using namespace phys;
 
 // Constructors
-Problem::Problem(const std::string &fname) 
+Problem::Problem(const std::string &fname)
 {
   initProblem();
   readProblem(fname);
@@ -24,41 +24,42 @@ void Problem::initProblem() {
 
 
 // Iterator
+
+Problem::DBIterator::DBIterator(std::shared_ptr<Aggregate> root, bool begin){
+  if(begin)
+    push(root);
+  else
+    db_iter = root->dbs.cend();
+}
+
 Problem::DBIterator& Problem::DBIterator::operator++(){
-  std::shared_ptr<Aggregate> curr = agg_stack.top().first;
 
-  std::cout << "entered DBIterator++" << std::endl;
+  // exhaust the current Aggregate DBs first
+  if(db_iter != curr->dbs.cend())
+    return ++db_iter != curr->dbs.cend() ? *this : ++(*this);
 
-  std::cout << "*db_iter (before): " << *db_iter << std::endl;
-  std::cout << "addr of curr->dbs.cend(): " << &*(curr->dbs.cend()) << std::endl;
-
-  // exhaust current DBs first
-  if(db_iter != curr->dbs.cend()) {
-    std::cout << "looking at DBs" << std::endl;
-    ++db_iter;
-    std::cout << "*db_iter (after): " << *db_iter << std::endl;
+  // if available, push the next aggregate onto the stack
+  if(agg_stack.top().second != curr->aggs.cend()){
+    push(*agg_stack.top().second);
     return db_iter != curr->dbs.cend() ? *this : ++(*this);
   }
-  // look at children aggregates
-  else if(agg_stack.top().second != curr->aggs.cend()) {
-    // add next aggregate to stack
-    std::cout << "looking at children aggregates" << std::endl;
-    curr = *agg_stack.top().second;
-    db_iter = curr->dbs.cbegin();
-    ++agg_stack.top().second; // AggIter should point to the next agg
-    agg_stack.push(make_pair(curr, curr->aggs.cbegin()));
-    return ++(*this);
-  }
-  // children aggregates and DBs exhausted, pop out this element
-  else {
-    std::cout << "agg and dbdots exhausted" << std::endl;
-    agg_stack.pop();
-    assert(!agg_stack.empty());
-    curr = agg_stack.top().first;
-    db_iter = curr->dbs.cend(); // prevent re-reading of parent dbs
-    std::cout << "addr of curr->dbs.cend(): " << &*(curr->dbs.cend()) << ". addr of db_iter: " << &*db_iter << std::endl;
-    return agg_stack.size() == 1 ? *this : ++(*this); // if there's only one elem in stack, iteration complete
-  }
+
+  // aggregate is complete, pop off stack
+  pop();
+  return agg_stack.size() == 1 ? *this : ++(*this);
+}
+
+void Problem::DBIterator::push(std::shared_ptr<Aggregate> agg){
+  ++agg_stack.top().second;
+  agg_stack.push(std::make_pair(agg, agg->aggs.cbegin()));
+  db_iter = agg->dbs.cbegin();
+  curr = agg;
+}
+
+void Problem::DBIterator::pop(){
+  agg_stack.pop();              // pop complete aggregate off stack
+  curr = agg_stack.top().first; // update current to new top
+  db_iter = curr->dbs.cend();   // don't reread dbs
 }
 
 
@@ -172,4 +173,3 @@ bool Problem::writeResult()
 {
   return true;
 }
-

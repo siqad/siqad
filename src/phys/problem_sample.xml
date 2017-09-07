@@ -27,6 +27,10 @@
                 <dbdot x="0" y="4" />
                 <dbdot x="1" y="5" />
             </aggregate>
+            <aggregate>
+                <dbdot x="7" y="11" />
+                <dbdot x="8" y="12" />
+            </aggregate>
             <dbdot x="2" y="6" />
             <dbdot x="3" y="7" />
             <dbdot x="4" y="8" />
