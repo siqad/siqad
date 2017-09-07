@@ -65,12 +65,13 @@ namespace phys{
         }
         else{
           // right-populate agg_stack
-          std::shared_ptr<Aggregate> agg = root;
+          /*std::shared_ptr<Aggregate> agg = root;
           do{
             agg_stack.push(std::make_pair(agg, agg->aggs.cend()));
             agg = agg->aggs.empty() ? 0 : agg->aggs.back();
           }while(agg);
-          db_iter = agg_stack.top().first->dbs.cend();
+          db_iter = agg_stack.top().first->dbs.cend();*/
+          db_iter = root->dbs.cend();
         }
       }
 

@@ -37,7 +37,7 @@ Problem::DBIterator& Problem::DBIterator::operator++(){
     std::cout << "looking at DBs" << std::endl;
     ++db_iter;
     std::cout << "*db_iter (after): " << *db_iter << std::endl;
-    return *this;
+    return db_iter != curr->dbs.cend() ? *this : ++(*this);
   }
   // look at children aggregates
   else if(agg_stack.top().second != curr->aggs.cend()) {
@@ -56,7 +56,8 @@ Problem::DBIterator& Problem::DBIterator::operator++(){
     assert(!agg_stack.empty());
     curr = agg_stack.top().first;
     db_iter = curr->dbs.cend(); // prevent re-reading of parent dbs
-    return ++(*this);
+    std::cout << "addr of curr->dbs.cend(): " << &*(curr->dbs.cend()) << ". addr of db_iter: " << &*db_iter << std::endl;
+    return agg_stack.size() == 1 ? *this : ++(*this); // if there's only one elem in stack, iteration complete
   }
 }
 
