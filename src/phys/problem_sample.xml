@@ -23,10 +23,15 @@
     </sim_param>
     <db_tree>
         <aggregate>
-            <dbdot x="0" y="4" />
-            <dbdot x="1" y="5" />
+            <aggregate>
+                <dbdot x="0" y="4" />
+                <dbdot x="1" y="5" />
+            </aggregate>
             <dbdot x="2" y="6" />
             <dbdot x="3" y="7" />
+            <dbdot x="4" y="8" />
         </aggregate>
+        <dbdot x="5" y="9" />
+        <dbdot x="6" y="10" />
     </db_tree>
 </db_problem>

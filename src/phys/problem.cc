@@ -18,8 +18,49 @@ Problem::Problem(const std::string &fname)
 }
 
 void Problem::initProblem() {
-  db_tree = std::make_unique<Problem::Aggregate>();
+  db_tree = std::make_shared<Problem::Aggregate>();
 }
+
+
+
+// Iterator
+Problem::DBIterator& Problem::DBIterator::operator++(){
+  std::shared_ptr<Aggregate> curr = agg_stack.top().first;
+
+  std::cout << "entered DBIterator++" << std::endl;
+
+  std::cout << "*db_iter (before): " << *db_iter << std::endl;
+  std::cout << "addr of curr->dbs.cend(): " << &*(curr->dbs.cend()) << std::endl;
+
+  // exhaust current DBs first
+  if(db_iter != curr->dbs.cend()) {
+    std::cout << "looking at DBs" << std::endl;
+    ++db_iter;
+    std::cout << "*db_iter (after): " << *db_iter << std::endl;
+    return *this;
+  }
+  // look at children aggregates
+  else if(agg_stack.top().second != curr->aggs.cend()) {
+    // add next aggregate to stack
+    std::cout << "looking at children aggregates" << std::endl;
+    curr = *agg_stack.top().second;
+    db_iter = curr->dbs.cbegin();
+    ++agg_stack.top().second; // AggIter should point to the next agg
+    agg_stack.push(make_pair(curr, curr->aggs.cbegin()));
+    return ++(*this);
+  }
+  // children aggregates and DBs exhausted, pop out this element
+  else {
+    std::cout << "agg and dbdots exhausted" << std::endl;
+    agg_stack.pop();
+    assert(!agg_stack.empty());
+    curr = agg_stack.top().first;
+    db_iter = curr->dbs.cend(); // prevent re-reading of parent dbs
+    return ++(*this);
+  }
+}
+
+
 
 
 // File handling
@@ -64,6 +105,7 @@ bool Problem::readProblem(const std::string &fname)
   // item tree
   std::cout << "Read DB tree" << std::endl;
   readItemTree(root_node->first_node("db_tree"), db_tree);
+  std::cout << "db_tree pointer " << db_tree.get() << std::endl;
 
   return true;
 }
@@ -88,26 +130,19 @@ bool Problem::readSimulationParam(rapidxml::xml_node<> *node)
 }
 
 
-bool Problem::readItemTree(rapidxml::xml_node<> *node, const std::unique_ptr<Aggregate>& agg_parent)
+bool Problem::readItemTree(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent)
 {
-  std::cout << "Entered readItemTree" << std::endl;
   for(rapidxml::xml_node<> *item_node = node->first_node(); item_node; item_node = item_node->next_sibling()){
     std::string item_name = item_node->name();
-    std::cout << "Item name: " << item_name << std::endl;
 
     if(!item_name.compare("aggregate")){
-      std::cout << "Entered Aggregate" << std::endl;
       // add aggregate child to tree
-      std::cout << "db_tree pointer " << db_tree.get() << std::endl;
-      agg_parent->aggs.push_back(std::make_unique<Aggregate>());
+      agg_parent->aggs.push_back(std::make_shared<Aggregate>());
       readItemTree(item_node, agg_parent->aggs.back());
-      std::cout << "Ended Aggregate" << std::endl;
     }
     else if(!item_name.compare("dbdot")) {
-      std::cout << "Entered DBDot" << std::endl;
       // add DBDot to tree
       readDBDot(item_node, agg_parent);
-      std::cout << "Ended DBDot" << std::endl;
     }
     else
       std::cout << "Encountered unknown item_node: " << item_node->name() << std::endl;
@@ -116,21 +151,17 @@ bool Problem::readItemTree(rapidxml::xml_node<> *node, const std::unique_ptr<Agg
 }
 
 
-bool Problem::readDBDot(rapidxml::xml_node<> *node, const std::unique_ptr<Aggregate>& agg_parent)
+bool Problem::readDBDot(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent)
 {
-  std::cout << "Entered readDBDot" << std::endl;
   float x,y;
 
   // read x and y from XML stream
   x = std::stof(node->first_attribute("x")->value());
   y = std::stof(node->first_attribute("y")->value());
 
-  std::cout << "DBDot read with x=" << x << ", y=" << y << std::endl;
-  std::cout << "agg_parent address: " << agg_parent.get() << std::endl;
+  agg_parent->dbs.push_back(std::make_shared<DBDot>(x,y));
 
-  agg_parent->dbdots.push_back(std::make_unique<DBDot>(x,y));
-
-  std::cout << "DBDot created" << std::endl;
+  std::cout << "DBDot created with x=" << agg_parent->dbs.back()->x << ", y=" << agg_parent->dbs.back()->y << std::endl;
 
   return true;
 }

@@ -3,3 +3,5 @@ physeng
 *.o
 build/
 bin/
+
+!Makefile

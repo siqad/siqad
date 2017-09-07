@@ -17,6 +17,8 @@ int main()
 {
   std::string fname("problem_sample.xml");
   SimAnneal sim_anneal(fname);
+
+  sim_anneal.runSim();
   //Problem *problem = new Problem();
 
   //problem->readProblem(std::string("problem_sample.xml"));

@@ -7,7 +7,9 @@
 // @desc:     Definition of the problem - dbdot loc, material properties, etc.
 
 #include <vector>
+#include <stack>
 #include <memory>
+//#include <iterator>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -36,8 +38,8 @@ namespace phys{
 
     // aggregate
     struct Aggregate {
-      std::vector<std::unique_ptr<Aggregate>> aggs;
-      std::vector<std::unique_ptr<DBDot>> dbdots;
+      std::vector<std::shared_ptr<Aggregate>> aggs;
+      std::vector<std::shared_ptr<DBDot>> dbs;
     };
 
     // electrode
@@ -48,17 +50,56 @@ namespace phys{
       float voltage;  // voltage that the electrode is set to
     };
 
+    // Iterator
+    typedef std::vector<std::shared_ptr<DBDot>>::const_iterator DBIter;
+    typedef std::vector<std::shared_ptr<Aggregate>>::const_iterator AggIter;
+
+    // a constant iterator that iterates through all dangling bonds in the problem
+    class DBIterator{
+    public:
+      explicit DBIterator(std::shared_ptr<Aggregate> root, bool begin=true){
+        // some sort of check for valid Aggregate root
+        if(begin){
+          db_iter = root->dbs.cbegin();
+          agg_stack.push(std::make_pair(root, root->aggs.cbegin()));
+        }
+        else{
+          // right-populate agg_stack
+          std::shared_ptr<Aggregate> agg = root;
+          do{
+            agg_stack.push(std::make_pair(agg, agg->aggs.cend()));
+            agg = agg->aggs.empty() ? 0 : agg->aggs.back();
+          }while(agg);
+          db_iter = agg_stack.top().first->dbs.cend();
+        }
+      }
+
+      //~Iterator() {delete agg_stack;};
+
+      DBIterator& operator++(); // recursive part here
+      bool operator==(const DBIterator &other) {return other.db_iter == db_iter;}
+      bool operator!=(const DBIterator &other) {return other.db_iter != db_iter;}
+      std::shared_ptr<DBDot> operator*() const {return *db_iter;}
+
+    private:
+      DBIter db_iter;
+      std::stack<std::pair<std::shared_ptr<Aggregate>, AggIter>> agg_stack;
+    };
+
+    DBIterator begin() {return DBIterator(db_tree);}
+    DBIterator end() {return DBIterator(db_tree, false);}
+
     // File Handling
 
     bool readProblem(const std::string &fname);
     bool readMaterialProp(rapidxml::xml_node<> *node);
     bool readSimulationParam(rapidxml::xml_node<> *node);
-    bool readItemTree(rapidxml::xml_node<> *node, const std::unique_ptr<Aggregate>& agg_parent);
-    bool readDBDot(rapidxml::xml_node<> *node, const std::unique_ptr<Aggregate>& agg_parent);
+    bool readItemTree(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent);
+    bool readDBDot(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent);
 
     static bool writeResult();
 
     // Variables
-    std::unique_ptr<Problem::Aggregate> db_tree;
+    std::shared_ptr<Aggregate> db_tree;
   };
 }
