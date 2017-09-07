@@ -57,22 +57,7 @@ namespace phys{
     // a constant iterator that iterates through all dangling bonds in the problem
     class DBIterator{
     public:
-      explicit DBIterator(std::shared_ptr<Aggregate> root, bool begin=true){
-        // some sort of check for valid Aggregate root
-        if(begin){
-          db_iter = root->dbs.cbegin();
-          agg_stack.push(std::make_pair(root, root->aggs.cbegin()));
-        }
-        else{
-          // right-populate agg_stack
-          std::shared_ptr<Aggregate> agg = root;
-          do{
-            agg_stack.push(std::make_pair(agg, agg->aggs.cend()));
-            agg = agg->aggs.empty() ? 0 : agg->aggs.back();
-          }while(agg);
-          db_iter = agg_stack.top().first->dbs.cend();
-        }
-      }
+      explicit DBIterator(std::shared_ptr<Aggregate> root, bool begin=true);
 
       //~Iterator() {delete agg_stack;};
 
@@ -82,8 +67,15 @@ namespace phys{
       std::shared_ptr<DBDot> operator*() const {return *db_iter;}
 
     private:
-      DBIter db_iter;
+      DBIter db_iter;                   // points to the current DB
+      std::shared_ptr<Aggregate> curr;  // current working Aggregate
       std::stack<std::pair<std::shared_ptr<Aggregate>, AggIter>> agg_stack;
+
+      // add a new aggregate pair to the stack
+      void push(std::shared_ptr<Aggregate> agg);
+
+      // pop the aggregate stack
+      void pop();
     };
 
     DBIterator begin() {return DBIterator(db_tree);}
