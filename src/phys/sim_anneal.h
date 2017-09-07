@@ -9,15 +9,37 @@
 #include "phys_engine.h"
 #include <vector>
 #include <memory>
+#include <cmath>
+#include <random>
 
 namespace phys {
 
   class SimAnneal: public PhysicsEngine
   {
   public:
+    // constructor
     SimAnneal(const std::string& fname);
+
+    // destructor
     ~SimAnneal() {};
 
+    // run simulation
     bool runSim();
+
+
+
+    // ACCEPTANCE FUNCTIONS
+
+    // acceptance function for population change. 
+      // v_offset shifts the probability function horizontally for freezing out the problem
+      // dir = 1 for 0->1, dir = 0 for 1->0
+      // temp = temperature
+    bool acceptPop(float v_eff, float v_offset, float temp, bool dir); 
+
+    // acceptance function for hopping
+    bool acceptHop(float v_del);
+
+    // generate true or false based on given probaility
+    bool evalProb(float prob);
   };
 }

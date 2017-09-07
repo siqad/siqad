@@ -29,6 +29,10 @@ namespace phys{
     // Destructor
     ~Problem() {};
 
+
+
+    // DB & AGG
+
     // dangling bond
     struct DBDot {
       float x,y;  // physical location in angstroms
@@ -37,9 +41,14 @@ namespace phys{
     };
 
     // aggregate
-    struct Aggregate {
+    class Aggregate 
+    {
+    public:
       std::vector<std::shared_ptr<Aggregate>> aggs;
       std::vector<std::shared_ptr<DBDot>> dbs;
+
+      // PROPERTIES
+      int size(); // returns the number of contained DBs, including those in children aggs
     };
 
     // electrode
@@ -50,12 +59,15 @@ namespace phys{
       float voltage;  // voltage that the electrode is set to
     };
 
-    // Iterator
+
+
+    // ITERATOR
     typedef std::vector<std::shared_ptr<DBDot>>::const_iterator DBIter;
     typedef std::vector<std::shared_ptr<Aggregate>>::const_iterator AggIter;
 
     // a constant iterator that iterates through all dangling bonds in the problem
-    class DBIterator{
+    class DBIterator
+    {
     public:
       explicit DBIterator(std::shared_ptr<Aggregate> root, bool begin=true);
 
@@ -81,7 +93,9 @@ namespace phys{
     DBIterator begin() {return DBIterator(db_tree);}
     DBIterator end() {return DBIterator(db_tree, false);}
 
-    // File Handling
+
+
+    // FILE HANDLING
 
     bool readProblem(const std::string &fname);
     bool readMaterialProp(rapidxml::xml_node<> *node);

@@ -10,30 +10,46 @@
 
 using namespace phys;
 
-// Constructors
+// Constructor
 Problem::Problem(const std::string &fname)
 {
   initProblem();
   readProblem(fname);
 }
 
-void Problem::initProblem() {
+void Problem::initProblem() 
+{
   db_tree = std::make_shared<Problem::Aggregate>();
 }
 
 
 
-// Iterator
+// DB & AGG
 
-Problem::DBIterator::DBIterator(std::shared_ptr<Aggregate> root, bool begin){
+// aggregate
+int Problem::Aggregate::size()
+{
+  int n_dbs=dbs.size();
+  if(!aggs.empty())
+    for(auto agg : aggs)
+      n_dbs += agg->size();
+  return n_dbs;
+}
+
+
+
+// ITERATOR
+
+Problem::DBIterator::DBIterator(std::shared_ptr<Aggregate> root, bool begin)
+{
   if(begin)
     push(root);
   else
     db_iter = root->dbs.cend();
 }
 
-Problem::DBIterator& Problem::DBIterator::operator++(){
-
+Problem::DBIterator& Problem::DBIterator::operator++()
+{
   // exhaust the current Aggregate DBs first
   if(db_iter != curr->dbs.cend())
     return ++db_iter != curr->dbs.cend() ? *this : ++(*this);
@@ -49,14 +65,16 @@ Problem::DBIterator& Problem::DBIterator::operator++(){
   return agg_stack.size() == 1 ? *this : ++(*this);
 }
 
-void Problem::DBIterator::push(std::shared_ptr<Aggregate> agg){
+void Problem::DBIterator::push(std::shared_ptr<Aggregate> agg)
+{
   ++agg_stack.top().second;
   agg_stack.push(std::make_pair(agg, agg->aggs.cbegin()));
   db_iter = agg->dbs.cbegin();
   curr = agg;
 }
 
-void Problem::DBIterator::pop(){
+void Problem::DBIterator::pop()
+{
   agg_stack.pop();              // pop complete aggregate off stack
   curr = agg_stack.top().first; // update current to new top
   db_iter = curr->dbs.cend();   // don't reread dbs
@@ -64,8 +82,7 @@ void Problem::DBIterator::pop(){
 
 
 
-
-// File handling
+// FILE HANDLING
 
 // parse problem XML, return true if successful
 bool Problem::readProblem(const std::string &fname)
