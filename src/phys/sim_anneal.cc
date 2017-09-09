@@ -19,10 +19,9 @@ SimAnneal::SimAnneal(const std::string& fname)
 bool SimAnneal::runSim()
 {
   int i=0,j=0;
-  std::vector<int> db_charges; // charge in each db, only 0 or 1 are allowed
-  std::vector<std::vector<float>> db_r; // distance between all dbs
-  float temp, v_eff, v_offset; // other system variables
+  int n_dbs = problem.db_tree.size();
 
+  // fill in r (db to db distance) matrix
   for(Problem::DBIterator db_iter1 = problem.begin(); db_iter1 != problem.end(); ++db_iter1) {
     for(Problem::DBIterator db_iter2 = problem.begin(); db_iter2 != problem.end(); ++db_iter2) {
       if (i>j)
@@ -39,17 +38,46 @@ bool SimAnneal::runSim()
 
 
 
-  // TODO random initial population and charge distribution
+  // initialize problem variables
+  float temp = 200, v_offset = 0, v_eff; // TODO placeholder for temp, change later
+  int from_db, to_db;
+  bool converged = false;
 
-  // TODO initial temperature
-
-  // while not converged
-    // for each dbdot
+  while(!converged) {
+    // pop
+    for(int i=0; i<n_dbs; i++) {
       // make changes to population using current electrostatics potential
       // accept population changes? (acceptance function)
-    // for each dbdot
-      // make changes to e- occupation (hopping, random)
-      // accept hopping changes? (if E goes down, accept 100%. Else, certain acceptance function)
+    }
+
+    // hop
+    bool finished_hop = false;
+    // TODO haven't figured out how many hops to perform in total
+    // TODO might have to store the previous hop(s) that has been performed to reduce redundant calculations
+    while(!finished_hop) {
+      prev_E = systemEnergy(); // calculate original energy
+
+      from_db = getRandDBInd(true); // from an occupied DB
+      to_db = getRandDBInd(false); // to an unoccupied DB
+
+      // perform the hop
+      db_charges[from_db] = 0;
+      db_charges[to_db] = 1;
+
+      // calculate new system energy and see whether the hop is accepted
+      new_E = systemEnergy();
+      if(!acceptHop(new_E-prev_E)) {
+        // reverse hop if the energy delta is unaccepted
+        db_charges[from_db] = 1;
+        db_charges[to_db] = 0;
+      }
+      else
+        successful_hops++; // TODO might not be useful at the end, delete this line if so
+
+      // TODO determine finished_hop
+    }
+  }
+
   return true;
 
   /* Iterator test code
@@ -73,6 +101,23 @@ bool SimAnneal::runSim()
   }
 
   std::cout << std::endl << "Iteration complete without seg fault!" << std::endl;*/
+}
+
+int SimAnneal::getRandDBInd(bool occ)
+{
+  vector<int> dbs;
+
+  // store the indices of dbs that have the desired occupation
+  for (int i=0; i<db_charges.size(); i++)
+    if (db_charges[i] == occ)
+      dbs.push_back(i);
+
+  // pick one from them
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<int> dis(0,dbs.size());
+
+  return dbs[dis(gen)];
 }
 
 bool SimAnneal::acceptPop(float v_eff, float v_offset, float temp, bool dir)

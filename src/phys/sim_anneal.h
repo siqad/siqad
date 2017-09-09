@@ -41,5 +41,9 @@ namespace phys {
 
     // generate true or false based on given probaility
     bool evalProb(float prob);
+
+  private:
+    std::vector<int> db_charges; // charge in each db, only 0 or 1 are allowed
+    std::vector<std::vector<float>> db_r; // distance between all dbs
   };
 }
