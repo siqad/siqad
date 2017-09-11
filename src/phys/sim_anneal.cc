@@ -19,7 +19,9 @@ SimAnneal::SimAnneal(const std::string& fname)
 bool SimAnneal::runSim()
 {
   int i=0,j=0;
-  int n_dbs = problem.db_tree.size();
+  int n_dbs = problem.db_tree->size();
+
+  // INIT VARS
 
   // fill in r (db to db distance) matrix
   for(Problem::DBIterator db_iter1 = problem.begin(); db_iter1 != problem.end(); ++db_iter1) {
@@ -36,10 +38,13 @@ bool SimAnneal::runSim()
     j=0;
   }
 
+  // TODO fill in v_ij, note how to deal with v_ii
+
+  // TODO fill in v_electrode (0 for now)
 
 
-  // initialize problem variables
-  float temp = 200, v_offset = 0, v_eff; // TODO placeholder for temp, change later
+  // other problem variables
+  float temp = 200, v_freeze = 0, v_eff; // TODO placeholder for temp, change later
   int from_db, to_db;
   bool converged = false;
 
@@ -47,12 +52,18 @@ bool SimAnneal::runSim()
     // pop
     for(int i=0; i<n_dbs; i++) {
       // make changes to population using current electrostatics potential
-      // accept population changes? (acceptance function)
+      v_eff = v_0 + v_electrode[i];
+      for(int j=0; j<n_dbs; j++)
+        v_eff += v_ij[i][j] * db_charges[j];
+
+      // make population change?
+      db_charges[i] = acceptPop(v_eff, v_freeze, temp, !db_charges[i]) ? 1 : 0;
     }
 
     // hop
     bool finished_hop = false;
-    // TODO haven't figured out how many hops to perform in total
+    int successful_hops;
+    float prev_E, new_E;
     // TODO might have to store the previous hop(s) that has been performed to reduce redundant calculations
     while(!finished_hop) {
       prev_E = systemEnergy(); // calculate original energy
@@ -75,7 +86,16 @@ bool SimAnneal::runSim()
         successful_hops++; // TODO might not be useful at the end, delete this line if so
 
       // TODO determine finished_hop
+      // TODO haven't figured out how many hops to perform in total
     }
+
+    // temp & v_freeze time step
+    tempStep();
+    vOffsetStep();
+
+    // TODO pre-annealing (keep time-step at 0 for a while)
+
+    // TODO determine convergence
   }
 
   return true;
@@ -103,38 +123,47 @@ bool SimAnneal::runSim()
   std::cout << std::endl << "Iteration complete without seg fault!" << std::endl;*/
 }
 
-int SimAnneal::getRandDBInd(bool occ)
+
+
+// ENV
+void SimAnneal::tempStep()
 {
-  vector<int> dbs;
 
-  // store the indices of dbs that have the desired occupation
-  for (int i=0; i<db_charges.size(); i++)
-    if (db_charges[i] == occ)
-      dbs.push_back(i);
-
-  // pick one from them
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<int> dis(0,dbs.size());
-
-  return dbs[dis(gen)];
 }
 
-bool SimAnneal::acceptPop(float v_eff, float v_offset, float temp, bool dir)
+void SimAnneal::vDelStep()
 {
-  float k = 8.61733E-5; // Boltzmann constant in eV/K, might have to switch to other units later
-  float v = dir ? v_eff-v_offset : v_offset-v_eff;
+
+}
+
+
+
+// PHYS CALC
+
+float SimAnneal::systemEnergy()
+{
+  
+}
+
+
+
+// ACCEPTANCE FUNCTIONS
+
+bool SimAnneal::acceptPop(int db_ind, bool direction)
+{
+  //float k = 8.61733E-5; // Boltzmann constant in eV/K, might have to switch to other units later
+  float v = direction ? v_eff[db_ind]-v_freeze : v_freeze-v_eff[db_ind];
   float prob;
   
-  prob = 1. / ( 1 + exp( v/(k*temp) ) );
+  prob = 1. / ( 1 + exp( v/kT ) );
 
   return evalProb(prob);
 }
 
 // acceptance function for hopping
-bool SimAnneal::acceptHop(float v_del)
+bool SimAnneal::acceptHop(float v_diff)
 {
-  if (v_del < 0)
+  if (v_diff < 0)
     return true;
 
   // some acceptance function, acceptance probability falls off exponentially
@@ -150,3 +179,31 @@ bool SimAnneal::evalProb(float prob)
 
   return dis(gen) >= prob;
 }
+
+
+
+
+// ACCESSORS
+
+int SimAnneal::getRandDBInd(bool occ)
+{
+  std::vector<int> dbs;
+
+  // store the indices of dbs that have the desired occupation
+  for (unsigned int i=0; i<db_charges.size(); i++)
+    if (db_charges[i] == occ)
+      dbs.push_back(i);
+
+  // pick one from them
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<int> dis(0,dbs.size());
+
+  return dbs[dis(gen)];
+}
+
+float SimAnneal::systemEnergy()
+{
+
+}
+
