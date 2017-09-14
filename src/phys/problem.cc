@@ -42,10 +42,17 @@ int Problem::Aggregate::size()
 
 Problem::DBIterator::DBIterator(std::shared_ptr<Aggregate> root, bool begin)
 {
-  if(begin)
+  if(begin){
+    // keep finding deeper aggregates until one that contains dbs is found
+    while(root->dbs.empty() && !root->aggs.empty()) {
+      push(root);
+      root = root->aggs.front();
+    }
     push(root);
-  else
+  }
+  else{
     db_iter = root->dbs.cend();
+  }
 }
 
 Problem::DBIterator& Problem::DBIterator::operator++()
@@ -67,7 +74,8 @@ Problem::DBIterator& Problem::DBIterator::operator++()
 
 void Problem::DBIterator::push(std::shared_ptr<Aggregate> agg)
 {
-  ++agg_stack.top().second;
+  if(!agg_stack.empty())
+    ++agg_stack.top().second;
   agg_stack.push(std::make_pair(agg, agg->aggs.cbegin()));
   db_iter = agg->dbs.cbegin();
   curr = agg;
