@@ -25,12 +25,8 @@ namespace phys {
 
     // run simulation
     bool runSim();
-
-
-
-    // ENV
-    void tempStep();
-    void vFreezeStep();
+    void timeStep();
+    void printCharges();
 
 
 
@@ -41,7 +37,7 @@ namespace phys {
 
     // ACCEPTANCE FUNCTIONS
     //bool acceptPop(float v_eff, float v_freeze, float temp, bool direction);  TODO del later
-    bool acceptPop(int db_ind, bool direction); 
+    bool acceptPop(int db_ind); 
     bool acceptHop(float v_diff); // acceptance function for hopping
     bool evalProb(float prob); // generate true or false based on given probaility
 
@@ -51,14 +47,22 @@ namespace phys {
     int getRandDBInd(bool occ);
 
   private:
-    std::vector<int> db_charges; // charge in each db, only 0 or 1 are allowed
-    std::vector<std::vector<float>> db_r; // distance between all dbs
-    
+    // CONST
+    const int div_0 = 1E5; // arbitrary big number that represents divide by 0
+    const float debye_length = 24E-6; // Silicon intrinsic Debye length in m (TODO trial and error to get good magic number)
+    const float har_to_ev = 27.2114; // hartree to eV conversion factor
+    const float db_distance_scale = 1E-10; // TODO move this to xml
+
     // VARIABLES
+    int n_dbs=-1; // number of dbs
+    std::vector<int> db_charges; // charge in each db, only 0 or 1 are allowed
+    std::vector<std::pair<float,float>> db_phys_loc;
+    std::vector<std::vector<float>> db_r; // distance between all dbs
     float v_0; // global potential and other stuff (magic number)
-    float kT, t, t_step; // temperature, time, time step for each time progression
+    float kT, kT_step, v_freeze_step; // temperature, time
+    int t=0;
     float v_freeze; // freeze out potential (pushes out population transition probability)
-    std::vector<float> v_eff, v_electrode;
+    std::vector<float> v_eff, v_electrodes;
     std::vector<std::vector<float>> v_ij;
   };
 }

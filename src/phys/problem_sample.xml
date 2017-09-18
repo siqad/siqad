@@ -24,18 +24,29 @@
     <db_tree>
         <aggregate>
             <aggregate>
-                <dbdot x="0" y="4" />
-                <dbdot x="1" y="5" />
+                <dbdot x="25.44" y="23.04" />
+                <dbdot x="17.76" y="23.04" />
+                <dbdot x="25.44" y="15.36" />
+                <dbdot x="17.76" y="15.36" />
             </aggregate>
             <aggregate>
-                <dbdot x="7" y="11" />
-                <dbdot x="8" y="12" />
+                <dbdot x="33.12" y="15.36" />
+                <dbdot x="40.8" y="15.36" />
+                <dbdot x="33.12" y="23.04" />
+                <dbdot x="40.8" y="23.04" />
             </aggregate>
-            <dbdot x="2" y="6" />
-            <dbdot x="3" y="7" />
-            <dbdot x="4" y="8" />
+            <aggregate>
+                <dbdot x="2.4" y="15.36" />
+                <dbdot x="10.08" y="15.36" />
+                <dbdot x="2.4" y="23.04" />
+                <dbdot x="10.08" y="23.04" />
+            </aggregate>
+            <aggregate>
+                <dbdot x="17.76" y="0" />
+                <dbdot x="25.44" y="0" />
+                <dbdot x="17.76" y="7.68" />
+                <dbdot x="25.44" y="7.68" />
+            </aggregate>
         </aggregate>
-        <dbdot x="5" y="9" />
-        <dbdot x="6" y="10" />
     </db_tree>
 </db_problem>
