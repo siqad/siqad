@@ -24,28 +24,40 @@
     <db_tree>
         <aggregate>
             <aggregate>
-                <dbdot x="25.44" y="23.04" />
-                <dbdot x="17.76" y="23.04" />
-                <dbdot x="25.44" y="15.36" />
-                <dbdot x="17.76" y="15.36" />
+                <dbdot x="7.68" y="7.68" elec="1" />
+                <dbdot x="0" y="7.68" elec="-1" />
+                <dbdot x="7.68" y="0" elec="-1" />
+                <dbdot x="0" y="0" elec="1" />
             </aggregate>
             <aggregate>
-                <dbdot x="33.12" y="15.36" />
-                <dbdot x="40.8" y="15.36" />
-                <dbdot x="33.12" y="23.04" />
-                <dbdot x="40.8" y="23.04" />
+                <dbdot x="15.36" y="0" elec="-1" />
+                <dbdot x="23.04" y="0" elec="-1" />
+                <dbdot x="15.36" y="7.68" elec="-1" />
+                <dbdot x="23.04" y="7.68" elec="-1" />
             </aggregate>
             <aggregate>
-                <dbdot x="2.4" y="15.36" />
-                <dbdot x="10.08" y="15.36" />
-                <dbdot x="2.4" y="23.04" />
-                <dbdot x="10.08" y="23.04" />
+                <dbdot x="30.72" y="0" elec="-1" />
+                <dbdot x="38.4" y="0" elec="-1" />
+                <dbdot x="30.72" y="7.68" elec="-1" />
+                <dbdot x="38.4" y="7.68" elec="-1" />
             </aggregate>
             <aggregate>
-                <dbdot x="17.76" y="0" />
-                <dbdot x="25.44" y="0" />
-                <dbdot x="17.76" y="7.68" />
-                <dbdot x="25.44" y="7.68" />
+                <dbdot x="46.08" y="0" elec="-1" />
+                <dbdot x="53.76" y="0" elec="-1" />
+                <dbdot x="46.08" y="7.68" elec="-1" />
+                <dbdot x="53.76" y="7.68" elec="-1" />
+            </aggregate>
+            <aggregate>
+                <dbdot x="61.44" y="0" elec="-1" />
+                <dbdot x="69.12" y="0" elec="-1" />
+                <dbdot x="61.44" y="7.68" elec="-1" />
+                <dbdot x="69.12" y="7.68" elec="-1" />
+            </aggregate>
+            <aggregate>
+                <dbdot x="76.8" y="0" elec="-1" />
+                <dbdot x="84.48" y="0" elec="-1" />
+                <dbdot x="76.8" y="7.68" elec="-1" />
+                <dbdot x="84.48" y="7.68" elec="-1" />
             </aggregate>
         </aggregate>
     </db_tree>

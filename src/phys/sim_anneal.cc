@@ -24,13 +24,17 @@ bool SimAnneal::runSim()
   float E_begin, E_end, E_converge = 1E-5; // NOTE arbitrary
   int converge_count = 0, converge_threshold = 10;
   int max_t = 10000, preanneal_t = 1000;
-  n_dbs = problem.db_tree->size();
   kT = 2.568E-2; kT_step = 0.999999; // kT = Boltzmann constant (eV/K) * 298 K, NOTE kT_step arbitrary
   v_freeze = 0, v_freeze_step = 0.001; // NOTE v_freeze_step arbitrary
-  v_0 = 7; // 10 is kinda okay
+  v_0 = 5; // 7 is good for the example problem TODO need a way to automatically find this number
+  debye_length = 24E-6;
 
   // general
   int i=0,j=0;
+  std::vector<std::pair<float,float>> db_loc;
+  std::vector<std::tuple<float,float,float>> fixed_charges;
+  //n_dbs = problem.db_tree->size(); // stopped using this because the size() function counts fixed polarity cells
+  n_dbs = 0;
 
   // hopping variables
   int from_db, to_db;
@@ -43,19 +47,25 @@ bool SimAnneal::runSim()
 
   // grab all physical locations (in original distance unit)
   std::cout << "Grab all physical locations..." << std::endl;
-  for(Problem::DBIterator db_iter = problem.begin(); db_iter != problem.end(); ++db_iter)
-    db_phys_loc.push_back(std::make_pair((**db_iter).x, (**db_iter).y));
+  for(Problem::DBIterator db_iter = problem.begin(); db_iter != problem.end(); ++db_iter) {
+    if( (**db_iter).elec == -1 ){
+      db_loc.push_back(std::make_pair((**db_iter).x, (**db_iter).y));
+      n_dbs++;
+    }
+    else
+      fixed_charges.push_back(std::make_tuple((**db_iter).x, (**db_iter).y, (**db_iter).elec));
+  }
 
   // resize vectors
   v_eff.resize(n_dbs);
-  v_electrodes.resize(n_dbs);
+  v_ext.resize(n_dbs);
   v_ij.resize(n_dbs);
   db_r.resize(n_dbs);
   db_charges.resize(n_dbs);
 
   // pre-calculation
   std::cout << "Performing pre-calculation..." << std::endl;
-  std::cout << "Size of db_phys_loc=" << db_phys_loc.size() << std::endl;
+  std::cout << "Size of db_loc=" << db_loc.size() << std::endl;
   for(i=0; i<n_dbs; i++) {
     db_r[i].resize(n_dbs);
     v_ij[i].resize(n_dbs);
@@ -69,14 +79,21 @@ bool SimAnneal::runSim()
         v_ij[i][j] = div_0;
       }
       else {
-        db_r[i][j] = sqrt(pow(db_phys_loc[i].first - db_phys_loc[j].first, 2.0) + pow(db_phys_loc[i].second - db_phys_loc[j].second, 2.0))*db_distance_scale; // converted to m
-        //v_ij[i][j] = exp(-db_r[i][j]/debye_length) / db_r[i][j];
-        v_ij[i][j] = 1.6E-19 / (4*3.14*8.854E-12) * exp(-db_r[i][j]/debye_length) / db_r[i][j]; // (close to) real v_ij, TODO revert to the version above after verification stage
+        db_r[i][j] = distance(db_loc[i].first, db_loc[i].second, db_loc[j].first, db_loc[j].second)*db_distance_scale;
+        v_ij[i][j] = interElecPotential(db_r[i][j]);
         std::cout << "db_r[" << i << "][" << j << "]=" << db_r[i][j] << ", v_ij[" << i << "][" << j << "]=" << v_ij[i][j] << std::endl;
       }
     }
+
+    // effect from fixed charges
+    v_ext[i] = 0;
+    for(std::tuple<float,float,float> fc : fixed_charges) {
+      float r = distance(std::get<0>(fc), std::get<1>(fc), db_loc[i].first, db_loc[i].second)*db_distance_scale;
+      v_ext[i] += interElecPotential(r);
+    }
+    // TODO add electrode effect to v_ext
+
     v_eff[i] = 0;
-    v_electrodes[i] = 0; // NOTE temporary
     db_charges[i] = 0;
   }
 
@@ -88,7 +105,7 @@ bool SimAnneal::runSim()
     // Population
     std::cout << "Population update, v_freeze=" << v_freeze << std::endl;
     for(i=0; i<n_dbs; i++) {
-      v_eff[i] = v_0 + v_electrodes[i];
+      v_eff[i] = v_0 + v_ext[i];
       for(j=0; j<n_dbs; j++)
         if(i!=j)
           v_eff[i] -= v_ij[i][j] * db_charges[j];
@@ -136,7 +153,7 @@ bool SimAnneal::runSim()
 
     // determine convergence
     E_end = systemEnergy();
-    if(!preanneal_t && (E_end-E_begin < E_converge)) {
+    if(!preanneal_t && (abs(E_end-E_begin) < E_converge)) {
       converge_count++;
       if(converge_count >= converge_threshold)
         converged = true;
@@ -253,10 +270,23 @@ float SimAnneal::systemEnergy()
   assert(n_dbs > 0);
   float v = v_0;
   for(int i=0; i<n_dbs; i++) {
-    v += db_charges[i] * v_electrodes[i];
+    v += db_charges[i] * v_ext[i];
     for(int j=i; j<n_dbs; j++)
       v += db_charges[i] * db_charges[j] * v_ij[i][j];
   }
   return v * har_to_ev;
+}
+
+
+float SimAnneal::distance(float x1, float y1, float x2, float y2)
+{
+  return sqrt(pow(x1-x2, 2.0) + pow(y1-y2, 2.0));
+}
+
+
+float SimAnneal::interElecPotential(float r)
+{
+  //return exp(-r/debye_length) / r;
+  return 1.6E-19 / (4*3.14*8.854E-12) * exp(-r/debye_length) / r; // TODO revert to the version above after verification stage
 }
 

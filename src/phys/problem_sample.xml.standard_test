@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<db_problem>
+    <material_prop>
+        <silicon>
+            <smell>good</smell>
+            <taste>decent</taste>
+            <goes_well_with>beer</goes_well_with>
+        </silicon>
+        <copper>
+            <smell>money-like</smell>
+            <taste>money-like</taste>
+            <goes_well_with>beer</goes_well_with>
+        </copper>
+    </material_prop>
+    <sim_param>
+        <strength>5</strength>
+        <perception>6</perception>
+        <endurance>3</endurance>
+        <charisma>7</charisma>
+        <intelligence>9</intelligence>
+        <agility>3</agility>
+        <luck>9</luck>
+    </sim_param>
+    <db_tree>
+        <aggregate>
+            <aggregate>
+                <dbdot x="25.44" y="23.04" elec="1" />
+                <dbdot x="17.76" y="23.04" elec="-1" />
+                <dbdot x="25.44" y="15.36" elec="-1" />
+                <dbdot x="17.76" y="15.36" elec="1" />
+            </aggregate>
+            <aggregate>
+                <dbdot x="33.12" y="15.36" elec="-1" />
+                <dbdot x="40.8" y="15.36" elec="-1" />
+                <dbdot x="33.12" y="23.04" elec="-1" />
+                <dbdot x="40.8" y="23.04" elec="-1" />
+            </aggregate>
+            <aggregate>
+                <dbdot x="2.4" y="15.36" elec="-1" />
+                <dbdot x="10.08" y="15.36" elec="-1" />
+                <dbdot x="2.4" y="23.04" elec="-1" />
+                <dbdot x="10.08" y="23.04" elec="-1" />
+            </aggregate>
+            <aggregate>
+                <dbdot x="17.76" y="0" elec="-1" />
+                <dbdot x="25.44" y="0" elec="-1" />
+                <dbdot x="17.76" y="7.68" elec="-1" />
+                <dbdot x="25.44" y="7.68" elec="-1" />
+            </aggregate>
+        </aggregate>
+    </db_tree>
+</db_problem>

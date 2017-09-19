@@ -8,6 +8,7 @@
 
 #include "phys_engine.h"
 #include <vector>
+#include <tuple>
 #include <memory>
 #include <cmath>
 #include <random>
@@ -32,6 +33,8 @@ namespace phys {
 
     // PHYS CALC
     float systemEnergy();
+    float distance(float x1, float y1, float x2, float y2);
+    float interElecPotential(float r);
 
 
 
@@ -49,20 +52,19 @@ namespace phys {
   private:
     // CONST
     const int div_0 = 1E5; // arbitrary big number that represents divide by 0
-    const float debye_length = 24E-6; // Silicon intrinsic Debye length in m (TODO trial and error to get good magic number)
     const float har_to_ev = 27.2114; // hartree to eV conversion factor
     const float db_distance_scale = 1E-10; // TODO move this to xml
 
     // VARIABLES
     int n_dbs=-1; // number of dbs
+    float debye_length; // Silicon intrinsic Debye length in m (TODO trial and error to get good magic number)
     std::vector<int> db_charges; // charge in each db, only 0 or 1 are allowed
-    std::vector<std::pair<float,float>> db_phys_loc;
     std::vector<std::vector<float>> db_r; // distance between all dbs
     float v_0; // global potential and other stuff (magic number)
     float kT, kT_step, v_freeze_step; // temperature, time
     int t=0;
     float v_freeze; // freeze out potential (pushes out population transition probability)
-    std::vector<float> v_eff, v_electrodes;
+    std::vector<float> v_eff, v_ext;
     std::vector<std::vector<float>> v_ij;
   };
 }
