@@ -27,7 +27,7 @@ bool SimAnneal::runSim()
   n_dbs = problem.db_tree->size();
   kT = 2.568E-2; kT_step = 0.999999; // kT = Boltzmann constant (eV/K) * 298 K, NOTE kT_step arbitrary
   v_freeze = 0, v_freeze_step = 0.001; // NOTE v_freeze_step arbitrary
-  v_0 = 10;
+  v_0 = 7; // 10 is kinda okay
 
   // general
   int i=0,j=0;

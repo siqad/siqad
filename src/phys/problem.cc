@@ -180,15 +180,16 @@ bool Problem::readItemTree(rapidxml::xml_node<> *node, const std::shared_ptr<Agg
 
 bool Problem::readDBDot(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent)
 {
-  float x,y;
+  float x,y,elec;
 
   // read x and y from XML stream
   x = std::stof(node->first_attribute("x")->value());
   y = std::stof(node->first_attribute("y")->value());
+  elec = std::stof(node->first_attribute("elec")->value());
 
-  agg_parent->dbs.push_back(std::make_shared<DBDot>(x,y));
+  agg_parent->dbs.push_back(std::make_shared<DBDot>(x,y,elec));
 
-  std::cout << "DBDot created with x=" << agg_parent->dbs.back()->x << ", y=" << agg_parent->dbs.back()->y << std::endl;
+  std::cout << "DBDot created with x=" << agg_parent->dbs.back()->x << ", y=" << agg_parent->dbs.back()->y << ", elec=" << agg_parent->dbs.back()->elec << std::endl;
 
   return true;
 }
