@@ -22,12 +22,13 @@ bool SimAnneal::runSim()
   // INIT VARS
   // user controlled (TODO move to .xml in the future)
   float E_begin, E_end, E_converge = 1E-5; // NOTE arbitrary
-  int converge_count = 0, converge_threshold = 10;
+  int converge_count = 0, converge_threshold = 100;
   int max_t = 10000, preanneal_t = 1000;
   kT = 2.568E-2; kT_step = 0.999999; // kT = Boltzmann constant (eV/K) * 298 K, NOTE kT_step arbitrary
   v_freeze = 0, v_freeze_step = 0.001; // NOTE v_freeze_step arbitrary
-  v_0 = 5; // 7 is good for the example problem TODO need a way to automatically find this number
-  debye_length = 24E-6;
+  v_0 = -0.5; // 7 is good for the example problem TODO need a way to automatically find this number
+  //debye_length = 24E-6;
+  debye_length = 5E-9; // ~10s of dimer rows
 
   // general
   int i=0,j=0;
@@ -38,7 +39,6 @@ bool SimAnneal::runSim()
 
   // hopping variables
   int from_db, to_db;
-  bool hop_done;
   int hop_count;
   float E_pre_hop, E_post_hop;
   bool converged = false;
@@ -103,7 +103,7 @@ bool SimAnneal::runSim()
     E_begin = systemEnergy();
 
     // Population
-    std::cout << "Population update, v_freeze=" << v_freeze << std::endl;
+    std::cout << "Population update, v_freeze=" << v_freeze << ", kT=" << kT << std::endl;
     for(i=0; i<n_dbs; i++) {
       v_eff[i] = v_0 + v_ext[i];
       for(j=0; j<n_dbs; j++)
@@ -117,13 +117,13 @@ bool SimAnneal::runSim()
 
     // Hopping
     std::cout << "Hopping" << std::endl;
-    hop_done = false;
     hop_count = 0;
+    int unocc_count = chargedDBCount(1);
     // TODO might have to store the previous hop(s) that has been performed to reduce redundant calculations
-    while(!hop_done) {
+    while(hop_count < unocc_count*5) {
       E_pre_hop = systemEnergy(); // original energy
-      from_db = getRandDBInd(true);
-      to_db = getRandDBInd(false);
+      from_db = getRandDBInd(1);
+      to_db = getRandDBInd(0);
 
       if(from_db == -1 || to_db == -1)
         break; // hopping not possible
@@ -137,13 +137,9 @@ bool SimAnneal::runSim()
       if(!acceptHop(E_post_hop-E_pre_hop)) // TODO WARNING acceptance function here contains placeholder values
         db_charges[from_db] = 1, db_charges[to_db] = 0;
 
-      hop_count++; // NOTE might not be useful at the end, delete this line if so
-
-      // determine hop_done
-      if(hop_count == 10) // TODO WARNING completely arbitrary
-        hop_done = true;
+      hop_count++;
     }
-    std::cout << std::endl;
+    printCharges();
 
     // Pre-annealing
     if(preanneal_t > 0)
@@ -208,8 +204,7 @@ bool SimAnneal::acceptPop(int db_ind)
   
   prob = 1. / ( 1 + exp( v/kT ) );
 
-  std::cout << "v_eff=" << v_eff[db_ind] << ", prob of population change from " << curr_charge << " to " << !curr_charge << ": " << prob << std::endl;
-  //std::cout << "v_eff=" << v_eff[db_ind] << ", v_freeze=" << v_freeze << std::endl;
+  //std::cout << "v_eff=" << v_eff[db_ind] << ", P(" << curr_charge << "->" << !curr_charge << ")=" << prob << std::endl;
 
   return evalProb(prob);
 }
@@ -244,13 +239,23 @@ bool SimAnneal::evalProb(float prob)
 // ACCESSORS
 
 
-int SimAnneal::getRandDBInd(bool occ)
+int SimAnneal::chargedDBCount(int charge)
+{
+  int i=0;
+  for(int db_charge : db_charges)
+    if(db_charge == charge)
+      i++;
+  return i;
+}
+
+
+int SimAnneal::getRandDBInd(int charge)
 {
   std::vector<int> dbs;
 
   // store the indices of dbs that have the desired occupation
   for (unsigned int i=0; i<db_charges.size(); i++)
-    if (db_charges[i] == occ)
+    if (db_charges[i] == charge)
       dbs.push_back(i);
 
   if (dbs.empty())
@@ -259,10 +264,16 @@ int SimAnneal::getRandDBInd(bool occ)
   // pick one from them
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_real_distribution<float> dis(0.0,static_cast<float>(dbs.size()));
+  std::uniform_int_distribution<int> dis(0,dbs.size()-1);
 
   return dbs[dis(gen)];
 }
+
+
+
+
+
+// PHYS CALCU
 
 
 float SimAnneal::systemEnergy()

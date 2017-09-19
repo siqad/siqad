@@ -47,7 +47,8 @@ namespace phys {
 
 
     // OTHER ACCESSORS
-    int getRandDBInd(bool occ);
+    int getRandDBInd(int charge);
+    int chargedDBCount(int charge);
 
   private:
     // CONST
