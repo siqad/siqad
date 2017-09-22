@@ -7,6 +7,7 @@
 // @desc:     Simulated annealing physics engine
 
 #include "phys_engine.h"
+#include "logger.h"
 #include <vector>
 #include <tuple>
 #include <memory>
@@ -25,6 +26,8 @@ namespace phys {
     ~SimAnneal() {};
 
     // run simulation
+    void initVars();
+    void precalc();
     bool runSim();
     void timeStep();
     void printCharges();
@@ -61,11 +64,15 @@ namespace phys {
     float debye_length; // Silicon intrinsic Debye length in m (TODO trial and error to get good magic number)
     std::vector<int> db_charges; // charge in each db, only 0 or 1 are allowed
     std::vector<std::vector<float>> db_r; // distance between all dbs
+    std::vector<std::pair<float,float>> db_loc; // location of free dbs
+    std::vector<std::tuple<float,float,float>> fixed_charges; // location of fixed charges
     float v_0; // global potential and other stuff (magic number)
     float kT, kT_step, v_freeze_step; // temperature, time
-    int t=0;
+    float E_converge;
+    int t=0, max_t, preanneal_t, converge_threshold;
     float v_freeze; // freeze out potential (pushes out population transition probability)
-    std::vector<float> v_eff, v_ext;
+    std::vector<float> v_eff, v_ext, v_drive;
     std::vector<std::vector<float>> v_ij;
+    float unfav_hop_scale; // acceptance prob of positive energy hopes, lower for less probable: exp(-v_diff/unfav_hop_scale)
   };
 }
