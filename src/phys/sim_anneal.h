@@ -9,6 +9,7 @@
 #include "phys_engine.h"
 #include "logger.h"
 #include <vector>
+#include <deque>
 #include <tuple>
 #include <memory>
 #include <cmath>
@@ -29,6 +30,7 @@ namespace phys {
     void initVars();
     void precalc();
     bool runSim();
+    void simAnneal();
     void timeStep();
     void printCharges();
 
@@ -62,17 +64,20 @@ namespace phys {
     // VARIABLES
     int n_dbs=-1; // number of dbs
     float debye_length; // Silicon intrinsic Debye length in m (TODO trial and error to get good magic number)
-    std::vector<int> db_charges; // charge in each db, only 0 or 1 are allowed
+    //std::vector<int> db_charges; // charge in each db, only 0 or 1 are allowed
     std::vector<std::vector<float>> db_r; // distance between all dbs
     std::vector<std::pair<float,float>> db_loc; // location of free dbs
     std::vector<std::tuple<float,float,float>> fixed_charges; // location of fixed charges
     float v_0; // global potential and other stuff (magic number)
     float kT, kT_step, v_freeze_step; // temperature, time
-    float E_converge;
-    int t=0, max_t, preanneal_t, converge_threshold;
+    int t=0, t_max, t_preanneal;
     float v_freeze; // freeze out potential (pushes out population transition probability)
     std::vector<float> v_eff, v_ext, v_drive;
     std::vector<std::vector<float>> v_ij;
     float unfav_hop_scale; // acceptance prob of positive energy hopes, lower for less probable: exp(-v_diff/unfav_hop_scale)
+    // TODO result queue: which type?
+    int result_queue_size;
+    std::deque<std::vector<int>> db_charges;
+    std::vector<int> curr_charges;
   };
 }
