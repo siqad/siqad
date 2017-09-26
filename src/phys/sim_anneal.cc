@@ -17,19 +17,55 @@ SimAnneal::SimAnneal(const std::string& fname)
 }
 
 
+bool SimAnneal::runSim()
+{
+  // grab all physical locations (in original distance unit)
+  std::cout << "Grab all physical locations..." << std::endl;
+  n_dbs = 0;
+  for(Problem::DBIterator db_iter = problem.begin(); db_iter != problem.end(); ++db_iter) {
+    if( (**db_iter).elec != 1 ){
+      db_loc.push_back(std::make_pair((**db_iter).x, (**db_iter).y));
+      n_dbs++;
+      std::cout << "DB loc: x=" << db_loc.back().first << ", y=" << db_loc.back().second << std::endl;
+    }
+    else
+      fixed_charges.push_back(std::make_tuple((**db_iter).x, (**db_iter).y, (**db_iter).elec));
+  }
+
+  std::cout << "Free dbs, n_dbs=" << n_dbs << std::endl;
+
+  // initialize variables & perform pre-calculation
+  initVars();
+  precalc();
+
+
+  // SIM ANNEAL
+  simAnneal();
+
+
+  return true;
+}
+
+
+// PRIVATE
+
 void SimAnneal::initVars()
 {
+  std::cout << "Initializing variables..." << std::endl;
+  if(n_dbs <= 0){
+    std::cout << "There are no dbs in the problem!" << std::endl;
+    return;
+  }
   // these should move to XML
   //t_max = 10000;
   //t_preanneal = 1000;
   t_max = 10;
   t_preanneal = 10;
-  kT = 2.568E-2; kT_step = 0.999999; // kT = Boltzmann constant (eV/K) * 298 K, NOTE kT_step arbitrary
-  v_freeze = 0, v_freeze_step = 0.001; // NOTE v_freeze_step arbitrary
-  v_0 = 2; // 7 is good for the example problem TODO need a way to automatically find this number
-  debye_length = 5E-9; // ~10s of dimer rows
-  n_dbs = 0;
-  unfav_hop_scale = 1; // TODO still needs experimenting
+  kT = 2.568E-2; kT_step = 0.999999;    // kT = Boltzmann constant (eV/K) * 298 K, NOTE kT_step arbitrary
+  v_freeze = 0, v_freeze_step = 0.001;  // NOTE v_freeze_step arbitrary
+  v_0 = 1;                // TODO need a way to automatically find this number
+  debye_length = 5E-9;    // ~10s of dimer rows
+  unfav_hop_scale = 1;    // TODO still needs experimenting
   result_queue_size = 100;
 
   // resize vectors
@@ -38,8 +74,12 @@ void SimAnneal::initVars()
   v_drive.resize(n_dbs);
   v_ij.resize(n_dbs);
   db_r.resize(n_dbs);
+
   db_charges.resize(result_queue_size);
   db_charges.push_back(std::vector<int>(n_dbs));
+  curr_charges = db_charges.back();
+
+  std::cout << "Variable initialization complete" << std::endl;
 }
 
 void SimAnneal::precalc()
@@ -52,11 +92,8 @@ void SimAnneal::precalc()
 
   for(int i=0; i<n_dbs; i++) {
     db_r[i].resize(n_dbs);
-    std::cout << "resized db_r[" << i << "]" << std::endl;
     v_ij[i].resize(n_dbs);
-    std::cout << "resized v_ij[" << i << "]" << std::endl;
     for(int j=0; j<n_dbs; j++) {
-      std::cout << "i=" << i << ",j=" << j << std::endl;
       if (i>j) {
         db_r[i][j] = db_r[j][i];
         v_ij[i][j] = v_ij[j][i];
@@ -78,6 +115,7 @@ void SimAnneal::precalc()
       float r = distance(std::get<0>(fc), std::get<1>(fc), db_loc[i].first, db_loc[i].second)*db_distance_scale;
       v_drive[i] += interElecPotential(r);
     }
+    std::cout << "v_drive["<<i<<"]="<<v_drive[i]<<std::endl;
     // TODO add electrode effect to v_ext
 
     v_eff[i] = 0;
@@ -88,52 +126,21 @@ void SimAnneal::precalc()
 }
 
 
-bool SimAnneal::runSim()
-{
-  // grab all physical locations (in original distance unit)
-  std::cout << "Grab all physical locations..." << std::endl;
-  for(Problem::DBIterator db_iter = problem.begin(); db_iter != problem.end(); ++db_iter) {
-    if( (**db_iter).elec == -1 ){
-      db_loc.push_back(std::make_pair((**db_iter).x, (**db_iter).y));
-      n_dbs++;
-    }
-    else
-      fixed_charges.push_back(std::make_tuple((**db_iter).x, (**db_iter).y, (**db_iter).elec));
-  }
-
-  std::cout << "Free dbs, n_dbs=" << n_dbs << std::endl;
-
-  // INIT VARS
-  initVars();
-
-  // pre-calculation
-  precalc();
-
-
-  // SIM ANNEAL
-  simAnneal();
-
-
-  return true;
-}
-
 void SimAnneal::simAnneal()
 {
   std::cout << "Performing simulated annealing..." << std::endl;
 
   // Vars
-  float E_begin, E_end; // NOTE arbitrary
+  float E_begin, E_end;
   int i=0,j=0;
-  int from_db, to_db; // hopping from -> to (indices)
+  int from_ind, to_ind; // hopping from -> to (indices)
   int hop_count;
   float E_pre_hop, E_post_hop;
 
+  // Run simulated annealing for predetermined time steps
   while(t < t_max) {
-    if(!db_charges.empty())
-      db_charges.push_back(db_charges.back()); // copy and pushback the last charges vector, and use it for manipulation
-    curr_charges = db_charges.back();
-
     E_begin = systemEnergy();
+
 
     // Population
     std::cout << "Population update, v_freeze=" << v_freeze << ", kT=" << kT << std::endl;
@@ -143,10 +150,10 @@ void SimAnneal::simAnneal()
         if(i!=j)
           v_eff[i] -= v_ij[i][j] * curr_charges[j];
 
-      // accept population change?
-      curr_charges[i] = acceptPop(i) ? !curr_charges[i] : curr_charges[i];
+      curr_charges[i] = acceptPop(i) ? !curr_charges[i] : curr_charges[i]; // accept population change?
     }
     printCharges();
+
 
     // Hopping
     std::cout << "Hopping" << std::endl;
@@ -155,29 +162,33 @@ void SimAnneal::simAnneal()
     while(hop_count < unocc_count*5) {
       // TODO instead of finding system energy twice, could just find the potential difference of the db between pre- and post-hop
       E_pre_hop = systemEnergy(); // original energy
-      from_db = getRandDBInd(1);
-      to_db = getRandDBInd(0);
+      from_ind = getRandDBInd(1);
+      to_ind = getRandDBInd(0);
 
-      if(from_db == -1 || to_db == -1)
+      if(from_ind == -1 || to_ind == -1)
         break; // hopping not possible
 
       // perform the hop
-      curr_charges[from_db] = 0;
-      curr_charges[to_db] = 1;
+      dbHop(from_ind, to_ind);
       E_post_hop = systemEnergy(); // new energy
 
       // accept hop given energy change? reverse hop if energy delta is unaccpted
       if(!acceptHop(E_post_hop-E_pre_hop))
-        curr_charges[from_db] = 1, curr_charges[to_db] = 0;
+        dbHop(to_ind, from_ind);
+        //curr_charges[from_ind] = 1, curr_charges[to_ind] = 0;
       else{
         std::cout << "Hop performed: ";
         printCharges();
         std::cout << "Energy diff=" << E_post_hop-E_pre_hop << std::endl;
       }
-
       hop_count++;
     }
+    std::cout << "Charge post-hop=";
     printCharges();
+
+
+    // push back the new arrangement
+    db_charges.push_back(curr_charges);
 
     // perform time-step if not pre-annealing
     if(t_preanneal > 0)
@@ -185,14 +196,19 @@ void SimAnneal::simAnneal()
     else
       timeStep();
 
-    // TODO add result to queue
-
     // print statistics
     E_end = systemEnergy();
     std::cout << "Cycle: " << ((t_preanneal > 0) ? -t_preanneal : t);
     std::cout << ", ending energy: " << E_end;
     std::cout << ", delta: " << E_end-E_begin << std::endl << std::endl;
   }
+}
+
+
+void SimAnneal::dbHop(int from_ind, int to_ind)
+{
+  curr_charges[from_ind] = 0;
+  curr_charges[to_ind] = 1;
 }
 
 

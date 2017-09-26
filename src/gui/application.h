@@ -72,7 +72,7 @@ namespace gui{
     void screenshot();  // take an svg capture of the GUI
     void designScreenshot();         // take an svg capture ofthe design window
 
-    // FILE HANDqt number of instancLING
+    // FILE HANDLING
     bool resolveUnsavedChanges();       // returns whether to proceed or not
     void newFile();                     // create a new file
     bool saveToFile(SaveFlag flag=Save, const QString &path=QString());   // actual save function

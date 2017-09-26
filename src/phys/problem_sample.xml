@@ -19,14 +19,13 @@
         <preanneal_t>1000</preanneal_t>
     </sim_param>
     <db_tree>
-        <aggregate>
-            <dbdot x="0" y="0" elec="-1" />
-            <dbdot x="7.68" y="0" elec="1" />
-            <dbdot x="15.36" y="0" elec="-1" />
-            <dbdot x="23.04" y="0" elec="-1" />
-            <dbdot x="30.72" y="0" elec="-1" />
-            <dbdot x="38.4" y="0" elec="-1" />
-            <dbdot x="46.08" y="0" elec="-1" />
-        </aggregate>
+        <dbdot x="0" y="0" elec="0" />
+        <dbdot x="7.68" y="0" elec="0" />
+        <dbdot x="15.36" y="0" elec="0" />
+        <dbdot x="23.04" y="0" elec="0" />
+        <dbdot x="30.72" y="0" elec="0" />
+        <dbdot x="38.4" y="0" elec="0" />
+        <dbdot x="46.08" y="0" elec="0" />
+        <dbdot x="53.76" y="0" elec="1" />
     </db_tree>
 </db_problem>

@@ -69,7 +69,7 @@ Problem::DBIterator& Problem::DBIterator::operator++()
 
   // aggregate is complete, pop off stack
   pop();
-  return agg_stack.size() == 1 ? *this : ++(*this);
+  return agg_stack.size() == 0 ? *this : ++(*this);
 }
 
 void Problem::DBIterator::push(std::shared_ptr<Aggregate> agg)
@@ -84,8 +84,10 @@ void Problem::DBIterator::push(std::shared_ptr<Aggregate> agg)
 void Problem::DBIterator::pop()
 {
   agg_stack.pop();              // pop complete aggregate off stack
-  curr = agg_stack.top().first; // update current to new top
-  db_iter = curr->dbs.cend();   // don't reread dbs
+  if(agg_stack.size() > 0){
+    curr = agg_stack.top().first; // update current to new top
+    db_iter = curr->dbs.cend();   // don't reread dbs
+  }
 }
 
 

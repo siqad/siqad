@@ -27,41 +27,39 @@ namespace phys {
     ~SimAnneal() {};
 
     // run simulation
+    bool runSim();
+
+
+  private:
+    // simulation components
     void initVars();
     void precalc();
-    bool runSim();
-    void simAnneal();
-    void timeStep();
+    void simAnneal();     // perform simulated annealing
+    void dbHop(int from_ind, int to_ind);
+    void timeStep();      // advance time-step
     void printCharges();
 
-
-
-    // PHYS CALC
+    // physical calculations
     float systemEnergy();
     float distance(float x1, float y1, float x2, float y2);
     float interElecPotential(float r);
 
-
-
-    // ACCEPTANCE FUNCTIONS
-    //bool acceptPop(float v_eff, float v_freeze, float temp, bool direction);  TODO del later
+    // acceptance functions
     bool acceptPop(int db_ind); 
     bool acceptHop(float v_diff); // acceptance function for hopping
     bool evalProb(float prob); // generate true or false based on given probaility
 
-
-
-    // OTHER ACCESSORS
+    // other accessors
     int getRandDBInd(int charge);
     int chargedDBCount(int charge);
 
-  private:
-    // CONST
+
+
+    // VARIABLES
     const int div_0 = 1E5; // arbitrary big number that represents divide by 0
     const float har_to_ev = 27.2114; // hartree to eV conversion factor
     const float db_distance_scale = 1E-10; // TODO move this to xml
 
-    // VARIABLES
     int n_dbs=-1; // number of dbs
     float debye_length; // Silicon intrinsic Debye length in m (TODO trial and error to get good magic number)
     //std::vector<int> db_charges; // charge in each db, only 0 or 1 are allowed
