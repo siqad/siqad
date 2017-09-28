@@ -98,8 +98,14 @@ namespace gui{
     int autosave_ind=0;
     int save_ind=0;
 
-    void saveToFile(QXmlStreamWriter *);
+    void saveToFile(QXmlStreamWriter *stream, bool for_sim=false);
     void loadFromFile(QXmlStreamReader *);
+
+
+    // SIMULATION RESULT DISPLAY
+    void displaySimResults();         // right now, just show charge distribution. Need a lot more functionality in the future *NOTE might be more suited for design_panel
+    void clearSimResults();           // clear all simulation results and go back to design mode *NOTE might be more suited for design_panel
+    // TODO can probably implement something like a "design mode" and a "simulation mode"
 
   public slots:
 

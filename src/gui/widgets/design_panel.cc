@@ -383,17 +383,8 @@ void gui::DesignPanel::setFills(float *fills)
 
 // SAVE
 
-void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream){
+void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream, bool for_sim=false){
   int layer_ind;
-
-  // save program flags
-  stream->writeComment("Program Flags");
-  stream->writeStartElement("program");
-
-  stream->writeTextElement("version", "I don't know yet");
-  stream->writeTextElement("date", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
-
-  stream->writeEndElement();
 
   // save gui flags
   stream->writeComment("GUI Flags");

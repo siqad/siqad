@@ -33,7 +33,7 @@ namespace gui{
 
   public:
 
-    enum SaveFlag{Save, SaveAs, AutoSave};
+    enum SaveFlag{Save, SaveAs, AutoSave, Simulation};
 
     // constructor
     explicit ApplicationGUI(QWidget *parent=0);
@@ -63,7 +63,7 @@ namespace gui{
     // the simulation method we push the problem onto a working stack to be run
     // in the background: will need to be able to display results on request
     // after job finished.
-    void runSimulation();
+    void runSimulation();             // high-level structure for running simulation
 
     // SANDBOX
 

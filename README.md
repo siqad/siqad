@@ -95,6 +95,12 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
   * Custom class containing properties
 * Simple estimation tool of electron distribution
 * Static or animated display of charge (like the AFM images)
+* Simulation visualization panel that allows users to control visualization of simulation results
+  * Control what type of result to show
+  * Filter results, e.g. only show results with 2 electrons
+  * Time control, if the simulator supports that
+  * Degenerate state visualization
+  * stuff like that
 
 > general bugs
 ## Bugs
@@ -109,14 +115,30 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * Interface with solvers (standards for passing DB configuration to them, and taking results back)
   * Write data structure to xml
     * Use normal save xml for now
+    * In the XML, add a section containing simulation parameters
     * Temperarily use an available xml parser for now, might change later (rapidxml?)
     * Material, material parameters/properties (that can be overidden by the simulator), DB locations
     * Aggregates (in the future: predetermined simulation parameters for aggregates can be stored)
-* Classes completely unrelated to Qt - physics engine entirely written in C++
 * Simple estimation tool of electron distribution
   * Simulated annealing algorithm with 1. electron population determined by bulk-DB interaction and 2. inter-DB electron hopping.
   * Export results to file for gui to read - time, charge distribution, etc
+
+GUI side
+* One simulation at a time for simplicity.
+* When sim is running, don't allow modification in the main window to avoid conflict btwn sim and window content.
+* Rundown:
+  * Sim Setup (pick simulator, adjust simulation params)
+  * Run simulation, shows simulation text output
+  * When simulation completes, allow users the following options: 1. visualize results (details of visualization should be handled by another widget I guess); 2. save simulation results
+* Detect runtime error messages from the simulator and alert the user
 * Static or animated display of charge (like the AFM images)
+Short future:
+* Has a result screen that allows user to view previous results
+Future:
+* Show currently running jobs
+* For example, some jobs might be detailed simulation for small aggregates, while another crude simulation could be ongoing in the background.
+* If this widget is called from the main window while an instance of this is open, just focus such instance.
+* Assuming that sim takes a long time to run, and user makes changes to DB, when sim is complete user can open a new tab to view the results without disturbing the updated design.
 
 
 > Past TODOs for implementations of major features

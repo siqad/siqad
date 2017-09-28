@@ -29,15 +29,18 @@ namespace prim{
   public:
 
     // constructor
-    DBDot(int lay_id, prim::LatticeDot *src=0);
+    DBDot(int lay_id, prim::LatticeDot *src=0, int elec_in=0);
     DBDot(QXmlStreamReader *, QGraphicsScene *);
-    void initDBDot(int lay_id, prim::LatticeDot *src=0);
+    void initDBDot(int lay_id, prim::LatticeDot *src=0, int elec_in=0);
 
     // destructor
     ~DBDot(){}
 
     // accessors
     QPointF getPhysLoc() const {return phys_loc;}
+
+    void setElec(int e_in) {elec = e_in;}
+    int getElec() {return elec;}
 
     void setSource(prim::LatticeDot *src);
     prim::LatticeDot *getSource() const {return source;}
@@ -61,8 +64,9 @@ namespace prim{
     void constructStatics();
 
     // VARIABLES
-
     QPointF phys_loc;         // physical location of dot in angstroms
+    int elec;               // 1=forced electron on this db
+
     prim::LatticeDot *source=0; // lattice site beneath dot
 
     qreal fill_fact;  // area proportional of dot filled

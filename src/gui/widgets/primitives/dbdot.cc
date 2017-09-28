@@ -21,10 +21,10 @@ QColor prim::DBDot::selected_col;
 
 
 
-prim::DBDot::DBDot(int lay_id, prim::LatticeDot *src)
+prim::DBDot::DBDot(int lay_id, prim::LatticeDot *src, int elec_in)
   : prim::Item(prim::Item::DBDot)
 {
-  initDBDot(lay_id, src);
+  initDBDot(lay_id, src, elec_in);
 }
 
 
@@ -34,12 +34,17 @@ prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
   //qDebug() << QObject::tr("Constructing DBDot from XML");
   QPointF scene_loc; // physical location from file
   int lay_id; // layer id from file
+  int elec_in;
 
   while(!stream->atEnd()){
     if(stream->isStartElement()){
       if(stream->name() == "layer_id"){
         lay_id = stream->readElementText().toInt();
         //qDebug() << QObject::tr("DBDot: layer id is %1").arg(lay_id);
+        stream->readNext();
+      }
+      else if(stream->name() == "elec"){
+        elec_in = stream->readElementText().toInt();
         stream->readNext();
       }
       else if(stream->name() == "physloc"){
@@ -49,7 +54,6 @@ prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
           else if(attr.name().toString() == QLatin1String("y"))
             scene_loc.setY(scale_factor*attr.value().toFloat());
         }
-        //qDebug() << QObject::tr("DBDot: physical location (%1,%2)").arg(scene_loc.x()).arg(scene_loc.y());
         stream->readNext();
       }
       else{
@@ -83,13 +87,13 @@ prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
   }
 
   // initialize
-  initDBDot(lay_id, src_latdot);
+  initDBDot(lay_id, src_latdot, elec_in);
 
   scene->addItem(this);
 }
 
 
-void prim::DBDot::initDBDot(int lay_id, prim::LatticeDot *src)
+void prim::DBDot::initDBDot(int lay_id, prim::LatticeDot *src, int elec_in)
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   setLayerIndex(lay_id);
@@ -100,6 +104,9 @@ void prim::DBDot::initDBDot(int lay_id, prim::LatticeDot *src)
 
   // set dot location in pixels
   setSource(src);
+
+  // set electron occupation
+  setElec(elec_in);
 
   fill_fact = 0.;
   fill_col = gui_settings->get<QColor>("dbdot/fill_col");
@@ -167,10 +174,18 @@ prim::Item *prim::DBDot::deepCopy() const
 
 void prim::DBDot::saveItems(QXmlStreamWriter *stream) const
 {
+  /*stream->writeEmptyElement("dbdot");
+  stream->writeAttribute("x", QString::number(getPhysLoc().x()));
+  stream->writeAttribute("y", QString::number(getPhysLoc().y()));
+  stream->writeAttribute("layer_id", QString::number(layer_id));
+  stream->writeAttribute("elec", QString::number(elec));*/
   stream->writeStartElement("dbdot");
 
   // layer id
   stream->writeTextElement("layer_id", QString::number(layer_id));
+
+  // elec
+  stream->writeTextElement("elec", QString::number(elec));
 
   // physical location
   stream->writeEmptyElement("physloc");

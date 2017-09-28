@@ -32,7 +32,7 @@ prim::Aggregate::Aggregate(QXmlStreamReader *stream, QGraphicsScene *scene)
   while(!stream->atEnd()){
     if(stream->isStartElement()){
       if(stream->name() == "dbdot"){
-        stream->readNext();
+        //stream->readNext();
         ld_children.push(new prim::DBDot(stream, scene));
       }
       else if(stream->name() == "aggregate"){

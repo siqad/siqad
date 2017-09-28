@@ -130,6 +130,8 @@ void gui::ApplicationGUI::initMenuBar()
   tools->addAction(select_color);
   tools->addAction(screenshot);
   tools->addAction(design_screenshot);
+  // TODO setup simulation
+  // TODO rerun last simulation
 
   connect(new_file, &QAction::triggered, this, &gui::ApplicationGUI::newFile);
   //connect(quit, &QAction::triggered, qApp, QApplication::quit);
@@ -509,7 +511,7 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
     return false;
   }
 
-  // write to XML stream
+  // WRITE TO XML
   QXmlStreamWriter stream(&file);
   qDebug() << tr("Save: Beginning write to %1").arg(file.fileName());
   stream.setAutoFormatting(true);
@@ -517,10 +519,27 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
 
   // call the save functions for each relevant class
   stream.writeStartElement("dbdesigner");
-  design_pan->saveToFile(&stream);
-  stream.writeEndElement();
 
-  // close the file
+  // save program flags
+  stream->writeComment("Program Flags");
+  stream->writeStartElement("program");
+
+  QString file_purpose = for_sim ? "simulation" : "save";
+  stream->writeTextElement("file_purpose", file_purpose);
+  stream->writeTextElement("version", "TBD");
+  stream->writeTextElement("date", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+
+  stream->writeEndElement();
+
+  // save simulation parameters
+  // TODO create class that handles simulations?
+  // TODO maybe simulation parameters should be saved even when saving file normally? In case the user has preferred simulation settings for this particular problem. Perhaps make this an option in the simulation dialog - 1. save these parameters as default only for this file; 2. save these parameters as default for all simulations using this simulator
+
+  // save design panel content (including GUI flags, layers and their corresponding contents (electrode, dbs, etc.)
+  design_pan->saveToFile(&stream, flag==Simulation);
+
+  // close root element & close file
+  stream.writeEndElement();
   file.close();
 
   // delete the existing file and rename the new one to it
@@ -530,7 +549,7 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   qDebug() << tr("Save: Write completed for %1").arg(file.fileName());
 
   // update working path if needed
-  if(flag != AutoSave){
+  if(flag == Save || flag == SaveAs){
     save_dir.setPath(write_path);
     working_path = write_path;
   }
@@ -597,6 +616,8 @@ void gui::ApplicationGUI::openFromFile()
   // read from XML stream
   QXmlStreamReader stream(&file);
   qDebug() << tr("Beginning load from %1").arg(file.fileName());
+  // TODO load program status here instead of from file
+  // TODO if save type is simulation, warn the user when opening the file, especially the fact that sim params will not be retained the next time they save
   design_pan->loadFromFile(&stream);
   qDebug() << tr("Load complete");
   file.close();
