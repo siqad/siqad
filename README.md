@@ -129,6 +129,7 @@ GUI side
 * Rundown:
   * Sim Setup (pick simulator, adjust simulation params)
   * Run simulation, shows simulation text output
+    * XML file describing the problem and parameters is saved to a specific directory that queues simulations. The binary of the simulator is called to run the simulation.
   * When simulation completes, allow users the following options: 1. visualize results (details of visualization should be handled by another widget I guess); 2. save simulation results
 * Detect runtime error messages from the simulator and alert the user
 * Static or animated display of charge (like the AFM images)

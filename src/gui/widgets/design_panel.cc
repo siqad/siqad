@@ -383,7 +383,7 @@ void gui::DesignPanel::setFills(float *fills)
 
 // SAVE
 
-void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream, bool for_sim=false){
+void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream, bool for_sim){
   int layer_ind;
 
   // save gui flags
@@ -446,23 +446,6 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
               setTransform(QTransform(zoom,0,0,zoom,0,0));
               verticalScrollBar()->setValue(scroll_v);
               horizontalScrollBar()->setValue(scroll_h);
-              /*qreal m11,m12,m21,m22,dx,dy;
-              for(QXmlStreamAttribute &attr : stream->attributes()){
-                if(attr.name().toString() == QLatin1String("m11"))
-                  m11 = attr.value().toDouble();
-                else if(attr.name().toString() == QLatin1String("m12"))
-                  m12 = attr.value().toDouble();
-                else if(attr.name().toString() == QLatin1String("m21"))
-                  m21 = attr.value().toDouble();
-                else if(attr.name().toString() == QLatin1String("m22"))
-                  m22 = attr.value().toDouble();
-                else if(attr.name().toString() == QLatin1String("dx"))
-                  dx = attr.value().toDouble();
-                else if(attr.name().toString() == QLatin1String("dy"))
-                  dy = attr.value().toDouble();
-              }*/
-              //setTransform(QTransform(m11,m12,m21,m22,dx,dy));
-              //qDebug() << tr("Loaded qtransform with m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(m11).arg(m12).arg(m21).arg(m22).arg(dx).arg(dy);
             }
             else{
               qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());

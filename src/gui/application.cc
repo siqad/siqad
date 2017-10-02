@@ -521,15 +521,15 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   stream.writeStartElement("dbdesigner");
 
   // save program flags
-  stream->writeComment("Program Flags");
-  stream->writeStartElement("program");
+  stream.writeComment("Program Flags");
+  stream.writeStartElement("program");
 
-  QString file_purpose = for_sim ? "simulation" : "save";
-  stream->writeTextElement("file_purpose", file_purpose);
-  stream->writeTextElement("version", "TBD");
-  stream->writeTextElement("date", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+  QString file_purpose = flag==Simulation ? "simulation" : "save";
+  stream.writeTextElement("file_purpose", file_purpose);
+  stream.writeTextElement("version", "TBD");
+  stream.writeTextElement("date", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
 
-  stream->writeEndElement();
+  stream.writeEndElement();
 
   // save simulation parameters
   // TODO create class that handles simulations?
