@@ -138,7 +138,7 @@ bool Problem::readProblem(const std::string &fname)
 
   // item tree
   std::cout << "Read DB tree" << std::endl;
-  if(!readItemTree(root_node->first_node("db_tree"), db_tree))
+  if(!readDesign(root_node->first_node("design"), db_tree))
     return false;
 
   std::cout << "db_tree pointer " << db_tree.get() << std::endl;
@@ -177,6 +177,23 @@ bool Problem::readSimulationParam(rapidxml::xml_node<> *node)
 }
 
 
+bool Problem::readDesign(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent)
+{
+  // loop through layers, extract dbdots
+  // NOTE in the future, need to also extract electrodes
+  for(rapidxml::xml_node<> *layer_node = node->first_node(); layer_node; layer_node = layer_node->next_sibling()){
+    std::string layer_type = layer_node->first_attribute("type")->value();
+    if(!layer_type.compare("db")){
+      std::cout << "Encountered node " << layer_node->name() << " with type " << layer_type << ", entering" << std::endl;
+      readItemTree(layer_node, agg_parent);
+    }
+    else {
+      std::cout << "Encountered node " << layer_node->name() << " with type " << layer_type << ", skipping" << std::endl;
+    }
+  }
+  return true;
+}
+
 bool Problem::readItemTree(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent)
 {
   for(rapidxml::xml_node<> *item_node = node->first_node(); item_node; item_node = item_node->next_sibling()){
@@ -196,7 +213,6 @@ bool Problem::readItemTree(rapidxml::xml_node<> *node, const std::shared_ptr<Agg
   }
   return true;
 }
-
 
 bool Problem::readDBDot(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent)
 {

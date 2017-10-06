@@ -7,6 +7,9 @@
 // @desc:     Base class for physics engines
 
 #include "problem.h"
+#include "rapidxml-1.13/rapidxml.hpp"
+#include "rapidxml-1.13/rapidxml_print.hpp"
+#include <iostream>
 #include <string>
 
 namespace phys{
@@ -16,13 +19,19 @@ namespace phys{
   public:
 
     // constructor
-    PhysicsEngine(const std::string &fname);
+    PhysicsEngine(const std::string &ifnm, const std::string &ofnm);
 
     // destructor
     ~PhysicsEngine() {};
 
+    // export results
+    void writeResultsXML();
+
     // variables
     Problem problem;
+
+  private:
+    std::string of_name;
   };
 
 }

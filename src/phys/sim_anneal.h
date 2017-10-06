@@ -7,7 +7,6 @@
 // @desc:     Simulated annealing physics engine
 
 #include "phys_engine.h"
-#include "logger.h"
 #include <vector>
 #include <deque>
 #include <tuple>
@@ -21,7 +20,7 @@ namespace phys {
   {
   public:
     // constructor
-    SimAnneal(const std::string& fname);
+    SimAnneal(const std::string& ifnm, const std::string& ofnm);
 
     // destructor
     ~SimAnneal() {};

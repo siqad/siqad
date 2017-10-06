@@ -13,12 +13,36 @@
 using namespace phys;
 
 // temporary main function for testing the xml parsing functionality
-int main()
+int main(int argc, char *argv[])
 {
   std::cout << "Physeng invoked" << std::endl;
+  std::string if_name, of_name;
 
-  std::string fname("export_to_simanneal.xml");
-  SimAnneal sim_anneal(fname);
+  // for now, only support one argument which is the input file
+  // TODO -i input_path -o output_path
+  // maybe make a struct to contain program options in case of more input options
+  if(argc == 1){
+    if_name = std::string("cooldbdesign.xml");
+    of_name = std::string("cooloutput.xml");
+  }
+  else if(argc == 2){
+    if_name = argv[1];
+    of_name = std::string("cooloutput.xml");
+  }
+  else if(argc == 3){
+    if_name = argv[1];
+    of_name = argv[2];
+  }
+  else{
+    std::cout << "More arguments than expected are encountered, aborting" << std::endl;
+    return 0;
+  }
+
+
+  std::cout << "In File: " << if_name << std::endl;
+  std::cout << "Out File: " << of_name << std::endl;
+
+  SimAnneal sim_anneal(if_name, of_name);
 
   sim_anneal.runSim();
   //Problem *problem = new Problem();

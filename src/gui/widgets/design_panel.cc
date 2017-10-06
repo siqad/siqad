@@ -164,7 +164,7 @@ void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
 
 
 
-void gui::DesignPanel::addLayer(const QString &name)
+void gui::DesignPanel::addLayer(const QString &name, const QString &cnt_type)
 {
   // check if name already taken
   bool taken = false;
@@ -180,7 +180,7 @@ void gui::DesignPanel::addLayer(const QString &name)
   }
 
   // layer is added to the end of layers stack, so ID = layers.size() before it was added
-  prim::Layer *layer = new prim::Layer(name, layers.size());
+  prim::Layer *layer = new prim::Layer(name, cnt_type, layers.size());
   layers.append(layer);
 }
 
@@ -319,7 +319,7 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   layers.append(lattice);
 
   // add in the dangling bond surface
-  addLayer(tr("Surface"));
+  addLayer(tr("Surface"),tr("db"));
   top_layer = layers.at(1);
 }
 
@@ -409,10 +409,12 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream, bool for_sim){
 
   // save item hierarchy
   stream->writeComment("Item Hierarchy");
+  stream->writeStartElement("design");
   for(prim::Layer *layer : layers){
     stream->writeComment(layer->getName());
     layer->saveItems(stream);
   }
+  stream->writeEndElement(); // end design level
 }
 
 void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
@@ -492,11 +494,18 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
           layer_id++;*/
         }
       }
-      else if(stream->name() == "layer"){
-        // recursively populate layer with items
+      else if(stream->name() == "design") {
         stream->readNext();
-        getLayer(layer_id)->loadItems(stream, scene);
-        layer_id++;
+        while(stream->name() != "design"){
+          if(stream->name() == "layer"){
+            // recursively populate layer with items
+            stream->readNext();
+            getLayer(layer_id)->loadItems(stream, scene);
+            layer_id++;
+          }
+          else
+            stream->readNext();
+        }
       }
       else{
         qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());

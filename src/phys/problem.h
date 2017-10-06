@@ -101,6 +101,7 @@ namespace phys{
     bool readProgramProp(rapidxml::xml_node<> *node);
     bool readMaterialProp(rapidxml::xml_node<> *node);
     bool readSimulationParam(rapidxml::xml_node<> *node);
+    bool readDesign(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent);
     bool readItemTree(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent);
     bool readDBDot(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent);
 

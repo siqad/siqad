@@ -15,11 +15,12 @@
 uint prim::Layer::layer_count = 0;
 
 
-prim::Layer::Layer(const QString &nm, int lay_id, QObject *parent)
+prim::Layer::Layer(const QString &nm, const QString &cnt_type, int lay_id, QObject *parent)
   : QObject(parent), visible(true), active(false)
 {
   layer_id = lay_id;
   name = nm.isEmpty() ? nm : QString("Layer %1").arg(layer_count++);
+  content_type = cnt_type;
 }
 
 
@@ -152,6 +153,7 @@ void prim::Layer::saveLayer(QXmlStreamWriter *stream) const
 void prim::Layer::saveItems(QXmlStreamWriter *stream) const
 {
   stream->writeStartElement("layer");
+  stream->writeAttribute("type", content_type);
 
   for(prim::Item *item : items){
     item->saveItems(stream);

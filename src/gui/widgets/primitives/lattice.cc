@@ -15,7 +15,7 @@
 
 
 prim::Lattice::Lattice(const QString &fname, int lay_id)
-  : Layer(tr("Lattice"))
+  : Layer(tr("Lattice"),tr("lattice"))
 {
   layer_id = lay_id;
   settings::LatticeSettings::updateLattice(fname);

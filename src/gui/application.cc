@@ -381,7 +381,7 @@ void gui::ApplicationGUI::runSimulation()
   QProcess *physeng = new QProcess();
   QString phys_bin = "/home/samuelngsh/git/qsi-sim/src/phys/physeng";
   QStringList arguments;
-  arguments << "-if" << "export_to_simanneal.xml";
+  arguments << QFileInfo("./src/phys/export_to_simanneal.xml").canonicalFilePath();
 
   // TODO setup slots to deal with QProcess finish/error signals
 

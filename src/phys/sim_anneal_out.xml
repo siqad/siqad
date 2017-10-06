@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sim_out>
+    <date>2017-10-05 21:43:00</date>
+    <!--Physeng Properties-->
+    <physeng_prop>
+        <engine>SimAnneal</engine>
+        <version>TBD</version>
+    </physeng_prop>
+    <!--Simulation Parameters-->
+    <param>
+        <uh>pretty much all of the user defined params</uh>
+    </param>
+    <!--Physical Locations-->
+    <physloc>
+        <dbdot x="0" y="0"/>
+        <dbdot x="1" y="0"/>
+        <dbdot x="2" y="0"/>
+        <dbdot x="3" y="0"/>
+    </physloc>
+    <!--Electron Configurations-->
+    <elec_dist>
+        <dist>0101</dist>
+        <dist>1001</dist>
+        <dist>1001</dist>
+        <dist>1010</dist>
+    </elec_dist>
+</sim_out>

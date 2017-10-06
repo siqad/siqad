@@ -31,7 +31,7 @@ namespace prim{
 
     // constructor, create a Layer with the given name. If no name is given,
     // use the default naming scheme with layer_count.
-    Layer(const QString &nm = QString(), int lay_id=-1, QObject *parent=0);
+    Layer(const QString &nm = QString(), const QString &cnt_type = QString(), int lay_id=-1, QObject *parent=0);
     Layer(QXmlStreamReader *stream);
 
     // destructor
@@ -73,6 +73,9 @@ namespace prim{
     // get the Layer name, possibly change return to const QString&
     const QString& getName() const {return name;}
 
+    // get the Layer content type, like "electrode", "dbdots", etc.
+    const QString& getContentType() const {return content_type;}
+
     // if i is within bounds, return a pointer to the indexed item in the Layer
     // item stack; otherwise, return 0
     prim::Item *getItem(int i) { return i >= 0 && i<items.size() ? items.at(i) : 0;}
@@ -91,6 +94,7 @@ namespace prim{
     static uint layer_count;  // number of created Layer() objects, does not decrement
 
     QString name;   // arbitrary layer name, layers can be selected by name
+    QString content_type;
 
     // list of items in order of insertion, should probably be a linked list
     QStack<prim::Item*> items;
