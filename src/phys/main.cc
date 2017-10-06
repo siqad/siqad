@@ -45,6 +45,8 @@ int main(int argc, char *argv[])
   SimAnneal sim_anneal(if_name, of_name);
 
   sim_anneal.runSim();
+
+  sim_anneal.writeResultsXML();
   //Problem *problem = new Problem();
 
   //problem->readProblem(std::string("problem_sample.xml"));

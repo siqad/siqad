@@ -2,14 +2,14 @@
 <sim_out>
     <date>2017-10-05 21:43:00</date>
     <!--Physeng Properties-->
-    <physeng_prop>
+    <eng_info>
         <engine>SimAnneal</engine>
         <version>TBD</version>
-    </physeng_prop>
+    </eng_info>
     <!--Simulation Parameters-->
-    <param>
+    <sim_param>
         <uh>pretty much all of the user defined params</uh>
-    </param>
+    </sim_param>
     <!--Physical Locations-->
     <physloc>
         <dbdot x="0" y="0"/>

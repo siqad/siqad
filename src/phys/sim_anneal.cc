@@ -11,7 +11,7 @@
 using namespace phys;
 
 SimAnneal::SimAnneal(const std::string& ifnm, const std::string& ofnm)
-  : PhysicsEngine(ifnm, ofnm)
+  : PhysicsEngine("SimAnneal", ifnm, ofnm)
 {
 
 }

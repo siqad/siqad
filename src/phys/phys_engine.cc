@@ -11,19 +11,70 @@
 using namespace phys;
 
 // CONSTRUCTOR
-PhysicsEngine::PhysicsEngine(const std::string &ifnm, const std::string &ofnm)
+PhysicsEngine::PhysicsEngine(const std::string &eng_nm, const std::string &ifnm, const std::string &ofnm)
 {
+  eng_name = eng_nm;
   problem.readProblem(ifnm);
   of_name = ofnm;
 }
 
 void PhysicsEngine::writeResultsXML()
 {
+  std::cout << "Write results to XML..." << std::endl;
   // NOTE in the future, there's probably a range of stuff that can be exported.
   // for now, only export charge config
   std::ofstream of(of_name);
   // TODO test that the output file path works
 
-  xml_document<> doc;
-  // https://stackoverflow.com/questions/25991961/how-to-fill-xml-document-using-rapidxml-c
+  // xml declaration
+  rapidxml::xml_document<> doc;
+  rapidxml::xml_node<>* decl = doc.allocate_node(rapidxml::node_declaration);
+  decl->append_attribute(doc.allocate_attribute("version", "1.0"));
+  decl->append_attribute(doc.allocate_attribute("encoding", "UTF-8"));
+  doc.append_node(decl);
+
+  // major nodes
+  //rapidxml::xml_node<>* nd_root, nd_eng_info, nd_sim_param, nd_physloc, nd_elec_dist;
+  rapidxml::xml_node<>* nd_root = doc.allocate_node(rapidxml::node_element, "sim_out");
+  rapidxml::xml_node<>* nd_eng_info = doc.allocate_node(rapidxml::node_element, "eng_info");
+  rapidxml::xml_node<>* nd_sim_param = doc.allocate_node(rapidxml::node_element, "sim_param");
+  rapidxml::xml_node<>* nd_physloc = doc.allocate_node(rapidxml::node_element, "physloc");
+  rapidxml::xml_node<>* nd_elec_dist = doc.allocate_node(rapidxml::node_element, "elec_dist");
+  doc.append_node(nd_root);
+  nd_root->append_node(nd_eng_info);
+  nd_root->append_node(nd_sim_param);
+  nd_root->append_node(nd_physloc);
+  nd_root->append_node(nd_elec_dist);
+
+  // eng_info
+  //rapidxml::xml_node<>* nd_eng_name, nd_version;
+  rapidxml::xml_node<>* nd_engine_name = doc.allocate_node(rapidxml::node_element, "engine", eng_name.c_str());
+  rapidxml::xml_node<>* nd_version = doc.allocate_node(rapidxml::node_element, "version", "TBD");
+  nd_eng_info->append_node(nd_engine_name);
+  nd_eng_info->append_node(nd_version);
+
+  // sim_param
+  // TODO implement a struct in phys::Problem storing all user sim params, write all that
+  
+  // physloc
+  // TODO the physical location in the order of the simulator's db_loc array (exclude driver cells)
+  for(auto dbl : db_loc) {
+    rapidxml::xml_node<>* nd_dbl = doc.allocate_node(rapidxml::node_element, "dbdot");
+    char *dbl_x = doc.allocate_string(std::to_string(dbl.first).c_str());
+    char *dbl_y = doc.allocate_string(std::to_string(dbl.second).c_str());
+    nd_dbl->append_attribute(doc.allocate_attribute("x",dbl_x));
+    nd_dbl->append_attribute(doc.allocate_attribute("y",dbl_y));
+    nd_physloc->append_node(nd_dbl);
+  }
+
+  // elec_dist
+  // TODO print a bunch of elec_dist
+
+
+  // write to file
+  of << doc;
+  of.close();
+  doc.clear();
+
+  std::cout << "Write complete" << std::endl;
 }
