@@ -60,6 +60,9 @@ namespace phys {
     const float har_to_ev = 27.2114; // hartree to eV conversion factor
     const float db_distance_scale = 1E-10; // TODO move this to xml
 
+    // TODO variables could be grouped into structs
+    // TODO reduce class-level variables
+
     int n_dbs=-1; // number of dbs
     float debye_length; // Silicon intrinsic Debye length in m (TODO trial and error to get good magic number)
     //std::vector<int> db_charges; // charge in each db, only 0 or 1 are allowed

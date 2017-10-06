@@ -19,6 +19,8 @@ SimAnneal::SimAnneal(const std::string& fname)
 
 bool SimAnneal::runSim()
 {
+  // TODO check that problem exists before attemping to run simulation
+
   // grab all physical locations (in original distance unit)
   std::cout << "Grab all physical locations..." << std::endl;
   n_dbs = 0;
@@ -106,6 +108,7 @@ void SimAnneal::precalc()
         db_r[i][j] = distance(db_loc[i].first, db_loc[i].second, db_loc[j].first, db_loc[j].second)*db_distance_scale;
         v_ij[i][j] = interElecPotential(db_r[i][j]);
         std::cout << "db_r[" << i << "][" << j << "]=" << db_r[i][j] << ", v_ij[" << i << "][" << j << "]=" << v_ij[i][j] << std::endl;
+        // TODO: db_r in bohr length
       }
     }
 
@@ -306,6 +309,7 @@ int SimAnneal::getRandDBInd(int charge)
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<int> dis(0,dbs.size()-1);
+  // TODO move these to init and make them class var, not reinitialize it every time
 
   return dbs[dis(gen)];
 }
@@ -322,11 +326,9 @@ float SimAnneal::systemEnergy()
   assert(n_dbs > 0);
   float v = v_0;
   for(int i=0; i<n_dbs; i++) {
-    v += curr_charges[i] * v_ext[i];
-    v += curr_charges[i] * v_drive[i];
-    for(int j=0; j<n_dbs; j++)
-      if(i!=j)
-        v += curr_charges[i] * curr_charges[j] * v_ij[i][j];
+    v += curr_charges[i] * (v_ext[i] + v_drive[i]); // TODO combine v_ext and v_drive since they're not changing anyway
+    for(int j=i+1; j<n_dbs; j++)
+      v += curr_charges[i] * curr_charges[j] * v_ij[i][j];
   }
   return v * har_to_ev;
 }

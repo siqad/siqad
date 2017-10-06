@@ -22,14 +22,15 @@ SimManager::SimManager(QWidget *parent)
 SimManager::~SimManager()
 {}
 
-bool SimManager::toggleManagerVisibility()
+
+void SimManager::newSimSetup()
 {
-  // show or hide the manager dialog window
-  // use QWidget::hide() and QWidget::show() I think
+  // TODO dialog with simulation parameter settings
+
+  // for now, just jump directly to export stage
+  exportSimProblem(); // todo: indicate path
 }
 
-bool SimManager::installSim()
-{}
 
 
 // PRIVATE
@@ -38,22 +39,45 @@ void SimManager::initSimManager()
 {
   // init simulation manager GUI
 
-  // simulation list pane
-  sim_list_pan = new QListWidget;
-  // TODO blank for now
+  // simulator manager panes
+  sim_list_pan = new QListWidget();
+  sim_actions_pan = new QVBoxLayout();
 
+  // populate panes
+  initMenu();
+  initListPan();
+  initSimActionsPan();
 
-  // simulation actions pane
-  sim_actions_pan = new QListWidget;
+  // simulator manager layout
+  QHBoxLayout *man_main = new QHBoxLayout();
+  man_main->addWidget(sim_list_pan);
+  man_main->addLayout(sim_actions_pan);
 
+  setLayout(man_main);
 
-  // combine widgets into main layout
-  QHBoxLayout *sim_man_main = new QHBoxLayout;
-  sim_man_main->addWidget(sim_list_pan);
-  sim_man_main->addWidget(sim_actions_pan);
-  setLayout(sim_man_main);
 
   setWindowTitle(tr("Simulation Manager"));
+}
+
+void SimManager::initMenu()
+{}
+
+void SimManager::initListPan()
+{}
+
+void SimManager::initSimActionsPan()
+{
+  QPushButton *new_simulation = new QPushButton(tr("&New Simulation"));
+  QPushButton *close_button = new QPushButton(tr("Close"));
+
+  connect(new_simulation, &QAbstractButton::clicked, this, &gui::SimManager::newSimSetup);
+  connect(close_button, &QAbstractButton::clicked, this, &QWidget::hide);
+
+  close_button->setShortcut(tr("Esc"));
+
+  sim_actions_pan->addWidget(new_simulation);
+  sim_actions_pan->addWidget(close_button);
+  sim_actions_pan->addStretch(1);
 }
 
 void SimManager::fetchSimList()
@@ -70,6 +94,8 @@ void SimManager::simParamSetup()
 bool SimManager::exportSimProblem()
 {
   // call save function in application.cc with path going to appropriate directory (still need to finalize directory)
+  // returns whether export is successful
+  //return static_cast<gui::ApplicationGUI*>(parent())->saveToFile(parent()->SaveFlag::Simulation, "problem_export.xml"); // TODO change file name
 }
 
 void SimManager::invokeSimulator()
@@ -83,6 +109,8 @@ bool SimManager::checkSimCompletion()
   // if not, just check when the output file is complete
 
   // also, detect error from the simulator, alert the user if error occurs during simulation
+
+  return true; // placeholder
 }
 
 } // end gui namespace

@@ -67,6 +67,7 @@ void gui::ApplicationGUI::initGUI()
   design_pan = new gui::DesignPanel(this);
   input_field = new gui::InputField(this);
   info_pan = new gui::InfoPanel(this);
+  sim_manager = new gui::SimManager(this);
 
   // layout management
   QWidget *main_widget = new QWidget(this); // main widget for mainwindow
@@ -166,6 +167,7 @@ void gui::ApplicationGUI::initTopBar()
   top_bar->setIconSize(QSize(ico_scale, ico_scale));
 
   action_run_sim = top_bar->addAction(QIcon(":/ico/runsim.svg"), tr("Run Simulation..."));
+  action_run_sim->setShortcut(tr("F11"));
 
   connect(action_run_sim, &QAction::triggered, this, &gui::ApplicationGUI::runSimulation);
   addToolBar(Qt::TopToolBarArea, top_bar);
@@ -368,7 +370,42 @@ void gui::ApplicationGUI::parseInputField()
 
 void gui::ApplicationGUI::runSimulation()
 {
-  qDebug() << tr("Simulation functionality currently disabled...");
+  // TODO show simulation setup dialog
+  // for now, just hard code those settings
+
+  // call saveToFile, don't forget to account for setup dialog settings
+  saveToFile(Simulation, "src/phys/export_to_simanneal.xml");
+
+  // prepare physeng binary execution
+  qDebug() << tr("prepare physeng binary execution");
+  QProcess *physeng = new QProcess();
+  QString phys_bin = "/home/samuelngsh/git/qsi-sim/src/phys/physeng";
+  QStringList arguments;
+  arguments << "-if" << "export_to_simanneal.xml";
+
+  // TODO setup slots to deal with QProcess finish/error signals
+
+  // invoke simulator binary and TODO show std output
+  qDebug() << tr("about to invoke physeng binary");
+  physeng->setProgram(phys_bin);
+  physeng->setArguments(arguments);
+  physeng->setProcessChannelMode(QProcess::MergedChannels);
+  qDebug() << tr("physeng working directory: %1").arg(physeng->workingDirectory());
+  physeng->start();
+
+  // Wait for it to start
+  while(!physeng->waitForStarted());
+
+  qDebug() << tr("past wait for started");
+
+  while(physeng->waitForReadyRead())
+    qDebug() << physeng->readAll();
+
+  //qDebug() << tr("physeng working directory: %1").arg(physeng->workingDirectory());
+  //qDebug() << physeng->readAllStandardOutput();
+
+  qDebug() << tr("simulation has completed");
+  // TODO once simulation has completed, visualize results
 }
 
 

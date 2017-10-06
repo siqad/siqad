@@ -15,7 +15,9 @@ using namespace phys;
 // temporary main function for testing the xml parsing functionality
 int main()
 {
-  std::string fname("problem_sample.xml");
+  std::cout << "Physeng invoked" << std::endl;
+
+  std::string fname("export_to_simanneal.xml");
   SimAnneal sim_anneal(fname);
 
   sim_anneal.runSim();

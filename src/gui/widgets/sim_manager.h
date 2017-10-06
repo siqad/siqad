@@ -11,6 +11,7 @@
 #define _GUI_SIM_MANGER_H_
 
 #include <QtWidgets>
+#include "primitives/simulator.h"
 
 namespace gui{
 
@@ -27,13 +28,17 @@ public:
   ~SimManager();
 
   // show manager dialog
-  void toggleManagerVisibility();
+  void showManager() {show();}
 
-  // install new simulator, returns whether installation was successful (far future)
-  bool installSim();
+  // manager actions
+  void newSimSetup();               // walks user through simulation setup
 
 private:
   void initSimManager();
+  void initMenu();
+  void initListPan();
+  void initSimActionsPan();
+  void fetchSimList();
 
   void simParamSetup();             // take user options for simulation parameters
   bool exportSimProblem();          // generate problem XML
@@ -45,7 +50,7 @@ private:
 
   // manager panes
   QListWidget *sim_list_pan;
-  QListWidget *sim_actions_pan;
+  QVBoxLayout*sim_actions_pan;
 };
 
 

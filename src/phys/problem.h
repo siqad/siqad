@@ -98,6 +98,7 @@ namespace phys{
     // FILE HANDLING
 
     bool readProblem(const std::string &fname);
+    bool readProgramProp(rapidxml::xml_node<> *node);
     bool readMaterialProp(rapidxml::xml_node<> *node);
     bool readSimulationParam(rapidxml::xml_node<> *node);
     bool readItemTree(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent);

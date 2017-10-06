@@ -123,25 +123,41 @@ bool Problem::readProblem(const std::string &fname)
   root_node = xmldoc.first_node(); // get root node of input file
   std::cout << "Root node name: " << root_node->name() << std::endl;
 
-  // material parameters
-  std::cout << "Read material properties" << std::endl;
-  readMaterialProp(root_node->first_node("material_prop"));
+  /* for now, not reading properties as those are not implemented yet
+  std::cout << "Read program properties" << std::endl;
+  if(!readProgramProp(root_node->first_node("program")))
+    return false;
 
-  // simulation parameters
+  std::cout << "Read material properties" << std::endl;
+  if(!readMaterialProp(root_node->first_node("material_prop")))
+    return false;
+
   std::cout << "Read simulation parameters" << std::endl;
-  readSimulationParam(root_node->first_node("sim_param"));
+  if(!readSimulationParam(root_node->first_node("sim_param")))
+    return false;*/
 
   // item tree
   std::cout << "Read DB tree" << std::endl;
-  readItemTree(root_node->first_node("db_tree"), db_tree);
+  if(!readItemTree(root_node->first_node("db_tree"), db_tree))
+    return false;
+
   std::cout << "db_tree pointer " << db_tree.get() << std::endl;
 
   return true;
 }
 
 
+bool Problem::readProgramProp(rapidxml::xml_node<> *node)
+{
+  // TODO print the following and return false if error in data is encountered
+  //std::cout << "Error in program properties!" << std::endl;
+  return true;
+}
+
 bool Problem::readMaterialProp(rapidxml::xml_node<> *node)
 {
+  // TODO print the following and return false if error in data is encountered
+  //std::cout << "Error in program properties!" << std::endl;
   for(rapidxml::xml_node<> *material_node = node->first_node(); material_node; material_node = material_node->next_sibling()){
     std::cout << "Material property: " << material_node->name() << std::endl;
     // TODO material vector, containing structs of material properties
@@ -152,6 +168,8 @@ bool Problem::readMaterialProp(rapidxml::xml_node<> *node)
 
 bool Problem::readSimulationParam(rapidxml::xml_node<> *node)
 {
+  // TODO print the following and return false if error in data is encountered
+  //std::cout << "Error in program properties!" << std::endl;
   for(rapidxml::xml_node<> *sim_node = node->first_node(); sim_node; sim_node = sim_node->next_sibling()){
     // TODO just add everything into sim_param dictionary
   }
@@ -185,9 +203,12 @@ bool Problem::readDBDot(rapidxml::xml_node<> *node, const std::shared_ptr<Aggreg
   float x,y,elec;
 
   // read x and y from XML stream
-  x = std::stof(node->first_attribute("x")->value());
-  y = std::stof(node->first_attribute("y")->value());
-  elec = std::stof(node->first_attribute("elec")->value());
+  //x = std::stof(node->first_attribute("x")->value());
+  //y = std::stof(node->first_attribute("y")->value());
+  //elec = std::stof(node->first_attribute("elec")->value());
+  elec = std::stof(node->first_node("elec")->value());
+  x = std::stof(node->first_node("physloc")->first_attribute("x")->value());
+  y = std::stof(node->first_node("physloc")->first_attribute("y")->value());
 
   agg_parent->dbs.push_back(std::make_shared<DBDot>(x,y,elec));
 

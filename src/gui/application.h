@@ -17,6 +17,7 @@
 #include "widgets/dialog_panel.h"
 #include "widgets/input_field.h"
 #include "widgets/info_panel.h"
+#include "widgets/sim_manager.h"
 
 
 // declare Application GUI in Ui namespace
@@ -120,6 +121,7 @@ namespace gui{
     gui::DesignPanel  *design_pan;  // mainwindow design panel
     gui::InfoPanel    *info_pan;    // mainwindow info panel
     gui::InputField   *input_field; // mainwindow input field
+    gui::SimManager   *sim_manager; // pop-up simulator manager
 
     // action pointers
     QAction *action_select_tool;  // change cursor tool to select
