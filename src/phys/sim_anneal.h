@@ -77,7 +77,7 @@ namespace phys {
     float unfav_hop_scale; // acceptance prob of positive energy hopes, lower for less probable: exp(-v_diff/unfav_hop_scale)
     // TODO result queue: which type?
     int result_queue_size;
-    std::deque<std::vector<int>> db_charges;
+    //std::deque<std::vector<int>> db_charges;
     std::vector<int> curr_charges;
   };
 }

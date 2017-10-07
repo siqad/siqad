@@ -13,6 +13,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <deque>
 
 namespace phys{
 
@@ -33,6 +34,7 @@ namespace phys{
     Problem problem;
 
     std::vector<std::pair<float,float>> db_loc; // location of free dbs
+    std::deque<std::vector<int>> db_charges;
 
   private:
     std::string eng_name;

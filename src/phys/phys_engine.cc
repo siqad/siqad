@@ -57,7 +57,6 @@ void PhysicsEngine::writeResultsXML()
   // TODO implement a struct in phys::Problem storing all user sim params, write all that
   
   // physloc
-  // TODO the physical location in the order of the simulator's db_loc array (exclude driver cells)
   for(auto dbl : db_loc) {
     rapidxml::xml_node<>* nd_dbl = doc.allocate_node(rapidxml::node_element, "dbdot");
     char *dbl_x = doc.allocate_string(std::to_string(dbl.first).c_str());
@@ -68,8 +67,12 @@ void PhysicsEngine::writeResultsXML()
   }
 
   // elec_dist
-  // TODO print a bunch of elec_dist
-
+  for(auto dbc : db_charges) {
+    rapidxml::xml_node<>* nd_dbc = doc.allocate_node(rapidxml::node_element, "dist");
+    char *dbc = doc.allocate_string(std::to_string(TODOTODOTODO).c_str());
+  }
+  
+    std::deque<std::vector<int>> db_charges;
 
   // write to file
   of << doc;
