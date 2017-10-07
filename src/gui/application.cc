@@ -379,9 +379,10 @@ void gui::ApplicationGUI::runSimulation()
   // prepare physeng binary execution
   qDebug() << tr("prepare physeng binary execution");
   QProcess *physeng = new QProcess();
-  QString phys_bin = "/home/samuelngsh/git/qsi-sim/src/phys/physeng";
+  QString phys_bin = "/home/samuelngsh/git/qsi-sim/src/phys/physeng"; // TODO don't hard code path
   QStringList arguments;
-  arguments << QFileInfo("./src/phys/export_to_simanneal.xml").canonicalFilePath();
+  arguments << QFileInfo("./src/phys/export_to_simanneal.xml").canonicalFilePath(); // TODO put in other directories
+  arguments << QFileInfo("./src/phys/simanneal_output.xml").canonicalFilePath(); // TODO put in other directories
 
   // TODO setup slots to deal with QProcess finish/error signals
 
@@ -393,19 +394,56 @@ void gui::ApplicationGUI::runSimulation()
   qDebug() << tr("physeng working directory: %1").arg(physeng->workingDirectory());
   physeng->start();
 
-  // Wait for it to start
+  // Stall and wait for it to start
+  // will get rid of this after slot connections are made
   while(!physeng->waitForStarted());
-
-  qDebug() << tr("past wait for started");
 
   while(physeng->waitForReadyRead())
     qDebug() << physeng->readAll();
 
-  //qDebug() << tr("physeng working directory: %1").arg(physeng->workingDirectory());
-  //qDebug() << physeng->readAllStandardOutput();
-
   qDebug() << tr("simulation has completed");
-  // TODO once simulation has completed, visualize results
+
+  // read output xml
+}
+
+bool gui::ApplicationGUI::readSimOut(const QString &result_path)
+{
+  // TODO check that output file exists and can be opened
+  QFile result_file(result_path);
+  
+  if(!result_file.open(QFile::ReadOnly | QFile::Text)){
+    qDebug() << tr("Error when opening file to read: %1").arg(result_file.errorString());
+    return;
+  }
+
+  // read from XML stream
+  QXmlStreamReader rs(&result_file); // result stream
+  qDebug() << tr("Begin to read result from %1").arg(result_file.fileName());
+  while(!rs->atEnd()){
+    if(rs->isStartElement()){
+      if(rs->name() == "eng_info"){
+        // basic engine info
+      }
+      else if(rs->name() == "sim_param"){
+
+      }
+      else if(rs->name() == "physloc"){
+
+      }
+      else if(rs->name() == "elec_dist"){
+
+      }
+      else{
+        qDebug() << tr("%1: invalid element encountered on line %2 - %3").arg(result_file).arg(rs->lineNumber()).arg(rs->name().toString());
+        rs->readNext();
+      }
+    }
+    else
+      rs->readNext();
+  }
+  // TODO some read function and visualization function
+  qDebug() << tr("Load complete");
+  result_file.close();
 }
 
 

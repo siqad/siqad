@@ -77,7 +77,7 @@ void SimAnneal::initVars()
   v_ij.resize(n_dbs);
   db_r.resize(n_dbs);
 
-  db_charges.resize(result_queue_size);
+  //db_charges.resize(result_queue_size);
   db_charges.push_back(std::vector<int>(n_dbs));
   curr_charges = db_charges.back();
 

@@ -65,6 +65,7 @@ namespace gui{
     // in the background: will need to be able to display results on request
     // after job finished.
     void runSimulation();             // high-level structure for running simulation
+    bool readSimOut(const QString &result_path);                // read simulator output
 
     // SANDBOX
 

@@ -67,9 +67,13 @@ void PhysicsEngine::writeResultsXML()
   }
 
   // elec_dist
-  for(auto dbc : db_charges) {
-    rapidxml::xml_node<>* nd_dbc = doc.allocate_node(rapidxml::node_element, "dist");
-    char *dbc = doc.allocate_string(std::to_string(TODOTODOTODO).c_str());
+  for(auto db_charge : db_charges) {
+    std::string dbc_link;
+    for(auto chg : db_charge)
+      dbc_link.append(std::to_string(chg));
+    char *dbc_char = doc.allocate_string(dbc_link.c_str());
+    rapidxml::xml_node<>* nd_dbc = doc.allocate_node(rapidxml::node_element, "dist", dbc_char);
+    nd_elec_dist->append_node(nd_dbc);
   }
   
     std::deque<std::vector<int>> db_charges;
