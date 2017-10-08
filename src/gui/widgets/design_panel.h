@@ -264,7 +264,7 @@ namespace gui{
   {
   public:
     // create a dangling bond at the given lattice dot, set invert if deleting DB
-    CreateDB(prim::LatticeDot *ldot, int layer_index, DesignPanel *dp,
+    CreateDB(prim::LatticeDot *ldot, int layer_index, DesignPanel *dp, prim::DBDot *src_db=0,
                               bool invert=false, QUndoCommand *parent=0);
 
     // destroy the dangling bond and update the lattice dot
@@ -282,6 +282,7 @@ namespace gui{
 
     DesignPanel *dp;  // DesignPanel pointer
     int layer_index;  // index of layer in dp->layers stack
+    int elec;         // elec content of the db
 
     // internals
     int index;              // index of DBDot item in the layer item stack

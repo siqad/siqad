@@ -1214,7 +1214,7 @@ void gui::DesignPanel::snapDB(QPointF scene_pos)
 // CreateDB class
 
 gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
-                        gui::DesignPanel *dp, bool invert, QUndoCommand *parent)
+                        gui::DesignPanel *dp, prim::DBDot *src_db, bool invert, QUndoCommand *parent)
   : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), ldot(ldot)
 {
   prim::DBDot *dbdot = ldot->getDBDot();
@@ -1226,6 +1226,7 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
   // dbdot index in layer
   prim::Layer *layer = dp->getLayer(layer_index);
   index = invert ? layer->getItems().indexOf(dbdot) : layer->getItems().size();
+  elec = src_db ? src_db->getElec() : 0; // TODO in the future, instead of copying properties 1 by 1, probably want to make a struct that stores all properties
 }
 
 void gui::DesignPanel::CreateDB::undo()
@@ -1242,7 +1243,7 @@ void gui::DesignPanel::CreateDB::create()
 {
   // add dangling bond to layer and scene, index in layer item stack will be
   // equal to layer->getItems().size()
-  dp->addItem(new prim::DBDot(layer_index, ldot), layer_index, index);
+  dp->addItem(new prim::DBDot(layer_index, ldot, elec), layer_index, index);
 }
 
 void gui::DesignPanel::CreateDB::destroy()
@@ -1509,7 +1510,7 @@ void gui::DesignPanel::deleteSelection()
     switch(item->item_type){
       case prim::Item::DBDot:
         undo_stack->push(new CreateDB( static_cast<prim::DBDot*>(item)->getSource(),
-                                      item->layer_id, this, true));
+                                      item->layer_id, this, 0, true));
         break;
       case prim::Item::Aggregate:
         destroyAggregate(static_cast<prim::Aggregate*>(item));
@@ -1590,7 +1591,7 @@ void gui::DesignPanel::destroyAggregate(prim::Aggregate *agg)
     switch(item->item_type){
       case prim::Item::DBDot:
         undo_stack->push(new CreateDB(static_cast<prim::DBDot*>(item)->getSource(),
-                                      item->layer_id, this, true));
+                                      item->layer_id, this, 0, true));
         break;
       case prim::Item::Aggregate:
         destroyAggregate(static_cast<prim::Aggregate*>(item));
@@ -1641,7 +1642,7 @@ void gui::DesignPanel::pasteDBDot(prim::Ghost *ghost, prim::DBDot *db)
   // get the target lattice dor
   prim::LatticeDot *ldot = ghost->getLatticeDot(db);
   if(ldot){
-    undo_stack->push(new CreateDB(ldot, getLayerIndex(top_layer), this));
+    undo_stack->push(new CreateDB(ldot, getLayerIndex(top_layer), this, db));
   }
 
 }

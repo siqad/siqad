@@ -25,13 +25,13 @@ prim::DBDot::DBDot(int lay_id, prim::LatticeDot *src, int elec_in)
   : prim::Item(prim::Item::DBDot)
 {
   initDBDot(lay_id, src, elec_in);
+  // TODO might want to add a struct or something that stores all properties of the db, this way copies can be much easier
 }
 
 
 prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
   : prim::Item(prim::Item::DBDot)
 {
-  //qDebug() << QObject::tr("Constructing DBDot from XML");
   QPointF scene_loc; // physical location from file
   int lay_id; // layer id from file
   int elec_in;
@@ -40,7 +40,6 @@ prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
     if(stream->isStartElement()){
       if(stream->name() == "layer_id"){
         lay_id = stream->readElementText().toInt();
-        //qDebug() << QObject::tr("DBDot: layer id is %1").arg(lay_id);
         stream->readNext();
       }
       else if(stream->name() == "elec"){
@@ -73,14 +72,11 @@ prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
       stream->readNext();
   }
 
-  // show error if any
-  if(stream->hasError()){
+  if(stream->hasError())
     qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
-  }
 
   // find the lattice dot located at scene_loc
   prim::LatticeDot *src_latdot = static_cast<prim::LatticeDot*>(scene->itemAt(scene_loc, QTransform()));
-
   if(!src_latdot){
     qCritical() << QObject::tr("No lattice dot at %1, %2").arg(scene_loc.x()).arg(scene_loc.y());
     // TODO error alert dialog?
@@ -88,7 +84,6 @@ prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
 
   // initialize
   initDBDot(lay_id, src_latdot, elec_in);
-
   scene->addItem(this);
 }
 
@@ -96,6 +91,12 @@ prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
 void prim::DBDot::initDBDot(int lay_id, prim::LatticeDot *src, int elec_in)
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
+
+  fill_fact = 0.;
+  fill_col_default = gui_settings->get<QColor>("dbdot/fill_col");
+  fill_col_driver = gui_settings->get<QColor>("dbdot/fill_col_driver");
+  fill_col = fill_col_default;
+
   setLayerIndex(lay_id);
 
   // construct static class variables
@@ -108,11 +109,32 @@ void prim::DBDot::initDBDot(int lay_id, prim::LatticeDot *src, int elec_in)
   // set electron occupation
   setElec(elec_in);
 
-  fill_fact = 0.;
-  fill_col = gui_settings->get<QColor>("dbdot/fill_col");
-
   // flags
   setFlag(QGraphicsItem::ItemIsSelectable, true);
+}
+
+
+void prim::DBDot::toggleElec() {
+  if(elec) 
+    setElec(0); 
+  else 
+    setElec(1);
+}
+
+
+void prim::DBDot::setElec(int e_in) {
+  elec = e_in;
+  if(elec){
+    // set to 1
+    setFill(1);
+    setFillCol(fill_col_driver);
+  }
+  else{
+    // set to 0
+    setFill(0);
+    setFillCol(fill_col_default);
+  }
+  update();
 }
 
 
@@ -166,7 +188,7 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
 
 prim::Item *prim::DBDot::deepCopy() const
 {
-  prim::DBDot *cp = new DBDot(layer_id, 0);
+  prim::DBDot *cp = new DBDot(layer_id, 0, elec);
   cp->setPos(pos());
   return cp;
 }
@@ -205,4 +227,18 @@ void prim::DBDot::constructStatics()
   edge_col= gui_settings->get<QColor>("dbdot/edge_col");
   selected_col= gui_settings->get<QColor>("dbdot/selected_col");
 
+}
+
+void prim::DBDot::mousePressEvent(QGraphicsSceneMouseEvent *e)
+{
+  qDebug() << QObject::tr("DBDot has seen the mousePressEvent");
+
+  switch(e->buttons()){
+    case Qt::RightButton:
+      toggleElec(); // for now, right click toggles electron. In the future, show context menu with electron toggle being one option
+      break;
+    default:
+      prim::Item::mousePressEvent(e);
+      break;
+  }
 }

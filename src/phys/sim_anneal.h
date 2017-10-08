@@ -20,7 +20,7 @@ namespace phys {
   {
   public:
     // constructor
-    SimAnneal(const std::string& ifnm, const std::string& ofnm);
+    SimAnneal(const std::string& i_path, const std::string& o_path);
 
     // destructor
     ~SimAnneal() {};

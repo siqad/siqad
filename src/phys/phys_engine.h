@@ -22,7 +22,7 @@ namespace phys{
   public:
 
     // constructor
-    PhysicsEngine(const std::string &eng_nm, const std::string &ifnm, const std::string &ofnm);
+    PhysicsEngine(const std::string &eng_nm, const std::string &i_path, const std::string &o_path);
 
     // destructor
     ~PhysicsEngine() {};
@@ -38,7 +38,7 @@ namespace phys{
 
   private:
     std::string eng_name;
-    std::string of_name;
+    std::string out_path;
 
   };
 

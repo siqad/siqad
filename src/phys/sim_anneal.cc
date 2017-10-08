@@ -10,8 +10,8 @@
 
 using namespace phys;
 
-SimAnneal::SimAnneal(const std::string& ifnm, const std::string& ofnm)
-  : PhysicsEngine("SimAnneal", ifnm, ofnm)
+SimAnneal::SimAnneal(const std::string& i_path, const std::string& o_path)
+  : PhysicsEngine("SimAnneal", i_path, o_path)
 {
 
 }

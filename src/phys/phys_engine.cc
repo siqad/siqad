@@ -11,11 +11,11 @@
 using namespace phys;
 
 // CONSTRUCTOR
-PhysicsEngine::PhysicsEngine(const std::string &eng_nm, const std::string &ifnm, const std::string &ofnm)
+PhysicsEngine::PhysicsEngine(const std::string &eng_nm, const std::string &i_path, const std::string &o_path)
 {
   eng_name = eng_nm;
-  problem.readProblem(ifnm);
-  of_name = ofnm;
+  problem.readProblem(i_path);
+  out_path = o_path;
 }
 
 void PhysicsEngine::writeResultsXML()
@@ -23,7 +23,7 @@ void PhysicsEngine::writeResultsXML()
   std::cout << "Write results to XML..." << std::endl;
   // NOTE in the future, there's probably a range of stuff that can be exported.
   // for now, only export charge config
-  std::ofstream of(of_name);
+  std::ofstream of(out_path);
   // TODO test that the output file path works
 
   // xml declaration
@@ -83,5 +83,5 @@ void PhysicsEngine::writeResultsXML()
   of.close();
   doc.clear();
 
-  std::cout << "Write complete" << std::endl;
+  std::cout << "Output written to: " << out_path << std::endl;
 }

@@ -378,30 +378,30 @@ void gui::ApplicationGUI::runSimulation()
 
   // prepare physeng binary execution
   qDebug() << tr("prepare physeng binary execution");
-  QProcess *physeng = new QProcess();
+  QFileInfo file_to_sim("./src/phys/export_to_simanneal.xml"); // TODO put in other directories
   QString phys_bin = "/home/samuelngsh/git/qsi-sim/src/phys/physeng"; // TODO don't hard code path
   QStringList arguments;
-  arguments << QFileInfo("./src/phys/export_to_simanneal.xml").canonicalFilePath(); // TODO put in other directories
-  arguments << QFileInfo("./src/phys/simanneal_output.xml").canonicalFilePath(); // TODO put in other directories
+  arguments << file_to_sim.canonicalFilePath();
+  arguments << file_to_sim.canonicalPath().append("/simanneal_output.xml"); // TODO put in other directories
 
   // TODO setup slots to deal with QProcess finish/error signals
 
   // invoke simulator binary and TODO show std output
   qDebug() << tr("about to invoke physeng binary");
+  QProcess *physeng = new QProcess();
   physeng->setProgram(phys_bin);
   physeng->setArguments(arguments);
   physeng->setProcessChannelMode(QProcess::MergedChannels);
-  qDebug() << tr("physeng working directory: %1").arg(physeng->workingDirectory());
   physeng->start();
 
-  // Stall and wait for it to start
-  // will get rid of this after slot connections are made
+  // Stall and wait for it to start TODO get rid of this after slot connections are made
   while(!physeng->waitForStarted());
 
+  // Dump output
   while(physeng->waitForReadyRead())
     qDebug() << physeng->readAll();
 
-  qDebug() << tr("simulation has completed");
+  qDebug() << tr("Physeng binary has finished running");
 
   // read output xml
 }
@@ -413,37 +413,47 @@ bool gui::ApplicationGUI::readSimOut(const QString &result_path)
   
   if(!result_file.open(QFile::ReadOnly | QFile::Text)){
     qDebug() << tr("Error when opening file to read: %1").arg(result_file.errorString());
-    return;
+    return false;
   }
+
+  // TODO either use prim::Simulator or make a new prim::SimResult?
+  // basically, a simulator class that stores the engine info and the returned results, then the results can be shown on demand
 
   // read from XML stream
   QXmlStreamReader rs(&result_file); // result stream
   qDebug() << tr("Begin to read result from %1").arg(result_file.fileName());
-  while(!rs->atEnd()){
-    if(rs->isStartElement()){
-      if(rs->name() == "eng_info"){
+  // TODO might just be better to pass this whole block to simulator class
+  // new simulator object for each simulation result? If that's the case then prim::Simulator might have to be repurposed
+  while(!rs.atEnd()){
+    if(rs.isStartElement()){
+      if(rs.name() == "eng_info"){
+        rs.readNext();
         // basic engine info
+        while(rs.name() != "eng_info"){
+          // TODO read engine info
+        }
       }
-      else if(rs->name() == "sim_param"){
-
+      else if(rs.name() == "sim_param"){
+        // TODO simulator class
       }
-      else if(rs->name() == "physloc"){
-
+      else if(rs.name() == "physloc"){
+        // TODO simulator class
       }
-      else if(rs->name() == "elec_dist"){
-
+      else if(rs.name() == "elec_dist"){
+        // TODO simulator class
       }
       else{
-        qDebug() << tr("%1: invalid element encountered on line %2 - %3").arg(result_file).arg(rs->lineNumber()).arg(rs->name().toString());
-        rs->readNext();
+        qDebug() << tr("%1: invalid element encountered on line %2 - %3").arg(result_path).arg(rs.lineNumber()).arg(rs.name().toString());
+        rs.readNext();
       }
     }
     else
-      rs->readNext();
+      rs.readNext();
   }
-  // TODO some read function and visualization function
   qDebug() << tr("Load complete");
   result_file.close();
+  
+  return true;
 }
 
 

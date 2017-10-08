@@ -39,7 +39,8 @@ namespace prim{
     // accessors
     QPointF getPhysLoc() const {return phys_loc;}
 
-    void setElec(int e_in) {elec = e_in;}
+    void toggleElec();
+    void setElec(int e_in);
     int getElec() {return elec;}
 
     void setSource(prim::LatticeDot *src);
@@ -58,6 +59,9 @@ namespace prim{
     // SAVE LOAD
     virtual void saveItems(QXmlStreamWriter *) const;
 
+  protected:
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
+
   private:
 
     // construct static variables
@@ -71,6 +75,8 @@ namespace prim{
 
     qreal fill_fact;  // area proportional of dot filled
     QColor fill_col;  // color of fill
+    QColor fill_col_default;
+    QColor fill_col_driver;
 
     // static class parameters for painting
 
