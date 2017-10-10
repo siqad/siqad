@@ -90,12 +90,11 @@ prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
 
 void prim::DBDot::initDBDot(int lay_id, prim::LatticeDot *src, int elec_in)
 {
-  settings::GUISettings *gui_settings = settings::GUISettings::instance();
-
   fill_fact = 0.;
-  fill_col_default = gui_settings->get<QColor>("dbdot/fill_col");
-  fill_col_driver = gui_settings->get<QColor>("dbdot/fill_col_driver");
-  fill_col = fill_col_default;
+  //fill_col = fill_col_default;
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  fill_col_drv = gui_settings->get<QColor>("dbdot/fill_col_drv");
+  fill_col_drv_sel = gui_settings->get<QColor>("dbdot/fill_col_drv_sel");
 
   setLayerIndex(lay_id);
 
@@ -127,7 +126,7 @@ void prim::DBDot::setElec(int e_in) {
   if(elec){
     // set to 1
     setFill(1);
-    setFillCol(fill_col_driver);
+    setFillCol(fill_col_drv);
   }
   else{
     // set to 0
@@ -167,10 +166,6 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
   qreal dxy = .5*edge_width;
   rect.adjust(dxy,dxy,-dxy,-dxy);
 
-  // draw outer circle
-  painter->setPen(QPen((select_mode && upSelected()) ? selected_col : edge_col, edge_width));
-  painter->drawEllipse(rect);
-
   // draw inner fill
   if(fill_fact>0){
     QPointF center = rect.center();
@@ -182,6 +177,10 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
     painter->setBrush(fill_col);
     painter->drawEllipse(rect);
   }
+
+  // draw outer circle
+  painter->setPen(QPen((select_mode && upSelected()) ? selected_col : edge_col, edge_width));
+  painter->drawEllipse(rect);
 
 }
 
@@ -226,6 +225,9 @@ void prim::DBDot::constructStatics()
   edge_width = gui_settings->get<qreal>("dbdot/edge_width")*diameter;
   edge_col= gui_settings->get<QColor>("dbdot/edge_col");
   selected_col= gui_settings->get<QColor>("dbdot/selected_col");
+  fill_col_default = gui_settings->get<QColor>("dbdot/fill_col");
+  fill_col_drv = gui_settings->get<QColor>("dbdot/fill_col_drv");
+  fill_col_drv_sel = gui_settings->get<QColor>("dbdot/fill_col_drv_sel");
 
 }
 

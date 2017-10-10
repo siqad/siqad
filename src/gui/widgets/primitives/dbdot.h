@@ -76,7 +76,8 @@ namespace prim{
     qreal fill_fact;  // area proportional of dot filled
     QColor fill_col;  // color of fill
     QColor fill_col_default;
-    QColor fill_col_driver;
+    QColor fill_col_drv;
+    QColor fill_col_drv_sel;
 
     // static class parameters for painting
 
