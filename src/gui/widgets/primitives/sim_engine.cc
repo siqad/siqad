@@ -1,28 +1,34 @@
-// @file:     simulator.cc
+// @file:     sim_engine.cc
 // @author:   Samuel
 // @created:  2017.10.03
 // @editted:  2017.10.03 - Samuel
 // @license:  GNU LGPL v3
 //
-// @desc:     simulator classes
+// @desc:     SimEngine classes
 
-#include "simulator.h"
+#include "sim_engine.h"
 
 namespace prim{
 
-Simulator::Simulator(const QString &s_desc_path, QWidget *parent)
+SimEngine::SimEngine(const QString &s_desc_path, QWidget *parent)
   : QObject(parent), sim_desc_path(s_desc_path)
 {
+  // if(!readSimInfo()) throw error
 }
 
 
+bool SimEngine::readSimEngineDecl(QFile *in_f)
+{
+  // check desc path readability
 
-// TODO might just put this in constructor
-void Simulator::readSimInfo()
-{}
+  // start QXmlStreamReader
+
+  // read simulator properties and desired parameters from simulator XML
+  return true;
+}
 
 // invoke the simulator binary
-bool Simulator::invokeBinary(const QStringList &arguments)
+bool SimEngine::invokeBinary(const QStringList &arguments)
 {
   // TODO check whether bin_path is valid
 
@@ -40,4 +46,4 @@ bool Simulator::invokeBinary(const QStringList &arguments)
 
 
 
-} // end of gui namespace
+} // end of prim namespace

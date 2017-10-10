@@ -47,7 +47,7 @@ namespace prim{
     prim::LatticeDot *getSource() const {return source;}
 
     void setFill(float fill){fill_fact = fill;}
-    void setFillCol(QColor col){fill_col = col;}
+    void setFillCol(QColor col, QColor col_sel){fill_col = col; fill_col_sel = col_sel;}
 
     // inherited abstract method implementations
 
@@ -69,15 +69,17 @@ namespace prim{
 
     // VARIABLES
     QPointF phys_loc;         // physical location of dot in angstroms
-    int elec;               // 1=forced electron on this db
+    int elec;                 // 1=forced electron on this db
 
     prim::LatticeDot *source=0; // lattice site beneath dot
 
-    qreal fill_fact;  // area proportional of dot filled
-    QColor fill_col;  // color of fill
-    QColor fill_col_default;
-    QColor fill_col_drv;
-    QColor fill_col_drv_sel;
+    qreal fill_fact;          // area proportional of dot filled
+    QColor fill_col;          // color of fill that is drawn
+    QColor fill_col_sel;      // color of fill when selected that is drawn
+    static QColor fill_col_default;  // default fill color
+    static QColor fill_col_default_sel;  // default fill color (selected)
+    static QColor fill_col_drv;      // driver fill color
+    static QColor fill_col_drv_sel;  // driver fill color (selected)
 
     // static class parameters for painting
 

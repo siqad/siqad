@@ -18,7 +18,10 @@ qreal prim::DBDot::edge_width = -1;
 QColor prim::DBDot::edge_col;
 QColor prim::DBDot::selected_col;
 
-
+QColor prim::DBDot::fill_col_default;
+QColor prim::DBDot::fill_col_default_sel;
+QColor prim::DBDot::fill_col_drv;
+QColor prim::DBDot::fill_col_drv_sel;
 
 
 prim::DBDot::DBDot(int lay_id, prim::LatticeDot *src, int elec_in)
@@ -91,10 +94,6 @@ prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
 void prim::DBDot::initDBDot(int lay_id, prim::LatticeDot *src, int elec_in)
 {
   fill_fact = 0.;
-  //fill_col = fill_col_default;
-  settings::GUISettings *gui_settings = settings::GUISettings::instance();
-  fill_col_drv = gui_settings->get<QColor>("dbdot/fill_col_drv");
-  fill_col_drv_sel = gui_settings->get<QColor>("dbdot/fill_col_drv_sel");
 
   setLayerIndex(lay_id);
 
@@ -126,12 +125,12 @@ void prim::DBDot::setElec(int e_in) {
   if(elec){
     // set to 1
     setFill(1);
-    setFillCol(fill_col_drv);
+    setFillCol(fill_col_drv, fill_col_drv_sel);
   }
   else{
     // set to 0
     setFill(0);
-    setFillCol(fill_col_default);
+    setFillCol(fill_col_default, fill_col_default_sel);
   }
   update();
 }
@@ -174,7 +173,7 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
     rect.moveCenter(center);
 
     painter->setPen(Qt::NoPen);
-    painter->setBrush(fill_col);
+    painter->setBrush((select_mode && upSelected()) ? fill_col_sel : fill_col);
     painter->drawEllipse(rect);
   }
 
@@ -226,6 +225,7 @@ void prim::DBDot::constructStatics()
   edge_col= gui_settings->get<QColor>("dbdot/edge_col");
   selected_col= gui_settings->get<QColor>("dbdot/selected_col");
   fill_col_default = gui_settings->get<QColor>("dbdot/fill_col");
+  fill_col_default_sel = gui_settings->get<QColor>("dbdot/fill_col_sel");
   fill_col_drv = gui_settings->get<QColor>("dbdot/fill_col_drv");
   fill_col_drv_sel = gui_settings->get<QColor>("dbdot/fill_col_drv_sel");
 

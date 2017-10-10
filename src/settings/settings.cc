@@ -143,7 +143,8 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("dbdot/edge_col", QColor(255,255,255));     // edge color, unselected
   S->setValue("dbdot/selected_col", QColor(0, 100, 255)); // edge color, selected
   S->setValue("dbdot/fill_col", QColor(200,200,200));     // dot fill color
-  S->setValue("dbdot/fill_col_drv", QColor(255,90,90));  // dot fill color for driver dot (forced electron=1)
+  S->setValue("dbdot/fill_col_sel", QColor(200,200,200)); // dot fill color (selected)
+  S->setValue("dbdot/fill_col_drv", QColor(255,90,90));   // dot fill color for driver dot (forced electron=1)
   S->setValue("dbdot/fill_col_drv_sel", QColor(128,95,173));  // dot fill color for driver dot (forced electron=1)
 
   // lattice dot parameters

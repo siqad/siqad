@@ -43,7 +43,8 @@ HEADERS += \
 	src/gui/widgets/primitives/items.h \
 	src/gui/widgets/primitives/layer.h \
 	src/gui/widgets/primitives/lattice.h \
-    src/gui/widgets/primitives/simulator.h
+    src/gui/widgets/primitives/sim_engine.h \
+    src/gui/widgets/primitives/sim_job.h 
 
 SOURCES += \
 	src/gui/widgets/primitives/emitter.cc \
@@ -54,7 +55,8 @@ SOURCES += \
 	src/gui/widgets/primitives/ghost.cc \
 	src/gui/widgets/primitives/layer.cc \
 	src/gui/widgets/primitives/lattice.cc \
-    src/gui/widgets/primitives/simulator.cc
+    src/gui/widgets/primitives/sim_engine.cc \
+    src/gui/widgets/primitives/sim_job.cc
 
 # widgets
 
@@ -73,19 +75,6 @@ SOURCES += \
 	src/gui/widgets/input_field.cc \
 	src/gui/widgets/info_panel.cc \
     src/gui/widgets/sim_manager.cc
-
-# physics engine
-
-#HEADERS += \
-#    src/phys/phys_engine.h \
-#    src/phys/problem.h \
-#    src/phys/sim_anneal.h
-#
-#SOURCES += \
-#    src/phys/phys_engine.cc \
-#    src/phys/problem.cc \
-#    src/phys/sim_anneal.cc
-
 
 #####################
 # BUILD DIRECTORIES #

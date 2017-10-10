@@ -128,12 +128,16 @@ GUI side
 * When sim is running, don't allow modification in the main window to avoid conflict btwn sim and window content.
 * Rundown:
   * Sim Setup (pick simulator, adjust simulation params)
+    * There should be flags in the simulator info XML controlling what kind of params are exported.
+    * Other simulation params are described in the simulator info XML too I guess?
   * Run simulation, shows simulation text output
     * XML file describing the problem and parameters is saved to a specific directory that queues simulations. The binary of the simulator is called to run the simulation.
-  * When simulation completes, allow users the following options: 1. visualize results (details of visualization should be handled by another widget I guess); 2. save simulation results
+  * When simulation completes, allow users the following options: 1. visualize results (details of visualization, like filters and whatnot, should be handled by another widget I guess); 2. save simulation results
+    * Simulation results, corresponding params, energy levels, etc. should be stored to different classes?
 * Detect runtime error messages from the simulator and alert the user
-* Static or animated display of charge (like the AFM images)
 Short future:
+* Static or animated display of charge (like the AFM images)
+  * For degenerate states where the hop is of short distance? Might need to change the way the results are exported to make this easier.
 * Has a result screen that allows user to view previous results
 Future:
 * Show currently running jobs
