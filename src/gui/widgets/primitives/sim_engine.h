@@ -20,20 +20,17 @@ namespace prim{
     Q_OBJECT
   public:
     // constructor
-    SimEngine(const QString &s_desc_path, QWidget *parent);
+    SimEngine(const QString &e_desc_path, QWidget *parent);
 
     // destructor
     ~SimEngine() {};
 
     // function for reading simulator definition from xml
-    bool readSimEngineDecl(QFile *in_f);
+    bool readEngineDecl(QFile *in_f);
 
-    // invoke simulator binary, TODO might want to return the QProcess instead of bool
-    // TODO move this to sim_job
-    bool invokeBinary(const QStringList &arguments);
-    // NOTE actually this might be it: https://stackoverflow.com/questions/14960472/running-c-binary-from-inside-qt-and-redirecting-the-output-of-the-binary-to-a
+    // generate a directory for the next job to use
+    QString generateJobDir();
 
-    
 
     // ACCESSORS
 
@@ -41,13 +38,14 @@ namespace prim{
     // available parameters and associated type, for user alteration
 
     void setBinaryPath(const QString &b_path) {bin_path = b_path;}
+    QString getBinaryPath() {return bin_path;}
 
 
   private:
     // variables like binary location, temp file location, etc.
-    QString sim_desc_path;
-    QString bin_path;
-    QProcess *sim_process;
+    QString eng_desc_path;      // description file of this engine
+    QString bin_path;           // binary path of this engine
+    QString eng_problem_root;   // root directory for all problems files for this engine
 
     // TODO some stack/dictionary/etc with simulator info, for showing up in manager
     // TODO something that stores default parameters, associated types (so the appropriate fields are used), for user alteration

@@ -11,13 +11,13 @@
 namespace prim{
 
 SimEngine::SimEngine(const QString &s_desc_path, QWidget *parent)
-  : QObject(parent), sim_desc_path(s_desc_path)
+  : QObject(parent), eng_desc_path(s_desc_path)
 {
   // if(!readSimInfo()) throw error
 }
 
 
-bool SimEngine::readSimEngineDecl(QFile *in_f)
+bool SimEngine::readEngineDecl(QFile *in_f)
 {
   // check desc path readability
 
@@ -27,22 +27,6 @@ bool SimEngine::readSimEngineDecl(QFile *in_f)
   return true;
 }
 
-// invoke the simulator binary
-bool SimEngine::invokeBinary(const QStringList &arguments)
-{
-  // TODO check whether bin_path is valid
-
-  // TODO check that &arguments contains a valid path of the problem XML
-
-  sim_process = new QProcess();
-  sim_process->start(bin_path, arguments);
-  
-  // TODO check documentation for piping outputs
-
-  // TODO connect signals for error and finish
-
-  return true;
-}
 
 
 

@@ -26,17 +26,22 @@ namespace prim{
     // destructor
     ~SimJob() {};
 
-    // call sim engine binary
-    // probably makes sense to put this here as the same simulator binary could be used for multiple jobs
-    void invokeBinary();
+    // load job from XML (for jobs that keep running even if parent terminates)
+    // TODO sim_manager probably needs to check folders for unfinished simulations
+    bool loadJob(const QString &job_path);
 
-    // read result XML TODO maybe move to private
+    // call sim engine binary
+    bool invokeBinary(const QStringList &arguments);
+
+    // read result XML
     void readResults(QString read_path);
 
     
 
   private:
     SimEngine *engine;
+    QProcess *sim_process;
+    QStringList arguments;
     //QList<QPair<the field stuff, value>> sim_params;
     //QList of results. For now: 1. db physloc, 2. db config
   };
