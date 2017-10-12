@@ -10,12 +10,11 @@
 
 // Qt includes
 #include <QtSvg>
+#include <iostream>
 
 // gui includes
 #include "application.h"
 #include "src/settings/settings.h"
-
-#include <iostream>
 
 
 // init the DialogPanel to NULL until build in constructor

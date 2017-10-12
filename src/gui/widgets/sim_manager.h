@@ -11,7 +11,7 @@
 #define _GUI_SIM_MANGER_H_
 
 #include <QtWidgets>
-#include "primitives/simulator.h"
+#include "primitives/sim_engine.h"
 
 namespace gui{
 
@@ -46,7 +46,7 @@ private:
   bool checkSimCompletion();        // check whether simulation has been completed
 
   // variables
-  QStack<prim::Simulator*> simulators;   // stack of all simulators
+  QStack<prim::SimEngine*> sim_engines;   // stack of all simulators
 
   // manager panes
   QListWidget *sim_list_pan;

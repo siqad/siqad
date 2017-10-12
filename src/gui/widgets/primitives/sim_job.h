@@ -26,15 +26,18 @@ namespace prim{
     // destructor
     ~SimJob() {};
 
+    void setEngine(SimEngine *eng) {engine = eng;}
+
+
     // load job from XML (for jobs that keep running even if parent terminates)
     // TODO sim_manager probably needs to check folders for unfinished simulations
     bool loadJob(const QString &job_path);
 
     // call sim engine binary
-    bool invokeBinary(const QStringList &arguments);
+    bool invokeBinary();
 
     // read result XML
-    void readResults(QString read_path);
+    bool readResults(QString read_path);
 
     
 
@@ -42,8 +45,16 @@ namespace prim{
     SimEngine *engine;
     QProcess *sim_process;
     QStringList arguments;
+
+    // read xml
+    QStringList ignored_xml_elements; // XML elements to ignore when reading results
+
+    // parameters
     //QList<QPair<the field stuff, value>> sim_params;
-    //QList of results. For now: 1. db physloc, 2. db config
+
+    // results
+    QList<QPair<float,float>> physlocs;   // physlocs[dot_ind].first or .second
+    QList<QList<bool>> elec_dists;        // elec_dists[result_ind][dot_ind]
   };
 
 } // end of prim namespace
