@@ -21,7 +21,7 @@ namespace prim{
     Q_OBJECT
   public:
     // constructor
-    SimJob(SimEngine *eng, QWidget *parent=0);
+    SimJob(SimEngine *eng=0, QWidget *parent=0);
 
     // destructor
     ~SimJob() {};
@@ -54,7 +54,7 @@ namespace prim{
 
     // results
     QList<QPair<float,float>> physlocs;   // physlocs[dot_ind].first or .second
-    QList<QList<bool>> elec_dists;        // elec_dists[result_ind][dot_ind]
+    QList<QList<int>> elec_dists;        // elec_dists[result_ind][dot_ind] TODO change this to QList of QVectors
   };
 
 } // end of prim namespace

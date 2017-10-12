@@ -372,11 +372,16 @@ void gui::ApplicationGUI::runSimulation()
   // TODO show simulation setup dialog
   // for now, just hard code those settings
 
+  prim::SimJob job; // TODO update initialization
+  // TODO add SimJob to some list
+
   // call saveToFile, don't forget to account for setup dialog settings
-  saveToFile(Simulation, "src/phys/export_to_simanneal.xml");
+  saveToFile(Simulation, "src/phys/problem_desc.xml");
+
+  job.invokeBinary(); // TODO lots of hard coded stuff, need to revamp job initiation & func params after D-Wave
 
   // prepare physeng binary execution
-  qDebug() << tr("prepare physeng binary execution");
+  /*qDebug() << tr("prepare physeng binary execution");
   QFileInfo file_to_sim("./src/phys/export_to_simanneal.xml"); // TODO put in other directories
   QString phys_bin = "/home/samuelngsh/git/qsi-sim/src/phys/physeng"; // TODO don't hard code path
   QStringList arguments;
@@ -400,9 +405,10 @@ void gui::ApplicationGUI::runSimulation()
   while(physeng->waitForReadyRead())
     qDebug() << physeng->readAll();
 
-  qDebug() << tr("Physeng binary has finished running");
+  qDebug() << tr("Physeng binary has finished running");*/
 
   // read output xml
+  job.readResults("src/phys/simanneal_output.xml");
 }
 
 bool gui::ApplicationGUI::readSimOut(const QString &result_path)

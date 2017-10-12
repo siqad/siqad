@@ -18,6 +18,7 @@
 #include "widgets/input_field.h"
 #include "widgets/info_panel.h"
 #include "widgets/sim_manager.h"
+#include "widgets/primitives/sim_job.h" // TODO move these stuff to SimManager later
 
 
 // declare Application GUI in Ui namespace
