@@ -39,12 +39,15 @@ namespace prim{
     // read result XML
     bool readResults(QString read_path);
 
+    // indicate whether the job has been completed
+    bool isComplete() {return complete};
     
 
   private:
     SimEngine *engine;
     QProcess *sim_process;
     QStringList arguments;
+    bool complete;          // whether the job has completed simulation
 
     // read xml
     QStringList ignored_xml_elements; // XML elements to ignore when reading results
