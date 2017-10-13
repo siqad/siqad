@@ -157,4 +157,11 @@ bool SimJob::readResults(QString read_path)
   return true;
 }
 
+bool SimJob::processResults()
+{
+  // TODO check that results have already been read
+  // TODO deduplicate results, keep count of how many times it was duplicated
+  // 
+}
+
 } // end of prim namespace

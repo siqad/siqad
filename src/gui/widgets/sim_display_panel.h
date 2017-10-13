@@ -26,13 +26,13 @@ namespace gui{
     ~SimDisplay();
 
     // set job
-    bool setJob(prim::SimJob *job) {return job ? curr_job = job : false;} // TODO not sure if this actually works
+    bool setJob(prim::SimJob *job) {return job ? showing_job = job : false;} // TODO not sure if this actually works
 
-
+    // TODO generate a list of DBDot* with the same order as physlocs in showing_job
 
 
   private:
-    prim::SimJob *curr_job;   // current job result being shown
+    prim::SimJob *showing_job;   // current job result being shown
     // TODO struct of display options that users can change, as well as the available range of each option
   };
 

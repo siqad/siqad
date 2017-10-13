@@ -38,6 +38,9 @@ namespace prim{
 
     // read result XML
     bool readResults(QString read_path);
+    
+    // process results
+    bool processResults();
 
     // indicate whether the job has been completed
     bool isComplete() {return complete};
@@ -57,7 +60,8 @@ namespace prim{
 
     // results
     QList<QPair<float,float>> physlocs;   // physlocs[dot_ind].first or .second
-    QList<QList<int>> elec_dists;        // elec_dists[result_ind][dot_ind] TODO change this to QList of QVectors
+    QList<QList<int>> elec_dists;         // elec_dists[result_ind][dot_ind] TODO change this to QList of QVectors
+    int dist_count;                       // number of distributions
   };
 
 } // end of prim namespace

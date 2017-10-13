@@ -380,33 +380,6 @@ void gui::ApplicationGUI::runSimulation()
 
   job.invokeBinary(); // TODO lots of hard coded stuff, need to revamp job initiation & func params after D-Wave
 
-  // prepare physeng binary execution
-  /*qDebug() << tr("prepare physeng binary execution");
-  QFileInfo file_to_sim("./src/phys/export_to_simanneal.xml"); // TODO put in other directories
-  QString phys_bin = "/home/samuelngsh/git/qsi-sim/src/phys/physeng"; // TODO don't hard code path
-  QStringList arguments;
-  arguments << file_to_sim.canonicalFilePath();
-  arguments << file_to_sim.canonicalPath().append("/simanneal_output.xml"); // TODO put in other directories
-
-  // TODO setup slots to deal with QProcess finish/error signals
-
-  // invoke simulator binary and TODO show std output
-  qDebug() << tr("about to invoke physeng binary");
-  QProcess *physeng = new QProcess();
-  physeng->setProgram(phys_bin);
-  physeng->setArguments(arguments);
-  physeng->setProcessChannelMode(QProcess::MergedChannels);
-  physeng->start();
-
-  // Stall and wait for it to start TODO get rid of this after slot connections are made
-  while(!physeng->waitForStarted());
-
-  // Dump output
-  while(physeng->waitForReadyRead())
-    qDebug() << physeng->readAll();
-
-  qDebug() << tr("Physeng binary has finished running");*/
-
   // read output xml
   job.readResults("src/phys/simanneal_output.xml");
 }

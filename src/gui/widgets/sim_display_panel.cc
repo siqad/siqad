@@ -26,10 +26,11 @@ bool SimDisplay::setJob(prim::SimJob *job)
 {
   if(!job)
     return false;
-  curr_job = job;
+  showing_job = job;
   // TODO if(curr_job->isComplete()), update display option ranges
   return true;
 }
+
 
 
 
@@ -37,26 +38,10 @@ bool SimDisplay::setJob(prim::SimJob *job)
 
 void SimDisplay::initSimDisplay()
 {
-  // init simulation manager GUI
+  // TODO for now, only show options to choose which result to show, maybe get rid of duplicated ones but keep the count of occurance for duplicated results
+  // TODO next, show energy level, and maybe sorting feature
+  // TODO that's about time to make slides
 
-  /*// simulator manager panes
-  sim_list_pan = new QListWidget();
-  sim_actions_pan = new QVBoxLayout();
-
-  // populate panes
-  initMenu();
-  initListPan();
-  initSimActionsPan();
-
-  // simulator manager layout
-  QHBoxLayout *man_main = new QHBoxLayout();
-  man_main->addWidget(sim_list_pan);
-  man_main->addLayout(sim_actions_pan);
-
-  setLayout(man_main);
-
-
-  setWindowTitle(tr("Simulation Manager"));*/
 }
 
 
