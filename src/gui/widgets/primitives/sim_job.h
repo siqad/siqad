@@ -36,21 +36,25 @@ namespace prim{
     // call sim engine binary
     bool invokeBinary();
 
-    // read result XML
-    bool readResults(QString read_path);
-    
-    // process results
-    bool processResults();
+    // result related tasks
+    bool readResults(QString read_path);  // read result XML
+    bool processResults();                // process results
 
-    // indicate whether the job has been completed
-    bool isComplete() {return complete};
+
+    // ACCESSORS
+    bool isComplete() {return completed;} // indicate whether the job has been completed
+    int distCount() {return dist_count;}  // return the number of charge distributions this has
     
 
   private:
+
+    void deduplicateDist();               // deduplicate charge distribution results
+    
+    // variables
     SimEngine *engine;
     QProcess *sim_process;
     QStringList arguments;
-    bool complete;          // whether the job has completed simulation
+    bool completed = false;           // whether the job has completed simulation
 
     // read xml
     QStringList ignored_xml_elements; // XML elements to ignore when reading results

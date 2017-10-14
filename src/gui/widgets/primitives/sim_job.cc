@@ -68,6 +68,7 @@ bool SimJob::invokeBinary()
     qDebug() << sim_process->readAll();
 
   qDebug() << tr("SimJob: binary has finished running.");
+  completed = true;
 
   return true;
 }
@@ -160,8 +161,13 @@ bool SimJob::readResults(QString read_path)
 bool SimJob::processResults()
 {
   // TODO check that results have already been read
+  // TODO sort results?
   // TODO deduplicate results, keep count of how many times it was duplicated
-  // 
+}
+
+void SimJob::deduplicateDist()
+{
+  // TODO update dist count after deduplication
 }
 
 } // end of prim namespace

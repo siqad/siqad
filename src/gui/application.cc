@@ -60,6 +60,7 @@ void gui::ApplicationGUI::initGUI()
   initMenuBar();
   initTopBar();
   initSideBar();
+  initOptionDock();
 
   // initialise mainwindow panels
   dialog_pan = new gui::DialogPanel(this);
@@ -219,6 +220,30 @@ void gui::ApplicationGUI::initSideBar()
   connect(action_dbgen_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolDBGen);
 
   addToolBar(area, side_bar);
+}
+
+void gui::ApplicationGUI::initOptionDock()
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+
+  // recall or initialize option dock location
+  Qt::DockWidgetArea area;
+  if(gui_settings->contains("ODOCK/loc"))
+    area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("ODOCK/loc"));
+  else
+    area = Qt::RightDockWidgetArea;
+
+  option_dock = new QDockWidget(tr("Options"));
+
+  // location behaviour
+  option_dock->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
+
+  // size policy
+  //option_dock->setMinimumWidth(gui_settings->get<int>("ODOCK/mw"));
+
+  // TODO add default widget?
+
+  addDockWidget(area, option_dock);
 }
 
 

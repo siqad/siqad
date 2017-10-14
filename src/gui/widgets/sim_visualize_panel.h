@@ -1,4 +1,4 @@
-// @file:     sim_display.h
+// @file:     sim_visualize_panel.h
 // @author:   Samuel
 // @created:  2017.10.12
 // @editted:  2017.10.12 - Samuel
@@ -11,28 +11,31 @@
 
 #include <QtWidgets>
 #include <QtCore>
+#include "primitives/sim_job.h"
 #include "src/settings/settings.h" // TODO probably need this later
 
 namespace gui{
 
-  class SimDisplay : public QWidget
+  class SimVisualize : public QWidget
   {
     Q_OBJECT
   public:
     // constructor
-    SimDisplay(prim::SimJob *job=0, QSomething *parent=0);
+    SimVisualize(prim::SimJob *job=0, QWidget *parent=0);
 
     // destructor
-    ~SimDisplay();
+    ~SimVisualize() {};
 
     // set job
-    bool setJob(prim::SimJob *job) {return job ? showing_job = job : false;} // TODO not sure if this actually works
+    bool setJob(prim::SimJob *job);
+    void updateOptions();
 
-    // TODO generate a list of DBDot* with the same order as physlocs in showing_job
+    // TODO generate a list of DBDot* with the same order as physlocs in curr_job
 
 
   private:
-    prim::SimJob *showing_job;   // current job result being shown
+    void initSimVisualize();
+    prim::SimJob *curr_job;   // current job result being shown
     // TODO struct of display options that users can change, as well as the available range of each option
   };
 

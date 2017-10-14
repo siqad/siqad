@@ -66,7 +66,8 @@ HEADERS += \
 	src/gui/widgets/dialog_panel.h \
 	src/gui/widgets/input_field.h \
 	src/gui/widgets/info_panel.h \
-    src/gui/widgets/sim_manager.h
+    src/gui/widgets/sim_manager.h \
+    src/gui/widgets/sim_visualize_panel.h
 
 SOURCES += \
 	src/gui/application.cc \
@@ -74,7 +75,8 @@ SOURCES += \
 	src/gui/widgets/dialog_panel.cc \
 	src/gui/widgets/input_field.cc \
 	src/gui/widgets/info_panel.cc \
-    src/gui/widgets/sim_manager.cc
+    src/gui/widgets/sim_manager.cc \
+    src/gui/widgets/sim_visualize_panel.cc
 
 #####################
 # BUILD DIRECTORIES #

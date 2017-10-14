@@ -18,6 +18,7 @@
 #include "widgets/input_field.h"
 #include "widgets/info_panel.h"
 #include "widgets/sim_manager.h"
+#include "widgets/sim_visualize_panel.h"
 #include "widgets/primitives/sim_job.h" // TODO move these stuff to SimManager later
 
 
@@ -95,6 +96,7 @@ namespace gui{
     void initMenuBar();   // initialise the GUI menubar
     void initTopBar();    // initialise the GUI topbar, toolbar
     void initSideBar();   // initialise the GUI sidebar, toolbar
+    void initOptionDock();// initialize the GUI option dock
 
     // prepare any extra actions not attched to an icon or meny
     void initActions();
@@ -124,6 +126,7 @@ namespace gui{
     gui::InfoPanel    *info_pan;    // mainwindow info panel
     gui::InputField   *input_field; // mainwindow input field
     gui::SimManager   *sim_manager; // pop-up simulator manager
+    QDockWidget       *option_dock; // right side panel for context aware options
 
     // action pointers
     QAction *action_select_tool;  // change cursor tool to select
