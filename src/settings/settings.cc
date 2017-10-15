@@ -120,6 +120,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("SBAR/mw", 60);
   S->setValue("SBAR/ico", 0.7); // icon size, relative to mw
   S->setValue("SBAR/loc", 1);
+  S->setValue("ODOCK/mw", 120);
   S->setValue("Panel/logw", 400);
   S->setValue("Panel/maxh", 150);
 

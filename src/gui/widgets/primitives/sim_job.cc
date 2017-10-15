@@ -13,10 +13,10 @@
 
 namespace prim{
 
-SimJob::SimJob(SimEngine *eng, QWidget *parent)
-  : QObject(parent), engine(eng)
+SimJob::SimJob(const QString &nm, SimEngine *eng, QWidget *parent)
+  : QObject(parent), job_name(nm), engine(eng)
 {
-
+  completed = false;
 }
 
 
@@ -163,6 +163,7 @@ bool SimJob::processResults()
   // TODO check that results have already been read
   // TODO sort results?
   // TODO deduplicate results, keep count of how many times it was duplicated
+  return true;
 }
 
 void SimJob::deduplicateDist()

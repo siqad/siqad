@@ -21,7 +21,7 @@ namespace prim{
     Q_OBJECT
   public:
     // constructor
-    SimJob(SimEngine *eng=0, QWidget *parent=0);
+    SimJob(const QString &nm, SimEngine *eng=0, QWidget *parent=0);
 
     // destructor
     ~SimJob() {};
@@ -42,6 +42,7 @@ namespace prim{
 
 
     // ACCESSORS
+    QString name() {return job_name;}
     bool isComplete() {return completed;} // indicate whether the job has been completed
     int distCount() {return dist_count;}  // return the number of charge distributions this has
     
@@ -51,13 +52,14 @@ namespace prim{
     void deduplicateDist();               // deduplicate charge distribution results
     
     // variables
+    QString job_name;
     SimEngine *engine;
     QProcess *sim_process;
     QStringList arguments;
-    bool completed = false;           // whether the job has completed simulation
+    bool completed;                       // whether the job has completed simulation
 
     // read xml
-    QStringList ignored_xml_elements; // XML elements to ignore when reading results
+    QStringList ignored_xml_elements;     // XML elements to ignore when reading results
 
     // parameters
     //QList<QPair<the field stuff, value>> sim_params;

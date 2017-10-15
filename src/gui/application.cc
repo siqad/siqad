@@ -68,6 +68,8 @@ void gui::ApplicationGUI::initGUI()
   input_field = new gui::InputField(this);
   info_pan = new gui::InfoPanel(this);
   sim_manager = new gui::SimManager(this);
+  sim_visualize = new gui::SimVisualize(sim_manager, this);
+  option_dock->setWidget(sim_visualize);
 
   // layout management
   QWidget *main_widget = new QWidget(this); // main widget for mainwindow
@@ -169,7 +171,11 @@ void gui::ApplicationGUI::initTopBar()
   action_run_sim = top_bar->addAction(QIcon(":/ico/runsim.svg"), tr("Run Simulation..."));
   action_run_sim->setShortcut(tr("F11"));
 
+  action_sim_visualize = top_bar->addAction(QIcon(":/ico/simvisual.svg"), tr("Simulation Visualization Dock"));
+
   connect(action_run_sim, &QAction::triggered, this, &gui::ApplicationGUI::runSimulation);
+  connect(action_sim_visualize, &QAction::triggered, this, &gui::ApplicationGUI::showOptionDock);
+
   addToolBar(Qt::TopToolBarArea, top_bar);
 }
 
@@ -239,10 +245,11 @@ void gui::ApplicationGUI::initOptionDock()
   option_dock->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
 
   // size policy
-  //option_dock->setMinimumWidth(gui_settings->get<int>("ODOCK/mw"));
+  option_dock->setMinimumWidth(gui_settings->get<int>("ODOCK/mw"));
 
   // TODO add default widget?
 
+  option_dock->hide();
   addDockWidget(area, option_dock);
 }
 
@@ -397,16 +404,22 @@ void gui::ApplicationGUI::runSimulation()
   // TODO show simulation setup dialog
   // for now, just hard code those settings
 
-  prim::SimJob job; // TODO update initialization
+  QString job_name = "SimAnneal_" + QDateTime::currentDateTime().toString("yy-MM-dd_HH:mm:ss");
+  qDebug() << job_name;
+  prim::SimJob *job = new prim::SimJob(job_name); // TODO update initialization
+  sim_manager->addJob(job);
   // TODO add SimJob to some list
 
   // call saveToFile, don't forget to account for setup dialog settings
   saveToFile(Simulation, "src/phys/problem_desc.xml");
 
-  job.invokeBinary(); // TODO lots of hard coded stuff, need to revamp job initiation & func params after D-Wave
+  job->invokeBinary(); // TODO lots of hard coded stuff, need to revamp job initiation & func params after D-Wave
 
   // read output xml
-  job.readResults("src/phys/simanneal_output.xml");
+  job->readResults("src/phys/simanneal_output.xml");
+
+  showOptionDock(); // TODO make this option through settings
+  sim_visualize->updateJobList();
 }
 
 bool gui::ApplicationGUI::readSimOut(const QString &result_path)

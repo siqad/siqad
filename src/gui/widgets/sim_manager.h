@@ -33,6 +33,10 @@ public:
 
   // manager actions
   void newSimSetup();               // walks user through simulation setup
+  bool addJob(prim::SimJob *job);   // add a simulation job
+
+  // ACCESSORS
+  QList<prim::SimJob*> jobs() {return sim_jobs;}
 
 private:
   void initSimManager();
@@ -47,11 +51,12 @@ private:
   bool checkSimCompletion();        // check whether simulation has been completed
 
   // variables
-  QStack<prim::SimEngine*> sim_engines;   // stack of all simulators
+  QList<prim::SimEngine*>  sim_engines;  // stack of all simulators
+  QList<prim::SimJob*>     sim_jobs;     // stack of all jobs
 
   // manager panes
   QListWidget *sim_list_pan;
-  QVBoxLayout*sim_actions_pan;
+  QVBoxLayout *sim_actions_pan;
 };
 
 

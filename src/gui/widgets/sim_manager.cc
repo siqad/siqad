@@ -32,6 +32,15 @@ void SimManager::newSimSetup()
 }
 
 
+bool SimManager::addJob(prim::SimJob *job)
+{
+  if(!job)
+    return false;
+  sim_jobs.prepend(job);
+  return true;
+}
+
+
 
 // PRIVATE
 
@@ -96,6 +105,7 @@ bool SimManager::exportSimProblem()
   // call save function in application.cc with path going to appropriate directory (still need to finalize directory)
   // returns whether export is successful
   //return static_cast<gui::ApplicationGUI*>(parent())->saveToFile(parent()->SaveFlag::Simulation, "problem_export.xml"); // TODO change file name
+  return true;
 }
 
 void SimManager::invokeSimulator()

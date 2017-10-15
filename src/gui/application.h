@@ -66,6 +66,7 @@ namespace gui{
     // the simulation method we push the problem onto a working stack to be run
     // in the background: will need to be able to display results on request
     // after job finished.
+    void showOptionDock() {option_dock->show();}
     void runSimulation();             // high-level structure for running simulation
     bool readSimOut(const QString &result_path);                // read simulator output
 
@@ -126,6 +127,7 @@ namespace gui{
     gui::InfoPanel    *info_pan;    // mainwindow info panel
     gui::InputField   *input_field; // mainwindow input field
     gui::SimManager   *sim_manager; // pop-up simulator manager
+    gui::SimVisualize *sim_visualize; // simulation visualizer that goes in option_dock
     QDockWidget       *option_dock; // right side panel for context aware options
 
     // action pointers
@@ -133,6 +135,7 @@ namespace gui{
     QAction *action_drag_tool;    // change cursor tool to drag
     QAction *action_dbgen_tool;   // change cursor tool to gen
     QAction *action_run_sim;      // run the current simulation method
+    QAction *action_sim_visualize;// show the option dock which allows simulation visualization
 
     // save file
     QTimer autosave_timer;     // timer for autosaves
