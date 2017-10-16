@@ -33,6 +33,7 @@ namespace prim{
 
 
     // ACCESSORS
+    QString name() {return eng_name;}
 
     // simulator info, for showing up in manager
     // available parameters and associated type, for user alteration
@@ -44,6 +45,7 @@ namespace prim{
   private:
     // variables like binary location, temp file location, etc.
     QString eng_desc_path;      // description file of this engine
+    QString eng_name;           // name of this engine
     QString bin_path;           // binary path of this engine
     QString eng_problem_root;   // root directory for all problems files for this engine
 

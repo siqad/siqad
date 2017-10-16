@@ -70,6 +70,7 @@ void gui::ApplicationGUI::initGUI()
   sim_manager = new gui::SimManager(this);
   sim_visualize = new gui::SimVisualize(sim_manager, this);
   option_dock->setWidget(sim_visualize);
+  connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene, design_pan, &gui::DesignPanel::displaySimResults); // TODO better place for this?
 
   // layout management
   QWidget *main_widget = new QWidget(this); // main widget for mainwindow
@@ -173,7 +174,7 @@ void gui::ApplicationGUI::initTopBar()
 
   action_sim_visualize = top_bar->addAction(QIcon(":/ico/simvisual.svg"), tr("Simulation Visualization Dock"));
 
-  connect(action_run_sim, &QAction::triggered, this, &gui::ApplicationGUI::runSimulation);
+  connect(action_run_sim, &QAction::triggered, this, &gui::ApplicationGUI::simulationSetup);
   connect(action_sim_visualize, &QAction::triggered, this, &gui::ApplicationGUI::showOptionDock);
 
   addToolBar(Qt::TopToolBarArea, top_bar);
@@ -399,16 +400,20 @@ void gui::ApplicationGUI::parseInputField()
   }
 }
 
+void gui::ApplicationGUI::simulationSetup()
+{
+  sim_manager->showSimSetupDialog();
+}
+
 void gui::ApplicationGUI::runSimulation()
 {
   // TODO show simulation setup dialog
   // for now, just hard code those settings
 
-  QString job_name = "SimAnneal_" + QDateTime::currentDateTime().toString("yy-MM-dd_HH:mm:ss");
+  QString job_name = "SA_" + QDateTime::currentDateTime().toString("MM-dd_HH:mm:ss");
   qDebug() << job_name;
   prim::SimJob *job = new prim::SimJob(job_name); // TODO update initialization
   sim_manager->addJob(job);
-  // TODO add SimJob to some list
 
   // call saveToFile, don't forget to account for setup dialog settings
   saveToFile(Simulation, "src/phys/problem_desc.xml");
@@ -419,7 +424,7 @@ void gui::ApplicationGUI::runSimulation()
   job->readResults("src/phys/simanneal_output.xml");
 
   showOptionDock(); // TODO make this option through settings
-  sim_visualize->updateJobList();
+  sim_visualize->updateJobSelCombo();
 }
 
 bool gui::ApplicationGUI::readSimOut(const QString &result_path)
@@ -632,9 +637,15 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
 
   stream.writeEndElement();
 
-  // save simulation parameters
-  // TODO create class that handles simulations?
-  // TODO maybe simulation parameters should be saved even when saving file normally? In case the user has preferred simulation settings for this particular problem. Perhaps make this an option in the simulation dialog - 1. save these parameters as default only for this file; 2. save these parameters as default for all simulations using this simulator
+  // save simulation parameters 
+  /*
+    TODO implement later
+    if(flag == Simulation){
+    stream.writeTextElement("sim_params");
+    if(sim_manager->hasSimParams())
+      sim_manager->writeSimParams();
+    stream.writeEndElement();
+  }*/
 
   // save design panel content (including GUI flags, layers and their corresponding contents (electrode, dbs, etc.)
   design_pan->saveToFile(&stream, flag==Simulation);

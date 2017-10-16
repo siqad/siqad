@@ -31,28 +31,37 @@ public:
   // show manager dialog
   void showManager() {show();}
 
+  // show sim setup dialog
+  void showSimSetupDialog();
+
   // manager actions
   void newSimSetup();               // walks user through simulation setup
   bool addJob(prim::SimJob *job);   // add a simulation job
 
-  // ACCESSORS
-  QList<prim::SimJob*> jobs() {return sim_jobs;}
+  // variables
+  QList<prim::SimEngine*>  sim_engines;  // stack of all simulators
+  QList<prim::SimJob*>     sim_jobs;     // stack of all jobs
+
+signals:
+  void runSimWithArg(const QStringList &args);
 
 private:
   void initSimManager();
   void initMenu();
   void initListPan();
   void initSimActionsPan();
-  void fetchSimList();
 
+  void initSimSetupDialog();
+  void updateSimSetupDialog();
+  void submitSimSetup();
+  
+  void fetchEngineList();
   void simParamSetup();             // take user options for simulation parameters
   bool exportSimProblem();          // generate problem XML
-  void invokeSimulator();           // call simulator to run problem XML
-  bool checkSimCompletion();        // check whether simulation has been completed
 
-  // variables
-  QList<prim::SimEngine*>  sim_engines;  // stack of all simulators
-  QList<prim::SimJob*>     sim_jobs;     // stack of all jobs
+  // dialogs
+  QWidget *sim_manager_dialog;
+  QWidget *sim_setup_dialog;        // TODO maybe make a subclass for this
 
   // manager panes
   QListWidget *sim_list_pan;

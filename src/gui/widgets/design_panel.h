@@ -18,6 +18,7 @@
 #include "primitives/lattice.h"
 #include "primitives/items.h"
 #include "primitives/emitter.h"
+#include "primitives/sim_job.h"
 
 namespace gui{
 
@@ -103,7 +104,7 @@ namespace gui{
 
 
     // SIMULATION RESULT DISPLAY
-    void displaySimResults();         // right now, just show charge distribution. Need a lot more functionality in the future *NOTE might be more suited for design_panel
+    void displaySimResults(prim::SimJob *job, int dist_int);         // right now, just show charge distribution. Need a lot more functionality in the future *NOTE might be more suited for design_panel
     void clearSimResults();           // clear all simulation results and go back to design mode *NOTE might be more suited for design_panel
     // TODO can probably implement something like a "design mode" and a "simulation mode"
 

@@ -383,7 +383,8 @@ void gui::DesignPanel::setFills(float *fills)
 
 // SAVE
 
-void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream, bool for_sim){
+void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream, bool for_sim)
+{
   int layer_ind;
 
   // save gui flags
@@ -417,7 +418,8 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream, bool for_sim){
   stream->writeEndElement(); // end design level
 }
 
-void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
+void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
+{
   int layer_id=0;
   QString layer_nm;
   bool layer_visible, layer_active;
@@ -520,6 +522,48 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream){
   if(stream->hasError()){
     qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
   }
+}
+
+
+// SIMULATION RESULT DISPLAY
+void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
+{
+  // TODO don't allow design modifications in displaySimResults mode!
+  // TODO in the future, need to add ability to show different types of results. e.g. E-field?
+
+  // for now, there's only one type of result that can be shown - elec_dist, so show that
+  if(!job){
+    qDebug() << tr("DisplayPanel: Job pointer invalid");
+    return;
+  }
+  // TODO perform this check in job's accessor rather than here
+  else if(dist_ind < 0 || dist_ind > job->elec_dists.size()){
+    qDebug() << tr("DesignPanel: Invalid dist_ind when attempting to display sim results: %1").arg(dist_ind);
+    return;
+  }
+
+  // grab a list of DBDots in the order of job->physlocs
+  QList<prim::DBDot*> db_dots_ordered;
+  qreal scale_factor = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
+  for(auto job_pl : job->physlocs){
+    QPointF scene_loc;
+    scene_loc.setX(scale_factor*job_pl.first);
+    scene_loc.setY(scale_factor*job_pl.second);
+
+    // TODO there could be issues with this so do additional checks in the future
+    db_dots_ordered.append(static_cast<prim::DBDot*>(scene->itemAt(scene_loc, QTransform())));
+  }
+  
+  // set their show_elec to the set specified by job->elec_dists
+  for(int i=0; i<db_dots_ordered.size(); i++)
+    db_dots_ordered[i]->setShowElec(job->elec_dists[dist_ind][i]);
+}
+
+
+void gui::DesignPanel::clearSimResults()
+{
+  // set show_elec of all DBDots to 0
+  // maybe also set some mode for simulation result display, and just set that mode to design mode
 }
 
 

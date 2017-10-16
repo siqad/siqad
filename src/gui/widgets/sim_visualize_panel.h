@@ -29,22 +29,34 @@ namespace gui{
 
     // set job
     bool setManager(SimManager *sim_man);
-    bool setJob(int job_ind);
-    bool setJob(prim::SimJob *job);
-    void updateJobList();
+    bool showJob(int job_ind);
+    bool showJob(prim::SimJob *job);
+    void updateJobSelCombo();
+    bool showElecDist(int dist_ind);
+    void updateElecDistCombo();
     void updateOptions();
 
-    // TODO generate a list of DBDot* with the same order as physlocs in curr_job
+    // TODO generate a list of DBDot* with the same order as physlocs in show_job
 
+  signals:
+    void showElecDistOnScene(prim::SimJob *job, int dist_ind);
 
   private:
     void initSimVisualize();
+    void jobSelUpdate();
+    void distSelUpdate();
+
     SimManager *sim_manager;
-    prim::SimJob *curr_job;   // current job result being shown
+    prim::SimJob *show_job;   // current job result being shown
     // TODO struct of display options that users can change, as well as the available range of each option
 
     // variables
     QComboBox *combo_job_sel;
+    QLabel *text_job_engine;
+    QLabel *text_job_start_time;
+    QLabel *text_job_end_time;
+
+    QComboBox *combo_dist_sel;
   };
 
 } // end of gui namespace

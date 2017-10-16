@@ -26,6 +26,13 @@ namespace prim{
     // destructor
     ~SimJob() {};
 
+    // elec_dists struct
+    struct elecDist{
+      QString dist_str;
+      QList<int> dist_ls; // TODO might not be necessary
+      float energy;
+    };
+
     void setEngine(SimEngine *eng) {engine = eng;}
 
 
@@ -43,17 +50,27 @@ namespace prim{
 
     // ACCESSORS
     QString name() {return job_name;}
+    QString engineName() {return engine ? engine->name() : "SimAnneal";} // TODO cheating here, change SimAnneal back to Undefined later
+    QDateTime startTime() {return start_time;}
+    QDateTime endTime() {return end_time;}
     bool isComplete() {return completed;} // indicate whether the job has been completed
     int distCount() {return dist_count;}  // return the number of charge distributions this has
     
 
+    // variables TODO put them back to private later, with proper accessors
+    QList<QPair<float,float>> physlocs;   // physlocs[dot_ind].first or .second
+    QList<QList<int>> elec_dists;         // elec_dists[result_ind][dot_ind] TODO change this to QList of QVectors
+    //QList<elecDist> elec_dists;
   private:
 
     void deduplicateDist();               // deduplicate charge distribution results
     
     // variables
+    // TODO struct job_desc
     QString job_name;
     SimEngine *engine;
+    QDateTime start_time;
+    QDateTime end_time;
     QProcess *sim_process;
     QStringList arguments;
     bool completed;                       // whether the job has completed simulation
@@ -65,8 +82,7 @@ namespace prim{
     //QList<QPair<the field stuff, value>> sim_params;
 
     // results
-    QList<QPair<float,float>> physlocs;   // physlocs[dot_ind].first or .second
-    QList<QList<int>> elec_dists;         // elec_dists[result_ind][dot_ind] TODO change this to QList of QVectors
+    // TODO struct results
     int dist_count;                       // number of distributions
   };
 

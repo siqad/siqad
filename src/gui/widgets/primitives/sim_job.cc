@@ -42,6 +42,8 @@ bool SimJob::invokeBinary()
   arguments << problem_file_info.canonicalFilePath();
   arguments << problem_file_info.canonicalPath().append("/simanneal_output.xml"); // TODO put in other directories
 
+  start_time = QDateTime::currentDateTime();
+
   sim_process = new QProcess();
   qDebug() << tr("SimJob: Setting binary path...");
   //sim_process->setProgram(engine->getBinaryPath());
@@ -69,6 +71,8 @@ bool SimJob::invokeBinary()
 
   qDebug() << tr("SimJob: binary has finished running.");
   completed = true;
+
+  end_time = QDateTime::currentDateTime(); // TODO instead of determining end time here, should read end time from XML for future
 
   return true;
 }
@@ -112,7 +116,7 @@ bool SimJob::readResults(QString read_path)
                 y = attr.value().toFloat();
             }
             physlocs.append(qMakePair(x,y));
-            qDebug() << tr("SimJob: Physloc identified at x=%1, y=%2").arg(x).arg(y);
+            //qDebug() << tr("SimJob: Physloc identified at x=%1, y=%2").arg(x).arg(y);
           }
         }
         rs.readNext();
@@ -131,7 +135,7 @@ bool SimJob::readResults(QString read_path)
             QString this_dist;
             for(int this_chg : elec_dists.last())
               this_dist.append(QString::number(this_chg));
-            qDebug() << tr("This distribution: %1").arg(this_dist);
+            //qDebug() << tr("This distribution: %1").arg(this_dist);
           }
         }
         rs.readNext();

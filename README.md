@@ -144,6 +144,7 @@ Future:
 * For example, some jobs might be detailed simulation for small aggregates, while another crude simulation could be ongoing in the background.
 * If this widget is called from the main window while an instance of this is open, just focus such instance.
 * Assuming that sim takes a long time to run, and user makes changes to DB, when sim is complete user can open a new tab to view the results without disturbing the updated design.
+* gui::DesignPanel::displaySimResults to handle multiple types of simulation results that should be shown
 
 
 > Past TODOs for implementations of major features

@@ -42,6 +42,7 @@ namespace prim{
     void toggleElec();
     void setElec(int e_in);
     int getElec() {return elec;}
+    void setShowElec(int se_in);
 
     void setSource(prim::LatticeDot *src);
     prim::LatticeDot *getSource() const {return source;}
@@ -70,6 +71,7 @@ namespace prim{
     // VARIABLES
     QPointF phys_loc;         // physical location of dot in angstroms
     int elec;                 // 1=forced electron on this db
+    int show_elec;            // simulation result visualization electron, 1=has electron
 
     prim::LatticeDot *source=0; // lattice site beneath dot
 
@@ -80,6 +82,8 @@ namespace prim{
     static QColor fill_col_default_sel;  // default fill color (selected)
     static QColor fill_col_drv;      // driver fill color
     static QColor fill_col_drv_sel;  // driver fill color (selected)
+    static QColor fill_col_elec;
+    static QColor fill_col_elec_sel;
 
     // static class parameters for painting
 
