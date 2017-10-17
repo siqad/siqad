@@ -18,7 +18,7 @@
 gui::DesignPanel::DesignPanel(QWidget *parent)
   : QGraphicsView(parent)
 {
-  rotate(-90);
+  //rotate(-90);
 
   // set-up scale_factor in prim::Item
   prim::Item::init();
@@ -129,7 +129,7 @@ void gui::DesignPanel::resetDesignPanel()
   resetMatrix(); // resets QTransform, which undoes the zoom
 
   // rotate scene and set scroll to top left
-  rotate(-90);
+  //rotate(-90);
   QScrollBar *vsb = verticalScrollBar();
   QScrollBar *hsb = horizontalScrollBar();
   vsb->setValue(vsb->minimum());
@@ -396,8 +396,9 @@ void gui::DesignPanel::setFills(float *fills)
 
 void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream, bool for_sim)
 {
-  int layer_ind;
-
+  if(for_sim){
+    // if saving for simulation, do something
+  }
   // save gui flags
   stream->writeComment("GUI Flags");
   stream->writeStartElement("gui");
@@ -476,7 +477,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
         stream->readNext();
         // keep reading until end of layer_prop tag
         while(stream->name() != "layer_prop"){
-          bool visible_ld, active_ld;
+          //bool visible_ld, active_ld;
 
           if(stream->isStartElement()){
             if(stream->name() == "name"){
@@ -501,10 +502,13 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
           }
 
           // make layer object using loaded information
-          /*addLayer(layer_nm);
+          /* haven't fully implemented
+          addLayer(layer_nm);
           getLayer(layer_id)->setVisible(visible_ld);
           getLayer(layer_id)->setActive(active_ld);
           layer_id++;*/
+          Q_UNUSED(layer_visible);  // for now, suppress warning
+          Q_UNUSED(layer_active);   // ditto
         }
       }
       else if(stream->name() == "design") {
