@@ -18,6 +18,8 @@
 gui::DesignPanel::DesignPanel(QWidget *parent)
   : QGraphicsView(parent)
 {
+  rotate(-90);
+
   // set-up scale_factor in prim::Item
   prim::Item::init();
 
@@ -71,6 +73,12 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 
   // initialise the Ghost and set the scene
   prim::Ghost::instance()->setScene(scene);
+
+  // set scroll to top left
+  QScrollBar *vsb = verticalScrollBar();
+  QScrollBar *hsb = horizontalScrollBar();
+  vsb->setValue(vsb->minimum());
+  hsb->setValue(hsb->minimum());
 }
 
 // destructor
@@ -119,6 +127,9 @@ void gui::DesignPanel::resetDesignPanel()
   prim::Ghost::instance()->setScene(scene);
 
   resetMatrix(); // resets QTransform, which undoes the zoom
+
+  // rotate scene and set scroll to top left
+  rotate(-90);
   QScrollBar *vsb = verticalScrollBar();
   QScrollBar *hsb = horizontalScrollBar();
   vsb->setValue(vsb->minimum());

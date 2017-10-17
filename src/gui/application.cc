@@ -402,13 +402,16 @@ void gui::ApplicationGUI::parseInputField()
 
 void gui::ApplicationGUI::simulationSetup()
 {
-  sim_manager->showSimSetupDialog();
+  //sim_manager->showSimSetupDialog();
+  runSimulation();
 }
 
 void gui::ApplicationGUI::runSimulation()
 {
   // TODO show simulation setup dialog
   // for now, just hard code those settings
+
+  setTool(gui::DesignPanel::SelectTool);
 
   QString job_name = "SA_" + QDateTime::currentDateTime().toString("MM-dd_HH:mm:ss");
   qDebug() << job_name;
