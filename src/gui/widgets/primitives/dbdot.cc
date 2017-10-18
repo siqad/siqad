@@ -134,7 +134,7 @@ void prim::DBDot::setElec(int e_in)
   }
   else{
     // set to 0
-    setFill(0);
+    setFill(1);
     setFillCol(fill_col_default, fill_col_default_sel);
   }
   update();
@@ -152,7 +152,7 @@ void prim::DBDot::setShowElec(int se_in)
   }
   else{
     // set to 0
-    setFill(0);
+    setFill(1);
     setFillCol(fill_col_default, fill_col_default_sel);
   }
   update();

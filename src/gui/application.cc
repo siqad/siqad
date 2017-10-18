@@ -84,6 +84,10 @@ void gui::ApplicationGUI::initGUI()
   hbl->addLayout(vbl_l, 1);
   hbl->addWidget(info_pan, 1);
 
+  dialog_pan->hide();
+  input_field->hide();
+  info_pan->hide();
+
   vbl->addWidget(design_pan, 2);
   vbl->addLayout(hbl, 1);
 
