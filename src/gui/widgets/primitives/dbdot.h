@@ -87,7 +87,9 @@ namespace prim{
 
     // static class parameters for painting
 
-    static qreal diameter;      // dot diameter in angstroms
+    qreal diameter;      // dot diameter in angstroms
+    static qreal diameter_m;
+    static qreal diameter_l;
     static qreal edge_width;    // proportional width of dot boundary edge
 
     static QColor edge_col;     // edge colour, unselected

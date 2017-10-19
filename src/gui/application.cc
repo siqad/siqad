@@ -177,6 +177,8 @@ void gui::ApplicationGUI::initTopBar()
   action_run_sim->setShortcut(tr("F11"));
 
   action_sim_visualize = top_bar->addAction(QIcon(":/ico/simvisual.svg"), tr("Simulation Visualization Dock"));
+  action_layer_sel= top_bar->addAction(QIcon(":/ico/layer.svg"), tr("Layer Selection"));
+  action_circuit_lib= top_bar->addAction(QIcon(":/ico/circuitlib.svg"), tr("Circuit Library"));
 
   connect(action_run_sim, &QAction::triggered, this, &gui::ApplicationGUI::simulationSetup);
   connect(action_sim_visualize, &QAction::triggered, this, &gui::ApplicationGUI::showOptionDock);

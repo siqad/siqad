@@ -137,6 +137,8 @@ namespace gui{
     QAction *action_dbgen_tool;   // change cursor tool to gen
     QAction *action_run_sim;      // run the current simulation method
     QAction *action_sim_visualize;// show the option dock which allows simulation visualization
+    QAction *action_layer_sel;
+    QAction *action_circuit_lib;
 
     // save file
     QTimer autosave_timer;     // timer for autosaves
