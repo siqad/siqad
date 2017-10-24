@@ -139,7 +139,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("view/padding", .1);              // additional space around draw region
 
   // dangling bond parameters
-  S->setValue("dbdot/diameter", 1.3);                     // dot diameter
+  S->setValue("dbdot/diameter_m", 1.3);                     // dot diameter
   S->setValue("dbdot/diameter_l", 2);                     // dot diameter
   S->setValue("dbdot/edge_width", .1);                    // edge width rel. to diameter
   S->setValue("dbdot/edge_col", QColor(255,255,255));     // edge color, unselected

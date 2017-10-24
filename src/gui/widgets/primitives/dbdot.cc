@@ -134,11 +134,13 @@ void prim::DBDot::setElec(int e_in)
     // set to 1
     setFill(1);
     setFillCol(fill_col_drv, fill_col_drv_sel);
+    diameter = diameter_m;
   }
   else{
     // set to 0
     setFill(1);
     setFillCol(fill_col_default, fill_col_default_sel);
+    diameter = diameter_m;
   }
   update();
 }
@@ -248,7 +250,7 @@ void prim::DBDot::constructStatics()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
-  diameter_m = gui_settings->get<qreal>("dbdot/diameter")*scale_factor;
+  diameter_m = gui_settings->get<qreal>("dbdot/diameter_m")*scale_factor;
   diameter_l = gui_settings->get<qreal>("dbdot/diameter_l")*scale_factor;
   edge_width = gui_settings->get<qreal>("dbdot/edge_width")*diameter;
   edge_col= gui_settings->get<QColor>("dbdot/edge_col");
