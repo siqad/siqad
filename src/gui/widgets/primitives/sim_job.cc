@@ -170,6 +170,36 @@ bool SimJob::processResults()
   return true;
 }
 
+
+QString SimJob::runtimeTempDir()
+{
+  if(run_job_dir.empty()){
+    run_job_dir = engine->runtimeTempDir();
+    if(name().empty())
+      run_job_dir += QDateTime::currentDateTime().toString("MM-dd_HHmm");
+    else
+      run_job_dir += name();
+    // TODO check that run_job_dir name is unused
+  }
+  return run_job_dir;
+}
+
+
+QString problemPath()
+{
+  if(problem_path.empty())
+    problem_path = runtimeTempDir() + "sim_problem.xml";
+  return problem_path;
+}
+
+
+QString resultPath()
+{
+  if(result_path.empty())
+    result_path = runtimeTempDir() + "sim_result.xml";
+  return result_path;
+}
+
 void SimJob::deduplicateDist()
 {
   // TODO update dist count after deduplication

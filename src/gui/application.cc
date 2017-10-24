@@ -70,7 +70,12 @@ void gui::ApplicationGUI::initGUI()
   sim_manager = new gui::SimManager(this);
   sim_visualize = new gui::SimVisualize(sim_manager, this);
   option_dock->setWidget(sim_visualize);
-  connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene, design_pan, &gui::DesignPanel::displaySimResults); // TODO better place for this?
+
+  // inter-widget signals
+  connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene, design_pan, &gui::DesignPanel::displaySimResults);
+
+  // widget to self signals
+  connect(sim_manager, &gui::SimManager::emitSimJob, this, &gui::ApplicationGUI::runSimulation);
 
   // layout management
   QWidget *main_widget = new QWidget(this); // main widget for mainwindow
@@ -406,32 +411,32 @@ void gui::ApplicationGUI::parseInputField()
 
 void gui::ApplicationGUI::simulationSetup()
 {
-  //sim_manager->showSimSetupDialog();
-  runSimulation();
+  sim_manager->showSimSetupDialog();
 }
 
-void gui::ApplicationGUI::runSimulation()
+
+void gui::ApplicationGUI::runSimulation(prim::SimJob *job)
 {
-  // TODO show simulation setup dialog
-  // for now, just hard code those settings
+  if(!job){
+    qWarning() << tr("ApplicationGUI: Received job is not a valid pointer.");
+    return;
+  }
 
   setTool(gui::DesignPanel::SelectTool);
 
-  QString job_name = "SA_" + QDateTime::currentDateTime().toString("MM-dd_HH:mm:ss");
-  qDebug() << job_name;
-  prim::SimJob *job = new prim::SimJob(job_name); // TODO update initialization
-  sim_manager->addJob(job);
+  qDebug() << tr("ApplicationGUI: About to run job '%1'").arg(job->name());
 
   // call saveToFile, don't forget to account for setup dialog settings
-  saveToFile(Simulation, "src/phys/problem_desc.xml");
+  saveToFile(Simulation, job->problemPath());
+  // TODO check that the file is saved
 
-  job->invokeBinary(); // TODO lots of hard coded stuff, need to revamp job initiation & func params after D-Wave
+  job->invokeBinary();
 
   // read output xml
   job->readResults("src/phys/simanneal_output.xml");
 
-  showOptionDock(); // TODO make this option through settings
-  sim_visualize->updateJobSelCombo();
+  showOptionDock(); // TODO make this optional through settings
+  sim_visualize->updateJobSelCombo(); // TODO make sim_visualize caption job completion signals, so it updates this on its own
 }
 
 bool gui::ApplicationGUI::readSimOut(const QString &result_path)

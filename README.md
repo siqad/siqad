@@ -45,6 +45,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
   * ~~C-s C-Shift-s shortcuts~~ Implemented
   * ~~Periodic autosave~~ 17.08.22
   * Autorecovery
+* Reseting design panel doesn't reset tool type to Select
 * Don't deselect cells when entering Panning mode
 * When using DBGen Tool, show ghosts indicating where DBs will be created
 * Labels (input, output, other arbitrary labels)

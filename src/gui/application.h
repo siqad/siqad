@@ -68,7 +68,8 @@ namespace gui{
     // after job finished.
     void showOptionDock() {option_dock->show();}
     void simulationSetup();
-    void runSimulation();             // high-level structure for running simulation
+    void runSimulation(prim::SimJob *job);             // high-level structure for running simulation
+    //void runSimWithArg(const QStringList &args);
     bool readSimOut(const QString &result_path);                // read simulator output
 
     // SANDBOX

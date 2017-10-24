@@ -125,7 +125,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("Panel/maxh", 150);
 
   S->setValue("lattice/fname", QString("src/settings/lattices/si_100_2x1.ini"));
-  S->setValue("lattice/xy", QPoint(60,60));
+  S->setValue("lattice/xy", QPoint(120,120));
 
   // QGraphicsView
   S->setValue("view/scale_fact", 10);           // pixels/angstrom in the main view
@@ -140,15 +140,16 @@ QSettings* settings::GUISettings::m_defs()
 
   // dangling bond parameters
   S->setValue("dbdot/diameter", 1.3);                     // dot diameter
+  S->setValue("dbdot/diameter_l", 2);                     // dot diameter
   S->setValue("dbdot/edge_width", .1);                    // edge width rel. to diameter
   S->setValue("dbdot/edge_col", QColor(255,255,255));     // edge color, unselected
   S->setValue("dbdot/selected_col", QColor(0, 100, 255)); // edge color, selected
   S->setValue("dbdot/fill_col", QColor(200,200,200));     // dot fill color
-  S->setValue("dbdot/fill_col_sel", QColor(200,200,200)); // dot fill color (selected)
+  S->setValue("dbdot/fill_col_sel", QColor(150,150,150)); // dot fill color (selected)
   S->setValue("dbdot/fill_col_drv", QColor(255,90,90));   // dot fill color for driver dot (forced electron=1)
   S->setValue("dbdot/fill_col_drv_sel", QColor(128,95,173));  // dot fill color for driver dot (forced electron=1)
-  S->setValue("dbdot/fill_col_elec", QColor(255,255,0));   // dot fill color for driver dot (forced electron=1)
-  S->setValue("dbdot/fill_col_elec_sel", QColor(191,216,64));  // dot fill color for driver dot (forced electron=1)
+  S->setValue("dbdot/fill_col_elec", QColor(0,255,0));   // dot fill color for driver dot (forced electron=1)
+  S->setValue("dbdot/fill_col_elec_sel", QColor(0,150,0));  // dot fill color for driver dot (forced electron=1)
 
   // lattice dot parameters
   S->setValue("latdot/diameter", 1.0);                    // dot diameter

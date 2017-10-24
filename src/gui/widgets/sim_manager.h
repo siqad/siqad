@@ -43,7 +43,7 @@ public:
   QList<prim::SimJob*>     sim_jobs;     // stack of all jobs
 
 signals:
-  void runSimWithArg(const QStringList &args);
+  void emitSimJob(prim::SimJob *new_job);
 
 private:
   void initSimManager();
@@ -59,6 +59,7 @@ private:
   void simParamSetup();             // take user options for simulation parameters
   bool exportSimProblem();          // generate problem XML
 
+
   // dialogs
   QWidget *sim_manager_dialog;
   QWidget *sim_setup_dialog;        // TODO maybe make a subclass for this
@@ -66,6 +67,12 @@ private:
   // manager panes
   QListWidget *sim_list_pan;
   QVBoxLayout *sim_actions_pan;
+
+  // sim_setup_dialog fields (hard coded for SimAnneal)
+  QLineEdit *le_job_nm;
+  QLineEdit *le_preanneal_cycles;
+  QLineEdit *le_anneal_cycles;
+  QLineEdit *le_global_v0;
 };
 
 

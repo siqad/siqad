@@ -28,12 +28,10 @@ namespace prim{
     // function for reading simulator definition from xml
     bool readEngineDecl(QFile *in_f);
 
-    // generate a directory for the next job to use
-    QString generateJobDir();
-
 
     // ACCESSORS
     QString name() {return eng_name;}
+    QString runtimeTempDir();
 
     // simulator info, for showing up in manager
     // available parameters and associated type, for user alteration

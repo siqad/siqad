@@ -51,6 +51,9 @@ namespace prim{
     // ACCESSORS
     QString name() {return job_name;}
     QString engineName() {return engine ? engine->name() : "SimAnneal";} // TODO cheating here, change SimAnneal back to Undefined later
+    QString runtimeTempDir();             // runtime job directory
+    QString problemFile();        // runtime problem file
+    QString resultFile();         // runtime result file
     QDateTime startTime() {return start_time;}
     QDateTime endTime() {return end_time;}
     bool isComplete() {return completed;} // indicate whether the job has been completed
@@ -69,8 +72,10 @@ namespace prim{
     // TODO struct job_desc
     QString job_name;
     SimEngine *engine;
-    QDateTime start_time;
-    QDateTime end_time;
+    QString run_job_dir;                  // job directory for storing runtime data, must access with accessor
+    QString problem_path;
+    QString result_path;
+    QDateTime start_time, end_time;
     QProcess *sim_process;
     QStringList arguments;
     bool completed;                       // whether the job has completed simulation
