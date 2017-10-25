@@ -5,7 +5,5 @@
 	<file>ico/dbgen.svg</file>
 	<file>ico/runsim.svg</file>
 	<file>ico/simvisual.svg</file>
-    <file>ico/layer.svg</file>
-    <file>ico/circuitlib.svg</file>
 </qresource>
 </RCC>

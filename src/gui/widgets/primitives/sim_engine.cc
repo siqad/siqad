@@ -10,11 +10,16 @@
 
 namespace prim{
 
-SimEngine::SimEngine(const QString &s_desc_path, QWidget *parent)
-  : QObject(parent), eng_desc_path(s_desc_path)
+/*SimEngine::SimEngine(const QString &s_desc_file, QWidget *parent)
+  : QObject(parent), eng_desc_file(s_desc_file)
 {
   // if(!readSimInfo()) throw error
-}
+}*/
+
+// temporary constructor until desc file is implemented
+SimEngine::SimEngine(const QString &eng_nm, QWidget *parent)
+  : QObject(parent), eng_name(eng_nm)
+{}
 
 
 bool SimEngine::readEngineDecl(QFile *in_f)
@@ -28,6 +33,13 @@ bool SimEngine::readEngineDecl(QFile *in_f)
 }
 
 
+QString SimEngine::runtimeTempDir()
+{
+  if(runtime_temp_dir.isEmpty()){
+    runtime_temp_dir = "./tmp/phys"; // TODO hard coded for now, this should be done by readEngineDecl in the future. The relative path should be relative to the root temp dir
+  }
+  return runtime_temp_dir;
+}
 
 
 } // end of prim namespace

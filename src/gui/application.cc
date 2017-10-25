@@ -72,10 +72,8 @@ void gui::ApplicationGUI::initGUI()
   option_dock->setWidget(sim_visualize);
 
   // inter-widget signals
-  connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene, design_pan, &gui::DesignPanel::displaySimResults);
-
-  // widget to self signals
   connect(sim_manager, &gui::SimManager::emitSimJob, this, &gui::ApplicationGUI::runSimulation);
+  connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene, design_pan, &gui::DesignPanel::displaySimResults);
 
   // layout management
   QWidget *main_widget = new QWidget(this); // main widget for mainwindow
@@ -143,11 +141,8 @@ void gui::ApplicationGUI::initMenuBar()
   tools->addAction(select_color);
   tools->addAction(screenshot);
   tools->addAction(design_screenshot);
-  // TODO setup simulation
-  // TODO rerun last simulation
 
   connect(new_file, &QAction::triggered, this, &gui::ApplicationGUI::newFile);
-  //connect(quit, &QAction::triggered, qApp, QApplication::quit);
   connect(quit, &QAction::triggered, this, &gui::ApplicationGUI::closeFile);
   connect(save, &QAction::triggered, this, &gui::ApplicationGUI::saveDefault);
   connect(save_as, &QAction::triggered, this, &gui::ApplicationGUI::saveNew);
@@ -183,10 +178,11 @@ void gui::ApplicationGUI::initTopBar()
 
   action_sim_visualize = top_bar->addAction(QIcon(":/ico/simvisual.svg"), tr("Simulation Visualization Dock"));
   action_layer_sel= top_bar->addAction(QIcon(":/ico/layer.svg"), tr("Layer Selection"));
-  action_circuit_lib= top_bar->addAction(QIcon(":/ico/circuitlib.svg"), tr("Circuit Library"));
+  //action_circuit_lib= top_bar->addAction(QIcon(":/ico/circuitlib.svg"), tr("Circuit Library"));
 
   connect(action_run_sim, &QAction::triggered, this, &gui::ApplicationGUI::simulationSetup);
   connect(action_sim_visualize, &QAction::triggered, this, &gui::ApplicationGUI::showOptionDock);
+  connect(action_layer_sel, &QAction::triggered, this, &gui::ApplicationGUI::showLayerDialog);
 
   addToolBar(Qt::TopToolBarArea, top_bar);
 }
@@ -399,6 +395,11 @@ void gui::ApplicationGUI::changeLattice()
   design_pan->buildLattice(fname);
 }
 
+void gui::ApplicationGUI::showLayerDialog()
+{
+  // TODO small dialog for changing layer
+}
+
 void gui::ApplicationGUI::parseInputField()
 {
   // get input from input_field, remove leading/trailing whitespace
@@ -428,37 +429,32 @@ void gui::ApplicationGUI::runSimulation(prim::SimJob *job)
 
   qDebug() << tr("ApplicationGUI: About to run job '%1'").arg(job->name());
 
-  // call saveToFile, don't forget to account for setup dialog settings
-  saveToFile(Simulation, job->problemPath());
-  // TODO check that the file is saved
+  // call saveToFile TODO don't forget to account for setup dialog settings
+  saveToFile(Simulation, job->problemFile());
 
+  // call job binary and read output when done
   job->invokeBinary();
+  job->readResults();
 
-  // read output xml
-  job->readResults("src/phys/simanneal_output.xml");
-
-  showOptionDock(); // TODO make this optional through settings
-  sim_visualize->updateJobSelCombo(); // TODO make sim_visualize caption job completion signals, so it updates this on its own
+  // show side option dock for user to look at sim result
+  showOptionDock();
+  sim_visualize->updateJobSelCombo(); // TODO make sim_visualize capture job completion signals, so it updates the field on its own
 }
 
-bool gui::ApplicationGUI::readSimOut(const QString &result_path)
+bool gui::ApplicationGUI::readSimResult(const QString &result_path)
 {
-  // TODO check that output file exists and can be opened
   QFile result_file(result_path);
   
+  // check that output file exists and can be opened
   if(!result_file.open(QFile::ReadOnly | QFile::Text)){
     qDebug() << tr("Error when opening file to read: %1").arg(result_file.errorString());
     return false;
   }
 
-  // TODO either use prim::Simulator or make a new prim::SimResult?
-  // basically, a simulator class that stores the engine info and the returned results, then the results can be shown on demand
-
   // read from XML stream
   QXmlStreamReader rs(&result_file); // result stream
   qDebug() << tr("Begin to read result from %1").arg(result_file.fileName());
   // TODO might just be better to pass this whole block to simulator class
-  // new simulator object for each simulation result? If that's the case then prim::Simulator might have to be repurposed
   while(!rs.atEnd()){
     if(rs.isStartElement()){
       if(rs.name() == "eng_info"){
@@ -466,6 +462,8 @@ bool gui::ApplicationGUI::readSimOut(const QString &result_path)
         // basic engine info
         while(rs.name() != "eng_info"){
           // TODO read engine info
+          // can't get rid of this because there's no guarantee that the result file is being 
+          // read by a machine that has the simulator installed.
         }
       }
       else if(rs.name() == "sim_param"){

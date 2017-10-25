@@ -29,7 +29,7 @@ bool SimJob::invokeBinary()
   // problem_file_path = engine->generateJobDir() + "problem_desc.xml";
 
   qDebug() << tr("SimJob: prepare physeng binary execution"); // TODO put in other directories
-  QFileInfo problem_file_info("./src/phys/problem_desc.xml"); // TODO don't hard code path
+  QFileInfo problem_file_info(problemFile()); // TODO don't hard code path
 
   // check if file exists
   qDebug() << tr("Check if file exists...");
@@ -40,7 +40,8 @@ bool SimJob::invokeBinary()
   qDebug() << tr("SimJob: File does exist");
 
   arguments << problem_file_info.canonicalFilePath();
-  arguments << problem_file_info.canonicalPath().append("/simanneal_output.xml"); // TODO put in other directories
+  arguments << resultFile();
+  //arguments << problem_file_info.canonicalPath().append("/simanneal_output.xml"); // TODO put in other directories
 
   start_time = QDateTime::currentDateTime();
 
@@ -78,10 +79,10 @@ bool SimJob::invokeBinary()
 }
 
 
-bool SimJob::readResults(QString read_path)
+bool SimJob::readResults()
 {
   // TODO check path exists
-  QFile result_file(read_path);
+  QFile result_file(resultFile());
   
   if(!result_file.open(QFile::ReadOnly | QFile::Text)){
     qDebug() << tr("SimJob: Error when opening result file to read: %1").arg(result_file.errorString());
@@ -173,30 +174,29 @@ bool SimJob::processResults()
 
 QString SimJob::runtimeTempDir()
 {
-  if(run_job_dir.empty()){
-    run_job_dir = engine->runtimeTempDir();
-    if(name().empty())
-      run_job_dir += QDateTime::currentDateTime().toString("MM-dd_HHmm");
-    else
-      run_job_dir += name();
-    // TODO check that run_job_dir name is unused
+  if(run_job_dir.isEmpty()){
+    run_job_dir = engine->runtimeTempDir() + "/";
+    run_job_dir += name().isEmpty() ? QDateTime::currentDateTime().toString("MM-dd_HHmm") : name();
   }
+  QDir job_qdir(run_job_dir);
+  if(!job_qdir.exists())
+    job_qdir.mkpath(".");
   return run_job_dir;
 }
 
 
-QString problemPath()
+QString SimJob::problemFile()
 {
-  if(problem_path.empty())
-    problem_path = runtimeTempDir() + "sim_problem.xml";
+  if(problem_path.isEmpty())
+    problem_path = runtimeTempDir() + "/sim_problem.xml";
   return problem_path;
 }
 
 
-QString resultPath()
+QString SimJob::resultFile()
 {
-  if(result_path.empty())
-    result_path = runtimeTempDir() + "sim_result.xml";
+  if(result_path.isEmpty())
+    result_path = runtimeTempDir() + "/sim_result.xml";
   return result_path;
 }
 

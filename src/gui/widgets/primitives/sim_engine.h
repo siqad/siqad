@@ -20,7 +20,8 @@ namespace prim{
     Q_OBJECT
   public:
     // constructor
-    SimEngine(const QString &e_desc_path, QWidget *parent);
+    //SimEngine(const QString &e_desc_file, QWidget *parent=0); // TODO implement this constructor and remove the other
+    SimEngine(const QString &eng_nm, QWidget *parent=0);
 
     // destructor
     ~SimEngine() {};
@@ -37,15 +38,15 @@ namespace prim{
     // available parameters and associated type, for user alteration
 
     void setBinaryPath(const QString &b_path) {bin_path = b_path;}
-    QString getBinaryPath() {return bin_path;}
+    QString binaryPath() {return bin_path;}
 
 
   private:
     // variables like binary location, temp file location, etc.
-    QString eng_desc_path;      // description file of this engine
+    QString eng_desc_file;      // description file of this engine
     QString eng_name;           // name of this engine
     QString bin_path;           // binary path of this engine
-    QString eng_problem_root;   // root directory for all problems files for this engine
+    QString runtime_temp_dir;   // root directory for all problems files for this engine
 
     // TODO some stack/dictionary/etc with simulator info, for showing up in manager
     // TODO something that stores default parameters, associated types (so the appropriate fields are used), for user alteration

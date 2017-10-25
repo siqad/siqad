@@ -44,14 +44,14 @@ namespace prim{
     bool invokeBinary();
 
     // result related tasks
-    bool readResults(QString read_path);  // read result XML
+    bool readResults();  // read result XML
     bool processResults();                // process results
 
 
     // ACCESSORS
     QString name() {return job_name;}
     QString engineName() {return engine ? engine->name() : "SimAnneal";} // TODO cheating here, change SimAnneal back to Undefined later
-    QString runtimeTempDir();             // runtime job directory
+    QString runtimeTempDir();     // runtime job directory
     QString problemFile();        // runtime problem file
     QString resultFile();         // runtime result file
     QDateTime startTime() {return start_time;}

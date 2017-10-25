@@ -58,19 +58,23 @@ namespace gui{
     // change lattice
     void changeLattice();
 
+    // layer dialog
+    void showLayerDialog();
+
     // parse input field and act accordingly
     void parseInputField();
+
+    // option dock
+    void showOptionDock() {option_dock->show();}    // for now, option dock only contains options related to SimVisualization
 
     // Start current simulation method
     // ... it might be worth modifying the work-flow such that instead of running
     // the simulation method we push the problem onto a working stack to be run
     // in the background: will need to be able to display results on request
     // after job finished.
-    void showOptionDock() {option_dock->show();}
     void simulationSetup();
     void runSimulation(prim::SimJob *job);             // high-level structure for running simulation
-    //void runSimWithArg(const QStringList &args);
-    bool readSimOut(const QString &result_path);                // read simulator output
+    bool readSimResult(const QString &result_path);                // read simulator output
 
     // SANDBOX
 

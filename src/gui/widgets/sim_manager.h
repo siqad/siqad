@@ -52,10 +52,11 @@ private:
   void initSimActionsPan();
 
   void initSimSetupDialog();
+  void updateEngSelCombo();
   void updateSimSetupDialog();
   void submitSimSetup();
   
-  void fetchEngineList();
+  void initEngines();
   void simParamSetup();             // take user options for simulation parameters
   bool exportSimProblem();          // generate problem XML
 
@@ -69,6 +70,7 @@ private:
   QVBoxLayout *sim_actions_pan;
 
   // sim_setup_dialog fields (hard coded for SimAnneal)
+  QComboBox *combo_eng_sel;
   QLineEdit *le_job_nm;
   QLineEdit *le_preanneal_cycles;
   QLineEdit *le_anneal_cycles;

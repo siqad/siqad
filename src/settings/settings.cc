@@ -125,7 +125,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("Panel/maxh", 150);
 
   S->setValue("lattice/fname", QString("src/settings/lattices/si_100_2x1.ini"));
-  S->setValue("lattice/xy", QPoint(120,120));
+  S->setValue("lattice/xy", QPoint(60,60));
 
   // QGraphicsView
   S->setValue("view/scale_fact", 10);           // pixels/angstrom in the main view

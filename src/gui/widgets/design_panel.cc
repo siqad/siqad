@@ -544,34 +544,47 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
 void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
 {
   // TODO don't allow design modifications in displaySimResults mode!
-  // TODO in the future, need to add ability to show different types of results. e.g. E-field?
+  // TODO in the future, show results in a pop up windows instead of the result screen itself
 
-  // for now, there's only one type of result that can be shown - elec_dist, so show that
   if(!job){
     qDebug() << tr("DisplayPanel: Job pointer invalid");
     return;
   }
   // TODO perform this check in job's accessor rather than here
   else if(dist_ind < 0 || dist_ind > job->elec_dists.size()){
-    qDebug() << tr("DesignPanel: Invalid dist_ind when attempting to display sim results: %1").arg(dist_ind);
+    qDebug() << tr("DesignPanel: dist_ind out of range when attempting to display sim results: %1").arg(dist_ind);
     return;
   }
 
   // grab a list of DBDots in the order of job->physlocs
-  QList<prim::DBDot*> db_dots_ordered;
+  QList<prim::DBDot*> db_dots_result;
   qreal scale_factor = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
   for(auto job_pl : job->physlocs){
     QPointF scene_loc;
     scene_loc.setX(scale_factor*job_pl.first);
     scene_loc.setY(scale_factor*job_pl.second);
 
-    // TODO there could be issues with this so do additional checks in the future
-    db_dots_ordered.append(static_cast<prim::DBDot*>(scene->itemAt(scene_loc, QTransform())));
+    bool db_exists = false;
+    QList<QGraphicsItem*> items_at_loc = scene->items(scene_loc);
+    for(auto i_at_loc : items_at_loc){
+      if(static_cast<prim::Item*>(i_at_loc)->item_type == prim::Item::DBDot){
+        db_dots_result.append(static_cast<prim::DBDot*>(i_at_loc));
+        db_exists = true;
+        break;
+      }
+    }
+
+    if(!db_exists){
+      qDebug() << tr("DesignPanel: unable to show result, no DBDot is present at location x=%1, y=%2").arg(scene_loc.x()).arg(scene_loc.y());
+      return;
+    }
   }
   
   // set their show_elec to the set specified by job->elec_dists
-  for(int i=0; i<db_dots_ordered.size(); i++)
-    db_dots_ordered[i]->setShowElec(job->elec_dists[dist_ind][i]);
+  for(int i=0; i<db_dots_result.size(); i++){
+    if(db_dots_result[i])
+      db_dots_result[i]->setShowElec(job->elec_dists[dist_ind][i]);
+  }
 }
 
 
@@ -1285,7 +1298,7 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
   // dbdot index in layer
   prim::Layer *layer = dp->getLayer(layer_index);
   index = invert ? layer->getItems().indexOf(dbdot) : layer->getItems().size();
-  elec = src_db ? src_db->getElec() : 0; // TODO in the future, instead of copying properties 1 by 1, probably want to make a struct that stores all properties
+  elec = src_db ? src_db->getElec() : 0; // TODO in the future, instead of copying properties 1 by 1, probably want to make something that copies all properties
 }
 
 void gui::DesignPanel::CreateDB::undo()

@@ -16,6 +16,7 @@ namespace gui{
 SimManager::SimManager(QWidget *parent)
   : QWidget(parent, Qt::Dialog)
 {
+  initEngines();
   initSimManager();
   initSimSetupDialog();
 }
@@ -113,21 +114,21 @@ void SimManager::initSimSetupDialog()
 
   QString job_nm_default = "SA_" + QDateTime::currentDateTime().toString("MM-dd_HHmm"); // TODO SA to engine short name
 
-  /* for now, hard code SimAnneal as the only available engine
   combo_eng_sel = new QComboBox();
   combo_eng_sel->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  updateEngSelCombo();*/
-  QLabel *text_eng_sel = new QLabel(tr("SimAnneal")); // TODO update this to actually take the engine name
+  updateEngSelCombo();
   le_job_nm = new QLineEdit(job_nm_default);
+  
+  // TODO when combo_eng_sel is updated, the available options should also change
 
-  label_eng_sel->setBuddy(text_eng_sel);
+  label_eng_sel->setBuddy(combo_eng_sel);
   label_job_nm->setBuddy(le_job_nm);
 
   QHBoxLayout *eng_sel_hl = new QHBoxLayout;
   QHBoxLayout *job_nm_hl = new QHBoxLayout;
 
   eng_sel_hl->addWidget(label_eng_sel);
-  eng_sel_hl->addWidget(text_eng_sel);
+  eng_sel_hl->addWidget(combo_eng_sel);
   job_nm_hl->addWidget(label_job_nm);
   job_nm_hl->addWidget(le_job_nm);
 
@@ -201,6 +202,20 @@ void SimManager::initSimSetupDialog()
 }
 
 
+void SimManager::updateEngSelCombo()
+{
+  if(!combo_eng_sel)
+    return;
+  combo_eng_sel->clear();
+
+  if(sim_engines.isEmpty())
+    combo_eng_sel->addItem("No Engines");
+  else
+    for(auto eng : sim_engines)
+      combo_eng_sel->addItem(eng->name());
+}
+
+
 void SimManager::updateSimSetupDialog()
 {
   // update dialog content with engine selection
@@ -210,9 +225,11 @@ void SimManager::updateSimSetupDialog()
 
 void SimManager::submitSimSetup()
 {
+  // hide setup dialog
+  sim_setup_dialog->hide();
+
   // create job object
-  // TODO grab engine choice
-  prim::SimJob *new_job = new prim::SimJob(le_job_nm->text());
+  prim::SimJob *new_job = new prim::SimJob(le_job_nm->text(), sim_engines[combo_eng_sel->currentIndex()]);
 
   // fill in job properties according to input fields
 
@@ -242,10 +259,13 @@ void SimManager::submitSimSetup()
 }
 
 
-void SimManager::fetchEngineList()
+void SimManager::initEngines()
 {
-  // fetch a list of available simulators
-  // save to simulators stack
+  // TODO fetch a list of available simulators
+  // TODO save to simulators stack
+
+  // for now, just one hardcoded engine
+  sim_engines.append(new prim::SimEngine("SimAnneal"));
 }
 
 void SimManager::simParamSetup()

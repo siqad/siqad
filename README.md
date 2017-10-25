@@ -125,8 +125,19 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
   * Export results to file for gui to read - time, charge distribution, etc
 
 GUI side
-* One simulation at a time for simplicity.
-* When sim is running, don't allow modification in the main window to avoid conflict btwn sim and window content.
+* Get available engines
+  * Read engine properties from certain directory, properties are stored in XML files
+  * Simulation jobs are ran on a runtime temp directory that is structured as follows:
+    [tempDir]/[engineDir]/[problemDir]
+  * For now, SimEngine::runtimeTempDir is hard coded to return the only physeng
+* Show simulation options
+  * Show options relevant to the selected engine
+* Problem and result files are stored in tmp
+  * Delete them when quiting program
+* Read simultion result
+  * ApplicationGUI::readSimResult still has many unfinished sections
+
+The following mess was made before d-wave meeting, will consolidate into list above
 * Rundown:
   * Sim Setup (pick simulator, adjust simulation params)
     * There should be flags in the simulator info XML controlling what kind of params are exported.
@@ -176,6 +187,7 @@ All tasks described here contribute to save/load functionality
   * ~~Number of saves~~ Implemented 17.08.16
   * ~~Rotational save in a folder dedicated to that program instance~~ Implemented 17.08.16
   * Put tmp directory to system tmp?
+  * Delete autosaves when quiting the program gracefully
 * autorecovery
   * Check for existing autosaves, ask the user whether they want to recover the latest autosave.
 
