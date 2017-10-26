@@ -372,6 +372,11 @@ void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
       setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
       break;
+    case gui::DesignPanel::ElectrodeTool:
+      // replaced with custom rubberBandUpdate, delete this later
+      setDragMode(QGraphicsView::NoDrag);
+      setInteractive(true);
+      break;
     default:
       qCritical() << tr("Invalid ToolType... should not have happened");
       return;
@@ -402,7 +407,7 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream, bool for_sim)
   // save gui flags
   stream->writeComment("GUI Flags");
   stream->writeStartElement("gui");
-  
+
   // save zoom and scroll bar position
   stream->writeTextElement("zoom", QString::number(transform().m11())); // m11 of qtransform
   stream->writeEmptyElement("scroll");
@@ -579,7 +584,7 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
       return;
     }
   }
-  
+
   // set their show_elec to the set specified by job->elec_dists
   for(int i=0; i<db_dots_result.size(); i++){
     if(db_dots_result[i])
@@ -628,7 +633,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   clicked = true;
   switch(e->button()){
     case Qt::LeftButton:
-      if(tool_type == SelectTool || tool_type == DBGenTool){
+      if(tool_type == SelectTool || tool_type == DBGenTool || tool_type == ElectrodeTool){
         // rubber band variables
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
@@ -682,7 +687,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
       case Qt::LeftButton:
-        if(clicked && (tool_type == SelectTool || tool_type == DBGenTool))
+        if(clicked && (tool_type == SelectTool || tool_type == DBGenTool || tool_type == ElectrodeTool))
           rubberBandUpdate(e->pos());
 
         // use default behaviour for left mouse button
@@ -748,6 +753,10 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             // identify free lattice sites and create dangling bonds
             filterSelection(false);
             createDBs();
+            break;
+          case gui::DesignPanel::ElectrodeTool:
+            // identify free lattice sites and create dangling bonds
+            createElectrodes();
             break;
           case gui::DesignPanel::DragTool:
             // pan ends
@@ -947,7 +956,7 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
 void gui::DesignPanel::wheelPan(bool boost)
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
-  
+
   qreal dx=0, dy=0;
   QScrollBar *vsb = verticalScrollBar();
   QScrollBar *hsb = horizontalScrollBar();
@@ -1565,6 +1574,11 @@ void gui::DesignPanel::createDBs()
   for(QGraphicsItem *gitem : selection)
     undo_stack->push(new CreateDB(static_cast<prim::LatticeDot *>(gitem), layer_index, this));
   undo_stack->endMacro();
+}
+
+void gui::DesignPanel::createElectrodes()
+{
+  qCritical() << tr("Creating electrodes now!");
 }
 
 void gui::DesignPanel::deleteSelection()

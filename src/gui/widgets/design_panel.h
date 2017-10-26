@@ -30,7 +30,7 @@ namespace gui{
 
   public:
 
-    enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool};
+    enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool, ElectrodeTool};
     class UndoCommand;
 
     // constructor
@@ -230,6 +230,8 @@ namespace gui{
 
     // create dangling bonds in the surface at all selected lattice dots
     void createDBs();
+
+    void createElectrodes();
 
     // delete all selected items
     void deleteSelection();

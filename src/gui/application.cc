@@ -218,20 +218,24 @@ void gui::ApplicationGUI::initSideBar()
   action_select_tool = side_bar->addAction(QIcon(":/ico/select.svg"), tr("Select tool"));
   action_drag_tool = side_bar->addAction(QIcon(":/ico/drag.svg"), tr("Drag tool"));
   action_dbgen_tool = side_bar->addAction(QIcon(":/ico/dbgen.svg"), tr("DB tool"));
+  action_electrode_tool = side_bar->addAction(QIcon(":/ico/dbgen.svg"), tr("Electrode tool"));
 
   action_group->addAction(action_select_tool);
   action_group->addAction(action_drag_tool);
   action_group->addAction(action_dbgen_tool);
+  action_group->addAction(action_electrode_tool);
 
   action_select_tool->setCheckable(true);
   action_drag_tool->setCheckable(true);
   action_dbgen_tool->setCheckable(true);
+  action_electrode_tool->setCheckable(true);
 
   action_select_tool->setChecked(true);
 
   connect(action_select_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolSelect);
   connect(action_drag_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolDrag);
   connect(action_dbgen_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolDBGen);
+  connect(action_electrode_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolElectrode);
 
   addToolBar(area, side_bar);
 }
@@ -361,6 +365,10 @@ void gui::ApplicationGUI::setTool(gui::DesignPanel::ToolType tool)
       action_dbgen_tool->setChecked(true);
       setToolDBGen();
       break;
+    case gui::DesignPanel::ElectrodeTool:
+      action_electrode_tool->setChecked(true);
+      setToolElectrode();
+      break;
     default:
       break;
   }
@@ -383,6 +391,13 @@ void gui::ApplicationGUI::setToolDBGen()
   qDebug() << tr("selecting dbgen tool");
   design_pan->setTool(gui::DesignPanel::DBGenTool);
 }
+
+void gui::ApplicationGUI::setToolElectrode()
+{
+  qDebug() << tr("selecting electrode tool");
+  design_pan->setTool(gui::DesignPanel::ElectrodeTool);
+}
+
 
 void gui::ApplicationGUI::changeLattice()
 {
@@ -444,7 +459,7 @@ void gui::ApplicationGUI::runSimulation(prim::SimJob *job)
 bool gui::ApplicationGUI::readSimResult(const QString &result_path)
 {
   QFile result_file(result_path);
-  
+
   // check that output file exists and can be opened
   if(!result_file.open(QFile::ReadOnly | QFile::Text)){
     qDebug() << tr("Error when opening file to read: %1").arg(result_file.errorString());
@@ -462,7 +477,7 @@ bool gui::ApplicationGUI::readSimResult(const QString &result_path)
         // basic engine info
         while(rs.name() != "eng_info"){
           // TODO read engine info
-          // can't get rid of this because there's no guarantee that the result file is being 
+          // can't get rid of this because there's no guarantee that the result file is being
           // read by a machine that has the simulator installed.
         }
       }
@@ -485,7 +500,7 @@ bool gui::ApplicationGUI::readSimResult(const QString &result_path)
   }
   qDebug() << tr("Load complete");
   result_file.close();
-  
+
   return true;
 }
 
@@ -649,7 +664,7 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
 
   stream.writeEndElement();
 
-  // save simulation parameters 
+  // save simulation parameters
   /*
     TODO implement later
     if(flag == Simulation){
