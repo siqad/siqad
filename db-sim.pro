@@ -44,8 +44,8 @@ HEADERS += \
 	src/gui/widgets/primitives/layer.h \
 	src/gui/widgets/primitives/lattice.h \
   src/gui/widgets/primitives/sim_engine.h \
-  src/gui/widgets/primitives/sim_job.h 
-
+  src/gui/widgets/primitives/sim_job.h \
+	src/gui/widgets/primitives/electrode.h
 SOURCES += \
 	src/gui/widgets/primitives/emitter.cc \
 	src/gui/widgets/primitives/item.cc \
@@ -55,8 +55,9 @@ SOURCES += \
 	src/gui/widgets/primitives/ghost.cc \
 	src/gui/widgets/primitives/layer.cc \
 	src/gui/widgets/primitives/lattice.cc \
-    src/gui/widgets/primitives/sim_engine.cc \
-    src/gui/widgets/primitives/sim_job.cc
+  src/gui/widgets/primitives/sim_engine.cc \
+  src/gui/widgets/primitives/sim_job.cc \
+	src/gui/widgets/primitives/electrode.cc		
 
 # widgets
 

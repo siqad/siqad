@@ -14,6 +14,8 @@
 
 #include <algorithm>
 
+#include "electrode.h"
+
 // constructor
 gui::DesignPanel::DesignPanel(QWidget *parent)
   : QGraphicsView(parent)
@@ -752,7 +754,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             break;
           case gui::DesignPanel::ElectrodeTool:
             //get start and end locations, and create the electrode.
-            createElectrodes(mouse_pos_cached, e->pos());
+            createElectrodes();
             break;
           case gui::DesignPanel::DragTool:
             // pan ends
@@ -1574,19 +1576,12 @@ void gui::DesignPanel::createDBs()
 
 void gui::DesignPanel::createElectrodes(QPoint p1, QPoint p2)
 {
-  QRect rect( std::min(p1.x(), p2.x()),
-              std::min(p1.y(), p2.y()),
-              std::max(p1.x(), p2.x()) - std::min(p1.x(), p2.x()),
-              std::max(p1.y(), p2.y()) - std::min(p1.y(), p2.y())
-            );
+  Electrode elec(mouse_pos_cached, e->pos())
+  QPoint test = elec.getLoc();
+  qCritical() << tr("getLoc() returns: %1, %2").arg(test.x()).arg(test.y());
   qCritical() << tr("Creating electrodes now!");
   qCritical() << tr("P1 x = %1, y = %2").arg(p1.x()).arg(p1.y());
   qCritical() << tr("P2 x = %1, y = %2").arg(p2.x()).arg(p2.y());
-
-  scene->addItem(rect);
-  update();
-
-
 }
 
 void gui::DesignPanel::deleteSelection()

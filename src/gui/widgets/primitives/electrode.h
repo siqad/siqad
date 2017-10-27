@@ -17,17 +17,12 @@ namespace prim{
   // forard declarations
   class Layer;
 
-  // Specific Item derived class for showing the possible dangling bond
-  // location on the surface lattice. For now, this class has very similar
-  // characteristics to the DBDot but will be kept a separate class to allow for
-  // future distinction in properties and avoid overbloating the functionality of
-  // either class.
   class Electrode: public Item
   {
   public:
 
     // constructor, create an electrode given two points
-    Electrode(QPoint p1, QPoint p2);
+    Electrode(int lay_id, QPoint p1, QPoint p2);
     // Electrode(QPoint p1, int width, int height); //or a QPoint point and an integer width and an integer height
 
     // destructor
