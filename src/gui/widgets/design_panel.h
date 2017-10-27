@@ -231,7 +231,7 @@ namespace gui{
     // create dangling bonds in the surface at all selected lattice dots
     void createDBs();
 
-    void createElectrodes();
+    void createElectrodes(QPoint, QPoint);
 
     // delete all selected items
     void deleteSelection();

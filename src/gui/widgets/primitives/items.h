@@ -14,5 +14,6 @@
 #include "dbdot.h"
 #include "latdot.h"
 #include "ghost.h"
+#include "electrode.h"
 
 #endif

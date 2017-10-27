@@ -43,8 +43,8 @@ HEADERS += \
 	src/gui/widgets/primitives/items.h \
 	src/gui/widgets/primitives/layer.h \
 	src/gui/widgets/primitives/lattice.h \
-    src/gui/widgets/primitives/sim_engine.h \
-    src/gui/widgets/primitives/sim_job.h 
+  src/gui/widgets/primitives/sim_engine.h \
+  src/gui/widgets/primitives/sim_job.h 
 
 SOURCES += \
 	src/gui/widgets/primitives/emitter.cc \

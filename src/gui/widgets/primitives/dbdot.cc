@@ -117,16 +117,16 @@ void prim::DBDot::initDBDot(int lay_id, prim::LatticeDot *src, int elec_in)
 }
 
 
-void prim::DBDot::toggleElec() 
+void prim::DBDot::toggleElec()
 {
-  if(elec) 
-    setElec(0); 
-  else 
+  if(elec)
+    setElec(0);
+  else
     setElec(1);
 }
 
 
-void prim::DBDot::setElec(int e_in) 
+void prim::DBDot::setElec(int e_in)
 {
   // TODO move the color logic to paint
   elec = e_in;
@@ -146,7 +146,7 @@ void prim::DBDot::setElec(int e_in)
 }
 
 
-void prim::DBDot::setShowElec(int se_in) 
+void prim::DBDot::setShowElec(int se_in)
 {
   // TODO move the color logic to paint
   show_elec = se_in;
