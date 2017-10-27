@@ -757,3 +757,122 @@ void gui::ApplicationGUI::closeFile()
 
   QApplication::quit();
 }
+
+
+bool gui::ApplicationGUI::exportToLabview()
+{
+  qreal scale_factor = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
+  // TODO implement some sort of check for lattice type
+
+  // fetch list of all dbdots
+  //QList<prim::DBDot*> dbdots = design_pan->listDBDots(); // TODO implement listDBDots
+  QList<prim::DBDot*> dbdots; // TODO placeholder for listDBDots, remove after listDBDots is implemented
+  if(dbdots.size() == 0){
+    qDebug() << tr("ApplicationGUI: There are no DBDots, nothing can be exported.");
+    return false;
+  }
+
+  // convert from coord to index (make use of %)
+  int x,y;
+  QPointF phys_loc;
+  QMap<int, QList<int>> db_y_map; // [y,x] y is already sorted by QMap, x needs to be further sorted
+  for(auto db : dbdots){
+    phys_loc = db->getPhysLoc();
+    x = phys_loc.x() / scale_factor + fmod(phys_loc.x(), scale_factor);
+    y = phys_loc.y() / scale_factor + fmod(phys_loc.y(), scale_factor);
+
+    auto insert_y = db_y_map.find(y);
+    if(insert_y == db_y_map.end())
+      db_y_map.insert(y, QList<int>({x}));
+    else
+      insert_y->append(x);
+  }
+
+  // sort
+  bool sort_asc = true;
+  int max_x=0, max_x_local=0; // find max x while performing the sort
+  for(auto x_row : db_y_map){ // grabs each x_row in the y map
+    if(sort_asc){
+      std::sort(x_row.begin(), x_row.end());
+      max_x_local = x_row.last();
+    }
+    else{
+      std::sort(x_row.rbegin(), x_row.rend()); // sort with reverse iterator (descending)
+      max_x_local = x_row.first();
+    }
+    max_x = max_x > max_x_local ? max_x : max_x_local;
+    sort_asc = !sort_asc; // flip the sorting order for the next column
+  }
+
+  // construct array with determined samples and channels
+  int grid[x][y] = {0}; // create grid and initialize to 0
+  int db_i=0;
+  for(auto y_it = db_y_map.keyBegin(); y_it != db_y_map.keyEnd(); ++y_it)
+    for(auto x : db_y_map.value(*y_it))
+      grid[x][*y_it] = db_i++;
+
+
+  // write to file
+  QString fn = QFileDialog::getSaveFileName(this, tr("Export to QSi LabView"),
+                "qsi_labview.lvm", tr("LabView files (*.lvm)"));
+
+  QFile ef(fn);
+  if(!ef.open(QIODevice::WriteOnly)){
+    qDebug() << tr("Export to LVM: Error when opening file to export, %1").arg(ef.errorString());
+    return false;
+  }
+
+  QTextStream output(&ef);
+
+  // Channels
+  int max_y = db_y_map.lastKey();
+  output << tr("Channels\t%1\n").arg(max_y);   // channels = max y
+  output << tr("Samples\t%1\n").arg(max_x);                 // samples = max x
+
+  // Header info
+  QString sample_date = QDateTime::currentDateTime().toString("yyyy/MM/dd");
+  QString sample_time = QDateTime::currentDateTime().toString("HH:mm:ss.z");
+  QList<QString> out_header;
+  out_header.append("Samples");
+  out_header.append("Date");
+  out_header.append("Time");
+  out_header.append("X_Dimension");
+  out_header.append("X0");
+  out_header.append("Delta_X");
+  out_header.append("***End_of_Header***");
+  out_header.append("");  // column names of grid
+  for(int i=0; i<max_x; i++){
+    out_header[0] += tr("\t%1\t").arg(max_x);         // Samples
+    out_header[1] += tr("\t%1\t").arg(sample_date);   // Date
+    out_header[2] += tr("\t%1\t").arg(sample_time);   // Time
+    out_header[3] += "\tTime\t";                      // X_Dimension
+    out_header[4] += "\t0\t";                         // X0
+    out_header[5] += "\t1\t";                         // Delta_X
+    // *** End_of_Header ***
+    out_header[7] += tr("X_Value\tUntitled%1\t").arg(i>0 ? tr(" %1").arg(i) : "");  // col names of grid
+  }
+  out_header[7] += "Comment";
+
+  for(QString text_row : out_header)
+    output << tr("%1\n").arg(text_row);
+
+  QString out_grid = "";
+  for(int x_ind = 0; x_ind < max_x; x_ind++){
+    for(int y_ind = 0; y_ind < max_y; y_ind++){
+      out_grid += tr("%1\t%2").arg(x_ind).arg(grid[x_ind][y_ind]);
+      if(y_ind != max_y - 1)
+        out_grid += "\t"; // don't add extra tab if it's the last column
+    }
+    if(x_ind != max_x - 1)
+      out_grid += "\n"; // don't add line break if this is the last row
+  }
+
+  output << out_grid;
+
+  // idea for format for where to start: what if we just always start at the left dimer row?
+  ef.close();
+
+  qDebug() << tr("Export to LVM: Write completed for %1").arg(ef.fileName());
+
+  return true;
+}

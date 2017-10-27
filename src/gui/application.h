@@ -93,6 +93,9 @@ namespace gui{
     void openFromFile();                // open a previous save
     void closeFile();                   // close the file when quitting the program
 
+    // Export to Labview
+    bool exportToLabview();
+
   protected:
 
 
