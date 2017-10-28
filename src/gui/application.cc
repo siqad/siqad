@@ -811,7 +811,7 @@ bool gui::ApplicationGUI::exportToLabview()
       max_x_local = (*it).last();
     }
     else{
-      std::sort((*it).rbegin(), (*it).rend()); // sort with reverse iterator (descending)
+      std::sort((*it).begin(), (*it).end(), std::greater<int>());
       max_x_local = (*it).first();
     }
     max_x = max_x > max_x_local ? max_x : max_x_local;
@@ -827,11 +827,9 @@ bool gui::ApplicationGUI::exportToLabview()
     grid[i] = new int[size_y]();
 
   int db_i=1;
-  for(auto y_it = db_y_map.keyBegin(); y_it != db_y_map.keyEnd(); ++y_it){
-    for(auto x : db_y_map.value(*y_it)){
-      grid[x][*y_it] = db_i++;
-    }
-  }
+  for(auto y_key : db_y_map.keys())
+    for(auto x : db_y_map.value(y_key))
+      grid[x][y_key] = db_i++;
 
 
   // write to file
