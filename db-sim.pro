@@ -19,6 +19,7 @@ TARGET = db-sim
 INCLUDEPATH += .
 
 RESOURCES = resources/application.qrc
+RC_ICONS = app.ico
 
 #################################
 # INPUT GUI HEADERS AND SOURCES #
@@ -97,17 +98,18 @@ UI_DIR		= $$DESTDIR/.ui
 # official physics engines
 
 EXEC_DIR = $$DESTDIR
+PHYS_DIR = src/phys
 
 macx {
-    EXEC_DIR = [$$DESTDIR]/[$$TARGET].app/Contents/MacOS
+    EXEC_DIR = $${DESTDIR}/$${TARGET}.app/Contents/MacOS
 }
 
 sim_common.path = $$EXEC_DIR/src/phys
 sim_common.files = \
-    src/phys/engines.xml
+    $$PHYS_DIR/engines.xml
 INSTALLS += sim_common
 
 sim_simanneal.path = $$EXEC_DIR/src/phys/simanneal
 sim_simanneal.files = \
-    src/phys/simanneal/simanneal
+    $$PHYS_DIR/simanneal/simanneal
 INSTALLS += sim_simanneal
