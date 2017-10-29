@@ -39,6 +39,14 @@ bool SimJob::invokeBinary()
   }
   qDebug() << tr("SimJob: File does exist");
 
+  // check if binary path exists
+  qDebug() << tr("Check if binary path exists...");
+  QFileInfo bin_path_info(engine->binaryPath());
+  if(!(bin_path_info.exists() && bin_path_info.isFile())){
+    qDebug() << tr("SimJob: engine binary '%1' doesn't exist.").arg(bin_path_info.filePath());
+    return false;
+  }
+
   arguments << problem_file_info.canonicalFilePath();
   arguments << resultFile();
   //arguments << problem_file_info.canonicalPath().append("/simanneal_output.xml"); // TODO put in other directories
@@ -47,8 +55,8 @@ bool SimJob::invokeBinary()
 
   sim_process = new QProcess();
   qDebug() << tr("SimJob: Setting binary path...");
-  //sim_process->setProgram(engine->getBinaryPath());
-  sim_process->setProgram("src/phys/physeng");
+  sim_process->setProgram(engine->binaryPath());
+  //sim_process->setProgram("src/phys/physeng");
   qDebug() << tr("SimJob: Setting arguments...");
   sim_process->setArguments(arguments);
   qDebug() << tr("SimJob: setting process channel mode...");

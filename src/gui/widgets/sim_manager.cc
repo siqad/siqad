@@ -261,11 +261,61 @@ void SimManager::submitSimSetup()
 
 void SimManager::initEngines()
 {
+  settings::AppSettings *app_settings = settings::AppSettings::instance();
+  engine_lib_dir = app_settings->get<QString>("phys/eng_lib_dir");
+  engine_lib_file = app_settings->get<QString>("phys/eng_lib_file");
+
   // TODO fetch a list of available simulators
+  QFile eng_f(engine_lib_file);
+
+  if(!eng_f.open(QFile::ReadOnly | QFile::Text)){
+    qCritical() << tr("SimManager: Engine library file not found in %1").arg(engine_lib_file);
+    return;
+  }
+
+  QXmlStreamReader eng_s(&eng_f);
+  qDebug() << tr("Beginning to read engine library from %1").arg(eng_f.fileName());
+
+  QString read_eng_nm, read_eng_ver, read_bin_path;
+  while(!eng_s.atEnd()){
+    if(eng_s.isStartElement()){
+      if(eng_s.name() == "physeng")
+        eng_s.readNext();
+      else if(eng_s.name() == "engine"){
+        // TODO move the following to SimEngine
+        while(!(eng_s.isEndElement() && eng_s.name() == "engine")){
+          if(!eng_s.readNextStartElement())
+            continue; // skip until a start element is encountered
+          if(eng_s.name() == "name"){
+            read_eng_nm = eng_s.readElementText();
+          }
+          else if(eng_s.name() == "version"){
+            read_eng_ver = eng_s.readElementText();
+          }
+          else if(eng_s.name() == "bin_path"){
+            read_bin_path = eng_s.readElementText();
+          }
+        }
+        prim::SimEngine *eng = new prim::SimEngine(read_eng_nm);
+        eng->setVersion(read_eng_ver);
+        eng->setBinaryPath(engine_lib_dir + read_bin_path);
+
+        sim_engines.append(eng);
+
+        read_eng_nm = read_eng_ver = read_bin_path = ""; // TODO make this into a QHash or smth
+        eng_s.readNext();
+      }
+      else{
+        qDebug() << tr("SimManager: invalid element encountered on line %1 - %2").arg(eng_s.lineNumber()).arg(eng_s.name().toString());
+      }
+    }
+    else
+      eng_s.readNext();
+  }
+
   // TODO save to simulators stack
 
-  // for now, just one hardcoded engine
-  sim_engines.append(new prim::SimEngine("SimAnneal"));
+  eng_f.close();
 }
 
 void SimManager::simParamSetup()

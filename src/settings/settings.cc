@@ -103,6 +103,10 @@ QSettings *settings::AppSettings::m_defs()
   S->setValue("phys/debye_length", 50);
   S->setValue("phys/epsr", 10);
 
+  S->setValue("phys/eng_lib_dir", QString("src/phys/"));
+  S->setValue("phys/eng_lib_file", QString("src/phys/engines.xml"));
+  S->setValue("phys/runtime_temp_dir", QString("tmp/phys/"));
+
   S->setValue("save/autosaveroot", QString("tmp/autosave/"));
   S->setValue("save/autosavenum", 3);
   S->setValue("save/autosaveinterval", 300); // in seconds
