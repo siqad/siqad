@@ -225,6 +225,12 @@ void SimManager::updateSimSetupDialog()
 
 void SimManager::submitSimSetup()
 {
+  int eng_ind = combo_eng_sel->currentIndex();
+  if(eng_ind < 0 || eng_ind >= sim_engines.size()){
+    qDebug() << tr("Invalid engine selection");
+    return;
+  }
+
   // hide setup dialog
   sim_setup_dialog->hide();
 
