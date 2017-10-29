@@ -19,7 +19,9 @@ TARGET = db-sim
 INCLUDEPATH += .
 
 RESOURCES = resources/application.qrc
-RC_ICONS = app.ico
+win32:RC_ICONS = resources/ico/app.ico
+macx:ICON = resources/ico/app.icns
+
 
 #################################
 # INPUT GUI HEADERS AND SOURCES #

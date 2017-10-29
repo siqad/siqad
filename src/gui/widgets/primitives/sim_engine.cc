@@ -36,7 +36,9 @@ bool SimEngine::readEngineDecl(QFile *in_f)
 QString SimEngine::runtimeTempDir()
 {
   if(runtime_temp_dir.isEmpty()){
-    runtime_temp_dir = QCoreApplication::applicationDirPath() + settings::AppSettings::instance()->get<QString>("phys/runtime_temp_dir");
+    QDir r_dir(QCoreApplication::applicationDirPath());
+    r_dir.cd(settings::AppSettings::instance()->get<QString>("phys/runtime_temp_dir"));
+    runtime_temp_dir = r_dir.canonicalPath();
   }
   return runtime_temp_dir;
 }
