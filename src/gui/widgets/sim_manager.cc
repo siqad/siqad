@@ -268,8 +268,8 @@ void SimManager::submitSimSetup()
 void SimManager::initEngines()
 {
   settings::AppSettings *app_settings = settings::AppSettings::instance();
-  engine_lib_dir = app_settings->get<QString>("phys/eng_lib_dir");
-  engine_lib_file = app_settings->get<QString>("phys/eng_lib_file");
+  engine_lib_dir = QCoreApplication::applicationDirPath() + "/" + app_settings->get<QString>("phys/eng_lib_dir");
+  engine_lib_file = QCoreApplication::applicationDirPath() + "/" + app_settings->get<QString>("phys/eng_lib_file");
 
   // TODO fetch a list of available simulators
   QFile eng_f(engine_lib_file);

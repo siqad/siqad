@@ -89,3 +89,19 @@ OBJECTS_DIR	= $$DESTDIR/.obj
 MOC_DIR		= $$DESTDIR/.moc
 RCC_DIR		= $$DESTDIR/.qrc
 UI_DIR		= $$DESTDIR/.ui
+
+##############
+# COPY FILES #
+##############
+
+# official physics engines
+
+sim_common.path = $$DESTDIR/src/phys
+sim_common.files = \
+    src/phys/engines.xml
+INSTALLS += sim_common
+
+sim_simanneal.path = $$DESTDIR/src/phys/simanneal
+sim_simanneal.files = \
+    src/phys/simanneal/simanneal
+INSTALLS += sim_simanneal
