@@ -81,7 +81,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   hsb->setValue(hsb->minimum());
 
   // set display mode
-  display_mode = DesignMode;
+  setDisplayMode(DesignMode);
 }
 
 // destructor
@@ -139,7 +139,7 @@ void gui::DesignPanel::resetDesignPanel()
   hsb->setValue(hsb->minimum());
 
   // set display mode
-  display_mode = DesignMode;
+  setDisplayMode(DesignMode);
 
   qDebug() << tr("Design Panel reset complete");
 }
@@ -398,6 +398,16 @@ void gui::DesignPanel::setFills(float *fills)
 }
 
 
+void gui::DesignPanel::setDisplayMode(DisplayMode mode)
+{
+  display_mode = mode;
+
+  for(prim::Layer* layer : layers)
+    for(prim::Item* item : layer->getItems())
+      item->setDesignMode(mode == DesignMode);
+}
+
+
 // SAVE
 
 void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream, bool for_sim)
@@ -550,7 +560,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
 void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
 {
   // TODO in the future, show results in a pop up windows instead of the result screen itself
-  display_mode = SimDisplayMode;
+  setDisplayMode(SimDisplayMode);
 
   if(!job){
     qDebug() << tr("DisplayPanel: Job pointer invalid");
@@ -596,7 +606,7 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
 
 void gui::DesignPanel::clearSimResults()
 {
-  display_mode = DesignMode;
+  setDisplayMode(DesignMode);
 
   // set show_elec of all DBDots to 0
   if(!db_dots_result.isEmpty())

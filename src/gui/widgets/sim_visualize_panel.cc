@@ -175,21 +175,35 @@ void SimVisualize::initSimVisualize()
   // Elec Distribution Group
   QGroupBox *dist_group = new QGroupBox(tr("Electron Distribution"));
   QLabel *label_dist_sel = new QLabel(tr("Dist:"));
+  QPushButton *button_dist_prev = new QPushButton(tr("<"));
+  QPushButton *button_dist_next = new QPushButton(tr(">"));
+
+  button_dist_prev->setShortcut(tr("CTRL+H"));
+  button_dist_next->setShortcut(tr("CTRL+L"));
+
   combo_dist_sel = new QComboBox;
   label_dist_sel->setBuddy(combo_job_sel);
   updateElecDistCombo();
 
-  QHBoxLayout *dist_sel = new QHBoxLayout;
-  dist_sel->addWidget(label_dist_sel);
-  dist_sel->addWidget(combo_dist_sel);
+  QHBoxLayout *dist_sel_hl = new QHBoxLayout;
+  dist_sel_hl->addWidget(label_dist_sel);
+  dist_sel_hl->addWidget(combo_dist_sel);
 
-  QVBoxLayout *dist_layout = new QVBoxLayout;
-  dist_layout->addLayout(dist_sel);
-  dist_group->setLayout(dist_layout);
+  QHBoxLayout *dist_sel_buttons_hl = new QHBoxLayout;
+  dist_sel_buttons_hl->addWidget(button_dist_prev);
+  dist_sel_buttons_hl->addWidget(button_dist_next);
+
+  QVBoxLayout *dist_vl = new QVBoxLayout;
+  dist_vl->addLayout(dist_sel_hl);
+  dist_vl->addLayout(dist_sel_buttons_hl);
+
+  dist_group->setLayout(dist_vl);
 
   // signal connection
   connect(combo_job_sel, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &gui::SimVisualize::jobSelUpdate);
   connect(combo_dist_sel, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &gui::SimVisualize::distSelUpdate);
+  connect(button_dist_prev, &QAbstractButton::clicked, this, &gui::SimVisualize::distPrev);
+  connect(button_dist_next, &QAbstractButton::clicked, this, &gui::SimVisualize::distNext);
 
   // TODO show energy level, and maybe sorting feature
 
@@ -210,6 +224,18 @@ void SimVisualize::jobSelUpdate()
 void SimVisualize::distSelUpdate()
 {
   showElecDist(combo_dist_sel->currentIndex());
+}
+
+void SimVisualize::distPrev()
+{
+  if(combo_dist_sel->currentIndex() != 0)
+    combo_dist_sel->setCurrentIndex(combo_dist_sel->currentIndex() - 1);
+}
+
+void SimVisualize::distNext()
+{
+  if(combo_dist_sel->currentIndex() != combo_dist_sel->count() - 1)
+    combo_dist_sel->setCurrentIndex(combo_dist_sel->currentIndex() + 1);
 }
 
 

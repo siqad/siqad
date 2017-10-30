@@ -60,6 +60,10 @@ namespace prim{
     // true if the item or its parent has been hovered, recursive to highest level parent
     bool upHovered();
 
+    // design mode
+    bool designMode() {return design_mode;}
+    void setDesignMode(bool mode) {design_mode = mode;}
+
     // securing the item type and layer as private isn't worth the copy
     // constructor calls for accessors, make public
 
@@ -83,6 +87,11 @@ namespace prim{
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *) Q_DECL_OVERRIDE {}
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *) Q_DECL_OVERRIDE {}
+
+  private:
+
+    bool design_mode;
+
   };
 
 } // end prim namespace

@@ -45,6 +45,8 @@ namespace gui{
     void initSimVisualize();
     void jobSelUpdate();
     void distSelUpdate();
+    void distPrev();
+    void distNext();
 
     SimManager *sim_manager;
     prim::SimJob *show_job;   // current job result being shown

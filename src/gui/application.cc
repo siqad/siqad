@@ -311,7 +311,7 @@ void gui::ApplicationGUI::loadSettings()
   // autosave related settings
   settings::AppSettings *app_settings = settings::AppSettings::instance();
   autosave_num = app_settings->get<int>("save/autosavenum");
-  autosave_root.setPath(app_settings->get<QString>("save/autosaveroot"));
+  autosave_root.setPath(app_settings->getPath("save/autosaveroot"));
 
   // autosave directory for current instance
   qint64 tag = QCoreApplication::applicationPid();

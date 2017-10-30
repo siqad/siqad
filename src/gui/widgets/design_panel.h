@@ -96,6 +96,7 @@ namespace gui{
 
     // return the current display mode
     DisplayMode displayMode() {return display_mode;}
+    void setDisplayMode(DisplayMode mode);
 
     // SAVE
 

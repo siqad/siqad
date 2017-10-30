@@ -183,8 +183,7 @@ bool SimJob::processResults()
 QString SimJob::runtimeTempDir()
 {
   if(run_job_dir.isEmpty()){
-    run_job_dir = engine->runtimeTempDir() + "/";
-    run_job_dir += name().isEmpty() ? QDateTime::currentDateTime().toString("MM-dd_HHmm") : name();
+    run_job_dir = QDir(engine->runtimeTempDir()).filePath(name().isEmpty() ? QDateTime::currentDateTime().toString("MM-dd_HHmm") : name());
   }
   QDir job_qdir(run_job_dir);
   if(!job_qdir.exists())
@@ -196,7 +195,7 @@ QString SimJob::runtimeTempDir()
 QString SimJob::problemFile()
 {
   if(problem_path.isEmpty())
-    problem_path = runtimeTempDir() + "/sim_problem.xml";
+    problem_path = QDir(runtimeTempDir()).filePath("sim_problem.xml");
   return problem_path;
 }
 
@@ -204,7 +203,7 @@ QString SimJob::problemFile()
 QString SimJob::resultFile()
 {
   if(result_path.isEmpty())
-    result_path = runtimeTempDir() + "/sim_result.xml";
+    result_path = QDir(runtimeTempDir()).filePath("sim_result.xml");
   return result_path;
 }
 
