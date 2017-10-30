@@ -226,12 +226,16 @@ namespace gui{
 
     class MoveItem;         // move a single Item
 
+
+
+    class CreateElectrode;         // create an electrode at the given points
+
     // functions including undo/redo behaviour
 
     // create dangling bonds in the surface at all selected lattice dots
     void createDBs();
 
-    void createElectrodes(QPoint, QPoint);
+    void createElectrodes(QPoint p1);
 
     // delete all selected items
     void deleteSelection();
@@ -356,6 +360,29 @@ namespace gui{
     QPointF offset;   // amount by which to move the Item
     int layer_index;  // index of layer containing the Item
     int item_index;   // index of item in Layer imte stack
+  };
+
+
+  class DesignPanel::CreateElectrode
+  {
+  public:
+    // create an electrode at the given points
+    CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2);
+
+  private:
+
+
+    void create();  // create the dangling bond
+    void destroy(); // destroy the dangling bond
+
+    DesignPanel *dp;  // DesignPanel pointer
+    int layer_index;  // index of layer in dp->layers stack
+
+    QPoint p1;
+    QPoint p2;
+    // internals
+    int index;              // index of electrode item in the layer item stack
+
   };
 
 

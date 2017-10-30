@@ -9,7 +9,7 @@
 #ifndef _GUI_PR_ELECTRODE_H_
 #define _GUI_PR_ELECTRODE_H_
 
-
+#include <QtWidgets>
 #include "item.h"
 
 namespace prim{
@@ -17,20 +17,19 @@ namespace prim{
   // forard declarations
   class Layer;
 
-  class Electrode: public Item
+  class Electrode: public prim::Item
   {
   public:
 
     // constructor, create an electrode given two points
     Electrode(int lay_id, QPoint p1, QPoint p2);
-    // Electrode(QPoint p1, int width, int height); //or a QPoint point and an integer width and an integer height
-
     // destructor
     ~Electrode(){}
 
     // accessors
 
-    QPoint getLoc() const {return p1;}   // get the pixel location of p1.
+    QPoint getp1(void){ return p1;}
+    QPoint getp2(void){ return p2;}
 
     // inherited abstract method implementations
 
@@ -38,23 +37,24 @@ namespace prim{
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
 
     Item *deepCopy() const;
+  //
+  protected:
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
   private:
 
     // construct static variables
     void constructStatics();
 
-
     // VARIABLES
+    QPoint p1;
+    QPoint p2;
+    QPoint topLeft;
+    int elec_width;
+    int elec_height;
 
-    QPoint p1;                // location of first point in pixels (REQUIRED)
-    QPoint p2;                // location of second point in pixels
-
-    // static class parameters for painting
-
-    static QColor edge_col;   // boundary edge color
-    static QColor fill_col;   // dot fill color (same for all lattice dots)
-
+    static QColor fill_col;          // color of fill that is drawn
+    static QColor edge_col;     // edge colour, unselected
   };
 
 } // end prim namespace

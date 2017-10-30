@@ -14,8 +14,6 @@
 
 #include <algorithm>
 
-#include "electrode.h"
-
 // constructor
 gui::DesignPanel::DesignPanel(QWidget *parent)
   : QGraphicsView(parent)
@@ -152,12 +150,10 @@ void gui::DesignPanel::addItem(prim::Item *item, int layer_index, int ind)
   }
 
   prim::Layer *layer = layer_index > 0 ? layers.at(layer_index) : top_layer;
-
   if(ind > layer->getItems().count()){
     qCritical() << tr("Invalid item index");
     return;
   }
-
   // add Item
   layer->addItem(item, ind);
   scene->addItem(item);
@@ -754,7 +750,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             break;
           case gui::DesignPanel::ElectrodeTool:
             //get start and end locations, and create the electrode.
-            createElectrodes();
+            createElectrodes(e->pos());
             break;
           case gui::DesignPanel::DragTool:
             // pan ends
@@ -1297,7 +1293,7 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
   : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), ldot(ldot)
 {
   prim::DBDot *dbdot = ldot->getDBDot();
-
+  qDebug() << tr("CreateDB::CreateDB()");
   // dbdot should be 0 if invert is false else non-zero
   if( !(invert ^ (dbdot==0)) )
     qFatal("Either trying to delete a non-existing DB or overwrite an existing one");
@@ -1339,8 +1335,33 @@ void gui::DesignPanel::CreateDB::destroy()
   }
 }
 
+// CreateElectrode class
 
+gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2)
+  : dp(dp), layer_index(layer_index), p1(p1), p2(p2)
+{
+  // dbdot index in layer
+  prim::Layer *layer = dp->getLayer(layer_index);
+  index = layer->getItems().size();
+  create();
+}
 
+void gui::DesignPanel::CreateElectrode::create()
+{
+  dp->addItem(new prim::Electrode(layer_index, p1, p2), layer_index, index);
+}
+
+void gui::DesignPanel::CreateElectrode::destroy()
+{
+  prim::Electrode *electrode = static_cast<prim::Electrode*>(dp->getLayer(layer_index)->getItem(index));
+
+  if(electrode != 0){
+
+    // destroy electrode
+    dp->removeItem(electrode, dp->getLayer(electrode->layer_id));  // deletes electrode
+    electrode = 0;
+  }
+}
 
 // FromAggregate class
 gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
@@ -1572,16 +1593,15 @@ void gui::DesignPanel::createDBs()
   for(QGraphicsItem *gitem : selection)
     undo_stack->push(new CreateDB(static_cast<prim::LatticeDot *>(gitem), layer_index, this));
   undo_stack->endMacro();
+  qDebug() << tr("Finished endMacro");
 }
 
-void gui::DesignPanel::createElectrodes(QPoint p1, QPoint p2)
+void gui::DesignPanel::createElectrodes(QPoint p1)
 {
-  Electrode elec(mouse_pos_cached, e->pos())
-  QPoint test = elec.getLoc();
-  qCritical() << tr("getLoc() returns: %1, %2").arg(test.x()).arg(test.y());
-  qCritical() << tr("Creating electrodes now!");
-  qCritical() << tr("P1 x = %1, y = %2").arg(p1.x()).arg(p1.y());
-  qCritical() << tr("P2 x = %1, y = %2").arg(p2.x()).arg(p2.y());
+  QPoint p2 = mouse_pos_cached;
+
+  int layer_index = layers.indexOf(top_layer);
+  CreateElectrode(layer_index, this, p1, p2);
 }
 
 void gui::DesignPanel::deleteSelection()
