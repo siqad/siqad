@@ -79,6 +79,9 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   QScrollBar *hsb = horizontalScrollBar();
   vsb->setValue(vsb->minimum());
   hsb->setValue(hsb->minimum());
+
+  // set display mode
+  display_mode = DesignMode;
 }
 
 // destructor
@@ -134,6 +137,9 @@ void gui::DesignPanel::resetDesignPanel()
   QScrollBar *hsb = horizontalScrollBar();
   vsb->setValue(vsb->minimum());
   hsb->setValue(hsb->minimum());
+
+  // set display mode
+  display_mode = DesignMode;
 
   qDebug() << tr("Design Panel reset complete");
 }
@@ -543,8 +549,8 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
 // SIMULATION RESULT DISPLAY
 void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
 {
-  // TODO don't allow design modifications in displaySimResults mode!
   // TODO in the future, show results in a pop up windows instead of the result screen itself
+  display_mode = SimDisplayMode;
 
   if(!job){
     qDebug() << tr("DisplayPanel: Job pointer invalid");
@@ -557,7 +563,7 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
   }
 
   // grab a list of DBDots in the order of job->physlocs
-  QList<prim::DBDot*> db_dots_result;
+  db_dots_result.clear();
   qreal scale_factor = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
   for(auto job_pl : job->physlocs){
     QPointF scene_loc;
@@ -590,9 +596,14 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
 
 void gui::DesignPanel::clearSimResults()
 {
+  display_mode = DesignMode;
+
   // set show_elec of all DBDots to 0
-  // maybe also set some mode for simulation result display, and just set that mode to design mode
+  if(!db_dots_result.isEmpty())
+    for(auto *db : db_dots_result)
+      db->setShowElec(0);
 }
+
 
 
 // SLOTS
@@ -601,12 +612,16 @@ void gui::DesignPanel::selectClicked(prim::Item *)
 {
   // for now, if an item is clicked in selection mode, act as though the highest
   // level aggregate was clicked
-  if(tool_type == gui::DesignPanel::SelectTool)
+  if(tool_type == gui::DesignPanel::SelectTool && display_mode == DesignMode)
     initMove();
 
 }
 
-
+void gui::DesignPanel::simDockVisibilityChanged(bool visible)
+{
+  if(!visible)
+    clearSimResults();
+}
 
 // INTERRUPTS
 
@@ -672,7 +687,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     if(snapGhost(scene_pos, offset))
       prim::Ghost::instance()->moveBy(offset.x(), offset.y());
   }
-  /* DB ghosting when DBGen tool is in use - deal with this later
+  /* TODO DB ghosting when DBGen tool is in use
     else if(tool_type == gui::DesignPanel::DBGenTool){
      show "ghost" of new DB
     QPointF scene_pos = mapToScene(e->pos());
@@ -847,11 +862,13 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
         }
         break;
       case Qt::Key_G:
-        // grouping behaviour for selecting surface dangling bonds
-        if(keymods == (Qt::ControlModifier | Qt::ShiftModifier))
-          splitAggregates();
-        else if(keymods == Qt::ControlModifier)
-          formAggregate();
+        if(display_mode == DesignMode){
+          // grouping behaviour for selecting surface dangling bonds
+          if(keymods == (Qt::ControlModifier | Qt::ShiftModifier))
+            splitAggregates();
+          else if(keymods == Qt::ControlModifier)
+            formAggregate();
+        }
         break;
       case Qt::Key_C:
         // copy selected items to the clipboard
@@ -859,28 +876,30 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
         break;
       case Qt::Key_V:{
         // create ghost for clipboard if any
-        if(!clipboard.isEmpty())
+        if(!clipboard.isEmpty() && display_mode == DesignMode)
           createGhost(true);
         break;
       }
       case Qt::Key_Z:{
-        // undo/redo based on keymods
-        //qDebug() << tr("Index before undo/redo: %1").arg(undo_stack->index());
-        if(keymods == (Qt::ControlModifier | Qt::ShiftModifier))
-          undo_stack->redo();
-        else if(keymods == Qt::ControlModifier)
-          undo_stack->undo();
+          if(display_mode == DesignMode){
+            // undo/redo based on keymods
+            //qDebug() << tr("Index before undo/redo: %1").arg(undo_stack->index());
+            if(keymods == (Qt::ControlModifier | Qt::ShiftModifier))
+              undo_stack->redo();
+            else if(keymods == Qt::ControlModifier)
+              undo_stack->undo();
+            //qDebug() << tr("Index after undo/redo: %1").arg(undo_stack->index());
+            //qDebug() << tr("ptr %1").arg((size_t)undo_stack->command(undo_stack->index()));
+          }
         }
-        //qDebug() << tr("Index after undo/redo: %1").arg(undo_stack->index());
-        //qDebug() << tr("ptr %1").arg((size_t)undo_stack->command(undo_stack->index()));
         break;
       case Qt::Key_Y:{
-        if(keymods == Qt::ControlModifier)
+        if(keymods == Qt::ControlModifier && display_mode == DesignMode)
           undo_stack->redo();
         break;
       }
       case Qt::Key_X:{
-        if(keymods == Qt::ControlModifier){
+        if(keymods == Qt::ControlModifier && display_mode == DesignMode){
           // copy current selection
           copySelection();
           // delete current selection
@@ -888,9 +907,10 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
         }
         break;
       }
+      case Qt::Key_Backspace:
       case Qt::Key_Delete:
         // delete selected items
-        if(tool_type == gui::DesignPanel::SelectTool)
+        if(tool_type == gui::DesignPanel::SelectTool && display_mode == DesignMode)
           deleteSelection();
         break;
       case Qt::Key_S:
@@ -1535,6 +1555,10 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
   // for Aggregates, move only the contained Items
   for(prim::Item *item : agg->getChildren())
     moveItem(item, delta);
+
+  // workaround to make sure the boundingRect scene position is updated
+  agg->setPos(agg->scenePos()+QPointF(1,0));
+  agg->setPos(agg->scenePos()+QPointF(-1,0));
 }
 
 

@@ -59,12 +59,6 @@ gui::ApplicationGUI::~ApplicationGUI()
 
 void gui::ApplicationGUI::initGUI()
 {
-  // initialise bars
-  initMenuBar();
-  initTopBar();
-  initSideBar();
-  initOptionDock();
-
   // initialise mainwindow panels
   dialog_pan = new gui::DialogPanel(this);
   design_pan = new gui::DesignPanel(this);
@@ -72,7 +66,12 @@ void gui::ApplicationGUI::initGUI()
   info_pan = new gui::InfoPanel(this);
   sim_manager = new gui::SimManager(this);
   sim_visualize = new gui::SimVisualize(sim_manager, this);
-  option_dock->setWidget(sim_visualize);
+
+  // initialise bars
+  initMenuBar();
+  initTopBar();
+  initSideBar();
+  initOptionDock();
 
   // inter-widget signals
   connect(sim_manager, &gui::SimManager::emitSimJob, this, &gui::ApplicationGUI::runSimulation);
@@ -90,9 +89,9 @@ void gui::ApplicationGUI::initGUI()
   hbl->addLayout(vbl_l, 1);
   hbl->addWidget(info_pan, 1);
 
-  dialog_pan->hide();
-  input_field->hide();
-  info_pan->hide();
+  //dialog_pan->hide();
+  //input_field->hide();
+  //info_pan->hide();
 
   vbl->addWidget(design_pan, 2);
   vbl->addLayout(hbl, 1);
@@ -263,9 +262,15 @@ void gui::ApplicationGUI::initOptionDock()
   option_dock->setMinimumWidth(gui_settings->get<int>("ODOCK/mw"));
 
   // TODO add default widget?
+  //connect(option_dock, SIGNAL(visibilityChanged(bool)), design_pan, SLOT(simDockVisibilityChanged(bool)));
+  qDebug() << "before connect";
+  connect(option_dock, &QDockWidget::visibilityChanged, design_pan, &gui::DesignPanel::simDockVisibilityChanged);
+  qDebug() << "after connect";
 
+  option_dock->setWidget(sim_visualize);
   option_dock->hide();
   addDockWidget(area, option_dock);
+
 }
 
 
@@ -288,6 +293,8 @@ void gui::ApplicationGUI::initState()
   setTool(gui::DesignPanel::SelectTool);
   working_path.clear();
   autosave_timer.start(1000*app_settings->get<int>("save/autosaveinterval"));
+
+  save_dir = QDir::homePath();
 }
 
 
@@ -387,6 +394,10 @@ void gui::ApplicationGUI::setToolDrag()
 
 void gui::ApplicationGUI::setToolDBGen()
 {
+  if(design_pan->displayMode() != gui::DesignPanel::DesignMode){
+    qDebug() << tr("dbgen tool not allowed outside of design mode");
+    return;
+  }
   qDebug() << tr("selecting dbgen tool");
   design_pan->setTool(gui::DesignPanel::DBGenTool);
 }
@@ -834,7 +845,7 @@ bool gui::ApplicationGUI::exportToLabview()
 
   // write to file
   QString fn = QFileDialog::getSaveFileName(this, tr("Export to QSi LabView"),
-                "qsi_labview.lvm", tr("LabView files (*.lvm)"));
+                save_dir.filePath("qsi_labview.lvm"), tr("LabView files (*.lvm)"));
 
   QFile ef(fn);
   if(!ef.open(QIODevice::WriteOnly)){

@@ -184,7 +184,7 @@ void prim::DBDot::setSource(prim::LatticeDot *src)
 
 QRectF prim::DBDot::boundingRect() const
 {
-  qreal width = diameter+edge_width;
+  qreal width = diameter_l+edge_width;
   return QRectF(-.5*width, -.5*width, width, width);
 }
 

@@ -6,6 +6,6 @@
         <bin_path>simanneal/simanneal</bin_path> <!-- relative to engines.xml -->
     </engine>
     <engine>
-        <name>TestEngine</name>
+        <name>Dummy</name>
     </engine>
 </physeng>
