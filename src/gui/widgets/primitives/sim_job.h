@@ -58,6 +58,9 @@ namespace prim{
     QDateTime endTime() {return end_time;}
     bool isComplete() {return completed;} // indicate whether the job has been completed
     int distCount() {return dist_count;}  // return the number of charge distributions this has
+
+    QString terminalOutput() {return terminal_output;}
+    void saveTerminalOutput();
     
 
     // variables TODO put them back to private later, with proper accessors
@@ -75,6 +78,7 @@ namespace prim{
     QString run_job_dir;                  // job directory for storing runtime data, must access with accessor
     QString problem_path;
     QString result_path;
+    QString terminal_output;              // terminal output from the job
     QDateTime start_time, end_time;
     QProcess *sim_process;
     QStringList arguments;

@@ -90,8 +90,8 @@ void gui::ApplicationGUI::initGUI()
   hbl->addWidget(info_pan, 1);
 
   //dialog_pan->hide();
-  //input_field->hide();
-  //info_pan->hide();
+  input_field->hide();
+  info_pan->hide();
 
   vbl->addWidget(design_pan, 2);
   vbl->addLayout(hbl, 1);
@@ -640,7 +640,7 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   // set file name of [whatevername].writing while writing to prevent loss of previous save if this save fails
   QFile file(write_path+".writing");
 
-  qDebug() << write_path;
+  qDebug() << tr("About to write to %1").arg(write_path);
 
   if(!file.open(QIODevice::WriteOnly)){
     qDebug() << tr("Save: Error when opening file to save: %1").arg(file.errorString());

@@ -53,13 +53,11 @@ bool SimJob::invokeBinary()
 
   start_time = QDateTime::currentDateTime();
 
+  qDebug() << tr("SimJob: Setting up simulation process...");
   sim_process = new QProcess();
-  qDebug() << tr("SimJob: Setting binary path...");
   sim_process->setProgram(engine->binaryPath());
   //sim_process->setProgram("src/phys/physeng");
-  qDebug() << tr("SimJob: Setting arguments...");
   sim_process->setArguments(arguments);
-  qDebug() << tr("SimJob: setting process channel mode...");
   sim_process->setProcessChannelMode(QProcess::MergedChannels);
   qDebug() << tr("SimJob: Starting process");
   sim_process->start();
@@ -76,9 +74,10 @@ bool SimJob::invokeBinary()
 
   // dump output
   while(sim_process->waitForReadyRead())
-    qDebug() << sim_process->readAll();
+    terminal_output.append(QString::fromStdString(sim_process->readAll().toStdString()));
+    //qDebug() << sim_process->readAll();
 
-  qDebug() << tr("SimJob: binary has finished running.");
+  qDebug() << tr("SimJob: simulation complete. You may check the job's terminal output on the simulation visualization panel.");
   completed = true;
 
   end_time = QDateTime::currentDateTime(); // TODO instead of determining end time here, should read end time from XML for future
@@ -206,6 +205,31 @@ QString SimJob::resultFile()
     result_path = QDir(runtimeTempDir()).filePath("sim_result.xml");
   return result_path;
 }
+
+
+void SimJob::saveTerminalOutput()
+{
+  // TODO implement
+  QString save_term_path = QFileDialog::getSaveFileName(0, tr("Save Terminal Output"),
+                            QDir::home().filePath(tr("%1_term_out.txt").arg(name())), tr("TXT files (*.txt)"));
+  if(save_term_path.isEmpty())
+    return;
+
+  QFile save_f(save_term_path);
+
+  if(!save_f.open(QIODevice::WriteOnly)){
+    qWarning() << tr("Error opening file '%1' when saving terminal output").arg(save_f.errorString());
+    return;
+  }
+
+  QTextStream save_s(&save_f);
+  save_s << terminalOutput();
+
+  save_f.close();
+}
+
+
+// PRIVATE
 
 void SimJob::deduplicateDist()
 {

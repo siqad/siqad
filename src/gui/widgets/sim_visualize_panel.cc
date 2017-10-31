@@ -49,6 +49,44 @@ bool SimVisualize::showJob(prim::SimJob *job)
 }
 
 
+void SimVisualize::showJobTerminalOutput()
+{
+  if(!show_job){
+    qWarning() << tr("No job is being shown, cannot show terminal output.");
+    return;
+  }
+
+  // main widget for the terminal output window
+  QWidget *w_job_term = new QWidget(this, Qt::Dialog);
+  
+  QPlainTextEdit *te_term_output = new QPlainTextEdit;
+  te_term_output->appendPlainText(show_job->terminalOutput());
+  QPushButton *button_save_term_out = new QPushButton(tr("Save"));
+  QPushButton *button_close_term_out = new QPushButton(tr("Close"));
+
+  button_save_term_out->setShortcut(tr("CTRL+S"));
+  button_close_term_out->setShortcut(tr("Esc"));
+
+  connect(button_save_term_out, &QAbstractButton::clicked, show_job, &prim::SimJob::saveTerminalOutput);
+  connect(button_close_term_out, &QAbstractButton::clicked, w_job_term, &QWidget::close);
+
+  // layout
+  QHBoxLayout *job_term_buttons_hl = new QHBoxLayout;
+  job_term_buttons_hl->addStretch(1);
+  job_term_buttons_hl->addWidget(button_save_term_out);
+  job_term_buttons_hl->addWidget(button_close_term_out);
+  QVBoxLayout *job_term_vl = new QVBoxLayout;
+  job_term_vl->addWidget(te_term_output);
+  job_term_vl->addLayout(job_term_buttons_hl);
+
+  // pop-up widget
+  w_job_term->setWindowTitle(tr("%1 Terminal Output").arg(show_job->name()));
+  w_job_term->setLayout(job_term_vl);
+  
+  w_job_term->show();
+}
+
+
 void SimVisualize::updateJobSelCombo()
 {
   if(!combo_job_sel)
@@ -143,6 +181,8 @@ void SimVisualize::initSimVisualize()
   text_job_start_time = new QLabel;
   text_job_end_time = new QLabel;
 
+  button_show_term_out = new QPushButton("Show Terminal Output");
+
   text_job_engine->setAlignment(Qt::AlignRight);
   text_job_start_time->setAlignment(Qt::AlignRight);
   text_job_end_time->setAlignment(Qt::AlignRight);
@@ -170,6 +210,7 @@ void SimVisualize::initSimVisualize()
   job_info_layout->addLayout(job_engine_hl);
   job_info_layout->addLayout(job_start_time_hl);
   job_info_layout->addLayout(job_end_time_hl);
+  job_info_layout->addWidget(button_show_term_out);
   job_info_group->setLayout(job_info_layout);
 
   // Elec Distribution Group
@@ -200,6 +241,7 @@ void SimVisualize::initSimVisualize()
   dist_group->setLayout(dist_vl);
 
   // signal connection
+  connect(button_show_term_out, &QAbstractButton::clicked, this, &gui::SimVisualize::showJobTerminalOutput);
   connect(combo_job_sel, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &gui::SimVisualize::jobSelUpdate);
   connect(combo_dist_sel, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &gui::SimVisualize::distSelUpdate);
   connect(button_dist_prev, &QAbstractButton::clicked, this, &gui::SimVisualize::distPrev);
