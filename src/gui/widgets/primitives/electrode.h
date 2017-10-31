@@ -50,11 +50,18 @@ namespace prim{
     QPoint p1;
     QPoint p2;
     QPoint topLeft;
+
     int elec_width;
     int elec_height;
 
-    static QColor fill_col;          // color of fill that is drawn
-    static QColor edge_col;     // edge colour, unselected
+    static qreal edge_width;  // proportional width of dot boundary edge
+
+    static QColor edge_col;   // boundary edge color
+    static QColor fill_col;   // dot fill color (same for all lattice dots)
+
+    static qreal in_fill;       // fil factor for inner circle
+    static QColor in_fill_col;  // colour of inner circle
+
   };
 
 } // end prim namespace

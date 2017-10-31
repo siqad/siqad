@@ -1340,7 +1340,6 @@ void gui::DesignPanel::CreateDB::destroy()
 gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2)
   : dp(dp), layer_index(layer_index), p1(p1), p2(p2)
 {
-  // dbdot index in layer
   prim::Layer *layer = dp->getLayer(layer_index);
   index = layer->getItems().size();
   create();
@@ -1356,7 +1355,6 @@ void gui::DesignPanel::CreateElectrode::destroy()
   prim::Electrode *electrode = static_cast<prim::Electrode*>(dp->getLayer(layer_index)->getItem(index));
 
   if(electrode != 0){
-
     // destroy electrode
     dp->removeItem(electrode, dp->getLayer(electrode->layer_id));  // deletes electrode
     electrode = 0;
@@ -1598,10 +1596,9 @@ void gui::DesignPanel::createDBs()
 
 void gui::DesignPanel::createElectrodes(QPoint p1)
 {
-  QPoint p2 = mouse_pos_cached;
-
+  QPoint p2 = mapToScene(mouse_pos_cached).toPoint(); //get coordinates relative to top-left
   int layer_index = layers.indexOf(top_layer);
-  CreateElectrode(layer_index, this, p1, p2);
+  CreateElectrode(layer_index, this, mapToScene(p1).toPoint(), p2);
 }
 
 void gui::DesignPanel::deleteSelection()
