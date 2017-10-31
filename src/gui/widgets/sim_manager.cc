@@ -100,12 +100,7 @@ void SimManager::initSimActionsPan()
 
 void SimManager::initSimSetupDialog()
 {
-  qDebug() << tr("Entered initSimSetupDialog");
-  //if(sim_setup_dialog)
-  //  delete sim_setup_dialog;
-
   sim_setup_dialog = new QWidget(this, Qt::Dialog);
-  qDebug() << tr("Created sim setup dialog");
   
   // Engine Select Group
   QGroupBox *engine_sel_group = new QGroupBox(tr("Engine Selection"));
@@ -137,7 +132,6 @@ void SimManager::initSimSetupDialog()
   engine_sel_vl->addLayout(job_nm_hl);
 
   engine_sel_group->setLayout(engine_sel_vl);
-  qDebug() << tr("engine_sel_group done");
 
   // Sim Params Group
   QGroupBox *sim_params_group = new QGroupBox(tr("Simulation Parameters"));
@@ -171,7 +165,6 @@ void SimManager::initSimSetupDialog()
   sim_params_vl->addLayout(global_v0_hl);
 
   sim_params_group->setLayout(sim_params_vl);
-  qDebug() << tr("sim_params_group done");
 
   // Bottom Buttons
   QPushButton *button_run = new QPushButton(tr("&Run"));
@@ -280,7 +273,7 @@ void SimManager::initEngines()
   }
 
   QXmlStreamReader eng_s(&eng_f);
-  qDebug() << tr("Beginning to read engine library from %1").arg(eng_f.fileName());
+  qDebug() << tr("Reading engine library from %1").arg(eng_f.fileName());
 
   QString read_eng_nm, read_eng_ver, read_bin_path;
   while(!eng_s.atEnd()){
@@ -319,9 +312,9 @@ void SimManager::initEngines()
       eng_s.readNext();
   }
 
-  // TODO save to simulators stack
-
   eng_f.close();
+
+  qDebug() << tr("Successfully read physics engine library");
 }
 
 void SimManager::simParamSetup()

@@ -45,11 +45,6 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 
   tool_type = gui::DesignPanel::NoneTool;     // now setTool will update the tool
 
-  // rubber band selection
-  // replaced with custom rubberBandUpdate, delete this later
-  //setRubberBandSelectionMode(Qt::IntersectsItemBoundingRect);
-  //setStyleSheet("selection-background-color: rgba(100, 100, 255, 10)");
-
   // set view behaviour
   setTransformationAnchor(QGraphicsView::NoAnchor);
   setResizeAnchor(QGraphicsView::AnchorViewCenter);

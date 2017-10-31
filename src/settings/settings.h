@@ -84,13 +84,17 @@ public:
 
     // perform replacement
     QRegExp regex("<(.*)?>");
-    int match_ind = path_stored.indexOf(regex);
-    if(match_ind != -1 && path_map.contains(regex.capturedTexts().first())){
+    while(path_stored.indexOf(regex) != -1){
+      if(!path_map.contains(regex.capturedTexts().first()))
+        qFatal(tr("Path replacement failed, key '%1' not found.").arg(regex.capturedTexts().first()).toLatin1().constData(),0);
       path_stored.replace(regex, path_map[regex.capturedTexts().first()]);
-      qDebug() << tr("Path replacement successful, key '%1', new path '%2'.").arg(regex.capturedTexts().first()).arg(path_stored);
     }
-    else
-      qFatal(tr("Path replacement failed, key '%1' not found.").arg(regex.capturedTexts().first()).toLatin1().constData(),0);
+    //if(match_ind != -1 && path_map.contains(regex.capturedTexts().first())){
+    //  path_stored.replace(regex, path_map[regex.capturedTexts().first()]);
+    //  qDebug() << tr("Path replacement successful, key '%1', new path '%2'.").arg(regex.capturedTexts().first()).arg(path_stored);
+    //}
+    //else
+    //  qFatal(tr("Path replacement failed, key '%1' not found.").arg(regex.capturedTexts().first()).toLatin1().constData(),0);
 
     // return
     return path_stored;

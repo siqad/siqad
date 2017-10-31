@@ -261,11 +261,8 @@ void gui::ApplicationGUI::initOptionDock()
   // size policy
   option_dock->setMinimumWidth(gui_settings->get<int>("ODOCK/mw"));
 
-  // TODO add default widget?
-  //connect(option_dock, SIGNAL(visibilityChanged(bool)), design_pan, SLOT(simDockVisibilityChanged(bool)));
-  qDebug() << "before connect";
+  // TODO change option dock to specifically sim visualize dock
   connect(option_dock, &QDockWidget::visibilityChanged, design_pan, &gui::DesignPanel::simDockVisibilityChanged);
-  qDebug() << "after connect";
 
   option_dock->setWidget(sim_visualize);
   option_dock->hide();
@@ -639,8 +636,6 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
 
   // set file name of [whatevername].writing while writing to prevent loss of previous save if this save fails
   QFile file(write_path+".writing");
-
-  qDebug() << tr("About to write to %1").arg(write_path);
 
   if(!file.open(QIODevice::WriteOnly)){
     qDebug() << tr("Save: Error when opening file to save: %1").arg(file.errorString());

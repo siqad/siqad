@@ -23,24 +23,14 @@ SimJob::SimJob(const QString &nm, SimEngine *eng, QWidget *parent)
 // invoke the simulator binary
 bool SimJob::invokeBinary()
 {
-  // NOTE might be helpful: https://stackoverflow.com/questions/14960472/running-c-binary-from-inside-qt-and-redirecting-the-output-of-the-binary-to-a
-
-  // TODO emit signal to save problem file and wait for it to complete
-  // problem_file_path = engine->generateJobDir() + "problem_desc.xml";
-
-  qDebug() << tr("SimJob: prepare physeng binary execution"); // TODO put in other directories
-  QFileInfo problem_file_info(problemFile()); // TODO don't hard code path
+  QFileInfo problem_file_info(problemFile());
 
   // check if file exists
-  qDebug() << tr("Check if file exists...");
   if(!(problem_file_info.exists() && problem_file_info.isFile())){
     qDebug() << tr("SimJob: problem file '%1' doesn't exist.").arg(problem_file_info.filePath());
     return false;
   }
-  qDebug() << tr("SimJob: File does exist");
-
   // check if binary path exists
-  qDebug() << tr("Check if binary path exists...");
   QFileInfo bin_path_info(engine->binaryPath());
   if(!(bin_path_info.exists() && bin_path_info.isFile())){
     qDebug() << tr("SimJob: engine binary '%1' doesn't exist.").arg(bin_path_info.filePath());
@@ -49,11 +39,9 @@ bool SimJob::invokeBinary()
 
   arguments << problem_file_info.canonicalFilePath();
   arguments << resultFile();
-  //arguments << problem_file_info.canonicalPath().append("/simanneal_output.xml"); // TODO put in other directories
 
   start_time = QDateTime::currentDateTime();
 
-  qDebug() << tr("SimJob: Setting up simulation process...");
   sim_process = new QProcess();
   sim_process->setProgram(engine->binaryPath());
   //sim_process->setProgram("src/phys/physeng");
@@ -62,14 +50,10 @@ bool SimJob::invokeBinary()
   qDebug() << tr("SimJob: Starting process");
   sim_process->start();
 
-  // TODO check that &arguments contains a valid path of the problem XML
-
-  // TODO check documentation for piping outputs
-
   // TODO connect signals for error and finish
 
   // temperary solution: just wait till completion
-  qDebug() << tr("SimJob: wait for completion...");
+  qDebug() << tr("SimJob: Process started, waiting for completion...");
   while(!sim_process->waitForStarted());
 
   // dump output
@@ -97,15 +81,26 @@ bool SimJob::readResults()
   }
 
   QXmlStreamReader rs(&result_file);
-  qDebug() << tr("Beginning load from %1").arg(result_file.fileName());
+  qDebug() << tr("SimJob: Reading simulation results from %1...").arg(result_file.fileName());
 
   // TODO flag that indicates what type of data these results contain, might be useful for sim_manager
 
   while(!rs.atEnd()){
     if(rs.isStartElement()){
-      if(rs.name() == "eng_info"){
-        // TODO
+      if(rs.name() == "sim_out"){
         rs.readNext();
+      }
+      else if(rs.name() == "eng_info"){
+        while(!(rs.isEndElement() && rs.name() == "eng_info")){
+          if(!rs.readNextStartElement())
+            continue; // skip until a start element is encountered
+          if(rs.name() == "engine"){
+            // TODO
+          }
+          else if(rs.name() == "version"){
+            // TODO
+          }
+        }
       }
       else if(rs.name() == "sim_param"){
         // TODO
@@ -164,7 +159,7 @@ bool SimJob::readResults()
     return false;
   }
 
-  qDebug() << tr("Load complete");
+  qDebug() << tr("SimJob: Successfully read simulation result.");
   result_file.close();
 
   return true;

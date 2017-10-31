@@ -189,7 +189,6 @@ void prim::Aggregate::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
   // QGraphicsItem order precedence will trigger the children before the Aggregate
   // The following will only be triggered if the children pass the event up.
-  qDebug() << QObject::tr("Aggregate has seen the mousePressEvent");
 
   if(parentItem() != 0)
     e->ignore();
