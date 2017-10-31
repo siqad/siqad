@@ -266,7 +266,7 @@ void prim::DBDot::constructStatics()
 void prim::DBDot::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
   qDebug() << QObject::tr("DBDot has seen the mousePressEvent");
-
+  qDebug() << QObject::tr("lay_id: %1").arg(layer_id);
   switch(e->buttons()){
     case Qt::RightButton:
       toggleElec(); // for now, right click toggles electron. In the future, show context menu with electron toggle being one option

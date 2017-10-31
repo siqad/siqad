@@ -55,13 +55,15 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
   // draw inner circle
   if(!select_mode && isSelected()){
-      QPointF center = rect.center();
-      QSizeF size(rect.width(), rect.height());
-      rect.setSize(size*in_fill);
-      rect.moveCenter(center);
 
-      painter->setPen(Qt::NoPen);
-      painter->setBrush(in_fill_col);
+      qDebug() << QObject::tr("Electrode is selected!");
+      // QPointF center = rect.center();
+      // QSizeF size(rect.width(), rect.height());
+      // rect.setSize(size*in_fill);
+      // rect.moveCenter(center);
+      //
+      // painter->setPen(Qt::NoPen);
+      // painter->setBrush(in_fill_col);
       // painter->drawEllipse(rect);
   }
 }
@@ -74,6 +76,7 @@ prim::Item *prim::Electrode::deepCopy() const
 void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
   qDebug() << QObject::tr("Electrode has seen the mousePressEvent");
+  qDebug() << QObject::tr("lay_id: %1").arg(layer_id);
 
   switch(e->buttons()){
     case Qt::RightButton:

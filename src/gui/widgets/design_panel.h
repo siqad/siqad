@@ -141,6 +141,7 @@ namespace gui{
 
     QStack<prim::Layer*> layers;  // stack of all layers, order immutable
     prim::Layer *top_layer;       // new items added to this layer
+    prim::Layer *electrode_layer; // add electrodes to this layer
 
     // flags, change later to bit flags
     bool clicked;   // mouse left button is clicked
@@ -225,8 +226,6 @@ namespace gui{
     class DeleteLayer;      // delete an existing layer
 
     class MoveItem;         // move a single Item
-
-
 
     class CreateElectrode;         // create an electrode at the given points
 
@@ -367,7 +366,7 @@ namespace gui{
   {
   public:
     // create an electrode at the given points
-    CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2);
+    CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2, bool invert=false);
 
   private:
 
@@ -380,6 +379,9 @@ namespace gui{
 
     QPoint p1;
     QPoint p2;
+
+    bool invert;
+
     // internals
     int index;              // index of electrode item in the layer item stack
 

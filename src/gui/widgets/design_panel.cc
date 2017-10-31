@@ -70,7 +70,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 
   // surface layer active on init
   top_layer = layers.at(1);
-
+  electrode_layer = layers.at(2);
   // initialise the Ghost and set the scene
   prim::Ghost::instance()->setScene(scene);
 
@@ -123,7 +123,7 @@ void gui::DesignPanel::resetDesignPanel()
 
   buildLattice();
   top_layer = layers.at(1);
-
+  electrode_layer = layers.at(2);
   prim::Ghost::instance()->setScene(scene);
 
   resetMatrix(); // resets QTransform, which undoes the zoom
@@ -326,7 +326,14 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   // add in the dangling bond surface
   addLayer(tr("Surface"),tr("db"));
   top_layer = layers.at(1);
+
+  // add in the metal layer for electrodes
+  addLayer(tr("Metal"),tr("electrodes"));
+  electrode_layer = layers.at(2);
+
 }
+
+
 
 void gui::DesignPanel::setScenePadding(){
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
@@ -750,6 +757,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             break;
           case gui::DesignPanel::ElectrodeTool:
             //get start and end locations, and create the electrode.
+            // filterSelection(true);
             createElectrodes(e->pos());
             break;
           case gui::DesignPanel::DragTool:
@@ -1293,7 +1301,6 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
   : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), ldot(ldot)
 {
   prim::DBDot *dbdot = ldot->getDBDot();
-  qDebug() << tr("CreateDB::CreateDB()");
   // dbdot should be 0 if invert is false else non-zero
   if( !(invert ^ (dbdot==0)) )
     qFatal("Either trying to delete a non-existing DB or overwrite an existing one");
@@ -1337,10 +1344,11 @@ void gui::DesignPanel::CreateDB::destroy()
 
 // CreateElectrode class
 
-gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2)
-  : dp(dp), layer_index(layer_index), p1(p1), p2(p2)
+gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2, bool invert)
+  : dp(dp), layer_index(layer_index), p1(p1), p2(p2), invert(invert)
 {
   prim::Layer *layer = dp->getLayer(layer_index);
+  // index = invert ? layer->getItems().indexOf(dbdot) : layer->getItems().size();
   index = layer->getItems().size();
   create();
 }
@@ -1597,7 +1605,7 @@ void gui::DesignPanel::createDBs()
 void gui::DesignPanel::createElectrodes(QPoint p1)
 {
   QPoint p2 = mapToScene(mouse_pos_cached).toPoint(); //get coordinates relative to top-left
-  int layer_index = layers.indexOf(top_layer);
+  int layer_index = layers.indexOf(electrode_layer);
   CreateElectrode(layer_index, this, mapToScene(p1).toPoint(), p2);
 }
 
