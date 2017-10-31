@@ -7,13 +7,14 @@
 // @desc:     Simulated annealing physics engine
 
 #include "sim_anneal.h"
+#include <ctime>
 
 using namespace phys;
 
 SimAnneal::SimAnneal(const std::string& i_path, const std::string& o_path)
   : PhysicsEngine("SimAnneal", i_path, o_path)
 {
-
+  rng.seed(std::time(NULL));
 }
 
 
@@ -269,11 +270,13 @@ bool SimAnneal::acceptHop(float v_diff)
 // takes a probability and generates true/false accordingly
 bool SimAnneal::evalProb(float prob)
 {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<float> dis(0.0,1.0);
+  boost::random::uniform_real_distribution<float> dis(0,1);
+  boost::variate_generator<boost::random::mt19937&, boost::random::uniform_real_distribution<float>> rnd_gen(rng, dis);
 
-  return prob >= dis(gen);
+  float generated_num = rnd_gen();
+  std::cout << "Probability ha: Good if lower than " << prob << ", evaluation " << generated_num << std::endl;
+
+  return prob >= generated_num;
 }
 
 
@@ -306,12 +309,11 @@ int SimAnneal::getRandDBInd(int charge)
     return -1; // no potential candidates
 
   // pick one from them
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dis(0,dbs.size()-1);
+  boost::random::uniform_int_distribution<int> dis(0,dbs.size()-1);
+  boost::variate_generator<boost::random::mt19937&, boost::random::uniform_int_distribution<int>> rnd_gen(rng, dis);
   // TODO move these to init and make them class var, not reinitialize it every time
 
-  return dbs[dis(gen)];
+  return dbs[rnd_gen()];
 }
 
 

@@ -168,8 +168,8 @@ void SimManager::initSimSetupDialog()
 
   // Bottom Buttons
   QPushButton *button_run = new QPushButton(tr("&Run"));
-  QPushButton *button_export = new QPushButton(tr("&Export"));
-  QPushButton *button_import = new QPushButton(tr("&Import"));
+  //QPushButton *button_export = new QPushButton(tr("&Export"));
+  //QPushButton *button_import = new QPushButton(tr("&Import"));
   QPushButton *button_cancel = new QPushButton(tr("Cancel"));
 
   connect(button_run, &QAbstractButton::clicked, this, &gui::SimManager::submitSimSetup);
@@ -181,8 +181,8 @@ void SimManager::initSimSetupDialog()
   QHBoxLayout *bottom_buttons_hl = new QHBoxLayout;
   bottom_buttons_hl->addStretch(1);
   bottom_buttons_hl->addWidget(button_run);
-  bottom_buttons_hl->addWidget(button_export);
-  bottom_buttons_hl->addWidget(button_import);
+  //bottom_buttons_hl->addWidget(button_export);
+  //bottom_buttons_hl->addWidget(button_import);
   bottom_buttons_hl->addWidget(button_cancel);
 
   // bring it together

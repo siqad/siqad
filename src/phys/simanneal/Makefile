@@ -1,8 +1,21 @@
 #### PROJECT SETTINGS ####
 # The name of the executable to be created
-BIN_NAME := simanneal
+ifeq ($(FOR_OS),win)
+	CROSS = i686-w64-mingw32.static-
+	BIN_EXT = .exe
+	CXX = i686-w64-mingw32.static-g++
+	PKG_CONFIG = i686-w64-mingw32.static-pkg-config
+else
+	CROSS =
+	BIN_EXT =
+	CXX = g++
+	PKG_CONFIG = pkg-config
+endif
+BIN_NAME := simanneal$(BIN_EXT)
 # Compiler used
-CXX ?= g++
+#CXX ?= $(CROSS)g++
+# Package config
+#PKG_CONFIG = $(CROSS)pkg-config
 # Extension of source files used in the project
 SRC_EXT = cc
 # Path to the source directory, relative to the makefile
@@ -55,8 +68,8 @@ INSTALL_DATA = $(INSTALL) -m 644
 
 # Append pkg-config specific libraries if need be
 ifneq ($(LIBS),)
-	COMPILE_FLAGS += $(shell pkg-config --cflags $(LIBS))
-	LINK_FLAGS += $(shell pkg-config --libs $(LIBS))
+	COMPILE_FLAGS += $(shell $(PKG_CONFIG) --cflags $(LIBS))
+	LINK_FLAGS += $(shell $(PKG_CONFIG) --libs $(LIBS))
 endif
 
 # Verbose option, to output compile and link commands
@@ -73,11 +86,11 @@ debug: export CXXFLAGS := $(CXXFLAGS) $(COMPILE_FLAGS) $(DCOMPILE_FLAGS)
 debug: export LDFLAGS := $(LDFLAGS) $(LINK_FLAGS) $(DLINK_FLAGS)
 
 # Build and output paths
-release: export BUILD_PATH := build/release
-release: export BIN_PATH := bin/release
-debug: export BUILD_PATH := build/debug
-debug: export BIN_PATH := bin/debug
-install: export BIN_PATH := bin/release
+release: export BUILD_PATH := build/release$(FOR_OS)
+release: export BIN_PATH := bin/release$(FOR_OS)
+debug: export BUILD_PATH := build/debug$(FOR_OS)
+debug: export BIN_PATH := bin/debug$(FOR_OS)
+install: export BIN_PATH := bin/release$(FOR_OS)
 
 # Find all source files in the source directory, sorted by most
 # recently modified

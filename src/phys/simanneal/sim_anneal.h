@@ -12,7 +12,8 @@
 #include <tuple>
 #include <memory>
 #include <cmath>
-#include <random>
+
+#include <boost/random.hpp>
 
 namespace phys {
 
@@ -53,6 +54,7 @@ namespace phys {
     int chargedDBCount(int charge);
 
 
+    boost::random::mt19937 rng;
 
     // VARIABLES
     const int div_0 = 1E5; // arbitrary big number that represents divide by 0
