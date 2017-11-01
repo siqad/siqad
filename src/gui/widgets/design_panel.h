@@ -227,7 +227,7 @@ namespace gui{
 
     class MoveItem;         // move a single Item
 
-    class CreateElectrode;         // create an electrode at the given points
+    class CreateElectrode;  // create an electrode at the given points
 
     // functions including undo/redo behaviour
 
@@ -354,6 +354,8 @@ namespace gui{
     // move an Aggregate by the given amount
     void moveAggregate(prim::Aggregate *agg, const QPointF &delta);
 
+    //move an Electrode by the given amount
+    void moveElectrode(prim::Electrode *electrode, const QPointF &delta);
     DesignPanel *dp;
 
     QPointF offset;   // amount by which to move the Item
@@ -362,11 +364,11 @@ namespace gui{
   };
 
 
-  class DesignPanel::CreateElectrode
+  class DesignPanel::CreateElectrode : public QUndoCommand
   {
   public:
     // create an electrode at the given points
-    CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2, bool invert=false);
+    CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2, bool invert=false, QUndoCommand *parent=0);
 
   private:
 

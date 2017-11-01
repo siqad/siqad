@@ -30,7 +30,7 @@ namespace prim{
 
     QPoint getp1(void){ return p1;}
     QPoint getp2(void){ return p2;}
-
+    QPoint gettopLeft(void) {return topLeft;}
     // inherited abstract method implementations
 
     QRectF boundingRect() const Q_DECL_OVERRIDE;

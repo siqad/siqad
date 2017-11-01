@@ -757,7 +757,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             break;
           case gui::DesignPanel::ElectrodeTool:
             //get start and end locations, and create the electrode.
-            // filterSelection(true);
+            filterSelection(true);
             createElectrodes(e->pos());
             break;
           case gui::DesignPanel::DragTool:
@@ -1009,7 +1009,7 @@ void gui::DesignPanel::boundZoom(qreal &ds)
 void gui::DesignPanel::filterSelection(bool select_flag)
 {
   // should only be here if tool type is either select or dbgen
-  if(tool_type != gui::DesignPanel::SelectTool && tool_type != gui::DesignPanel::DBGenTool){
+  if(tool_type != gui::DesignPanel::SelectTool && tool_type != gui::DesignPanel::DBGenTool && tool_type != gui::DesignPanel::ElectrodeTool){
     qCritical() << tr("Filtering selection with invalid tool type...");
     return;
   }
@@ -1344,8 +1344,8 @@ void gui::DesignPanel::CreateDB::destroy()
 
 // CreateElectrode class
 
-gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2, bool invert)
-  : dp(dp), layer_index(layer_index), p1(p1), p2(p2), invert(invert)
+gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), layer_index(layer_index), p1(p1), p2(p2), invert(invert)
 {
   prim::Layer *layer = dp->getLayer(layer_index);
   // index = invert ? layer->getItems().indexOf(dbdot) : layer->getItems().size();
@@ -1538,6 +1538,9 @@ void gui::DesignPanel::MoveItem::moveItem(prim::Item *item, const QPointF &delta
     case prim::Item::Aggregate:
       moveAggregate(static_cast<prim::Aggregate*>(item), delta);
       break;
+    case prim::Item::Electrode:
+      moveElectrode(static_cast<prim::Electrode*>(item), delta);
+      break;
     default:
       item->moveBy(delta.x(), delta.y());
       break;
@@ -1571,7 +1574,24 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
     moveItem(item, delta);
 }
 
+void gui::DesignPanel::MoveItem::moveElectrode(prim::Electrode *electrode, const QPointF &delta)
+{
+  // get the target LatticeDot
+  QList<QGraphicsItem*> cands = electrode->scene()->items(electrode->scenePos()+delta);
+  prim::LatticeDot *ldot=0;
+  for(QGraphicsItem *cand : cands){
+    if(static_cast<prim::Item*>(cand)->item_type == prim::Item::LatticeDot){
+      ldot=static_cast<prim::LatticeDot*>(cand);
+      break;
+    }
+  }
 
+  if(ldot==0)
+    qCritical() << tr("Failed to move Electrode");
+  else
+    qDebug() << tr("Moving electrode");
+    // electrode->setTopLeft(electrode->gettopLeft()+delta, QSize());
+}
 
 
 // Undo/Redo Methods
@@ -1605,8 +1625,10 @@ void gui::DesignPanel::createDBs()
 void gui::DesignPanel::createElectrodes(QPoint p1)
 {
   QPoint p2 = mapToScene(mouse_pos_cached).toPoint(); //get coordinates relative to top-left
+  // QPoint p2 = mouse_pos_cached; //get coordinates relative to top-left
   int layer_index = layers.indexOf(electrode_layer);
   CreateElectrode(layer_index, this, mapToScene(p1).toPoint(), p2);
+  // CreateElectrode(layer_index, this, p1, p2);
 }
 
 void gui::DesignPanel::deleteSelection()

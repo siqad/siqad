@@ -30,6 +30,7 @@ prim::Electrode::Electrode(int lay_id, QPoint p1, QPoint p2):
   elec_height = (std::max(p1.y(), p2.y()) - std::min(p1.y(), p2.y()));
   topLeft.setX(std::min(p1.x(), p2.x()));
   topLeft.setY(std::min(p1.y(), p2.y()));
+  setPos(mapToScene(topLeft).toPoint());
   // flags
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
@@ -38,7 +39,8 @@ QRectF prim::Electrode::boundingRect() const
 {
   qreal width = elec_width+edge_width;
   qreal height = elec_height+edge_width;
-  return QRectF(mapToScene(topLeft), QSizeF(width, height));
+  return QRectF(0, 0, width, height);
+  // return QRectF(-0.5*width, -0.5*height, width, height);
 }
 
 // NOTE: nothing in this paint method changes... possibly cache background as
@@ -54,17 +56,17 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
   painter->drawRect(rect);
 
   // draw inner circle
-  if(!select_mode && isSelected()){
+  if(select_mode && isSelected()){
 
       qDebug() << QObject::tr("Electrode is selected!");
-      // QPointF center = rect.center();
-      // QSizeF size(rect.width(), rect.height());
-      // rect.setSize(size*in_fill);
-      // rect.moveCenter(center);
-      //
-      // painter->setPen(Qt::NoPen);
-      // painter->setBrush(in_fill_col);
-      // painter->drawEllipse(rect);
+      QPointF center = rect.center();
+      QSizeF size(rect.width(), rect.height());
+      rect.setSize(size*in_fill);
+      rect.moveCenter(center);
+
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(in_fill_col);
+      painter->drawEllipse(rect);
   }
 }
 
