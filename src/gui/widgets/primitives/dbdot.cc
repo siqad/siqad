@@ -39,8 +39,8 @@ prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
   : prim::Item(prim::Item::DBDot)
 {
   QPointF scene_loc; // physical location from file
-  int lay_id; // layer id from file
-  int elec_in;
+  int lay_id=-1; // layer id from file
+  int elec_in=0;
 
   while(!stream->atEnd()){
     if(stream->isStartElement()){

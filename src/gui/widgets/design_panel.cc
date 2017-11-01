@@ -464,7 +464,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
         // keep reading until end of gui tag
         while(stream->name() != "gui"){
           if(stream->isStartElement()){
-            qreal zoom,scroll_v,scroll_h;
+            qreal zoom=1, scroll_v=0, scroll_h=0;
             if(stream->name() == "zoom"){
               zoom = stream->readElementText().toDouble();
             }

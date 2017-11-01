@@ -15,4 +15,4 @@ Makefile
 
 # other
 *.swp
-
+.qmake.stash
