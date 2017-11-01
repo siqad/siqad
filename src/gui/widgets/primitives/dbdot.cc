@@ -44,7 +44,9 @@ prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
 
   while(!stream->atEnd()){
     if(stream->isStartElement()){
-      if(stream->name() == "layer_id"){
+      if(stream->name() == "dbdot")
+        stream->readNext();
+      else if(stream->name() == "layer_id"){
         lay_id = stream->readElementText().toInt();
         stream->readNext();
       }

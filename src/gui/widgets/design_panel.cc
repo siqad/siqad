@@ -453,8 +453,12 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
   // read from XML stream (children will be created recursively, add those children to stack)
   while(!stream->atEnd()){
     if(stream->isStartElement()){
+      // read program flags
+      if(stream->name() == "program"){
+        // TODO implement
+      }
       // read GUI flags
-      if(stream->name() == "gui"){
+      else if(stream->name() == "gui"){
         stream->readNext();
         // keep reading until end of gui tag
         while(stream->name() != "gui"){
