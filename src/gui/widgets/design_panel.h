@@ -248,6 +248,9 @@ namespace gui{
     // destroy an aggregate with all contained item
     void destroyAggregate(prim::Aggregate *agg);
 
+    // destroy an Electrode
+    void destroyElectrode(prim::Electrode *elec);
+
     // paste the current Ghost, returns True if successful
     bool pasteAtGhost();
 
@@ -372,6 +375,10 @@ namespace gui{
 
   private:
 
+    // destroy the dangling bond and update the lattice dot
+    virtual void undo();
+    // re-create the dangling bond
+    virtual void redo();
 
     void create();  // create the dangling bond
     void destroy(); // destroy the dangling bond

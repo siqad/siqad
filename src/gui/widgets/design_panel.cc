@@ -1209,6 +1209,10 @@ void gui::DesignPanel::setLatticeDotSelectability(prim::Item *item, bool flag)
       ldot = static_cast<prim::LatticeDot*>(item);
       ldot->setFlag(QGraphicsItem::ItemIsSelectable, flag);
       break;
+    case prim::Item::Electrode:
+      qDebug() << QObject::tr("Electrode movability changed.");
+      item->setFlag(QGraphicsItem::ItemIsMovable, flag);
+      break;
     default:
       break;
   }
@@ -1352,6 +1356,17 @@ gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignP
   index = layer->getItems().size();
   create();
 }
+
+void gui::DesignPanel::CreateElectrode::undo()
+{
+  invert ? create() : destroy();
+}
+
+void gui::DesignPanel::CreateElectrode::redo()
+{
+  invert ? destroy() : create();
+}
+
 
 void gui::DesignPanel::CreateElectrode::create()
 {
@@ -1538,9 +1553,11 @@ void gui::DesignPanel::MoveItem::moveItem(prim::Item *item, const QPointF &delta
     case prim::Item::Aggregate:
       moveAggregate(static_cast<prim::Aggregate*>(item), delta);
       break;
-    case prim::Item::Electrode:
-      moveElectrode(static_cast<prim::Electrode*>(item), delta);
-      break;
+    // case prim::Item::Electrode: //set the electrode as a movable object instead
+    //   // moveElectrode(static_cast<prim::Electrode*>(item), delta);
+    //   item->setFlag(QGraphicsItem::ItemIsMovable, true);
+    //   qDebug() << tr("Moving electrode");
+    //   break;
     default:
       item->moveBy(delta.x(), delta.y());
       break;
@@ -1650,6 +1667,10 @@ void gui::DesignPanel::deleteSelection()
         break;
       case prim::Item::Aggregate:
         destroyAggregate(static_cast<prim::Aggregate*>(item));
+        break;
+      case prim::Item::Electrode:
+        destroyElectrode(static_cast<prim::Electrode*>(item));
+        break;
       default:
         break;
     }
@@ -1738,6 +1759,11 @@ void gui::DesignPanel::destroyAggregate(prim::Aggregate *agg)
   }
 
   undo_stack->endMacro();
+}
+
+void gui::DesignPanel::destroyElectrode(prim::Electrode *elec)
+{
+
 }
 
 bool gui::DesignPanel::pasteAtGhost()

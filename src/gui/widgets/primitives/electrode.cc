@@ -17,6 +17,7 @@ qreal prim::Electrode::edge_width = -1;
 
 QColor prim::Electrode::edge_col;
 QColor prim::Electrode::fill_col;
+QColor prim::Electrode::selected_col; // edge colour, selected
 
 qreal prim::Electrode::in_fill;
 QColor prim::Electrode::in_fill_col;
@@ -25,7 +26,7 @@ QColor prim::Electrode::in_fill_col;
 prim::Electrode::Electrode(int lay_id, QPoint p1, QPoint p2):
   prim::Item(prim::Item::Electrode, lay_id), p1(p1), p2(p2)
 {
-  // constructStatics();
+  constructStatics();
   elec_width = (std::max(p1.x(), p2.x()) - std::min(p1.x(), p2.x()));
   elec_height = (std::max(p1.y(), p2.y()) - std::min(p1.y(), p2.y()));
   topLeft.setX(std::min(p1.x(), p2.x()));
@@ -60,13 +61,13 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
       qDebug() << QObject::tr("Electrode is selected!");
       QPointF center = rect.center();
-      QSizeF size(rect.width(), rect.height());
-      rect.setSize(size*in_fill);
+      QSizeF size(elec_width+edge_width, elec_height+edge_width);
+      rect.setSize(size);
       rect.moveCenter(center);
 
       painter->setPen(Qt::NoPen);
-      painter->setBrush(in_fill_col);
-      painter->drawEllipse(rect);
+      painter->setBrush(selected_col);
+      painter->drawRect(rect);
   }
 }
 
@@ -93,9 +94,11 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 void prim::Electrode::constructStatics() //needs to be changed to look at electrode settings instead.
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
-  edge_width = gui_settings->get<qreal>("latdot/edge_width");
-  edge_col= gui_settings->get<QColor>("latdot/edge_col");
-  fill_col= gui_settings->get<QColor>("latdot/fill_col");
-  in_fill = gui_settings->get<qreal>("latdot/inner_fill");
-  in_fill_col = gui_settings->get<QColor>("latdot/inner_fill_col");
+  edge_width = gui_settings->get<qreal>("dbdot/edge_width");
+  edge_col= gui_settings->get<QColor>("dbdot/edge_col");
+  selected_col= gui_settings->get<QColor>("dbdot/selected_col");
+  // edge_col= gui_settings->get<QColor>("latdot/edge_col");
+  // fill_col= gui_settings->get<QColor>("latdot/fill_col");
+  // in_fill = gui_settings->get<qreal>("latdot/inner_fill");
+  // in_fill_col = gui_settings->get<QColor>("latdot/inner_fill_col");
 }

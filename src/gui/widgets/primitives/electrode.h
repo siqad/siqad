@@ -56,12 +56,14 @@ namespace prim{
 
     static qreal edge_width;  // proportional width of dot boundary edge
 
-    static QColor edge_col;   // boundary edge color
+    // static QColor edge_col;   // boundary edge color
     static QColor fill_col;   // dot fill color (same for all lattice dots)
 
     static qreal in_fill;       // fil factor for inner circle
     static QColor in_fill_col;  // colour of inner circle
 
+    static QColor edge_col;     // edge colour, unselected
+    static QColor selected_col; // edge colour, selected
   };
 
 } // end prim namespace
