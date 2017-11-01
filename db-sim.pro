@@ -102,9 +102,8 @@ UI_DIR		= $$DESTDIR/.ui
 EXEC_DIR = $$DESTDIR
 PHYS_DIR = src/phys
 
-macx {
-    EXEC_DIR = $${DESTDIR}/$${TARGET}.app/Contents/MacOS
-}
+macx:   EXEC_DIR = $${DESTDIR}/$${TARGET}.app/Contents/MacOS
+
 
 sim_common.path = $$EXEC_DIR/src/phys
 sim_common.files = \
@@ -112,6 +111,6 @@ sim_common.files = \
 INSTALLS += sim_common
 
 sim_simanneal.path = $$EXEC_DIR/src/phys/simanneal
-sim_simanneal.files = \
-    $$PHYS_DIR/simanneal/simanneal
+sim_simanneal.files = $$PHYS_DIR/simanneal/simanneal
+win32: sim_simanneal.files = $$PHYS_DIR/simanneal/simanneal.exe
 INSTALLS += sim_simanneal

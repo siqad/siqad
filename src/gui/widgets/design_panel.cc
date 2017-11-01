@@ -456,6 +456,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
       // read program flags
       if(stream->name() == "program"){
         // TODO implement
+        stream->readNext();
       }
       // read GUI flags
       else if(stream->name() == "gui"){
