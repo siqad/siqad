@@ -1,27 +1,25 @@
 #### PROJECT SETTINGS ####
 # The name of the executable to be created
 ifeq ($(FOR_OS),win)
-	CROSS = i686-w64-mingw32.static-
+	# Boost compiled with mingw32
+	MINGW_BOOST_INC = /usr/local/win32/include
+	MINGW_BOOST_LIB = /usr/local/win32/lib
+
 	BIN_EXT = .exe
-	CXX = i686-w64-mingw32.static-g++
+	CXX = i686-w64-mingw32.static-g++ -I $(MINGW_BOOST_INC) -L $(MINGW_BOOST_LIB)
 	PKG_CONFIG = i686-w64-mingw32.static-pkg-config
-else
-	CROSS =
-	BIN_EXT =
-	CXX = g++
-	PKG_CONFIG = pkg-config
 endif
 BIN_NAME := simanneal$(BIN_EXT)
 # Compiler used
-#CXX ?= $(CROSS)g++
+CXX ?= g++
 # Package config
-#PKG_CONFIG = $(CROSS)pkg-config
+PKG_CONFIG ?= pkg-config
 # Extension of source files used in the project
 SRC_EXT = cc
 # Path to the source directory, relative to the makefile
 SRC_PATH = .
 # Space-separated pkg-config libraries used by this project
-LIBS =
+LIBS = 
 # General compiler flags
 COMPILE_FLAGS = -std=c++14 -Wall -Wextra -g
 # Additional release-specific flags
@@ -31,7 +29,7 @@ DCOMPILE_FLAGS = -D DEBUG
 # Add additional include paths
 INCLUDES = -I $(SRC_PATH)
 # General linker settings
-LINK_FLAGS =
+LINK_FLAGS = 
 # Additional release-specific linker settings
 RLINK_FLAGS =
 # Additional debug-specific linker settings
@@ -40,6 +38,7 @@ DLINK_FLAGS =
 DESTDIR = /
 # Install path (bin/ is appended automatically)
 INSTALL_PREFIX = usr/local
+
 #### END PROJECT SETTINGS ####
 
 # Optionally you may move the section above to a separate config.mk file, and
