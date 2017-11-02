@@ -1524,6 +1524,8 @@ void gui::DesignPanel::MoveItem::redo()
 
 void gui::DesignPanel::MoveItem::move(bool invert)
 {
+  qDebug() << tr("layer_index = %1").arg(layer_index);
+  qDebug() << tr("item_index = %1").arg(item_index);
   prim::Layer *layer = dp->getLayer(layer_index);
   prim::Item *item = layer->getItem(item_index);
 
@@ -1545,10 +1547,14 @@ void gui::DesignPanel::MoveItem::moveItem(prim::Item *item, const QPointF &delta
 {
   switch(item->item_type){
     case prim::Item::DBDot:
+      qDebug() << tr("Moving DBDot");
       moveDBDot(static_cast<prim::DBDot*>(item), delta);
       break;
     case prim::Item::Aggregate:
       moveAggregate(static_cast<prim::Aggregate*>(item), delta);
+      break;
+    case prim::Item::Electrode:
+      qDebug() << tr("Moving Electrode");
       break;
     default:
       item->moveBy(delta.x(), delta.y());

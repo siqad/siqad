@@ -43,6 +43,8 @@ void prim::GhostDot::constructStatics()
   diameter = gui_settings->get<qreal>("ghost/dot_diameter")*scale_factor;
 }
 
+
+
 //GHOSTBOX CLASS
 prim::GhostBox::GhostBox(prim::Item *item, prim::Item *parent, QColor *pcol)
   : Item(prim::Item::GhostBox, 0, parent), pcol(pcol)
@@ -69,8 +71,6 @@ void prim::GhostBox::constructStatics()
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   // diameter = gui_settings->get<qreal>("ghost/dot_diameter")*scale_factor;
 }
-
-
 
 
 // GHOST CLASS
