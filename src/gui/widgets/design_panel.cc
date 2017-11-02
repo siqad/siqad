@@ -1315,13 +1315,11 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
 
 void gui::DesignPanel::CreateDB::undo()
 {
-  qDebug() << QObject::tr("undo()");
   invert ? create() : destroy();
 }
 
 void gui::DesignPanel::CreateDB::redo()
 {
-  qDebug() << QObject::tr("redo()");
   invert ? destroy() : create();
 }
 
@@ -1348,7 +1346,7 @@ void gui::DesignPanel::CreateDB::destroy()
 
 // CreateElectrode class
 
-gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2, prim::Electrode *elec, bool invert, QUndoCommand *parent)
+gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignPanel *dp, QPointF p1, QPointF p2, prim::Electrode *elec, bool invert, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), layer_index(layer_index), p1(p1), p2(p2), invert(invert)
 {  //if called to destroy, *elec points to selected electrode. if called to create, *elec = 0
   prim::Layer *layer = dp->getLayer(layer_index);
@@ -1646,7 +1644,10 @@ void gui::DesignPanel::deleteSelection()
         destroyAggregate(static_cast<prim::Aggregate*>(item));
         break;
       case prim::Item::Electrode:
-        undo_stack->push(new CreateElectrode( item->layer_id, this, static_cast<prim::Electrode*>(item)->getp1(), static_cast<prim::Electrode*>(item)->getp2(), static_cast<prim::Electrode*>(item), true));
+        undo_stack->push(new CreateElectrode( item->layer_id, this, QPointF(item->x(), item->y()),
+                        QPointF(item->x() + static_cast<prim::Electrode*>(item)->getwidth(),
+                        item->y() + static_cast<prim::Electrode*>(item)->getheight()),
+                        static_cast<prim::Electrode*>(item), true));
         break;
       default:
         break;
@@ -1765,6 +1766,10 @@ void gui::DesignPanel::pasteItem(prim::Ghost *ghost, prim::Item *item)
     case prim::Item::Aggregate:
       pasteAggregate(ghost, static_cast<prim::Aggregate*>(item));
       break;
+    case prim::Item::Electrode:
+      pasteElectrode(static_cast<prim::Electrode*>(item));
+      break;
+
     default:
       qCritical() << tr("No functionality for pasting given item... update pasteItem");
       break;
@@ -1800,6 +1805,11 @@ void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)
 
 }
 
+void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec)
+{
+  undo_stack->push(new CreateElectrode( elec->layer_id, this, elec->getp1() + QPointF(20, 20),
+                  elec->getp2() + QPointF(20, 20), elec, true));
+}
 
 // NOTE: currently item move relies on there being a snap target (i.e. at least
 //       one dangling bond is being moved). Should modify in future to be more

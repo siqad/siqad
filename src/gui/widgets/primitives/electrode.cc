@@ -23,7 +23,7 @@ qreal prim::Electrode::in_fill;
 QColor prim::Electrode::in_fill_col;
 
 // Draw on layer 0 for now.
-prim::Electrode::Electrode(int lay_id, QPoint p1, QPoint p2):
+prim::Electrode::Electrode(int lay_id, QPointF p1, QPointF p2):
   prim::Item(prim::Item::Electrode, lay_id), p1(p1), p2(p2)
 {
   constructStatics();
@@ -58,6 +58,7 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
   // draw inner circle
   if(select_mode && isSelected()){
+      setPos(pos());
       QPointF center = rect.center();
       QSizeF size(elec_width+edge_width, elec_height+edge_width);
       rect.setSize(size);
@@ -71,7 +72,9 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
 prim::Item *prim::Electrode::deepCopy() const
 {
-  return new prim::Electrode(layer_id, p1, p2);
+  prim::Electrode *elec = new Electrode(layer_id, p1, p2);
+  elec->setPos(pos());
+  return elec;
 }
 
 void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)

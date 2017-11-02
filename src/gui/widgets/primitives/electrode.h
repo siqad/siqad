@@ -22,15 +22,18 @@ namespace prim{
   public:
 
     // constructor, create an electrode given two points
-    Electrode(int lay_id, QPoint p1, QPoint p2);
+    Electrode(int lay_id, QPointF p1, QPointF p2);
     // destructor
     ~Electrode(){}
 
     // accessors
 
-    QPoint getp1(void){ return p1;}
-    QPoint getp2(void){ return p2;}
-    QPoint gettopLeft(void) {return topLeft;}
+    QPointF getp1(void){ return p1;}
+    QPointF getp2(void){ return p2;}
+    QPointF gettopLeft(void){return topLeft;}
+    qreal getwidth(void){return elec_width;}
+    qreal getheight(void){return elec_height;}
+    
     // inherited abstract method implementations
 
     QRectF boundingRect() const Q_DECL_OVERRIDE;
@@ -47,12 +50,12 @@ namespace prim{
     void constructStatics();
 
     // VARIABLES
-    QPoint p1;
-    QPoint p2;
-    QPoint topLeft;
+    QPointF p1;
+    QPointF p2;
+    QPointF topLeft;
 
-    int elec_width;
-    int elec_height;
+    qreal elec_width;
+    qreal elec_height;
 
     static qreal edge_width;  // proportional width of dot boundary edge
 

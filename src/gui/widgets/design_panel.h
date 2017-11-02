@@ -255,7 +255,7 @@ namespace gui{
     void pasteItem(prim::Ghost *ghost, prim::Item *item);
     void pasteDBDot(prim::Ghost *ghost, prim::DBDot *db);
     void pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg);
-
+    void pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec);
 
     // move the selected items to the current Ghost, returns True if successful
     bool moveToGhost(bool kill=false);
@@ -366,7 +366,7 @@ namespace gui{
   {
   public:
     // create an electrode at the given points
-    CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2, prim::Electrode *elec = 0, bool invert=false, QUndoCommand *parent=0);
+    CreateElectrode(int layer_index, gui::DesignPanel *dp, QPointF p1, QPointF p2, prim::Electrode *elec = 0, bool invert=false, QUndoCommand *parent=0);
 
   private:
 
@@ -381,8 +381,8 @@ namespace gui{
     DesignPanel *dp;  // DesignPanel pointer
     int layer_index;  // index of layer in dp->layers stack
 
-    QPoint p1;
-    QPoint p2;
+    QPointF p1;
+    QPointF p2;
 
     bool invert;
 

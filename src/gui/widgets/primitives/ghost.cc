@@ -43,6 +43,32 @@ void prim::GhostDot::constructStatics()
   diameter = gui_settings->get<qreal>("ghost/dot_diameter")*scale_factor;
 }
 
+//GHOSTBOX CLASS
+prim::GhostBox::GhostBox(prim::Item *item, prim::Item *parent, QColor *pcol)
+  : Item(prim::Item::GhostBox, 0, parent), pcol(pcol)
+{
+  setPos(item->pos());
+  width = static_cast<prim::Electrode*>(item)->getwidth();
+  height = static_cast<prim::Electrode*>(item)->getheight();
+}
+
+QRectF prim::GhostBox::boundingRect() const
+{
+  return QRectF(0, 0, width, height);
+}
+
+void prim::GhostBox::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
+{
+  painter->setPen(Qt::NoPen);
+  painter->setBrush(*pcol);
+  painter->drawRect(boundingRect());
+}
+
+void prim::GhostBox::constructStatics()
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  // diameter = gui_settings->get<qreal>("ghost/dot_diameter")*scale_factor;
+}
 
 
 
@@ -65,6 +91,11 @@ void prim::Ghost::cleanGhost()
   for(prim::GhostDot *dot : dots)
     delete dot;
   dots.clear();
+
+  box_sources.clear();
+  for(prim::GhostBox *box : boxes)
+    delete box;
+  boxes.clear();
 
   setPos(0,0);
   setValid(true);
@@ -253,6 +284,18 @@ void prim::Ghost::createGhostDot(prim::Item *item)
   sources.append(item);
 }
 
+
+void prim::Ghost::createGhostBox(prim::Item *item)
+{
+  qDebug() << QObject::tr("Creating Ghost Box");
+  // prim::GhostDot *dot = new prim::GhostDot(item, this, &col);
+  prim::GhostBox *box = new prim::GhostBox(item, this, &col);
+  //
+  boxes.append(box);
+  box_sources.append(item);
+}
+
+
 void prim::Ghost::prepareItem(prim::Item *item, prim::AggNode *node)
 {
   prim::AggNode *new_node;
@@ -265,12 +308,19 @@ void prim::Ghost::prepareItem(prim::Item *item, prim::AggNode *node)
     for(prim::Item *it : agg->getChildren())
       prepareItem(it, new_node);
   }
-  else if(item->item_type != prim::Item::Electrode){
+  else if(item->item_type == prim::Item::DBDot){
     // add a new index-type IndexList
     new_node = new prim::AggNode(sources.count());
     node->nodes.append(new_node);
     // create a GhostDot for the Item
     createGhostDot(item);
+  }
+  else if(item->item_type == prim::Item::Electrode){
+    // add a new index-type IndexList
+    new_node = new prim::AggNode(sources.count());
+    node->nodes.append(new_node);
+    // create a GhostDot for the Item
+    createGhostBox(item);
   }
 }
 
