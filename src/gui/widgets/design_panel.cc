@@ -1767,7 +1767,7 @@ void gui::DesignPanel::pasteItem(prim::Ghost *ghost, prim::Item *item)
       pasteAggregate(ghost, static_cast<prim::Aggregate*>(item));
       break;
     case prim::Item::Electrode:
-      pasteElectrode(static_cast<prim::Electrode*>(item));
+      pasteElectrode(ghost, static_cast<prim::Electrode*>(item));
       break;
 
     default:
