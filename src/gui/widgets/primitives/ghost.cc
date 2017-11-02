@@ -265,7 +265,7 @@ void prim::Ghost::prepareItem(prim::Item *item, prim::AggNode *node)
     for(prim::Item *it : agg->getChildren())
       prepareItem(it, new_node);
   }
-  else{
+  else if(item->item_type != prim::Item::Electrode){
     // add a new index-type IndexList
     new_node = new prim::AggNode(sources.count());
     node->nodes.append(new_node);

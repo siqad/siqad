@@ -248,9 +248,6 @@ namespace gui{
     // destroy an aggregate with all contained item
     void destroyAggregate(prim::Aggregate *agg);
 
-    // destroy an Electrode
-    void destroyElectrode(prim::Electrode *elec);
-
     // paste the current Ghost, returns True if successful
     bool pasteAtGhost();
 
@@ -357,8 +354,6 @@ namespace gui{
     // move an Aggregate by the given amount
     void moveAggregate(prim::Aggregate *agg, const QPointF &delta);
 
-    //move an Electrode by the given amount
-    void moveElectrode(prim::Electrode *electrode, const QPointF &delta);
     DesignPanel *dp;
 
     QPointF offset;   // amount by which to move the Item
@@ -371,7 +366,7 @@ namespace gui{
   {
   public:
     // create an electrode at the given points
-    CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2, bool invert=false, QUndoCommand *parent=0);
+    CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2, prim::Electrode *elec = 0, bool invert=false, QUndoCommand *parent=0);
 
   private:
 

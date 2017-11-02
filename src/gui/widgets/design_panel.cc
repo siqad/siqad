@@ -1083,8 +1083,7 @@ void gui::DesignPanel::rubberBandEnd(){
 
 void gui::DesignPanel::createGhost(bool paste)
 {
-  //qDebug() << tr("Creating ghost...");
-
+  // qDebug() << tr("Creating ghost...");
   prim::Ghost *ghost = prim::Ghost::instance();
 
   ghosting=true;
@@ -1209,8 +1208,7 @@ void gui::DesignPanel::setLatticeDotSelectability(prim::Item *item, bool flag)
       ldot = static_cast<prim::LatticeDot*>(item);
       ldot->setFlag(QGraphicsItem::ItemIsSelectable, flag);
       break;
-    case prim::Item::Electrode:
-      qDebug() << QObject::tr("Electrode movability changed.");
+    case prim::Item::Electrode: //move electrode using movable flag.
       item->setFlag(QGraphicsItem::ItemIsMovable, flag);
       break;
     default:
@@ -1317,11 +1315,13 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
 
 void gui::DesignPanel::CreateDB::undo()
 {
+  qDebug() << QObject::tr("undo()");
   invert ? create() : destroy();
 }
 
 void gui::DesignPanel::CreateDB::redo()
 {
+  qDebug() << QObject::tr("redo()");
   invert ? destroy() : create();
 }
 
@@ -1348,22 +1348,22 @@ void gui::DesignPanel::CreateDB::destroy()
 
 // CreateElectrode class
 
-gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2, bool invert, QUndoCommand *parent)
+gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignPanel *dp, QPoint p1, QPoint p2, prim::Electrode *elec, bool invert, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), layer_index(layer_index), p1(p1), p2(p2), invert(invert)
-{
+{  //if called to destroy, *elec points to selected electrode. if called to create, *elec = 0
   prim::Layer *layer = dp->getLayer(layer_index);
-  // index = invert ? layer->getItems().indexOf(dbdot) : layer->getItems().size();
-  index = layer->getItems().size();
-  create();
+  index = invert ? layer->getItems().indexOf(elec) : layer->getItems().size();
 }
 
 void gui::DesignPanel::CreateElectrode::undo()
 {
+  qDebug() << QObject::tr("undo(), p1 = (%1, %2), p2 = (%3, %4)").arg(p1.x()).arg(p1.y()).arg(p2.x()).arg(p2.y());
   invert ? create() : destroy();
 }
 
 void gui::DesignPanel::CreateElectrode::redo()
 {
+  qDebug() << QObject::tr("redo(), p1 = (%1, %2), p2 = (%3, %4)").arg(p1.x()).arg(p1.y()).arg(p2.x()).arg(p2.y());
   invert ? destroy() : create();
 }
 
@@ -1376,7 +1376,6 @@ void gui::DesignPanel::CreateElectrode::create()
 void gui::DesignPanel::CreateElectrode::destroy()
 {
   prim::Electrode *electrode = static_cast<prim::Electrode*>(dp->getLayer(layer_index)->getItem(index));
-
   if(electrode != 0){
     // destroy electrode
     dp->removeItem(electrode, dp->getLayer(electrode->layer_id));  // deletes electrode
@@ -1553,11 +1552,6 @@ void gui::DesignPanel::MoveItem::moveItem(prim::Item *item, const QPointF &delta
     case prim::Item::Aggregate:
       moveAggregate(static_cast<prim::Aggregate*>(item), delta);
       break;
-    // case prim::Item::Electrode: //set the electrode as a movable object instead
-    //   // moveElectrode(static_cast<prim::Electrode*>(item), delta);
-    //   item->setFlag(QGraphicsItem::ItemIsMovable, true);
-    //   qDebug() << tr("Moving electrode");
-    //   break;
     default:
       item->moveBy(delta.x(), delta.y());
       break;
@@ -1590,26 +1584,6 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
   for(prim::Item *item : agg->getChildren())
     moveItem(item, delta);
 }
-
-void gui::DesignPanel::MoveItem::moveElectrode(prim::Electrode *electrode, const QPointF &delta)
-{
-  // get the target LatticeDot
-  QList<QGraphicsItem*> cands = electrode->scene()->items(electrode->scenePos()+delta);
-  prim::LatticeDot *ldot=0;
-  for(QGraphicsItem *cand : cands){
-    if(static_cast<prim::Item*>(cand)->item_type == prim::Item::LatticeDot){
-      ldot=static_cast<prim::LatticeDot*>(cand);
-      break;
-    }
-  }
-
-  if(ldot==0)
-    qCritical() << tr("Failed to move Electrode");
-  else
-    qDebug() << tr("Moving electrode");
-    // electrode->setTopLeft(electrode->gettopLeft()+delta, QSize());
-}
-
 
 // Undo/Redo Methods
 
@@ -1644,7 +1618,10 @@ void gui::DesignPanel::createElectrodes(QPoint p1)
   QPoint p2 = mapToScene(mouse_pos_cached).toPoint(); //get coordinates relative to top-left
   // QPoint p2 = mouse_pos_cached; //get coordinates relative to top-left
   int layer_index = layers.indexOf(electrode_layer);
-  CreateElectrode(layer_index, this, mapToScene(p1).toPoint(), p2);
+  //only ever create one electrode at a time
+  undo_stack->beginMacro(tr("create electrode with given corners"));
+  undo_stack->push(new CreateElectrode(layer_index, this, mapToScene(p1).toPoint(), p2));
+  undo_stack->endMacro();
   // CreateElectrode(layer_index, this, p1, p2);
 }
 
@@ -1669,7 +1646,7 @@ void gui::DesignPanel::deleteSelection()
         destroyAggregate(static_cast<prim::Aggregate*>(item));
         break;
       case prim::Item::Electrode:
-        destroyElectrode(static_cast<prim::Electrode*>(item));
+        undo_stack->push(new CreateElectrode( item->layer_id, this, static_cast<prim::Electrode*>(item)->getp1(), static_cast<prim::Electrode*>(item)->getp2(), static_cast<prim::Electrode*>(item), true));
         break;
       default:
         break;
@@ -1759,11 +1736,6 @@ void gui::DesignPanel::destroyAggregate(prim::Aggregate *agg)
   }
 
   undo_stack->endMacro();
-}
-
-void gui::DesignPanel::destroyElectrode(prim::Electrode *elec)
-{
-
 }
 
 bool gui::DesignPanel::pasteAtGhost()
