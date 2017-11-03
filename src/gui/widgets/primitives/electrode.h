@@ -26,6 +26,9 @@ namespace prim{
     // destructor
     ~Electrode(){}
 
+    //setters
+    void setpot(double pot_given);
+
     // accessors
 
     QPointF getp1(void){ return p1;}
@@ -33,7 +36,7 @@ namespace prim{
     QPointF gettopLeft(void){return topLeft;}
     qreal getwidth(void){return elec_width;}
     qreal getheight(void){return elec_height;}
-    
+    double getpot(void){return potential;}
     // inherited abstract method implementations
 
     QRectF boundingRect() const Q_DECL_OVERRIDE;
@@ -43,6 +46,7 @@ namespace prim{
   //
   protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
+    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
   private:
 
@@ -54,6 +58,7 @@ namespace prim{
     QPointF p2;
     QPointF topLeft;
 
+    double potential = 0;
     qreal elec_width;
     qreal elec_height;
 

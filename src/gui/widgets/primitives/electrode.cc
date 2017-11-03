@@ -85,10 +85,27 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
     case Qt::RightButton:
       qDebug() << QObject::tr("Electrode: User right clicked.");
       qDebug() << QObject::tr("item_type: %1").arg(item_type);
+      setpot(potential-1);
       break;
     default:
       prim::Item::mousePressEvent(e);
       break;
+  }
+}
+
+void prim::Electrode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e)
+{
+  qDebug() << QObject::tr("Electrode has seen the mouseDoubleClickEvent");
+  //do something here to manipulate potential. Maybe dialog box?
+  setpot(potential+1);
+}
+
+void prim::Electrode::setpot(double pot_given)
+{
+  if (pot_given == pot_given)//check for NULL argument
+  {
+    potential = pot_given;
+    qDebug() << QObject::tr("potential = %1").arg(potential);
   }
 }
 
