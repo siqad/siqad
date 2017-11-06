@@ -64,6 +64,9 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 
   setCacheMode(QGraphicsView::CacheBackground);
 
+  //createActions
+  createActions();
+
   // make lattice and surface layer
   buildLattice();
   setScenePadding();
@@ -1005,6 +1008,249 @@ void gui::DesignPanel::boundZoom(qreal &ds)
     ds = qMin(ds, gui_settings->get<qreal>("view/zoom_max")/m-1);
 }
 
+void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *event)
+{
+    qDebug() << tr("Hello...");
+    QMenu menu(this);
+    qDebug() << tr("QMenu...");
+    menu.addAction(cutAct);
+    qDebug() << tr("cutAct...");
+    menu.addAction(copyAct);
+    qDebug() << tr("copyAct...");
+    menu.addAction(pasteAct);
+    qDebug() << tr("pasteAct...");
+    menu.exec(event->globalPos());
+    qDebug() << tr("globalPos...");
+}
+//
+// void gui::DesignPanel::newFile()
+// {
+//     infoLabel->setText(tr("Invoked <b>File|New</b>"));
+// }
+//
+// void gui::DesignPanel::open()
+// {
+//     infoLabel->setText(tr("Invoked <b>File|Open</b>"));
+// }
+//
+// void gui::DesignPanel::save()
+// {
+//     infoLabel->setText(tr("Invoked <b>File|Save</b>"));
+// }
+//
+// void gui::DesignPanel::print()
+// {
+//     infoLabel->setText(tr("Invoked <b>File|Print</b>"));
+// }
+//
+// void gui::DesignPanel::undo()
+// {
+//     infoLabel->setText(tr("Invoked <b>Edit|Undo</b>"));
+// }
+//
+// void gui::DesignPanel::redo()
+// {
+//     infoLabel->setText(tr("Invoked <b>Edit|Redo</b>"));
+// }
+//
+void gui::DesignPanel::cut()
+{
+    qDebug() << tr("Cut...");
+    // infoLabel->setText(tr("Invoked <b>Edit|Cut</b>"));
+}
+
+void gui::DesignPanel::copy()
+{
+    qDebug() << tr("Copy...");
+    // infoLabel->setText(tr("Invoked <b>Edit|Copy</b>"));
+}
+
+void gui::DesignPanel::paste()
+{
+    qDebug() << tr("Paste...");
+    // infoLabel->setText(tr("Invoked <b>Edit|Paste</b>"));
+}
+//
+// void gui::DesignPanel::bold()
+// {
+//     infoLabel->setText(tr("Invoked <b>Edit|Format|Bold</b>"));
+// }
+//
+// void gui::DesignPanel::italic()
+// {
+//     infoLabel->setText(tr("Invoked <b>Edit|Format|Italic</b>"));
+// }
+//
+// void gui::DesignPanel::leftAlign()
+// {
+//     infoLabel->setText(tr("Invoked <b>Edit|Format|Left Align</b>"));
+// }
+//
+// void gui::DesignPanel::rightAlign()
+// {
+//     infoLabel->setText(tr("Invoked <b>Edit|Format|Right Align</b>"));
+// }
+//
+// void gui::DesignPanel::justify()
+// {
+//     infoLabel->setText(tr("Invoked <b>Edit|Format|Justify</b>"));
+// }
+//
+// void gui::DesignPanel::center()
+// {
+//     infoLabel->setText(tr("Invoked <b>Edit|Format|Center</b>"));
+// }
+//
+// void gui::DesignPanel::setLineSpacing()
+// {
+//     infoLabel->setText(tr("Invoked <b>Edit|Format|Set Line Spacing</b>"));
+// }
+//
+// void gui::DesignPanel::setParagraphSpacing()
+// {
+//     infoLabel->setText(tr("Invoked <b>Edit|Format|Set Paragraph Spacing</b>"));
+// }
+//
+// void gui::DesignPanel::about()
+// {
+//     infoLabel->setText(tr("Invoked <b>Help|About</b>"));
+//     QMessageBox::about(this, tr("About Menu"),
+//             tr("The <b>Menu</b> example shows how to create "
+//                "menu-bar menus and context menus."));
+// }
+//
+// void gui::DesignPanel::aboutQt()
+// {
+//     infoLabel->setText(tr("Invoked <b>Help|About Qt</b>"));
+// }
+
+void gui::DesignPanel::createActions()
+{
+    // newAct = new QAction(tr("&New"), this);
+    // newAct->setShortcuts(QKeySequence::New);
+    // newAct->setStatusTip(tr("Create a new file"));
+    // connect(newAct, &QAction::triggered, this, &gui::DesignPanel::newFile);
+    //
+    // openAct = new QAction(tr("&Open..."), this);
+    // openAct->setShortcuts(QKeySequence::Open);
+    // openAct->setStatusTip(tr("Open an existing file"));
+    // connect(openAct, &QAction::triggered, this, &gui::DesignPanel::open);
+    //
+    // saveAct = new QAction(tr("&Save"), this);
+    // saveAct->setShortcuts(QKeySequence::Save);
+    // saveAct->setStatusTip(tr("Save the document to disk"));
+    // connect(saveAct, &QAction::triggered, this, &gui::DesignPanel::save);
+    //
+    // printAct = new QAction(tr("&Print..."), this);
+    // printAct->setShortcuts(QKeySequence::Print);
+    // printAct->setStatusTip(tr("Print the document"));
+    // connect(printAct, &QAction::triggered, this, &gui::DesignPanel::print);
+    //
+    // exitAct = new QAction(tr("E&xit"), this);
+    // exitAct->setShortcuts(QKeySequence::Quit);
+    // exitAct->setStatusTip(tr("Exit the application"));
+    // connect(exitAct, &QAction::triggered, this, &QWidget::close);
+    //
+    // undoAct = new QAction(tr("&Undo"), this);
+    // undoAct->setShortcuts(QKeySequence::Undo);
+    // undoAct->setStatusTip(tr("Undo the last operation"));
+    // connect(undoAct, &QAction::triggered, this, &gui::DesignPanel::undo);
+    //
+    // redoAct = new QAction(tr("&Redo"), this);
+    // redoAct->setShortcuts(QKeySequence::Redo);
+    // redoAct->setStatusTip(tr("Redo the last operation"));
+    // connect(redoAct, &QAction::triggered, this, &gui::DesignPanel::redo);
+    //
+    cutAct = new QAction(tr("&Cut"), this);
+    cutAct->setShortcuts(QKeySequence::Cut);
+    cutAct->setStatusTip(tr("Cut the current selection's contents to the "
+                            "clipboard"));
+    connect(cutAct, &QAction::triggered, this, &gui::DesignPanel::cut);
+
+    copyAct = new QAction(tr("&Copy"), this);
+    copyAct->setShortcuts(QKeySequence::Copy);
+    copyAct->setStatusTip(tr("Copy the current selection's contents to the "
+                             "clipboard"));
+    connect(copyAct, &QAction::triggered, this, &gui::DesignPanel::copy);
+
+    pasteAct = new QAction(tr("&Paste"), this);
+    pasteAct->setShortcuts(QKeySequence::Paste);
+    pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
+                              "selection"));
+    connect(pasteAct, &QAction::triggered, this, &gui::DesignPanel::paste);
+    //
+    // boldAct = new QAction(tr("&Bold"), this);
+    // boldAct->setCheckable(true);
+    // boldAct->setShortcut(QKeySequence::Bold);
+    // boldAct->setStatusTip(tr("Make the text bold"));
+    // connect(boldAct, &QAction::triggered, this, &gui::DesignPanel::bold);
+    //
+    // QFont boldFont = boldAct->font();
+    // boldFont.setBold(true);
+    // boldAct->setFont(boldFont);
+    //
+    // italicAct = new QAction(tr("&Italic"), this);
+    // italicAct->setCheckable(true);
+    // italicAct->setShortcut(QKeySequence::Italic);
+    // italicAct->setStatusTip(tr("Make the text italic"));
+    // connect(italicAct, &QAction::triggered, this, &gui::DesignPanel::italic);
+    //
+    // QFont italicFont = italicAct->font();
+    // italicFont.setItalic(true);
+    // italicAct->setFont(italicFont);
+    //
+    // setLineSpacingAct = new QAction(tr("Set &Line Spacing..."), this);
+    // setLineSpacingAct->setStatusTip(tr("Change the gap between the lines of a "
+    //                                    "paragraph"));
+    // connect(setLineSpacingAct, &QAction::triggered, this, &gui::DesignPanel::setLineSpacing);
+    //
+    // setParagraphSpacingAct = new QAction(tr("Set &Paragraph Spacing..."), this);
+    // setParagraphSpacingAct->setStatusTip(tr("Change the gap between paragraphs"));
+    // connect(setParagraphSpacingAct, &QAction::triggered,
+    //         this, &gui::DesignPanel::setParagraphSpacing);
+    //
+    // aboutAct = new QAction(tr("&About"), this);
+    // aboutAct->setStatusTip(tr("Show the application's About box"));
+    // connect(aboutAct, &QAction::triggered, this, &gui::DesignPanel::about);
+    //
+    // aboutQtAct = new QAction(tr("About &Qt"), this);
+    // aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
+    // connect(aboutQtAct, &QAction::triggered, qApp, &QApplication::aboutQt);
+    // connect(aboutQtAct, &QAction::triggered, this, &gui::DesignPanel::aboutQt);
+    //
+    // leftAlignAct = new QAction(tr("&Left Align"), this);
+    // leftAlignAct->setCheckable(true);
+    // leftAlignAct->setShortcut(tr("Ctrl+L"));
+    // leftAlignAct->setStatusTip(tr("Left align the selected text"));
+    // connect(leftAlignAct, &QAction::triggered, this, &gui::DesignPanel::leftAlign);
+    //
+    // rightAlignAct = new QAction(tr("&Right Align"), this);
+    // rightAlignAct->setCheckable(true);
+    // rightAlignAct->setShortcut(tr("Ctrl+R"));
+    // rightAlignAct->setStatusTip(tr("Right align the selected text"));
+    // connect(rightAlignAct, &QAction::triggered, this, &gui::DesignPanel::rightAlign);
+    //
+    // justifyAct = new QAction(tr("&Justify"), this);
+    // justifyAct->setCheckable(true);
+    // justifyAct->setShortcut(tr("Ctrl+J"));
+    // justifyAct->setStatusTip(tr("Justify the selected text"));
+    // connect(justifyAct, &QAction::triggered, this, &gui::DesignPanel::justify);
+    //
+    // centerAct = new QAction(tr("&Center"), this);
+    // centerAct->setCheckable(true);
+    // centerAct->setShortcut(tr("Ctrl+E"));
+    // centerAct->setStatusTip(tr("Center the selected text"));
+    // connect(centerAct, &QAction::triggered, this, &gui::DesignPanel::center);
+    //
+    // alignmentGroup = new QActionGroup(this);
+    // alignmentGroup->addAction(leftAlignAct);
+    // alignmentGroup->addAction(rightAlignAct);
+    // alignmentGroup->addAction(justifyAct);
+    // alignmentGroup->addAction(centerAct);
+    // leftAlignAct->setChecked(true);
+}
+
+
 
 void gui::DesignPanel::filterSelection(bool select_flag)
 {
@@ -1554,7 +1800,7 @@ void gui::DesignPanel::MoveItem::moveItem(prim::Item *item, const QPointF &delta
       moveAggregate(static_cast<prim::Aggregate*>(item), delta);
       break;
     case prim::Item::Electrode:
-      qDebug() << tr("Moving Electrode");
+      moveElectrode(static_cast<prim::Electrode*>(item), delta);
       break;
     default:
       item->moveBy(delta.x(), delta.y());
@@ -1587,6 +1833,25 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
   // for Aggregates, move only the contained Items
   for(prim::Item *item : agg->getChildren())
     moveItem(item, delta);
+}
+
+void gui::DesignPanel::MoveItem::moveElectrode(prim::Electrode *electrode, const QPointF &delta)
+{
+  qDebug() << tr("Moving Electrode");
+  // // get the target LatticeDot
+  // QList<QGraphicsItem*> cands = dot->scene()->items(dot->scenePos()+delta);
+  // prim::LatticeDot *ldot=0;
+  // for(QGraphicsItem *cand : cands){
+  //   if(static_cast<prim::Item*>(cand)->item_type == prim::Item::LatticeDot){
+  //     ldot=static_cast<prim::LatticeDot*>(cand);
+  //     break;
+  //   }
+  // }
+  //
+  // if(ldot==0)
+  //   qCritical() << tr("Failed to move DBDot");
+  // else
+    // dot->setSource(ldot);
 }
 
 // Undo/Redo Methods

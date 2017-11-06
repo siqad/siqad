@@ -11,7 +11,6 @@
 #include "src/settings/settings.h"
 
 
-
 // Initialize statics
 qreal prim::Electrode::edge_width = -1;
 
@@ -69,6 +68,10 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
       painter->drawRect(rect);
   }
 }
+
+//clocking
+//fixed
+
 
 prim::Item *prim::Electrode::deepCopy() const
 {

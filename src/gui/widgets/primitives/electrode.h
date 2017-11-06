@@ -26,6 +26,10 @@ namespace prim{
     // destructor
     ~Electrode(){}
 
+    //Electrodes will have two types, clocked (that will change over time) and fixed
+    enum ElectrodeType{Clock, Fix};
+
+    ElectrodeType electrode_type;
     //setters
     void setpot(double pot_given);
 

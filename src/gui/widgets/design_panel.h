@@ -117,6 +117,8 @@ namespace gui{
 
   protected:
 
+    void contextMenuEvent(QContextMenuEvent *event) override;
+
     // interrupts
 
     void mousePressEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
@@ -129,6 +131,27 @@ namespace gui{
     void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
     void keyReleaseEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
 
+  private slots:
+    //   void newFile();
+    //   void open();
+    //   void save();
+    //   void print();
+    //   void undo();
+    //   void redo();
+    void cut();
+    void copy();
+    void paste();
+    //   void bold();
+    //   void italic();
+    //   void leftAlign();
+    //   void rightAlign();
+    //   void justify();
+    //   void center();
+    //   void setLineSpacing();
+    //   void setParagraphSpacing();
+    //   void about();
+    //   void aboutQt();
+
   private:
 
     QGraphicsScene *scene;  // scene for the QGraphicsView
@@ -137,7 +160,6 @@ namespace gui{
 
     // copy/paste
     QList<prim::Item*> clipboard;  // cached deep copy of a set of items for pasting
-
 
     QStack<prim::Layer*> layers;  // stack of all layers, order immutable
     prim::Layer *top_layer;       // new items added to this layer
@@ -157,8 +179,6 @@ namespace gui{
     QPoint mouse_pos_old;     // old mouse position in pixels
     QPoint mouse_pos_cached;  // parameter for caching relevant mouse positions, in pixels
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
-
-
 
     // INTERNAL METHODS
 
@@ -260,6 +280,36 @@ namespace gui{
     // move the selected items to the current Ghost, returns True if successful
     bool moveToGhost(bool kill=false);
 
+    void createActions();
+  //   QMenu *fileMenu;
+  //   QMenu *editMenu;
+  //   QMenu *formatMenu;
+  //   QMenu *helpMenu;
+  //   QActionGroup *alignmentGroup;
+  //   QAction *newAct;
+  //   QAction *openAct;
+  //   QAction *saveAct;
+  //   QAction *printAct;
+  //   QAction *exitAct;
+  //   QAction *undoAct;
+  //   QAction *redoAct;
+    QAction *cutAct;
+    QAction *copyAct;
+    QAction *pasteAct;
+  //   QAction *boldAct;
+  //   QAction *italicAct;
+  //   QAction *leftAlignAct;
+  //   QAction *rightAlignAct;
+  //   QAction *justifyAct;
+  //   QAction *centerAct;
+  //   QAction *setLineSpacingAct;
+  //   QAction *setParagraphSpacingAct;
+  //   QAction *aboutAct;
+  //   QAction *aboutQtAct;
+  //   QLabel *infoLabel;
+  //
+
+
   };
 
 
@@ -353,6 +403,7 @@ namespace gui{
 
     // move an Aggregate by the given amount
     void moveAggregate(prim::Aggregate *agg, const QPointF &delta);
+    void moveElectrode(prim::Electrode *electrode, const QPointF &delta);
 
     DesignPanel *dp;
 
