@@ -96,6 +96,9 @@ namespace gui{
     // Export to Labview
     bool exportToLabview();
 
+    // About and Version
+    void aboutVersion();
+
   protected:
 
 

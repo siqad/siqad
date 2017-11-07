@@ -260,59 +260,70 @@ void SimManager::submitSimSetup()
 
 void SimManager::initEngines()
 {
-  settings::AppSettings *app_settings = settings::AppSettings::instance();
-  engine_lib_dir = app_settings->getPath("phys/eng_lib_dir");
-  engine_lib_file = app_settings->getPath("phys/eng_lib_file");
+  QString engine_lib_dir_path = settings::AppSettings::instance()->getPath("phys/eng_lib_dir");
 
-  // TODO fetch a list of available simulators
-  QFile eng_f(engine_lib_file);
+  QDir engine_lib_dir(engine_lib_dir_path);
+  QStringList engine_dir_paths = engine_lib_dir.entryList(QStringList({"*"}), QDir::AllDirs | QDir::NoDotAndDotDot);
 
-  if(!eng_f.open(QFile::ReadOnly | QFile::Text)){
-    qCritical() << tr("SimManager: Engine library file not found in %1").arg(engine_lib_file);
-    return;
+  // find all existing engines in the engine library
+  QList<QDir> engine_dirs;
+  for(QString engine_dir_path : engine_dir_paths){
+    qDebug() << tr("SimManager: Checking %1 for engine description file").arg(engine_dir_path);
+    QDir eng_dir(engine_lib_dir.filePath(engine_dir_path));
+    if(eng_dir.exists("engine_description.xml"))
+      engine_dirs.append(eng_dir);
   }
 
-  QXmlStreamReader eng_s(&eng_f);
-  qDebug() << tr("Reading engine library from %1").arg(eng_f.fileName());
+  // read each engine description file
+  for(QDir engine_dir : engine_dirs) {
+    QFile eng_f(engine_dir.absoluteFilePath("engine_description.xml"));
 
-  QString read_eng_nm, read_eng_ver, read_bin_path;
-  while(!eng_s.atEnd()){
-    if(eng_s.isStartElement()){
-      if(eng_s.name() == "physeng")
-        eng_s.readNext();
-      else if(eng_s.name() == "engine"){
-        // TODO move the following to SimEngine
-        while(!(eng_s.isEndElement() && eng_s.name() == "engine")){
-          if(!eng_s.readNextStartElement())
-            continue; // skip until a start element is encountered
-          if(eng_s.name() == "name"){
-            read_eng_nm = eng_s.readElementText();
-          }
-          else if(eng_s.name() == "version"){
-            read_eng_ver = eng_s.readElementText();
-          }
-          else if(eng_s.name() == "bin_path"){
-            read_bin_path = eng_s.readElementText();
-          }
-        }
-        prim::SimEngine *eng = new prim::SimEngine(read_eng_nm);
-        eng->setVersion(read_eng_ver);
-        eng->setBinaryPath(QDir(engine_lib_dir).filePath(read_bin_path));
-
-        sim_engines.append(eng);
-
-        read_eng_nm = read_eng_ver = read_bin_path = ""; // TODO make this into a QHash or smth
-        eng_s.readNext();
-      }
-      else{
-        qDebug() << tr("SimManager: invalid element encountered on line %1 - %2").arg(eng_s.lineNumber()).arg(eng_s.name().toString());
-      }
+    if(!eng_f.open(QFile::ReadOnly | QFile::Text)){
+      qCritical() << tr("SimManager: cannot open engine description file %1").arg(eng_f.fileName());
+      return;
     }
-    else
-      eng_s.readNext();
+
+    QXmlStreamReader eng_s(&eng_f);
+    qDebug() << tr("Reading engine library from %1").arg(eng_f.fileName());
+
+    QString read_eng_nm, read_eng_ver, read_bin_path;
+    while(!eng_s.atEnd()){
+      if(eng_s.isStartElement()){
+        if(eng_s.name() == "physeng"){
+          // TODO move the following to SimEngine
+          while(!(eng_s.isEndElement() && eng_s.name() == "physeng")){
+            if(!eng_s.readNextStartElement())
+              continue; // skip until a start element is encountered
+            if(eng_s.name() == "name"){
+              read_eng_nm = eng_s.readElementText();
+            }
+            else if(eng_s.name() == "version"){
+              read_eng_ver = eng_s.readElementText();
+            }
+            else if(eng_s.name() == "bin_path"){
+              read_bin_path = eng_s.readElementText();
+            }
+          }
+          prim::SimEngine *eng = new prim::SimEngine(read_eng_nm);
+          eng->setVersion(read_eng_ver);
+          eng->setBinaryPath(engine_dir.filePath(read_bin_path));
+
+          sim_engines.append(eng);
+
+          read_eng_nm = read_eng_ver = read_bin_path = "";
+          eng_s.readNext();
+        }
+        else{
+          qDebug() << tr("SimManager: invalid element encountered on line %1 - %2").arg(eng_s.lineNumber()).arg(eng_s.name().toString());
+        }
+      }
+      else
+        eng_s.readNext();
+    }
+
+    eng_f.close();
   }
 
-  eng_f.close();
 
   qDebug() << tr("Successfully read physics engine library");
 }

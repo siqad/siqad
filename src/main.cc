@@ -82,6 +82,7 @@ int main(int argc, char **argv){
 
   // initialise QApplication
   QApplication app(argc, argv);
+  app.setApplicationVersion(APP_VERSION);
 
   // Main Window
   gui::ApplicationGUI w;

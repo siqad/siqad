@@ -60,9 +60,6 @@ private:
   void simParamSetup();             // take user options for simulation parameters
   bool exportSimProblem();          // generate problem XML
 
-  QString engine_lib_dir;
-  QString engine_lib_file;             // file describing all available engines
-
   // dialogs
   QWidget *sim_manager_dialog;
   QWidget *sim_setup_dialog;        // TODO maybe make a subclass for this

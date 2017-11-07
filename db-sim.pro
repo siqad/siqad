@@ -18,6 +18,17 @@ TEMPLATE = app
 TARGET = db-sim
 INCLUDEPATH += .
 
+###########################
+# APPLICATION INFORMATION #
+###########################
+
+VERSION = 0.0.1
+DEFINES += APP_VERSION=\\\"0.0.1\\\"
+QMAKE_TARGET_COMPANY = "WalusLab"
+QMAKE_TARGET_PRODUCT = "DBDesigner"
+QMAKE_TARGET_DESCRIPTION = "A CAD tool that enables the creation and simulation of quantum dot networks"
+QMAKE_TARGET_COPYRIGHT = "GPLv3"
+
 RESOURCES = resources/application.qrc
 win32:RC_ICONS = resources/ico/app.ico
 macx:ICON = resources/ico/app.icns
@@ -107,10 +118,11 @@ macx:   EXEC_DIR = $${DESTDIR}/$${TARGET}.app/Contents/MacOS
 
 sim_common.path = $$EXEC_DIR/src/phys
 sim_common.files = \
-    $$PHYS_DIR/engines.xml
+    $$PHYS_DIR/installing-new-engines.txt
 INSTALLS += sim_common
 
 sim_simanneal.path = $$EXEC_DIR/src/phys/simanneal
-sim_simanneal.files = $$PHYS_DIR/simanneal/simanneal
-win32: sim_simanneal.files = $$PHYS_DIR/simanneal/simanneal.exe
+sim_simanneal.files = $$PHYS_DIR/simanneal/engine_description.xml
+!win32: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal
+win32: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal.exe
 INSTALLS += sim_simanneal

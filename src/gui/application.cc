@@ -14,6 +14,7 @@
 // Qt includes
 #include <QtSvg>
 #include <iostream>
+#include <QMessageBox>
 
 // gui includes
 #include "application.h"
@@ -117,6 +118,7 @@ void gui::ApplicationGUI::initMenuBar()
   menuBar()->addMenu(tr("&Edit"));
   menuBar()->addMenu(tr("&View"));
   QMenu *tools = menuBar()->addMenu(tr("&Tools"));
+  QMenu *help = menuBar()->addMenu(tr("&Help"));
 
   // file menu actions
   QAction *new_file = new QAction(tr("&New"), this);
@@ -137,6 +139,7 @@ void gui::ApplicationGUI::initMenuBar()
   file->addAction(export_lvm);
   file->addAction(quit);
 
+  // tools menu actions
   QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
   QAction *select_color = new QAction(tr("Select Color..."), this);
   QAction *screenshot = new QAction(tr("Full Screenshot..."), this);
@@ -146,6 +149,11 @@ void gui::ApplicationGUI::initMenuBar()
   tools->addAction(select_color);
   tools->addAction(screenshot);
   tools->addAction(design_screenshot);
+
+  // help menu actions
+  QAction *about_version = new QAction(tr("About"), this);
+  
+  help->addAction(about_version);
 
   connect(new_file, &QAction::triggered, this, &gui::ApplicationGUI::newFile);
   connect(quit, &QAction::triggered, this, &gui::ApplicationGUI::closeFile);
@@ -157,6 +165,7 @@ void gui::ApplicationGUI::initMenuBar()
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
   connect(design_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::designScreenshot);
+  connect(about_version, &QAction::triggered, this, &gui::ApplicationGUI::aboutVersion);
 
 }
 
@@ -899,4 +908,13 @@ bool gui::ApplicationGUI::exportToLabview()
   qDebug() << tr("Export to LVM: Write completed for %1").arg(ef.fileName());
 
   return true;
+}
+
+
+void gui::ApplicationGUI::aboutVersion()
+{
+  QString app_name = QCoreApplication::applicationName();
+  QString version = QCoreApplication::applicationVersion();
+
+  QMessageBox::about(this, tr("About"), tr("Application: %1\nVersion: %2").arg(app_name).arg(version));
 }
