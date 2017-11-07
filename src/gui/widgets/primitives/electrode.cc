@@ -60,22 +60,19 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
   // draw inner circle
   if(select_mode && isSelected()){
 
-      qDebug() << QObject::tr("Electrode selected");
-      setPos(pos());
-      QPointF center = rect.center();
-      QSizeF size(elec_width+edge_width, elec_height+edge_width);
-      rect.setSize(size);
-      rect.moveCenter(center);
+      // qDebug() << QObject::tr("Electrode selected");
+    setPos(pos());
+    // qDebug() << QObject::tr("pos = %1, %2").arg(pos().x()).arg(pos().y());
+    QPointF center = rect.center();
+    QSizeF size(elec_width+edge_width, elec_height+edge_width);
+    rect.setSize(size);
+    rect.moveCenter(center);
 
-      painter->setPen(Qt::NoPen);
-      painter->setBrush(selected_col);
-      painter->drawRect(rect);
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(selected_col);
+    painter->drawRect(rect);
   }
 }
-
-//clocking
-//fixed
-
 
 prim::Item *prim::Electrode::deepCopy() const
 {
@@ -86,12 +83,14 @@ prim::Item *prim::Electrode::deepCopy() const
 
 void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
-  qDebug() << QObject::tr("Electrode has seen the mousePressEvent");
-  qDebug() << QObject::tr("isSelected = %1").arg(isSelected());
-
+  qDebug() << QObject::tr("Electrode::mousePressEvent");
+  // qDebug() << QObject::tr("isSelected = %1").arg(isSelected());
+  // setFlag(QGraphicsItem::ItemIsMovable, true);
+  // qDebug() << QObject::tr("pos = %1, %2").arg(pos().x()).arg(pos().y());
   switch(e->buttons()){
     case Qt::RightButton:
       qDebug() << QObject::tr("Electrode: User right clicked.");
+      qDebug() << QObject::tr("layer_id = %1").arg(layer_id);
       qDebug() << QObject::tr("item_type: %1").arg(item_type);
       setpot(potential-1);
       break;
@@ -108,13 +107,18 @@ void prim::Electrode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e)
   setpot(potential+1);
 }
 
-// void prim::Electrode::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
+// void prim::Electrode::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
 // {
-//   if(select_mode && isSelected())
-//     qDebug() << QObject::tr("Electrode has seen the mouseMoveEvent");
-//   //do something here to signal a move.
+//     qDebug() << QObject::tr("Electrode::mouseReleaseEvent");
+//     setPos(pos());
+//     // setFlag(QGraphicsItem::ItemIsMovable, false);
+//     qDebug() << QObject::tr("pos = %1, %2").arg(pos().x()).arg(pos().y());
 // }
 
+// void prim::Electrode::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
+// {
+//     qDebug() << QObject::tr("Electrode has seen the mouseMoveEvent");
+// }
 
 void prim::Electrode::setpot(double pot_given)
 {

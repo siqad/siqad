@@ -629,6 +629,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   // set clicked flag and store current mouse position for move behaviour
   mouse_pos_old = e->pos();
   mouse_pos_cached = e->pos(); // this might be a referencing clash, check.
+  // qDebug() << tr("ghosting = %1").arg(ghosting);
 
   // if other buttons are clicked during rubber band selection, end selection
   if(rb)
@@ -739,7 +740,9 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
   if(ghosting){
     // plant ghost and end ghosting
     if(moving)
+    {
       moveToGhost();
+    }
     else
       pasteAtGhost();
     clearGhost();
@@ -1010,21 +1013,21 @@ void gui::DesignPanel::boundZoom(qreal &ds)
 
 void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *event)
 {
-    qDebug() << tr("Hello...");
+    // qDebug() << tr("Hello...");
     QMenu menu(this);
-    qDebug() << tr("QMenu...");
+    // qDebug() << tr("QMenu...");
     menu.addAction(undoAct);
-    qDebug() << tr("undoAct...");
+    // qDebug() << tr("undoAct...");
     menu.addAction(redoAct);
-    qDebug() << tr("redoAct...");
+    // qDebug() << tr("redoAct...");
     menu.addAction(cutAct);
-    qDebug() << tr("cutAct...");
+    // qDebug() << tr("cutAct...");
     menu.addAction(copyAct);
-    qDebug() << tr("copyAct...");
+    // qDebug() << tr("copyAct...");
     menu.addAction(pasteAct);
-    qDebug() << tr("pasteAct...");
+    // qDebug() << tr("pasteAct...");
     menu.exec(event->globalPos());
-    qDebug() << tr("globalPos...");
+    // qDebug() << tr("globalPos...");
 }
 //
 // void gui::DesignPanel::newFile()
@@ -1074,6 +1077,10 @@ void gui::DesignPanel::copy()
 void gui::DesignPanel::paste()
 {
     qDebug() << tr("Paste...");
+    for(QGraphicsItem *gitem : scene->selectedItems())
+    {
+      pasteElectrode(static_cast<prim::Electrode*>(gitem));
+    }
     // infoLabel->setText(tr("Invoked <b>Edit|Paste</b>"));
 }
 //
@@ -1369,8 +1376,6 @@ void gui::DesignPanel::clearGhost()
 
 bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
 {
-
-  qDebug() << tr("snapGhost");
   // don't need to recheck snap target unless the cursor has moved significantly
   if((scene_pos-snap_cache).manhattanLength()<.3*snap_diameter)
     return false;
@@ -1606,13 +1611,13 @@ gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignP
 
 void gui::DesignPanel::CreateElectrode::undo()
 {
-  qDebug() << QObject::tr("undo(), p1 = (%1, %2), p2 = (%3, %4)").arg(p1.x()).arg(p1.y()).arg(p2.x()).arg(p2.y());
+  // qDebug() << QObject::tr("undo(), p1 = (%1, %2), p2 = (%3, %4)").arg(p1.x()).arg(p1.y()).arg(p2.x()).arg(p2.y());
   invert ? create() : destroy();
 }
 
 void gui::DesignPanel::CreateElectrode::redo()
 {
-  qDebug() << QObject::tr("redo(), p1 = (%1, %2), p2 = (%3, %4)").arg(p1.x()).arg(p1.y()).arg(p2.x()).arg(p2.y());
+  // qDebug() << QObject::tr("redo(), p1 = (%1, %2), p2 = (%3, %4)").arg(p1.x()).arg(p1.y()).arg(p2.x()).arg(p2.y());
   invert ? destroy() : create();
 }
 
@@ -1757,26 +1762,41 @@ gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
                                       DesignPanel *dp, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), offset(offset)
 {
-  layer_index = item->layer_id;
-  item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
+  // qDebug() << tr("MoveItem");
+  // qDebug() << tr("item_type = %1").arg(item->item_type);
+  // qDebug() << tr("offset = %1, %2").arg(offset.x()).arg(offset.y());
+  if(item->item_type != prim::Item::Electrode)
+  {
+    // qDebug() << tr("Not Electrode");
+    layer_index = item->layer_id;
+    item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
+  }
+  else if(item->item_type == prim::Item::Electrode)
+  {
+    // qDebug() << tr("Is Electrode");
+    layer_index = item->layer_id;
+    item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
+  }
 }
 
 
 void gui::DesignPanel::MoveItem::undo()
 {
+  // qDebug() << tr("MoveItem::undo");
   move(true);
 }
 
 
 void gui::DesignPanel::MoveItem::redo()
 {
+  // qDebug() << tr("MoveItem::redo");
   move(false);
 }
 
 void gui::DesignPanel::MoveItem::move(bool invert)
 {
-  qDebug() << tr("layer_index = %1").arg(layer_index);
-  qDebug() << tr("item_index = %1").arg(item_index);
+  // qDebug() << tr("layer_index = %1").arg(layer_index);
+  // qDebug() << tr("item_index = %1").arg(item_index);
   prim::Layer *layer = dp->getLayer(layer_index);
   prim::Item *item = layer->getItem(item_index);
 
@@ -1798,7 +1818,7 @@ void gui::DesignPanel::MoveItem::moveItem(prim::Item *item, const QPointF &delta
 {
   switch(item->item_type){
     case prim::Item::DBDot:
-      qDebug() << tr("Moving DBDot");
+      // qDebug() << tr("Moving DBDot");
       moveDBDot(static_cast<prim::DBDot*>(item), delta);
       break;
     case prim::Item::Aggregate:
@@ -1825,7 +1845,6 @@ void gui::DesignPanel::MoveItem::moveDBDot(prim::DBDot *dot, const QPointF &delt
       break;
     }
   }
-
   if(ldot==0)
     qCritical() << tr("Failed to move DBDot");
   else
@@ -1842,21 +1861,10 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
 
 void gui::DesignPanel::MoveItem::moveElectrode(prim::Electrode *electrode, const QPointF &delta)
 {
-  qDebug() << tr("Moving Electrode");
-  // // get the target LatticeDot
-  // QList<QGraphicsItem*> cands = dot->scene()->items(dot->scenePos()+delta);
-  // prim::LatticeDot *ldot=0;
-  // for(QGraphicsItem *cand : cands){
-  //   if(static_cast<prim::Item*>(cand)->item_type == prim::Item::LatticeDot){
-  //     ldot=static_cast<prim::LatticeDot*>(cand);
-  //     break;
-  //   }
-  // }
-  //
-  // if(ldot==0)
-  //   qCritical() << tr("Failed to move DBDot");
-  // else
-    // dot->setSource(ldot);
+  // qDebug() << tr("Moving Electrode");
+  // qDebug() << tr("delta = %1, %2").arg(delta.x()).arg(delta.y());
+  // qDebug() << tr("Moving Electrode");
+  electrode->setPos( electrode->pos() + delta );
 }
 
 // Undo/Redo Methods
@@ -2043,7 +2051,7 @@ void gui::DesignPanel::pasteItem(prim::Ghost *ghost, prim::Item *item)
       pasteAggregate(ghost, static_cast<prim::Aggregate*>(item));
       break;
     case prim::Item::Electrode:
-      pasteElectrode(ghost, static_cast<prim::Electrode*>(item));
+      pasteElectrode(static_cast<prim::Electrode*>(item));
       break;
 
     default:
@@ -2081,7 +2089,7 @@ void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)
 
 }
 
-void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec)
+void gui::DesignPanel::pasteElectrode(prim::Electrode *elec)
 {
   undo_stack->push(new CreateElectrode( elec->layer_id, this, elec->getp1() + QPointF(20, 20),
                   elec->getp2() + QPointF(20, 20), elec, true));
@@ -2095,14 +2103,14 @@ bool gui::DesignPanel::moveToGhost(bool kill)
 {
   prim::Ghost *ghost = prim::Ghost::instance();
   moving = false;
-
-  qDebug() << tr("moveToGhost, ghosting = %1").arg(ghosting);
+  //try to move all the electrodes first, if any.
+  moveGhostBoxes(ghost);
+  // qDebug() << tr("moveToGhost, ghosting = %1").arg(ghosting);
   // get the move offset
   QPointF offset = (!kill && ghost->valid_hash[snap_target]) ? ghost->moveOffset() : QPointF();
 
   if(offset.isNull()){
-
-    qDebug() << tr("offset is null");
+    // qDebug() << tr("offset is null");
     // reset the original lattice dot selectability and return false
     for(QGraphicsItem *gitem : scene->selectedItems())
     {
@@ -2119,4 +2127,8 @@ bool gui::DesignPanel::moveToGhost(bool kill)
 
   undo_stack->endMacro();
   return true;
+}
+
+void gui::DesignPanel::moveGhostBoxes( prim::Ghost* ghost){
+  // qDebug() << tr("moveGhostBoxes");
 }

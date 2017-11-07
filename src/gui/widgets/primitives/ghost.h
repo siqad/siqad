@@ -19,6 +19,9 @@ namespace prim{
   struct AggNode{
     int index;              // index of source if not an Aggregate
     QList<AggNode*> nodes;  // children of the Aggregate if any
+    enum SourceType{DBDot, Aggregate, Electrode};
+
+    SourceType source_type;
 
     AggNode(int index=-1) : index(index) {}
     ~AggNode() {for(AggNode* node : nodes) delete node;}
@@ -57,30 +60,30 @@ namespace prim{
     QColor *pcol;           // pointer to the GhostDot color
   };
 
-  // class GhostBox : public Item
-  // {
-  // public:
-  //
-  //   // constructor
-  //   GhostBox(Item *item, Item *parent, QColor *pcol);
-  //
-  //   // destructor
-  //   ~GhostBox(){}
-  //
-  //   // virtual methods
-  //   QRectF boundingRect() const Q_DECL_OVERRIDE;
-  //   void paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*) Q_DECL_OVERRIDE;
-  //
-  //   Item* deepCopy() const {return 0;}
-  //
-  // private:
-  //
-  //   qreal width; //width of electrode that was passed
-  //   qreal height; //height of electrode that was passed
-  //   void constructStatics();
-  //
-  //   QColor *pcol;           // pointer to the GhostDot color
-  // };
+  class GhostBox : public Item
+  {
+  public:
+
+    // constructor
+    GhostBox(Item *item, Item *parent, QColor *pcol);
+
+    // destructor
+    ~GhostBox(){}
+
+    // virtual methods
+    QRectF boundingRect() const Q_DECL_OVERRIDE;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*) Q_DECL_OVERRIDE;
+
+    Item* deepCopy() const {return 0;}
+
+  private:
+
+    qreal width; //width of electrode that was passed
+    qreal height; //height of electrode that was passed
+    void constructStatics();
+
+    QColor *pcol;           // pointer to the GhostDot color
+  };
 
   // collection of GhostDot objects for moving Items or copy/paste, singleton
   class Ghost : public Item
@@ -108,6 +111,9 @@ namespace prim{
 
     QList<prim::Item*>& getSources() {return sources;}
     QList<prim::GhostDot*> getDots() {return dots;}
+
+    QList<prim::Item*>& getBoxSources() {return box_sources;}
+    QList<prim::GhostBox*> getBoxes() {return boxes;}
 
     // get a list of the highest level Items associated with the sources
     QList<prim::Item*> getTopItems() const;
@@ -171,7 +177,7 @@ namespace prim{
     void createGhostDot(Item *item);
 
 
-    // void createGhostBox(Item *item); //box for electrodes.
+    void createGhostBox(Item *item); //box for electrodes.
 
     // prepare a single item. If item is an Aggregate, recursively prepare children
     void prepareItem(Item *item, prim::AggNode *node);
@@ -194,8 +200,8 @@ namespace prim{
     QList<prim::GhostDot*> dots;  // list of GhostDots
     prim::AggNode aggnode;        // nested structure of sources
 
-    // QList<Item*> box_sources; // list of Item objects for each GhostBox
-    // QList<prim::GhostBox*> boxes; // list of GhostBoxes
+    QList<Item*> box_sources; // list of Item objects for each GhostBox
+    QList<prim::GhostBox*> boxes; // list of GhostBoxes
 
     QColor col;             // current dot color
     bool valid;             // current placement is valid

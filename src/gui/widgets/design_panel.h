@@ -275,10 +275,12 @@ namespace gui{
     void pasteItem(prim::Ghost *ghost, prim::Item *item);
     void pasteDBDot(prim::Ghost *ghost, prim::DBDot *db);
     void pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg);
-    void pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec);
+    void pasteElectrode(prim::Electrode *elec);
 
     // move the selected items to the current Ghost, returns True if successful
     bool moveToGhost(bool kill=false);
+    void moveGhostBoxes(prim::Ghost *ghost);
+
     void createActions();
   //   QMenu *fileMenu;
   //   QMenu *editMenu;
