@@ -135,9 +135,9 @@ namespace gui{
     //   void newFile();
     //   void open();
     //   void save();
-    //   void print();
-    //   void undo();
-    //   void redo();
+      // void print();
+    void undo();
+    void redo();
     void cut();
     void copy();
     void paste();
@@ -279,7 +279,6 @@ namespace gui{
 
     // move the selected items to the current Ghost, returns True if successful
     bool moveToGhost(bool kill=false);
-
     void createActions();
   //   QMenu *fileMenu;
   //   QMenu *editMenu;
@@ -290,9 +289,9 @@ namespace gui{
   //   QAction *openAct;
   //   QAction *saveAct;
   //   QAction *printAct;
-  //   QAction *exitAct;
-  //   QAction *undoAct;
-  //   QAction *redoAct;
+    // QAction *exitAct;
+    QAction *undoAct;
+    QAction *redoAct;
     QAction *cutAct;
     QAction *copyAct;
     QAction *pasteAct;

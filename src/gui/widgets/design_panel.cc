@@ -760,7 +760,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             break;
           case gui::DesignPanel::ElectrodeTool:
             //get start and end locations, and create the electrode.
-            filterSelection(true);
+            filterSelection(false);
             createElectrodes(e->pos());
             break;
           case gui::DesignPanel::DragTool:
@@ -1013,6 +1013,10 @@ void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *event)
     qDebug() << tr("Hello...");
     QMenu menu(this);
     qDebug() << tr("QMenu...");
+    menu.addAction(undoAct);
+    qDebug() << tr("undoAct...");
+    menu.addAction(redoAct);
+    qDebug() << tr("redoAct...");
     menu.addAction(cutAct);
     qDebug() << tr("cutAct...");
     menu.addAction(copyAct);
@@ -1043,16 +1047,18 @@ void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *event)
 //     infoLabel->setText(tr("Invoked <b>File|Print</b>"));
 // }
 //
-// void gui::DesignPanel::undo()
-// {
-//     infoLabel->setText(tr("Invoked <b>Edit|Undo</b>"));
-// }
-//
-// void gui::DesignPanel::redo()
-// {
-//     infoLabel->setText(tr("Invoked <b>Edit|Redo</b>"));
-// }
-//
+void gui::DesignPanel::undo()
+{
+    // infoLabel->setText(tr("Invoked <b>Edit|Undo</b>"));
+    qDebug() << tr("Undo...");
+}
+
+void gui::DesignPanel::redo()
+{
+    // infoLabel->setText(tr("Invoked <b>Edit|Redo</b>"));
+    qDebug() << tr("Redo...");
+}
+
 void gui::DesignPanel::cut()
 {
     qDebug() << tr("Cut...");
@@ -1146,20 +1152,20 @@ void gui::DesignPanel::createActions()
     // printAct->setStatusTip(tr("Print the document"));
     // connect(printAct, &QAction::triggered, this, &gui::DesignPanel::print);
     //
-    // exitAct = new QAction(tr("E&xit"), this);
+    // exitAct = new QAction(tr("&Exit"), this);
     // exitAct->setShortcuts(QKeySequence::Quit);
     // exitAct->setStatusTip(tr("Exit the application"));
     // connect(exitAct, &QAction::triggered, this, &QWidget::close);
     //
-    // undoAct = new QAction(tr("&Undo"), this);
-    // undoAct->setShortcuts(QKeySequence::Undo);
-    // undoAct->setStatusTip(tr("Undo the last operation"));
-    // connect(undoAct, &QAction::triggered, this, &gui::DesignPanel::undo);
-    //
-    // redoAct = new QAction(tr("&Redo"), this);
-    // redoAct->setShortcuts(QKeySequence::Redo);
-    // redoAct->setStatusTip(tr("Redo the last operation"));
-    // connect(redoAct, &QAction::triggered, this, &gui::DesignPanel::redo);
+    undoAct = new QAction(tr("&Undo"), this);
+    undoAct->setShortcuts(QKeySequence::Undo);
+    undoAct->setStatusTip(tr("Undo the last operation"));
+    connect(undoAct, &QAction::triggered, this, &gui::DesignPanel::undo);
+
+    redoAct = new QAction(tr("&Redo"), this);
+    redoAct->setShortcuts(QKeySequence::Redo);
+    redoAct->setStatusTip(tr("Redo the last operation"));
+    connect(redoAct, &QAction::triggered, this, &gui::DesignPanel::redo);
     //
     cutAct = new QAction(tr("&Cut"), this);
     cutAct->setShortcuts(QKeySequence::Cut);
@@ -1363,6 +1369,8 @@ void gui::DesignPanel::clearGhost()
 
 bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
 {
+
+  qDebug() << tr("snapGhost");
   // don't need to recheck snap target unless the cursor has moved significantly
   if((scene_pos-snap_cache).manhattanLength()<.3*snap_diameter)
     return false;
@@ -1453,9 +1461,6 @@ void gui::DesignPanel::setLatticeDotSelectability(prim::Item *item, bool flag)
     case prim::Item::LatticeDot:
       ldot = static_cast<prim::LatticeDot*>(item);
       ldot->setFlag(QGraphicsItem::ItemIsSelectable, flag);
-      break;
-    case prim::Item::Electrode: //move electrode using movable flag.
-      item->setFlag(QGraphicsItem::ItemIsMovable, flag);
       break;
     default:
       break;
@@ -2091,13 +2096,18 @@ bool gui::DesignPanel::moveToGhost(bool kill)
   prim::Ghost *ghost = prim::Ghost::instance();
   moving = false;
 
+  qDebug() << tr("moveToGhost, ghosting = %1").arg(ghosting);
   // get the move offset
   QPointF offset = (!kill && ghost->valid_hash[snap_target]) ? ghost->moveOffset() : QPointF();
 
   if(offset.isNull()){
+
+    qDebug() << tr("offset is null");
     // reset the original lattice dot selectability and return false
     for(QGraphicsItem *gitem : scene->selectedItems())
+    {
       setLatticeDotSelectability(static_cast<prim::Item*>(gitem), false);
+    }
     return false;
   }
 

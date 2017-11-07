@@ -11,6 +11,7 @@
 #include "src/settings/settings.h"
 
 
+
 // Initialize statics
 qreal prim::Electrode::edge_width = -1;
 
@@ -33,6 +34,7 @@ prim::Electrode::Electrode(int lay_id, QPointF p1, QPointF p2):
   setPos(mapToScene(topLeft).toPoint());
   // flags
   setFlag(QGraphicsItem::ItemIsSelectable, true);
+  setFlag(QGraphicsItem::ItemIsMovable, true);
 }
 
 QRectF prim::Electrode::boundingRect() const
@@ -57,6 +59,8 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
   // draw inner circle
   if(select_mode && isSelected()){
+
+      qDebug() << QObject::tr("Electrode selected");
       setPos(pos());
       QPointF center = rect.center();
       QSizeF size(elec_width+edge_width, elec_height+edge_width);
@@ -83,6 +87,7 @@ prim::Item *prim::Electrode::deepCopy() const
 void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
   qDebug() << QObject::tr("Electrode has seen the mousePressEvent");
+  qDebug() << QObject::tr("isSelected = %1").arg(isSelected());
 
   switch(e->buttons()){
     case Qt::RightButton:
@@ -102,6 +107,14 @@ void prim::Electrode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e)
   //do something here to manipulate potential. Maybe dialog box?
   setpot(potential+1);
 }
+
+// void prim::Electrode::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
+// {
+//   if(select_mode && isSelected())
+//     qDebug() << QObject::tr("Electrode has seen the mouseMoveEvent");
+//   //do something here to signal a move.
+// }
+
 
 void prim::Electrode::setpot(double pot_given)
 {
