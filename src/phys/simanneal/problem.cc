@@ -130,15 +130,17 @@ bool Problem::readProblem(const std::string &fname)
 
   std::cout << "Read material properties" << std::endl;
   if(!readMaterialProp(root_node->first_node("material_prop")))
-    return false;
+    return false;*/
 
   std::cout << "Read simulation parameters" << std::endl;
-  if(!readSimulationParam(root_node->first_node("sim_param")))
-    return false;*/
+  rapidxml::xml_node<> *sim_params_node = root_node->first_node("sim_params");
+  if(sim_params_node == 0 || !readSimulationParam(sim_params_node))
+    return false;
 
   // item tree
   std::cout << "Read DB tree" << std::endl;
-  if(!readDesign(root_node->first_node("design"), db_tree))
+  rapidxml::xml_node<> *design_node = root_node->first_node("design");
+  if(design_node == 0 || !readDesign(design_node, db_tree))
     return false;
 
   std::cout << "db_tree pointer " << db_tree.get() << std::endl;
@@ -171,7 +173,8 @@ bool Problem::readSimulationParam(rapidxml::xml_node<> *node)
   // TODO print the following and return false if error in data is encountered
   //std::cout << "Error in program properties!" << std::endl;
   for(rapidxml::xml_node<> *sim_node = node->first_node(); sim_node; sim_node = sim_node->next_sibling()){
-    // TODO just add everything into sim_param dictionary
+    sim_params.insert(std::map<std::string, std::string>::value_type(sim_node->name(), sim_node->value()));
+    std::cout << "SimParam: Key=" << sim_node->name() << ", Value=" << sim_params[sim_node->name()] << std::endl;
   }
   return true;
 }

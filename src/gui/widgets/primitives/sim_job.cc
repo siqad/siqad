@@ -44,7 +44,6 @@ bool SimJob::invokeBinary()
 
   sim_process = new QProcess();
   sim_process->setProgram(engine->binaryPath());
-  //sim_process->setProgram("src/phys/physeng");
   sim_process->setArguments(arguments);
   sim_process->setProcessChannelMode(QProcess::MergedChannels);
   qDebug() << tr("SimJob: Starting process");
@@ -56,16 +55,18 @@ bool SimJob::invokeBinary()
   qDebug() << tr("SimJob: Process started, waiting for completion...");
   while(!sim_process->waitForStarted());
 
-  // dump output
   while(sim_process->waitForReadyRead())
-    terminal_output.append(QString::fromStdString(sim_process->readAll().toStdString()));
-    //qDebug() << sim_process->readAll();
+    terminal_output.append(QString::fromStdString(sim_process->readAll().toStdString())); // dump output TODO might not have to do it in while
 
-  qDebug() << tr("SimJob: simulation complete. You may check the job's terminal output on the simulation visualization panel.");
+  // post-simulation flag setting
+  end_time = QDateTime::currentDateTime();
   completed = true;
 
-  end_time = QDateTime::currentDateTime(); // TODO instead of determining end time here, should read end time from XML for future
+  // clean up sim_process pointer
+  delete sim_process;
+  sim_process = NULL;
 
+  qDebug() << tr("SimJob: simulation complete. You may check the job's terminal output on the simulation visualization panel.");
   return true;
 }
 

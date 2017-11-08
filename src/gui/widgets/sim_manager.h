@@ -74,6 +74,7 @@ private:
   QLineEdit *le_preanneal_cycles;
   QLineEdit *le_anneal_cycles;
   QLineEdit *le_global_v0;
+  QLineEdit *le_debye_length;
 };
 
 

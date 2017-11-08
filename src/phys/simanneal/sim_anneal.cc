@@ -60,14 +60,13 @@ void SimAnneal::initVars()
     return;
   }
   // these should move to XML
-  //t_max = 10000;
-  //t_preanneal = 1000;
-  t_max = 10;
-  t_preanneal = 10;
+  t_preanneal = problem.parameterExists("preanneal_cycles") ? std::stoi(problem.getParameter("preanneal_cycles")) : 1000;
+  t_max = problem.parameterExists("anneal_cycles") ? std::stoi(problem.getParameter("anneal_cycles")) : 10000;
+  v_0 = problem.parameterExists("global_v0") ? std::stof(problem.getParameter("global_v0")) : 1; // TODO this shouldn't be variable
+  debye_length = problem.parameterExists("debye_length") ? std::stof(problem.getParameter("debye_length")) : 5E-9; // ~10s of dimer rows
+
   kT = 2.568E-2; kT_step = 0.999999;    // kT = Boltzmann constant (eV/K) * 298 K, NOTE kT_step arbitrary
   v_freeze = 0, v_freeze_step = 0.001;  // NOTE v_freeze_step arbitrary
-  v_0 = 1;                // TODO need a way to automatically find this number
-  debye_length = 5E-9;    // ~10s of dimer rows
   unfav_hop_scale = 1;    // TODO still needs experimenting
   result_queue_size = 100;
 
@@ -274,7 +273,7 @@ bool SimAnneal::evalProb(float prob)
   boost::variate_generator<boost::random::mt19937&, boost::random::uniform_real_distribution<float>> rnd_gen(rng, dis);
 
   float generated_num = rnd_gen();
-  std::cout << "Probability ha: Good if lower than " << prob << ", evaluation " << generated_num << std::endl;
+  //std::cout << "Probability: True if lower than " << prob << ", evaluation " << generated_num << std::endl;
 
   return prob >= generated_num;
 }

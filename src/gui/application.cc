@@ -192,12 +192,12 @@ void gui::ApplicationGUI::initTopBar()
   action_run_sim->setShortcut(tr("F11"));
 
   action_sim_visualize = top_bar->addAction(QIcon(":/ico/simvisual.svg"), tr("Simulation Visualization Dock"));
-  action_layer_sel= top_bar->addAction(QIcon(":/ico/layer.svg"), tr("Layer Selection"));
+  //action_layer_sel= top_bar->addAction(QIcon(":/ico/layer.svg"), tr("Layer Selection"));
   //action_circuit_lib= top_bar->addAction(QIcon(":/ico/circuitlib.svg"), tr("Circuit Library"));
 
   connect(action_run_sim, &QAction::triggered, this, &gui::ApplicationGUI::simulationSetup);
   connect(action_sim_visualize, &QAction::triggered, this, &gui::ApplicationGUI::showOptionDock);
-  connect(action_layer_sel, &QAction::triggered, this, &gui::ApplicationGUI::showLayerDialog);
+  //connect(action_layer_sel, &QAction::triggered, this, &gui::ApplicationGUI::showLayerDialog);
 
   addToolBar(Qt::TopToolBarArea, top_bar);
 }
@@ -454,7 +454,7 @@ void gui::ApplicationGUI::runSimulation(prim::SimJob *job)
   qDebug() << tr("ApplicationGUI: About to run job '%1'").arg(job->name());
 
   // call saveToFile TODO don't forget to account for setup dialog settings
-  saveToFile(Simulation, job->problemFile());
+  saveToFile(Simulation, job->problemFile(), job);
 
   // call job binary and read output when done
   job->invokeBinary();
@@ -623,7 +623,7 @@ void gui::ApplicationGUI::newFile()
 
 
 // save/load:
-bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const QString &path)
+bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const QString &path, prim::SimJob *sim_job)
 {
   QString write_path;
 
@@ -672,14 +672,13 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   stream.writeEndElement();
 
   // save simulation parameters 
-  /*
-    TODO implement later
-    if(flag == Simulation){
-    stream.writeTextElement("sim_params");
-    if(sim_manager->hasSimParams())
-      sim_manager->writeSimParams();
+  if(flag == Simulation && sim_job){
+    stream.writeStartElement("sim_params");
+    QList<QPair<QString, QString>> sim_params = sim_job->simulationParameters();
+    for(auto sim_param_pair : sim_params)
+      stream.writeTextElement(sim_param_pair.first, sim_param_pair.second);
     stream.writeEndElement();
-  }*/
+  }
 
   // save design panel content (including GUI flags, layers and their corresponding contents (electrode, dbs, etc.)
   design_pan->saveToFile(&stream, flag==Simulation);

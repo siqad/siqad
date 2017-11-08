@@ -14,6 +14,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <map>
 #include "rapidxml-1.13/rapidxml.hpp"
 
 namespace phys{
@@ -107,7 +108,14 @@ namespace phys{
 
     static bool writeResult();
 
+
+    // ACCESSORS
+
+    bool parameterExists(const std::string &key) {return sim_params.find(key) == sim_params.end();}
+    std::string getParameter(const std::string &key) {return sim_params.find(key) != sim_params.end() ? sim_params.at(key) : "";}
+
     // Variables
     std::shared_ptr<Aggregate> db_tree;
+    std::map<std::string, std::string> sim_params;
   };
 }

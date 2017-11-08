@@ -54,6 +54,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * Shift + middle click drag "zoom to region"
 * Dialog panel add HTML color processing (and regex remove HTML tags when writing to log)
 * Make function that determines whether specific actions are allowed in current display mode
+* Break gui::ApplicationGUI::saveToFile apart to a modular file writer, and pick what to include in the output file
 * ~~Esc cancels paste operation~~ Implemented 17.07.13
 * ~~Esc cancels DB Tool~~ Implemented 17.07.13
 * ~~Visual feedback on which tool is currently in use (e.g. changed background of the button)~~ Implemented 17.07.12

@@ -123,6 +123,6 @@ INSTALLS += sim_common
 
 sim_simanneal.path = $$EXEC_DIR/src/phys/simanneal
 sim_simanneal.files = $$PHYS_DIR/simanneal/engine_description.xml
-!win32: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal
+linux | macx: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal
 win32: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal.exe
 INSTALLS += sim_simanneal

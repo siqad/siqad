@@ -22,7 +22,15 @@ SimManager::SimManager(QWidget *parent)
 }
 
 SimManager::~SimManager()
-{}
+{
+  for(prim::SimEngine *engine : sim_engines)
+    delete engine;
+  sim_engines.clear();
+
+  for(prim::SimJob *job : sim_jobs)
+    delete job;
+  sim_jobs.clear();
+}
 
 
 void SimManager::showSimSetupDialog()
@@ -107,7 +115,7 @@ void SimManager::initSimSetupDialog()
   QLabel *label_eng_sel = new QLabel(tr("Engine:"));
   QLabel *label_job_nm = new QLabel(tr("Job Name:"));
 
-  QString job_nm_default = "SA_" + QDateTime::currentDateTime().toString("MM-dd_HHmm"); // TODO SA to engine short name
+  QString job_nm_default = "SIM_" + QDateTime::currentDateTime().toString("yyMMdd_HHmmss"); // TODO SA to engine short name
 
   combo_eng_sel = new QComboBox();
   combo_eng_sel->setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -140,29 +148,36 @@ void SimManager::initSimSetupDialog()
   QLabel *label_preanneal_cycles = new QLabel("Preanneal Cycles:");
   QLabel *label_anneal_cycles = new QLabel("Anneal Cycles:");
   QLabel *label_global_v0 = new QLabel("Global Bias v_0:");
+  QLabel *label_debye_length = new QLabel("Debye Length (m):");
 
   le_preanneal_cycles = new QLineEdit("1000"); // TODO these default values should be read from the engine description file
   le_anneal_cycles = new QLineEdit("10000");
   le_global_v0 = new QLineEdit("0");
+  le_debye_length = new QLineEdit("5E-9");
 
   label_preanneal_cycles->setBuddy(le_preanneal_cycles);
   label_anneal_cycles->setBuddy(le_anneal_cycles);
   label_global_v0->setBuddy(le_global_v0);
+  label_debye_length->setBuddy(le_debye_length);
 
   QHBoxLayout *preanneal_cycles_hl = new QHBoxLayout;
   QHBoxLayout *anneal_cycles_hl = new QHBoxLayout;
   QHBoxLayout *global_v0_hl = new QHBoxLayout;
+  QHBoxLayout *debye_length_hl = new QHBoxLayout;
   preanneal_cycles_hl->addWidget(label_preanneal_cycles);
   preanneal_cycles_hl->addWidget(le_preanneal_cycles);
   anneal_cycles_hl->addWidget(label_anneal_cycles);
   anneal_cycles_hl->addWidget(le_anneal_cycles);
   global_v0_hl->addWidget(label_global_v0);
   global_v0_hl->addWidget(le_global_v0);
+  debye_length_hl->addWidget(label_debye_length);
+  debye_length_hl->addWidget(le_debye_length);
 
   QVBoxLayout *sim_params_vl = new QVBoxLayout;
   sim_params_vl->addLayout(preanneal_cycles_hl);
   sim_params_vl->addLayout(anneal_cycles_hl);
   sim_params_vl->addLayout(global_v0_hl);
+  sim_params_vl->addLayout(debye_length_hl);
 
   sim_params_group->setLayout(sim_params_vl);
 
@@ -231,6 +246,10 @@ void SimManager::submitSimSetup()
   prim::SimJob *new_job = new prim::SimJob(le_job_nm->text(), sim_engines[combo_eng_sel->currentIndex()]);
 
   // fill in job properties according to input fields
+  new_job->addSimulationParameter("preanneal_cycles", le_preanneal_cycles->text());
+  new_job->addSimulationParameter("anneal_cycles", le_anneal_cycles->text());
+  new_job->addSimulationParameter("global_v0", le_global_v0->text());
+  new_job->addSimulationParameter("debye_length", le_debye_length->text());
 
   // engine
     // auto filled in: job export path, job result path

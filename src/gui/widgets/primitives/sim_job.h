@@ -50,7 +50,11 @@ namespace prim{
 
     // ACCESSORS
     QString name() {return job_name;}
-    QString engineName() {return engine ? engine->name() : "SimAnneal";} // TODO cheating here, change SimAnneal back to Undefined later
+    QString engineName() {return engine ? engine->name() : "Undefined";} // TODO cheating here, change SimAnneal back to Undefined later
+
+    QList<QPair<QString, QString>> simulationParameters() {return sim_params;}
+    void addSimulationParameter(QString field, QString value) {sim_params.append(qMakePair(field, value));}
+
     QString runtimeTempDir();     // runtime job directory
     QString problemFile();        // runtime problem file
     QString resultFile();         // runtime result file
@@ -66,7 +70,6 @@ namespace prim{
     // variables TODO put them back to private later, with proper accessors
     QList<QPair<float,float>> physlocs;   // physlocs[dot_ind].first or .second
     QList<QList<int>> elec_dists;         // elec_dists[result_ind][dot_ind] TODO change this to QList of QVectors
-    //QList<elecDist> elec_dists;
   private:
 
     void deduplicateDist();               // deduplicate charge distribution results
@@ -88,7 +91,7 @@ namespace prim{
     QStringList ignored_xml_elements;     // XML elements to ignore when reading results
 
     // parameters
-    //QList<QPair<the field stuff, value>> sim_params;
+    QList<QPair<QString, QString>> sim_params;
 
     // results
     // TODO struct results
