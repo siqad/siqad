@@ -34,7 +34,7 @@ prim::Electrode::Electrode(int lay_id, QPointF p1, QPointF p2):
   setPos(mapToScene(topLeft).toPoint());
   // flags
   setFlag(QGraphicsItem::ItemIsSelectable, true);
-  setFlag(QGraphicsItem::ItemIsMovable, true);
+  // setFlag(QGraphicsItem::ItemIsMovable, true);
 }
 
 QRectF prim::Electrode::boundingRect() const
@@ -83,15 +83,15 @@ prim::Item *prim::Electrode::deepCopy() const
 
 void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
-  qDebug() << QObject::tr("Electrode::mousePressEvent");
+  // qDebug() << QObject::tr("Electrode::mousePressEvent");
   // qDebug() << QObject::tr("isSelected = %1").arg(isSelected());
   // setFlag(QGraphicsItem::ItemIsMovable, true);
   // qDebug() << QObject::tr("pos = %1, %2").arg(pos().x()).arg(pos().y());
   switch(e->buttons()){
     case Qt::RightButton:
-      qDebug() << QObject::tr("Electrode: User right clicked.");
-      qDebug() << QObject::tr("layer_id = %1").arg(layer_id);
-      qDebug() << QObject::tr("item_type: %1").arg(item_type);
+      // qDebug() << QObject::tr("Electrode: User right clicked.");
+      // qDebug() << QObject::tr("layer_id = %1").arg(layer_id);
+      // qDebug() << QObject::tr("item_type: %1").arg(item_type);
       setpot(potential-1);
       break;
     default:
@@ -102,9 +102,10 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 
 void prim::Electrode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e)
 {
-  qDebug() << QObject::tr("Electrode has seen the mouseDoubleClickEvent");
+  // qDebug() << QObject::tr("Electrode has seen the mouseDoubleClickEvent");
   //do something here to manipulate potential. Maybe dialog box?
   setpot(potential+1);
+  qDebug() << QObject::tr("mouse pos = %1, %2").arg(e->pos().x()).arg(e->pos().y());
 }
 
 // void prim::Electrode::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
@@ -125,7 +126,7 @@ void prim::Electrode::setpot(double pot_given)
   if (pot_given == pot_given)//check for NULL argument
   {
     potential = pot_given;
-    qDebug() << QObject::tr("potential = %1").arg(potential);
+    // qDebug() << QObject::tr("potential = %1").arg(potential);
   }
 }
 

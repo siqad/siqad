@@ -66,6 +66,7 @@ void prim::GhostBox::paint(QPainter *painter, const QStyleOptionGraphicsItem*, Q
   painter->setPen(Qt::NoPen);
   painter->setBrush(*pcol);
   painter->drawRect(boundingRect());
+  qDebug() << QObject::tr("Drawing GhostBox!");
 }
 
 void prim::GhostBox::constructStatics()
@@ -94,7 +95,7 @@ void prim::Ghost::cleanGhost()
     delete dot;
   dots.clear();
 
-  qDebug() << QObject::tr("Deleting Ghost Box");
+  // qDebug() << QObject::tr("Deleting Ghost Box");
   box_sources.clear();
   for(prim::GhostBox *box : boxes)
     delete box;
@@ -141,7 +142,7 @@ QList<prim::Item*> prim::Ghost::getTopItems() const
 {
   // each top item corresponds to one of the top level nodes in aggnode
 
-  qDebug() << QObject::tr("Ghost::getTopItems");
+  // qDebug() << QObject::tr("Ghost::getTopItems");
   QList<prim::Item*> items;
   for(prim::AggNode *node : aggnode.nodes)
     items.append(getNodeItem(node));
@@ -292,7 +293,7 @@ void prim::Ghost::createGhostDot(prim::Item *item)
 
 void prim::Ghost::createGhostBox(prim::Item *item)
 {
-  qDebug() << QObject::tr("Creating Ghost Box");
+  // qDebug() << QObject::tr("Creating Ghost Box");
   // prim::GhostDot *dot = new prim::GhostDot(item, this, &col);
   prim::GhostBox *box = new prim::GhostBox(item, this, &col);
   //
@@ -389,7 +390,7 @@ void prim::Ghost::setAnchor()
 prim::Item *prim::Ghost::getNodeItem(prim::AggNode *node) const
 {
 
-  qDebug() << QObject::tr("node index: %1").arg(node->index);
+  // qDebug() << QObject::tr("node index: %1").arg(node->index);
   if(node->index<0){
     // node corresponds to an Aggregate, the parent of the first item in the Aggregate
     return static_cast<prim::Item*>(getNodeItem(node->nodes.first())->parentItem());
@@ -398,5 +399,7 @@ prim::Item *prim::Ghost::getNodeItem(prim::AggNode *node) const
     return sources.at(node->index);
   else if(node->source_type == prim::AggNode::Electrode)
     return box_sources.at(node->index);
+  else
+    return 0;
 
 }

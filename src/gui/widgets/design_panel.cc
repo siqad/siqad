@@ -669,6 +669,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 // the middle mouse button to always pan and right click for context menus.
 void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
+
   QPoint mouse_pos_del;
   //QTransform trans = transform();
   QScrollBar *vsb = verticalScrollBar();
@@ -679,8 +680,18 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     // update snap
     QPointF scene_pos = mapToScene(e->pos());
     QPointF offset;
-    if(snapGhost(scene_pos, offset))
+    if(snapGhost(scene_pos, offset)) //if there are db dots
       prim::Ghost::instance()->moveBy(offset.x(), offset.y());
+    else //if there are only electrodes
+    {
+      // qDebug() << tr("mouse_pos_old = %1, %2").arg(mouse_pos_old.x()).arg(mouse_pos_old.y());
+      // qDebug() << tr("e->pos = %1, %2").arg(e->pos().x()).arg(e->pos().y());
+      // qDebug() << tr("mapToScene(e->pos) = %1, %2").arg(mapToScene(e->pos()).x()).arg(mapToScene(e->pos()).y());
+      // qDebug() << tr("mapFromScene(e->pos) = %1, %2").arg(mapFromScene(e->pos()).x()).arg(mapFromScene(e->pos()).y());
+      // qDebug() << tr("mapToGlobal(e->pos) = %1, %2").arg(mapToGlobal(e->pos()).x()).arg(mapToGlobal(e->pos()).y());
+      // qDebug() << tr("mapFromGlobal(e->pos) = %1, %2").arg(mapFromGlobal(e->pos()).x()).arg(mapFromGlobal(e->pos()).y());
+      // prim::Ghost::instance()->moveTo(mapToScene(e->pos()) - mapToScene(mouse_pos_old));
+    }
   }
   /* DB ghosting when DBGen tool is in use - deal with this later
     else if(tool_type == gui::DesignPanel::DBGenTool){
@@ -1376,65 +1387,91 @@ void gui::DesignPanel::clearGhost()
 
 bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
 {
-  // don't need to recheck snap target unless the cursor has moved significantly
-  if((scene_pos-snap_cache).manhattanLength()<.3*snap_diameter)
-    return false;
-  snap_cache = scene_pos;
-
-  prim::Ghost *ghost = prim::Ghost::instance();
-  prim::GhostDot *anchor = ghost->snapAnchor();
-
-  // if no anchor, allow free movement of the ghost
-  if(anchor==0){
-    offset = QPointF();
-    return true;
+  bool isAllElectrodes = true;
+  //check if holding any non-electrodes
+  for(QGraphicsItem *gitem : scene->selectedItems()){
+    if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode)
+      isAllElectrodes = false;
   }
+  // if holding any non-electrodes (for now just db dots or lat dots)
+  // don't need to recheck snap target unless the cursor has moved significantly
+  if(isAllElectrodes == false){
+    if((scene_pos-snap_cache).manhattanLength()<.3*snap_diameter)
+      return false;
+    snap_cache = scene_pos;
 
-  // otherwise restrict possible ghost position to lattice sites
+    prim::Ghost *ghost = prim::Ghost::instance();
+    prim::GhostDot *anchor = ghost->snapAnchor();
 
-  QPointF old_anchor = anchor->scenePos();
-  QPointF free_anchor = ghost->freeAnchor(scene_pos);
+    // if no anchor, allow free movement of the ghost
+    if(anchor==0){
+      offset = QPointF();
+      return true;
+    }
 
-  // get nearest lattice site to free anchor
-  QRectF rect;
-  rect.setSize(QSize(snap_diameter, snap_diameter));
-  rect.moveCenter(free_anchor);
-  QList<QGraphicsItem*> near_items = scene->items(rect);
+    // otherwise restrict possible ghost position to lattice sites
 
-  // tdot->setPos(free_anchor);
-  // trect->setRect(rect);
+    QPointF old_anchor = anchor->scenePos();
+    QPointF free_anchor = ghost->freeAnchor(scene_pos);
 
-  // if no items nearby, change nothing
-  if(near_items.count()==0)
-    return false;
+    // get nearest lattice site to free anchor
+    QRectF rect;
+    rect.setSize(QSize(snap_diameter, snap_diameter));
+    rect.moveCenter(free_anchor);
+    QList<QGraphicsItem*> near_items = scene->items(rect);
 
-  // select the nearest lattice point to the free_anchor
-  prim::LatticeDot *target=0;
-  qreal mdist=-1, dist;
+    // tdot->setPos(free_anchor);
+    // trect->setRect(rect);
 
-  for(QGraphicsItem *gitem : near_items){
-    // lattice dot
-    if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::LatticeDot){
-      dist = (gitem->pos()-free_anchor).manhattanLength();
-      if(mdist<0 || dist<mdist){
-        target = static_cast<prim::LatticeDot*>(gitem);
-        mdist=dist;
+    // if no items nearby, change nothing
+    if(near_items.count()==0)
+      return false;
+
+    // select the nearest lattice point to the free_anchor
+    prim::LatticeDot *target=0;
+    qreal mdist=-1, dist;
+
+    for(QGraphicsItem *gitem : near_items){
+      // lattice dot
+      if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::LatticeDot){
+        dist = (gitem->pos()-free_anchor).manhattanLength();
+        if(mdist<0 || dist<mdist){
+          target = static_cast<prim::LatticeDot*>(gitem);
+          mdist=dist;
+        }
       }
     }
+
+    // if no valid target or target has not changed, do nothing
+    if(!target || (target==snap_target))
+      return false;
+
+    // move ghost and update validity hash table.
+    offset = target->scenePos()-old_anchor;
+    if(!ghost->valid_hash.contains(target))
+      ghost->valid_hash[target] = ghost->checkValid(offset);
+    snap_target = target;
+    ghost->setValid(ghost->valid_hash[target]);
+
+    return true;
   }
-
-  // if no valid target or target has not changed, do nothing
-  if(!target || (target==snap_target))
-    return false;
-
-  // move ghost and update validity hash table.
-  offset = target->scenePos()-old_anchor;
-  if(!ghost->valid_hash.contains(target))
-    ghost->valid_hash[target] = ghost->checkValid(offset);
-  snap_target = target;
-  ghost->setValid(ghost->valid_hash[target]);
-
-  return true;
+  else
+  {
+    qDebug() << tr("BeepBoop");
+    prim::Ghost *ghost = prim::Ghost::instance();
+    ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos())) - mapToScene(mouse_pos_old));
+    // qDebug() << tr("QCursor::pos = %1, %2").arg(QCursor::pos().x()).arg(QCursor::pos().y());
+    // qDebug() << tr("mapToScene(QCursor::pos = %1, %2").arg(mapToScene(QCursor::pos()).x()).arg(mapToScene(QCursor::pos()).y());
+    // qDebug() << tr("mapFromScene(QCursor::pos = %1, %2").arg(mapFromScene(QCursor::pos()).x()).arg(mapFromScene(QCursor::pos()).y());
+    // qDebug() << tr("mapToGlobal(QCursor::pos) = %1, %2").arg(mapToGlobal(QCursor::pos()).x()).arg(mapToGlobal(QCursor::pos()).y());
+    // qDebug() << tr("mapFromGlobal(QCursor::pos) = %1, %2").arg(mapFromGlobal(QCursor::pos()).x()).arg(mapFromGlobal(QCursor::pos()).y());
+    // qDebug() << tr("mouse_pos_old = %1, %2").arg(mouse_pos_old.x()).arg(mouse_pos_old.y());
+    // qDebug() << tr("mapToScene(mouse_pos_old = %1, %2").arg(mapToScene(mouse_pos_old).x()).arg(mapToScene(mouse_pos_old).y());
+    // qDebug() << tr("mapFromScene(mouse_pos_old = %1, %2").arg(mapFromScene(mouse_pos_old).x()).arg(mapFromScene(mouse_pos_old).y());
+    // qDebug() << tr("mapToGlobal(mouse_pos_old) = %1, %2").arg(mapToGlobal(mouse_pos_old).x()).arg(mapToGlobal(mouse_pos_old).y());
+    // qDebug() << tr("mapFromGlobal(mouse_pos_old) = %1, %2").arg(mapFromGlobal(mouse_pos_old).x()).arg(mapFromGlobal(mouse_pos_old).y());
+    // prim::Ghost::instance()->moveTo(mapToScene(e->pos()) - mapToScene(mouse_pos_old));
+  }
 }
 
 
@@ -1861,7 +1898,6 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
 
 void gui::DesignPanel::MoveItem::moveElectrode(prim::Electrode *electrode, const QPointF &delta)
 {
-  // qDebug() << tr("Moving Electrode");
   // qDebug() << tr("delta = %1, %2").arg(delta.x()).arg(delta.y());
   // qDebug() << tr("Moving Electrode");
   electrode->setPos( electrode->pos() + delta );
@@ -2101,21 +2137,30 @@ void gui::DesignPanel::pasteElectrode(prim::Electrode *elec)
 //       unselectable again.
 bool gui::DesignPanel::moveToGhost(bool kill)
 {
+  bool isAllElectrodes = true;
   prim::Ghost *ghost = prim::Ghost::instance();
   moving = false;
-  //try to move all the electrodes first, if any.
-  moveGhostBoxes(ghost);
-  // qDebug() << tr("moveToGhost, ghosting = %1").arg(ghosting);
   // get the move offset
   QPointF offset = (!kill && ghost->valid_hash[snap_target]) ? ghost->moveOffset() : QPointF();
 
   if(offset.isNull()){
-    // qDebug() << tr("offset is null");
+    // There is no offset for dbs. Check if selection is all electrodes, and if it is, move them.
     // reset the original lattice dot selectability and return false
     for(QGraphicsItem *gitem : scene->selectedItems())
     {
+      if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode)
+        isAllElectrodes = false;
       setLatticeDotSelectability(static_cast<prim::Item*>(gitem), false);
     }
+    if(isAllElectrodes == true) //selection is all electrodes. try to move them without snapping.
+    { //offset is kept inside ghost->pos()
+      qDebug() << tr("BleepBloop");
+      qDebug() << tr("ghost position: %1, %2").arg(ghost->pos().x()).arg(ghost->pos().y());
+      for(prim::Item *item : ghost->getTopItems())
+        undo_stack->push(new MoveItem(item, ghost->pos(), this));
+      return true; //things were moved.
+    }
+    //either no selection, or selection contains non-electrodes. return false as usual.
     return false;
   }
 

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dbdesigner>
+    <!--Program Flags-->
+    <program>
+        <file_purpose>save</file_purpose>
+        <version>TBD</version>
+        <date>2017-11-08 15:54:13</date>
+    </program>
+    <!--GUI Flags-->
+    <gui>
+        <zoom>1</zoom>
+        <scroll x="-119" y="-119"/>
+    </gui>
+    <!--Layer Properties-->
+    <!--Layer ID is intrinsic to the layer order-->
+    <layer_prop>
+        <name>Layer 0</name>
+        <visible>1</visible>
+        <active>0</active>
+    </layer_prop>
+    <layer_prop>
+        <name>Layer 1</name>
+        <visible>1</visible>
+        <active>0</active>
+    </layer_prop>
+    <layer_prop>
+        <name>Layer 2</name>
+        <visible>1</visible>
+        <active>0</active>
+    </layer_prop>
+    <!--Item Hierarchy-->
+    <design>
+        <!--Layer 0-->
+        <layer type="lattice"/>
+        <!--Layer 1-->
+        <layer type="db"/>
+        <!--Layer 2-->
+        <layer type="electrodes"/>
+    </design>
+</dbdesigner>
