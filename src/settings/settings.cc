@@ -91,6 +91,7 @@ QSettings *settings::AppSettings::m_defs()
   QSettings *S = new QSettings("src/settings/defaults/app_settings.ini", QSettings::IniFormat);
 
   // overwrites existing default values with same keys... no check
+  S->setValue("view/hidpi_support", false);
 
   S->setValue("log/override", true);
   S->setValue("log/tofile", true);

@@ -65,12 +65,13 @@ static void messageHandler(QtMsgType type, const QMessageLogContext &context, co
 }
 
 int main(int argc, char **argv){
-  QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
   // initialise rand
   srand(time(NULL));
 
   settings::AppSettings *app_settings = settings::AppSettings::instance();
+
+  if(app_settings->get<bool>("view/hidpi_support"))
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
   // call the message handler only if the override flag is set
   // note that if the override is set and the log file is suppresed there will
