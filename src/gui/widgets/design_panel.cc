@@ -6,9 +6,6 @@
 //
 // @desc:     DesignPanel implementation
 
-
-
-
 #include "design_panel.h"
 #include "src/settings/settings.h"
 
@@ -707,16 +704,6 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     QPointF offset;
     if(snapGhost(scene_pos, offset)) //if there are db dots
       prim::Ghost::instance()->moveBy(offset.x(), offset.y());
-    else //if there are only electrodes
-    {
-      // qDebug() << tr("mouse_pos_old = %1, %2").arg(mouse_pos_old.x()).arg(mouse_pos_old.y());
-      // qDebug() << tr("e->pos = %1, %2").arg(e->pos().x()).arg(e->pos().y());
-      // qDebug() << tr("mapToScene(e->pos) = %1, %2").arg(mapToScene(e->pos()).x()).arg(mapToScene(e->pos()).y());
-      // qDebug() << tr("mapFromScene(e->pos) = %1, %2").arg(mapFromScene(e->pos()).x()).arg(mapFromScene(e->pos()).y());
-      // qDebug() << tr("mapToGlobal(e->pos) = %1, %2").arg(mapToGlobal(e->pos()).x()).arg(mapToGlobal(e->pos()).y());
-      // qDebug() << tr("mapFromGlobal(e->pos) = %1, %2").arg(mapFromGlobal(e->pos()).x()).arg(mapFromGlobal(e->pos()).y());
-      // prim::Ghost::instance()->moveTo(mapToScene(e->pos()) - mapToScene(mouse_pos_old));
-    }
   }
   /* TODO DB ghosting when DBGen tool is in use
     else if(tool_type == gui::DesignPanel::DBGenTool){
@@ -757,10 +744,6 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
   QGraphicsView::mouseMoveEvent(e);
 }
 
-
-//
-//
-//
 void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
 {
   // for now, default behaviour first
@@ -963,10 +946,6 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
   }
 }
 
-
-
-
-
 // INTERNAL METHODS
 
 
@@ -1070,27 +1049,7 @@ void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *event)
     menu.exec(event->globalPos());
     // qDebug() << tr("globalPos...");
 }
-//
-// void gui::DesignPanel::newFile()
-// {
-//     infoLabel->setText(tr("Invoked <b>File|New</b>"));
-// }
-//
-// void gui::DesignPanel::open()
-// {
-//     infoLabel->setText(tr("Invoked <b>File|Open</b>"));
-// }
-//
-// void gui::DesignPanel::save()
-// {
-//     infoLabel->setText(tr("Invoked <b>File|Save</b>"));
-// }
-//
-// void gui::DesignPanel::print()
-// {
-//     infoLabel->setText(tr("Invoked <b>File|Print</b>"));
-// }
-//
+
 void gui::DesignPanel::undo()
 {
     // infoLabel->setText(tr("Invoked <b>Edit|Undo</b>"));
@@ -1124,87 +1083,10 @@ void gui::DesignPanel::paste()
     }
     // infoLabel->setText(tr("Invoked <b>Edit|Paste</b>"));
 }
-//
-// void gui::DesignPanel::bold()
-// {
-//     infoLabel->setText(tr("Invoked <b>Edit|Format|Bold</b>"));
-// }
-//
-// void gui::DesignPanel::italic()
-// {
-//     infoLabel->setText(tr("Invoked <b>Edit|Format|Italic</b>"));
-// }
-//
-// void gui::DesignPanel::leftAlign()
-// {
-//     infoLabel->setText(tr("Invoked <b>Edit|Format|Left Align</b>"));
-// }
-//
-// void gui::DesignPanel::rightAlign()
-// {
-//     infoLabel->setText(tr("Invoked <b>Edit|Format|Right Align</b>"));
-// }
-//
-// void gui::DesignPanel::justify()
-// {
-//     infoLabel->setText(tr("Invoked <b>Edit|Format|Justify</b>"));
-// }
-//
-// void gui::DesignPanel::center()
-// {
-//     infoLabel->setText(tr("Invoked <b>Edit|Format|Center</b>"));
-// }
-//
-// void gui::DesignPanel::setLineSpacing()
-// {
-//     infoLabel->setText(tr("Invoked <b>Edit|Format|Set Line Spacing</b>"));
-// }
-//
-// void gui::DesignPanel::setParagraphSpacing()
-// {
-//     infoLabel->setText(tr("Invoked <b>Edit|Format|Set Paragraph Spacing</b>"));
-// }
-//
-// void gui::DesignPanel::about()
-// {
-//     infoLabel->setText(tr("Invoked <b>Help|About</b>"));
-//     QMessageBox::about(this, tr("About Menu"),
-//             tr("The <b>Menu</b> example shows how to create "
-//                "menu-bar menus and context menus."));
-// }
-//
-// void gui::DesignPanel::aboutQt()
-// {
-//     infoLabel->setText(tr("Invoked <b>Help|About Qt</b>"));
-// }
+
 
 void gui::DesignPanel::createActions()
 {
-    // newAct = new QAction(tr("&New"), this);
-    // newAct->setShortcuts(QKeySequence::New);
-    // newAct->setStatusTip(tr("Create a new file"));
-    // connect(newAct, &QAction::triggered, this, &gui::DesignPanel::newFile);
-    //
-    // openAct = new QAction(tr("&Open..."), this);
-    // openAct->setShortcuts(QKeySequence::Open);
-    // openAct->setStatusTip(tr("Open an existing file"));
-    // connect(openAct, &QAction::triggered, this, &gui::DesignPanel::open);
-    //
-    // saveAct = new QAction(tr("&Save"), this);
-    // saveAct->setShortcuts(QKeySequence::Save);
-    // saveAct->setStatusTip(tr("Save the document to disk"));
-    // connect(saveAct, &QAction::triggered, this, &gui::DesignPanel::save);
-    //
-    // printAct = new QAction(tr("&Print..."), this);
-    // printAct->setShortcuts(QKeySequence::Print);
-    // printAct->setStatusTip(tr("Print the document"));
-    // connect(printAct, &QAction::triggered, this, &gui::DesignPanel::print);
-    //
-    // exitAct = new QAction(tr("&Exit"), this);
-    // exitAct->setShortcuts(QKeySequence::Quit);
-    // exitAct->setStatusTip(tr("Exit the application"));
-    // connect(exitAct, &QAction::triggered, this, &QWidget::close);
-    //
     undoAct = new QAction(tr("&Undo"), this);
     undoAct->setShortcuts(QKeySequence::Undo);
     undoAct->setStatusTip(tr("Undo the last operation"));
@@ -1232,76 +1114,6 @@ void gui::DesignPanel::createActions()
     pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
                               "selection"));
     connect(pasteAct, &QAction::triggered, this, &gui::DesignPanel::paste);
-    //
-    // boldAct = new QAction(tr("&Bold"), this);
-    // boldAct->setCheckable(true);
-    // boldAct->setShortcut(QKeySequence::Bold);
-    // boldAct->setStatusTip(tr("Make the text bold"));
-    // connect(boldAct, &QAction::triggered, this, &gui::DesignPanel::bold);
-    //
-    // QFont boldFont = boldAct->font();
-    // boldFont.setBold(true);
-    // boldAct->setFont(boldFont);
-    //
-    // italicAct = new QAction(tr("&Italic"), this);
-    // italicAct->setCheckable(true);
-    // italicAct->setShortcut(QKeySequence::Italic);
-    // italicAct->setStatusTip(tr("Make the text italic"));
-    // connect(italicAct, &QAction::triggered, this, &gui::DesignPanel::italic);
-    //
-    // QFont italicFont = italicAct->font();
-    // italicFont.setItalic(true);
-    // italicAct->setFont(italicFont);
-    //
-    // setLineSpacingAct = new QAction(tr("Set &Line Spacing..."), this);
-    // setLineSpacingAct->setStatusTip(tr("Change the gap between the lines of a "
-    //                                    "paragraph"));
-    // connect(setLineSpacingAct, &QAction::triggered, this, &gui::DesignPanel::setLineSpacing);
-    //
-    // setParagraphSpacingAct = new QAction(tr("Set &Paragraph Spacing..."), this);
-    // setParagraphSpacingAct->setStatusTip(tr("Change the gap between paragraphs"));
-    // connect(setParagraphSpacingAct, &QAction::triggered,
-    //         this, &gui::DesignPanel::setParagraphSpacing);
-    //
-    // aboutAct = new QAction(tr("&About"), this);
-    // aboutAct->setStatusTip(tr("Show the application's About box"));
-    // connect(aboutAct, &QAction::triggered, this, &gui::DesignPanel::about);
-    //
-    // aboutQtAct = new QAction(tr("About &Qt"), this);
-    // aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
-    // connect(aboutQtAct, &QAction::triggered, qApp, &QApplication::aboutQt);
-    // connect(aboutQtAct, &QAction::triggered, this, &gui::DesignPanel::aboutQt);
-    //
-    // leftAlignAct = new QAction(tr("&Left Align"), this);
-    // leftAlignAct->setCheckable(true);
-    // leftAlignAct->setShortcut(tr("Ctrl+L"));
-    // leftAlignAct->setStatusTip(tr("Left align the selected text"));
-    // connect(leftAlignAct, &QAction::triggered, this, &gui::DesignPanel::leftAlign);
-    //
-    // rightAlignAct = new QAction(tr("&Right Align"), this);
-    // rightAlignAct->setCheckable(true);
-    // rightAlignAct->setShortcut(tr("Ctrl+R"));
-    // rightAlignAct->setStatusTip(tr("Right align the selected text"));
-    // connect(rightAlignAct, &QAction::triggered, this, &gui::DesignPanel::rightAlign);
-    //
-    // justifyAct = new QAction(tr("&Justify"), this);
-    // justifyAct->setCheckable(true);
-    // justifyAct->setShortcut(tr("Ctrl+J"));
-    // justifyAct->setStatusTip(tr("Justify the selected text"));
-    // connect(justifyAct, &QAction::triggered, this, &gui::DesignPanel::justify);
-    //
-    // centerAct = new QAction(tr("&Center"), this);
-    // centerAct->setCheckable(true);
-    // centerAct->setShortcut(tr("Ctrl+E"));
-    // centerAct->setStatusTip(tr("Center the selected text"));
-    // connect(centerAct, &QAction::triggered, this, &gui::DesignPanel::center);
-    //
-    // alignmentGroup = new QActionGroup(this);
-    // alignmentGroup->addAction(leftAlignAct);
-    // alignmentGroup->addAction(rightAlignAct);
-    // alignmentGroup->addAction(justifyAct);
-    // alignmentGroup->addAction(centerAct);
-    // leftAlignAct->setChecked(true);
 }
 
 
@@ -1471,27 +1283,24 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
         }
       }
     }
-
     // if no valid target or target has not changed, do nothing
     if(!target || (target==snap_target))
       return false;
-
     // move ghost and update validity hash table.
     offset = target->scenePos()-old_anchor;
     if(!ghost->valid_hash.contains(target))
       ghost->valid_hash[target] = ghost->checkValid(offset);
     snap_target = target;
     ghost->setValid(ghost->valid_hash[target]);
-
     return true;
   }
   else
   {
     prim::Ghost *ghost = prim::Ghost::instance();
     ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos())) - mapToScene(mouse_pos_old));
+    return false;
   }
 }
-
 
 void gui::DesignPanel::initMove()
 {
@@ -2192,8 +2001,4 @@ bool gui::DesignPanel::moveToGhost(bool kill)
 
   undo_stack->endMacro();
   return true;
-}
-
-void gui::DesignPanel::moveGhostBoxes( prim::Ghost* ghost){
-  // qDebug() << tr("moveGhostBoxes");
 }
