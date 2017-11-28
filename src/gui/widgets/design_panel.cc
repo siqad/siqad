@@ -827,8 +827,10 @@ void gui::DesignPanel::wheelEvent(QWheelEvent *e)
   else if(~deg_del.isNull())
     wheel_deg += deg_del;
 
+  qDebug() << tr("wheel_deg: %1").arg(wheel_deg.y());
+
   // if enough scroll achieved, act and reset wheel_deg
-  if(qMax(qAbs(wheel_deg.x()),qAbs(wheel_deg.y())) >= 120) {
+  if(qMax(qAbs(wheel_deg.x()),qAbs(wheel_deg.y())) >= 15) {
     Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
     if(keymods & Qt::ControlModifier)
       wheelZoom(e, keymods & Qt::ShiftModifier);
@@ -953,24 +955,22 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
-  if(qAbs(wheel_deg.y())>=120){
-    // base zoom factor
-    qreal ds = (wheel_deg.y()>0 ? 1 : -1) * gui_settings->get<qreal>("view/zoom_factor");
-    // apply boost
-    if(boost)
-      ds *= gui_settings->get<qreal>("view/zoom_boost");
+  // base zoom factor
+  qreal ds = (wheel_deg.y()>0 ? 1 : -1) * gui_settings->get<qreal>("view/zoom_factor");
+  // apply boost
+  if(boost)
+    ds *= gui_settings->get<qreal>("view/zoom_boost");
 
-    // assert scale limitations
-    boundZoom(ds);
+  // assert scale limitations
+  boundZoom(ds);
 
-    if(ds!=0){
-      // zoom under mouse, should be indep of transformationAnchor
-      QPointF old_pos = mapToScene(e->pos());
-      scale(1+ds,1+ds);
-      QPointF delta = mapToScene(e->pos()) - old_pos;
-      verticalScrollBar()->setValue(verticalScrollBar()->value()-delta.y()*transform().m11());
-      horizontalScrollBar()->setValue(horizontalScrollBar()->value()-delta.x()*transform().m22());
-    }
+  if(ds!=0){
+    // zoom under mouse, should be indep of transformationAnchor
+    QPointF old_pos = mapToScene(e->pos());
+    scale(1+ds,1+ds);
+    QPointF delta = mapToScene(e->pos()) - old_pos;
+    verticalScrollBar()->setValue(verticalScrollBar()->value()-delta.y()*transform().m11());
+    horizontalScrollBar()->setValue(horizontalScrollBar()->value()-delta.x()*transform().m22());
   }
 
   // reset both scrolls (avoid repeat from |x|>=120)
@@ -990,22 +990,18 @@ void gui::DesignPanel::wheelPan(bool boost)
   QScrollBar *hsb = horizontalScrollBar();
 
   // y scrolling
-  if(qAbs(wheel_deg.y())>=120){
-    if(wheel_deg.y()>0)
-      dy -= gui_settings->get<qreal>("view/wheel_pan_step");
-    else
-      dy += gui_settings->get<qreal>("view/wheel_pan_step");
-    wheel_deg.setY(0);
-  }
+  if(wheel_deg.y()>0)
+    dy -= gui_settings->get<qreal>("view/wheel_pan_step");
+  else if(wheel_deg.y()<0)
+    dy += gui_settings->get<qreal>("view/wheel_pan_step");
+  wheel_deg.setY(0);
 
   // x scrolling
-  if(qAbs(wheel_deg.x())>=120){
-    if(wheel_deg.x()>0)
-      dx -= gui_settings->get<qreal>("view/wheel_pan_step");
-    else
-      dx += gui_settings->get<qreal>("view/wheel_pan_step");
-    wheel_deg.setX(0);
-  }
+  if(wheel_deg.x()>0)
+    dx -= gui_settings->get<qreal>("view/wheel_pan_step");
+  else if(wheel_deg.x()<0)
+    dx += gui_settings->get<qreal>("view/wheel_pan_step");
+  wheel_deg.setX(0);
 
   // apply boost
   if(boost){
