@@ -31,6 +31,8 @@ namespace gui{
   public:
 
     enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool, ElectrodeTool};
+    enum DisplayMode{DesignMode, SimDisplayMode};
+
     class UndoCommand;
 
     // constructor
@@ -93,6 +95,10 @@ namespace gui{
     // check if the contents of the DesignPanel have changed
     bool stateChanged() const {return !undo_stack->isClean();}
 
+    // return the current display mode
+    DisplayMode displayMode() {return display_mode;}
+    void setDisplayMode(DisplayMode mode);
+
     // SAVE
 
     // flag if actions are performed after last saved
@@ -104,13 +110,13 @@ namespace gui{
 
 
     // SIMULATION RESULT DISPLAY
-    void displaySimResults(prim::SimJob *job, int dist_int);         // right now, just show charge distribution. Need a lot more functionality in the future *NOTE might be more suited for design_panel
-    void clearSimResults();           // clear all simulation results and go back to design mode *NOTE might be more suited for design_panel
-    // TODO can probably implement something like a "design mode" and a "simulation mode"
+    void displaySimResults(prim::SimJob *job, int dist_int);
+    void clearSimResults();
 
   public slots:
 
     void selectClicked(prim::Item *item);
+    void simDockVisibilityChanged(bool visible);
 
   signals:
     void sig_toolChange(ToolType tool);
@@ -154,9 +160,10 @@ namespace gui{
 
   private:
 
-    QGraphicsScene *scene;  // scene for the QGraphicsView
-    ToolType tool_type;     // current cursor tool type
-    QUndoStack *undo_stack; // undo stack
+    QGraphicsScene *scene;    // scene for the QGraphicsView
+    ToolType tool_type;       // current cursor tool type
+    DisplayMode display_mode; // current display mode
+    QUndoStack *undo_stack;   // undo stack
 
     // copy/paste
     QList<prim::Item*> clipboard;  // cached deep copy of a set of items for pasting
@@ -180,6 +187,14 @@ namespace gui{
     QPoint mouse_pos_cached;  // parameter for caching relevant mouse positions, in pixels
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
 
+<<<<<<< HEAD
+=======
+    // sim visualization
+    QList<prim::DBDot*> db_dots_result;
+
+
+
+>>>>>>> master
     // INTERNAL METHODS
 
     // perform scene zoom based on wheel rotation

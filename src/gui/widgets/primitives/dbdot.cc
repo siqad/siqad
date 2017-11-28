@@ -39,12 +39,14 @@ prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
   : prim::Item(prim::Item::DBDot)
 {
   QPointF scene_loc; // physical location from file
-  int lay_id; // layer id from file
-  int elec_in;
+  int lay_id=-1; // layer id from file
+  int elec_in=0;
 
   while(!stream->atEnd()){
     if(stream->isStartElement()){
-      if(stream->name() == "layer_id"){
+      if(stream->name() == "dbdot")
+        stream->readNext();
+      else if(stream->name() == "layer_id"){
         lay_id = stream->readElementText().toInt();
         stream->readNext();
       }
@@ -184,7 +186,7 @@ void prim::DBDot::setSource(prim::LatticeDot *src)
 
 QRectF prim::DBDot::boundingRect() const
 {
-  qreal width = diameter+edge_width;
+  qreal width = diameter_l+edge_width;
   return QRectF(-.5*width, -.5*width, width, width);
 }
 
@@ -269,7 +271,8 @@ void prim::DBDot::mousePressEvent(QGraphicsSceneMouseEvent *e)
   qDebug() << QObject::tr("lay_id: %1").arg(layer_id);
   switch(e->buttons()){
     case Qt::RightButton:
-      toggleElec(); // for now, right click toggles electron. In the future, show context menu with electron toggle being one option
+      if(designMode())
+        toggleElec(); // for now, right click toggles electron. In the future, show context menu with electron toggle being one option
       break;
     default:
       prim::Item::mousePressEvent(e);

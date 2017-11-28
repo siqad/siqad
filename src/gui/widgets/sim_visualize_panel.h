@@ -31,6 +31,10 @@ namespace gui{
     bool setManager(SimManager *sim_man);
     bool showJob(int job_ind);
     bool showJob(prim::SimJob *job);
+
+    void showJobTerminalOutput();
+    void saveJobTerminalOutput();
+
     void updateJobSelCombo();
     bool showElecDist(int dist_ind);
     void updateElecDistCombo();
@@ -45,6 +49,8 @@ namespace gui{
     void initSimVisualize();
     void jobSelUpdate();
     void distSelUpdate();
+    void distPrev();
+    void distNext();
 
     SimManager *sim_manager;
     prim::SimJob *show_job;   // current job result being shown
@@ -55,6 +61,7 @@ namespace gui{
     QLabel *text_job_engine;
     QLabel *text_job_start_time;
     QLabel *text_job_end_time;
+    QPushButton *button_show_term_out;
 
     QComboBox *combo_dist_sel;
   };

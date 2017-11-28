@@ -65,6 +65,7 @@ static void messageHandler(QtMsgType type, const QMessageLogContext &context, co
 }
 
 int main(int argc, char **argv){
+  QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
   // initialise rand
   srand(time(NULL));
@@ -81,6 +82,7 @@ int main(int argc, char **argv){
 
   // initialise QApplication
   QApplication app(argc, argv);
+  app.setApplicationVersion(APP_VERSION);
 
   // Main Window
   gui::ApplicationGUI w;

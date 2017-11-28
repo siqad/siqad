@@ -8,9 +8,13 @@
 
 
 
+// std includes
+#include <algorithm>
+
 // Qt includes
 #include <QtSvg>
 #include <iostream>
+#include <QMessageBox>
 
 // gui includes
 #include "application.h"
@@ -56,12 +60,6 @@ gui::ApplicationGUI::~ApplicationGUI()
 
 void gui::ApplicationGUI::initGUI()
 {
-  // initialise bars
-  initMenuBar();
-  initTopBar();
-  initSideBar();
-  initOptionDock();
-
   // initialise mainwindow panels
   dialog_pan = new gui::DialogPanel(this);
   design_pan = new gui::DesignPanel(this);
@@ -69,7 +67,12 @@ void gui::ApplicationGUI::initGUI()
   info_pan = new gui::InfoPanel(this);
   sim_manager = new gui::SimManager(this);
   sim_visualize = new gui::SimVisualize(sim_manager, this);
-  option_dock->setWidget(sim_visualize);
+
+  // initialise bars
+  initMenuBar();
+  initTopBar();
+  initSideBar();
+  initOptionDock();
 
   // inter-widget signals
   connect(sim_manager, &gui::SimManager::emitSimJob, this, &gui::ApplicationGUI::runSimulation);
@@ -87,7 +90,7 @@ void gui::ApplicationGUI::initGUI()
   hbl->addLayout(vbl_l, 1);
   hbl->addWidget(info_pan, 1);
 
-  dialog_pan->hide();
+  //dialog_pan->hide();
   input_field->hide();
   info_pan->hide();
 
@@ -115,23 +118,28 @@ void gui::ApplicationGUI::initMenuBar()
   menuBar()->addMenu(tr("&Edit"));
   menuBar()->addMenu(tr("&View"));
   QMenu *tools = menuBar()->addMenu(tr("&Tools"));
+  QMenu *help = menuBar()->addMenu(tr("&Help"));
 
   // file menu actions
   QAction *new_file = new QAction(tr("&New"), this);
-  QAction *quit = new QAction(tr("&Quit"), this);
   QAction *save = new QAction(tr("&Save"), this);
   QAction *save_as = new QAction(tr("Save As..."), this);
   QAction *open_save = new QAction(tr("&Open..."), this);
-  quit->setShortcut(tr("CTRL+Q"));
+  QAction *export_lvm = new QAction(tr("&Export to QSi LV"), this);
+  QAction *quit = new QAction(tr("&Quit"), this);
   save->setShortcut(tr("CTRL+S"));
   save_as->setShortcut(tr("CTRL+SHIFT+S"));
   open_save->setShortcut(tr("CTRL+O"));
+  export_lvm->setShortcut(tr("CTRL+E"));
+  quit->setShortcut(tr("CTRL+Q"));
   file->addAction(new_file);
   file->addAction(save);
   file->addAction(save_as);
   file->addAction(open_save);
+  file->addAction(export_lvm);
   file->addAction(quit);
 
+  // tools menu actions
   QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
   QAction *select_color = new QAction(tr("Select Color..."), this);
   QAction *screenshot = new QAction(tr("Full Screenshot..."), this);
@@ -142,15 +150,22 @@ void gui::ApplicationGUI::initMenuBar()
   tools->addAction(screenshot);
   tools->addAction(design_screenshot);
 
+  // help menu actions
+  QAction *about_version = new QAction(tr("About"), this);
+
+  help->addAction(about_version);
+
   connect(new_file, &QAction::triggered, this, &gui::ApplicationGUI::newFile);
   connect(quit, &QAction::triggered, this, &gui::ApplicationGUI::closeFile);
   connect(save, &QAction::triggered, this, &gui::ApplicationGUI::saveDefault);
   connect(save_as, &QAction::triggered, this, &gui::ApplicationGUI::saveNew);
   connect(open_save, &QAction::triggered, this, &gui::ApplicationGUI::openFromFile);
+  connect(export_lvm, &QAction::triggered, this, &gui::ApplicationGUI::exportToLabview);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
   connect(design_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::designScreenshot);
+  connect(about_version, &QAction::triggered, this, &gui::ApplicationGUI::aboutVersion);
 
 }
 
@@ -177,12 +192,12 @@ void gui::ApplicationGUI::initTopBar()
   action_run_sim->setShortcut(tr("F11"));
 
   action_sim_visualize = top_bar->addAction(QIcon(":/ico/simvisual.svg"), tr("Simulation Visualization Dock"));
-  action_layer_sel= top_bar->addAction(QIcon(":/ico/layer.svg"), tr("Layer Selection"));
+  //action_layer_sel= top_bar->addAction(QIcon(":/ico/layer.svg"), tr("Layer Selection"));
   //action_circuit_lib= top_bar->addAction(QIcon(":/ico/circuitlib.svg"), tr("Circuit Library"));
 
   connect(action_run_sim, &QAction::triggered, this, &gui::ApplicationGUI::simulationSetup);
   connect(action_sim_visualize, &QAction::triggered, this, &gui::ApplicationGUI::showOptionDock);
-  connect(action_layer_sel, &QAction::triggered, this, &gui::ApplicationGUI::showLayerDialog);
+  //connect(action_layer_sel, &QAction::triggered, this, &gui::ApplicationGUI::showLayerDialog);
 
   addToolBar(Qt::TopToolBarArea, top_bar);
 }
@@ -259,10 +274,13 @@ void gui::ApplicationGUI::initOptionDock()
   // size policy
   option_dock->setMinimumWidth(gui_settings->get<int>("ODOCK/mw"));
 
-  // TODO add default widget?
+  // TODO change option dock to specifically sim visualize dock
+  connect(option_dock, &QDockWidget::visibilityChanged, design_pan, &gui::DesignPanel::simDockVisibilityChanged);
 
+  option_dock->setWidget(sim_visualize);
   option_dock->hide();
   addDockWidget(area, option_dock);
+
 }
 
 
@@ -285,6 +303,8 @@ void gui::ApplicationGUI::initState()
   setTool(gui::DesignPanel::SelectTool);
   working_path.clear();
   autosave_timer.start(1000*app_settings->get<int>("save/autosaveinterval"));
+
+  save_dir = QDir::homePath();
 }
 
 
@@ -301,7 +321,7 @@ void gui::ApplicationGUI::loadSettings()
   // autosave related settings
   settings::AppSettings *app_settings = settings::AppSettings::instance();
   autosave_num = app_settings->get<int>("save/autosavenum");
-  autosave_root.setPath(app_settings->get<QString>("save/autosaveroot"));
+  autosave_root.setPath(app_settings->getPath("save/autosaveroot"));
 
   // autosave directory for current instance
   qint64 tag = QCoreApplication::applicationPid();
@@ -388,6 +408,10 @@ void gui::ApplicationGUI::setToolDrag()
 
 void gui::ApplicationGUI::setToolDBGen()
 {
+  if(design_pan->displayMode() != gui::DesignPanel::DesignMode){
+    qDebug() << tr("dbgen tool not allowed outside of design mode");
+    return;
+  }
   qDebug() << tr("selecting dbgen tool");
   design_pan->setTool(gui::DesignPanel::DBGenTool);
 }
@@ -445,7 +469,7 @@ void gui::ApplicationGUI::runSimulation(prim::SimJob *job)
   qDebug() << tr("ApplicationGUI: About to run job '%1'").arg(job->name());
 
   // call saveToFile TODO don't forget to account for setup dialog settings
-  saveToFile(Simulation, job->problemFile());
+  saveToFile(Simulation, job->problemFile(), job);
 
   // call job binary and read output when done
   job->invokeBinary();
@@ -614,7 +638,7 @@ void gui::ApplicationGUI::newFile()
 
 
 // save/load:
-bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const QString &path)
+bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const QString &path, prim::SimJob *sim_job)
 {
   QString write_path;
 
@@ -636,8 +660,6 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
 
   // set file name of [whatevername].writing while writing to prevent loss of previous save if this save fails
   QFile file(write_path+".writing");
-
-  qDebug() << write_path;
 
   if(!file.open(QIODevice::WriteOnly)){
     qDebug() << tr("Save: Error when opening file to save: %1").arg(file.errorString());
@@ -665,14 +687,14 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   stream.writeEndElement();
 
   // save simulation parameters
-  /*
-    TODO implement later
-    if(flag == Simulation){
-    stream.writeTextElement("sim_params");
-    if(sim_manager->hasSimParams())
-      sim_manager->writeSimParams();
+  if(flag == Simulation && sim_job){
+    stream.writeStartElement("sim_params");
+    QList<QPair<QString, QString>> sim_params = sim_job->simulationParameters();
+    for(auto sim_param_pair : sim_params)
+      stream.writeTextElement(sim_param_pair.first, sim_param_pair.second);
+
     stream.writeEndElement();
-  }*/
+  }
 
   // save design panel content (including GUI flags, layers and their corresponding contents (electrode, dbs, etc.)
   design_pan->saveToFile(&stream, flag==Simulation);
@@ -771,4 +793,143 @@ void gui::ApplicationGUI::closeFile()
       return;
 
   QApplication::quit();
+}
+
+
+bool gui::ApplicationGUI::exportToLabview()
+{
+  settings::LatticeSettings *lat_settings = settings::LatticeSettings::instance();
+
+  qreal h_dimer_len = lat_settings->get<QPointF>("lattice/a1").x();
+  qreal v_dimer_len = lat_settings->get<QPointF>("lattice/a2").y();
+  qreal dimer_width = lat_settings->get<QPointF>("cell/b2").x();
+
+  // TODO implement some sort of check for lattice type
+
+  // fetch list of all dbdots
+  QList<prim::DBDot*> dbdots = design_pan->getSurfaceDBs(); // NOTE only gets visible layer
+  if(dbdots.size() == 0){
+    qDebug() << tr("ApplicationGUI: There are no DBDots, nothing can be exported.");
+    return false;
+  }
+
+  // convert from coord to index (make use of %)
+  int x,y;
+  QPointF phys_loc;
+  QMap<int, QList<int>> db_y_map; // [y,x] y is already sorted by QMap, x needs to be further sorted
+  for(auto db : dbdots){
+    phys_loc = db->getPhysLoc();
+    //qDebug() << tr("x=%1, y=%2");
+    //qDebug() << tr("  2*floor(%1 / %2) = %3").arg(phys_loc.x()).arg(h_dimer_len).arg(2*floor(phys_loc.x() / h_dimer_len));
+    //qDebug() << tr("  %1 % %2 / %3 = %4").arg(phys_loc.x()).arg(h_dimer_len).arg(dimer_width).arg(fmod(phys_loc.x(), h_dimer_len) / dimer_width);
+    x = round(2*floor(phys_loc.x() / h_dimer_len) + fmod(phys_loc.x(), h_dimer_len) / dimer_width);
+    //qDebug() << tr("  %1").arg(x);
+    y = round(phys_loc.y() / v_dimer_len);
+    auto insert_y = db_y_map.find(y);
+    if(insert_y == db_y_map.end())
+      db_y_map.insert(y, QList<int>({x}));
+    else
+      insert_y->append(x);
+  }
+
+  // sort
+  bool sort_asc = true;
+  int max_x=0, max_x_local=0; // find max x while performing the sort
+  for(auto it = db_y_map.begin(); it != db_y_map.end(); ++it){
+    if(sort_asc){
+      std::sort((*it).begin(), (*it).end());
+      max_x_local = (*it).last();
+    }
+    else{
+      std::sort((*it).begin(), (*it).end(), std::greater<int>());
+      max_x_local = (*it).first();
+    }
+    max_x = max_x > max_x_local ? max_x : max_x_local;
+    sort_asc = !sort_asc; // flip the sorting order for the next column
+  }
+  int max_y = db_y_map.lastKey();
+
+  // construct array with determined samples and channels
+  int size_x = max_x+1;
+  int size_y = max_y+1;
+  int** grid = new int* [size_x];
+  for(int i=0; i<size_x; i++)
+    grid[i] = new int[size_y]();
+
+  int db_i=1;
+  for(auto y_key : db_y_map.keys())
+    for(auto x : db_y_map.value(y_key))
+      grid[x][y_key] = db_i++;
+
+
+  // write to file
+  QString fn = QFileDialog::getSaveFileName(this, tr("Export to QSi LabView"),
+                save_dir.filePath("qsi_labview.lvm"), tr("LabView files (*.lvm)"));
+
+  QFile ef(fn);
+  if(!ef.open(QIODevice::WriteOnly)){
+    qDebug() << tr("Export to LVM: Error when opening file to export, %1").arg(ef.errorString());
+    return false;
+  }
+
+  QTextStream output(&ef);
+
+  // Channels
+  output << tr("Channels\t%1\n").arg(size_y);   // channels = max y
+
+  // Header info
+  QString sample_date = QDateTime::currentDateTime().toString("yyyy/MM/dd");
+  QString sample_time = QDateTime::currentDateTime().toString("HH:mm:ss.z");
+  QList<QString> out_header;
+  out_header.append("Samples");
+  out_header.append("Date");
+  out_header.append("Time");
+  out_header.append("X_Dimension");
+  out_header.append("X0");
+  out_header.append("Delta_X");
+  out_header.append("***End_of_Header***");
+  out_header.append("");  // column names of grid
+  for(int i=0; i<size_y; i++){
+    out_header[0] += tr("\t%1\t").arg(size_x);        // Samples
+    out_header[1] += tr("\t%1\t").arg(sample_date);   // Date
+    out_header[2] += tr("\t%1\t").arg(sample_time);   // Time
+    out_header[3] += "\tTime\t";                      // X_Dimension
+    out_header[4] += "\t0\t";                         // X0
+    out_header[5] += "\t1\t";                         // Delta_X
+    // *** End_of_Header ***
+    out_header[7] += tr("X_Value\tUntitled%1\t").arg(i>0 ? tr(" %1").arg(i) : "");  // col names of grid
+  }
+  out_header[7] += "Comment";
+
+  for(QString text_row : out_header)
+    output << tr("%1\n").arg(text_row);
+
+  QString out_grid = "";
+  for(int x_ind = 0; x_ind < size_x; x_ind++){
+    for(int y_ind = 0; y_ind < size_y; y_ind++){
+      out_grid += tr("%1\t%2").arg(x_ind).arg(grid[x_ind][y_ind]);
+      if(y_ind != size_y - 1)
+        out_grid += "\t"; // don't add extra tab if it's the last column
+      else
+        out_grid += "\n";
+    }
+  }
+
+  output << out_grid;
+
+  // idea for format for where to start: what if we just always start at the left dimer row?
+  ef.close();
+
+  qDebug() << tr("Export to LVM: Write completed for %1").arg(ef.fileName());
+
+  return true;
+}
+
+
+void gui::ApplicationGUI::aboutVersion()
+{
+  QString app_name = QCoreApplication::applicationName();
+  QString version = QCoreApplication::applicationVersion();
+
+  QMessageBox::about(this, tr("About"), tr("Application: %1\nVersion: %2").arg(app_name).arg(version));
 }

@@ -14,6 +14,7 @@
 
 #include <QtWidgets>
 #include <QtCore>
+#include <QRegExp>
 
 #define DEFAULT_OVERRIDE true // always use default settings
 
@@ -41,7 +42,7 @@ public:
   // found, it checks for default values. If a default value is found, the
   // value is stored in the current settings file; otherwise, the app terminates
   template<typename T>
-  T get(QString key)
+  T get(const QString &key)
   {
     QVariant var = DEFAULT_OVERRIDE ? defaults->value(key) : this->value(key);
     T val;
@@ -68,6 +69,27 @@ public:
       qFatal(tr("Unexpected key in Settings::get").toLatin1().constData(),0);
 
     return val;
+  }
+
+  QString getPath(const QString &key)
+  {
+    QString path_stored = get<QString>(key);
+
+    // TODO put map in the constructor
+    QMap<QString, QString> path_map;
+    path_map["<BINPATH>"] = QCoreApplication::applicationDirPath();
+    path_map["<HOME>"] = QDir::homePath();
+    path_map["<ROOT>"] = QDir::rootPath();
+    path_map["<SYSTMP>"] = QDir::tempPath();
+
+    // perform replacement
+    QRegExp regex("<(.*)?>");
+    while(path_stored.indexOf(regex) != -1){
+      if(!path_map.contains(regex.capturedTexts().first()))
+        qFatal(tr("Path replacement failed, key '%1' not found.").arg(regex.capturedTexts().first()).toLatin1().constData(),0);
+      path_stored.replace(regex, path_map[regex.capturedTexts().first()]);
+    }
+    return path_stored;
   }
 
 protected:

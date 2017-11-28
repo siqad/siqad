@@ -1,0 +1,8 @@
+simanneal
+simanneal.exe
+.depend
+*.o
+build/
+bin/
+
+!Makefile

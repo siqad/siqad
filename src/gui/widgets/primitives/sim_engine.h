@@ -32,19 +32,22 @@ namespace prim{
 
     // ACCESSORS
     QString name() {return eng_name;}
+    void setName(const QString &nm) {eng_name = nm;}
+    QString version() {return eng_version;}
+    void setVersion(const QString &ver) {eng_version = ver;}
+    QString binaryPath() {return bin_path;}
+    void setBinaryPath(const QString &path) {bin_path = path;}
     QString runtimeTempDir();
 
     // simulator info, for showing up in manager
     // available parameters and associated type, for user alteration
-
-    void setBinaryPath(const QString &b_path) {bin_path = b_path;}
-    QString binaryPath() {return bin_path;}
 
 
   private:
     // variables like binary location, temp file location, etc.
     QString eng_desc_file;      // description file of this engine
     QString eng_name;           // name of this engine
+    QString eng_version;
     QString bin_path;           // binary path of this engine
     QString runtime_temp_dir;   // root directory for all problems files for this engine
 

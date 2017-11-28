@@ -49,6 +49,44 @@ bool SimVisualize::showJob(prim::SimJob *job)
 }
 
 
+void SimVisualize::showJobTerminalOutput()
+{
+  if(!show_job){
+    qWarning() << tr("No job is being shown, cannot show terminal output.");
+    return;
+  }
+
+  // main widget for the terminal output window
+  QWidget *w_job_term = new QWidget(this, Qt::Dialog);
+  
+  QPlainTextEdit *te_term_output = new QPlainTextEdit;
+  te_term_output->appendPlainText(show_job->terminalOutput());
+  QPushButton *button_save_term_out = new QPushButton(tr("Save"));
+  QPushButton *button_close_term_out = new QPushButton(tr("Close"));
+
+  button_save_term_out->setShortcut(tr("CTRL+S"));
+  button_close_term_out->setShortcut(tr("Esc"));
+
+  connect(button_save_term_out, &QAbstractButton::clicked, show_job, &prim::SimJob::saveTerminalOutput);
+  connect(button_close_term_out, &QAbstractButton::clicked, w_job_term, &QWidget::close);
+
+  // layout
+  QHBoxLayout *job_term_buttons_hl = new QHBoxLayout;
+  job_term_buttons_hl->addStretch(1);
+  job_term_buttons_hl->addWidget(button_save_term_out);
+  job_term_buttons_hl->addWidget(button_close_term_out);
+  QVBoxLayout *job_term_vl = new QVBoxLayout;
+  job_term_vl->addWidget(te_term_output);
+  job_term_vl->addLayout(job_term_buttons_hl);
+
+  // pop-up widget
+  w_job_term->setWindowTitle(tr("%1 Terminal Output").arg(show_job->name()));
+  w_job_term->setLayout(job_term_vl);
+  
+  w_job_term->show();
+}
+
+
 void SimVisualize::updateJobSelCombo()
 {
   if(!combo_job_sel)
@@ -143,6 +181,8 @@ void SimVisualize::initSimVisualize()
   text_job_start_time = new QLabel;
   text_job_end_time = new QLabel;
 
+  button_show_term_out = new QPushButton("Show Terminal Output");
+
   text_job_engine->setAlignment(Qt::AlignRight);
   text_job_start_time->setAlignment(Qt::AlignRight);
   text_job_end_time->setAlignment(Qt::AlignRight);
@@ -170,26 +210,42 @@ void SimVisualize::initSimVisualize()
   job_info_layout->addLayout(job_engine_hl);
   job_info_layout->addLayout(job_start_time_hl);
   job_info_layout->addLayout(job_end_time_hl);
+  job_info_layout->addWidget(button_show_term_out);
   job_info_group->setLayout(job_info_layout);
 
   // Elec Distribution Group
   QGroupBox *dist_group = new QGroupBox(tr("Electron Distribution"));
   QLabel *label_dist_sel = new QLabel(tr("Dist:"));
+  QPushButton *button_dist_prev = new QPushButton(tr("<"));
+  QPushButton *button_dist_next = new QPushButton(tr(">"));
+
+  button_dist_prev->setShortcut(tr("CTRL+H"));
+  button_dist_next->setShortcut(tr("CTRL+L"));
+
   combo_dist_sel = new QComboBox;
   label_dist_sel->setBuddy(combo_job_sel);
   updateElecDistCombo();
 
-  QHBoxLayout *dist_sel = new QHBoxLayout;
-  dist_sel->addWidget(label_dist_sel);
-  dist_sel->addWidget(combo_dist_sel);
+  QHBoxLayout *dist_sel_hl = new QHBoxLayout;
+  dist_sel_hl->addWidget(label_dist_sel);
+  dist_sel_hl->addWidget(combo_dist_sel);
 
-  QVBoxLayout *dist_layout = new QVBoxLayout;
-  dist_layout->addLayout(dist_sel);
-  dist_group->setLayout(dist_layout);
+  QHBoxLayout *dist_sel_buttons_hl = new QHBoxLayout;
+  dist_sel_buttons_hl->addWidget(button_dist_prev);
+  dist_sel_buttons_hl->addWidget(button_dist_next);
+
+  QVBoxLayout *dist_vl = new QVBoxLayout;
+  dist_vl->addLayout(dist_sel_hl);
+  dist_vl->addLayout(dist_sel_buttons_hl);
+
+  dist_group->setLayout(dist_vl);
 
   // signal connection
+  connect(button_show_term_out, &QAbstractButton::clicked, this, &gui::SimVisualize::showJobTerminalOutput);
   connect(combo_job_sel, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &gui::SimVisualize::jobSelUpdate);
   connect(combo_dist_sel, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &gui::SimVisualize::distSelUpdate);
+  connect(button_dist_prev, &QAbstractButton::clicked, this, &gui::SimVisualize::distPrev);
+  connect(button_dist_next, &QAbstractButton::clicked, this, &gui::SimVisualize::distNext);
 
   // TODO show energy level, and maybe sorting feature
 
@@ -210,6 +266,18 @@ void SimVisualize::jobSelUpdate()
 void SimVisualize::distSelUpdate()
 {
   showElecDist(combo_dist_sel->currentIndex());
+}
+
+void SimVisualize::distPrev()
+{
+  if(combo_dist_sel->currentIndex() != 0)
+    combo_dist_sel->setCurrentIndex(combo_dist_sel->currentIndex() - 1);
+}
+
+void SimVisualize::distNext()
+{
+  if(combo_dist_sel->currentIndex() != combo_dist_sel->count() - 1)
+    combo_dist_sel->setCurrentIndex(combo_dist_sel->currentIndex() + 1);
 }
 
 

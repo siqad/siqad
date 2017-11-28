@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>DBDesigner</DisplayName>
+    <Description>Install DBDesigner on this machine.</Description>
+    <Version>0.0.1</Version>
+    <ReleaseDate>2017-10-27</ReleaseDate>
+    <Licenses>
+        <License name="GPLv3" file="license_GPLv3.txt" />
+    </Licenses>
+    <ForcedInstallation>true</ForcedInstallation>
+    <Script>installscript.qs</Script>
+</Package>

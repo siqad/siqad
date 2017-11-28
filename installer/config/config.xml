@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+     <Name>DBDesigner</Name>
+     <Version>0.0.1</Version>
+     <Title>DBDesigner Installer</Title>
+     <Publisher>Walus Lab</Publisher>
+     <StartMenuDir>DBDesigner</StartMenuDir>
+     <TargetDir>@ApplicationsDir@/DBDesigner</TargetDir>
+</Installer>

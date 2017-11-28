@@ -23,58 +23,50 @@ SimJob::SimJob(const QString &nm, SimEngine *eng, QWidget *parent)
 // invoke the simulator binary
 bool SimJob::invokeBinary()
 {
-  // NOTE might be helpful: https://stackoverflow.com/questions/14960472/running-c-binary-from-inside-qt-and-redirecting-the-output-of-the-binary-to-a
-
-  // TODO emit signal to save problem file and wait for it to complete
-  // problem_file_path = engine->generateJobDir() + "problem_desc.xml";
-
-  qDebug() << tr("SimJob: prepare physeng binary execution"); // TODO put in other directories
-  QFileInfo problem_file_info(problemFile()); // TODO don't hard code path
+  QFileInfo problem_file_info(problemFile());
 
   // check if file exists
-  qDebug() << tr("Check if file exists...");
   if(!(problem_file_info.exists() && problem_file_info.isFile())){
     qDebug() << tr("SimJob: problem file '%1' doesn't exist.").arg(problem_file_info.filePath());
     return false;
   }
-  qDebug() << tr("SimJob: File does exist");
+  // check if binary path exists
+  QFileInfo bin_path_info(engine->binaryPath());
+  if(!(bin_path_info.exists() && bin_path_info.isFile())){
+    qDebug() << tr("SimJob: engine binary '%1' doesn't exist.").arg(bin_path_info.filePath());
+    return false;
+  }
 
   arguments << problem_file_info.canonicalFilePath();
   arguments << resultFile();
-  //arguments << problem_file_info.canonicalPath().append("/simanneal_output.xml"); // TODO put in other directories
 
   start_time = QDateTime::currentDateTime();
 
   sim_process = new QProcess();
-  qDebug() << tr("SimJob: Setting binary path...");
-  //sim_process->setProgram(engine->getBinaryPath());
-  sim_process->setProgram("src/phys/physeng");
-  qDebug() << tr("SimJob: Setting arguments...");
+  sim_process->setProgram(engine->binaryPath());
   sim_process->setArguments(arguments);
-  qDebug() << tr("SimJob: setting process channel mode...");
   sim_process->setProcessChannelMode(QProcess::MergedChannels);
   qDebug() << tr("SimJob: Starting process");
   sim_process->start();
 
-  // TODO check that &arguments contains a valid path of the problem XML
-
-  // TODO check documentation for piping outputs
-
   // TODO connect signals for error and finish
 
   // temperary solution: just wait till completion
-  qDebug() << tr("SimJob: wait for completion...");
+  qDebug() << tr("SimJob: Process started, waiting for completion...");
   while(!sim_process->waitForStarted());
 
-  // dump output
   while(sim_process->waitForReadyRead())
-    qDebug() << sim_process->readAll();
+    terminal_output.append(QString::fromStdString(sim_process->readAll().toStdString())); // dump output TODO might not have to do it in while
 
-  qDebug() << tr("SimJob: binary has finished running.");
+  // post-simulation flag setting
+  end_time = QDateTime::currentDateTime();
   completed = true;
 
-  end_time = QDateTime::currentDateTime(); // TODO instead of determining end time here, should read end time from XML for future
+  // clean up sim_process pointer
+  delete sim_process;
+  sim_process = NULL;
 
+  qDebug() << tr("SimJob: simulation complete. You may check the job's terminal output on the simulation visualization panel.");
   return true;
 }
 
@@ -90,15 +82,26 @@ bool SimJob::readResults()
   }
 
   QXmlStreamReader rs(&result_file);
-  qDebug() << tr("Beginning load from %1").arg(result_file.fileName());
+  qDebug() << tr("SimJob: Reading simulation results from %1...").arg(result_file.fileName());
 
   // TODO flag that indicates what type of data these results contain, might be useful for sim_manager
 
   while(!rs.atEnd()){
     if(rs.isStartElement()){
-      if(rs.name() == "eng_info"){
-        // TODO
+      if(rs.name() == "sim_out"){
         rs.readNext();
+      }
+      else if(rs.name() == "eng_info"){
+        while(!(rs.isEndElement() && rs.name() == "eng_info")){
+          if(!rs.readNextStartElement())
+            continue; // skip until a start element is encountered
+          if(rs.name() == "engine"){
+            // TODO
+          }
+          else if(rs.name() == "version"){
+            // TODO
+          }
+        }
       }
       else if(rs.name() == "sim_param"){
         // TODO
@@ -157,7 +160,7 @@ bool SimJob::readResults()
     return false;
   }
 
-  qDebug() << tr("Load complete");
+  qDebug() << tr("SimJob: Successfully read simulation result.");
   result_file.close();
 
   return true;
@@ -175,8 +178,7 @@ bool SimJob::processResults()
 QString SimJob::runtimeTempDir()
 {
   if(run_job_dir.isEmpty()){
-    run_job_dir = engine->runtimeTempDir() + "/";
-    run_job_dir += name().isEmpty() ? QDateTime::currentDateTime().toString("MM-dd_HHmm") : name();
+    run_job_dir = QDir(engine->runtimeTempDir()).filePath(name().isEmpty() ? QDateTime::currentDateTime().toString("MM-dd_HHmm") : name());
   }
   QDir job_qdir(run_job_dir);
   if(!job_qdir.exists())
@@ -188,7 +190,7 @@ QString SimJob::runtimeTempDir()
 QString SimJob::problemFile()
 {
   if(problem_path.isEmpty())
-    problem_path = runtimeTempDir() + "/sim_problem.xml";
+    problem_path = QDir(runtimeTempDir()).filePath("sim_problem.xml");
   return problem_path;
 }
 
@@ -196,9 +198,34 @@ QString SimJob::problemFile()
 QString SimJob::resultFile()
 {
   if(result_path.isEmpty())
-    result_path = runtimeTempDir() + "/sim_result.xml";
+    result_path = QDir(runtimeTempDir()).filePath("sim_result.xml");
   return result_path;
 }
+
+
+void SimJob::saveTerminalOutput()
+{
+  // TODO implement
+  QString save_term_path = QFileDialog::getSaveFileName(0, tr("Save Terminal Output"),
+                            QDir::home().filePath(tr("%1_term_out.txt").arg(name())), tr("TXT files (*.txt)"));
+  if(save_term_path.isEmpty())
+    return;
+
+  QFile save_f(save_term_path);
+
+  if(!save_f.open(QIODevice::WriteOnly)){
+    qWarning() << tr("Error opening file '%1' when saving terminal output").arg(save_f.errorString());
+    return;
+  }
+
+  QTextStream save_s(&save_f);
+  save_s << terminalOutput();
+
+  save_f.close();
+}
+
+
+// PRIVATE
 
 void SimJob::deduplicateDist()
 {

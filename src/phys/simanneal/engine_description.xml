@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<physeng>
+    <name>SimAnneal</name>
+    <version>0.1</version>
+    <bin_path>simanneal</bin_path> <!-- relative to engines.xml -->
+</physeng>

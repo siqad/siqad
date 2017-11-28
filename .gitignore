@@ -6,6 +6,7 @@ db-sim
 *.o
 *.pyc
 qrc_application.cpp
+build
 
 # logs and databases
 src/log/
@@ -14,4 +15,4 @@ Makefile
 
 # other
 *.swp
-
+.qmake.stash

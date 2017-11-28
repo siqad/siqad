@@ -87,12 +87,18 @@ namespace gui{
     // FILE HANDLING
     bool resolveUnsavedChanges();       // returns whether to proceed or not
     void newFile();                     // create a new file
-    bool saveToFile(SaveFlag flag=Save, const QString &path=QString());   // actual save function
+    bool saveToFile(SaveFlag flag=Save, const QString &path=QString(), prim::SimJob *sim_job=0);   // actual save function
     void saveDefault();                 // save normally (calls saveToFile)
     void saveNew();                     // save as a new file (calls saveToFile)
     void autoSave();                    // perform autosave at specified interval (ms)
     void openFromFile();                // open a previous save
     void closeFile();                   // close the file when quitting the program
+
+    // Export to Labview
+    bool exportToLabview();
+
+    // About and Version
+    void aboutVersion();
 
   protected:
 

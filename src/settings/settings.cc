@@ -92,18 +92,21 @@ QSettings *settings::AppSettings::m_defs()
 
   // overwrites existing default values with same keys... no check
 
-  S->setValue("log/override", false);
+  S->setValue("log/override", true);
   S->setValue("log/tofile", true);
   S->setValue("log/logfile", QString("src/log/log.txt"));
 
   S->setValue("snap/diameter", 5.); //relative to scale_fact
 
-  S->setValue("dir/lattice", QString("src/settings/lattices"));
+  S->setValue("dir/lattice", QString("<BINPATH>/src/settings/lattices"));
 
   S->setValue("phys/debye_length", 50);
   S->setValue("phys/epsr", 10);
 
-  S->setValue("save/autosaveroot", QString("tmp/autosave/"));
+  S->setValue("phys/eng_lib_dir", QString("<BINPATH>/src/phys/"));
+  S->setValue("phys/runtime_temp_dir", QString("<SYSTMP>/db-sim/phys/"));
+
+  S->setValue("save/autosaveroot", QString("<SYSTMP>/db-sim/autosave/"));
   S->setValue("save/autosavenum", 3);
   S->setValue("save/autosaveinterval", 300); // in seconds
 
