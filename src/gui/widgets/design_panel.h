@@ -187,14 +187,9 @@ namespace gui{
     QPoint mouse_pos_cached;  // parameter for caching relevant mouse positions, in pixels
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
 
-<<<<<<< HEAD
-=======
     // sim visualization
     QList<prim::DBDot*> db_dots_result;
 
-
-
->>>>>>> master
     // INTERNAL METHODS
 
     // perform scene zoom based on wheel rotation
