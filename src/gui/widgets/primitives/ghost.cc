@@ -66,7 +66,7 @@ void prim::GhostBox::paint(QPainter *painter, const QStyleOptionGraphicsItem*, Q
   painter->setPen(Qt::NoPen);
   painter->setBrush(*pcol);
   painter->drawRect(boundingRect());
-  qDebug() << QObject::tr("Drawing GhostBox!");
+  // qDebug() << QObject::tr("Drawing GhostBox!");
 }
 
 void prim::GhostBox::constructStatics()

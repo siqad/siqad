@@ -1457,20 +1457,8 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
   }
   else
   {
-    qDebug() << tr("BeepBoop");
     prim::Ghost *ghost = prim::Ghost::instance();
     ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos())) - mapToScene(mouse_pos_old));
-    // qDebug() << tr("QCursor::pos = %1, %2").arg(QCursor::pos().x()).arg(QCursor::pos().y());
-    // qDebug() << tr("mapToScene(QCursor::pos = %1, %2").arg(mapToScene(QCursor::pos()).x()).arg(mapToScene(QCursor::pos()).y());
-    // qDebug() << tr("mapFromScene(QCursor::pos = %1, %2").arg(mapFromScene(QCursor::pos()).x()).arg(mapFromScene(QCursor::pos()).y());
-    // qDebug() << tr("mapToGlobal(QCursor::pos) = %1, %2").arg(mapToGlobal(QCursor::pos()).x()).arg(mapToGlobal(QCursor::pos()).y());
-    // qDebug() << tr("mapFromGlobal(QCursor::pos) = %1, %2").arg(mapFromGlobal(QCursor::pos()).x()).arg(mapFromGlobal(QCursor::pos()).y());
-    // qDebug() << tr("mouse_pos_old = %1, %2").arg(mouse_pos_old.x()).arg(mouse_pos_old.y());
-    // qDebug() << tr("mapToScene(mouse_pos_old = %1, %2").arg(mapToScene(mouse_pos_old).x()).arg(mapToScene(mouse_pos_old).y());
-    // qDebug() << tr("mapFromScene(mouse_pos_old = %1, %2").arg(mapFromScene(mouse_pos_old).x()).arg(mapFromScene(mouse_pos_old).y());
-    // qDebug() << tr("mapToGlobal(mouse_pos_old) = %1, %2").arg(mapToGlobal(mouse_pos_old).x()).arg(mapToGlobal(mouse_pos_old).y());
-    // qDebug() << tr("mapFromGlobal(mouse_pos_old) = %1, %2").arg(mapFromGlobal(mouse_pos_old).x()).arg(mapFromGlobal(mouse_pos_old).y());
-    // prim::Ghost::instance()->moveTo(mapToScene(e->pos()) - mapToScene(mouse_pos_old));
   }
 }
 
@@ -2154,8 +2142,6 @@ bool gui::DesignPanel::moveToGhost(bool kill)
     }
     if(isAllElectrodes == true) //selection is all electrodes. try to move them without snapping.
     { //offset is kept inside ghost->pos()
-      qDebug() << tr("BleepBloop");
-      qDebug() << tr("ghost position: %1, %2").arg(ghost->pos().x()).arg(ghost->pos().y());
       for(prim::Item *item : ghost->getTopItems())
         undo_stack->push(new MoveItem(item, ghost->pos(), this));
       return true; //things were moved.
