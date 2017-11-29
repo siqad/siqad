@@ -162,6 +162,7 @@ namespace gui{
     bool clicked;   // mouse left button is clicked
     bool ghosting;  // currently dragging a ghost
     bool moving;    // moving an existing group
+    bool pasting;
 
     // snapping
     qreal snap_diameter;            // size of region to search for snap points

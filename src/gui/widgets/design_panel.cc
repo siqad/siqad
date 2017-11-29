@@ -664,7 +664,6 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
         // rubber band variables
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
-
         // save current selection if Shift is pressed
         if(keymods & Qt::ShiftModifier)
           rb_shift_selected = scene->selectedItems();
@@ -674,7 +673,6 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
       else{
         QGraphicsView::mousePressEvent(e);
       }
-
       break;
     case Qt::MiddleButton:
       break;
@@ -757,6 +755,8 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
 
   // case specific behaviour
   if(ghosting){
+
+    qDebug() << tr("MouseReleaseEvent");
     // plant ghost and end ghosting
     if(moving)
     {
@@ -1050,12 +1050,14 @@ void gui::DesignPanel::undo()
 {
     // infoLabel->setText(tr("Invoked <b>Edit|Undo</b>"));
     qDebug() << tr("Undo...");
+    undo_stack->undo();
 }
 
 void gui::DesignPanel::redo()
 {
     // infoLabel->setText(tr("Invoked <b>Edit|Redo</b>"));
     qDebug() << tr("Redo...");
+    undo_stack->redo();
 }
 
 void gui::DesignPanel::cut()
@@ -1073,10 +1075,6 @@ void gui::DesignPanel::copy()
 void gui::DesignPanel::paste()
 {
     qDebug() << tr("Paste...");
-    for(QGraphicsItem *gitem : scene->selectedItems())
-    {
-      pasteElectrode(static_cast<prim::Electrode*>(gitem));
-    }
     // infoLabel->setText(tr("Invoked <b>Edit|Paste</b>"));
 }
 
@@ -1193,13 +1191,14 @@ void gui::DesignPanel::createGhost(bool paste)
 {
   // qDebug() << tr("Creating ghost...");
   prim::Ghost *ghost = prim::Ghost::instance();
-
+  pasting=paste;
   ghosting=true;
   snap_cache = QPointF();
 
   if(paste){
     ghost->prepare(clipboard);
     QPointF offset;
+    qDebug() << tr("createGhost");
     if(snapGhost(mapToScene(mapFromGlobal(QCursor::pos())), offset))
       ghost->moveBy(offset.x(), offset.y());
   }
@@ -1222,14 +1221,22 @@ void gui::DesignPanel::clearGhost()
   snap_target=0;
 }
 
-
+//paste is defaulted to false.
 bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
 {
   bool isAllElectrodes = true;
   //check if holding any non-electrodes
-  for(QGraphicsItem *gitem : scene->selectedItems()){
-    if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode)
-      isAllElectrodes = false;
+  if(pasting){
+    for(QGraphicsItem *gitem : clipboard){
+      if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode)
+        isAllElectrodes = false;
+    }
+  }
+  else{
+    for(QGraphicsItem *gitem : scene->selectedItems()){
+      if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode)
+        isAllElectrodes = false;
+    }
   }
   // if holding any non-electrodes (for now just db dots or lat dots)
   // don't need to recheck snap target unless the cursor has moved significantly
@@ -1246,9 +1253,7 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
       offset = QPointF();
       return true;
     }
-
     // otherwise restrict possible ghost position to lattice sites
-
     QPointF old_anchor = anchor->scenePos();
     QPointF free_anchor = ghost->freeAnchor(scene_pos);
 
@@ -1257,9 +1262,6 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
     rect.setSize(QSize(snap_diameter, snap_diameter));
     rect.moveCenter(free_anchor);
     QList<QGraphicsItem*> near_items = scene->items(rect);
-
-    // tdot->setPos(free_anchor);
-    // trect->setRect(rect);
 
     // if no items nearby, change nothing
     if(near_items.count()==0)
@@ -1292,8 +1294,15 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
   }
   else
   {
+    //electrode only
     prim::Ghost *ghost = prim::Ghost::instance();
-    ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos())) - mapToScene(mouse_pos_old));
+    if(pasting){ //offset is in the first electrode item
+      ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos())) - clipboard[0]->pos()
+                    - QPointF(static_cast<prim::Electrode*>(clipboard[0])->getwidth()/2.0,
+                              static_cast<prim::Electrode*>(clipboard[0])->getheight()/2.0));
+    }
+    else
+      ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos())) - mapToScene(mouse_pos_old));
     return false;
   }
 }
@@ -1405,13 +1414,7 @@ void gui::DesignPanel::snapDB(QPointF scene_pos)
   return;
 }
 
-
-
-
-
 // UNDO/REDO STACK METHODS
-
-
 // CreateDB class
 
 gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
@@ -1895,12 +1898,13 @@ bool gui::DesignPanel::pasteAtGhost()
     return false;
 
   undo_stack->beginMacro(tr("Paste %1 items").arg(clipboard.count()));
-
+  qDebug() << tr("pasteAtGhost");
   // paste each item in the clipboard, same as ghost top items (preferred order)
   for(prim::Item *item : ghost->getTopItems())
     pasteItem(ghost, item);
 
   undo_stack->endMacro();
+  pasting=false;
   return true;
 }
 
@@ -1954,6 +1958,7 @@ void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)
 
 void gui::DesignPanel::pasteElectrode(prim::Electrode *elec)
 {
+  qDebug() << tr("pasteElectrode");
   undo_stack->push(new CreateElectrode( elec->layer_id, this, elec->getp1() + QPointF(20, 20),
                   elec->getp2() + QPointF(20, 20), elec, true));
 }
