@@ -31,6 +31,7 @@ prim::Electrode::Electrode(int lay_id, QPointF p1, QPointF p2):
   elec_height = (std::max(p1.y(), p2.y()) - std::min(p1.y(), p2.y()));
   topLeft.setX(std::min(p1.x(), p2.x()));
   topLeft.setY(std::min(p1.y(), p2.y()));
+  setZValue(-1);
   setPos(mapToScene(topLeft).toPoint());
   // flags
   setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -62,7 +63,6 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
       // qDebug() << QObject::tr("Electrode selected");
     setPos(pos());
-    // qDebug() << QObject::tr("pos = %1, %2").arg(pos().x()).arg(pos().y());
     QPointF center = rect.center();
     QSizeF size(elec_width+edge_width, elec_height+edge_width);
     rect.setSize(size);
@@ -83,15 +83,8 @@ prim::Item *prim::Electrode::deepCopy() const
 
 void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
-  // qDebug() << QObject::tr("Electrode::mousePressEvent");
-  // qDebug() << QObject::tr("isSelected = %1").arg(isSelected());
-  // setFlag(QGraphicsItem::ItemIsMovable, true);
-  // qDebug() << QObject::tr("pos = %1, %2").arg(pos().x()).arg(pos().y());
   switch(e->buttons()){
     case Qt::RightButton:
-      // qDebug() << QObject::tr("Electrode: User right clicked.");
-      // qDebug() << QObject::tr("layer_id = %1").arg(layer_id);
-      // qDebug() << QObject::tr("item_type: %1").arg(item_type);
       setpot(potential-1);
       break;
     default:
@@ -126,7 +119,6 @@ void prim::Electrode::setpot(double pot_given)
   if (pot_given == pot_given)//check for NULL argument
   {
     potential = pot_given;
-    // qDebug() << QObject::tr("potential = %1").arg(potential);
   }
 }
 
@@ -136,8 +128,4 @@ void prim::Electrode::constructStatics() //needs to be changed to look at electr
   edge_width = gui_settings->get<qreal>("dbdot/edge_width");
   edge_col= gui_settings->get<QColor>("dbdot/edge_col");
   selected_col= gui_settings->get<QColor>("dbdot/selected_col");
-  // edge_col= gui_settings->get<QColor>("latdot/edge_col");
-  // fill_col= gui_settings->get<QColor>("latdot/fill_col");
-  // in_fill = gui_settings->get<qreal>("latdot/inner_fill");
-  // in_fill_col = gui_settings->get<QColor>("latdot/inner_fill_col");
 }
