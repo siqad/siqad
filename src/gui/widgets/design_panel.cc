@@ -827,8 +827,6 @@ void gui::DesignPanel::wheelEvent(QWheelEvent *e)
   else if(~deg_del.isNull())
     wheel_deg += deg_del;
 
-  qDebug() << tr("wheel_deg: %1").arg(wheel_deg.y());
-
   // if enough scroll achieved, act and reset wheel_deg
   if(qMax(qAbs(wheel_deg.x()),qAbs(wheel_deg.y())) >= 15) {
     Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();

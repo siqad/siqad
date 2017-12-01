@@ -45,6 +45,11 @@ gui::ApplicationGUI::~ApplicationGUI()
   // save current settings
   saveSettings();
 
+  // delete dialog panel manually and set pointer to 0. This avoids segfaults from
+  // attempts to echo in dialog panel
+  delete dialog_pan;
+  dialog_pan = 0;
+
   // free memory, parent delete child Widgets so Graphical Items are already
   // handled. Still need to free Settings
 
