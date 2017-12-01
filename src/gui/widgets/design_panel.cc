@@ -755,16 +755,12 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
 
   // case specific behaviour
   if(ghosting){
-    qDebug() << tr("MouseReleaseEvent");
-    qDebug() << tr("moving: %1").arg(moving);
-    qDebug() << tr("pasting: %1").arg(pasting);
     // plant ghost and end ghosting
     if(moving)
     {
       moveToGhost();
     }
     else{
-      qDebug() << tr("MouseReleaseEvent -> pasteAtGhost");
       pasteAtGhost();
     }
     clearGhost();
@@ -1201,7 +1197,6 @@ void gui::DesignPanel::createGhost(bool paste)
   if(paste){
     ghost->prepare(clipboard);
     QPointF offset;
-    qDebug() << tr("createGhost");
     if(snapGhost(mapToScene(mapFromGlobal(QCursor::pos())), offset))
       ghost->moveBy(offset.x(), offset.y());
   }
@@ -1628,18 +1623,13 @@ gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
                                       DesignPanel *dp, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), offset(offset)
 {
-  // qDebug() << tr("MoveItem");
-  // qDebug() << tr("item_type = %1").arg(item->item_type);
-  // qDebug() << tr("offset = %1, %2").arg(offset.x()).arg(offset.y());
   if(item->item_type != prim::Item::Electrode)
   {
-    // qDebug() << tr("Not Electrode");
     layer_index = item->layer_id;
     item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
   }
   else if(item->item_type == prim::Item::Electrode)
   {
-    // qDebug() << tr("Is Electrode");
     layer_index = item->layer_id;
     item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
   }
@@ -1648,21 +1638,17 @@ gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
 
 void gui::DesignPanel::MoveItem::undo()
 {
-  // qDebug() << tr("MoveItem::undo");
   move(true);
 }
 
 
 void gui::DesignPanel::MoveItem::redo()
 {
-  // qDebug() << tr("MoveItem::redo");
   move(false);
 }
 
 void gui::DesignPanel::MoveItem::move(bool invert)
 {
-  // qDebug() << tr("layer_index = %1").arg(layer_index);
-  // qDebug() << tr("item_index = %1").arg(item_index);
   prim::Layer *layer = dp->getLayer(layer_index);
   prim::Item *item = layer->getItem(item_index);
 
@@ -1684,7 +1670,6 @@ void gui::DesignPanel::MoveItem::moveItem(prim::Item *item, const QPointF &delta
 {
   switch(item->item_type){
     case prim::Item::DBDot:
-      // qDebug() << tr("Moving DBDot");
       moveDBDot(static_cast<prim::DBDot*>(item), delta);
       break;
     case prim::Item::Aggregate:
@@ -1731,8 +1716,6 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
 
 void gui::DesignPanel::MoveItem::moveElectrode(prim::Electrode *electrode, const QPointF &delta)
 {
-  // qDebug() << tr("delta = %1, %2").arg(delta.x()).arg(delta.y());
-  // qDebug() << tr("Moving Electrode");
   electrode->setPos( electrode->pos() + delta );
 }
 
@@ -1909,7 +1892,6 @@ bool gui::DesignPanel::pasteAtGhost()
       return false;
   }
   undo_stack->beginMacro(tr("Paste %1 items").arg(clipboard.count()));
-  qDebug() << tr("pasteAtGhost");
   // paste each item in the clipboard, same as ghost top items (preferred order)
   for(prim::Item *item : ghost->getTopItems())
     pasteItem(ghost, item);
@@ -1969,9 +1951,7 @@ void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)
 
 void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec)
 {
-  qDebug() << tr("pasteElectrode");
   undo_stack->beginMacro(tr("create electrode with given corners"));
-  // undo_stack->push(new CreateElectrode(layer_index, this, mapToScene(p1).toPoint(), p2));
   undo_stack->push(new CreateElectrode(elec->layer_id, this, ghost->pos()+elec->pos(),
               ghost->pos()+elec->pos()+QPointF(elec->getwidth(), elec->getheight())));
   undo_stack->endMacro();
