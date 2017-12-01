@@ -755,15 +755,18 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
 
   // case specific behaviour
   if(ghosting){
-
     qDebug() << tr("MouseReleaseEvent");
+    qDebug() << tr("moving: %1").arg(moving);
+    qDebug() << tr("pasting: %1").arg(pasting);
     // plant ghost and end ghosting
     if(moving)
     {
       moveToGhost();
     }
-    else
+    else{
+      qDebug() << tr("MouseReleaseEvent -> pasteAtGhost");
       pasteAtGhost();
+    }
     clearGhost();
   }
   else if(clicked){
@@ -1230,12 +1233,14 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
     for(QGraphicsItem *gitem : clipboard){
       if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode)
         isAllElectrodes = false;
+        break;
     }
   }
   else{
     for(QGraphicsItem *gitem : scene->selectedItems()){
       if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode)
         isAllElectrodes = false;
+        break;
     }
   }
   // if holding any non-electrodes (for now just db dots or lat dots)
@@ -1474,13 +1479,11 @@ gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignP
 
 void gui::DesignPanel::CreateElectrode::undo()
 {
-  // qDebug() << QObject::tr("undo(), p1 = (%1, %2), p2 = (%3, %4)").arg(p1.x()).arg(p1.y()).arg(p2.x()).arg(p2.y());
   invert ? create() : destroy();
 }
 
 void gui::DesignPanel::CreateElectrode::redo()
 {
-  // qDebug() << QObject::tr("redo(), p1 = (%1, %2), p2 = (%3, %4)").arg(p1.x()).arg(p1.y()).arg(p2.x()).arg(p2.y());
   invert ? destroy() : create();
 }
 
@@ -1892,11 +1895,19 @@ void gui::DesignPanel::destroyAggregate(prim::Aggregate *agg)
 bool gui::DesignPanel::pasteAtGhost()
 {
   prim::Ghost *ghost = prim::Ghost::instance();
-
+  bool isAllElectrodes = true;
+  for(QGraphicsItem *gitem : clipboard){
+    if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode)
+      isAllElectrodes = false;
+      break;
+  }
   // do nothing if clipboard empty
-  if(clipboard.isEmpty() || !ghost->valid_hash[snap_target])
+  if(clipboard.isEmpty())
     return false;
-
+  else{
+    if( !isAllElectrodes && !ghost->valid_hash[snap_target])
+      return false;
+  }
   undo_stack->beginMacro(tr("Paste %1 items").arg(clipboard.count()));
   qDebug() << tr("pasteAtGhost");
   // paste each item in the clipboard, same as ghost top items (preferred order)
@@ -1918,7 +1929,7 @@ void gui::DesignPanel::pasteItem(prim::Ghost *ghost, prim::Item *item)
       pasteAggregate(ghost, static_cast<prim::Aggregate*>(item));
       break;
     case prim::Item::Electrode:
-      pasteElectrode(static_cast<prim::Electrode*>(item));
+      pasteElectrode(ghost, static_cast<prim::Electrode*>(item));
       break;
 
     default:
@@ -1956,11 +1967,14 @@ void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)
 
 }
 
-void gui::DesignPanel::pasteElectrode(prim::Electrode *elec)
+void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec)
 {
   qDebug() << tr("pasteElectrode");
-  undo_stack->push(new CreateElectrode( elec->layer_id, this, elec->getp1() + QPointF(20, 20),
-                  elec->getp2() + QPointF(20, 20), elec, true));
+  undo_stack->beginMacro(tr("create electrode with given corners"));
+  // undo_stack->push(new CreateElectrode(layer_index, this, mapToScene(p1).toPoint(), p2));
+  undo_stack->push(new CreateElectrode(elec->layer_id, this, ghost->pos()+elec->pos(),
+              ghost->pos()+elec->pos()+QPointF(elec->getwidth(), elec->getheight())));
+  undo_stack->endMacro();
 }
 
 // NOTE: currently item move relies on there being a snap target (i.e. at least
