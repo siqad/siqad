@@ -73,7 +73,8 @@ void SimAnneal::initVars()
   kT = 2.568E-2; kT_step = 0.999999;    // kT = Boltzmann constant (eV/K) * 298 K, NOTE kT_step arbitrary
   v_freeze = 0, v_freeze_step = 0.001;  // NOTE v_freeze_step arbitrary
   unfav_hop_scale = 1;    // TODO still needs experimenting
-  result_queue_size = 100;
+  result_queue_size = problem.parameterExists("result_queue_size") ?
+                  std::stoi(problem.getParameter("result_queue_size")) : 1000;
 
   // resize vectors
   v_eff.resize(n_dbs);
@@ -82,7 +83,7 @@ void SimAnneal::initVars()
   v_ij.resize(n_dbs);
   db_r.resize(n_dbs);
 
-  //db_charges.resize(result_queue_size);
+  db_charges.resize(result_queue_size);
   db_charges.push_back(std::vector<int>(n_dbs));
   curr_charges = db_charges.back();
 
