@@ -60,7 +60,8 @@ void SimAnneal::initVars()
     std::cout << "There are no dbs in the problem!" << std::endl;
     return;
   }
-  // these should move to XML
+  result_queue_size = problem.parameterExists("result_queue_size") ?
+                  std::stoi(problem.getParameter("result_queue_size")) : 1000;
   t_preanneal = problem.parameterExists("preanneal_cycles") ? 
                   std::stoi(problem.getParameter("preanneal_cycles")) : 1000;
   t_max = problem.parameterExists("anneal_cycles") ? 
@@ -73,8 +74,6 @@ void SimAnneal::initVars()
   kT = 2.568E-2; kT_step = 0.999999;    // kT = Boltzmann constant (eV/K) * 298 K, NOTE kT_step arbitrary
   v_freeze = 0, v_freeze_step = 0.001;  // NOTE v_freeze_step arbitrary
   unfav_hop_scale = 1;    // TODO still needs experimenting
-  result_queue_size = problem.parameterExists("result_queue_size") ?
-                  std::stoi(problem.getParameter("result_queue_size")) : 1000;
 
   // resize vectors
   v_eff.resize(n_dbs);

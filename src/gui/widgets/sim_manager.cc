@@ -154,7 +154,7 @@ void SimManager::initSimSetupDialog()
   le_result_queue_size = new QLineEdit("1000"); // TODO these default values should be read from the engine description file
   le_preanneal_cycles = new QLineEdit("1000");
   le_anneal_cycles = new QLineEdit("10000");
-  le_global_v0 = new QLineEdit("0");
+  le_global_v0 = new QLineEdit("1");
   le_debye_length = new QLineEdit("5E-9");
 
   label_result_queue_size->setBuddy(le_result_queue_size);
