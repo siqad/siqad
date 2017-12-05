@@ -25,14 +25,15 @@ bool SimAnneal::runSim()
   // grab all physical locations (in original distance unit)
   std::cout << "Grab all physical locations..." << std::endl;
   n_dbs = 0;
-  for(Problem::DBIterator db_iter = problem.begin(); db_iter != problem.end(); ++db_iter) {
-    if( (**db_iter).elec != 1 ){
-      db_loc.push_back(std::make_pair((**db_iter).x, (**db_iter).y));
+  for(auto db : problem) {
+    if(db->elec != 1){
+      db_loc.push_back(std::make_pair(db->x, db->y));
       n_dbs++;
-      std::cout << "DB loc: x=" << db_loc.back().first << ", y=" << db_loc.back().second << std::endl;
+      std::cout << "DB loc: x=" << db_loc.back().first 
+          << ", y=" << db_loc.back().second << std::endl;
     }
     else
-      fixed_charges.push_back(std::make_tuple((**db_iter).x, (**db_iter).y, (**db_iter).elec));
+      fixed_charges.push_back(std::make_tuple(db->x, db->y, db->elec));
   }
 
   std::cout << "Free dbs, n_dbs=" << n_dbs << std::endl;
@@ -60,10 +61,14 @@ void SimAnneal::initVars()
     return;
   }
   // these should move to XML
-  t_preanneal = problem.parameterExists("preanneal_cycles") ? std::stoi(problem.getParameter("preanneal_cycles")) : 1000;
-  t_max = problem.parameterExists("anneal_cycles") ? std::stoi(problem.getParameter("anneal_cycles")) : 10000;
-  v_0 = problem.parameterExists("global_v0") ? std::stof(problem.getParameter("global_v0")) : 1; // TODO this shouldn't be variable
-  debye_length = problem.parameterExists("debye_length") ? std::stof(problem.getParameter("debye_length")) : 5E-9; // ~10s of dimer rows
+  t_preanneal = problem.parameterExists("preanneal_cycles") ? 
+                  std::stoi(problem.getParameter("preanneal_cycles")) : 1000;
+  t_max = problem.parameterExists("anneal_cycles") ? 
+                  std::stoi(problem.getParameter("anneal_cycles")) : 10000;
+  v_0 = problem.parameterExists("global_v0") ? 
+                  std::stof(problem.getParameter("global_v0")) : 1; // TODO this should be fixed
+  debye_length = problem.parameterExists("debye_length") ? 
+                  std::stof(problem.getParameter("debye_length")) : 5E-9; // ~10s of dimer rows
 
   kT = 2.568E-2; kT_step = 0.999999;    // kT = Boltzmann constant (eV/K) * 298 K, NOTE kT_step arbitrary
   v_freeze = 0, v_freeze_step = 0.001;  // NOTE v_freeze_step arbitrary
