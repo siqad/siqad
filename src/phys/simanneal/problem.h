@@ -111,7 +111,7 @@ namespace phys{
 
     // ACCESSORS
 
-    bool parameterExists(const std::string &key) {return sim_params.find(key) == sim_params.end();}
+    bool parameterExists(const std::string &key) {return sim_params.find(key) != sim_params.end();}
     std::string getParameter(const std::string &key) {return sim_params.find(key) != sim_params.end() ? sim_params.at(key) : "";}
 
     // Variables
