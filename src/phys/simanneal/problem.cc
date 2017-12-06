@@ -143,7 +143,7 @@ bool Problem::readProblem(const std::string &fname)
   if(design_node == 0 || !readDesign(design_node, db_tree))
     return false;
 
-  std::cout << "db_tree pointer " << db_tree.get() << std::endl;
+  //std::cout << "db_tree pointer " << db_tree.get() << std::endl;
 
   return true;
 }
