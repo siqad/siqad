@@ -37,7 +37,7 @@ namespace gui{
 
     void updateJobSelCombo();
     bool showElecDist(int dist_ind);
-    void updateElecDistCombo();
+    void updateElecDistOptions();
     void updateOptions();
 
     // TODO generate a list of DBDot* with the same order as physlocs in show_job
@@ -63,7 +63,8 @@ namespace gui{
     QLabel *text_job_end_time;
     QPushButton *button_show_term_out;
 
-    QComboBox *combo_dist_sel;
+    QSlider *slider_dist_sel;
+    QLabel *text_dist_selected;
   };
 
 } // end of gui namespace
