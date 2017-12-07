@@ -67,6 +67,8 @@ namespace gui{
 
     // option dock
     void showOptionDock() {option_dock->show();}    // for now, option dock only contains options related to SimVisualization
+    void toggleDialogDockVisibility();
+    void dialogDockVisibilityChanged();
 
     // Start current simulation method
     // ... it might be worth modifying the work-flow such that instead of running
@@ -110,7 +112,8 @@ namespace gui{
     void initMenuBar();   // initialise the GUI menubar
     void initTopBar();    // initialise the GUI topbar, toolbar
     void initSideBar();   // initialise the GUI sidebar, toolbar
-    void initOptionDock();// initialize the GUI option dock
+    void initDialogDock();// initialise the GUI bottom dialog dock
+    void initOptionDock();// initialize the GUI side option dock
 
     // prepare any extra actions not attched to an icon or meny
     void initActions();
@@ -141,6 +144,7 @@ namespace gui{
     gui::InputField   *input_field; // mainwindow input field
     gui::SimManager   *sim_manager; // pop-up simulator manager
     gui::SimVisualize *sim_visualize; // simulation visualizer that goes in option_dock
+    QDockWidget       *dialog_dock; // bottom panel for terminal dialog
     QDockWidget       *option_dock; // right side panel for context aware options
 
     // action pointers
@@ -152,6 +156,7 @@ namespace gui{
     QAction *action_sim_visualize;// show the option dock which allows simulation visualization
     QAction *action_layer_sel;
     QAction *action_circuit_lib;
+    QAction *action_dialog_dock_visibility;
 
     // save file
     QTimer autosave_timer;     // timer for autosaves
