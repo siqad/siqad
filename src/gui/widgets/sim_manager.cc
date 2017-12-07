@@ -145,25 +145,31 @@ void SimManager::initSimSetupDialog()
   QGroupBox *sim_params_group = new QGroupBox(tr("Simulation Parameters"));
 
   // hard coded fields for now
+  QLabel *label_result_queue_size = new QLabel("Result Queue Size:");
   QLabel *label_preanneal_cycles = new QLabel("Preanneal Cycles:");
   QLabel *label_anneal_cycles = new QLabel("Anneal Cycles:");
   QLabel *label_global_v0 = new QLabel("Global Bias v_0:");
   QLabel *label_debye_length = new QLabel("Debye Length (m):");
 
-  le_preanneal_cycles = new QLineEdit("1000"); // TODO these default values should be read from the engine description file
+  le_result_queue_size = new QLineEdit("1000"); // TODO these default values should be read from the engine description file
+  le_preanneal_cycles = new QLineEdit("1000");
   le_anneal_cycles = new QLineEdit("10000");
-  le_global_v0 = new QLineEdit("0");
+  le_global_v0 = new QLineEdit("1");
   le_debye_length = new QLineEdit("5E-9");
 
+  label_result_queue_size->setBuddy(le_result_queue_size);
   label_preanneal_cycles->setBuddy(le_preanneal_cycles);
   label_anneal_cycles->setBuddy(le_anneal_cycles);
   label_global_v0->setBuddy(le_global_v0);
   label_debye_length->setBuddy(le_debye_length);
 
+  QHBoxLayout *result_queue_size_hl = new QHBoxLayout;
   QHBoxLayout *preanneal_cycles_hl = new QHBoxLayout;
   QHBoxLayout *anneal_cycles_hl = new QHBoxLayout;
   QHBoxLayout *global_v0_hl = new QHBoxLayout;
   QHBoxLayout *debye_length_hl = new QHBoxLayout;
+  result_queue_size_hl->addWidget(label_result_queue_size);
+  result_queue_size_hl->addWidget(le_result_queue_size);
   preanneal_cycles_hl->addWidget(label_preanneal_cycles);
   preanneal_cycles_hl->addWidget(le_preanneal_cycles);
   anneal_cycles_hl->addWidget(label_anneal_cycles);
@@ -174,6 +180,7 @@ void SimManager::initSimSetupDialog()
   debye_length_hl->addWidget(le_debye_length);
 
   QVBoxLayout *sim_params_vl = new QVBoxLayout;
+  sim_params_vl->addLayout(result_queue_size_hl);
   sim_params_vl->addLayout(preanneal_cycles_hl);
   sim_params_vl->addLayout(anneal_cycles_hl);
   sim_params_vl->addLayout(global_v0_hl);
@@ -246,6 +253,7 @@ void SimManager::submitSimSetup()
   prim::SimJob *new_job = new prim::SimJob(le_job_nm->text(), sim_engines[combo_eng_sel->currentIndex()]);
 
   // fill in job properties according to input fields
+  new_job->addSimulationParameter("result_queue_size", le_result_queue_size->text());
   new_job->addSimulationParameter("preanneal_cycles", le_preanneal_cycles->text());
   new_job->addSimulationParameter("anneal_cycles", le_anneal_cycles->text());
   new_job->addSimulationParameter("global_v0", le_global_v0->text());

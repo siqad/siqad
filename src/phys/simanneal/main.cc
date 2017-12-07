@@ -18,8 +18,10 @@ int main(int argc, char *argv[])
   std::cout << "Physeng invoked" << std::endl;
   std::string if_name, of_name;
 
-  // for now, only support one argument which is the input file
-  // TODO -i input_path -o output_path
+  std::cout << "*** Argument Parsing ***" << std::endl;
+
+  // for now, only support two arguments: input and output files
+  // TODO flags: -i input_path -o output_path
   // maybe make a struct to contain program options in case of more input options
   if(argc == 1){
     if_name = std::string("cooldbdesign.xml");
@@ -38,16 +40,18 @@ int main(int argc, char *argv[])
     return 0;
   }
 
-
   std::cout << "In File: " << if_name << std::endl;
   std::cout << "Out File: " << of_name << std::endl;
 
+  std::cout << std::endl << "*** Constructing Problem ***" << std::endl;
   SimAnneal sim_anneal(if_name, of_name);
 
-  sim_anneal.runSim();
+  std::cout << std::endl << "*** Run Simulation ***" << std::endl;
+  if(!sim_anneal.runSim()) {
+    std::cout << "Simulation failed, aborting" << std::endl;
+    return 0;
+  }
 
+  std::cout << std::endl << "*** Write Result to Output ***" << std::endl;
   sim_anneal.writeResultsXML();
-  //Problem *problem = new Problem();
-
-  //problem->readProblem(std::string("problem_sample.xml"));
 }

@@ -20,22 +20,26 @@ SimAnneal::SimAnneal(const std::string& i_path, const std::string& o_path)
 
 bool SimAnneal::runSim()
 {
-  // TODO check that problem exists before attemping to run simulation
-
   // grab all physical locations (in original distance unit)
   std::cout << "Grab all physical locations..." << std::endl;
   n_dbs = 0;
-  for(Problem::DBIterator db_iter = problem.begin(); db_iter != problem.end(); ++db_iter) {
-    if( (**db_iter).elec != 1 ){
-      db_loc.push_back(std::make_pair((**db_iter).x, (**db_iter).y));
+  for(auto db : problem) {
+    if(db->elec != 1){
+      db_loc.push_back(std::make_pair(db->x, db->y));
       n_dbs++;
-      std::cout << "DB loc: x=" << db_loc.back().first << ", y=" << db_loc.back().second << std::endl;
+      std::cout << "DB loc: x=" << db_loc.back().first 
+          << ", y=" << db_loc.back().second << std::endl;
     }
     else
-      fixed_charges.push_back(std::make_tuple((**db_iter).x, (**db_iter).y, (**db_iter).elec));
+      fixed_charges.push_back(std::make_tuple(db->x, db->y, db->elec));
   }
+  std::cout << "Free dbs, n_dbs=" << n_dbs << std::endl << std::endl;
 
-  std::cout << "Free dbs, n_dbs=" << n_dbs << std::endl;
+  // exit if no dbs
+  if(n_dbs == 0) {
+    std::cout << "No dbs found, nothing to simulation. Exiting." << std::endl;
+    return false;
+  }
 
   // initialize variables & perform pre-calculation
   initVars();
@@ -59,16 +63,22 @@ void SimAnneal::initVars()
     std::cout << "There are no dbs in the problem!" << std::endl;
     return;
   }
-  // these should move to XML
-  t_preanneal = problem.parameterExists("preanneal_cycles") ? std::stoi(problem.getParameter("preanneal_cycles")) : 1000;
-  t_max = problem.parameterExists("anneal_cycles") ? std::stoi(problem.getParameter("anneal_cycles")) : 10000;
-  v_0 = problem.parameterExists("global_v0") ? std::stof(problem.getParameter("global_v0")) : 1; // TODO this shouldn't be variable
-  debye_length = problem.parameterExists("debye_length") ? std::stof(problem.getParameter("debye_length")) : 5E-9; // ~10s of dimer rows
+  t_preanneal = problem.parameterExists("preanneal_cycles") ? 
+                  std::stoi(problem.getParameter("preanneal_cycles")) : 1000;
+  t_max = problem.parameterExists("anneal_cycles") ? 
+                  std::stoi(problem.getParameter("anneal_cycles")) : 10000;
+  v_0 = problem.parameterExists("global_v0") ? 
+                  std::stof(problem.getParameter("global_v0")) : 1; // TODO this should be fixed
+  debye_length = problem.parameterExists("debye_length") ? 
+                  std::stof(problem.getParameter("debye_length")) : 5E-9; // ~10s of dimer rows
+
+  result_queue_size = problem.parameterExists("result_queue_size") ?
+                  std::stoi(problem.getParameter("result_queue_size")) : 1000;
+  result_queue_size = t_max < result_queue_size ? t_max : result_queue_size;
 
   kT = 2.568E-2; kT_step = 0.999999;    // kT = Boltzmann constant (eV/K) * 298 K, NOTE kT_step arbitrary
   v_freeze = 0, v_freeze_step = 0.001;  // NOTE v_freeze_step arbitrary
   unfav_hop_scale = 1;    // TODO still needs experimenting
-  result_queue_size = 100;
 
   // resize vectors
   v_eff.resize(n_dbs);
@@ -77,11 +87,11 @@ void SimAnneal::initVars()
   v_ij.resize(n_dbs);
   db_r.resize(n_dbs);
 
-  //db_charges.resize(result_queue_size);
+  db_charges.resize(result_queue_size);
   db_charges.push_back(std::vector<int>(n_dbs));
   curr_charges = db_charges.back();
 
-  std::cout << "Variable initialization complete" << std::endl;
+  std::cout << "Variable initialization complete" << std::endl << std::endl;
 }
 
 void SimAnneal::precalc()
@@ -125,7 +135,7 @@ void SimAnneal::precalc()
     v_ext[i] = 0;
     //db_charges[i] = 0;
   }
-  std::cout << "Pre-calculation completed." << std::endl;
+  std::cout << "Pre-calculation complete" << std::endl << std::endl;
 }
 
 
@@ -327,7 +337,7 @@ float SimAnneal::systemEnergy()
   assert(n_dbs > 0);
   float v = v_0;
   for(int i=0; i<n_dbs; i++) {
-    v += curr_charges[i] * (v_ext[i] + v_drive[i]); // TODO combine v_ext and v_drive since they're not changing anyway
+    v += curr_charges[i] * (v_ext[i] + v_drive[i]); // TODO combine v_ext and v_drive since they're not changing anyway (but somewhere above there's v_ext - v_drive, investigate)
     for(int j=i+1; j<n_dbs; j++)
       v += curr_charges[i] * curr_charges[j] * v_ij[i][j];
   }

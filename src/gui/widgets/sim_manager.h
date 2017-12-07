@@ -70,6 +70,7 @@ private:
 
   // sim_setup_dialog fields (hard coded for SimAnneal)
   QComboBox *combo_eng_sel;
+  QLineEdit *le_result_queue_size;
   QLineEdit *le_job_nm;
   QLineEdit *le_preanneal_cycles;
   QLineEdit *le_anneal_cycles;

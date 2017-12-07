@@ -4,5 +4,7 @@ simanneal.exe
 *.o
 build/
 bin/
+cooldbdesign.xml
+cooloutput.xml
 
 !Makefile

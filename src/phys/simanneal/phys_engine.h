@@ -9,6 +9,7 @@
 #include "problem.h"
 #include "rapidxml-1.13/rapidxml.hpp"
 #include "rapidxml-1.13/rapidxml_print.hpp"
+#include <boost/circular_buffer.hpp>
 //#include "rapidxml-1.13/rapidxml_utils.hpp"
 #include <iostream>
 #include <string>
@@ -34,7 +35,8 @@ namespace phys{
     Problem problem;
 
     std::vector<std::pair<float,float>> db_loc; // location of free dbs
-    std::deque<std::vector<int>> db_charges;
+    //std::deque<std::vector<int>> db_charges;
+    boost::circular_buffer<std::vector<int>> db_charges;
 
   private:
     std::string eng_name;

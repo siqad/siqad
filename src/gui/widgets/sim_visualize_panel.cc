@@ -111,20 +111,24 @@ bool SimVisualize::showElecDist(int dist_ind)
 }
 
 
-void SimVisualize::updateElecDistCombo()
+void SimVisualize::updateElecDistOptions()
 {
-  if(!combo_dist_sel || !show_job)
+  // slider
+  if(!text_dist_selected || !slider_dist_sel || !show_job)
     return;
-  combo_dist_sel->clear();
 
-  if(!show_job->isComplete() || show_job->elec_dists.isEmpty())
-    combo_dist_sel->addItem("No Distribution");
+  if(!show_job->isComplete() || show_job->elec_dists.isEmpty()){
+    slider_dist_sel->setMinimum(0);
+    slider_dist_sel->setMaximum(0);
+    text_dist_selected->setText("0/0");
+  }
   else{
-    // primitive solution, need to figure out something better
-    // like better ways to visualize degenerate states, etc
-    int i=0;
-    for(auto dist : show_job->elec_dists)
-      combo_dist_sel->addItem(QString::number(i++));
+    int dist_count = show_job->elec_dists.size();
+    int min_sel = dist_count > 0;
+    slider_dist_sel->setMinimum(min_sel);
+    slider_dist_sel->setMaximum(dist_count);
+    slider_dist_sel->setValue(min_sel);
+    text_dist_selected->setText(tr("%1/%2").arg(min_sel).arg(dist_count));
   }
 }
 
@@ -150,7 +154,7 @@ void SimVisualize::updateOptions()
     // TODO result type selector (not needed for now)
 
     // elec dist selection
-    updateElecDistCombo();
+    updateElecDistOptions();
     
     // group box result filter
       // energies
@@ -218,20 +222,21 @@ void SimVisualize::initSimVisualize()
   QLabel *label_dist_sel = new QLabel(tr("Dist:"));
   QPushButton *button_dist_prev = new QPushButton(tr("<"));
   QPushButton *button_dist_next = new QPushButton(tr(">"));
+  text_dist_selected = new QLabel("0/0");
 
   button_dist_prev->setShortcut(tr("CTRL+H"));
   button_dist_next->setShortcut(tr("CTRL+L"));
 
-  combo_dist_sel = new QComboBox;
-  label_dist_sel->setBuddy(combo_job_sel);
-  updateElecDistCombo();
+  slider_dist_sel = new QSlider(Qt::Horizontal);
+  updateElecDistOptions();
 
   QHBoxLayout *dist_sel_hl = new QHBoxLayout;
   dist_sel_hl->addWidget(label_dist_sel);
-  dist_sel_hl->addWidget(combo_dist_sel);
+  dist_sel_hl->addWidget(slider_dist_sel);
 
   QHBoxLayout *dist_sel_buttons_hl = new QHBoxLayout;
   dist_sel_buttons_hl->addWidget(button_dist_prev);
+  dist_sel_buttons_hl->addWidget(text_dist_selected);
   dist_sel_buttons_hl->addWidget(button_dist_next);
 
   QVBoxLayout *dist_vl = new QVBoxLayout;
@@ -243,7 +248,7 @@ void SimVisualize::initSimVisualize()
   // signal connection
   connect(button_show_term_out, &QAbstractButton::clicked, this, &gui::SimVisualize::showJobTerminalOutput);
   connect(combo_job_sel, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &gui::SimVisualize::jobSelUpdate);
-  connect(combo_dist_sel, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &gui::SimVisualize::distSelUpdate);
+  connect(slider_dist_sel, static_cast<void(QSlider::*)(int)>(&QSlider::valueChanged), this, &gui::SimVisualize::distSelUpdate);
   connect(button_dist_prev, &QAbstractButton::clicked, this, &gui::SimVisualize::distPrev);
   connect(button_dist_next, &QAbstractButton::clicked, this, &gui::SimVisualize::distNext);
 
@@ -265,19 +270,26 @@ void SimVisualize::jobSelUpdate()
 
 void SimVisualize::distSelUpdate()
 {
-  showElecDist(combo_dist_sel->currentIndex());
+  text_dist_selected->setText(tr("%1/%2").arg(slider_dist_sel->value()).arg(show_job->elec_dists.size()));
+  showElecDist(slider_dist_sel->sliderPosition());
 }
 
 void SimVisualize::distPrev()
 {
-  if(combo_dist_sel->currentIndex() != 0)
-    combo_dist_sel->setCurrentIndex(combo_dist_sel->currentIndex() - 1);
+  if(!slider_dist_sel)
+    return;
+
+  if(slider_dist_sel->value() > 1)
+    slider_dist_sel->setValue(slider_dist_sel->value() - 1);
 }
 
 void SimVisualize::distNext()
 {
-  if(combo_dist_sel->currentIndex() != combo_dist_sel->count() - 1)
-    combo_dist_sel->setCurrentIndex(combo_dist_sel->currentIndex() + 1);
+  if(!slider_dist_sel)
+    return;
+
+  if(slider_dist_sel->value() != slider_dist_sel->maximum())
+    slider_dist_sel->setValue(slider_dist_sel->value() + 1);
 }
 
 
