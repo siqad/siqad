@@ -48,6 +48,11 @@ namespace prim{
 
     Item *deepCopy() const;
 
+  protected:
+
+    // double click event is added to fix the bug where latdot becomes unselectable
+    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE {e->ignore();}
+
   private:
 
     // construct static variables

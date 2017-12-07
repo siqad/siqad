@@ -72,4 +72,5 @@ void prim::Item::mousePressEvent(QGraphicsSceneMouseEvent *e)
   }
 
   qDebug() << QObject::tr("Item clicked: %1 :: (%2 , %3)").arg((size_t)this).arg(x()).arg(y());
+  qDebug() << QObject::tr("Selectability: %1").arg(flags() & QGraphicsItem::ItemIsSelectable);
 }
