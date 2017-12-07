@@ -139,12 +139,13 @@ namespace gui{
     void keyReleaseEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
 
   private slots:
-    void undo();
-    void redo();
-    void cut();
-    void copy();
-    void paste();
-    void electrodeSetPotential();
+    void undoAction();
+    void redoAction();
+    void cutAction();
+    void copyAction();
+    void pasteAction();
+    void deleteAction();
+    void electrodeSetPotentialAction();
 
   private:
 
@@ -164,7 +165,7 @@ namespace gui{
     bool clicked;   // mouse left button is clicked
     bool ghosting;  // currently dragging a ghost
     bool moving;    // moving an existing group
-    bool pasting;
+    bool pasting;   // evoked some kind of pasting
 
     // snapping
     qreal snap_diameter;            // size of region to search for snap points
@@ -283,6 +284,7 @@ namespace gui{
     QAction *action_cut;
     QAction *action_copy;
     QAction *action_paste;
+    QAction *action_delete;
     QAction *action_set_potential;
   };
 

@@ -1033,6 +1033,11 @@ void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
   } else {
     action_paste->setEnabled(false);
   }
+  if(!scene->selectedItems().isEmpty()) { //not empty, enable deleting
+    action_delete->setEnabled(true);
+  } else {
+    action_delete->setEnabled(false);
+  }
   QMenu menu(this); //create the context menu object
   if(QGraphicsItem *gitem = itemAt(e->pos())) {
     if(static_cast<prim::Item*>(gitem)->upSelected()){
@@ -1051,42 +1056,50 @@ void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
   menu.addAction(action_cut);
   menu.addAction(action_copy);
   menu.addAction(action_paste);
+  menu.addSeparator();
+  menu.addAction(action_delete);
   menu.exec(e->globalPos());
 }
 
-void gui::DesignPanel::undo()
+void gui::DesignPanel::undoAction()
 {
     // qDebug() << tr("Undo...");
     undo_stack->undo();
 }
 
-void gui::DesignPanel::redo()
+void gui::DesignPanel::redoAction()
 {
     // qDebug() << tr("Redo...");
     undo_stack->redo();
 }
 
-void gui::DesignPanel::cut()
+void gui::DesignPanel::cutAction()
 {
     // qDebug() << tr("Cut...");
     copySelection();
     deleteSelection();
 }
 
-void gui::DesignPanel::copy()
+void gui::DesignPanel::copyAction()
 {
     // qDebug() << tr("Copy...");
     copySelection();
 }
 
-void gui::DesignPanel::paste()
+void gui::DesignPanel::pasteAction()
 {
     // qDebug() << tr("Paste...");
     if(!clipboard.isEmpty() && display_mode == DesignMode)
       createGhost(true);
 }
 
-void gui::DesignPanel::electrodeSetPotential()
+void gui::DesignPanel::deleteAction()
+{
+  if(tool_type == gui::DesignPanel::SelectTool && display_mode == DesignMode)
+    deleteSelection();
+}
+
+void gui::DesignPanel::electrodeSetPotentialAction()
 {
   double potential;
   // qDebug() << tr("electrodeSetPotential...");
@@ -1106,22 +1119,25 @@ void gui::DesignPanel::electrodeSetPotential()
 void gui::DesignPanel::createActions()
 {
   action_undo = new QAction(tr("&Undo"), this);
-  connect(action_undo, &QAction::triggered, this, &gui::DesignPanel::undo);
+  connect(action_undo, &QAction::triggered, this, &gui::DesignPanel::undoAction);
 
   action_redo = new QAction(tr("&Redo"), this);
-  connect(action_redo, &QAction::triggered, this, &gui::DesignPanel::redo);
+  connect(action_redo, &QAction::triggered, this, &gui::DesignPanel::redoAction);
 
   action_cut = new QAction(tr("Cut"), this);
-  connect(action_cut, &QAction::triggered, this, &gui::DesignPanel::cut);
+  connect(action_cut, &QAction::triggered, this, &gui::DesignPanel::cutAction);
 
   action_copy = new QAction(tr("&Copy"), this);
-  connect(action_copy, &QAction::triggered, this, &gui::DesignPanel::copy);
+  connect(action_copy, &QAction::triggered, this, &gui::DesignPanel::copyAction);
 
   action_paste = new QAction(tr("&Paste"), this);
-  connect(action_paste, &QAction::triggered, this, &gui::DesignPanel::paste);
+  connect(action_paste, &QAction::triggered, this, &gui::DesignPanel::pasteAction);
+
+  action_delete = new QAction(tr("&Delete"), this);
+  connect(action_delete, &QAction::triggered, this, &gui::DesignPanel::deleteAction);
 
   action_set_potential = new QAction(tr("&Set Potential"), this);
-  connect(action_set_potential, &QAction::triggered, this, &gui::DesignPanel::electrodeSetPotential);
+  connect(action_set_potential, &QAction::triggered, this, &gui::DesignPanel::electrodeSetPotentialAction);
 }
 
 
@@ -1234,7 +1250,7 @@ void gui::DesignPanel::clearGhost()
   snap_target=0;
 }
 
-//paste is defaulted to false.
+
 bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
 {
   bool isAllElectrodes = true;
@@ -1326,7 +1342,6 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
 
 void gui::DesignPanel::initMove()
 {
-  // create ghost
   createGhost(false);
 
   // set lattice dots of objects to be moved as selectable
