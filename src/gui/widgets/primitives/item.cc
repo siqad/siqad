@@ -50,13 +50,13 @@ bool prim::Item::upHovered()
 void prim::Item::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
   Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
-
   switch(e->buttons()){
     case Qt::LeftButton:
       if(keymods & Qt::ControlModifier)
         e->ignore();
-      else if(upSelected())
+      else if(upSelected()){
         prim::Emitter::instance()->selectClicked(this);
+      }
       else{
         if(parentItem()==0)
           QGraphicsItem::mousePressEvent(e);

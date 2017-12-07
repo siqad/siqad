@@ -13,6 +13,7 @@
 
 #include <QtWidgets>
 #include <QtCore>
+#include <QDialog>
 
 #include "primitives/layer.h"
 #include "primitives/lattice.h"
@@ -123,7 +124,7 @@ namespace gui{
 
   protected:
 
-    void contextMenuEvent(QContextMenuEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *e) override;
 
     // interrupts
 
@@ -143,6 +144,7 @@ namespace gui{
     void cut();
     void copy();
     void paste();
+    void electrodeSetPotential();
 
   private:
 
@@ -190,8 +192,6 @@ namespace gui{
 
     // filter selected items
     void filterSelection(bool select_flag);
-
-
 
     // RUBBER BAND
 
@@ -283,6 +283,7 @@ namespace gui{
     QAction *cutAct;
     QAction *copyAct;
     QAction *pasteAct;
+    QAction *electrodeSetPotentialAct;
   };
 
 

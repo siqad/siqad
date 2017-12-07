@@ -30,11 +30,11 @@ namespace prim{
     enum ElectrodeType{Clock, Fix};
 
     ElectrodeType electrode_type;
+
     //setters
-    void setpot(double pot_given);
+    void setPotential(double givenPotential);
 
     // accessors
-
     QPointF getp1(void){ return p1;}
     QPointF getp2(void){ return p2;}
     QPointF gettopLeft(void){return topLeft;}
@@ -51,8 +51,6 @@ namespace prim{
   protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
     virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
-    // virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
-    // virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
   private:
 
@@ -83,3 +81,4 @@ namespace prim{
 } // end prim namespace
 
 #endif
+//////

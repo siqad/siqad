@@ -651,7 +651,6 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   // set clicked flag and store current mouse position for move behaviour
   mouse_pos_old = e->pos();
   mouse_pos_cached = e->pos(); // this might be a referencing clash, check.
-  // qDebug() << tr("ghosting = %1").arg(ghosting);
 
   // if other buttons are clicked during rubber band selection, end selection
   if(rb)
@@ -675,6 +674,8 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
       }
       break;
     case Qt::MiddleButton:
+      break;
+    case Qt::RightButton: //prevent deselection of items
       break;
     default:
       QGraphicsView::mousePressEvent(e);
@@ -1024,35 +1025,42 @@ void gui::DesignPanel::boundZoom(qreal &ds)
     ds = qMin(ds, gui_settings->get<qreal>("view/zoom_max")/m-1);
 }
 
-void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *event)
+void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
 {
-    // qDebug() << tr("Hello...");
-    QMenu menu(this);
-    // qDebug() << tr("QMenu...");
-    menu.addAction(undoAct);
-    // qDebug() << tr("undoAct...");
-    menu.addAction(redoAct);
-    // qDebug() << tr("redoAct...");
-    menu.addAction(cutAct);
-    // qDebug() << tr("cutAct...");
-    menu.addAction(copyAct);
-    // qDebug() << tr("copyAct...");
-    menu.addAction(pasteAct);
-    // qDebug() << tr("pasteAct...");
-    menu.exec(event->globalPos());
-    // qDebug() << tr("globalPos...");
+  if(!clipboard.isEmpty()) { //not empty, enable pasting
+    pasteAct->setEnabled(true);
+  } else {
+    pasteAct->setEnabled(false);
+  }
+  QMenu menu(this); //create the context menu object
+  if(QGraphicsItem *gitem = itemAt(e->pos())) {
+    if(static_cast<prim::Item*>(gitem)->upSelected()){
+      //Something was selected, so determine the type and give the correct context menu.
+      if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::Electrode) {
+        menu.addAction(electrodeSetPotentialAct);
+        menu.addSeparator();
+      }
+    } else {
+    }
+  } else {
+  }
+  menu.addAction(undoAct);
+  menu.addAction(redoAct);
+  menu.addSeparator();
+  menu.addAction(cutAct);
+  menu.addAction(copyAct);
+  menu.addAction(pasteAct);
+  menu.exec(e->globalPos());
 }
 
 void gui::DesignPanel::undo()
 {
-    // infoLabel->setText(tr("Invoked <b>Edit|Undo</b>"));
     qDebug() << tr("Undo...");
     undo_stack->undo();
 }
 
 void gui::DesignPanel::redo()
 {
-    // infoLabel->setText(tr("Invoked <b>Edit|Redo</b>"));
     qDebug() << tr("Redo...");
     undo_stack->redo();
 }
@@ -1060,51 +1068,59 @@ void gui::DesignPanel::redo()
 void gui::DesignPanel::cut()
 {
     qDebug() << tr("Cut...");
-    // infoLabel->setText(tr("Invoked <b>Edit|Cut</b>"));
+    copySelection();
+    deleteSelection();
 }
 
 void gui::DesignPanel::copy()
 {
     qDebug() << tr("Copy...");
-    // infoLabel->setText(tr("Invoked <b>Edit|Copy</b>"));
+    copySelection();
 }
 
 void gui::DesignPanel::paste()
 {
     qDebug() << tr("Paste...");
-    // infoLabel->setText(tr("Invoked <b>Edit|Paste</b>"));
+    if(!clipboard.isEmpty() && display_mode == DesignMode)
+      createGhost(true);
 }
 
+void gui::DesignPanel::electrodeSetPotential()
+{
+  double potential;
+  qDebug() << tr("electrodeSetPotential...");
+  QList<QGraphicsItem*> selection = scene->selectedItems();
+  if(selection.isEmpty()){ //TODO:figure out how we want to handle right click without selection
+    qDebug() << tr("Please select an item...");
+  } else {
+    potential = QInputDialog::getDouble(this, tr("Set Potential"),
+                tr("Set electrode potential(s) to:"));
+    for(QGraphicsItem *gitem : selection){
+      if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::Electrode)
+        static_cast<prim::Electrode*>(gitem)->setPotential(potential);
+    }
+  }
+}
 
 void gui::DesignPanel::createActions()
 {
-    undoAct = new QAction(tr("&Undo"), this);
-    undoAct->setShortcuts(QKeySequence::Undo);
-    undoAct->setStatusTip(tr("Undo the last operation"));
-    connect(undoAct, &QAction::triggered, this, &gui::DesignPanel::undo);
+  undoAct = new QAction(tr("&Undo"), this);
+  connect(undoAct, &QAction::triggered, this, &gui::DesignPanel::undo);
 
-    redoAct = new QAction(tr("&Redo"), this);
-    redoAct->setShortcuts(QKeySequence::Redo);
-    redoAct->setStatusTip(tr("Redo the last operation"));
-    connect(redoAct, &QAction::triggered, this, &gui::DesignPanel::redo);
-    //
-    cutAct = new QAction(tr("&Cut"), this);
-    cutAct->setShortcuts(QKeySequence::Cut);
-    cutAct->setStatusTip(tr("Cut the current selection's contents to the "
-                            "clipboard"));
-    connect(cutAct, &QAction::triggered, this, &gui::DesignPanel::cut);
+  redoAct = new QAction(tr("&Redo"), this);
+  connect(redoAct, &QAction::triggered, this, &gui::DesignPanel::redo);
 
-    copyAct = new QAction(tr("&Copy"), this);
-    copyAct->setShortcuts(QKeySequence::Copy);
-    copyAct->setStatusTip(tr("Copy the current selection's contents to the "
-                             "clipboard"));
-    connect(copyAct, &QAction::triggered, this, &gui::DesignPanel::copy);
+  cutAct = new QAction(tr("Cut"), this);
+  connect(cutAct, &QAction::triggered, this, &gui::DesignPanel::cut);
 
-    pasteAct = new QAction(tr("&Paste"), this);
-    pasteAct->setShortcuts(QKeySequence::Paste);
-    pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
-                              "selection"));
-    connect(pasteAct, &QAction::triggered, this, &gui::DesignPanel::paste);
+  copyAct = new QAction(tr("&Copy"), this);
+  connect(copyAct, &QAction::triggered, this, &gui::DesignPanel::copy);
+
+  pasteAct = new QAction(tr("&Paste"), this);
+  connect(pasteAct, &QAction::triggered, this, &gui::DesignPanel::paste);
+
+  electrodeSetPotentialAct = new QAction(tr("&Set Potential"), this);
+  connect(electrodeSetPotentialAct, &QAction::triggered, this, &gui::DesignPanel::electrodeSetPotential);
 }
 
 
@@ -1748,13 +1764,11 @@ void gui::DesignPanel::createDBs()
 void gui::DesignPanel::createElectrodes(QPoint p1)
 {
   QPoint p2 = mapToScene(mouse_pos_cached).toPoint(); //get coordinates relative to top-left
-  // QPoint p2 = mouse_pos_cached; //get coordinates relative to top-left
   int layer_index = layers.indexOf(electrode_layer);
   //only ever create one electrode at a time
   undo_stack->beginMacro(tr("create electrode with given corners"));
   undo_stack->push(new CreateElectrode(layer_index, this, mapToScene(p1).toPoint(), p2));
   undo_stack->endMacro();
-  // CreateElectrode(layer_index, this, p1, p2);
 }
 
 void gui::DesignPanel::deleteSelection()

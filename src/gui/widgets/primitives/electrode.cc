@@ -35,6 +35,7 @@ prim::Electrode::Electrode(int lay_id, QPointF p1, QPointF p2):
   setPos(mapToScene(topLeft).toPoint());
   // flags
   setFlag(QGraphicsItem::ItemIsSelectable, true);
+  setFlag(QGraphicsItem::ItemIsFocusable, true);
   // setFlag(QGraphicsItem::ItemIsMovable, true);
 }
 
@@ -43,7 +44,6 @@ QRectF prim::Electrode::boundingRect() const
   qreal width = elec_width+edge_width;
   qreal height = elec_height+edge_width;
   return QRectF(0, 0, width, height);
-  // return QRectF(-0.5*width, -0.5*height, width, height);
 }
 
 // NOTE: nothing in this paint method changes... possibly cache background as
@@ -84,9 +84,6 @@ prim::Item *prim::Electrode::deepCopy() const
 void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
   switch(e->buttons()){
-    case Qt::RightButton:
-      setpot(potential-1);
-      break;
     default:
       prim::Item::mousePressEvent(e);
       break;
@@ -97,28 +94,17 @@ void prim::Electrode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e)
 {
   // qDebug() << QObject::tr("Electrode has seen the mouseDoubleClickEvent");
   //do something here to manipulate potential. Maybe dialog box?
-  setpot(potential+1);
-  qDebug() << QObject::tr("mouse pos = %1, %2").arg(e->pos().x()).arg(e->pos().y());
+  // setpot(potential+1);
+  // qDebug() << QObject::tr("mouse pos = %1, %2").arg(e->pos().x()).arg(e->pos().y());
+  qDebug() << QObject::tr("Electrode potential: %1").arg(potential);
+
 }
 
-// void prim::Electrode::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
-// {
-//     qDebug() << QObject::tr("Electrode::mouseReleaseEvent");
-//     setPos(pos());
-//     // setFlag(QGraphicsItem::ItemIsMovable, false);
-//     qDebug() << QObject::tr("pos = %1, %2").arg(pos().x()).arg(pos().y());
-// }
-
-// void prim::Electrode::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
-// {
-//     qDebug() << QObject::tr("Electrode has seen the mouseMoveEvent");
-// }
-
-void prim::Electrode::setpot(double pot_given)
+void prim::Electrode::setPotential(double givenPotential)
 {
-  if (pot_given == pot_given)//check for NULL argument
+  if (givenPotential == givenPotential)//check for NULL argument
   {
-    potential = pot_given;
+    potential = givenPotential;
   }
 }
 
