@@ -65,10 +65,12 @@ namespace gui{
     // parse input field and act accordingly
     void parseInputField();
 
-    // option dock
-    void showOptionDock() {option_dock->show();}    // for now, option dock only contains options related to SimVisualization
-    void toggleDialogDockVisibility();
-    void dialogDockVisibilityChanged();
+    // sim visualization dock
+    void showSimVisualizeDock() {sim_visualize_dock->show();}
+    void toggleSimVisualizeDock();
+    void simVisualizeDockVisibilityChanged(bool);
+    void toggleDialogDock();
+    void dialogDockVisibilityChanged(bool);
 
     // Start current simulation method
     // ... it might be worth modifying the work-flow such that instead of running
@@ -113,7 +115,7 @@ namespace gui{
     void initTopBar();    // initialise the GUI topbar, toolbar
     void initSideBar();   // initialise the GUI sidebar, toolbar
     void initDialogDock();// initialise the GUI bottom dialog dock
-    void initOptionDock();// initialize the GUI side option dock
+    void initSimVisualizeDock();// initialize the GUI side sim visualize dock
 
     // prepare any extra actions not attched to an icon or meny
     void initActions();
@@ -143,9 +145,9 @@ namespace gui{
     gui::InfoPanel    *info_pan;    // mainwindow info panel
     gui::InputField   *input_field; // mainwindow input field
     gui::SimManager   *sim_manager; // pop-up simulator manager
-    gui::SimVisualize *sim_visualize; // simulation visualizer that goes in option_dock
+    gui::SimVisualize *sim_visualize; // simulation visualizer that goes in sim visualize dock
     QDockWidget       *dialog_dock; // bottom panel for terminal dialog
-    QDockWidget       *option_dock; // right side panel for context aware options
+    QDockWidget       *sim_visualize_dock; // right side panel for sim visualization
 
     // action pointers
     QAction *action_select_tool;  // change cursor tool to select
@@ -153,7 +155,7 @@ namespace gui{
     QAction *action_dbgen_tool;   // change cursor tool to gen
     QAction *action_electrode_tool;   // change cursor tool to electrode
     QAction *action_run_sim;      // run the current simulation method
-    QAction *action_sim_visualize;// show the option dock which allows simulation visualization
+    QAction *action_sim_visualize;// show the sim visualize dock which allows simulation visualization
     QAction *action_layer_sel;
     QAction *action_circuit_lib;
     QAction *action_dialog_dock_visibility;

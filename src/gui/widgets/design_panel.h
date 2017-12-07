@@ -117,7 +117,7 @@ namespace gui{
   public slots:
 
     void selectClicked(prim::Item *item);
-    void simDockVisibilityChanged(bool visible);
+    void simVisualizeDockVisibilityChanged(bool visible);
 
   signals:
     void sig_toolChange(ToolType tool);

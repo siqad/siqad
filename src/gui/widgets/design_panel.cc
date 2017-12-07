@@ -635,7 +635,7 @@ void gui::DesignPanel::selectClicked(prim::Item *)
 
 }
 
-void gui::DesignPanel::simDockVisibilityChanged(bool visible)
+void gui::DesignPanel::simVisualizeDockVisibilityChanged(bool visible)
 {
   if(!visible)
     clearSimResults();
