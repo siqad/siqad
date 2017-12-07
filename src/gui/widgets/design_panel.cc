@@ -804,7 +804,6 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
         break;
     }
   }
-
   clicked=false;
 }
 
@@ -1240,16 +1239,18 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
   //check if holding any non-electrodes
   if(pasting){
     for(QGraphicsItem *gitem : clipboard){
-      if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode)
+      if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode){
         isAllElectrodes = false;
         break;
+      }
     }
   }
   else{
     for(QGraphicsItem *gitem : scene->selectedItems()){
-      if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode)
+      if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode){
         isAllElectrodes = false;
         break;
+      }
     }
   }
   // if holding any non-electrodes (for now just db dots or lat dots)
