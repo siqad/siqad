@@ -73,6 +73,8 @@ namespace prim{
     // static class variables
     static qreal scale_factor;  // pixels/angstrom scaling factor
     static bool select_mode;    // Application is in select mode
+    static bool db_gen_mode;
+    static bool electrode_mode;
     static void init();
 
     // SAVE LOAD

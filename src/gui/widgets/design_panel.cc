@@ -358,6 +358,8 @@ void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
 
   // inform all items of select mode
   prim::Item::select_mode = tool==gui::DesignPanel::SelectTool;
+  prim::Item::db_gen_mode = tool==gui::DesignPanel::DBGenTool;
+  prim::Item::electrode_mode = tool==gui::DesignPanel::ElectrodeTool;
 
   switch(tool){
     case gui::DesignPanel::SelectTool:
