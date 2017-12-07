@@ -3,7 +3,7 @@
 Simulation Tool for QSi's dangling bonds. There are two proposed contributions:
 
 	1. A CAD tool to assist in designing arrangements of dangling bonds on the surface.
-  
+
 	2. A set of physics tools for the simulations of these arrangements.
 
 
@@ -20,7 +20,7 @@ The GUI is currently written in C++ and uses the Qt5 framework. The Qt5 framewor
 
 Depending on your installation method, you may need to first install Qt5 dependencies. On debian systems, these can be installed as (build-essential, libfontconfig1, mesa-common-dev, libglu1-mesa-dev).
 
-	
+
 ## Building
 
 There is currently no installer binary so the tool must be built from source. Development has been done purely in Linux and there has been no modification made to the .pro file to account for any additional OS-specified linking/includes.
@@ -77,7 +77,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 ### Electrode Design
 * Side view of vertical electrode stack
 * Top view of electrode layers
-* Creating, moving, and deleting electrodes
+* ~~Creating, moving, and deleting electrodes~~
 * Snapping, aligning and distributing like Inkscape
 
 ### Config
