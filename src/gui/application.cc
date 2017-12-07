@@ -238,7 +238,7 @@ void gui::ApplicationGUI::initSideBar()
   action_select_tool = side_bar->addAction(QIcon(":/ico/select.svg"), tr("Select tool"));
   action_drag_tool = side_bar->addAction(QIcon(":/ico/drag.svg"), tr("Drag tool"));
   action_dbgen_tool = side_bar->addAction(QIcon(":/ico/dbgen.svg"), tr("DB tool"));
-  action_electrode_tool = side_bar->addAction(QIcon(":/ico/dbgen.svg"), tr("Electrode tool"));
+  action_electrode_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"), tr("Electrode tool"));
 
   action_group->addAction(action_select_tool);
   action_group->addAction(action_drag_tool);
