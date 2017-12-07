@@ -251,7 +251,7 @@ namespace gui{
     // create dangling bonds in the surface at all selected lattice dots
     void createDBs();
 
-    void createElectrodes(QPoint p1);
+    void createElectrodes(QPoint point1);
 
     // delete all selected items
     void deleteSelection();
@@ -278,12 +278,12 @@ namespace gui{
     bool moveToGhost(bool kill=false);
 
     void createActions();
-    QAction *undoAct;
-    QAction *redoAct;
-    QAction *cutAct;
-    QAction *copyAct;
-    QAction *pasteAct;
-    QAction *electrodeSetPotentialAct;
+    QAction *action_undo;
+    QAction *action_redo;
+    QAction *action_cut;
+    QAction *action_copy;
+    QAction *action_paste;
+    QAction *action_set_potential;
   };
 
 
@@ -391,7 +391,7 @@ namespace gui{
   {
   public:
     // create an electrode at the given points
-    CreateElectrode(int layer_index, gui::DesignPanel *dp, QPointF p1, QPointF p2, prim::Electrode *elec = 0, bool invert=false, QUndoCommand *parent=0);
+    CreateElectrode(int layer_index, gui::DesignPanel *dp, QPointF point1, QPointF point2, prim::Electrode *elec = 0, bool invert=false, QUndoCommand *parent=0);
 
   private:
 
@@ -406,8 +406,8 @@ namespace gui{
     DesignPanel *dp;  // DesignPanel pointer
     int layer_index;  // index of layer in dp->layers stack
 
-    QPointF p1;
-    QPointF p2;
+    QPointF point1;
+    QPointF point2;
 
     bool invert;
 

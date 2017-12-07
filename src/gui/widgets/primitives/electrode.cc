@@ -23,16 +23,16 @@ qreal prim::Electrode::in_fill;
 QColor prim::Electrode::in_fill_col;
 
 // Draw on layer 0 for now.
-prim::Electrode::Electrode(int lay_id, QPointF p1, QPointF p2):
-  prim::Item(prim::Item::Electrode, lay_id), p1(p1), p2(p2)
+prim::Electrode::Electrode(int lay_id, QPointF point1, QPointF point2):
+  prim::Item(prim::Item::Electrode, lay_id), point1(point1), point2(point2)
 {
   constructStatics();
-  elec_width = (std::max(p1.x(), p2.x()) - std::min(p1.x(), p2.x()));
-  elec_height = (std::max(p1.y(), p2.y()) - std::min(p1.y(), p2.y()));
-  topLeft.setX(std::min(p1.x(), p2.x()));
-  topLeft.setY(std::min(p1.y(), p2.y()));
+  elec_width = (std::max(point1.x(), point2.x()) - std::min(point1.x(), point2.x()));
+  elec_height = (std::max(point1.y(), point2.y()) - std::min(point1.y(), point2.y()));
+  top_left.setX(std::min(point1.x(), point2.x()));
+  top_left.setY(std::min(point1.y(), point2.y()));
   setZValue(-1);
-  setPos(mapToScene(topLeft).toPoint());
+  setPos(mapToScene(top_left).toPoint());
   // flags
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemIsFocusable, true);
@@ -76,7 +76,7 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
 prim::Item *prim::Electrode::deepCopy() const
 {
-  prim::Electrode *elec = new Electrode(layer_id, p1, p2);
+  prim::Electrode *elec = new Electrode(layer_id, point1, point2);
   elec->setPos(pos());
   return elec;
 }

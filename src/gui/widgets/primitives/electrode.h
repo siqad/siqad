@@ -22,7 +22,7 @@ namespace prim{
   public:
 
     // constructor, create an electrode given two points
-    Electrode(int lay_id, QPointF p1, QPointF p2);
+    Electrode(int lay_id, QPointF point1, QPointF point2);
     // destructor
     ~Electrode(){}
 
@@ -35,12 +35,12 @@ namespace prim{
     void setPotential(double givenPotential);
 
     // accessors
-    QPointF getp1(void){ return p1;}
-    QPointF getp2(void){ return p2;}
-    QPointF gettopLeft(void){return topLeft;}
-    qreal getwidth(void){return elec_width;}
-    qreal getheight(void){return elec_height;}
-    double getpot(void){return potential;}
+    QPointF getPoint1(void){ return point1;}
+    QPointF getPoint2(void){ return point2;}
+    QPointF getTopLeft(void){return top_left;}
+    qreal getWidth(void){return elec_width;}
+    qreal getHeight(void){return elec_height;}
+    double getPotential(void){return potential;}
     // inherited abstract method implementations
 
     QRectF boundingRect() const Q_DECL_OVERRIDE;
@@ -58,9 +58,9 @@ namespace prim{
     void constructStatics();
 
     // VARIABLES
-    QPointF p1;
-    QPointF p2;
-    QPointF topLeft;
+    QPointF point1;
+    QPointF point2;
+    QPointF top_left;
 
     double potential = 0;
     qreal elec_width;

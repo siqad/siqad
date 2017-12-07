@@ -50,8 +50,8 @@ prim::GhostBox::GhostBox(prim::Item *item, prim::Item *parent, QColor *pcol)
   : Item(prim::Item::GhostBox, 0, parent), pcol(pcol)
 {
   setPos(item->pos());
-  width = static_cast<prim::Electrode*>(item)->getwidth();
-  height = static_cast<prim::Electrode*>(item)->getheight();
+  width = static_cast<prim::Electrode*>(item)->getWidth();
+  height = static_cast<prim::Electrode*>(item)->getHeight();
 }
 
 QRectF prim::GhostBox::boundingRect() const
