@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<physeng>
+    <name>PoisSolver</name>
+    <version>0.1</version>
+    <bin_path>poissolver</bin_path> <!-- relative to engines.xml -->
+</physeng>
