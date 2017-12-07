@@ -1893,9 +1893,10 @@ bool gui::DesignPanel::pasteAtGhost()
   prim::Ghost *ghost = prim::Ghost::instance();
   bool isAllElectrodes = true;
   for(QGraphicsItem *gitem : clipboard){
-    if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode)
+    if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode){
       isAllElectrodes = false;
       break;
+    }
   }
   // do nothing if clipboard empty
   if(clipboard.isEmpty())
