@@ -24,8 +24,78 @@ QColor prim::Electrode::in_fill_col;
 
 // Draw on layer 0 for now.
 prim::Electrode::Electrode(int lay_id, QPointF point1, QPointF point2):
-  prim::Item(prim::Item::Electrode, lay_id), point1(point1), point2(point2)
+  prim::Item(prim::Item::Electrode, lay_id)
 {
+  initElectrode(lay_id, point1, point2);
+}
+
+prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
+  prim::Item(prim::Item::Electrode)
+{
+  int lay_id=-1;
+  QPointF ld_point1, ld_point2;
+
+  while(!ls->atEnd()){
+    if(ls->isStartElement()){
+      if(ls->name() == "electrode")
+        ls->readNext();
+      else if(ls->name() == "layer_id"){
+        lay_id = ls->readElementText().toInt();
+        ls->readNext();
+      }
+      /*else if(ls->name() == "elec"){
+        elec_in = ls->readElementText().toInt();
+        ls->readNext();
+      }*/
+      else if(ls->name() == "dim"){
+        for(QXmlStreamAttribute &attr : ls->attributes()){
+          if(attr.name().toString() == QLatin1String("x1"))
+            ld_point1.setX(scale_factor*attr.value().toFloat());
+          else if(attr.name().toString() == QLatin1String("y1"))
+            ld_point1.setY(scale_factor*attr.value().toFloat());
+          else if(attr.name().toString() == QLatin1String("x2"))
+            ld_point2.setX(scale_factor*attr.value().toFloat());
+          else if(attr.name().toString() == QLatin1String("y2"))
+            ld_point2.setY(scale_factor*attr.value().toFloat());
+        }
+        ls->readNext();
+      }
+      // TODO the rest of the variables
+      else{
+        qDebug() << QObject::tr("Electrode: invalid element encountered on line %1 - %2").arg(ls->lineNumber()).arg(ls->name().toString());
+        ls->readNext();
+      }
+    }
+    else if(ls->isEndElement()){
+      // break out of ls if the end of this element has been reached
+      if(ls->name() == "electrode"){
+        ls->readNext();
+        break;
+      }
+      ls->readNext();
+    }
+    else
+      ls->readNext();
+  }
+
+  if(ls->hasError())
+    qCritical() << QObject::tr("XML error: ") << ls->errorString().data();
+
+  // TODO check that crucial vars aren't empty
+
+  // debug
+  qDebug() << QObject::tr("Electrode point 1: x=%1, y=%2").arg(ld_point1.x()).arg(ld_point1.y());
+
+
+  initElectrode(lay_id, ld_point1, ld_point2);
+  scene->addItem(this);
+}
+
+void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point2_in)
+{
+  point1 = point1_in;
+  point2 = point2_in;
+
   constructStatics();
   elec_width = (std::max(point1.x(), point2.x()) - std::min(point1.x(), point2.x()));
   elec_height = (std::max(point1.y(), point2.y()) - std::min(point1.y(), point2.y()));
@@ -79,6 +149,26 @@ prim::Item *prim::Electrode::deepCopy() const
   prim::Electrode *elec = new Electrode(layer_id, point1, point2);
   elec->setPos(pos());
   return elec;
+}
+
+void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
+{
+  ss->writeStartElement("electrode");
+
+  // layer id
+  ss->writeTextElement("layer_id", QString::number(layer_id));
+
+  // top left and bottom right locations
+  ss->writeEmptyElement("dim");
+  ss->writeAttribute("x1", QString::number(point1.x()));
+  ss->writeAttribute("y1", QString::number(point1.y()));
+  ss->writeAttribute("x2", QString::number(point2.x()));
+  ss->writeAttribute("y2", QString::number(point2.y()));
+
+  // other attributes
+  // ......
+
+  ss->writeEndElement();
 }
 
 void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)

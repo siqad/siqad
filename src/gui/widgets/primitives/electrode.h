@@ -23,6 +23,9 @@ namespace prim{
 
     // constructor, create an electrode given two points
     Electrode(int lay_id, QPointF point1, QPointF point2);
+    Electrode(QXmlStreamReader *ls, QGraphicsScene *scene);
+    void initElectrode(int lay_id, QPointF point1_in, QPointF point2_in);
+
     // destructor
     ~Electrode(){}
 
@@ -47,6 +50,9 @@ namespace prim{
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
 
     Item *deepCopy() const;
+
+    // SAVE LOAD
+    virtual void saveItems(QXmlStreamWriter *) const;
   //
   protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
