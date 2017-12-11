@@ -109,7 +109,7 @@ void SimManager::initSimActionsPan()
 void SimManager::initSimSetupDialog()
 {
   sim_setup_dialog = new QWidget(this, Qt::Dialog);
-  
+
   // Engine Select Group
   QGroupBox *engine_sel_group = new QGroupBox(tr("Engine Selection"));
   QLabel *label_eng_sel = new QLabel(tr("Engine:"));
@@ -121,7 +121,7 @@ void SimManager::initSimSetupDialog()
   combo_eng_sel->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   updateEngSelCombo();
   le_job_nm = new QLineEdit(job_nm_default);
-  
+
   // TODO when combo_eng_sel is updated, the available options should also change
 
   label_eng_sel->setBuddy(combo_eng_sel);
@@ -275,7 +275,7 @@ void SimManager::submitSimSetup()
   // TODO add parameters to QStringList according according to input text
   /*QStringList arguments;
   arguments << "-p"; // preanneal cycles
-  
+
   arguments << "-a"; // anneal cycles
 
   arguments << "-v"; // v_0*/

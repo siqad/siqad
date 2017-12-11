@@ -19,9 +19,6 @@ QColor prim::Electrode::edge_col;
 QColor prim::Electrode::fill_col;
 QColor prim::Electrode::selected_col; // edge colour, selected
 
-qreal prim::Electrode::in_fill;
-QColor prim::Electrode::in_fill_col;
-
 // Draw on layer 0 for now.
 prim::Electrode::Electrode(int lay_id, QPointF point1, QPointF point2):
   prim::Item(prim::Item::Electrode, lay_id), point1(point1), point2(point2)
@@ -111,7 +108,8 @@ void prim::Electrode::setPotential(double givenPotential)
 void prim::Electrode::constructStatics() //needs to be changed to look at electrode settings instead.
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
-  edge_width = gui_settings->get<qreal>("dbdot/edge_width");
-  edge_col= gui_settings->get<QColor>("dbdot/edge_col");
-  selected_col= gui_settings->get<QColor>("dbdot/selected_col");
+  edge_width = gui_settings->get<qreal>("electrode/edge_width");
+  edge_col= gui_settings->get<QColor>("electrode/edge_col");
+  fill_col= gui_settings->get<QColor>("electrode/fill_col");
+  selected_col= gui_settings->get<QColor>("electrode/selected_col");
 }

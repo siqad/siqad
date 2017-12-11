@@ -46,33 +46,32 @@ void prim::GhostDot::constructStatics()
 
 
 //GHOSTBOX CLASS
-prim::GhostBox::GhostBox(prim::Item *item, prim::Item *parent, QColor *pcol)
-  : Item(prim::Item::GhostBox, 0, parent), pcol(pcol)
+prim::GhostBox::GhostBox(prim::Item *item, prim::Item *parent)
+  : Item(prim::Item::GhostBox, 0, parent)
 {
-  setPos(item->pos());
+  constructStatics();
   width = static_cast<prim::Electrode*>(item)->getWidth();
   height = static_cast<prim::Electrode*>(item)->getHeight();
+  setZValue(-1);
+  setPos(item->pos());
 }
 
 QRectF prim::GhostBox::boundingRect() const
 {
-  // QPoint point = QWidget::mapFromGlobal(QCursor::pos());
-  // return QRectF(point.x(), point.y(), width, height);
   return QRectF(0, 0, width, height);
 }
 
 void prim::GhostBox::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
   painter->setPen(Qt::NoPen);
-  painter->setBrush(*pcol);
+  painter->setBrush(ghost_box_color);
   painter->drawRect(boundingRect());
-  // qDebug() << QObject::tr("Drawing GhostBox!");
 }
 
 void prim::GhostBox::constructStatics()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
-  // diameter = gui_settings->get<qreal>("ghost/dot_diameter")*scale_factor;
+  ghost_box_color = gui_settings->get<QColor>("ghostbox/valid_col");
 }
 
 
@@ -295,7 +294,7 @@ void prim::Ghost::createGhostBox(prim::Item *item)
 {
   // qDebug() << QObject::tr("Creating Ghost Box");
   // prim::GhostDot *dot = new prim::GhostDot(item, this, &col);
-  prim::GhostBox *box = new prim::GhostBox(item, this, &col);
+  prim::GhostBox *box = new prim::GhostBox(item, this);
   //
   boxes.append(box);
   box_sources.append(item);
