@@ -50,13 +50,13 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
       else if(ls->name() == "dim"){
         for(QXmlStreamAttribute &attr : ls->attributes()){
           if(attr.name().toString() == QLatin1String("x1"))
-            ld_point1.setX(scale_factor*attr.value().toFloat());
+            ld_point1.setX(attr.value().toFloat());
           else if(attr.name().toString() == QLatin1String("y1"))
-            ld_point1.setY(scale_factor*attr.value().toFloat());
+            ld_point1.setY(attr.value().toFloat());
           else if(attr.name().toString() == QLatin1String("x2"))
-            ld_point2.setX(scale_factor*attr.value().toFloat());
+            ld_point2.setX(attr.value().toFloat());
           else if(attr.name().toString() == QLatin1String("y2"))
-            ld_point2.setY(scale_factor*attr.value().toFloat());
+            ld_point2.setY(attr.value().toFloat());
         }
         ls->readNext();
       }
