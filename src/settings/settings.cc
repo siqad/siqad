@@ -169,9 +169,18 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("ghost/valid_col", QColor(0, 255, 0, 255));   // color for valid placements
   S->setValue("ghost/invalid_col", QColor(255, 0, 0, 255)); // color for invalid placements
 
+  // ghost box parameters
+  S->setValue("ghostbox/valid_col", QColor(0, 150, 0));
+
   // aggregate parameters
   S->setValue("aggregate/edge_col", QColor(9, 255, 200, 150));  // bounding box color
   S->setValue("aggregate/edge_col_hovered", QColor(9, 255, 200, 150));  // bounding box color
+
+  // electrode parameters
+  S->setValue("electrode/edge_width", .05);                   // edge width of box lines
+  S->setValue("electrode/edge_col", QColor(60,60,60));     // edge color
+  S->setValue("electrode/fill_col", QColor(100,100,100));     // fill color
+  S->setValue("electrode/selected_col", QColor(0, 100, 255)); // edge color, selected
 
   return S;
 }

@@ -27,7 +27,7 @@ bool SimAnneal::runSim()
     if(db->elec != 1){
       db_loc.push_back(std::make_pair(db->x, db->y));
       n_dbs++;
-      std::cout << "DB loc: x=" << db_loc.back().first 
+      std::cout << "DB loc: x=" << db_loc.back().first
           << ", y=" << db_loc.back().second << std::endl;
     }
     else
@@ -63,13 +63,13 @@ void SimAnneal::initVars()
     std::cout << "There are no dbs in the problem!" << std::endl;
     return;
   }
-  t_preanneal = problem.parameterExists("preanneal_cycles") ? 
+  t_preanneal = problem.parameterExists("preanneal_cycles") ?
                   std::stoi(problem.getParameter("preanneal_cycles")) : 1000;
-  t_max = problem.parameterExists("anneal_cycles") ? 
+  t_max = problem.parameterExists("anneal_cycles") ?
                   std::stoi(problem.getParameter("anneal_cycles")) : 10000;
-  v_0 = problem.parameterExists("global_v0") ? 
+  v_0 = problem.parameterExists("global_v0") ?
                   std::stof(problem.getParameter("global_v0")) : 1; // TODO this should be fixed
-  debye_length = problem.parameterExists("debye_length") ? 
+  debye_length = problem.parameterExists("debye_length") ?
                   std::stof(problem.getParameter("debye_length")) : 5E-9; // ~10s of dimer rows
 
   result_queue_size = problem.parameterExists("result_queue_size") ?
@@ -255,7 +255,7 @@ bool SimAnneal::acceptPop(int db_ind)
   int curr_charge = curr_charges[db_ind];
   float v = curr_charge ? v_eff[db_ind] + v_freeze : - v_eff[db_ind] + v_freeze; // 1->0 : 0->1
   float prob;
-  
+
   prob = 1. / ( 1 + exp( v/kT ) );
 
   //std::cout << "v_eff=" << v_eff[db_ind] << ", P(" << curr_charge << "->" << !curr_charge << ")=" << prob << std::endl;
@@ -356,4 +356,3 @@ float SimAnneal::interElecPotential(float r)
   //return exp(-r/debye_length) / r;
   return 1.6E-19 / (4*3.14*8.854E-12) * exp(-r/debye_length) / r; // TODO revert to the version above after verification stage
 }
-

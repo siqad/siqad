@@ -19,12 +19,10 @@ QColor prim::Electrode::edge_col;
 QColor prim::Electrode::fill_col;
 QColor prim::Electrode::selected_col; // edge colour, selected
 
-qreal prim::Electrode::in_fill;
-QColor prim::Electrode::in_fill_col;
-
 // Draw on layer 0 for now.
 prim::Electrode::Electrode(int lay_id, QPointF point1, QPointF point2):
-  prim::Item(prim::Item::Electrode, lay_id)
+
+  prim::Item(prim::Item::Electrode)
 {
   initElectrode(lay_id, point1, point2);
 }
@@ -33,8 +31,9 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
   prim::Item(prim::Item::Electrode)
 {
   int lay_id=-1;
+  double potential_in;
   QPointF ld_point1, ld_point2;
-
+  int electrode_type_in;
   while(!ls->atEnd()){
     if(ls->isStartElement()){
       if(ls->name() == "electrode")
@@ -60,6 +59,15 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
         }
         ls->readNext();
       }
+      else if(ls->name() == "potential"){
+        potential_in = ls->readElementText().toDouble();
+        ls->readNext();
+      }
+      else if(ls->name() == "electrode_type"){
+        electrode_type_in = ls->readElementText().toInt();
+        ls->readNext();
+      }
+
       // TODO the rest of the variables
       else{
         qDebug() << QObject::tr("Electrode: invalid element encountered on line %1 - %2").arg(ls->lineNumber()).arg(ls->name().toString());
@@ -96,6 +104,17 @@ void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point
   point1 = point1_in;
   point2 = point2_in;
 
+  initElectrode(lay_id, ld_point1, ld_point2, potential_in, electrode_type_in);
+  scene->addItem(this);
+}
+
+void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point2_in, double potential_in, int electrode_type_in)
+{
+  layer_id = lay_id;
+  point1 = point1_in;
+  point2 = point2_in;
+  potential = potential_in;
+  electrode_type = static_cast<prim::Electrode::ElectrodeType>(electrode_type_in);
   constructStatics();
   elec_width = (std::max(point1.x(), point2.x()) - std::min(point1.x(), point2.x()));
   elec_height = (std::max(point1.y(), point2.y()) - std::min(point1.y(), point2.y()));
@@ -106,7 +125,6 @@ void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point
   // flags
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemIsFocusable, true);
-  // setFlag(QGraphicsItem::ItemIsMovable, true);
 }
 
 QRectF prim::Electrode::boundingRect() const
@@ -123,7 +141,6 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
   QRectF rect = boundingRect();
   qreal dxy = .5*edge_width;
   rect.adjust(dxy,dxy,-dxy,-dxy); //make the bounding rectangle, and trim off the edges.
-  // draw outer circle
   painter->setPen(QPen(edge_col, edge_width));
   painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
   painter->drawRect(rect);
@@ -164,7 +181,8 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
   ss->writeAttribute("y1", QString::number(point1.y()));
   ss->writeAttribute("x2", QString::number(point2.x()));
   ss->writeAttribute("y2", QString::number(point2.y()));
-
+  ss->writeTextElement("potential", QString::number(getPotential()));
+  ss->writeTextElement("electrode_type", QString::number(electrode_type));
   // other attributes
   // ......
 
@@ -201,7 +219,8 @@ void prim::Electrode::setPotential(double givenPotential)
 void prim::Electrode::constructStatics() //needs to be changed to look at electrode settings instead.
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
-  edge_width = gui_settings->get<qreal>("dbdot/edge_width");
-  edge_col= gui_settings->get<QColor>("dbdot/edge_col");
-  selected_col= gui_settings->get<QColor>("dbdot/selected_col");
+  edge_width = gui_settings->get<qreal>("electrode/edge_width");
+  edge_col= gui_settings->get<QColor>("electrode/edge_col");
+  fill_col= gui_settings->get<QColor>("electrode/fill_col");
+  selected_col= gui_settings->get<QColor>("electrode/selected_col");
 }

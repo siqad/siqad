@@ -26,6 +26,7 @@ namespace prim{
     Electrode(QXmlStreamReader *ls, QGraphicsScene *scene);
     void initElectrode(int lay_id, QPointF point1_in, QPointF point2_in);
 
+
     // destructor
     ~Electrode(){}
 
@@ -33,6 +34,9 @@ namespace prim{
     enum ElectrodeType{Clock, Fix};
 
     ElectrodeType electrode_type;
+
+    //initializer
+    void initElectrode(int lay_id, QPointF point1_in, QPointF point2_in, double potential_in=0, int electrode_type_in=0);
 
     //setters
     void setPotential(double givenPotential);
@@ -43,7 +47,7 @@ namespace prim{
     QPointF getTopLeft(void){return top_left;}
     qreal getWidth(void){return elec_width;}
     qreal getHeight(void){return elec_height;}
-    double getPotential(void){return potential;}
+    double getPotential(void) const {return potential;}
     // inherited abstract method implementations
 
     QRectF boundingRect() const Q_DECL_OVERRIDE;
@@ -73,13 +77,7 @@ namespace prim{
     qreal elec_height;
 
     static qreal edge_width;  // proportional width of dot boundary edge
-
-    // static QColor edge_col;   // boundary edge color
     static QColor fill_col;   // dot fill color (same for all lattice dots)
-
-    static qreal in_fill;       // fil factor for inner circle
-    static QColor in_fill_col;  // colour of inner circle
-
     static QColor edge_col;     // edge colour, unselected
     static QColor selected_col; // edge colour, selected
   };

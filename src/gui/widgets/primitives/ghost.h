@@ -65,7 +65,7 @@ namespace prim{
   public:
 
     // constructor
-    GhostBox(Item *item, Item *parent, QColor *pcol);
+    GhostBox(Item *item, Item *parent);
 
     // destructor
     ~GhostBox(){}
@@ -82,7 +82,7 @@ namespace prim{
     qreal height; //height of electrode that was passed
     void constructStatics();
 
-    QColor *pcol;           // pointer to the GhostDot color
+    QColor ghost_box_color;
   };
 
   // collection of GhostDot objects for moving Items or copy/paste, singleton
@@ -184,7 +184,6 @@ namespace prim{
 
     // check the current position for validity and set if changed
     void updateValid();
-
 
     // compute the offset such that the Ghost remains under the cursor
     void zeroGhost();
