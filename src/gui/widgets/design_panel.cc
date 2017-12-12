@@ -136,6 +136,8 @@ void gui::DesignPanel::resetDesignPanel()
   // set display mode
   setDisplayMode(DesignMode);
 
+  //emit signal for SelectTool
+  emit sig_toolChange(gui::DesignPanel::SelectTool);
   qDebug() << tr("Design Panel reset complete");
 }
 
@@ -1101,6 +1103,7 @@ void gui::DesignPanel::deleteAction()
 
 void gui::DesignPanel::electrodeSetPotentialAction()
 {
+  bool ok = false;
   double potential;
   // qDebug() << tr("electrodeSetPotential...");
   QList<QGraphicsItem*> selection = scene->selectedItems();
@@ -1109,15 +1112,18 @@ void gui::DesignPanel::electrodeSetPotentialAction()
   } else {
     if(selection.count() == 1){
       potential = QInputDialog::getDouble(this, tr("Set Potential"),
-                  tr("Set electrode potential(s) to:"), static_cast<prim::Electrode*>(selection.at(0))->getPotential());
+                  tr("Set electrode potential(s) to:"), static_cast<prim::Electrode*>(selection.at(0))->getPotential(),
+                  -2147483647, 2147483647, 1, &ok);
     } else {
       potential = QInputDialog::getDouble(this, tr("Set Potential"),
-                  tr("WARNING: Multiple electrodes selected.\nSet electrode potential(s) to:"));
+                  tr("WARNING: Multiple electrodes selected.\nSet electrode potential(s) to:"), 0.0,
+                  -2147483647, 2147483647, 1, &ok);
     }
-
-    for(QGraphicsItem *gitem : selection){
-      if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::Electrode)
-        static_cast<prim::Electrode*>(gitem)->setPotential(potential);
+    if(ok){
+      for(QGraphicsItem *gitem : selection){
+        if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::Electrode)
+          static_cast<prim::Electrode*>(gitem)->setPotential(potential);
+      }
     }
   }
 }
