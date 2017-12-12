@@ -83,7 +83,7 @@ void gui::ApplicationGUI::initGUI()
   // inter-widget signals
   connect(sim_manager, &gui::SimManager::emitSimJob, this, &gui::ApplicationGUI::runSimulation);
   connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene, design_pan, &gui::DesignPanel::displaySimResults);
-
+  connect(design_pan, &gui::DesignPanel::sig_resetDesignPanel, this, &gui::ApplicationGUI::designPanelReset);
   // layout management
   QWidget *main_widget = new QWidget(this); // main widget for mainwindow
   QVBoxLayout *vbl = new QVBoxLayout();     // main layout, vertical
@@ -489,6 +489,11 @@ void gui::ApplicationGUI::parseInputField()
     // for now, just echo input to stdout
     qDebug() << input;
   }
+}
+
+void gui::ApplicationGUI::designPanelReset()
+{
+  initState();
 }
 
 void gui::ApplicationGUI::toggleSimVisualizeDock()

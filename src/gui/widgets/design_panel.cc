@@ -136,8 +136,8 @@ void gui::DesignPanel::resetDesignPanel()
   // set display mode
   setDisplayMode(DesignMode);
 
-  //emit signal for SelectTool
-  emit sig_toolChange(gui::DesignPanel::SelectTool);
+  //let application know that design panel has been reset.
+  emit sig_resetDesignPanel();
   qDebug() << tr("Design Panel reset complete");
 }
 
