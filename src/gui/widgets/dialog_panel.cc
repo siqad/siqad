@@ -18,7 +18,7 @@ gui::DialogPanel::DialogPanel(QWidget *parent)
   settings::AppSettings *app_settings = settings::AppSettings::instance();
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
-  setMaximumHeight(gui_settings->get<int>("Panel/maxh"));
+  //setMaximumHeight(gui_settings->get<int>("Panel/maxh"));
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   setReadOnly(true);

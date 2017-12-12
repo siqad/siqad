@@ -23,6 +23,8 @@ namespace prim{
 
     // constructor, create an electrode given two points
     Electrode(int lay_id, QPointF point1, QPointF point2);
+    Electrode(QXmlStreamReader *ls, QGraphicsScene *scene);
+
     // destructor
     ~Electrode(){}
 
@@ -30,6 +32,9 @@ namespace prim{
     enum ElectrodeType{Clock, Fix};
 
     ElectrodeType electrode_type;
+
+    //initializer
+    void initElectrode(int lay_id, QPointF point1_in, QPointF point2_in, double potential_in=0, int electrode_type_in=0);
 
     //setters
     void setPotential(double givenPotential);
@@ -40,13 +45,16 @@ namespace prim{
     QPointF getTopLeft(void){return top_left;}
     qreal getWidth(void){return elec_width;}
     qreal getHeight(void){return elec_height;}
-    double getPotential(void){return potential;}
+    double getPotential(void) const {return potential;}
     // inherited abstract method implementations
 
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
 
     Item *deepCopy() const;
+
+    // SAVE LOAD
+    virtual void saveItems(QXmlStreamWriter *) const;
   //
   protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;

@@ -9,6 +9,7 @@
 #include "layer.h"
 #include "aggregate.h"
 #include "dbdot.h"
+#include "electrode.h"
 
 
 // statics
@@ -176,8 +177,12 @@ void prim::Layer::loadItems(QXmlStreamReader *stream, QGraphicsScene *scene)
         stream->readNext();
         addItem(new prim::Aggregate(stream, scene));
       }
+      if(stream->name() == "electrode"){
+        stream->readNext();
+        addItem(new prim::Electrode(stream, scene));
+      }
       else{
-        qDebug() << QObject::tr("Layer: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
+        qDebug() << QObject::tr("Layer load item: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
         stream->readNext();
       }
     }

@@ -77,7 +77,8 @@ void gui::ApplicationGUI::initGUI()
   initMenuBar();
   initTopBar();
   initSideBar();
-  initOptionDock();
+  initSimVisualizeDock();
+  initDialogDock();
 
   // inter-widget signals
   connect(sim_manager, &gui::SimManager::emitSimJob, this, &gui::ApplicationGUI::runSimulation);
@@ -86,21 +87,17 @@ void gui::ApplicationGUI::initGUI()
   // layout management
   QWidget *main_widget = new QWidget(this); // main widget for mainwindow
   QVBoxLayout *vbl = new QVBoxLayout();     // main layout, vertical
-  QHBoxLayout *hbl = new QHBoxLayout();     // lower layout, horizontal
-  QVBoxLayout *vbl_l = new QVBoxLayout();   // dialog/input layout, vertical
 
-  vbl_l->addWidget(dialog_pan, 1);
-  vbl_l->addWidget(input_field, 0);
+  // NOTE commented out info_pan for now so it doesn't create empty space
+  //QHBoxLayout *hbl = new QHBoxLayout();     // lower layout, horizontal
 
-  hbl->addLayout(vbl_l, 1);
-  hbl->addWidget(info_pan, 1);
+  //hbl->addLayout(vbl_l, 1);
+  //hbl->addWidget(info_pan, 1);
 
-  //dialog_pan->hide();
-  input_field->hide();
-  info_pan->hide();
+  //info_pan->hide();
 
   vbl->addWidget(design_pan, 2);
-  vbl->addLayout(hbl, 1);
+  //vbl->addLayout(hbl, 1);
 
   // set mainwindow layout
   main_widget->setLayout(vbl);
@@ -119,9 +116,8 @@ void gui::ApplicationGUI::initMenuBar()
   // initialise menus
   QMenu *file = menuBar()->addMenu(tr("&File"));
   // QMenu *edit = menuBar()->addMenu(tr("&Edit"));
-  // QMenu *view = menuBar()->addMenu(tr("&View"));
+  QMenu *view = menuBar()->addMenu(tr("&View"));
   menuBar()->addMenu(tr("&Edit"));
-  menuBar()->addMenu(tr("&View"));
   QMenu *tools = menuBar()->addMenu(tr("&Tools"));
   QMenu *help = menuBar()->addMenu(tr("&Help"));
 
@@ -143,6 +139,11 @@ void gui::ApplicationGUI::initMenuBar()
   file->addAction(open_save);
   file->addAction(export_lvm);
   file->addAction(quit);
+
+  // view menu actions
+  action_dialog_dock_visibility = new QAction(tr("&Dialog Dock"), this);
+  action_dialog_dock_visibility->setCheckable(true);
+  view->addAction(action_dialog_dock_visibility);
 
   // tools menu actions
   QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
@@ -166,6 +167,7 @@ void gui::ApplicationGUI::initMenuBar()
   connect(save_as, &QAction::triggered, this, &gui::ApplicationGUI::saveNew);
   connect(open_save, &QAction::triggered, this, &gui::ApplicationGUI::openFromFile);
   connect(export_lvm, &QAction::triggered, this, &gui::ApplicationGUI::exportToLabview);
+  connect(action_dialog_dock_visibility, &QAction::triggered, this, &gui::ApplicationGUI::toggleDialogDock);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
@@ -200,8 +202,10 @@ void gui::ApplicationGUI::initTopBar()
   //action_layer_sel= top_bar->addAction(QIcon(":/ico/layer.svg"), tr("Layer Selection"));
   //action_circuit_lib= top_bar->addAction(QIcon(":/ico/circuitlib.svg"), tr("Circuit Library"));
 
+  action_sim_visualize->setCheckable(true);
+
   connect(action_run_sim, &QAction::triggered, this, &gui::ApplicationGUI::simulationSetup);
-  connect(action_sim_visualize, &QAction::triggered, this, &gui::ApplicationGUI::showOptionDock);
+  connect(action_sim_visualize, &QAction::triggered, this, &gui::ApplicationGUI::toggleSimVisualizeDock);
   //connect(action_layer_sel, &QAction::triggered, this, &gui::ApplicationGUI::showLayerDialog);
 
   addToolBar(Qt::TopToolBarArea, top_bar);
@@ -260,31 +264,62 @@ void gui::ApplicationGUI::initSideBar()
   addToolBar(area, side_bar);
 }
 
-void gui::ApplicationGUI::initOptionDock()
+void gui::ApplicationGUI::initDialogDock()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
-  // recall or initialize option dock location
+  // add dialog_pan and input_field into a single widget
+  QVBoxLayout *dialog_dock_vl = new QVBoxLayout();
+  dialog_dock_vl->addWidget(dialog_pan, 1);
+  dialog_dock_vl->addWidget(input_field, 0);
+
+  QWidget *dialog_dock_main = new QWidget();
+  dialog_dock_main->setLayout(dialog_dock_vl);
+
+  // recall or initialise dialog dock location
+  Qt::DockWidgetArea area;
+  if(gui_settings->contains("DDOCK/loc"))
+    area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("DDOCK/loc"));
+  else
+    area = Qt::BottomDockWidgetArea;
+
+  dialog_dock = new QDockWidget(tr("Terminal Dialog"));
+
+  dialog_dock->setAllowedAreas(Qt::BottomDockWidgetArea);  // location behaviour
+  dialog_dock->setMinimumHeight(gui_settings->get<int>("DDOCK/mh")); // size TODO add to settings
+
+  connect(dialog_dock, &QDockWidget::visibilityChanged, this, &gui::ApplicationGUI::dialogDockVisibilityChanged);
+
+  dialog_dock->setWidget(dialog_dock_main);
+  dialog_dock->show();
+  addDockWidget(area, dialog_dock);
+}
+
+void gui::ApplicationGUI::initSimVisualizeDock()
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+
+  // recall or initialize sim visualize dock location
   Qt::DockWidgetArea area;
   if(gui_settings->contains("ODOCK/loc"))
     area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("ODOCK/loc"));
   else
     area = Qt::RightDockWidgetArea;
 
-  option_dock = new QDockWidget(tr("Options"));
+  sim_visualize_dock = new QDockWidget(tr("Sim Visualize"));
 
   // location behaviour
-  option_dock->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
+  sim_visualize_dock->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
 
   // size policy
-  option_dock->setMinimumWidth(gui_settings->get<int>("ODOCK/mw"));
+  sim_visualize_dock->setMinimumWidth(gui_settings->get<int>("ODOCK/mw"));
 
-  // TODO change option dock to specifically sim visualize dock
-  connect(option_dock, &QDockWidget::visibilityChanged, design_pan, &gui::DesignPanel::simDockVisibilityChanged);
+  connect(sim_visualize_dock, &QDockWidget::visibilityChanged, this, &gui::ApplicationGUI::simVisualizeDockVisibilityChanged);
+  connect(sim_visualize_dock, &QDockWidget::visibilityChanged, design_pan, &gui::DesignPanel::simVisualizeDockVisibilityChanged);
 
-  option_dock->setWidget(sim_visualize);
-  option_dock->hide();
-  addDockWidget(area, option_dock);
+  sim_visualize_dock->setWidget(sim_visualize);
+  sim_visualize_dock->hide();
+  addDockWidget(area, sim_visualize_dock);
 
 }
 
@@ -456,6 +491,38 @@ void gui::ApplicationGUI::parseInputField()
   }
 }
 
+void gui::ApplicationGUI::toggleSimVisualizeDock()
+{
+  if(sim_visualize_dock)
+    sim_visualize_dock->setVisible(!sim_visualize_dock->isVisible());
+  else
+    qCritical() << tr("Sim Visualize dock pointer is null");
+}
+
+void gui::ApplicationGUI::simVisualizeDockVisibilityChanged(bool visible)
+{
+  if(sim_visualize_dock && action_sim_visualize)
+    action_sim_visualize->setChecked(visible);
+  else
+    qCritical() << tr("Sim Visualize dock or menu item pointer is null");
+}
+
+void gui::ApplicationGUI::toggleDialogDock()
+{
+  if(dialog_dock)
+    dialog_dock->setVisible(!dialog_dock->isVisible());
+  else
+    qCritical() << tr("Dialog dock pointer is null");
+}
+
+void gui::ApplicationGUI::dialogDockVisibilityChanged(bool visible)
+{
+  if(dialog_dock && action_dialog_dock_visibility)
+    action_dialog_dock_visibility->setChecked(visible);
+  else
+    qCritical() << tr("Dialog dock or dialog dock menu item pointer is null");
+}
+
 void gui::ApplicationGUI::simulationSetup()
 {
   sim_manager->showSimSetupDialog();
@@ -480,8 +547,8 @@ void gui::ApplicationGUI::runSimulation(prim::SimJob *job)
   job->invokeBinary();
   job->readResults();
 
-  // show side option dock for user to look at sim result
-  showOptionDock();
+  // show side dock for user to look at sim result
+  showSimVisualizeDock();
   sim_visualize->updateJobSelCombo(); // TODO make sim_visualize capture job completion signals, so it updates the field on its own
 }
 
