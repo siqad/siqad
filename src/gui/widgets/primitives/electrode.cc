@@ -21,7 +21,6 @@ QColor prim::Electrode::selected_col; // edge colour, selected
 
 // Draw on layer 0 for now.
 prim::Electrode::Electrode(int lay_id, QPointF point1, QPointF point2):
-
   prim::Item(prim::Item::Electrode)
 {
   initElectrode(lay_id, point1, point2);
@@ -94,15 +93,6 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
   // debug
   qDebug() << QObject::tr("Electrode point 1: x=%1, y=%2").arg(ld_point1.x()).arg(ld_point1.y());
 
-
-  initElectrode(lay_id, ld_point1, ld_point2);
-  scene->addItem(this);
-}
-
-void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point2_in)
-{
-  point1 = point1_in;
-  point2 = point2_in;
 
   initElectrode(lay_id, ld_point1, ld_point2, potential_in, electrode_type_in);
   scene->addItem(this);
