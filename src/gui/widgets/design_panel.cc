@@ -1107,8 +1107,14 @@ void gui::DesignPanel::electrodeSetPotentialAction()
   if(selection.isEmpty()){ //TODO:figure out how we want to handle right click without selection
     qDebug() << tr("Please select an item...");
   } else {
-    potential = QInputDialog::getDouble(this, tr("Set Potential"),
-                tr("Set electrode potential(s) to:"));
+    if(selection.count() == 1){
+      potential = QInputDialog::getDouble(this, tr("Set Potential"),
+                  tr("Set electrode potential(s) to:"), static_cast<prim::Electrode*>(selection.at(0))->getPotential());
+    } else {
+      potential = QInputDialog::getDouble(this, tr("Set Potential"),
+                  tr("WARNING: Multiple electrodes selected.\nSet electrode potential(s) to:"));
+    }
+
     for(QGraphicsItem *gitem : selection){
       if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::Electrode)
         static_cast<prim::Electrode*>(gitem)->setPotential(potential);
