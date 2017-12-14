@@ -104,6 +104,8 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
   * Time control, if the simulator supports that
   * Degenerate state visualization
   * stuff like that
+* SimAnneal
+  * Distance dependent hopping: precompute the probability of hopping from each site to any other site, put into matrix
 
 > general bugs
 ## Bugs
