@@ -167,10 +167,10 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
 
   // top left and bottom right locations
   ss->writeEmptyElement("dim");
-  ss->writeAttribute("x1", QString::number(point1.x()));
-  ss->writeAttribute("y1", QString::number(point1.y()));
-  ss->writeAttribute("x2", QString::number(point2.x()));
-  ss->writeAttribute("y2", QString::number(point2.y()));
+  ss->writeAttribute("x1", QString::number(std::min(point1.x(), point2.x())));
+  ss->writeAttribute("y1", QString::number(std::min(point1.y(), point2.y())));
+  ss->writeAttribute("x2", QString::number(std::max(point1.x(), point2.x())));
+  ss->writeAttribute("y2", QString::number(std::max(point1.y(), point2.y())));
   ss->writeTextElement("potential", QString::number(getPotential()));
   ss->writeTextElement("electrode_type", QString::number(electrode_type));
   // other attributes
