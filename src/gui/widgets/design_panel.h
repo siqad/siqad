@@ -58,7 +58,7 @@ namespace gui{
 
     // add a new layer with the given name. If no name is given, a default scheme
     // is used. Checks if the layer already exists.
-    void addLayer(const QString &name = QString(), const QString &cnt_type = QString());
+    void addLayer(const QString &name = QString(), const QString &cnt_type = QString(), const float zheight = 0);
 
     // attempt to remove a layer, either by name or index
     void removeLayer(const QString &name);

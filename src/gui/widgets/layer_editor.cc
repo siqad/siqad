@@ -52,18 +52,31 @@ void LayerEditor::updateLayerList()
   l_layers.clear();
   qDebug() << "cleared l_layers";
 
+  // TODO removal of previous entries
+
+  // header row
+  // TODO align columns
+  QHBoxLayout *layer_entry_hl = new QHBoxLayout;
+  layer_entry_hl->addWidget(new QLabel("Name"));
+  layer_entry_hl->addWidget(new QLabel("Z-Height"));
+  layer_entry_hl->addWidget(new QLabel("Visible"));
+  layer_entry_hl->addWidget(new QLabel("Editable")); // TODO wording
+  layer_list_vl->addLayout(layer_entry_hl);
+
+  // add layer info to LayerEditor, 1 row per layer
   for(prim::Layer* layer : *layers) {
-    l_layers.append(new QLabel(layer->getName()));
-  }
-  qDebug() << "added labels of layers";
+    // TODO maybe make this thing a function "addLayerRow"
+    QLabel *label_layer_name = new QLabel(layer->getName());
+    QLineEdit *le_zheight = new QLineEdit(QString::number(layer->getZHeight()));
+    // TODO visibility checkbox
+    // TODO editability checkbox
 
-  // TODO removal of layer labels from VL
+    QHBoxLayout *layer_entry_hl = new QHBoxLayout;
+    layer_entry_hl->addWidget(label_layer_name);
+    layer_entry_hl->addWidget(le_zheight);
 
-  //layer_list_vl->clear();
-  for(QLabel *l_layer : l_layers){
-    layer_list_vl->addWidget(l_layer);
+    layer_list_vl->addLayout(layer_entry_hl);
   }
-  qDebug() << "added layers to vl";
 }
 
 // update widget

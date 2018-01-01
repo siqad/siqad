@@ -31,7 +31,7 @@ namespace prim{
 
     // constructor, create a Layer with the given name. If no name is given,
     // use the default naming scheme with layer_count.
-    Layer(const QString &nm = QString(), const QString &cnt_type = QString(), int lay_id=-1, QObject *parent=0);
+    Layer(const QString &nm = QString(), const QString &cnt_type = QString(), const float z_height=0, int lay_id=-1, QObject *parent=0);
     Layer(QXmlStreamReader *stream);
 
     // destructor
@@ -45,6 +45,10 @@ namespace prim{
     
     // set layer index and update layer_id of contained items
     void setLayerIndex(int lay_id);
+
+    // set / get the z-height of the layer
+    void setZHeight(const float z_height) {zheight = z_height;}
+    float getZHeight() {return zheight;}
 
     // add a new Item to the current layer. If the Item is already in the layer,
     // do nothing.

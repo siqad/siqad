@@ -172,7 +172,7 @@ void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
   }
 }
 
-void gui::DesignPanel::addLayer(const QString &name, const QString &cnt_type)
+void gui::DesignPanel::addLayer(const QString &name, const QString &cnt_type, const float zheight)
 {
   // check if name already taken
   bool taken = false;
@@ -188,7 +188,7 @@ void gui::DesignPanel::addLayer(const QString &name, const QString &cnt_type)
   }
 
   // layer is added to the end of layers stack, so ID = layers.size() before it was added
-  prim::Layer *layer = new prim::Layer(name, cnt_type, layers.size());
+  prim::Layer *layer = new prim::Layer(name, cnt_type, zheight, layers.size());
   layers.append(layer);
 }
 
@@ -327,11 +327,11 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   layers.append(lattice);
 
   // add in the dangling bond surface
-  addLayer(tr("Surface"),tr("db"));
+  addLayer(tr("Surface"),tr("db"),0);
   top_layer = layers.at(1);
 
   // add in the metal layer for electrodes
-  addLayer(tr("Metal"),tr("electrodes"));
+  addLayer(tr("Metal"),tr("electrodes"),-1E-7);
   electrode_layer = layers.at(2);
 
 }
