@@ -77,6 +77,11 @@ void LayerEditor::updateLayerList()
 
     layer_list_vl->addLayout(layer_entry_hl);
   }
+
+  // TODO apply button to update layer properties, revert button to revert
+  // TODO simply reload the list if revert is pushed, I guess
+
+  // TODO UNDOable layer creation in DesignPanel
 }
 
 // update widget
