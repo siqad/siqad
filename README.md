@@ -59,6 +59,17 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * ~~Esc cancels DB Tool~~ Implemented 17.07.13
 * ~~Visual feedback on which tool is currently in use (e.g. changed background of the button)~~ Implemented 17.07.12
 
+### Layers
+* CreateLayer with undo and redo in DesignPanel
+* Add zheight property to layers (including updating functions in DP)
+* LayerEditor
+  * List layers
+  * Add layer
+  * Rm layer
+  * Edit layer zheight
+* Distinguishment between physical layer and logical layer
+  * Update code in physics engine
+
 ### Aggregates
 * Save and load aggregates
 * Disallow creation of new dots inside aggregates

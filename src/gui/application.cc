@@ -70,6 +70,7 @@ void gui::ApplicationGUI::initGUI()
   design_pan = new gui::DesignPanel(this);
   input_field = new gui::InputField(this);
   info_pan = new gui::InfoPanel(this);
+  layer_editor = new gui::LayerEditor(design_pan, this);
   sim_manager = new gui::SimManager(this);
   sim_visualize = new gui::SimVisualize(sim_manager, this);
 
@@ -199,14 +200,14 @@ void gui::ApplicationGUI::initTopBar()
   action_run_sim->setShortcut(tr("F11"));
 
   action_sim_visualize = top_bar->addAction(QIcon(":/ico/simvisual.svg"), tr("Simulation Visualization Dock"));
-  //action_layer_sel= top_bar->addAction(QIcon(":/ico/layer.svg"), tr("Layer Selection"));
+  action_layer_sel= top_bar->addAction(QIcon(":/ico/layer.svg"), tr("Layer Selection"));
   //action_circuit_lib= top_bar->addAction(QIcon(":/ico/circuitlib.svg"), tr("Circuit Library"));
 
   action_sim_visualize->setCheckable(true);
 
   connect(action_run_sim, &QAction::triggered, this, &gui::ApplicationGUI::simulationSetup);
   connect(action_sim_visualize, &QAction::triggered, this, &gui::ApplicationGUI::toggleSimVisualizeDock);
-  //connect(action_layer_sel, &QAction::triggered, this, &gui::ApplicationGUI::showLayerDialog);
+  connect(action_layer_sel, &QAction::triggered, this, &gui::ApplicationGUI::showLayerDialog);
 
   addToolBar(Qt::TopToolBarArea, top_bar);
 }
@@ -476,7 +477,9 @@ void gui::ApplicationGUI::changeLattice()
 
 void gui::ApplicationGUI::showLayerDialog()
 {
-  // TODO small dialog for changing layer
+  layer_editor->updateLayerList();
+  layer_editor->show();
+  // TODO give option to make LayerEditor a dock widget, make this function similar to the toggled dock widgets
 }
 
 void gui::ApplicationGUI::parseInputField()

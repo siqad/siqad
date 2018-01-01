@@ -827,7 +827,7 @@ void gui::DesignPanel::wheelEvent(QWheelEvent *e)
   // accumulate scroll value
   if(!pix_del.isNull())
     wheel_deg += pix_del;
-  else if(~deg_del.isNull())
+  else if(!deg_del.isNull())
     wheel_deg += deg_del;
 
   // if enough scroll achieved, act and reset wheel_deg

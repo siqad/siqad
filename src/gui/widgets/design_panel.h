@@ -64,6 +64,9 @@ namespace gui{
     void removeLayer(const QString &name);
     void removeLayer(int n);
 
+    // retreieve entire layer stack TODO might not be needed, delete if true
+    QStack<prim::Layer*>* getLayers() {return &layers;}
+
     // returns a pointer to the requested layer if it exists, else 0
     prim::Layer* getLayer(const QString &name) const;
     prim::Layer* getLayer(int n) const;

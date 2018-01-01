@@ -92,6 +92,7 @@ namespace prim{
 
     int layer_id;   // layer index in design panel's layers stack
     static uint layer_count;  // number of created Layer() objects, does not decrement
+    float zheight;  // layer distance from surface
 
     QString name;   // arbitrary layer name, layers can be selected by name
     QString content_type;
