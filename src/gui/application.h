@@ -65,6 +65,9 @@ namespace gui{
     // parse input field and act accordingly
     void parseInputField();
 
+    //
+    void designPanelReset();
+
     // sim visualization dock
     void showSimVisualizeDock() {sim_visualize_dock->show();}
     void toggleSimVisualizeDock();

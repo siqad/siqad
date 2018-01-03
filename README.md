@@ -76,9 +76,11 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 
 ### Electrode Design
 * Side view of vertical electrode stack
-* Top view of electrode layers
+* ~~Top view of electrode layers~~
 * ~~Creating, moving, and deleting electrodes~~
 * Snapping, aligning and distributing like Inkscape
+* ~~Save/Load~~
+* ~~Setting potentials individually, by batch~~
 
 ### Config
 * Make config file paths configurable
@@ -94,6 +96,9 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * Interface with solvers (standards for passing DB configuration to them, and taking results back)
   * Singleton
   * Custom class containing physical structure
+		* ~~Import size and potential data for electrodes into solver~~
+		* Translate size from Qt units to physical lengths
+		*	Add buffer region surrounding simulation area
     * Location, dimensions, etc
   * Custom class containing properties
 * Simple estimation tool of electron distribution
@@ -124,6 +129,11 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
     * Temperarily use an available xml parser for now, might change later (rapidxml?)
     * Material, material parameters/properties (that can be overidden by the simulator), DB locations
     * Aggregates (in the future: predetermined simulation parameters for aggregates can be stored)
+		* ~~Electrode potential and size~~
+		* A way to add a "buffer" region to the outer simulation boundaries.
+		* Specification of potential simulation boundaries.
+		* Translating the QPoint locations in Qt to physical locations in the simulation.
+		* Ensuring that Electrodes do not overlap with each other.
 * Simple estimation tool of electron distribution
   * Simulated annealing algorithm with 1. electron population determined by bulk-DB interaction and 2. inter-DB electron hopping.
   * Export results to file for gui to read - time, charge distribution, etc

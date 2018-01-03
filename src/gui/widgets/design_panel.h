@@ -121,6 +121,7 @@ namespace gui{
 
   signals:
     void sig_toolChange(ToolType tool);
+    void sig_resetDesignPanel();
 
   protected:
 
