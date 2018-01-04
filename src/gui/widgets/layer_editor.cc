@@ -26,61 +26,52 @@ void LayerEditor::initLayerEditor()
 {
   // populate widget with existing layers
 
-  // TEMP just show all the layers with no order for a start
-  l_layers.clear();
-  for(prim::Layer* layer : *layers) {
-    l_layers.append(new QLabel(layer->getName()));
-  }
-
-  layer_list_vl = new QVBoxLayout; // TODO make into class pointer if needed
-
-  for(QLabel *l_layer : l_layers)
-    layer_list_vl->addWidget(l_layer);
+  layer_list_vl = new QGridLayout; // TODO make into class pointer if needed
 
   setLayout(layer_list_vl);
 
 
   // TODO a struct that contains all graphical objects related to a layer
 
-  // TODO signal for adding/removing layers, LayerEditor receives signals and updates everytime
+  // TODO change add/remove to signal based
 }
 
 void LayerEditor::updateLayerList()
 {
   qDebug() << "entered update layer list";
 
-  l_layers.clear();
-  qDebug() << "cleared l_layers";
-
-  // TODO removal of previous entries
+  // TODO better way of updating, like using signals
+  delete layer_list_vl;
+  layer_list_vl = new QGridLayout;
+  setLayout(layer_list_vl);
 
   // header row
-  // TODO align columns
-  QHBoxLayout *layer_entry_hl = new QHBoxLayout;
-  layer_entry_hl->addWidget(new QLabel("Name"));
-  layer_entry_hl->addWidget(new QLabel("Z-Height"));
-  layer_entry_hl->addWidget(new QLabel("Visible"));
-  layer_entry_hl->addWidget(new QLabel("Editable")); // TODO wording
-  layer_list_vl->addLayout(layer_entry_hl);
+  layer_list_vl->addWidget(new QLabel("Name"),0,0);
+  layer_list_vl->addWidget(new QLabel("Z-Height"),0,1);
+  layer_list_vl->addWidget(new QLabel("Visible"),0,2);
+  layer_list_vl->addWidget(new QLabel("Editable"),0,3); // TODO wording
 
   // add layer info to LayerEditor, 1 row per layer
+  int i = 1;
   for(prim::Layer* layer : *layers) {
     // TODO maybe make this thing a function "addLayerRow"
     QLabel *label_layer_name = new QLabel(layer->getName());
     QLineEdit *le_zheight = new QLineEdit(QString::number(layer->getZHeight()));
     // TODO visibility checkbox
     // TODO editability checkbox
+    // TODO use icons instead of checkboxes for V and E
 
-    QHBoxLayout *layer_entry_hl = new QHBoxLayout;
-    layer_entry_hl->addWidget(label_layer_name);
-    layer_entry_hl->addWidget(le_zheight);
+    layer_list_vl->addWidget(label_layer_name,i,0);
+    layer_list_vl->addWidget(le_zheight,i,1);
 
-    layer_list_vl->addLayout(layer_entry_hl);
+    i++;
   }
 
   // TODO apply button to update layer properties, revert button to revert
   // TODO simply reload the list if revert is pushed, I guess
+  // TODO close button
 
+  // TODO UNDOable z-height change
   // TODO UNDOable layer creation in DesignPanel
 }
 

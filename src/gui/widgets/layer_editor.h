@@ -35,10 +35,9 @@ namespace gui{
     // vars
     gui::DesignPanel *dp;
     QStack<prim::Layer*> *layers;
-    QStack<QLabel*> l_layers;
 
     // GUI
-    QVBoxLayout *layer_list_vl;
+    QGridLayout *layer_list_vl;
   };
 
 }
