@@ -24,52 +24,95 @@ LayerEditor::LayerEditor(gui::DesignPanel *design_pan, QWidget *parent)
 // initialize widget
 void LayerEditor::initLayerEditor()
 {
-  // populate widget with existing layers
+  // TODO make into dock widget, or option to make it so
 
-  layer_list_vl = new QGridLayout; // TODO make into class pointer if needed
+  // grid layout that show all layers
+  layer_list_vl = new QVBoxLayout;
+  layer_grid_l = new QGridLayout; // this grid is destroyed and recreated everytime editor reloads
+  layer_list_vl->addLayout(layer_grid_l);
 
-  setLayout(layer_list_vl);
+  // bottom buttons
+  QHBoxLayout *bot_buttons_hl = new QHBoxLayout;
 
+  QPushButton *bt_add = new QPushButton(tr("Add")); // TODO implement function
+  QPushButton *bt_close = new QPushButton(tr("Close"));
+
+  connect(bt_close, SIGNAL(clicked()), this, SLOT(hide()));
+
+  bt_close->setShortcut(tr("Esc"));
+
+  bot_buttons_hl->addWidget(bt_add);
+  bot_buttons_hl->addWidget(bt_close);
+
+  // Main layout
+  QVBoxLayout *main_vl = new QVBoxLayout;
+  main_vl->addLayout(layer_list_vl);
+  main_vl->addLayout(bot_buttons_hl);
+
+  // TODO apply button to update layer properties, revert button to revert
+  // TODO simply reload the list if revert is pushed, I guess
+
+  setLayout(main_vl);
 
   // TODO a struct that contains all graphical objects related to a layer
 
   // TODO change add/remove to signal based
 }
 
+void LayerEditor:: addLayerRow()
+{
+  // TODO
+}
+
 void LayerEditor::updateLayerList()
 {
-  qDebug() << "entered update layer list";
+  // TODO layer update signals that trigger this function
 
-  // TODO better way of updating, like using signals
-  delete layer_list_vl;
-  layer_list_vl = new QGridLayout;
-  setLayout(layer_list_vl);
+  // TODO function to remake layout
+  //delete layer_grid_l;
+  //layer_grid_l = new QGridLayout;
+  // TODO buttons
+
+  // update layer list
+    // delete old layer grid and remake
+    // populate the new grid with existing layer info
+      // TODO sort the layers according to z-height, in descending order
+
 
   // header row
-  layer_list_vl->addWidget(new QLabel("Name"),0,0);
-  layer_list_vl->addWidget(new QLabel("Z-Height"),0,1);
-  layer_list_vl->addWidget(new QLabel("Visible"),0,2);
-  layer_list_vl->addWidget(new QLabel("Editable"),0,3); // TODO wording
+  layer_grid_l->addWidget(new QLabel("Name"),0,0);
+  layer_grid_l->addWidget(new QLabel("Type"),0,1);
+  layer_grid_l->addWidget(new QLabel("Z-Height"),0,2);
+  layer_grid_l->addWidget(new QLabel("Visible"),0,3);  // TODO change to icon
+  layer_grid_l->addWidget(new QLabel("Editable"),0,4); // TODO change to icon
+
 
   // add layer info to LayerEditor, 1 row per layer
   int i = 1;
   for(prim::Layer* layer : *layers) {
-    // TODO maybe make this thing a function "addLayerRow"
     QLabel *label_layer_name = new QLabel(layer->getName());
+    QLabel *label_content_type = new QLabel(layer->getContentType()); // TODO change to icon
     QLineEdit *le_zheight = new QLineEdit(QString::number(layer->getZHeight()));
-    // TODO visibility checkbox
+    // TODO meter scale (um,nm,etc)
+    QCheckBox *cb_visibility = new QCheckBox(this); // TODO not sure if "this" is needed
     // TODO editability checkbox
-    // TODO use icons instead of checkboxes for V and E
 
-    layer_list_vl->addWidget(label_layer_name,i,0);
-    layer_list_vl->addWidget(le_zheight,i,1);
+    cb_visibility->setChecked(layer->isVisible());
+
+    connect(cb_visibility, SIGNAL(stateChanged(int)), layer, SLOT(visibilityCheckBoxChanged(int)));
+
+    layer_grid_l->addWidget(label_layer_name,i,0);
+    layer_grid_l->addWidget(label_content_type,i,1);
+    layer_grid_l->addWidget(le_zheight,i,2);
+    layer_grid_l->addWidget(cb_visibility,i,3);
 
     i++;
   }
 
-  // TODO apply button to update layer properties, revert button to revert
-  // TODO simply reload the list if revert is pushed, I guess
-  // TODO close button
+  // TODO restructure the widget such that the following items are only created
+  // during initialization, instead of being remade every time the widget is
+  // updated.
+
 
   // TODO UNDOable z-height change
   // TODO UNDOable layer creation in DesignPanel

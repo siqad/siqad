@@ -27,17 +27,30 @@ namespace gui{
     // destructor
     ~LayerEditor() {};
 
+    // GUI items in layer list grid
+    struct layerGridRowItems
+    {
+      QLabel *label_layer_name;     // layer name
+      QLabel *label_content_type;   // layer content type
+      QLineEdit *le_zheight;        // layer z-height
+      QCheckBox *cb_visibility;     // layer visibility
+    };
+
     void updateLayerList();
 
   private:
     void initLayerEditor();
+
+    void addLayerRow(); // add an empty row to layer list
 
     // vars
     gui::DesignPanel *dp;
     QStack<prim::Layer*> *layers;
 
     // GUI
-    QGridLayout *layer_list_vl;
+    QVBoxLayout *layer_list_vl;
+    QGridLayout *layer_grid_l;
+    QStack<layerGridRowItems> layer_grid_items;
   };
 
 }
