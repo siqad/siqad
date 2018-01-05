@@ -38,14 +38,14 @@
         <layer type="electrodes">
             <electrode>
                 <layer_id>2</layer_id>
-                <dim x1="11" y1="8" x2="40" y2="40"/>
-                <potential>0</potential>
+                <dim x1="11" y1="8" x2="40" y2="50"/>
+                <potential>10</potential>
                 <electrode_type>0</electrode_type>
             </electrode>
             <electrode>
                 <layer_id>2</layer_id>
                 <dim x1="57" y1="42" x2="79" y2="70"/>
-                <potential>0</potential>
+                <potential>5</potential>
                 <electrode_type>0</electrode_type>
             </electrode>
             <electrode>

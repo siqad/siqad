@@ -13,6 +13,11 @@ src/log/
 *.log
 Makefile
 
+#PoissonSolver outputs
+*outfile.txt
+*outrho.txt
+*outcorr.txt
+
 # other
 *.swp
 .qmake.stash
