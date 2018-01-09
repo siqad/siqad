@@ -18,6 +18,9 @@ Makefile
 *outrho.txt
 *outcorr.txt
 
+#save files
+/*.xml
+
 # other
 *.swp
 .qmake.stash
