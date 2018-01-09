@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dbdesigner>
+    <!--Program Flags-->
+    <program>
+        <file_purpose>save</file_purpose>
+        <version>TBD</version>
+        <date>2017-12-15 11:54:35</date>
+    </program>
+    <!--GUI Flags-->
+    <gui>
+        <zoom>1</zoom>
+        <scroll x="-119" y="-119"/>
+    </gui>
+    <!--Layer Properties-->
+    <!--Layer ID is intrinsic to the layer order-->
+    <layer_prop>
+        <name>Layer 0</name>
+        <visible>1</visible>
+        <active>0</active>
+    </layer_prop>
+    <layer_prop>
+        <name>Layer 1</name>
+        <visible>1</visible>
+        <active>0</active>
+    </layer_prop>
+    <layer_prop>
+        <name>Layer 2</name>
+        <visible>1</visible>
+        <active>0</active>
+    </layer_prop>
+    <!--Item Hierarchy-->
+    <design>
+        <!--Layer 0-->
+        <layer type="lattice"/>
+        <!--Layer 1-->
+        <layer type="db"/>
+        <!--Layer 2-->
+        <layer type="electrodes">
+            <electrode>
+                <layer_id>2</layer_id>
+                <dim x1="11" y1="8" x2="40" y2="50"/>
+                <potential>10</potential>
+                <electrode_type>0</electrode_type>
+            </electrode>
+            <electrode>
+                <layer_id>2</layer_id>
+                <dim x1="57" y1="42" x2="79" y2="70"/>
+                <potential>5</potential>
+                <electrode_type>0</electrode_type>
+            </electrode>
+            <electrode>
+                <layer_id>2</layer_id>
+                <dim x1="13" y1="70" x2="40" y2="106"/>
+                <potential>0</potential>
+                <electrode_type>0</electrode_type>
+            </electrode>
+        </layer>
+    </design>
+</dbdesigner>

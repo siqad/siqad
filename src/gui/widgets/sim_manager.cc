@@ -35,7 +35,7 @@ SimManager::~SimManager()
 
 void SimManager::showSimSetupDialog()
 {
-  //updateSimSetupDialog();
+    // updateSimSetupDialog();
   sim_setup_dialog->show();
 }
 
@@ -80,7 +80,6 @@ void SimManager::initSimManager()
 
   setLayout(man_main);
 
-
   setWindowTitle(tr("Simulation Manager"));
 }
 
@@ -105,12 +104,11 @@ void SimManager::initSimActionsPan()
   sim_actions_pan->addStretch(1);
 }
 
-
 void SimManager::initSimSetupDialog()
 {
   sim_setup_dialog = new QWidget(this, Qt::Dialog);
 
-  // Engine Select Group
+  // Engine Select Group, can be written here since only done once.
   QGroupBox *engine_sel_group = new QGroupBox(tr("Engine Selection"));
   QLabel *label_eng_sel = new QLabel(tr("Engine:"));
   QLabel *label_job_nm = new QLabel(tr("Job Name:"));
@@ -121,8 +119,6 @@ void SimManager::initSimSetupDialog()
   combo_eng_sel->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   updateEngSelCombo();
   le_job_nm = new QLineEdit(job_nm_default);
-
-  // TODO when combo_eng_sel is updated, the available options should also change
 
   label_eng_sel->setBuddy(combo_eng_sel);
   label_job_nm->setBuddy(le_job_nm);
@@ -140,59 +136,18 @@ void SimManager::initSimSetupDialog()
   engine_sel_vl->addLayout(job_nm_hl);
 
   engine_sel_group->setLayout(engine_sel_vl);
+  connect(combo_eng_sel, SIGNAL(currentIndexChanged(int)), this, SLOT(updateSimParams(int))); //updates parameter list based on selection
 
-  // Sim Params Group
-  QGroupBox *sim_params_group = new QGroupBox(tr("Simulation Parameters"));
+  // Sim Params Group, this will change depending on combo box selection.
 
-  // hard coded fields for now
-  QLabel *label_result_queue_size = new QLabel("Result Queue Size:");
-  QLabel *label_preanneal_cycles = new QLabel("Preanneal Cycles:");
-  QLabel *label_anneal_cycles = new QLabel("Anneal Cycles:");
-  QLabel *label_global_v0 = new QLabel("Global Bias v_0:");
-  QLabel *label_debye_length = new QLabel("Debye Length (m):");
+  createParamGroup();
 
-  le_result_queue_size = new QLineEdit("1000"); // TODO these default values should be read from the engine description file
-  le_preanneal_cycles = new QLineEdit("1000");
-  le_anneal_cycles = new QLineEdit("10000");
-  le_global_v0 = new QLineEdit("1.5");
-  le_debye_length = new QLineEdit("5E-9");
+  // Buttons, these will have to be re-added every time the sim params are updated
 
-  label_result_queue_size->setBuddy(le_result_queue_size);
-  label_preanneal_cycles->setBuddy(le_preanneal_cycles);
-  label_anneal_cycles->setBuddy(le_anneal_cycles);
-  label_global_v0->setBuddy(le_global_v0);
-  label_debye_length->setBuddy(le_debye_length);
-
-  QHBoxLayout *result_queue_size_hl = new QHBoxLayout;
-  QHBoxLayout *preanneal_cycles_hl = new QHBoxLayout;
-  QHBoxLayout *anneal_cycles_hl = new QHBoxLayout;
-  QHBoxLayout *global_v0_hl = new QHBoxLayout;
-  QHBoxLayout *debye_length_hl = new QHBoxLayout;
-  result_queue_size_hl->addWidget(label_result_queue_size);
-  result_queue_size_hl->addWidget(le_result_queue_size);
-  preanneal_cycles_hl->addWidget(label_preanneal_cycles);
-  preanneal_cycles_hl->addWidget(le_preanneal_cycles);
-  anneal_cycles_hl->addWidget(label_anneal_cycles);
-  anneal_cycles_hl->addWidget(le_anneal_cycles);
-  global_v0_hl->addWidget(label_global_v0);
-  global_v0_hl->addWidget(le_global_v0);
-  debye_length_hl->addWidget(label_debye_length);
-  debye_length_hl->addWidget(le_debye_length);
-
-  QVBoxLayout *sim_params_vl = new QVBoxLayout;
-  sim_params_vl->addLayout(result_queue_size_hl);
-  sim_params_vl->addLayout(preanneal_cycles_hl);
-  sim_params_vl->addLayout(anneal_cycles_hl);
-  sim_params_vl->addLayout(global_v0_hl);
-  sim_params_vl->addLayout(debye_length_hl);
-
-  sim_params_group->setLayout(sim_params_vl);
-
-  // Bottom Buttons
-  QPushButton *button_run = new QPushButton(tr("&Run"));
+  button_run = new QPushButton(tr("&Run"));
   //QPushButton *button_export = new QPushButton(tr("&Export"));
   //QPushButton *button_import = new QPushButton(tr("&Import"));
-  QPushButton *button_cancel = new QPushButton(tr("Cancel"));
+  button_cancel = new QPushButton(tr("Cancel"));
 
   connect(button_run, &QAbstractButton::clicked, this, &gui::SimManager::submitSimSetup);
   // TODO connect export and import buttons
@@ -200,15 +155,10 @@ void SimManager::initSimSetupDialog()
 
   button_cancel->setShortcut(tr("Esc"));
 
-  QHBoxLayout *bottom_buttons_hl = new QHBoxLayout;
-  bottom_buttons_hl->addStretch(1);
-  bottom_buttons_hl->addWidget(button_run);
-  //bottom_buttons_hl->addWidget(button_export);
-  //bottom_buttons_hl->addWidget(button_import);
-  bottom_buttons_hl->addWidget(button_cancel);
+  createButtonLayout();
 
-  // bring it together
-  QVBoxLayout *new_setup_dialog_l = new QVBoxLayout;
+  // Combine into one dialog
+  new_setup_dialog_l = new QVBoxLayout;
   new_setup_dialog_l->addWidget(engine_sel_group);
   new_setup_dialog_l->addWidget(sim_params_group);
   new_setup_dialog_l->addLayout(bottom_buttons_hl);
@@ -216,6 +166,89 @@ void SimManager::initSimSetupDialog()
   sim_setup_dialog->setLayout(new_setup_dialog_l);
 }
 
+void SimManager::createButtonLayout()
+{
+  bottom_buttons_hl = new QHBoxLayout;
+  bottom_buttons_hl->addStretch(1);
+  bottom_buttons_hl->addWidget(button_run);
+  //bottom_buttons_hl->addWidget(button_export);
+  //bottom_buttons_hl->addWidget(button_import);
+  bottom_buttons_hl->addWidget(button_cancel);
+}
+
+void SimManager::createParamGroup()
+{
+  sim_params_group = new QGroupBox(tr("Simulation Parameters"));
+  sim_params_vl = new QVBoxLayout;
+
+  if(combo_eng_sel->currentText() == QString("SimAnneal")){
+    label_result_queue_size = new QLabel("Result Queue Size:");
+    label_preanneal_cycles = new QLabel("Preanneal Cycles:");
+    label_anneal_cycles = new QLabel("Anneal Cycles:");
+    label_global_v0 = new QLabel("Global Bias v_0:");
+    label_debye_length = new QLabel("Debye Length (m):");
+
+    le_result_queue_size = new QLineEdit("1000"); // TODO these default values should be read from the engine description file
+    le_preanneal_cycles = new QLineEdit("1000");
+    le_anneal_cycles = new QLineEdit("10000");
+    le_global_v0 = new QLineEdit("1.5");
+    le_debye_length = new QLineEdit("5E-9");
+
+    label_result_queue_size->setBuddy(le_result_queue_size);
+    label_preanneal_cycles->setBuddy(le_preanneal_cycles);
+    label_anneal_cycles->setBuddy(le_anneal_cycles);
+    label_global_v0->setBuddy(le_global_v0);
+    label_debye_length->setBuddy(le_debye_length);
+
+    QHBoxLayout *result_queue_size_hl = new QHBoxLayout;
+    QHBoxLayout *preanneal_cycles_hl = new QHBoxLayout;
+    QHBoxLayout *anneal_cycles_hl = new QHBoxLayout;
+    QHBoxLayout *global_v0_hl = new QHBoxLayout;
+    QHBoxLayout *debye_length_hl = new QHBoxLayout;
+    result_queue_size_hl->addWidget(label_result_queue_size);
+    result_queue_size_hl->addWidget(le_result_queue_size);
+    preanneal_cycles_hl->addWidget(label_preanneal_cycles);
+    preanneal_cycles_hl->addWidget(le_preanneal_cycles);
+    anneal_cycles_hl->addWidget(label_anneal_cycles);
+    anneal_cycles_hl->addWidget(le_anneal_cycles);
+    global_v0_hl->addWidget(label_global_v0);
+    global_v0_hl->addWidget(le_global_v0);
+    debye_length_hl->addWidget(label_debye_length);
+    debye_length_hl->addWidget(le_debye_length);
+
+    sim_params_vl->addLayout(result_queue_size_hl);
+    sim_params_vl->addLayout(preanneal_cycles_hl);
+    sim_params_vl->addLayout(anneal_cycles_hl);
+    sim_params_vl->addLayout(global_v0_hl);
+    sim_params_vl->addLayout(debye_length_hl);
+
+  }else if(combo_eng_sel->currentText() == QString("PoisSolver")){
+    label_xml_path = new QLabel("XML Path:");
+    le_xml_path = new QLineEdit("");
+    label_xml_path->setBuddy(le_xml_path);
+    QHBoxLayout *xml_path_hl = new QHBoxLayout;
+    xml_path_hl->addWidget(label_xml_path);
+    xml_path_hl->addWidget(le_xml_path);
+    sim_params_vl->addLayout(xml_path_hl);
+  }
+
+  sim_params_group->setLayout(sim_params_vl);
+}
+
+//only called when combo_eng_sel selection is changed.
+void SimManager::updateSimParams(int combo_index)
+{
+  if(new_setup_dialog_l->takeAt(new_setup_dialog_l->indexOf(sim_params_group)) != 0){
+    delete sim_params_group;
+  }
+  createParamGroup();
+  new_setup_dialog_l->addWidget(sim_params_group);
+  //TODO: Find a way to get the button layout's index so we can SAFELY delete it.
+  delete bottom_buttons_hl;
+  createButtonLayout();
+  new_setup_dialog_l->addLayout(bottom_buttons_hl);
+  sim_setup_dialog->adjustSize();
+}
 
 void SimManager::updateEngSelCombo()
 {
@@ -235,6 +268,7 @@ void SimManager::updateSimSetupDialog()
 {
   // update dialog content with engine selection
   // useless for now as there's only one engine
+  qDebug() << QObject::tr("updateSimSetupDialog");
 }
 
 
@@ -253,12 +287,15 @@ void SimManager::submitSimSetup()
   prim::SimJob *new_job = new prim::SimJob(le_job_nm->text(), sim_engines[combo_eng_sel->currentIndex()]);
 
   // fill in job properties according to input fields
-  new_job->addSimulationParameter("result_queue_size", le_result_queue_size->text());
-  new_job->addSimulationParameter("preanneal_cycles", le_preanneal_cycles->text());
-  new_job->addSimulationParameter("anneal_cycles", le_anneal_cycles->text());
-  new_job->addSimulationParameter("global_v0", le_global_v0->text());
-  new_job->addSimulationParameter("debye_length", le_debye_length->text());
-
+  if(combo_eng_sel->currentText() == QString("SimAnneal")){
+    new_job->addSimulationParameter("result_queue_size", le_result_queue_size->text());
+    new_job->addSimulationParameter("preanneal_cycles", le_preanneal_cycles->text());
+    new_job->addSimulationParameter("anneal_cycles", le_anneal_cycles->text());
+    new_job->addSimulationParameter("global_v0", le_global_v0->text());
+    new_job->addSimulationParameter("debye_length", le_debye_length->text());
+  } else if(combo_eng_sel->currentText() == QString("PoisSolver")){
+    new_job->addSimulationParameter("xml_path", le_xml_path->text());
+  }
   // engine
     // auto filled in: job export path, job result path
     // TODO option to change job export/result paths and option to keep the files after

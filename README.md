@@ -80,7 +80,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * ~~Creating, moving, and deleting electrodes~~
 * Snapping, aligning and distributing like Inkscape
 * ~~Save/Load~~
-* Setting potentials individually, by batch
+* ~~Setting potentials individually, by batch~~
 
 ### Config
 * Make config file paths configurable
@@ -96,6 +96,9 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * Interface with solvers (standards for passing DB configuration to them, and taking results back)
   * Singleton
   * Custom class containing physical structure
+		* ~~Import size and potential data for electrodes into solver~~
+		* Translate size from Qt units to physical lengths
+		*	Add buffer region surrounding simulation area
     * Location, dimensions, etc
   * Custom class containing properties
 * Simple estimation tool of electron distribution
