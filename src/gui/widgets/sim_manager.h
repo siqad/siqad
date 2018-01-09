@@ -11,6 +11,7 @@
 #define _GUI_SIM_MANGER_H_
 
 #include <QtWidgets>
+#include <QDialog>
 #include "primitives/sim_engine.h"
 #include "primitives/sim_job.h"
 
@@ -45,7 +46,12 @@ public:
 signals:
   void emitSimJob(prim::SimJob *new_job);
 
+private slots:
+  void updateSimParams(int);
+
 private:
+
+  int updateSimParams();
   void initSimManager();
   void initMenu();
   void initListPan();
@@ -55,7 +61,9 @@ private:
   void updateEngSelCombo();
   void updateSimSetupDialog();
   void submitSimSetup();
-  
+  void createParamGroup();
+  void createButtonLayout();
+
   void initEngines();
   void simParamSetup();             // take user options for simulation parameters
   bool exportSimProblem();          // generate problem XML
@@ -67,15 +75,41 @@ private:
   // manager panes
   QListWidget *sim_list_pan;
   QVBoxLayout *sim_actions_pan;
-
-  // sim_setup_dialog fields (hard coded for SimAnneal)
+  QGroupBox *sim_params_group;
+  QVBoxLayout *sim_params_vl;
   QComboBox *combo_eng_sel;
+
+  // sim_setup_dialog fields
+  // SimAnneal
+  QLabel *label_result_queue_size;
+  QLabel *label_preanneal_cycles;
+  QLabel *label_anneal_cycles;
+  QLabel *label_global_v0;
+  QLabel *label_debye_length;
   QLineEdit *le_result_queue_size;
   QLineEdit *le_job_nm;
   QLineEdit *le_preanneal_cycles;
   QLineEdit *le_anneal_cycles;
   QLineEdit *le_global_v0;
   QLineEdit *le_debye_length;
+
+  // PoisSolver
+  QLabel *label_xml_path;
+  QLineEdit *le_xml_path;
+  
+  // button group
+  QHBoxLayout *bottom_buttons_hl;
+  QVBoxLayout *new_setup_dialog_l;
+  QPushButton *button_run;
+  QPushButton *button_cancel;
+
+
+
+
+
+  QLabel *label_test;
+
+
 };
 
 
