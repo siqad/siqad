@@ -114,12 +114,13 @@ namespace gui{
   private:
 
     // graphics initialisation
-    void initGUI();       // initialise the mainwindow GUI
-    void initMenuBar();   // initialise the GUI menubar
-    void initTopBar();    // initialise the GUI topbar, toolbar
-    void initSideBar();   // initialise the GUI sidebar, toolbar
-    void initDialogDock();// initialise the GUI bottom dialog dock
-    void initSimVisualizeDock();// initialize the GUI side sim visualize dock
+    void initGUI();               // initialise the mainwindow GUI
+    void initMenuBar();           // initialise the GUI menubar
+    void initTopBar();            // initialise the GUI topbar, toolbar
+    void initSideBar();           // initialise the GUI sidebar, toolbar
+    void initDialogDock();        // initialise the bottom dialog dock
+    void initSimVisualizeDock();  // initialise the side sim visualize dock
+    void initLayerDock();         // initialise the side layer dock
 
     // prepare any extra actions not attched to an icon or meny
     void initActions();
@@ -151,8 +152,11 @@ namespace gui{
     gui::LayerEditor  *layer_editor;// pop-up layer editor
     gui::SimManager   *sim_manager; // pop-up simulator manager
     gui::SimVisualize *sim_visualize; // simulation visualizer that goes in sim visualize dock
-    QDockWidget       *dialog_dock; // bottom panel for terminal dialog
-    QDockWidget       *sim_visualize_dock; // right side panel for sim visualization
+
+    // dockable widgets
+    QDockWidget *dialog_dock; // bottom panel for terminal dialog
+    QDockWidget *sim_visualize_dock; // right side panel for sim visualization
+    QDockWidget *layer_dock;  // right side panel for showing layers
 
     // action pointers
     QAction *action_select_tool;  // change cursor tool to select

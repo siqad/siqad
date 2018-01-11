@@ -66,10 +66,12 @@ gui::ApplicationGUI::~ApplicationGUI()
 void gui::ApplicationGUI::initGUI()
 {
   // initialise mainwindow panels
-  dialog_pan = new gui::DialogPanel(this);
+  dialog_pan = new gui::DialogPanel(this); // init first to capture std output
   design_pan = new gui::DesignPanel(this);
   input_field = new gui::InputField(this);
   info_pan = new gui::InfoPanel(this);
+
+  // detachable/pop-up widgets, order matters in some cases due to pointers
   layer_editor = new gui::LayerEditor(design_pan, this);
   sim_manager = new gui::SimManager(this);
   sim_visualize = new gui::SimVisualize(sim_manager, this);
@@ -78,13 +80,17 @@ void gui::ApplicationGUI::initGUI()
   initMenuBar();
   initTopBar();
   initSideBar();
+
+  // initialise docks
   initSimVisualizeDock();
   initDialogDock();
+  initLayerDock();
 
   // inter-widget signals
   connect(sim_manager, &gui::SimManager::emitSimJob, this, &gui::ApplicationGUI::runSimulation);
   connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene, design_pan, &gui::DesignPanel::displaySimResults);
   connect(design_pan, &gui::DesignPanel::sig_resetDesignPanel, this, &gui::ApplicationGUI::designPanelReset);
+
   // layout management
   QWidget *main_widget = new QWidget(this); // main widget for mainwindow
   QVBoxLayout *vbl = new QVBoxLayout();     // main layout, vertical
@@ -302,18 +308,18 @@ void gui::ApplicationGUI::initSimVisualizeDock()
 
   // recall or initialize sim visualize dock location
   Qt::DockWidgetArea area;
-  if(gui_settings->contains("ODOCK/loc"))
-    area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("ODOCK/loc"));
+  if(gui_settings->contains("SIMVDOCK/loc"))
+    area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("SIMVDOCK/loc"));
   else
     area = Qt::RightDockWidgetArea;
 
   sim_visualize_dock = new QDockWidget(tr("Sim Visualize"));
 
   // location behaviour
-  sim_visualize_dock->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
+  sim_visualize_dock->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea|Qt::BottomDockWidgetArea);
 
   // size policy
-  sim_visualize_dock->setMinimumWidth(gui_settings->get<int>("ODOCK/mw"));
+  sim_visualize_dock->setMinimumWidth(gui_settings->get<int>("SIMVDOCK/mw"));
 
   connect(sim_visualize_dock, &QDockWidget::visibilityChanged, this, &gui::ApplicationGUI::simVisualizeDockVisibilityChanged);
   connect(sim_visualize_dock, &QDockWidget::visibilityChanged, design_pan, &gui::DesignPanel::simVisualizeDockVisibilityChanged);
@@ -322,6 +328,34 @@ void gui::ApplicationGUI::initSimVisualizeDock()
   sim_visualize_dock->hide();
   addDockWidget(area, sim_visualize_dock);
 
+}
+
+
+void gui::ApplicationGUI::initLayerDock()
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+
+  // recall or initialise layer dock location
+  Qt::DockWidgetArea area;
+  if(gui_settings->contains("LAYDOCK/loc"))
+    area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("LAYDOCK/loc"));
+  else
+    area = Qt::RightDockWidgetArea;
+
+  layer_dock = new QDockWidget(tr("Layers"));
+
+  // location behaviour
+  layer_dock->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea|Qt::BottomDockWidgetArea);
+
+  // size policy
+  layer_dock->setMinimumWidth(gui_settings->get<int>("LAYDOCK/mw"));
+
+  // connect visibility state with button check state
+  // TODO
+
+  layer_dock->setWidget(layer_editor);
+  layer_dock->show();
+  addDockWidget(area, layer_dock);
 }
 
 
