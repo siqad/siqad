@@ -148,8 +148,6 @@ void gui::ApplicationGUI::initMenuBar()
   file->addAction(quit);
 
   // view menu actions
-  //action_dialog_dock_visibility = new QAction(tr("&Dialog Dock"), this);
-  //action_dialog_dock_visibility->setCheckable(true);
   action_dialog_dock_visibility = dialog_dock->toggleViewAction();
   view->addAction(action_dialog_dock_visibility);
 
@@ -288,10 +286,7 @@ void gui::ApplicationGUI::initDialogDock()
 
   // recall or initialise dialog dock location
   Qt::DockWidgetArea area;
-  if(gui_settings->contains("DDOCK/loc"))
-    area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("DDOCK/loc"));
-  else
-    area = Qt::BottomDockWidgetArea;
+  area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("DDOCK/loc"));
 
   dialog_dock = new QDockWidget(tr("Terminal Dialog"));
 
@@ -309,10 +304,7 @@ void gui::ApplicationGUI::initSimVisualizeDock()
 
   // recall or initialize sim visualize dock location
   Qt::DockWidgetArea area;
-  if(gui_settings->contains("SIMVDOCK/loc"))
-    area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("SIMVDOCK/loc"));
-  else
-    area = Qt::RightDockWidgetArea;
+  area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("SIMVDOCK/loc"));
 
   sim_visualize_dock = new QDockWidget(tr("Sim Visualize"));
 
@@ -337,10 +329,7 @@ void gui::ApplicationGUI::initLayerDock()
 
   // recall or initialise layer dock location
   Qt::DockWidgetArea area;
-  if(gui_settings->contains("LAYDOCK/loc"))
-    area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("LAYDOCK/loc"));
-  else
-    area = Qt::RightDockWidgetArea;
+  area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("LAYDOCK/loc"));
 
   layer_dock = new QDockWidget(tr("Layers"));
 

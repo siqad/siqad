@@ -129,7 +129,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("DDOCK/mh", 120);     // dialog dock minimum height
   S->setValue("DDOCK/loc", 8);      // dialog dock default to bottom
   S->setValue("LAYDOCK/mw", 120);   // layer dock minimum width
-  S->setValue("LAYDOCK/loc", 2);    // layer dock default to right
+  S->setValue("LAYDOCK/loc", 8);    // layer dock default to bottom
   S->setValue("Panel/logw", 400);
   S->setValue("Panel/maxh", 150);
 
