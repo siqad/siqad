@@ -66,15 +66,7 @@ namespace gui{
     // parse input field and act accordingly
     void parseInputField();
 
-    //
     void designPanelReset();
-
-    // sim visualization dock
-    void showSimVisualizeDock() {sim_visualize_dock->show();}
-    void toggleSimVisualizeDock();
-    void simVisualizeDockVisibilityChanged(bool);
-    void toggleDialogDock();
-    void dialogDockVisibilityChanged(bool);
 
     // Start current simulation method
     // ... it might be worth modifying the work-flow such that instead of running

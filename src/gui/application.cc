@@ -76,15 +76,15 @@ void gui::ApplicationGUI::initGUI()
   sim_manager = new gui::SimManager(this);
   sim_visualize = new gui::SimVisualize(sim_manager, this);
 
-  // initialise bars
-  initMenuBar();
-  initTopBar();
-  initSideBar();
-
   // initialise docks
   initSimVisualizeDock();
   initDialogDock();
   initLayerDock();
+
+  // initialise bars
+  initMenuBar();
+  initTopBar();
+  initSideBar();
 
   // inter-widget signals
   connect(sim_manager, &gui::SimManager::emitSimJob, this, &gui::ApplicationGUI::runSimulation);
@@ -148,8 +148,9 @@ void gui::ApplicationGUI::initMenuBar()
   file->addAction(quit);
 
   // view menu actions
-  action_dialog_dock_visibility = new QAction(tr("&Dialog Dock"), this);
-  action_dialog_dock_visibility->setCheckable(true);
+  //action_dialog_dock_visibility = new QAction(tr("&Dialog Dock"), this);
+  //action_dialog_dock_visibility->setCheckable(true);
+  action_dialog_dock_visibility = dialog_dock->toggleViewAction();
   view->addAction(action_dialog_dock_visibility);
 
   // tools menu actions
@@ -174,7 +175,6 @@ void gui::ApplicationGUI::initMenuBar()
   connect(save_as, &QAction::triggered, this, &gui::ApplicationGUI::saveNew);
   connect(open_save, &QAction::triggered, this, &gui::ApplicationGUI::openFromFile);
   connect(export_lvm, &QAction::triggered, this, &gui::ApplicationGUI::exportToLabview);
-  connect(action_dialog_dock_visibility, &QAction::triggered, this, &gui::ApplicationGUI::toggleDialogDock);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
@@ -205,15 +205,18 @@ void gui::ApplicationGUI::initTopBar()
   action_run_sim = top_bar->addAction(QIcon(":/ico/runsim.svg"), tr("Run Simulation..."));
   action_run_sim->setShortcut(tr("F11"));
 
-  action_sim_visualize = top_bar->addAction(QIcon(":/ico/simvisual.svg"), tr("Simulation Visualization Dock"));
-  action_layer_sel= top_bar->addAction(QIcon(":/ico/layer.svg"), tr("Layer Selection"));
+  action_sim_visualize = sim_visualize_dock->toggleViewAction();
+  action_sim_visualize->setIcon(QIcon(":/ico/simvisual.svg"));
+  top_bar->addAction(action_sim_visualize);
+
+  action_layer_sel= layer_dock->toggleViewAction();
+  action_layer_sel->setIcon(QIcon(":/ico/layer.svg"));
+  top_bar->addAction(action_layer_sel);
+
   //action_circuit_lib= top_bar->addAction(QIcon(":/ico/circuitlib.svg"), tr("Circuit Library"));
 
-  action_sim_visualize->setCheckable(true);
 
   connect(action_run_sim, &QAction::triggered, this, &gui::ApplicationGUI::simulationSetup);
-  connect(action_sim_visualize, &QAction::triggered, this, &gui::ApplicationGUI::toggleSimVisualizeDock);
-  connect(action_layer_sel, &QAction::triggered, this, &gui::ApplicationGUI::showLayerDialog);
 
   addToolBar(Qt::TopToolBarArea, top_bar);
 }
@@ -295,8 +298,6 @@ void gui::ApplicationGUI::initDialogDock()
   dialog_dock->setAllowedAreas(Qt::BottomDockWidgetArea);  // location behaviour
   dialog_dock->setMinimumHeight(gui_settings->get<int>("DDOCK/mh")); // size TODO add to settings
 
-  connect(dialog_dock, &QDockWidget::visibilityChanged, this, &gui::ApplicationGUI::dialogDockVisibilityChanged);
-
   dialog_dock->setWidget(dialog_dock_main);
   dialog_dock->show();
   addDockWidget(area, dialog_dock);
@@ -321,7 +322,6 @@ void gui::ApplicationGUI::initSimVisualizeDock()
   // size policy
   sim_visualize_dock->setMinimumWidth(gui_settings->get<int>("SIMVDOCK/mw"));
 
-  connect(sim_visualize_dock, &QDockWidget::visibilityChanged, this, &gui::ApplicationGUI::simVisualizeDockVisibilityChanged);
   connect(sim_visualize_dock, &QDockWidget::visibilityChanged, design_pan, &gui::DesignPanel::simVisualizeDockVisibilityChanged);
 
   sim_visualize_dock->setWidget(sim_visualize);
@@ -349,9 +349,6 @@ void gui::ApplicationGUI::initLayerDock()
 
   // size policy
   layer_dock->setMinimumWidth(gui_settings->get<int>("LAYDOCK/mw"));
-
-  // connect visibility state with button check state
-  // TODO
 
   layer_dock->setWidget(layer_editor);
   layer_dock->show();
@@ -533,37 +530,6 @@ void gui::ApplicationGUI::designPanelReset()
   initState();
 }
 
-void gui::ApplicationGUI::toggleSimVisualizeDock()
-{
-  if(sim_visualize_dock)
-    sim_visualize_dock->setVisible(!sim_visualize_dock->isVisible());
-  else
-    qCritical() << tr("Sim Visualize dock pointer is null");
-}
-
-void gui::ApplicationGUI::simVisualizeDockVisibilityChanged(bool visible)
-{
-  if(sim_visualize_dock && action_sim_visualize)
-    action_sim_visualize->setChecked(visible);
-  else
-    qCritical() << tr("Sim Visualize dock or menu item pointer is null");
-}
-
-void gui::ApplicationGUI::toggleDialogDock()
-{
-  if(dialog_dock)
-    dialog_dock->setVisible(!dialog_dock->isVisible());
-  else
-    qCritical() << tr("Dialog dock pointer is null");
-}
-
-void gui::ApplicationGUI::dialogDockVisibilityChanged(bool visible)
-{
-  if(dialog_dock && action_dialog_dock_visibility)
-    action_dialog_dock_visibility->setChecked(visible);
-  else
-    qCritical() << tr("Dialog dock or dialog dock menu item pointer is null");
-}
 
 void gui::ApplicationGUI::simulationSetup()
 {
@@ -590,7 +556,7 @@ void gui::ApplicationGUI::runSimulation(prim::SimJob *job)
   job->readResults();
 
   // show side dock for user to look at sim result
-  showSimVisualizeDock();
+  sim_visualize_dock->show();
   sim_visualize->updateJobSelCombo(); // TODO make sim_visualize capture job completion signals, so it updates the field on its own
 }
 
