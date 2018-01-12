@@ -99,140 +99,115 @@ bool Problem::readProblem(const std::string &fname)
 {
   std::cout << "Reading problem file: " << fname << std::endl;
 
-  std::ifstream in_file(fname);
-  rapidxml::xml_document<> xmldoc;
-  rapidxml::xml_node<> *root_node;
-
-  if(!in_file){
-    std::cout << "Failed to open file " << fname << std::endl;
-    return false;
-  }
-
-
-  // read file to buffer and close
-  std::stringstream buffer;
-  buffer << in_file.rdbuf();
-  in_file.close();
-  std::string in_content(buffer.str());
-
-  //std::cout << "Buffer content: " << in_content << std::endl;
+  bpt::ptree tree; // create empty property tree object
+  bpt::read_xml(fname, tree, bpt::xml_parser::no_comments); // parse the input file into property tree
+  // TODO catch read error exception
 
   // parse XML
-  std::cout << "Parse XML" << std::endl;
-  xmldoc.parse<0>(&in_content[0]);
-  root_node = xmldoc.first_node(); // get root node of input file
-  std::cout << "Root node name: " << root_node->name() << std::endl;
 
-  /* for now, not reading properties as those are not implemented yet
-  std::cout << "Read program properties" << std::endl;
-  if(!readProgramProp(root_node->first_node("program")))
-    return false;
+  // read program properties
+  // TODO read program node
 
-  std::cout << "Read material properties" << std::endl;
-  if(!readMaterialProp(root_node->first_node("material_prop")))
-    return false;*/
+  // read material properties
+  // TODO read material_prop node
 
+  // read simulation parameters
   std::cout << "Read simulation parameters" << std::endl;
-  rapidxml::xml_node<> *sim_params_node = root_node->first_node("sim_params");
-  if(sim_params_node == 0 || !readSimulationParam(sim_params_node))
+  if(!readSimulationParam(tree.get_child("dbdesigner.sim_params")))
     return false;
 
-  // item tree
-  std::cout << "Read DB tree" << std::endl;
-  rapidxml::xml_node<> *design_node = root_node->first_node("design");
-  if(design_node == 0 || !readDesign(design_node, db_tree))
+  // read items
+  std::cout << "Read items tree" << std::endl;
+  if(!readDesign(tree.get_child("dbdesigner.design"), db_tree))
     return false;
 
-  //std::cout << "db_tree pointer " << db_tree.get() << std::endl;
 
-  return true;
+  //return true;
+  return false;
 }
 
 
-bool Problem::readProgramProp(rapidxml::xml_node<> *node)
+bool Problem::readProgramProp(const bpt::ptree &program_prop_tree)
 {
   // TODO print the following and return false if error in data is encountered
   //std::cout << "Error in program properties!" << std::endl;
   return true;
 }
 
-bool Problem::readMaterialProp(rapidxml::xml_node<> *node)
+bool Problem::readMaterialProp(const bpt::ptree &material_prop_tree)
 {
   // TODO print the following and return false if error in data is encountered
   //std::cout << "Error in program properties!" << std::endl;
-  for(rapidxml::xml_node<> *material_node = node->first_node(); material_node; material_node = material_node->next_sibling()){
+  /*for(rapidxml::xml_node<> *material_node = node->first_node(); material_node; material_node = material_node->next_sibling()){
     std::cout << "Material property: " << material_node->name() << std::endl;
     // TODO material vector, containing structs of material properties
+  }*/
+  return true;
+}
+
+
+bool Problem::readSimulationParam(const bpt::ptree &sim_params_tree)
+{
+  for (bpt::ptree::value_type const &v : sim_params_tree) {
+    sim_params.insert(std::map<std::string, std::string>::value_type(v.first, v.second.data()));
+    std::cout << "SimParam: Key=" << v.first << ", Value=" << sim_params[v.first] << std::endl;
   }
   return true;
 }
 
 
-bool Problem::readSimulationParam(rapidxml::xml_node<> *node)
+bool Problem::readDesign(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
 {
-  // TODO print the following and return false if error in data is encountered
-  //std::cout << "Error in program properties!" << std::endl;
-  for(rapidxml::xml_node<> *sim_node = node->first_node(); sim_node; sim_node = sim_node->next_sibling()){
-    sim_params.insert(std::map<std::string, std::string>::value_type(sim_node->name(), sim_node->value()));
-    std::cout << "SimParam: Key=" << sim_node->name() << ", Value=" << sim_params[sim_node->name()] << std::endl;
-  }
-  return true;
-}
-
-
-bool Problem::readDesign(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent)
-{
-  // loop through layers, extract dbdots
-  // NOTE in the future, need to also extract electrodes
-  for(rapidxml::xml_node<> *layer_node = node->first_node(); layer_node; layer_node = layer_node->next_sibling()){
-    std::string layer_type = layer_node->first_attribute("type")->value();
-    if(!layer_type.compare("db")){
-      std::cout << "Encountered node " << layer_node->name() << " with type " << layer_type << ", entering" << std::endl;
-      readItemTree(layer_node, agg_parent);
+  std::cout << "Beginning to read design" << std::endl;
+  for (bpt::ptree::value_type const &layer_tree : subtree) {
+    std::string layer_type = layer_tree.second.get<std::string>("<xmlattr>.type");
+    if (!layer_type.compare("db")) {
+      std::cout << "Encountered node " << layer_tree.first << " with type " << layer_type << ", entering" << std::endl;
+      readItemTree(layer_tree.second, agg_parent);
+    } else if (!layer_type.compare("electrodes")) {
+      // TODO parse electrode code
+      std::cout << "TODO write code for parsing electrodes" << std::endl;
+    } else {
+      std::cout << "Encountered node " << layer_tree.first << " with type " << layer_type << ", no defined action for this layer. Skipping." << std::endl;
     }
-    else {
-      std::cout << "Encountered node " << layer_node->name() << " with type " << layer_type << ", skipping" << std::endl;
-    }
   }
   return true;
 }
 
-bool Problem::readItemTree(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent)
-{
-  for(rapidxml::xml_node<> *item_node = node->first_node(); item_node; item_node = item_node->next_sibling()){
-    std::string item_name = item_node->name();
 
-    if(!item_name.compare("aggregate")){
+bool Problem::readItemTree(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
+{
+  for (bpt::ptree::value_type const &item_tree : subtree) {
+    std::string item_name = item_tree.first;
+
+    if (!item_name.compare("aggregate")) {
       // add aggregate child to tree
       agg_parent->aggs.push_back(std::make_shared<Aggregate>());
-      readItemTree(item_node, agg_parent->aggs.back());
-    }
-    else if(!item_name.compare("dbdot")) {
+      readItemTree(item_tree.second, agg_parent->aggs.back());
+    } else if (!item_name.compare("dbdot")) {
       // add DBDot to tree
-      readDBDot(item_node, agg_parent);
+      readDBDot(item_tree.second, agg_parent);
+    } else {
+      std::cout << "Encountered unknown item node: " << item_tree.first << std::endl;
     }
-    else
-      std::cout << "Encountered unknown item_node: " << item_node->name() << std::endl;
   }
   return true;
 }
 
-bool Problem::readDBDot(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent)
+
+bool Problem::readDBDot(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
 {
-  float x,y,elec;
+  float x, y, elec;
 
   // read x and y from XML stream
-  //x = std::stof(node->first_attribute("x")->value());
-  //y = std::stof(node->first_attribute("y")->value());
-  //elec = std::stof(node->first_attribute("elec")->value());
-  elec = std::stof(node->first_node("elec")->value());
-  x = std::stof(node->first_node("physloc")->first_attribute("x")->value());
-  y = std::stof(node->first_node("physloc")->first_attribute("y")->value());
+  elec = subtree.get<float>("elec");
+  x = subtree.get<float>("physloc.<xmlattr>.x");
+  y = subtree.get<float>("physloc.<xmlattr>.y");
 
   agg_parent->dbs.push_back(std::make_shared<DBDot>(x,y,elec));
 
   std::cout << "DBDot created with x=" << agg_parent->dbs.back()->x << ", y=" << agg_parent->dbs.back()->y << ", elec=" << agg_parent->dbs.back()->elec << std::endl;
-
+  
   return true;
 }
 

@@ -11,13 +11,18 @@
 #include <memory>
 //#include <iterator>
 #include <string>
+#include <map>
+// TODO get rid of includes used by rapidxml
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <map>
 #include "rapidxml-1.13/rapidxml.hpp"
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 namespace phys{
+
+  namespace bpt = boost::property_tree;
 
   class Problem
   {
@@ -80,6 +85,7 @@ namespace phys{
       std::shared_ptr<DBDot> operator*() const {return *db_iter;}
 
     private:
+
       DBIter db_iter;                   // points to the current DB
       std::shared_ptr<Aggregate> curr;  // current working Aggregate
       std::stack<std::pair<std::shared_ptr<Aggregate>, AggIter>> agg_stack;
@@ -99,12 +105,12 @@ namespace phys{
     // FILE HANDLING
 
     bool readProblem(const std::string &fname);
-    bool readProgramProp(rapidxml::xml_node<> *node);
-    bool readMaterialProp(rapidxml::xml_node<> *node);
-    bool readSimulationParam(rapidxml::xml_node<> *node);
-    bool readDesign(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent);
-    bool readItemTree(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent);
-    bool readDBDot(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent);
+    bool readProgramProp(const bpt::ptree &);
+    bool readMaterialProp(const bpt::ptree &);
+    bool readSimulationParam(const bpt::ptree &sim_params_tree);
+    bool readDesign(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
+    bool readItemTree(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
+    bool readDBDot(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
 
     static bool writeResult();
 
