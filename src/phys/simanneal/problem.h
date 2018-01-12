@@ -9,15 +9,16 @@
 #include <vector>
 #include <stack>
 #include <memory>
-//#include <iterator>
 #include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
 #include <map>
-#include "rapidxml-1.13/rapidxml.hpp"
+#include <iostream>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 namespace phys{
+
+  namespace bpt = boost::property_tree;
 
   class Problem
   {
@@ -30,9 +31,15 @@ namespace phys{
     // Destructor
     ~Problem() {};
 
+    // File Handling
+    bool readProblem(const std::string &fname);
+
+    // Accessors
+    bool parameterExists(const std::string &key) {return sim_params.find(key) != sim_params.end();}
+    std::string getParameter(const std::string &key) {return sim_params.find(key) != sim_params.end() ? sim_params.at(key) : "";}
 
 
-    // DB & AGG
+    // STRUCTS
 
     // dangling bond
     struct DBDot {
@@ -48,11 +55,11 @@ namespace phys{
       std::vector<std::shared_ptr<Aggregate>> aggs;
       std::vector<std::shared_ptr<DBDot>> dbs;
 
-      // PROPERTIES
+      // Properties
       int size(); // returns the number of contained DBs, including those in children aggs
     };
 
-    // electrode
+    // electrode TODO Nathan change at will
     struct Electrode {
       float x,y;      // physical location in angstroms (top left corner)
       float dx,dy;    // width and height in angstroms
@@ -80,6 +87,7 @@ namespace phys{
       std::shared_ptr<DBDot> operator*() const {return *db_iter;}
 
     private:
+
       DBIter db_iter;                   // points to the current DB
       std::shared_ptr<Aggregate> curr;  // current working Aggregate
       std::stack<std::pair<std::shared_ptr<Aggregate>, AggIter>> agg_stack;
@@ -94,28 +102,18 @@ namespace phys{
     DBIterator begin() {return DBIterator(db_tree);}
     DBIterator end() {return DBIterator(db_tree, false);}
 
-
-
-    // FILE HANDLING
-
-    bool readProblem(const std::string &fname);
-    bool readProgramProp(rapidxml::xml_node<> *node);
-    bool readMaterialProp(rapidxml::xml_node<> *node);
-    bool readSimulationParam(rapidxml::xml_node<> *node);
-    bool readDesign(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent);
-    bool readItemTree(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent);
-    bool readDBDot(rapidxml::xml_node<> *node, const std::shared_ptr<Aggregate>& agg_parent);
-
-    static bool writeResult();
-
-
-    // ACCESSORS
-
-    bool parameterExists(const std::string &key) {return sim_params.find(key) != sim_params.end();}
-    std::string getParameter(const std::string &key) {return sim_params.find(key) != sim_params.end() ? sim_params.at(key) : "";}
+  private:
+    bool readProgramProp(const bpt::ptree &);
+    bool readMaterialProp(const bpt::ptree &);
+    bool readSimulationParam(const bpt::ptree &sim_params_tree);
+    bool readDesign(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
+    bool readItemTree(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
+    bool readDBDot(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
 
     // Variables
     std::shared_ptr<Aggregate> db_tree;
+    std::map<std::string, std::string> program_props;
+    // std::map<std::string, std::string> material_props; TODO probably need a different structure for this
     std::map<std::string, std::string> sim_params;
   };
 }

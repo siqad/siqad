@@ -41,17 +41,18 @@ namespace prim{
     void setPotential(double givenPotential);
 
     // accessors
-    QPointF getPoint1(void){ return point1;}
-    QPointF getPoint2(void){ return point2;}
+    QPointF getPoint1(void){return point1;}
+    QPointF getPoint2(void){return point2;}
     QPointF getTopLeft(void){return top_left;}
+    qreal getTopDepth(void){return top_depth;}
     qreal getWidth(void){return elec_width;}
     qreal getHeight(void){return elec_height;}
+    qreal getDepth(void){return elec_depth;}
     double getPotential(void) const {return potential;}
-    // inherited abstract method implementations
 
+    // inherited abstract method implementations
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
-
     Item *deepCopy() const;
 
     // SAVE LOAD
@@ -74,6 +75,8 @@ namespace prim{
     double potential = 0;
     qreal elec_width;
     qreal elec_height;
+    qreal elec_depth;
+    qreal top_depth;
 
     static qreal edge_width;  // proportional width of dot boundary edge
     static QColor fill_col;   // dot fill color (same for all lattice dots)

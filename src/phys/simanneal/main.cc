@@ -53,5 +53,5 @@ int main(int argc, char *argv[])
   }
 
   std::cout << std::endl << "*** Write Result to Output ***" << std::endl;
-  sim_anneal.writeResultsXML();
+  sim_anneal.writeResultsXml();
 }

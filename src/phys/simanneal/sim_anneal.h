@@ -68,7 +68,7 @@ namespace phys {
     float debye_length; // Silicon intrinsic Debye length in m (TODO trial and error to get good magic number)
     //std::vector<int> db_charges; // charge in each db, only 0 or 1 are allowed
     std::vector<std::vector<float>> db_r; // distance between all dbs
-    //std::vector<std::pair<float,float>> db_loc; // location of free dbs
+    //std::vector<std::pair<float,float>> db_locs; // location of free dbs
     std::vector<std::tuple<float,float,float>> fixed_charges; // location of fixed charges
     float v_0; // global potential and other stuff (magic number)
     float kT, kT_step, v_freeze_step; // temperature, time

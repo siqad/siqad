@@ -84,16 +84,22 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
     else
       ls->readNext();
   }
-
   if(ls->hasError())
     qCritical() << QObject::tr("XML error: ") << ls->errorString().data();
-
-  // TODO check that crucial vars aren't empty
-
+  if(lay_id != 2){
+    qWarning() << "Electrode lay_id is at" << lay_id << ", should be at 2.";
+  }
+  if(ld_point1.isNull()){
+    qWarning() << "ld_point1 is null";
+  }
+  if(ld_point2.isNull()){
+    qWarning() << "ld_point2 is null";
+  }
+  //if potential is uninitialized, will have some random double value, never null.
   // debug
-  qDebug() << QObject::tr("Electrode point 1: x=%1, y=%2").arg(ld_point1.x()).arg(ld_point1.y());
+  // qDebug() << QObject::tr("Electrode point 1: x=%1, y=%2").arg(ld_point1.x()).arg(ld_point1.y());
 
-
+  //load all read data into init_electrode
   initElectrode(lay_id, ld_point1, ld_point2, potential_in, electrode_type_in);
   scene->addItem(this);
 }

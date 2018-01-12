@@ -8,6 +8,10 @@
 
 #include "phys_engine.h"
 
+#include <iostream>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
 using namespace phys;
 
 // CONSTRUCTOR
@@ -18,70 +22,54 @@ PhysicsEngine::PhysicsEngine(const std::string &eng_nm, const std::string &i_pat
   out_path = o_path;
 }
 
-void PhysicsEngine::writeResultsXML()
+void PhysicsEngine::writeResultsXml()
 {
   std::cout << "Write results to XML..." << std::endl;
   // NOTE in the future, there's probably a range of stuff that can be exported.
   // for now, only export charge config
-  std::ofstream of(out_path);
-  // TODO test that the output file path works
 
-  // xml declaration
-  rapidxml::xml_document<> doc;
-  rapidxml::xml_node<>* decl = doc.allocate_node(rapidxml::node_declaration);
-  decl->append_attribute(doc.allocate_attribute("version", "1.0"));
-  decl->append_attribute(doc.allocate_attribute("encoding", "UTF-8"));
-  doc.append_node(decl);
-
-  // major nodes
-  //rapidxml::xml_node<>* nd_root, nd_eng_info, nd_sim_param, nd_physloc, nd_elec_dist;
-  rapidxml::xml_node<>* nd_root = doc.allocate_node(rapidxml::node_element, "sim_out");
-  rapidxml::xml_node<>* nd_eng_info = doc.allocate_node(rapidxml::node_element, "eng_info");
-  rapidxml::xml_node<>* nd_sim_param = doc.allocate_node(rapidxml::node_element, "sim_param");
-  rapidxml::xml_node<>* nd_physloc = doc.allocate_node(rapidxml::node_element, "physloc");
-  rapidxml::xml_node<>* nd_elec_dist = doc.allocate_node(rapidxml::node_element, "elec_dist");
-  doc.append_node(nd_root);
-  nd_root->append_node(nd_eng_info);
-  nd_root->append_node(nd_sim_param);
-  nd_root->append_node(nd_physloc);
-  nd_root->append_node(nd_elec_dist);
+  // define major XML nodes
+  bpt::ptree tree;
+  bpt::ptree node_root;       // <sim_out>
+  bpt::ptree node_eng_info;   // <eng_info>
+  bpt::ptree node_sim_params; // <sim_params>
+  bpt::ptree node_physloc;    // <physloc>
+  bpt::ptree node_elec_dist;  // <elec_dist>
 
   // eng_info
-  //rapidxml::xml_node<>* nd_eng_name, nd_version;
-  rapidxml::xml_node<>* nd_engine_name = doc.allocate_node(rapidxml::node_element, "engine", eng_name.c_str());
-  rapidxml::xml_node<>* nd_version = doc.allocate_node(rapidxml::node_element, "version", "TBD");
-  nd_eng_info->append_node(nd_engine_name);
-  nd_eng_info->append_node(nd_version);
+  node_eng_info.put("engine", eng_name.c_str());
+  node_eng_info.put("version", "TBD"); // TODO real version
 
-  // sim_param
-  // TODO implement a struct in phys::Problem storing all user sim params, write all that
-  
+  // sim_params
+  // TODO
+
   // physloc
-  for(auto dbl : db_loc) {
-    rapidxml::xml_node<>* nd_dbl = doc.allocate_node(rapidxml::node_element, "dbdot");
-    char *dbl_x = doc.allocate_string(std::to_string(dbl.first).c_str());
-    char *dbl_y = doc.allocate_string(std::to_string(dbl.second).c_str());
-    nd_dbl->append_attribute(doc.allocate_attribute("x",dbl_x));
-    nd_dbl->append_attribute(doc.allocate_attribute("y",dbl_y));
-    nd_physloc->append_node(nd_dbl);
+  for (auto dbl : db_locs) {
+    bpt::ptree node_dbdot;
+    node_dbdot.put("<xmlattr>.x", std::to_string(dbl.first).c_str());
+    node_dbdot.put("<xmlattr>.y", std::to_string(dbl.second).c_str());
+    node_physloc.add_child("dbdot", node_dbdot);
   }
-
+  
   // elec_dist
-  for(auto db_charge : db_charges) {
+  for (auto db_charge : db_charges) {
+    bpt::ptree node_dist;
     std::string dbc_link;
     for(auto chg : db_charge)
       dbc_link.append(std::to_string(chg));
-    char *dbc_char = doc.allocate_string(dbc_link.c_str());
-    rapidxml::xml_node<>* nd_dbc = doc.allocate_node(rapidxml::node_element, "dist", dbc_char);
-    nd_elec_dist->append_node(nd_dbc);
+    node_dist.put("", dbc_link);
+    node_elec_dist.add_child("dist", node_dist);
   }
-  
-    std::deque<std::vector<int>> db_charges;
+
+  // add nodes to appropriate parent
+  node_root.add_child("eng_info", node_eng_info);
+  node_root.add_child("sim_params", node_sim_params);
+  node_root.add_child("physloc", node_physloc);
+  node_root.add_child("elec_dist", node_elec_dist);
+  tree.add_child("sim_out", node_root);
 
   // write to file
-  of << doc;
-  of.close();
-  doc.clear();
+  bpt::write_xml(out_path, tree, std::locale(), bpt::xml_writer_make_settings<std::string>(' ',4));
 
-  std::cout << "Output written to: " << out_path << std::endl;
+  std::cout << "Write to XML complete." << std::endl;
 }
