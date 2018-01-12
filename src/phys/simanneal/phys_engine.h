@@ -7,16 +7,14 @@
 // @desc:     Base class for physics engines
 
 #include "problem.h"
-#include "rapidxml-1.13/rapidxml.hpp"
-#include "rapidxml-1.13/rapidxml_print.hpp"
-#include <boost/circular_buffer.hpp>
-//#include "rapidxml-1.13/rapidxml_utils.hpp"
-#include <iostream>
+
 #include <string>
 #include <vector>
-#include <deque>
+#include <boost/circular_buffer.hpp>
 
 namespace phys{
+
+  namespace bpt = boost::property_tree;
 
   class PhysicsEngine
   {
@@ -29,13 +27,12 @@ namespace phys{
     ~PhysicsEngine() {};
 
     // export results
-    void writeResultsXML();
+    void writeResultsXml();
 
     // variables
     Problem problem;
 
-    std::vector<std::pair<float,float>> db_loc; // location of free dbs
-    //std::deque<std::vector<int>> db_charges;
+    std::vector<std::pair<float,float>> db_locs; // location of free dbs
     boost::circular_buffer<std::vector<int>> db_charges;
 
   private:

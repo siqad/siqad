@@ -129,19 +129,16 @@ bool Problem::readProblem(const std::string &fname)
 
 bool Problem::readProgramProp(const bpt::ptree &program_prop_tree)
 {
-  // TODO print the following and return false if error in data is encountered
-  //std::cout << "Error in program properties!" << std::endl;
+  for (bpt::ptree::value_type const &v : program_prop_tree) {
+    program_props.insert(std::map<std::string, std::string>::value_type(v.first, v.second.data()));
+    std::cout << "ProgramProp: Key=" << v.first << ", Value=" << program_props[v.first] << std::endl;
+  }
   return true;
 }
 
 bool Problem::readMaterialProp(const bpt::ptree &material_prop_tree)
 {
-  // TODO print the following and return false if error in data is encountered
-  //std::cout << "Error in program properties!" << std::endl;
-  /*for(rapidxml::xml_node<> *material_node = node->first_node(); material_node; material_node = material_node->next_sibling()){
-    std::cout << "Material property: " << material_node->name() << std::endl;
-    // TODO material vector, containing structs of material properties
-  }*/
+  (void)material_prop_tree; // function to be implemented, suppress variable unused warning for now
   return true;
 }
 

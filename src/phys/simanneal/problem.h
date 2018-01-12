@@ -9,16 +9,12 @@
 #include <vector>
 #include <stack>
 #include <memory>
-//#include <iterator>
 #include <string>
 #include <map>
-// TODO get rid of includes used by rapidxml
-#include <fstream>
-#include <sstream>
 #include <iostream>
-#include "rapidxml-1.13/rapidxml.hpp"
-#include <boost/property_tree/xml_parser.hpp>
+
 #include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 namespace phys{
 
@@ -122,6 +118,8 @@ namespace phys{
 
     // Variables
     std::shared_ptr<Aggregate> db_tree;
+    std::map<std::string, std::string> program_props;
+    // std::map<std::string, std::string> material_props; TODO probably need a different structure for this
     std::map<std::string, std::string> sim_params;
   };
 }

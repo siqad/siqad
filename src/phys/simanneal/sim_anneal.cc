@@ -25,10 +25,10 @@ bool SimAnneal::runSim()
   n_dbs = 0;
   for(auto db : problem) {
     if(db->elec != 1){
-      db_loc.push_back(std::make_pair(db->x, db->y));
+      db_locs.push_back(std::make_pair(db->x, db->y));
       n_dbs++;
-      std::cout << "DB loc: x=" << db_loc.back().first
-          << ", y=" << db_loc.back().second << std::endl;
+      std::cout << "DB loc: x=" << db_locs.back().first
+          << ", y=" << db_locs.back().second << std::endl;
     }
     else
       fixed_charges.push_back(std::make_tuple(db->x, db->y, db->elec));
@@ -115,7 +115,7 @@ void SimAnneal::precalc()
         v_ij[i][j] = div_0;
       }
       else {
-        db_r[i][j] = distance(db_loc[i].first, db_loc[i].second, db_loc[j].first, db_loc[j].second)*db_distance_scale;
+        db_r[i][j] = distance(db_locs[i].first, db_locs[i].second, db_locs[j].first, db_locs[j].second)*db_distance_scale;
         v_ij[i][j] = interElecPotential(db_r[i][j]);
         std::cout << "db_r[" << i << "][" << j << "]=" << db_r[i][j] << ", v_ij[" << i << "][" << j << "]=" << v_ij[i][j] << std::endl;
         // TODO: db_r in bohr length
@@ -125,7 +125,7 @@ void SimAnneal::precalc()
     // effect from fixed charges
     v_drive[i] = 0;
     for(std::tuple<float,float,float> fc : fixed_charges) {
-      float r = distance(std::get<0>(fc), std::get<1>(fc), db_loc[i].first, db_loc[i].second)*db_distance_scale;
+      float r = distance(std::get<0>(fc), std::get<1>(fc), db_locs[i].first, db_locs[i].second)*db_distance_scale;
       v_drive[i] += interElecPotential(r);
     }
     std::cout << "v_drive["<<i<<"]="<<v_drive[i]<<std::endl;
