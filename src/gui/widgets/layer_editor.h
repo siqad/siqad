@@ -27,7 +27,7 @@ namespace gui{
     // destructor
     ~LayerEditor() {};
 
-    // GUI items in layer list grid
+    // GUI items in layer list grid TODO remove if not needed
     struct layerGridRowItems
     {
       QLabel *label_layer_name;     // layer name
@@ -36,12 +36,15 @@ namespace gui{
       QCheckBox *cb_visibility;     // layer visibility
     };
 
-    void updateLayerList();
+    void addLayerRow(); // add a row to layer list
+
+    void initLayerTable();
+
+  public slots:
+    void updateLayerPropFromTable(int row, int column);
 
   private:
     void initLayerEditor();
-
-    void addLayerRow(); // add an empty row to layer list
 
     // vars
     gui::DesignPanel *dp;
@@ -49,8 +52,7 @@ namespace gui{
 
     // GUI
     QVBoxLayout *layer_list_vl;
-    QGridLayout *layer_grid_l;
-    QStack<layerGridRowItems> layer_grid_items;
+    QTableWidget *layer_table;
   };
 
 }

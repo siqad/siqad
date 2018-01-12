@@ -60,9 +60,6 @@ namespace gui{
     // change lattice
     void changeLattice();
 
-    // layer dialog
-    void showLayerDialog();
-
     // parse input field and act accordingly
     void parseInputField();
 

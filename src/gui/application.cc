@@ -331,7 +331,7 @@ void gui::ApplicationGUI::initLayerDock()
   Qt::DockWidgetArea area;
   area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("LAYDOCK/loc"));
 
-  layer_dock = new QDockWidget(tr("Layers"));
+  layer_dock = new QDockWidget(tr("Layer Editor"));
 
   // location behaviour
   layer_dock->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea|Qt::BottomDockWidgetArea);
@@ -354,6 +354,8 @@ void gui::ApplicationGUI::initActions()
   // set tool
   connect(design_pan, &gui::DesignPanel::sig_toolChange,
             this, &gui::ApplicationGUI::setTool);
+
+  layer_editor->initLayerTable();
 }
 
 
@@ -493,13 +495,6 @@ void gui::ApplicationGUI::changeLattice()
     this, tr("Select lattice file"), dir, tr("INI (*.ini)"));
 
   design_pan->buildLattice(fname);
-}
-
-void gui::ApplicationGUI::showLayerDialog()
-{
-  layer_editor->updateLayerList();
-  layer_editor->show();
-  // TODO give option to make LayerEditor a dock widget, make this function similar to the toggled dock widgets
 }
 
 void gui::ApplicationGUI::parseInputField()

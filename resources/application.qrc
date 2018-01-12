@@ -7,5 +7,7 @@
 	<file>ico/runsim.svg</file>
 	<file>ico/simvisual.svg</file>
     <file>ico/layer.svg</file>
+    <file>ico/visible.svg</file>
+    <file>ico/editable.svg</file>
 </qresource>
 </RCC>

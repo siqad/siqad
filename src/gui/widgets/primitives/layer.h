@@ -93,7 +93,8 @@ namespace prim{
     virtual void loadItems(QXmlStreamReader *, QGraphicsScene *);
 
   public slots:
-    void visibilityCheckBoxChanged(int check_state);
+    void visibilityCheckBoxChanged(int check_state); // for checkbox
+    void visibilityCheckBoxChanged(bool checked) {setVisible(checked);} // for pushbutton
 
   private:
 

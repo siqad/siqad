@@ -24,89 +24,79 @@ LayerEditor::LayerEditor(gui::DesignPanel *design_pan, QWidget *parent)
 // initialize widget
 void LayerEditor::initLayerEditor()
 {
-  // TODO make into dock widget, or option to make it so
+  // top buttons
+  QPushButton *bt_add = new QPushButton(tr("Add")); // TODO implement function
+
+  QHBoxLayout *top_buttons_hl = new QHBoxLayout;
+  top_buttons_hl->addWidget(bt_add);
 
   // grid layout that show all layers
-  layer_list_vl = new QVBoxLayout;
-  layer_grid_l = new QGridLayout; // this grid is destroyed and recreated everytime editor reloads
-  layer_list_vl->addLayout(layer_grid_l);
-
-  // bottom buttons
-  QHBoxLayout *bot_buttons_hl = new QHBoxLayout;
-
-  QPushButton *bt_add = new QPushButton(tr("Add")); // TODO implement function
-  QPushButton *bt_close = new QPushButton(tr("Close"));
-
-  connect(bt_close, SIGNAL(clicked()), this, SLOT(hide()));
-
-  bt_close->setShortcut(tr("Esc"));
-
-  bot_buttons_hl->addWidget(bt_add);
-  bot_buttons_hl->addWidget(bt_close);
+  layer_table = new QTableWidget(this);
 
   // Main layout
   QVBoxLayout *main_vl = new QVBoxLayout;
-  main_vl->addLayout(layer_list_vl);
-  main_vl->addLayout(bot_buttons_hl);
-
-  // TODO apply button to update layer properties, revert button to revert
-  // TODO simply reload the list if revert is pushed, I guess
+  main_vl->addLayout(top_buttons_hl);
+  main_vl->addWidget(layer_table);
 
   setLayout(main_vl);
-
-  // TODO a struct that contains all graphical objects related to a layer
 
   // TODO change add/remove to signal based
 }
 
-void LayerEditor:: addLayerRow()
+
+void LayerEditor::initLayerTable()
 {
-  // TODO
-}
+  QStringList table_headers;
+  table_headers << 
+    "Layer ID" << // Layer ID, hidden
+    "Name" <<     // Name
+    "Type" <<     // Type (lattice, db, electrode)
+    "Z-Height" << // Z-Height (vertical offset from surface)
+    "" <<  // Visibility
+    "";   // Editability
 
-void LayerEditor::updateLayerList()
-{
-  // TODO layer update signals that trigger this function
+  layer_table->setColumnCount(table_headers.count());
+  // TODO don't hard code column ID
+  layer_table->setColumnHidden(0, true); // hide Layer ID
+  layer_table->resizeColumnToContents(4); // reduce width of visibility column
+  layer_table->resizeColumnToContents(5); // reduce width of visibility column
+  layer_table->setHorizontalHeaderLabels(table_headers);
 
-  // TODO function to remake layout
-  //delete layer_grid_l;
-  //layer_grid_l = new QGridLayout;
-  // TODO buttons
+  // signals originating from the table
+  connect(layer_table, SIGNAL(cellChanged(int,int)), this, SLOT(updateLayerPropFromTable(int,int)));
 
-  // update layer list
-    // delete old layer grid and remake
-    // populate the new grid with existing layer info
-      // TODO sort the layers according to z-height, in descending order
+  // populate table with layer info
+  int layer_i = 0;
+  for (prim::Layer* layer : *layers) {
+    int curr_row = layer_table->rowCount();
+    int curr_col = 0;
+    QPushButton *bt_visibility = new QPushButton(QIcon(":/ico/visible.svg"), "", this);
+    QPushButton *bt_editability = new QPushButton(QIcon(":/ico/editable.svg"), "", this);
+
+    bt_visibility->setCheckable(true);
+    bt_visibility->setChecked(layer->isVisible());
+
+    // TODO editability has not been implemented in layer.cc yet
+    //bt_editability->setCheckable(true);
+    //bt_editability->setChecked(layer->isEditable());
+    bt_editability->setChecked(true); // TODO remove this after implementing the above
 
 
-  // header row
-  layer_grid_l->addWidget(new QLabel("Name"),0,0);
-  layer_grid_l->addWidget(new QLabel("Type"),0,1);
-  layer_grid_l->addWidget(new QLabel("Z-Height"),0,2);
-  layer_grid_l->addWidget(new QLabel("Visible"),0,3);  // TODO change to icon
-  layer_grid_l->addWidget(new QLabel("Editable"),0,4); // TODO change to icon
+    connect(bt_visibility, SIGNAL(toggled(bool)), layer, SLOT(visibilityCheckBoxChanged(bool)));
+    //connect(bt_editability, SIGNAL(toggled(bool)), layer, SLOT(editabilityCheckBoxChanged(bool)));
 
+    // insert row
+    layer_table->insertRow(curr_row); // insert row at the bottom
+    layer_table->setItem(curr_row, curr_col++, new QTableWidgetItem(QString::number(layer_i)));
+    layer_table->setItem(curr_row, curr_col++, new QTableWidgetItem(layer->getName()));
+    layer_table->setItem(curr_row, curr_col++, new QTableWidgetItem(layer->getContentType()));
+    layer_table->setItem(curr_row, curr_col++, new QTableWidgetItem(QString::number(layer->getZHeight())));
+    // TODO meter prefix (mm, um, nm, etc)
+    layer_table->setCellWidget(curr_row, curr_col++, bt_visibility);
+    layer_table->setCellWidget(curr_row, curr_col++, bt_editability);
 
-  // add layer info to LayerEditor, 1 row per layer
-  int i = 1;
-  for(prim::Layer* layer : *layers) {
-    QLabel *label_layer_name = new QLabel(layer->getName());
-    QLabel *label_content_type = new QLabel(layer->getContentType()); // TODO change to icon
-    QLineEdit *le_zheight = new QLineEdit(QString::number(layer->getZHeight()));
-    // TODO meter scale (um,nm,etc)
-    QCheckBox *cb_visibility = new QCheckBox(this); // TODO not sure if "this" is needed
-    // TODO editability checkbox
-
-    cb_visibility->setChecked(layer->isVisible());
-
-    connect(cb_visibility, SIGNAL(stateChanged(int)), layer, SLOT(visibilityCheckBoxChanged(int)));
-
-    layer_grid_l->addWidget(label_layer_name,i,0);
-    layer_grid_l->addWidget(label_content_type,i,1);
-    layer_grid_l->addWidget(le_zheight,i,2);
-    layer_grid_l->addWidget(cb_visibility,i,3);
-
-    i++;
+    layer_i++;
+    // TODO fold into addLayerRow()
   }
 
   // TODO restructure the widget such that the following items are only created
@@ -118,7 +108,14 @@ void LayerEditor::updateLayerList()
   // TODO UNDOable layer creation in DesignPanel
 }
 
+
+
+
 // update widget
+void LayerEditor:: addLayerRow()
+{
+  // TODO
+}
 
 // TODO
 // z-height of db-surface is 0
