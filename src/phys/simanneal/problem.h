@@ -31,9 +31,15 @@ namespace phys{
     // Destructor
     ~Problem() {};
 
+    // File Handling
+    bool readProblem(const std::string &fname);
+
+    // Accessors
+    bool parameterExists(const std::string &key) {return sim_params.find(key) != sim_params.end();}
+    std::string getParameter(const std::string &key) {return sim_params.find(key) != sim_params.end() ? sim_params.at(key) : "";}
 
 
-    // DB & AGG
+    // STRUCTS
 
     // dangling bond
     struct DBDot {
@@ -49,11 +55,11 @@ namespace phys{
       std::vector<std::shared_ptr<Aggregate>> aggs;
       std::vector<std::shared_ptr<DBDot>> dbs;
 
-      // PROPERTIES
+      // Properties
       int size(); // returns the number of contained DBs, including those in children aggs
     };
 
-    // electrode
+    // electrode TODO Nathan change at will
     struct Electrode {
       float x,y;      // physical location in angstroms (top left corner)
       float dx,dy;    // width and height in angstroms
@@ -96,25 +102,13 @@ namespace phys{
     DBIterator begin() {return DBIterator(db_tree);}
     DBIterator end() {return DBIterator(db_tree, false);}
 
-
-
-    // FILE HANDLING
-
-    bool readProblem(const std::string &fname);
+  private:
     bool readProgramProp(const bpt::ptree &);
     bool readMaterialProp(const bpt::ptree &);
     bool readSimulationParam(const bpt::ptree &sim_params_tree);
     bool readDesign(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
     bool readItemTree(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
     bool readDBDot(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
-
-    static bool writeResult();
-
-
-    // ACCESSORS
-
-    bool parameterExists(const std::string &key) {return sim_params.find(key) != sim_params.end();}
-    std::string getParameter(const std::string &key) {return sim_params.find(key) != sim_params.end() ? sim_params.at(key) : "";}
 
     // Variables
     std::shared_ptr<Aggregate> db_tree;

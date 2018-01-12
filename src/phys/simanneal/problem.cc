@@ -207,9 +207,3 @@ bool Problem::readDBDot(const bpt::ptree &subtree, const std::shared_ptr<Aggrega
   
   return true;
 }
-
-// write result to XML, return true if successful
-bool Problem::writeResult()
-{
-  return true;
-}
