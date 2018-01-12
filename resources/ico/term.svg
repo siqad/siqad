@@ -9,9 +9,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="36.952175mm"
-   height="35.86335mm"
-   viewBox="0 0 130.9329 127.07487"
+   width="39.06884mm"
+   height="37.980019mm"
+   viewBox="0 0 138.43289 134.57488"
    id="svg2"
    version="1.1"
    inkscape:version="0.92.2 5c3e80d, 2017-08-06"
@@ -25,9 +25,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4142136"
-     inkscape:cx="73.132095"
-     inkscape:cy="-0.69360491"
+     inkscape:zoom="0.3535534"
+     inkscape:cx="-479.96943"
+     inkscape:cy="204.42991"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -36,16 +36,16 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="952"
+     inkscape:window-width="1912"
      inkscape:window-height="1020"
-     inkscape:window-x="960"
+     inkscape:window-x="0"
      inkscape:window-y="56"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
        id="grid4167"
-       originx="-139.24252"
-       originy="-779.04509" />
+       originx="-135.49251"
+       originy="-775.29515" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -55,7 +55,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -63,9 +63,9 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-139.24254,-146.24232)">
+     transform="translate(-135.49254,-142.49232)">
     <rect
-       style="fill:none;fill-opacity:1;stroke:#4d4d4d;stroke-width:5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;fill-opacity:1;stroke:#4d4d4d;stroke-width:12.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4510"
        width="125.93291"
        height="122.07487"
@@ -76,17 +76,17 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:1.25;font-family:'Ubuntu Mono';-inkscape-font-specification:'Ubuntu Mono';letter-spacing:0px;word-spacing:0px;fill:#4d4d4d;fill-opacity:1;stroke:none;stroke-width:0.9375"
-       x="149.95256"
-       y="228.89856"
+       x="153.26712"
+       y="241.4939"
        id="text4514"><tspan
          sodipodi:role="line"
          id="tspan4512"
-         x="149.95256"
-         y="228.89856"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:70px;font-family:'Ubuntu Mono';-inkscape-font-specification:'Ubuntu Mono Bold';fill:#4d4d4d;fill-opacity:1;stroke-width:0.9375">&gt;_</tspan></text>
+         x="153.26712"
+         y="241.4939"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:70px;font-family:'Ubuntu Mono';-inkscape-font-specification:'Ubuntu Mono Bold';fill:#4d4d4d;fill-opacity:1;stroke-width:0.9375">$_</tspan></text>
     <path
-       style="fill:none;stroke:#4d4d4d;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 142.13086,184.9165 H 265.41211"
+       style="fill:none;stroke:#4d4d4d;stroke-width:12.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 142.13086,183.70441 H 265.41211"
        id="path4525"
        inkscape:connector-curvature="0" />
   </g>

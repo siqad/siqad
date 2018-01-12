@@ -35,7 +35,7 @@ void LayerEditor::initLayerEditor()
 
   // Main layout
   QVBoxLayout *main_vl = new QVBoxLayout;
-  main_vl->addLayout(top_buttons_hl);
+  //main_vl->addLayout(top_buttons_hl); TODO add this back when add function is implemented
   main_vl->addWidget(layer_table);
 
   setLayout(main_vl);
@@ -49,9 +49,9 @@ void LayerEditor::initLayerTable()
   QStringList table_headers;
   table_headers << 
     "Layer ID" << // Layer ID, hidden
-    "Name" <<     // Name
-    "Type" <<     // Type (lattice, db, electrode)
-    "Z-Height" << // Z-Height (vertical offset from surface)
+    "Name" <<     // Name TODO names of default layers can't be changed
+    "Type" <<     // Type (lattice, db, electrode) TODO types of default layers can't be changed
+    "Z-Height" << // Z-Height (vertical offset from surface) TODO surface zheight can't be changed
     "" <<  // Visibility
     "";   // Editability
 
@@ -61,6 +61,13 @@ void LayerEditor::initLayerTable()
   layer_table->resizeColumnToContents(4); // reduce width of visibility column
   layer_table->resizeColumnToContents(5); // reduce width of visibility column
   layer_table->setHorizontalHeaderLabels(table_headers);
+
+  // header tooltips TODO there's probably a more elegant way
+  layer_table->horizontalHeaderItem(1)->setToolTip("Layer Name");
+  layer_table->horizontalHeaderItem(2)->setToolTip("Layer Type: lattice, db, or electrode");
+  layer_table->horizontalHeaderItem(3)->setToolTip("Z-Height: vertical offset from surface.\nPositive for objects above surface, negative for objects under surface.");
+  layer_table->horizontalHeaderItem(4)->setToolTip("Visibility of the layer");
+  layer_table->horizontalHeaderItem(5)->setToolTip("Editability of the layer");
 
   // signals originating from the table
   connect(layer_table, SIGNAL(cellChanged(int,int)), this, SLOT(updateLayerPropFromTable(int,int)));
@@ -109,10 +116,16 @@ void LayerEditor::initLayerTable()
 }
 
 
+void LayerEditor::updateLayerPropFromTable(int row, int column)
+{
+  // TODO really need to not hard code layer ID and column position, need some sort of table that translates between readable name and row/col number
+  prim::Layer* layer = layers->at(layer_table->item(row, 0)->text().toInt()); // get layer according to Layer ID
+  // TODO edit layer property
+}
 
 
 // update widget
-void LayerEditor:: addLayerRow()
+void LayerEditor::addLayerRow()
 {
   // TODO
 }

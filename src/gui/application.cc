@@ -82,7 +82,7 @@ void gui::ApplicationGUI::initGUI()
   initLayerDock();
 
   // initialise bars
-  initMenuBar();
+  initMenuBar(); // must run before initTopBar
   initTopBar();
   initSideBar();
 
@@ -148,7 +148,14 @@ void gui::ApplicationGUI::initMenuBar()
   file->addAction(quit);
 
   // view menu actions
+  action_sim_visualize = sim_visualize_dock->toggleViewAction();
+  action_layer_sel = layer_dock->toggleViewAction();
   action_dialog_dock_visibility = dialog_dock->toggleViewAction();
+  action_sim_visualize->setIcon(QIcon(":/ico/simvisual.svg"));
+  action_layer_sel->setIcon(QIcon(":/ico/layer.svg"));
+  action_dialog_dock_visibility->setIcon(QIcon(":/ico/term.svg"));
+  view->addAction(action_sim_visualize);
+  view->addAction(action_layer_sel);
   view->addAction(action_dialog_dock_visibility);
 
   // tools menu actions
@@ -203,13 +210,9 @@ void gui::ApplicationGUI::initTopBar()
   action_run_sim = top_bar->addAction(QIcon(":/ico/runsim.svg"), tr("Run Simulation..."));
   action_run_sim->setShortcut(tr("F11"));
 
-  action_sim_visualize = sim_visualize_dock->toggleViewAction();
-  action_sim_visualize->setIcon(QIcon(":/ico/simvisual.svg"));
-  top_bar->addAction(action_sim_visualize);
-
-  action_layer_sel= layer_dock->toggleViewAction();
-  action_layer_sel->setIcon(QIcon(":/ico/layer.svg"));
-  top_bar->addAction(action_layer_sel);
+  top_bar->addAction(action_sim_visualize);           // already initialised in menu bar
+  top_bar->addAction(action_layer_sel);               // already initialised in menu bar
+  top_bar->addAction(action_dialog_dock_visibility);  // already initialised in menu bar
 
   //action_circuit_lib= top_bar->addAction(QIcon(":/ico/circuitlib.svg"), tr("Circuit Library"));
 
