@@ -49,8 +49,8 @@ void LayerEditor::initLayerTable()
   QStringList table_headers;
   table_headers << 
     "Layer ID" << // Layer ID, hidden
-    "Name" <<     // Name TODO names of default layers can't be changed
     "Type" <<     // Type (lattice, db, electrode) TODO types of default layers can't be changed
+    "Name" <<     // Name TODO names of default layers can't be changed
     "Z-Height" << // Z-Height (vertical offset from surface) TODO surface zheight can't be changed
     "" <<  // Visibility
     "";   // Editability
@@ -63,8 +63,8 @@ void LayerEditor::initLayerTable()
   layer_table->setHorizontalHeaderLabels(table_headers);
 
   // header tooltips TODO there's probably a more elegant way
-  layer_table->horizontalHeaderItem(1)->setToolTip("Layer Name");
-  layer_table->horizontalHeaderItem(2)->setToolTip("Layer Type: lattice, db, or electrode");
+  layer_table->horizontalHeaderItem(1)->setToolTip("Layer Type: lattice, db, or electrode");
+  layer_table->horizontalHeaderItem(2)->setToolTip("Layer Name");
   layer_table->horizontalHeaderItem(3)->setToolTip("Z-Height: vertical offset from surface.\nPositive for objects above surface, negative for objects under surface.");
   layer_table->horizontalHeaderItem(4)->setToolTip("Visibility of the layer");
   layer_table->horizontalHeaderItem(5)->setToolTip("Editability of the layer");
@@ -77,6 +77,11 @@ void LayerEditor::initLayerTable()
   for (prim::Layer* layer : *layers) {
     int curr_row = layer_table->rowCount();
     int curr_col = 0;
+
+    QTableWidgetItem *twi_type = new QTableWidgetItem(layer->getContentType());
+    twi_type->setIcon(layerType2Icon(layer->getContentType()));
+    twi_type->setToolTip(layer->getContentType());
+
     QPushButton *bt_visibility = new QPushButton(QIcon(":/ico/visible.svg"), "", this);
     QPushButton *bt_editability = new QPushButton(QIcon(":/ico/editable.svg"), "", this);
 
@@ -95,8 +100,8 @@ void LayerEditor::initLayerTable()
     // insert row
     layer_table->insertRow(curr_row); // insert row at the bottom
     layer_table->setItem(curr_row, curr_col++, new QTableWidgetItem(QString::number(layer_i)));
+    layer_table->setItem(curr_row, curr_col++, twi_type);
     layer_table->setItem(curr_row, curr_col++, new QTableWidgetItem(layer->getName()));
-    layer_table->setItem(curr_row, curr_col++, new QTableWidgetItem(layer->getContentType()));
     layer_table->setItem(curr_row, curr_col++, new QTableWidgetItem(QString::number(layer->getZHeight())));
     // TODO meter prefix (mm, um, nm, etc)
     layer_table->setCellWidget(curr_row, curr_col++, bt_visibility);
@@ -128,6 +133,19 @@ void LayerEditor::updateLayerPropFromTable(int row, int column)
 void LayerEditor::addLayerRow()
 {
   // TODO
+}
+
+QIcon LayerEditor::layerType2Icon(const QString &layer_type)
+{
+  // TODO make enumerated layer type instead of hard code string
+  if (layer_type == "lattice")
+    return QIcon(":/ico/lattice.svg");
+  /*else if (layer_type == "db")
+    return QIcon(":/ico/db.svg");
+  else if (layer_type == "electrodes")
+    return QIcon(":/ico/electrode.svg");*/
+  else
+    return QIcon(":/ico/unknown.svg");
 }
 
 // TODO

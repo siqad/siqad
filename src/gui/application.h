@@ -152,6 +152,7 @@ namespace gui{
     QAction *action_drag_tool;    // change cursor tool to drag
     QAction *action_dbgen_tool;   // change cursor tool to gen
     QAction *action_electrode_tool;   // change cursor tool to electrode
+    QAction *action_label_tool;   // change cursor tool to label
     QAction *action_run_sim;      // run the current simulation method
     QAction *action_sim_visualize;// show the sim visualize dock which allows simulation visualization
     QAction *action_layer_sel;

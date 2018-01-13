@@ -254,16 +254,19 @@ void gui::ApplicationGUI::initSideBar()
   action_drag_tool = side_bar->addAction(QIcon(":/ico/drag.svg"), tr("Drag tool"));
   action_dbgen_tool = side_bar->addAction(QIcon(":/ico/dbgen.svg"), tr("DB tool"));
   action_electrode_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"), tr("Electrode tool"));
+  action_label_tool = side_bar->addAction(QIcon(":/ico/drawlabel.svg"), tr("Label tool"));
 
   action_group->addAction(action_select_tool);
   action_group->addAction(action_drag_tool);
   action_group->addAction(action_dbgen_tool);
   action_group->addAction(action_electrode_tool);
+  action_group->addAction(action_label_tool);
 
   action_select_tool->setCheckable(true);
   action_drag_tool->setCheckable(true);
   action_dbgen_tool->setCheckable(true);
   action_electrode_tool->setCheckable(true);
+  action_label_tool->setCheckable(true);
 
   action_select_tool->setChecked(true);
 
@@ -271,6 +274,7 @@ void gui::ApplicationGUI::initSideBar()
   connect(action_drag_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolDrag);
   connect(action_dbgen_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolDBGen);
   connect(action_electrode_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolElectrode);
+  // TODO connect(action_label_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolLabel);
 
   addToolBar(area, side_bar);
 }

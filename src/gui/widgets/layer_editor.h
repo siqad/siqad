@@ -36,15 +36,15 @@ namespace gui{
       QCheckBox *cb_visibility;     // layer visibility
     };
 
-    void addLayerRow(); // add a row to layer list
-
     void initLayerTable();
+    void addLayerRow(); // add a row to layer list
 
   public slots:
     void updateLayerPropFromTable(int row, int column);
 
   private:
     void initLayerEditor();
+    QIcon layerType2Icon(const QString &layer_type);
 
     // vars
     gui::DesignPanel *dp;
