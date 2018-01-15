@@ -70,7 +70,9 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
   * List layers
   * Add layer
   * Rm layer
+  * Rename layer (except for default layers)
   * Edit layer zheight
+  * Signal based updates (and a button that allows manual update)
 * Toggle layer state
   * ~~Layer visibility~~ Implemented 18.01.12
   * Layer editability
