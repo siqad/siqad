@@ -158,10 +158,10 @@ bool Problem::readDesign(const bpt::ptree &subtree, const std::shared_ptr<Aggreg
   std::cout << "Beginning to read design" << std::endl;
   for (bpt::ptree::value_type const &layer_tree : subtree) {
     std::string layer_type = layer_tree.second.get<std::string>("<xmlattr>.type");
-    if (!layer_type.compare("db")) {
+    if (!layer_type.compare("DB")) {
       std::cout << "Encountered node " << layer_tree.first << " with type " << layer_type << ", entering" << std::endl;
       readItemTree(layer_tree.second, agg_parent);
-    } else if (!layer_type.compare("electrodes")) {
+    } else if (!layer_type.compare("Electrode")) {
       // TODO parse electrode code
       std::cout << "TODO write code for parsing electrodes" << std::endl;
     } else {
