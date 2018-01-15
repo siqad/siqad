@@ -212,6 +212,13 @@ void prim::Electrode::setPotential(double givenPotential)
   }
 }
 
+void prim::Electrode::updatePoints(QPointF offset)
+{
+  //use after moving electrode with mouse. Graphic in correct place, but points need updating.
+  point1 += offset;
+  point2 += offset;
+}
+
 void prim::Electrode::constructStatics() //needs to be changed to look at electrode settings instead.
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();

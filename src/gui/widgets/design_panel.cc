@@ -1784,6 +1784,7 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
 void gui::DesignPanel::MoveItem::moveElectrode(prim::Electrode *electrode, const QPointF &delta)
 {
   electrode->setPos( electrode->pos() + delta );
+  electrode->updatePoints(delta);
 }
 
 // Undo/Redo Methods

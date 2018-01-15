@@ -47,11 +47,10 @@ signals:
   void emitSimJob(prim::SimJob *new_job);
 
 private slots:
-  void updateSimParams(int);
+  void updateSimParams();
+  void xmlFind();
 
 private:
-
-  int updateSimParams();
   void initSimManager();
   void initMenu();
   void initListPan();
@@ -59,7 +58,6 @@ private:
 
   void initSimSetupDialog();
   void updateEngSelCombo();
-  void updateSimSetupDialog();
   void submitSimSetup();
   void createParamGroup();
   void createButtonLayout();
@@ -96,20 +94,13 @@ private:
   // PoisSolver
   QLabel *label_xml_path;
   QLineEdit *le_xml_path;
-  
+  QPushButton *button_xml_find;
+
   // button group
   QHBoxLayout *bottom_buttons_hl;
   QVBoxLayout *new_setup_dialog_l;
   QPushButton *button_run;
   QPushButton *button_cancel;
-
-
-
-
-
-  QLabel *label_test;
-
-
 };
 
 

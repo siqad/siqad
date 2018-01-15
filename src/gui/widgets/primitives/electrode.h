@@ -49,6 +49,7 @@ namespace prim{
     qreal getHeight(void){return elec_height;}
     qreal getDepth(void){return elec_depth;}
     double getPotential(void) const {return potential;}
+    void updatePoints(QPointF);
 
     // inherited abstract method implementations
     QRectF boundingRect() const Q_DECL_OVERRIDE;
