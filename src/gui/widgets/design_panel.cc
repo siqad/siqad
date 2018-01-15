@@ -172,7 +172,7 @@ void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
   }
 }
 
-void gui::DesignPanel::addLayer(const QString &name, const QString &cnt_type, const float zheight)
+void gui::DesignPanel::addLayer(const QString &name, const prim::Layer::LayerType cnt_type, const float zheight)
 {
   // check if name already taken
   bool taken = false;
@@ -327,11 +327,11 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   layers.append(lattice);
 
   // add in the dangling bond surface
-  addLayer(tr("Surface"),tr("db"),0);
+  addLayer(tr("Surface"),prim::Layer::DB,0);
   top_layer = layers.at(1);
 
   // add in the metal layer for electrodes
-  addLayer(tr("Metal"),tr("electrodes"),-1E-7);
+  addLayer(tr("Metal"),prim::Layer::Electrode,-1E-7);
   electrode_layer = layers.at(2);
 
 }
@@ -455,6 +455,8 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
 {
   int layer_id=0;
   QString layer_nm;
+  float zheight;
+  prim::Layer::LayerType layer_type;
   bool layer_visible, layer_active;
 
   // reset the design panel state
@@ -501,13 +503,26 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
       else if(stream->name() == "layer_prop"){
         // construct layers
         stream->readNext();
+
+        //bool visible_ld, active_ld;
+        layer_nm = QString();
+        layer_type = prim::Layer::DB;
+        zheight = 0;
+        layer_visible = layer_active = false;
+
         // keep reading until end of layer_prop tag
         while(stream->name() != "layer_prop"){
-          //bool visible_ld, active_ld;
-
           if(stream->isStartElement()){
             if(stream->name() == "name"){
               layer_nm = stream->readElementText();
+              stream->readNext();
+            }
+            else if(stream->name() == "type"){
+              layer_type = static_cast<prim::Layer::LayerType>(QMetaEnum::fromType<prim::Layer::LayerType>().keyToValue(stream->readElementText().toStdString().c_str()));
+              stream->readNext();
+            }
+            else if(stream->name() == "zheight"){
+              zheight = stream->readElementText().toFloat();
               stream->readNext();
             }
             else if(stream->name() == "visible"){
@@ -526,16 +541,18 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
           else{
             stream->readNext();
           }
-
-          // make layer object using loaded information
-          /* haven't fully implemented
-          addLayer(layer_nm);
-          getLayer(layer_id)->setVisible(visible_ld);
-          getLayer(layer_id)->setActive(active_ld);
-          layer_id++;*/
-          Q_UNUSED(layer_visible);  // for now, suppress warning
-          Q_UNUSED(layer_active);   // ditto
         }
+        // edit layer if it exists, create new otherwise
+        qDebug() << tr("Loading layer %1 with type %2").arg(layer_nm).arg(layer_type);
+        prim::Layer* load_layer = getLayer(layer_nm);
+        if (!load_layer) {
+          addLayer(layer_nm);
+          load_layer = getLayer(layers.count()-1);
+        }
+        load_layer->setContentType(layer_type);
+        load_layer->setZHeight(zheight);
+        load_layer->setVisible(layer_visible);
+        load_layer->setActive(layer_active);
       }
       else if(stream->name() == "design") {
         stream->readNext();

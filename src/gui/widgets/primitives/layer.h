@@ -17,6 +17,7 @@
 
 #include <QtWidgets>
 #include <QtCore>
+#include <QMetaEnum>
 #include "item.h"
 
 
@@ -29,9 +30,13 @@ namespace prim{
 
   public:
 
+    enum LayerType{Lattice, DB, Electrode, AFMTip};
+    Q_ENUM(LayerType)
+
+
     // constructor, create a Layer with the given name. If no name is given,
     // use the default naming scheme with layer_count.
-    Layer(const QString &nm = QString(), const QString &cnt_type = QString(), const float z_height=0, int lay_id=-1, QObject *parent=0);
+    Layer(const QString &nm = QString(), const LayerType cnt_type=DB, const float z_height=0, int lay_id=-1, QObject *parent=0);
     Layer(QXmlStreamReader *stream);
 
     // destructor
@@ -77,8 +82,12 @@ namespace prim{
     // get the Layer name, possibly change return to const QString&
     const QString& getName() const {return name;}
 
+    // set the Layer content type
+    void setContentType(LayerType type) {content_type = type;}
+
     // get the Layer content type, like "electrode", "dbdots", etc.
-    const QString& getContentType() const {return content_type;}
+    LayerType getContentType() {return content_type;}
+    const QString getContentTypeString() const {return QString(QMetaEnum::fromType<LayerType>().valueToKey(content_type));}
 
     // if i is within bounds, return a pointer to the indexed item in the Layer
     // item stack; otherwise, return 0
@@ -93,8 +102,9 @@ namespace prim{
     virtual void loadItems(QXmlStreamReader *, QGraphicsScene *);
 
   public slots:
-    void visibilityCheckBoxChanged(int check_state); // for checkbox
-    void visibilityCheckBoxChanged(bool checked) {setVisible(checked);} // for pushbutton
+    void visibilityCheckBoxChanged(int check_state);
+    void visibilityPushButtonChanged(bool checked) {setVisible(checked);}
+    void editabilityPushButtonChanged(bool checked) {setActive(checked);}
 
   private:
 
@@ -103,7 +113,7 @@ namespace prim{
     float zheight;  // layer distance from surface
 
     QString name;   // arbitrary layer name, layers can be selected by name
-    QString content_type;
+    LayerType content_type;
 
     // list of items in order of insertion, should probably be a linked list
     QStack<prim::Item*> items;

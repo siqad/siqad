@@ -44,7 +44,7 @@ namespace gui{
 
   private:
     void initLayerEditor();
-    QIcon layerType2Icon(const QString &layer_type);
+    QIcon layerType2Icon(const prim::Layer::LayerType);
 
     // vars
     gui::DesignPanel *dp;

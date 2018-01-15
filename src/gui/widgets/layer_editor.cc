@@ -78,9 +78,9 @@ void LayerEditor::initLayerTable()
     int curr_row = layer_table->rowCount();
     int curr_col = 0;
 
-    QTableWidgetItem *twi_type = new QTableWidgetItem(layer->getContentType());
+    QTableWidgetItem *twi_type = new QTableWidgetItem(layer->getContentTypeString());
     twi_type->setIcon(layerType2Icon(layer->getContentType()));
-    twi_type->setToolTip(layer->getContentType());
+    twi_type->setToolTip(layer->getContentTypeString());
 
     QPushButton *bt_visibility = new QPushButton(QIcon(":/ico/visible.svg"), "", this);
     QPushButton *bt_editability = new QPushButton(QIcon(":/ico/editable.svg"), "", this);
@@ -88,14 +88,12 @@ void LayerEditor::initLayerTable()
     bt_visibility->setCheckable(true);
     bt_visibility->setChecked(layer->isVisible());
 
-    // TODO editability has not been implemented in layer.cc yet
-    //bt_editability->setCheckable(true);
-    //bt_editability->setChecked(layer->isEditable());
-    bt_editability->setChecked(true); // TODO remove this after implementing the above
+    bt_editability->setCheckable(true);
+    bt_editability->setChecked(layer->isActive());
 
 
-    connect(bt_visibility, SIGNAL(toggled(bool)), layer, SLOT(visibilityCheckBoxChanged(bool)));
-    //connect(bt_editability, SIGNAL(toggled(bool)), layer, SLOT(editabilityCheckBoxChanged(bool)));
+    connect(bt_visibility, SIGNAL(toggled(bool)), layer, SLOT(visibilityPushButtonChanged(bool)));
+    connect(bt_editability, SIGNAL(toggled(bool)), layer, SLOT(editabilityPushButtonChanged(bool)));
 
     // insert row
     layer_table->insertRow(curr_row); // insert row at the bottom
@@ -135,14 +133,14 @@ void LayerEditor::addLayerRow()
   // TODO
 }
 
-QIcon LayerEditor::layerType2Icon(const QString &layer_type)
+QIcon LayerEditor::layerType2Icon(const prim::Layer::LayerType layer_type)
 {
   // TODO make enumerated layer type instead of hard code string
-  if (layer_type == "lattice")
+  if (layer_type == prim::Layer::Lattice)
     return QIcon(":/ico/lattice.svg");
-  /*else if (layer_type == "db")
+  /*else if (layer_type == prim::Layer::DB)
     return QIcon(":/ico/db.svg");
-  else if (layer_type == "electrodes")
+  else if (layer_type == prim::Layer::Electrode)
     return QIcon(":/ico/electrode.svg");*/
   else
     return QIcon(":/ico/unknown.svg");

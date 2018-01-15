@@ -60,6 +60,10 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * ~~Visual feedback on which tool is currently in use (e.g. changed background of the button)~~ Implemented 17.07.12
 
 ### Layers
+* Enumerated layer types
+  * Provide enum to QString conversion
+  * Also update save, load, export functions as the Enum strings are different from the original names
+  * 
 * CreateLayer with undo and redo in DesignPanel
 * Add zheight property to layers (including updating functions in DP)
 * LayerEditor
@@ -67,8 +71,17 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
   * Add layer
   * Rm layer
   * Edit layer zheight
+* Toggle layer state
+  * ~~Layer visibility~~ Implemented 18.01.12
+  * Layer editability
+    * Current "setActive()" in layer has not been implemented
+    * Hiding a layer should also make it uneditable
+  * Label visibility (labels can be stored within any layer)
 * Distinguishment between physical layer and logical layer
   * Update code in physics engine
+* Associated layers
+  * e.g. a layer containing the path of AFM tip associated with the AFM tip layer
+  * Allow multiple AFM layers
 
 ### Aggregates
 * Save and load aggregates
