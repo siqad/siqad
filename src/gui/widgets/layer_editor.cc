@@ -59,6 +59,7 @@ void LayerEditor::initLayerTable()
   QStringList table_headers;
   // TODO take enum type instead of this stringlist
   table_headers << 
+    "ID" <<       // Layer ID, layer's position in layers* stack
     "Type" <<     // Type (lattice, db, electrode) TODO types of default layers can't be changed
     "Name" <<     // Name TODO names of default layers can't be changed
     "Z-Height" << // Z-Height (vertical offset from surface) TODO surface zheight can't be changed
@@ -67,6 +68,7 @@ void LayerEditor::initLayerTable()
 
   layer_table->setColumnCount(table_headers.count());
   layer_table->setHorizontalHeaderLabels(table_headers);
+  layer_table->setColumnHidden(static_cast<int>(ID), true);
   layer_table->resizeColumnToContents(static_cast<int>(Visibility)); // reduce width of visibility column
   layer_table->resizeColumnToContents(static_cast<int>(Editability)); // reduce width of visibility column
 
@@ -77,15 +79,14 @@ void LayerEditor::initLayerTable()
   layer_table->horizontalHeaderItem(static_cast<int>(Visibility))->setToolTip("Visibility of the layer");
   layer_table->horizontalHeaderItem(static_cast<int>(Editability))->setToolTip("Editability of the layer");
 
-  // signals originating from the table
-  connect(layer_table, SIGNAL(cellChanged(int,int)), this, SLOT(updateLayerPropFromTable(int,int)));
-
   // populate table with layer info
   qDebug() << "Populating layer table";
   int layer_i = 0;
   for (prim::Layer* layer : *layers)
     addLayerRow(layer);
 
+  // signals originating from the table
+  connect(layer_table, SIGNAL(cellChanged(int,int)), this, SLOT(updateLayerPropFromTable(int,int)));
   // TODO UNDOable z-height change
   // TODO UNDOable layer creation in DesignPanel
 }
@@ -108,7 +109,33 @@ void LayerEditor::clearLayerTable()
 void LayerEditor::updateLayerPropFromTable(int row, int column)
 {
   // TODO really need to not hard code layer ID and column position, need some sort of table that translates between readable name and row/col number
-  prim::Layer* layer = layers->at(layer_table->item(row, 0)->text().toInt()); // get layer according to Layer ID
+  QString layer_name = layer_table->item(row, static_cast<int>(Name))->text();
+  qDebug() << QObject::tr("Row=%1, Col=%2, Layer name=%3").arg(row).arg(column).arg(layer_name);
+  prim::Layer* layer = dp->getLayer(layer_name); // get layer according to Layer Name
+
+  switch(column) {
+    case static_cast<int>(ID):
+      // not supposed to get this
+      break;
+    case static_cast<int>(Type):
+      // not supposed to get this
+      break;
+    case static_cast<int>(Name):
+      // not supposed to get this
+      break;
+    case static_cast<int>(ZHeight):
+      layer->setZHeight(layer_table->item(row, column)->text().toInt());
+      break;
+    case static_cast<int>(Visibility):
+      // not supposed to get this
+      break;
+    case static_cast<int>(Editability):
+      // not supposed to get this
+      break;
+    default:
+      // not supposed to get this
+      break;
+  }
   // TODO edit layer property
 }
 

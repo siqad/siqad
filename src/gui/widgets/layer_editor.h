@@ -23,7 +23,7 @@ namespace gui{
 
   public:
 
-    enum LayerEditorColumn{Type, Name, ZHeight, Visibility, Editability};
+    enum LayerEditorColumn{ID, Type, Name, ZHeight, Visibility, Editability};
     Q_ENUM(LayerEditorColumn)
     // constructor
     LayerEditor(gui::DesignPanel *design_pan, QWidget *parent);
