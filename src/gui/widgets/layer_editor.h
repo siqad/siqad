@@ -23,7 +23,7 @@ namespace gui{
 
   public:
 
-    enum LayerEditorColumn{ID, Type, Name, ZHeight, Visibility, Editability};
+    enum LayerEditorColumn{ID, Type, Name, ZOffset, ZHeight, Visibility, Editability};
     Q_ENUM(LayerEditorColumn)
     // constructor
     LayerEditor(gui::DesignPanel *design_pan, QWidget *parent);
@@ -37,6 +37,7 @@ namespace gui{
       prim::Layer *layer;           // layer that this row corresponds to
       QTableWidgetItem *name;       // layer name (identifier in *layers)
       QTableWidgetItem *type;       // layer type
+      QTableWidgetItem *zoffset;    // layer z-offset
       QTableWidgetItem *zheight;    // layer z-height
       QPushButton *bt_visibility;   // layer visibility
       QPushButton *bt_editability;  // layer editability (layer isActive)

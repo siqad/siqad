@@ -16,8 +16,8 @@
 uint prim::Layer::layer_count = 0;
 
 
-prim::Layer::Layer(const QString &nm, LayerType cnt_type, const float z_height, int lay_id, QObject *parent)
-  : QObject(parent), visible(true), active(false), zheight(z_height)
+prim::Layer::Layer(const QString &nm, LayerType cnt_type, const float z_offset, const float z_height, int lay_id, QObject *parent)
+  : QObject(parent), visible(true), active(false), zoffset(z_offset), zheight(z_height)
 {
   layer_id = lay_id;
   name = nm.isEmpty() ? QString("Layer %1").arg(layer_count++) : nm;

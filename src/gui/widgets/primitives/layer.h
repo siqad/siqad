@@ -36,7 +36,7 @@ namespace prim{
 
     // constructor, create a Layer with the given name. If no name is given,
     // use the default naming scheme with layer_count.
-    Layer(const QString &nm = QString(), const LayerType cnt_type=DB, const float z_height=0, int lay_id=-1, QObject *parent=0);
+    Layer(const QString &nm = QString(), const LayerType cnt_type=DB, const float z_offset=0, const float z_height=0, int lay_id=-1, QObject *parent=0);
     Layer(QXmlStreamReader *stream);
 
     // destructor
@@ -51,7 +51,11 @@ namespace prim{
     // set layer index and update layer_id of contained items
     void setLayerIndex(int lay_id);
 
-    // set / get the z-height of the layer
+    // set / get the zoffset of the layer
+    void setZOffset(const float z_offset) {zoffset = z_offset;}
+    float getZOffset() {return zoffset;}
+
+    // set / get the zheight of the layer
     void setZHeight(const float z_height) {zheight = z_height;}
     float getZHeight() {return zheight;}
 
@@ -110,7 +114,8 @@ namespace prim{
 
     int layer_id;   // layer index in design panel's layers stack
     static uint layer_count;  // number of created Layer() objects, does not decrement
-    float zheight;  // layer distance from surface
+    float zoffset;  // layer distance from surface. +ve for above, -ve for below.
+    float zheight;  // layer height, +ve for height in top direction, -ve for bot direction
 
     QString name;   // arbitrary layer name, layers can be selected by name
     LayerType content_type;

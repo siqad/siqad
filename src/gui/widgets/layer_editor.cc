@@ -21,10 +21,7 @@ LayerEditor::LayerEditor(gui::DesignPanel *design_pan, QWidget *parent)
 // destructor
 LayerEditor::~LayerEditor()
 {
-  for (auto row_item : table_row_items)
-    delete row_item;
-
-  // NOTE Pointers within *layers are deleted in design_panel
+  clearLayerTable();
 }
 
 
@@ -62,7 +59,8 @@ void LayerEditor::initLayerTable()
     "ID" <<       // Layer ID, layer's position in layers* stack
     "Type" <<     // Type (lattice, db, electrode) TODO types of default layers can't be changed
     "Name" <<     // Name TODO names of default layers can't be changed
-    "Z-Height" << // Z-Height (vertical offset from surface) TODO surface zheight can't be changed
+    "Z-Offset" << // Z-Offset (vertical offset from surface) TODO surface zheight can't be changed
+    "Z-Height" << // Z-Height (vertical height of layer)
     "" <<  // Visibility
     "";   // Editability
 
@@ -75,7 +73,8 @@ void LayerEditor::initLayerTable()
   // header tooltips
   layer_table->horizontalHeaderItem(static_cast<int>(Type))->setToolTip("Layer Type: lattice, db, or electrode");
   layer_table->horizontalHeaderItem(static_cast<int>(Name))->setToolTip("Layer Name");
-  layer_table->horizontalHeaderItem(static_cast<int>(ZHeight))->setToolTip("Z-Height: vertical offset from surface.\nPositive for objects above surface, negative for objects under surface.");
+  layer_table->horizontalHeaderItem(static_cast<int>(ZOffset))->setToolTip("Z-Offset: vertical offset from surface.\nPosition for objects above surface, negative for objects below surface.");
+  layer_table->horizontalHeaderItem(static_cast<int>(ZHeight))->setToolTip("Z-Height: vertical height of the layer");
   layer_table->horizontalHeaderItem(static_cast<int>(Visibility))->setToolTip("Visibility of the layer");
   layer_table->horizontalHeaderItem(static_cast<int>(Editability))->setToolTip("Editability of the layer");
 
@@ -101,8 +100,14 @@ void LayerEditor::refreshLayerTable()
 
 void LayerEditor::clearLayerTable()
 {
-  // delete layer rows and disconnect all signals within the table
-  // TODO
+  // Delete layer rows and disconnect all signals within the table.
+  // Called by destructor on exit or by design panel when loading new file.
+
+  for (auto row_item : table_row_items) {
+    row_item->bt_visibility->disconnect();
+    row_item->bt_editability->disconnect();
+    delete row_item;
+  }
 }
 
 
@@ -123,8 +128,11 @@ void LayerEditor::updateLayerPropFromTable(int row, int column)
     case static_cast<int>(Name):
       // not supposed to get this
       break;
+    case static_cast<int>(ZOffset):
+      layer->setZOffset(layer_table->item(row, column)->text().toFloat());
+      break;
     case static_cast<int>(ZHeight):
-      layer->setZHeight(layer_table->item(row, column)->text().toInt());
+      layer->setZHeight(layer_table->item(row, column)->text().toFloat());
       break;
     case static_cast<int>(Visibility):
       // not supposed to get this
@@ -166,6 +174,7 @@ void LayerEditor::addLayerRow(prim::Layer *layer)
   curr_row_items->type->setToolTip(layer->getContentTypeString());
   
   curr_row_items->name = new QTableWidgetItem(layer->getName());
+  curr_row_items->zoffset = new QTableWidgetItem(QString::number(layer->getZOffset()));
   curr_row_items->zheight = new QTableWidgetItem(QString::number(layer->getZHeight()));
 
   // add to table
@@ -185,6 +194,7 @@ void LayerEditor::addLayerRow(LayerTableRowItems *row_items)
   layer_table->insertRow(curr_row);
   layer_table->setItem(curr_row, static_cast<int>(Type), row_items->type);
   layer_table->setItem(curr_row, static_cast<int>(Name), row_items->name);
+  layer_table->setItem(curr_row, static_cast<int>(ZOffset), row_items->zoffset);
   layer_table->setItem(curr_row, static_cast<int>(ZHeight), row_items->zheight);
 
   layer_table->setCellWidget(curr_row, static_cast<int>(Visibility), row_items->bt_visibility);

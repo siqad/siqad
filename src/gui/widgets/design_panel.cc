@@ -172,7 +172,7 @@ void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
   }
 }
 
-void gui::DesignPanel::addLayer(const QString &name, const prim::Layer::LayerType cnt_type, const float zheight)
+void gui::DesignPanel::addLayer(const QString &name, const prim::Layer::LayerType cnt_type, const float zoffset, const float zheight)
 {
   // check if name already taken
   bool taken = false;
@@ -188,7 +188,7 @@ void gui::DesignPanel::addLayer(const QString &name, const prim::Layer::LayerTyp
   }
 
   // layer is added to the end of layers stack, so ID = layers.size() before it was added
-  prim::Layer *layer = new prim::Layer(name, cnt_type, zheight, layers.size());
+  prim::Layer *layer = new prim::Layer(name, cnt_type, zoffset, zheight, layers.size());
   layers.append(layer);
 }
 
@@ -327,11 +327,11 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   layers.append(lattice);
 
   // add in the dangling bond surface
-  addLayer(tr("Surface"),prim::Layer::DB,0);
+  addLayer(tr("Surface"),prim::Layer::DB,0,0);
   top_layer = layers.at(1);
 
   // add in the metal layer for electrodes
-  addLayer(tr("Metal"),prim::Layer::Electrode,-1E-7);
+  addLayer(tr("Metal"),prim::Layer::Electrode,-1E-7,0);
   electrode_layer = layers.at(2);
 
 }
@@ -455,7 +455,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
 {
   int layer_id=0;
   QString layer_nm;
-  float zheight;
+  float zoffset, zheight;
   prim::Layer::LayerType layer_type;
   bool layer_visible, layer_active;
 
@@ -508,6 +508,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
         layer_nm = QString();
         layer_type = prim::Layer::DB;
         zheight = 0;
+        zoffset = 0;
         layer_visible = layer_active = false;
 
         // keep reading until end of layer_prop tag
@@ -519,6 +520,10 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
             }
             else if(stream->name() == "type"){
               layer_type = static_cast<prim::Layer::LayerType>(QMetaEnum::fromType<prim::Layer::LayerType>().keyToValue(stream->readElementText().toStdString().c_str()));
+              stream->readNext();
+            }
+            else if(stream->name() == "zoffset"){
+              zoffset = stream->readElementText().toFloat();
               stream->readNext();
             }
             else if(stream->name() == "zheight"){
@@ -550,6 +555,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
           load_layer = getLayer(layers.count()-1);
         }
         load_layer->setContentType(layer_type);
+        load_layer->setZOffset(zoffset);
         load_layer->setZHeight(zheight);
         load_layer->setVisible(layer_visible);
         load_layer->setActive(layer_active);
