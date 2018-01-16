@@ -1053,25 +1053,28 @@ void gui::DesignPanel::boundZoom(qreal &ds)
 
 void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
 {
-  if(!clipboard.isEmpty()) { //not empty, enable pasting
+  if (!clipboard.isEmpty()) { //not empty, enable pasting
     action_paste->setEnabled(true);
   } else {
     action_paste->setEnabled(false);
   }
-  if(!scene->selectedItems().isEmpty()) { //not empty, enable deleting
+  if (!scene->selectedItems().isEmpty()) { //not empty, enable deleting
     action_delete->setEnabled(true);
   } else {
     action_delete->setEnabled(false);
   }
   QMenu menu(this); //create the context menu object
-  if(QGraphicsItem *gitem = itemAt(e->pos())) {
-    if(static_cast<prim::Item*>(gitem)->upSelected()){
+  if (QGraphicsItem *gitem = itemAt(e->pos())) {
+    qDebug() << tr("Item clicked was at: (%1 , %2)").arg(gitem->x()).arg(gitem->y());
+    if (static_cast<prim::Item*>(gitem)->upSelected()) {
       //Something was selected, so determine the type and give the correct context menu.
-      if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::Electrode) {
+      if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::Electrode) {
         menu.addAction(action_set_potential);
         menu.addSeparator();
+      } else if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::DBDot) {
+        menu.addAction(action_toggle_db_elec);
+        menu.addSeparator();
       }
-    } else {
     }
   } else {
   }
@@ -1126,6 +1129,7 @@ void gui::DesignPanel::deleteAction()
 
 void gui::DesignPanel::electrodeSetPotentialAction()
 {
+  // setting potential is not an un-doable action for now.
   bool ok = false;
   double potential;
   // qDebug() << tr("electrodeSetPotential...");
@@ -1147,6 +1151,22 @@ void gui::DesignPanel::electrodeSetPotentialAction()
         if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::Electrode)
           static_cast<prim::Electrode*>(gitem)->setPotential(potential);
       }
+    }
+  }
+}
+
+
+void gui::DesignPanel::toggleDBElecAction()
+{
+  // toggling is not an un-doable action for now.
+  // qDebug() << tr("toggleDBElecAction...");
+  QList<QGraphicsItem*> selection = scene->selectedItems();
+  if(selection.isEmpty()){ //TODO:figure out how we want to handle right click without selection
+    qDebug() << tr("Please select an item...");
+  } else { //at least 1 item was selected, toggle elec in dots.
+    for(QGraphicsItem *gitem : selection){
+      if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::DBDot)
+        static_cast<prim::DBDot*>(gitem)->toggleElec();
     }
   }
 }
@@ -1173,6 +1193,9 @@ void gui::DesignPanel::createActions()
 
   action_set_potential = new QAction(tr("&Set Potential"), this);
   connect(action_set_potential, &QAction::triggered, this, &gui::DesignPanel::electrodeSetPotentialAction);
+
+  action_toggle_db_elec = new QAction(tr("&Toggle Lattice<->DB"), this);
+  connect(action_toggle_db_elec, &QAction::triggered, this, &gui::DesignPanel::toggleDBElecAction);
 }
 
 
@@ -1784,6 +1807,7 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
 void gui::DesignPanel::MoveItem::moveElectrode(prim::Electrode *electrode, const QPointF &delta)
 {
   electrode->setPos( electrode->pos() + delta );
+  electrode->updatePoints(delta);
 }
 
 // Undo/Redo Methods

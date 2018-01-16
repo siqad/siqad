@@ -37,6 +37,9 @@ bool SimJob::invokeBinary()
     return false;
   }
 
+  // if(engine->name() == "PoisSolver"){ //give it the problem xml path from the sim manager.
+  //   arguments << sim_params[0].second;
+  // }
   arguments << problem_file_info.canonicalFilePath();
   arguments << resultFile();
 
@@ -75,7 +78,7 @@ bool SimJob::readResults()
 {
   // TODO check path exists
   QFile result_file(resultFile());
-  
+
   if(!result_file.open(QFile::ReadOnly | QFile::Text)){
     qDebug() << tr("SimJob: Error when opening result file to read: %1").arg(result_file.errorString());
     return false;

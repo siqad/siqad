@@ -122,13 +122,13 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 ## Physics Engine
 
 * Interface with solvers (standards for passing DB configuration to them, and taking results back)
-  * Reset SimManager after design panel reset
-  * Open new window for showing sim results
-  * Custom class containing physical structure
-		* ~~Import size and potential data for electrodes into solver~~
-		* Translate size from Qt units to physical lengths
-		*	Add buffer region surrounding simulation area
-    * Location, dimensions, etc
+* Reset SimManager after design panel reset
+* Open new window for showing sim results
+* Custom class containing physical structure
+    * ~~Import size and potential data for electrodes into solver~~
+    * Translate size from Qt units to physical lengths
+    *	Add buffer region surrounding simulation area
+* Location, dimensions, etc
   * Custom class containing properties
 * Simple estimation tool of electron distribution
 * Static or animated display of charge (like the AFM images)
@@ -140,6 +140,12 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
   * stuff like that
 * SimAnneal
   * Distance dependent hopping: precompute the probability of hopping from each site to any other site, put into matrix
+* PoisSolver
+	* Custom class containing physical structure
+		* ~~Import size and potential data for electrodes into solver~~
+		* Translate size from Qt units to physical lengths
+		*	~Add buffer region surrounding simulation area~
+		* Location, dimensions, etc
 
 > general bugs
 ## Bugs

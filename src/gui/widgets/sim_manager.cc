@@ -35,7 +35,6 @@ SimManager::~SimManager()
 
 void SimManager::showSimSetupDialog()
 {
-    // updateSimSetupDialog();
   sim_setup_dialog->show();
 }
 
@@ -136,7 +135,7 @@ void SimManager::initSimSetupDialog()
   engine_sel_vl->addLayout(job_nm_hl);
 
   engine_sel_group->setLayout(engine_sel_vl);
-  connect(combo_eng_sel, SIGNAL(currentIndexChanged(int)), this, SLOT(updateSimParams(int))); //updates parameter list based on selection
+  connect(combo_eng_sel, SIGNAL(currentIndexChanged(int)), this, SLOT(updateSimParams())); //updates parameter list based on selection
 
   // Sim Params Group, this will change depending on combo box selection.
 
@@ -223,12 +222,15 @@ void SimManager::createParamGroup()
     sim_params_vl->addLayout(debye_length_hl);
 
   }else if(combo_eng_sel->currentText() == QString("PoisSolver")){
+    button_xml_find = new QPushButton(tr("Find"));
+    connect(button_xml_find, &QAbstractButton::clicked, this, &gui::SimManager::xmlFind);
     label_xml_path = new QLabel("XML Path:");
     le_xml_path = new QLineEdit("");
     label_xml_path->setBuddy(le_xml_path);
     QHBoxLayout *xml_path_hl = new QHBoxLayout;
     xml_path_hl->addWidget(label_xml_path);
     xml_path_hl->addWidget(le_xml_path);
+    xml_path_hl->addWidget(button_xml_find);
     sim_params_vl->addLayout(xml_path_hl);
   }
 
@@ -236,19 +238,32 @@ void SimManager::createParamGroup()
 }
 
 //only called when combo_eng_sel selection is changed.
-void SimManager::updateSimParams(int combo_index)
+void SimManager::updateSimParams()
 {
+  //delete the old params
   if(new_setup_dialog_l->takeAt(new_setup_dialog_l->indexOf(sim_params_group)) != 0){
     delete sim_params_group;
   }
+  //create and readd the params to the end of the list
   createParamGroup();
   new_setup_dialog_l->addWidget(sim_params_group);
   //TODO: Find a way to get the button layout's index so we can SAFELY delete it.
+  //delete the old buttons, then readd them to the bottom
   delete bottom_buttons_hl;
   createButtonLayout();
   new_setup_dialog_l->addLayout(bottom_buttons_hl);
+  //fit to content
   sim_setup_dialog->adjustSize();
 }
+
+
+void SimManager::xmlFind()
+{
+  QString fileName = QFileDialog::getOpenFileName(this,
+    tr("Open XML"), ".", tr("XML Files (*.xml)"));
+  le_xml_path->setText(fileName);
+}
+
 
 void SimManager::updateEngSelCombo()
 {
@@ -261,14 +276,6 @@ void SimManager::updateEngSelCombo()
   else
     for(auto eng : sim_engines)
       combo_eng_sel->addItem(eng->name());
-}
-
-
-void SimManager::updateSimSetupDialog()
-{
-  // update dialog content with engine selection
-  // useless for now as there's only one engine
-  qDebug() << QObject::tr("updateSimSetupDialog");
 }
 
 
@@ -294,6 +301,7 @@ void SimManager::submitSimSetup()
     new_job->addSimulationParameter("global_v0", le_global_v0->text());
     new_job->addSimulationParameter("debye_length", le_debye_length->text());
   } else if(combo_eng_sel->currentText() == QString("PoisSolver")){
+    //it is up to the user to make sure the design xml is provided.
     new_job->addSimulationParameter("xml_path", le_xml_path->text());
   }
   // engine
