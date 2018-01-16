@@ -60,35 +60,32 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * ~~Visual feedback on which tool is currently in use (e.g. changed background of the button)~~ Implemented 17.07.12
 
 ### Layers
-* Enumerated layer types
-  * Provide enum to QString conversion
-  * Also update save, load, export functions as the Enum strings are different from the original names
+* Layer editor updates in response to signals emitted from design panel
+  * Reset layer editor after loading new layout
+* ~~Enumerated layer types~~ Implemented 18.01.15
+  * ~~Provide enum to QString conversion~~ 18.01.15
+  * ~~Also update save, load, export functions as the Enum strings are different from the original names~~ 18.01.15
 * AFM
   * Path primitive object with snap to DB capabilities
   * Constant speed / acceleration profile / etc.
     * Real time info of timing, etc.
   * Side view of AFM path allowing height adjustment and height movement profile, pop-up window when clicked on a segment
-* Reset layer editor after loading new layout
 * CreateLayer with undo and redo in DesignPanel
 * Add zheight property to layers (including updating functions in DP)
 * LayerEditor
-  * List layers
+  * ~~List layers~~ Implemented 18.01.15
   * Add layer
   * Rm layer
   * Rename layer (except for default layers)
-  * Edit layer zheight
-  * Signal based updates (and a button that allows manual update)
+  * ~~Edit layer zheight~~ Implemented 18.01.16
 * Toggle layer state
   * ~~Layer visibility~~ Implemented 18.01.12
   * Layer editability
     * Current "setActive()" in layer has not been implemented
     * Hiding a layer should also make it uneditable
-  * Label visibility (labels can be stored within any layer)
+  * Label visibility (labels can be stored within any layer when implemented)
 * Distinguishment between physical layer and logical layer
   * Update code in physics engine
-* Associated layers
-  * e.g. a layer containing the path of AFM tip associated with the AFM tip layer
-  * Allow multiple AFM layers
 
 ### Aggregates
 * Save and load aggregates
