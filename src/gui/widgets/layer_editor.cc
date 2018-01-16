@@ -18,6 +18,15 @@ LayerEditor::LayerEditor(gui::DesignPanel *design_pan, QWidget *parent)
   initLayerEditor();
 }
 
+// destructor
+LayerEditor::~LayerEditor()
+{
+  for (auto row_item : row_items)
+    delete row_item;
+
+  // NOTE Pointers within *layers are deleted in design_panel
+}
+
 
 // PRIVATE
 
@@ -48,12 +57,11 @@ void LayerEditor::initLayerTable()
 {
   QStringList table_headers;
   table_headers << 
-    "Layer ID" << // Layer ID, hidden
     "Type" <<     // Type (lattice, db, electrode) TODO types of default layers can't be changed
     "Name" <<     // Name TODO names of default layers can't be changed
     "Z-Height" << // Z-Height (vertical offset from surface) TODO surface zheight can't be changed
-    "" <<  // Visibility
-    "";   // Editability
+    "Visibility" <<  // Visibility
+    "Editability";   // Editability
 
   layer_table->setColumnCount(table_headers.count());
   // TODO don't hard code column ID
@@ -75,7 +83,7 @@ void LayerEditor::initLayerTable()
   // populate table with layer info
   int layer_i = 0;
   for (prim::Layer* layer : *layers) {
-    int curr_row = layer_table->rowCount();
+    /*int curr_row = layer_table->rowCount();
     int curr_col = 0;
 
     QTableWidgetItem *twi_type = new QTableWidgetItem(layer->getContentTypeString());
@@ -106,7 +114,7 @@ void LayerEditor::initLayerTable()
     layer_table->setCellWidget(curr_row, curr_col++, bt_editability);
 
     layer_i++;
-    // TODO fold into addLayerRow()
+    // TODO fold into addLayerRow()*/
   }
 
   // TODO restructure the widget such that the following items are only created
@@ -119,6 +127,20 @@ void LayerEditor::initLayerTable()
 }
 
 
+void LayerEditor::refreshLayerTable()
+{
+  // reload all rows and update with changes, including added/deleted layers
+  // TODO
+}
+
+
+void LayerEditor::clearLayerTable()
+{
+  // delete layer rows and disconnect all signals within the table
+  // TODO
+}
+
+
 void LayerEditor::updateLayerPropFromTable(int row, int column)
 {
   // TODO really need to not hard code layer ID and column position, need some sort of table that translates between readable name and row/col number
@@ -128,9 +150,61 @@ void LayerEditor::updateLayerPropFromTable(int row, int column)
 
 
 // update widget
-void LayerEditor::addLayerRow()
+void LayerEditor::addLayerRow(prim::Layer *layer)
 {
-  // TODO
+  LayerTableRowItems *curr_row_items = new LayerTableRowItems;
+  curr_row_items->layer = layer;
+
+  // items that require signal disconnection at removal
+  curr_row_items->bt_visibility = new QPushButton(QIcon(":/ico/visible.svg"), "", this);
+  curr_row_items->bt_editability = new QPushButton(QIcon(":/ico/editable.svg"), "", this);
+
+  curr_row_items->bt_visibility->setCheckable(true);
+  curr_row_items->bt_visibility->setChecked(layer->isVisible());
+  curr_row_items->bt_editability->setCheckable(true);
+  curr_row_items->bt_editability->setChecked(layer->isActive());
+
+  connect(curr_row_items->bt_visibility, SIGNAL(toggled(bool)), layer, SLOT(visibilityPushButtonChanged(bool)));
+  connect(curr_row_items->bt_editability, SIGNAL(toggled(bool)), layer, SLOT(editabilityPushButtonChanged(bool)));
+
+  // other items
+  curr_row_items->type = new QTableWidgetItem(layer->getContentTypeString());
+  curr_row_items->type->setIcon(layerType2Icon(layer->getContentType()));
+  curr_row_items->type->setToolTip(layer->getContentTypeString());
+  
+  curr_row_items->name = new QTableWidgetItem(layer->getName());
+  curr_row_items->zheight = new QTableWidgetItem(QString::number(layer->getZHeight()));
+
+  // add to table
+  addLayerRow(curr_row_items);
+}
+
+
+void LayerEditor::addLayerRow(LayerTableRowItems *row_items)
+{
+  // add elems to table
+  int curr_row = layer_table->rowCount();
+
+  // TODO use findColumn to find the correct column
+  layer_table->insertRow(curr_row);
+  layer_table->setItem(curr_row, findColumn("Type"), row_items->type);
+  layer_table->setItem(curr_row, findColumn("Name"), row_items->name);
+  layer_table->setItem(curr_row, findColumn("Z-Height"), row_items->zheight);
+
+  layer_table->setCellWidget(curr_row, findColumn("Visibility"), row_items->bt_visibility);
+  layer_table->setCellWidget(curr_row, findColumn("Editability"), row_items->bt_editability);
+}
+
+
+int LayerEditor::findColumn(const QString &header_text)
+{
+  QList<QTableWidgetItem *> match_items = layer_table->findItems(header_text, Qt::MatchExactly);
+  if (match_items.count() > 0) {
+    // Assume the first match contains the header text, since the the header text
+    // does not contain duplicates.
+    return match_items[0]->column();
+  }
+  return -1;
 }
 
 QIcon LayerEditor::layerType2Icon(const prim::Layer::LayerType layer_type)

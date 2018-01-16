@@ -63,7 +63,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * Enumerated layer types
   * Provide enum to QString conversion
   * Also update save, load, export functions as the Enum strings are different from the original names
-  * 
+* Reset layer editor after loading new layout
 * CreateLayer with undo and redo in DesignPanel
 * Add zheight property to layers (including updating functions in DP)
 * LayerEditor
@@ -120,7 +120,8 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 ## Physics Engine
 
 * Interface with solvers (standards for passing DB configuration to them, and taking results back)
-  * Singleton
+  * Reset SimManager after design panel reset
+  * Open new window for showing sim results
   * Custom class containing physical structure
 		* ~~Import size and potential data for electrodes into solver~~
 		* Translate size from Qt units to physical lengths

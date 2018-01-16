@@ -25,32 +25,50 @@ namespace gui{
     LayerEditor(gui::DesignPanel *design_pan, QWidget *parent);
 
     // destructor
-    ~LayerEditor() {};
+    ~LayerEditor();
 
     // GUI items in layer list grid TODO remove if not needed
-    struct layerGridRowItems
+    struct LayerTableRowItems
     {
-      QLabel *label_layer_name;     // layer name
-      QLabel *label_content_type;   // layer content type
-      QLineEdit *le_zheight;        // layer z-height
-      QCheckBox *cb_visibility;     // layer visibility
+      prim::Layer *layer;           // layer that this row corresponds to
+      QTableWidgetItem *name;       // layer name (identifier in *layers)
+      QTableWidgetItem *type;       // layer type
+      QTableWidgetItem *zheight;    // layer z-height
+      QPushButton *bt_visibility;   // layer visibility
+      QPushButton *bt_editability;  // layer editability (layer isActive)
     };
 
     void initLayerTable();
-    void addLayerRow(); // add a row to layer list
+    void refreshLayerTable();
+    void clearLayerTable();
 
   public slots:
     void updateLayerPropFromTable(int row, int column);
 
   private:
     void initLayerEditor();
+
+    // functions for adding / removing layers
+    void addLayerRow(); // wrapper, prompt user for new layer info and add to layer table
+    void addLayerRow(prim::Layer *layer); // wrapper, add a row to layer table with layer pointer
+    void addLayerRow(LayerTableRowItems *row_items); // actually adds the layer
+    void removeLayerRow(prim::Layer *layer);
+
+    // corresponding column number for specified column header
+    int findColumn(const QString &header_text); 
+
+    // return the icon corresponding to a layer type
     QIcon layerType2Icon(const prim::Layer::LayerType);
+
 
     // vars
     gui::DesignPanel *dp;
     QStack<prim::Layer*> *layers;
+    // TODO table column order (mapped with string)
 
     // GUI
+    QList<LayerTableRowItems*> row_items;
+
     QVBoxLayout *layer_list_vl;
     QTableWidget *layer_table;
   };
