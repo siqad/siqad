@@ -362,7 +362,7 @@ void gui::ApplicationGUI::initActions()
   connect(design_pan, &gui::DesignPanel::sig_toolChange,
             this, &gui::ApplicationGUI::setTool);
 
-  layer_editor->initLayerTable();
+  layer_editor->initLayerTable(); // TODO move to appropriate place
 }
 
 

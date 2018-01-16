@@ -52,6 +52,8 @@ void LayerEditor::initLayerEditor()
 
 void LayerEditor::initLayerTable()
 {
+  //clearLayerTable();
+
   qDebug() << "Initializing layer table";
   QStringList table_headers;
   // TODO take enum type instead of this stringlist

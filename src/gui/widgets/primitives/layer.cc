@@ -146,6 +146,7 @@ void prim::Layer::saveLayer(QXmlStreamWriter *stream) const
 
   stream->writeTextElement("name", name);
   stream->writeTextElement("type", getContentTypeString());
+  stream->writeTextElement("zoffset", QString::number(zoffset));
   stream->writeTextElement("zheight", QString::number(zheight));
   stream->writeTextElement("visible", QString::number(visible));
   stream->writeTextElement("active", QString::number(active));
