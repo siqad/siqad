@@ -14,15 +14,31 @@ namespace prim{
   {
   public:
 
-    // constructor
+    // Constructor
     AFMPath(int lay_id, QList<QPointF> nodes, QGraphicsItems *parent=0);
     AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene);
     void initAFMPath(QStack<QPointF>);
 
-    // destructor
+    // Destructor
     ~AFMPath() {};
 
-    // graphics
+    // Nodes
+
+    // insert new node at specified index, or the last index if not specified/out of bound
+    void addNode(QPointF loc, int index=path_nodes.length()) {path_nodes.insert(index, loc);}
+
+    // remove node at indicated index, or the last index if not specified. Error is thrown if out of bound
+    void removeNode(int index=path_nodes.length()-1) {path_nodes.removeAt(index);}
+
+    // create loops between two indices on the list with a loop count, the greater index loops back to the smaller one. reset_counter_post determines whether the loop counter is reset after the end of this loop, in case a future loop causes this loop to be encountered again.
+    void setLoop(int index_a, int index_b, int loop_count, bool reset_counter_post=false);
+
+    // Simulation TODO maybe move simulation code somewhere else
+
+    // unfold path that will be used during simulation
+    QList<QPointF> unfoldedPath(int index_a=0, int index_b=path_nodes.length()-1);
+
+    // Graphics
     virtual QRectF boundingRect() const;
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
 
@@ -50,10 +66,20 @@ namespace prim{
     static qreal seg_width;
 
 
-    // save to file
+    // Save to file
     virtual void saveItems(QXmlStreamWriter *) const;
 
   private:
+
+    // initialize static class variables
+    void parepareStatics();
+
+    // show path config dialog when selected
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
+
+    // change visuals when hovered
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *e) Q_DECL_OVERRIDE;
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *e) Q_DECL_OVERRIDE;
 
     QList<QPointF> path_nodes;
   };

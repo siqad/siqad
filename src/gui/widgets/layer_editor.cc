@@ -66,7 +66,7 @@ void LayerEditor::initLayerTable()
     "" <<  // Visibility
     "";   // Editability
 
-  layer_table->setColumnCount(table_headers.count());
+  layer_table->setColumnCount(table_headers.length());
   layer_table->setHorizontalHeaderLabels(table_headers);
   layer_table->setColumnHidden(static_cast<int>(ID), true);
   layer_table->resizeColumnToContents(static_cast<int>(Visibility)); // reduce width of visibility column
