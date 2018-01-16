@@ -20,7 +20,11 @@ namespace gui{
   class LayerEditor : public QWidget
   {
     Q_OBJECT
+
   public:
+
+    enum LayerEditorColumn{Type, Name, ZHeight, Visibility, Editability};
+    Q_ENUM(LayerEditorColumn)
     // constructor
     LayerEditor(gui::DesignPanel *design_pan, QWidget *parent);
 
@@ -54,9 +58,6 @@ namespace gui{
     void addLayerRow(LayerTableRowItems *row_items); // actually adds the layer
     void removeLayerRow(prim::Layer *layer);
 
-    // corresponding column number for specified column header
-    int findColumn(const QString &header_text); 
-
     // return the icon corresponding to a layer type
     QIcon layerType2Icon(const prim::Layer::LayerType);
 
@@ -67,7 +68,7 @@ namespace gui{
     // TODO table column order (mapped with string)
 
     // GUI
-    QList<LayerTableRowItems*> row_items;
+    QList<LayerTableRowItems*> table_row_items;
 
     QVBoxLayout *layer_list_vl;
     QTableWidget *layer_table;
