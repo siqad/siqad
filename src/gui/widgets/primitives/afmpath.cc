@@ -6,6 +6,9 @@
 //
 // @desc:     Base class for AFM travel path
 
+#ifndef _PRIM_AFMPATH_H_
+#define _PRIM_AFMPATH_H_
+
 #include "afmpath.h"
 
 namespace prim {
@@ -37,10 +40,26 @@ void AFMPath::initAFMPath(QList<QPointF> nodes)
 }
 
 
+void AFMPath::~AFMPath()
+{
+  for (auto node : path_nodes)
+    delete node;
+}
+
+
+void AFMPath::addNode(QPointF new_loc, int index)
+{
+  // make node at new_loc and add to current path
+  // TODO
+}
+
+
 void AFMPath::setLoop(int index_a, int index_b, int loop_count, bool reset_counter_post)
 {
   // The greater index always points back to the smaller one. Each node may only be the
   // starting point of one loop, but they are allowed to be the target of multiple loops.
+
+  // TODO
 }
 
 
@@ -118,3 +137,6 @@ void AFMPath::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 
 
 } // end of prim namespace
+
+
+#endif
