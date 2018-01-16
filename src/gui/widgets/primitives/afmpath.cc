@@ -21,10 +21,10 @@ StateColors AFMPath::seg_bd;
 qreal AFMPath::node_diameter;
 qreal AFMPath::seg_width;
 
-AFMPath::AFMPath(int lay_id, QList<QPointF> nodes, QGraphicsItems *parent=0)
+AFMPath::AFMPath(int lay_id, QList<AFMNode*> nodes, QList<AFMSeg*> segs, QGraphicsItems *parent=0)
   : prim::AFMPath(prim::Item::AFMPath, lay_id, parent)
 {
-  initAFMPath(nodes);
+  initAFMPath(nodes, segs);
 }
 
 AFMPath::AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene)
@@ -33,9 +33,13 @@ AFMPath::AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene)
   // TODO load from file
 }
 
-void AFMPath::initAFMPath(QList<QPointF> nodes)
+void AFMPath::initAFMPath(QList<AFMNode*> nodes, QList<AFMSeg*> segs)
 {
   path_nodes = nodes;
+  path_segs = segs;
+  // TODO check that segments match up with the nodes
+  // TODO ask Jake if there's a better way to store nodes and segments
+
   // TODO init GUI elements related to path
 }
 

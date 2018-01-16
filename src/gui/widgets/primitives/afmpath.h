@@ -21,9 +21,9 @@ namespace prim{
 
     // Constructor
     // TODO consider QList types
-    AFMPath(int lay_id, QList<AFMNode*> nodes, QGraphicsItems *parent=0);
+    AFMPath(int lay_id, QList<AFMNode*> nodes, QList<AFMSeg*> segs, QGraphicsItems *parent=0);
     AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene);
-    void initAFMPath(QList<AFMNode*>);
+    void initAFMPath(QList<AFMNode*>, QList<AFMSeg*>);
 
     // Destructor
     ~AFMPath();
@@ -38,7 +38,7 @@ namespace prim{
     void addNode(QPointF new_loc, int index=path_nodes.length()); // make node at new_loc and add to path
 
     // remove node at indicated index, or the last index if not specified. Error is thrown if out of bound
-    void removeNode(int index=path_nodes.length()-1) {path_nodes.removeAt(index);}
+    void removeNode(int index=path_nodes.length()-1) {path_nodes.removeAt(index);} // TODO have to deal with change in segments
 
     // create loops between two indices on the list with a loop count, the greater index loops back to the smaller one. reset_counter_post determines whether the loop counter is reset after the end of this loop, in case a future loop causes this loop to be encountered again.
     void setLoop(int index_a, int index_b, int loop_count, bool reset_counter_post=false);
@@ -53,27 +53,6 @@ namespace prim{
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
 
     virtual Item *deepCopy() const;
-
-    // params for this path
-    QList<QColor> node_fill_cols; // fill color of each node
-    QList<QColor> node_bd_col;    // border color of each node
-    QList<QColor> seg_fill_col;   // fill color of each segment
-    QList<QColor> seg_bd_col;     // border color of each segment
-
-    // static params for painting
-    struct StateColors
-    {
-      QColor def;
-      QColor hovered;
-      QColor sel;
-    };
-    static StateColors node_fill;
-    static StateColors node_bd;
-    static StateColors seg_fill;
-    static StateColors seg_bd;
-
-    static qreal node_diameter;
-    static qreal seg_width;
 
 
   private:
@@ -91,6 +70,7 @@ namespace prim{
 
     // VARS
     QList<AFMNode*> path_nodes;
+    QList<AFMSeg*> path_segs;
   };
 
 }
