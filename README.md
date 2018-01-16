@@ -63,6 +63,11 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * Enumerated layer types
   * Provide enum to QString conversion
   * Also update save, load, export functions as the Enum strings are different from the original names
+* AFM
+  * Path primitive object with snap to DB capabilities
+  * Constant speed / acceleration profile / etc.
+    * Real time info of timing, etc.
+  * Side view of AFM path allowing height adjustment and height movement profile, pop-up window when clicked on a segment
 * Reset layer editor after loading new layout
 * CreateLayer with undo and redo in DesignPanel
 * Add zheight property to layers (including updating functions in DP)
