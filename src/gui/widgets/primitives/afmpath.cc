@@ -6,25 +6,14 @@
 //
 // @desc:     Base class for AFM travel path
 
-#ifndef _PRIM_AFMPATH_H_
-#define _PRIM_AFMPATH_H_
-
 #include "afmpath.h"
 
 namespace prim {
 
-StateColors AFMPath::node_fill;
-StateColors AFMPath::node_bd;
-StateColors AFMPath::seg_fill;
-StateColors AFMPath::seg_bd;
-
-qreal AFMPath::node_diameter;
-qreal AFMPath::seg_width;
-
-AFMPath::AFMPath(int lay_id, QList<AFMNode*> nodes, QList<AFMSeg*> segs, QGraphicsItems *parent=0)
-  : prim::AFMPath(prim::Item::AFMPath, lay_id, parent)
+AFMPath::AFMPath(int lay_id, QList<prim::AFMNode*> nodes, QList<prim::AFMSeg*> segs)
+  : prim::Item(prim::Item::AFMPath)
 {
-  initAFMPath(nodes, segs);
+  initAFMPath(lay_id, nodes, segs);
 }
 
 AFMPath::AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene)
@@ -33,8 +22,9 @@ AFMPath::AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene)
   // TODO load from file
 }
 
-void AFMPath::initAFMPath(QList<AFMNode*> nodes, QList<AFMSeg*> segs)
+void AFMPath::initAFMPath(int lay_id, QList<prim::AFMNode*> nodes, QList<prim::AFMSeg*> segs)
 {
+  layer_id = lay_id;
   path_nodes = nodes;
   path_segs = segs;
   // TODO check that segments match up with the nodes
@@ -44,24 +34,85 @@ void AFMPath::initAFMPath(QList<AFMNode*> nodes, QList<AFMSeg*> segs)
 }
 
 
-void AFMPath::~AFMPath()
+AFMPath::~AFMPath()
 {
   for (auto node : path_nodes)
     delete node;
 }
 
 
-void AFMPath::addNode(QPointF new_loc, int index)
+// Save to XML
+void AFMPath::saveItems(QXmlStreamWriter *) const
 {
-  // make node at new_loc and add to current path
-  // TODO
+  // TODO save included afmnodes and afmsegs
+  // TODO save path properties like speed, loop
+}
+
+void AFMPath::insertNode(QPointF new_loc, int index, float z_offset)
+{
+  if (z_offset == 0)
+    z_offset = getNode(index-1)->getZOffset();
+
+  insertNode(new prim::AFMNode(layer_id, new_loc, z_offset), index);
 }
 
 
-void AFMPath::setLoop(int index_a, int index_b, int loop_count, bool reset_counter_post)
+void AFMPath::insertNode(prim::AFMNode *new_node, int index)
 {
-  // The greater index always points back to the smaller one. Each node may only be the
-  // starting point of one loop, but they are allowed to be the target of multiple loops.
+  int last_index = path_segs.length()-1;
+
+  // insert the node to node list
+  path_nodes.insert(index, new_node);
+
+  // reconnect preceding segment to this node
+  if (index != 0)
+    getSegment(index-1)->setDestination(getNode(index));
+
+  // create new segment connecting this node to the next
+  if (index != last_index)
+    insertSegment(index);
+}
+
+
+void AFMPath::removeNode(int index)
+{
+  int last_index = path_nodes.length()-1;
+
+  // take the node out of nodes list
+  prim::AFMNode *rm_node = path_nodes.takeAt(index);
+  delete rm_node;
+
+  // remove segments associated with that node
+  if (index == 0) {
+    removeSegment(index);
+  } else if (index == last_index) {
+    removeSegment(last_index-1);
+  } else {
+    removeSegment(index);
+    // reconnect segment to new neighboring node
+    getSegment(index-1)->setDestination(getNode(index));
+  }
+}
+
+
+void AFMPath::insertSegment(int index)
+{
+  path_segs.insert(index, new prim::AFMSeg(layer_id, getNode(index), getNode(index+1)));
+}
+
+
+void AFMPath::removeSegment(int index)
+{
+  prim::AFMSeg *rm_seg = path_segs.takeAt(index);
+  delete rm_seg;
+}
+
+
+void AFMPath::setLoop(bool loop_state)
+{
+  // Check if the first node and the end node are at the same location. If yes,
+  // create the loop. If not, prompt the user whether they want a node to be
+  // automatically added at the end.
 
   // TODO
 }
@@ -73,7 +124,7 @@ QRectF AFMPath::boundingRect() const
 }
 
 
-QList<QPointF> unfoldedPath(int index_a, int index_b)
+QList<QPointF> AFMPath::unfoldedPath()
 {
 
 }
@@ -84,14 +135,18 @@ void AFMPath::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget
 
 }
 
-Item *AFMPath::deepCopy() const
+/*Item *AFMPath::deepCopy() const
 {
-  AFMPath *cp = new AFMPath(layer_id, path_nodes); // TODO might be missing stuff
+  TODO look into aggregate's deep copy to figure out how this should be implemented.
+     Keep in mind that when pasting, all off the path_nodes and path_segs have to take
+     the new location, electrode code might have that implemented.
+  AFMPath *cp = new AFMPath(layer_id, path_nodes, path_segs);
   cp->setPos(pos());
   return cp;
-}
+}*/
 
 
+/* could be reused in afmnode and afmseg
 void AFMPath::prepareStatics()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
@@ -114,7 +169,7 @@ void AFMPath::prepareStatics()
   seg_bd.hovered = gui_settings->get<QColor>("afmpath/seg_bd_col_hovered");
   seg_bd.sel = gui_settings->get<QColor>("afmpath/seg_bd_col_sel");
 
-}
+}*/
 
 
 void AFMPath::mousePressEvent(QGraphicsSceneMouseEvent *e)
@@ -125,22 +180,4 @@ void AFMPath::mousePressEvent(QGraphicsSceneMouseEvent *e)
 }
 
 
-void AFMPath::hoverEnterEvent(QGraphicsSceneHoverEvent *)
-{
-  setHovered(true);
-  update();
-}
-
-
-void AFMPath::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
-{
-  setHovered(false);
-  update();
-}
-
-
-
 } // end of prim namespace
-
-
-#endif

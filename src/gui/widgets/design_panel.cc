@@ -383,6 +383,9 @@ void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
       setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
       break;
+    case gui::DesignPanel::AFMPathTool:
+      setInteractive(true); // TODO check back later that this is the right mode
+      break;
     default:
       qCritical() << tr("Invalid ToolType... should not have happened");
       return;

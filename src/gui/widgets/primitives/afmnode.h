@@ -6,6 +6,9 @@
 //
 // @desc:     Node in AFM travel path
 
+#ifndef _PRIM_AFMNODE_H_
+#define _PRIM_AFMNODE_H_
+
 #include "item.h"
 
 namespace prim{
@@ -15,9 +18,9 @@ namespace prim{
   public:
 
     // Constructor
-    AFMNode(int lay_id, QPointF loc, float z_offset, QGraphicsItems *parent=0);
+    AFMNode(int lay_id, QPointF physloc, float z_offset);
     AFMNode(QXmlStreamReader *rs, QGraphicsScene *scene);
-    void init AFMNode(int lay_id, float z_offset, QPointF loc);
+    void initAFMNode(int lay_id, QPointF loc, float z_offset);
 
     // Destructor
     ~AFMNode() {};
@@ -29,7 +32,9 @@ namespace prim{
     // Node manipulation
 
     // change node location
-    void setLocation(QPointF new_loc); // TODO maybe also allow dragging
+    void setPhysLoc(QPointF new_loc) {phys_loc = new_loc;}
+
+    QPointF getPhysLoc() {return phys_loc;}
 
     // change node zoffset (relative to surface) if it is within bounds of the layer
     void setZOffset(float z_offset);
@@ -66,12 +71,16 @@ namespace prim{
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
     // change visuals when hovered
-    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *e) Q_DECL_OVERRIDE;
-    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *e) Q_DECL_OVERRIDE;
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *) Q_DECL_OVERRIDE;
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *) Q_DECL_OVERRIDE;
 
 
     // VARS
+    QPointF phys_loc;   // physical location in angstrom
     float zoffset;
   };
 
 } // end of prim namespace
+
+
+#endif

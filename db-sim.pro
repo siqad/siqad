@@ -59,7 +59,10 @@ HEADERS += \
 	src/gui/widgets/primitives/lattice.h \
   	src/gui/widgets/primitives/sim_engine.h \
   	src/gui/widgets/primitives/sim_job.h \
-	src/gui/widgets/primitives/electrode.h
+	src/gui/widgets/primitives/electrode.h \
+    src/gui/widgets/primitives/afmpath.h \
+    src/gui/widgets/primitives/afmnode.h \
+    src/gui/widgets/primitives/afmseg.h
 
 SOURCES += \
 	src/gui/widgets/primitives/emitter.cc \
@@ -72,7 +75,10 @@ SOURCES += \
 	src/gui/widgets/primitives/lattice.cc \
   	src/gui/widgets/primitives/sim_engine.cc \
   	src/gui/widgets/primitives/sim_job.cc \
-	src/gui/widgets/primitives/electrode.cc
+	src/gui/widgets/primitives/electrode.cc \
+	src/gui/widgets/primitives/afmpath.cc \
+	src/gui/widgets/primitives/afmnode.cc \
+	src/gui/widgets/primitives/afmseg.cc
 
 # widgets
 

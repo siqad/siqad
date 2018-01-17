@@ -19,9 +19,9 @@ namespace prim{
   public:
 
     // Constructor
-    AFMSeg(int lay_id, AFMNode *node_from, AFMNode *node_to, QGraphicsItems *parent=0);
+    AFMSeg(int lay_id, prim::AFMNode *orig_node, prim::AFMNode *dest_node);
     AFMSeg(QXmlStreamReader *rs, QGraphicsScene *scene);
-    void init AFMSeg(int lay_id, AFMNode *node_from, AFMNode *node_to);
+    void initAFMSeg(int lay_id, prim::AFMNode *orig_node, prim::AFMNode *dest_node);
 
     // Destructor
     ~AFMSeg() {};
@@ -32,16 +32,16 @@ namespace prim{
 
     // Segment manipulation
 
-    // change segment speed
-    void setSpeed(float new_speed) {};
-
-    // change segment travel profile
-    void setTravelProfile() {}; // TODO not sure what input param to take yet, maybe enum?
+    // change/get segment origin / target
+    void setOrigin(prim::AFMNode *orig_node) {origin_node = orig_node;}
+    void setDestination(prim::AFMNode *dest_node) {destination_node = dest_node;}
+    prim::AFMNode* getOrigin() {return origin_node;}
+    prim::AFMNode* getDestination() {return destination_node;}
 
 
     // Graphics
     virtual QRectF boundingRect() const;
-    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWiget*);
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget*);
 
     virtual Item *deepCopy() const;
 
@@ -73,8 +73,8 @@ namespace prim{
 
 
     // VARS
-    float speed;
-    // TODO travel profile, maybe enum?
+    prim::AFMNode *origin_node;
+    prim::AFMNode *destination_node;
   };
 
 } // end of prim namespace

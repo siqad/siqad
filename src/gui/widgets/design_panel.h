@@ -31,7 +31,7 @@ namespace gui{
 
   public:
 
-    enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool, ElectrodeTool};
+    enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool, ElectrodeTool, AFMPathTool};
     enum DisplayMode{DesignMode, SimDisplayMode};
 
     class UndoCommand;

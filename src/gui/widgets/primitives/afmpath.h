@@ -21,9 +21,9 @@ namespace prim{
 
     // Constructor
     // TODO consider QList types
-    AFMPath(int lay_id, QList<AFMNode*> nodes, QList<AFMSeg*> segs, QGraphicsItems *parent=0);
+    AFMPath(int lay_id, QList<prim::AFMNode*> nodes, QList<prim::AFMSeg*> segs);
     AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene);
-    void initAFMPath(QList<AFMNode*>, QList<AFMSeg*>);
+    void initAFMPath(int lay_id, QList<prim::AFMNode*>, QList<prim::AFMSeg*>);
 
     // Destructor
     ~AFMPath();
@@ -33,44 +33,52 @@ namespace prim{
 
     // Nodes
 
-    // insert new node at specified index, or the last index if not specified/out of bound
-    void addNode(AFMNode *new_node, int index=path_nodes.length()) {path_nodes.insert(index, new_node);}
-    void addNode(QPointF new_loc, int index=path_nodes.length()); // make node at new_loc and add to path
+    // insert new node at specified index
+    void insertNode(QPointF new_loc, int index, float z_offset=0); // make node at new_loc and add to path
+    void insertNode(prim::AFMNode *new_node, int index);
+    void appendNode(QPointF new_loc, float z_offset=0) {insertNode(new_loc, z_offset, path_nodes.length());}
+    void appendNode(prim::AFMNode *new_node) {insertNode(new_node, path_nodes.length());}
 
-    // remove node at indicated index, or the last index if not specified. Error is thrown if out of bound
-    void removeNode(int index=path_nodes.length()-1) {path_nodes.removeAt(index);} // TODO have to deal with change in segments
+    // remove node at indicated index
+    void removeNode(int index);
 
-    // create loops between two indices on the list with a loop count, the greater index loops back to the smaller one. reset_counter_post determines whether the loop counter is reset after the end of this loop, in case a future loop causes this loop to be encountered again.
-    void setLoop(int index_a, int index_b, int loop_count, bool reset_counter_post=false);
+    // get node at index
+    prim::AFMNode *getNode(int index) {return path_nodes.at(index);}
+
+    // insert segment to index position with path_node[index] as origin and 
+    // path_node[index+1] as destination
+    void insertSegment(int index);
+
+    // remove segment at index, doesn't do anything else
+    void removeSegment(int index);
+
+    // get segment at index, or the last index if not specified
+    prim::AFMSeg *getSegment(int index) {return path_segs.at(index);}
+
+    // create loop between the nodes at first and last indices, they must be at the same physical location
+    void setLoop(bool loop_state);
 
     // Simulation TODO maybe move simulation code somewhere else
 
     // unfold path that will be used during simulation
-    QList<QPointF> unfoldedPath(int index_a=0, int index_b=path_nodes.length()-1);
+    QList<QPointF> unfoldedPath();
 
     // Graphics
     virtual QRectF boundingRect() const; // conform to segment shapes
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
 
-    virtual Item *deepCopy() const;
+    // TODO virtual Item *deepCopy() const;
 
 
   private:
 
-    // initialise static class variables
-    void parepareStatics();
-
     // show path config dialog when selected
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
-    // change visuals when hovered
-    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *e) Q_DECL_OVERRIDE;
-    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *e) Q_DECL_OVERRIDE;
-    
 
     // VARS
-    QList<AFMNode*> path_nodes;
-    QList<AFMSeg*> path_segs;
+    QList<prim::AFMNode*> path_nodes;
+    QList<prim::AFMSeg*> path_segs;
   };
 
 }
