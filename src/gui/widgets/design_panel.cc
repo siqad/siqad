@@ -689,17 +689,22 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   clicked = true;
   switch(e->button()){
     case Qt::LeftButton:
-      if(tool_type == SelectTool || tool_type == DBGenTool || tool_type == ElectrodeTool){
+      if (tool_type == SelectTool || tool_type == DBGenTool || tool_type == ElectrodeTool) {
         // rubber band variables
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
         // save current selection if Shift is pressed
-        if(keymods & Qt::ShiftModifier)
+        if(keymods & Qt::ShiftModifier) {
           rb_shift_selected = scene->selectedItems();
-        else
+        } else {
           QGraphicsView::mousePressEvent(e);
-      }
-      else{
+        }
+      } else if (tool_type == AFMPathTool) {
+        // show beginning AFM path node at cursor position
+
+        // if ctrl is held, plop down beginning point exactly at mouse pos
+        // TODO
+      } else {
         QGraphicsView::mousePressEvent(e);
       }
       break;
@@ -727,7 +732,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
   QScrollBar *hsb = horizontalScrollBar();
   qreal dx, dy;
 
-  if(ghosting){
+  if (ghosting) {
     // update snap
     QPointF scene_pos = mapToScene(e->pos());
     QPointF offset;
@@ -740,13 +745,17 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     QPointF scene_pos = mapToScene(e->pos());
     snapDB(scene_pos);
   }*/
-  else if(clicked){
+  else if (clicked) {
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
       case Qt::LeftButton:
-        if(clicked && (tool_type == SelectTool || tool_type == DBGenTool || tool_type == ElectrodeTool))
+        if (clicked && (tool_type == SelectTool || tool_type == DBGenTool 
+              || tool_type == ElectrodeTool)) {
           rubberBandUpdate(e->pos());
-
+        } else if (clicked && tool_type == AFMPathTool) {
+          // call AFMPath update function, keep 
+          // TODO AFM
+        }
         // use default behaviour for left mouse button
         QGraphicsView::mouseMoveEvent(e);
         break;
