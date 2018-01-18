@@ -25,9 +25,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.0000001"
-     inkscape:cx="-9.7196331"
-     inkscape:cy="59.580488"
+     inkscape:zoom="0.70710682"
+     inkscape:cx="-399.59299"
+     inkscape:cy="-291.11914"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -36,10 +36,10 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="1912"
-     inkscape:window-height="1002"
-     inkscape:window-x="0"
-     inkscape:window-y="74"
+     inkscape:window-width="1906"
+     inkscape:window-height="2043"
+     inkscape:window-x="3840"
+     inkscape:window-y="110"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -87,13 +87,13 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.99999905px;line-height:1.25;font-family:'Ubuntu Mono';-inkscape-font-specification:'Ubuntu Mono';letter-spacing:0px;word-spacing:0px;fill:#4d4d4d;fill-opacity:1;stroke:none;stroke-width:0.93749994"
-       x="184.81383"
-       y="200.03105"
+       x="198.87633"
+       y="211.28105"
        id="text4514-5"><tspan
          sodipodi:role="line"
          id="tspan4512-1"
-         x="184.81383"
-         y="200.03105"
+         x="198.87633"
+         y="211.28105"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:70px;font-family:monospace;-inkscape-font-specification:'monospace Bold';fill:#ffffff;fill-opacity:1;stroke-width:0.93749994">_</tspan></text>
   </g>
 </svg>
