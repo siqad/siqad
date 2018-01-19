@@ -706,7 +706,15 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
           QGraphicsView::mousePressEvent(e);
         }
       } else if (tool_type == AFMPathTool) {
-        // do nothing
+        // if there's already a focused path and node, insert new node behind focused node
+        AFMPth *focused_afm_path = afm_manager->getFocusedPath();
+        if (focused_afm_path) {
+          // insert new node behind focused node (or back of path if no focused node)
+          afm_manager->
+        } else {
+          // create new path and make it focused
+          // TODO
+        }
       } else {
         QGraphicsView::mousePressEvent(e);
       }

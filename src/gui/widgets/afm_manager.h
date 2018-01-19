@@ -26,22 +26,26 @@ namespace gui{
     ~AFMManager() {};
 
 
-    // path being displayed in the panel
-    void setAFMPathShowing(AFMPath *path_sh) {path_showing = path_sh;}
-    AFMPath *getAFMPathShowing() {return path_showing;}
+    // focused path (either showing properties or editing)
+    void setFocusedPath(AFMPath *path_fo) {path_focused = path_fo;}
+    void unsetFocusedPath() {path_focused = 0;} // TODO call this when not making path
+    AFMPath *getFocusedPath() {return path_focused;}
 
-    // path being edited
-    void setAFMPathEditing(AFMPath *path_ed) {path_editing = path_ed;}
-    AFMPath *getAFMPathEditing() {return path_editing;}
+    // focused node (either showing properties or editing)
+    void setFocusedNode(AFMNode *node_fo) {node_focused = node_fo;}
+    void unsetFocusedNode() {node_focused = 0;} // TODO call this when not making path
+    AFMNode *getFocusedNode() {return node_focused;}
 
-  public slots:
-    void 
+  public slot:
+
+    // TODO connect to DesignPanel's sig_toolChange, call unsetFocusedPath and
+    // unsetFocusedNode when the tool is changed to anything but AFM
 
   private:
 
     // VAR
-    AFMPath *path_showing;
-    AFMPath *path_editing;
+    AFMPath *path_focused;
+    AFMNode *node_focused;
 
 
   };
