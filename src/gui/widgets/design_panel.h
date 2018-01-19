@@ -165,6 +165,7 @@ namespace gui{
     QStack<prim::Layer*> layers;  // stack of all layers, order immutable
     prim::Layer *top_layer;       // new items added to this layer
     prim::Layer *electrode_layer; // add electrodes to this layer
+    prim::Layer *afm_layer;       // add afm paths to this layer TODO request layers from Layer Manager instead of keeping pointers like these
 
     // flags, change later to bit flags
     bool clicked;   // mouse left button is clicked
@@ -258,6 +259,11 @@ namespace gui{
     void createDBs();
 
     void createElectrodes(QPoint point1);
+
+    // create AFM node in given path
+    void createAFMNode();
+    // TODO create node in current path
+    // TODO make AFMNode/Path actions undoable
 
     // delete all selected items
     void deleteSelection();

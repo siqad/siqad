@@ -10,7 +10,16 @@
 
 namespace prim{
 
-// TODO static stuff
+// Initialise statics
+QColor AFMNode::fill_col_default;
+QColor AFMNode::fill_col_hovered;
+QColor AFMNode::fill_col_sel;
+QColor AFMNode::bd_col_default;
+QColor AFMNode::bd_col_hovered;
+QColor AFMNode::bd_col_sel;
+
+qreal AFMNode::diameter = -1;
+qreal AFMNode::edge_width = -1;
 
 // constructors
 AFMNode::AFMNode(int lay_id, QPointF physloc, float z_offset)
@@ -28,9 +37,17 @@ AFMNode::AFMNode(QXmlStreamReader *rs, QGraphicsScene *scene)
 
 void AFMNode::initAFMNode(int lay_id, QPointF physloc, float z_offset)
 {
+  // initialise static variables if not already
+  if (diameter < 0)
+    prepareStatics();
+
   layer_id = lay_id;
   setZOffset(z_offset);
   setPhysLoc(physloc);
+
+  setAcceptHoverEvents(true);
+
+  setPos(physloc); // TODO scale_factor
 }
 
 
@@ -55,17 +72,35 @@ void AFMNode::setZOffset(float z_offset)
 // Graphics
 QRectF AFMNode::boundingRect() const
 {
-
+  qreal width = diameter+edge_width;
+  return QRectF(-.5*width, -.5*width, width, width);
 }
 
 void AFMNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+  if (select_mode && upSelected()) {
+    fill_col = fill_col_sel;
+    bd_col = bd_col_sel;
+  } else if (isHovered()) {
+    fill_col = fill_col_hovered;
+    bd_col = bd_col_hovered;
+  } else {
+    fill_col = fill_col_default;
+    bd_col = bd_col_default;
+  }
 
+  QRectF rect = boundingRect();
+  qreal dxy = .5*edge_width;
+  rect.adjust(dxy,dxy,-dxy,-dxy);
+  
+  painter->setPen(Qt::NoPen);
+  painter->setBrush(fill_col);
+  painter->drawEllipse(rect);
 }
 
 Item *AFMNode::deepCopy() const
 {
-
+  // TODO
 }
 
 
@@ -73,7 +108,17 @@ Item *AFMNode::deepCopy() const
 
 void AFMNode::prepareStatics()
 {
-  // TODO prepare static vars
+  // Initialize statics
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+
+  fill_col_default = gui_settings->get<QColor>("afmnode/fill_col_default");
+  fill_col_hovered = gui_settings->get<QColor>("afmnode/fill_col_hovered");
+  fill_col_sel = gui_settings->get<QColor>("afmnode/fill_col_sel");
+  bd_col_default = gui_settings->get<QColor>("afmnode/bd_col_default");
+  bd_col_hovered = gui_settings->get<QColor>("afmnode/bd_col_hovered");
+  bd_col_sel = gui_settings->get<QColor>("afmnode/bd_col_sel");
+  diameter = gui_settings->get<qreal>("afmnode/diameter")*scale_factor;
+  edge_width = gui_settings->get<qreal>("afmnode/edge_width")*diameter;
 }
 
 
@@ -87,14 +132,12 @@ void AFMNode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 
 void AFMNode::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
-  qDebug() << QObject::tr("AFMNode  has seen the hoverEnterEvent");
   setHovered(true);
   update();
 }
 
 void AFMNode::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
-  qDebug() << QObject::tr("AFMNode has seen the hoverLeaveEvent");
   setHovered(false);
   update();
 }

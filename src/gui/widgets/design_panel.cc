@@ -326,13 +326,19 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   // add the lattice to the layers, as layer 0
   layers.append(lattice);
 
+  // TODO transfer all the hard-coded layer potitions to actual functions in LayerManager
+
   // add in the dangling bond surface
   addLayer(tr("Surface"),prim::Layer::DB,0,0);
   top_layer = layers.at(1);
 
   // add in the metal layer for electrodes
-  addLayer(tr("Metal"),prim::Layer::Electrode,-1E-7,0);
+  addLayer(tr("Metal"),prim::Layer::Electrode,-100E-9,0);
   electrode_layer = layers.at(2);
+
+  // add in the AFM layer for AFM tip travel paths
+  addLayer(tr("AFM"), prim::Layer::AFMTip,500E-12,50E-12);
+  afm_layer = layers.at(3);
 
 }
 
@@ -700,10 +706,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
           QGraphicsView::mousePressEvent(e);
         }
       } else if (tool_type == AFMPathTool) {
-        // show beginning AFM path node at cursor position
-
-        // if ctrl is held, plop down beginning point exactly at mouse pos
-        // TODO
+        // do nothing
       } else {
         QGraphicsView::mousePressEvent(e);
       }
@@ -725,6 +728,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 // the middle mouse button to always pan and right click for context menus.
 void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
+  Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
 
   QPoint mouse_pos_del;
   //QTransform trans = transform();
@@ -745,16 +749,25 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     QPointF scene_pos = mapToScene(e->pos());
     snapDB(scene_pos);
   }*/
-  else if (clicked) {
+  else if (tool_type == AFMPathTool) {
+    // snap to the nearest possible location unless ctrl is held
+    if (keymods & Qt::ControlModifier) {
+      // node appears where cursor is
+      // TODO some var that stores the location of the node
+      // TODO AFM
+    } else {
+      // node appears at the nearest latdot / dbdot
+      // TODO some var that stores the location of the node
+      // TODO AFM
+      snap_cache = mapToScene(e->pos());
+    }
+  } else if (clicked) {
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
       case Qt::LeftButton:
         if (clicked && (tool_type == SelectTool || tool_type == DBGenTool 
               || tool_type == ElectrodeTool)) {
           rubberBandUpdate(e->pos());
-        } else if (clicked && tool_type == AFMPathTool) {
-          // call AFMPath update function, keep 
-          // TODO AFM
         }
         // use default behaviour for left mouse button
         QGraphicsView::mouseMoveEvent(e);
@@ -790,22 +803,19 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
   QTransform trans = transform();
 
   // end rubber band if active
-  if(rb)
+  if (rb)
     rubberBandEnd();
 
   // case specific behaviour
-  if(ghosting){
+  if (ghosting) {
     // plant ghost and end ghosting
-    if(moving)
-    {
+    if (moving)
       moveToGhost();
-    }
-    else{
+    else
       pasteAtGhost();
-    }
     clearGhost();
   }
-  else if(clicked){
+  else if (clicked) {
     switch(e->button()){
       case Qt::LeftButton:
         // action based on chosen tool
@@ -820,9 +830,17 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             createDBs();
             break;
           case gui::DesignPanel::ElectrodeTool:
-            //get start and end locations, and create the electrode.
+            // get start and end locations, and create the electrode.
             filterSelection(false);
             createElectrodes(e->pos());
+            break;
+          case gui::DesignPanel::AFMPathTool:
+            // for now, just make nodes to make something show on the screen
+            createAFMNode();
+            // TODO Actual implementation that takes into account whether there's
+            // already an existing path being worked on, or if a new path should be
+            // created. Also, decide whether to put these determination code in AFM
+            // Manager (to be created) or let design panel do the work.
             break;
           case gui::DesignPanel::DragTool:
             // pan ends
@@ -1858,6 +1876,17 @@ void gui::DesignPanel::createElectrodes(QPoint point1)
   undo_stack->beginMacro(tr("create electrode with given corners"));
   undo_stack->push(new CreateElectrode(layer_index, this, mapToScene(point1).toPoint(), point2));
   undo_stack->endMacro();
+}
+
+void gui::DesignPanel::createAFMNode()
+{
+  qDebug() << "entered createAFMNode";
+  QPointF loc = snap_cache; // create node at cached mouse position
+  //int layer_index = layer_manager->getMruLayer(prim::LayerManager::AFMPath); // TODO implement something like this in Layer Manager in the future
+  int layer_index = layers.indexOf(afm_layer);
+  // TODO make the following UNDOable
+  addItem(new prim::AFMNode(layer_index, loc, afm_layer->getZOffset()), layer_index);
+  // TODO AFMNode is supposed to take physloc, account for that later
 }
 
 void gui::DesignPanel::deleteSelection()

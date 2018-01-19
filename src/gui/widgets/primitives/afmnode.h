@@ -59,7 +59,8 @@ namespace prim{
     static QColor bd_col_hovered;
     static QColor bd_col_sel;
 
-    static qreal node_diameter;
+    static qreal diameter;
+    static qreal edge_width;
 
 
   private:

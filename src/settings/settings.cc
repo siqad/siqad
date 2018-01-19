@@ -182,9 +182,19 @@ QSettings* settings::GUISettings::m_defs()
 
   // electrode parameters
   S->setValue("electrode/edge_width", .05);                   // edge width of box lines
-  S->setValue("electrode/edge_col", QColor(60,60,60));     // edge color
+  S->setValue("electrode/edge_col", QColor(60,60,60));        // edge color
   S->setValue("electrode/fill_col", QColor(100,100,100));     // fill color
   S->setValue("electrode/selected_col", QColor(0, 100, 255)); // edge color, selected
+
+  // afm parameters
+  S->setValue("afmnode/fill_col_default", QColor(0, 90, 255, 160));   // default fill color
+  S->setValue("afmnode/fill_col_hovered", QColor(0, 170, 255, 160));  // hovered fill color
+  S->setValue("afmnode/fill_col_sel", QColor(130, 90, 255, 160));     // selected fill color
+  S->setValue("afmnode/bd_col_default", QColor(255, 255, 255, 160));  // default border color
+  S->setValue("afmnode/bd_col_hovered", QColor(255, 255, 255, 160));  // hovered border color
+  S->setValue("afmnode/bd_col_sel", QColor(255, 255, 255, 160));      // selected border color
+  S->setValue("afmnode/diameter", 2);     // node diameter
+  S->setValue("afmnode/edge_width", .2);  // node edge width
 
   return S;
 }
