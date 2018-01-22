@@ -7,6 +7,8 @@
 // @desc:     SimVisualize classes
 
 #include "sim_visualize_panel.h"
+#include "../../qcustomplot.h"
+#include <QPixmap>
 
 
 namespace gui{
@@ -17,7 +19,6 @@ SimVisualize::SimVisualize(SimManager *sim_man, QWidget *parent)
 {
   initSimVisualize();
 }
-
 
 
 bool SimVisualize::setManager(SimManager *sim_man)
@@ -48,7 +49,6 @@ bool SimVisualize::showJob(prim::SimJob *job)
   return true;
 }
 
-
 void SimVisualize::showJobTerminalOutput()
 {
   if(!show_job){
@@ -58,7 +58,7 @@ void SimVisualize::showJobTerminalOutput()
 
   // main widget for the terminal output window
   QWidget *w_job_term = new QWidget(this, Qt::Dialog);
-  
+
   QPlainTextEdit *te_term_output = new QPlainTextEdit;
   te_term_output->appendPlainText(show_job->terminalOutput());
   QPushButton *button_save_term_out = new QPushButton(tr("Save"));
@@ -82,8 +82,68 @@ void SimVisualize::showJobTerminalOutput()
   // pop-up widget
   w_job_term->setWindowTitle(tr("%1 Terminal Output").arg(show_job->name()));
   w_job_term->setLayout(job_term_vl);
-  
+
   w_job_term->show();
+}
+
+void SimVisualize::openPoisResult()
+{
+  QWidget *window = new QWidget;
+  window->resize(750, 750);
+  QHBoxLayout *layout = new QHBoxLayout;
+  QCustomPlot *customPlot = new QCustomPlot();
+  // configure axis rect:
+  customPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom); // this will also allow rescaling the color scale by dragging/zooming
+  customPlot->axisRect()->setupFullAxesBox(true);
+  customPlot->xAxis->setLabel("x");
+  customPlot->yAxis->setLabel("y");
+
+  // set up the QCPColorMap:
+  QCPColorMap *colorMap = new QCPColorMap(customPlot->xAxis, customPlot->yAxis);
+  // number of points in x and y direction
+  int nx = 200;
+  int ny = 200;
+  colorMap->data()->setSize(nx, ny);
+  // coordinate range for x and y
+  colorMap->data()->setRange(QCPRange(-4, 4), QCPRange(-4, 4));
+
+  // now we assign some data, by accessing the QCPColorMapData instance of the color map:
+  double x, y, z;
+  for (int xIndex=0; xIndex<nx; ++xIndex)
+  {
+    for (int yIndex=0; yIndex<ny; ++yIndex)
+    {
+      colorMap->data()->cellToCoord(xIndex, yIndex, &x, &y);
+      double r = 3*qSqrt(x*x+y*y)+1e-2;
+      z = 2*x*(qCos(r+2)/r-qSin(r+2)/r); // the B field strength of dipole radiation (modulo physical constants)
+      colorMap->data()->setCell(xIndex, yIndex, z);
+    }
+  }
+
+  // add a color scale:
+  QCPColorScale *colorScale = new QCPColorScale(customPlot);
+  customPlot->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
+  colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
+  colorMap->setColorScale(colorScale); // associate the color map with the color scale
+  colorScale->axis()->setLabel("Magnetic Field Strength");
+
+  // set the color gradient of the color map to one of the presets:
+  colorMap->setGradient(QCPColorGradient::gpPolar);
+
+  // rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
+  colorMap->rescaleDataRange();
+
+  // make sure the axis rect and color scale synchronize their bottom and top margins (so they line up):
+  QCPMarginGroup *marginGroup = new QCPMarginGroup(customPlot);
+  customPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+  colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+
+  // rescale the key (x) and value (y) axes so the whole color map is visible:
+  customPlot->rescaleAxes();
+
+  layout->addWidget(customPlot); //customPlot doubles as a widget
+  window->setLayout(layout);
+  window->show();
 }
 
 
@@ -155,7 +215,7 @@ void SimVisualize::updateOptions()
 
     // elec dist selection
     updateElecDistOptions();
-    
+
     // group box result filter
       // energies
       // # elecs
@@ -186,6 +246,7 @@ void SimVisualize::initSimVisualize()
   text_job_end_time = new QLabel;
 
   button_show_term_out = new QPushButton("Show Terminal Output");
+  button_open_window = new QPushButton("Open Window");
 
   text_job_engine->setAlignment(Qt::AlignRight);
   text_job_start_time->setAlignment(Qt::AlignRight);
@@ -215,6 +276,7 @@ void SimVisualize::initSimVisualize()
   job_info_layout->addLayout(job_start_time_hl);
   job_info_layout->addLayout(job_end_time_hl);
   job_info_layout->addWidget(button_show_term_out);
+  job_info_layout->addWidget(button_open_window);
   job_info_group->setLayout(job_info_layout);
 
   // Elec Distribution Group
@@ -247,6 +309,7 @@ void SimVisualize::initSimVisualize()
 
   // signal connection
   connect(button_show_term_out, &QAbstractButton::clicked, this, &gui::SimVisualize::showJobTerminalOutput);
+  connect(button_open_window, &QAbstractButton::clicked, this, &gui::SimVisualize::openPoisResult);
   connect(combo_job_sel, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &gui::SimVisualize::jobSelUpdate);
   connect(slider_dist_sel, static_cast<void(QSlider::*)(int)>(&QSlider::valueChanged), this, &gui::SimVisualize::distSelUpdate);
   connect(button_dist_prev, &QAbstractButton::clicked, this, &gui::SimVisualize::distPrev);

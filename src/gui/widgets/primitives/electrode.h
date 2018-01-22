@@ -1,7 +1,7 @@
 // @file:     electrode.h
 // @author:   Nathan
 // @created:  2017.10.27
-// @editted:  2017.10.27 - Nathan
+// @editted:  2018.01.17 - Nathan
 // @license:  GNU LGPL v3
 //
 // @desc:     Electrode objects for creation, deletion, and moving of electrodes.
@@ -14,7 +14,7 @@
 
 namespace prim{
 
-  // forard declarations
+  // forward declarations
   class Layer;
 
   class Electrode: public prim::Item
@@ -23,6 +23,7 @@ namespace prim{
 
     // constructor, create an electrode given two points
     Electrode(int lay_id, QPointF point1, QPointF point2);
+    // constructor, create an electrode using the data found in a design file.
     Electrode(QXmlStreamReader *ls, QGraphicsScene *scene);
 
 
@@ -49,6 +50,8 @@ namespace prim{
     qreal getHeight(void){return elec_height;}
     qreal getDepth(void){return elec_depth;}
     double getPotential(void) const {return potential;}
+
+    //! updates the electrode with its new location after moving it with the mouse.
     void updatePoints(QPointF);
 
     // inherited abstract method implementations
@@ -71,7 +74,7 @@ namespace prim{
     // VARIABLES
     QPointF point1;
     QPointF point2;
-    QPointF top_left;
+    QPointF top_left; //top left point, since the two points given could be any two opposite points
 
     double potential = 0;
     qreal elec_width;

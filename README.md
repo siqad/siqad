@@ -63,7 +63,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * Enumerated layer types
   * Provide enum to QString conversion
   * Also update save, load, export functions as the Enum strings are different from the original names
-  * 
+  *
 * CreateLayer with undo and redo in DesignPanel
 * Add zheight property to layers (including updating functions in DP)
 * LayerEditor
@@ -139,6 +139,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 		* Translate size from Qt units to physical lengths
 		*	~Add buffer region surrounding simulation area~
 		* Location, dimensions, etc
+		* Implement heat map/colour map support for PoisSolver
 
 > general bugs
 ## Bugs

@@ -10,7 +10,7 @@
 CONFIG += c++11
 CONFIG += debug
 
-QT += core gui widgets svg
+QT += core gui widgets svg printsupport
 
 greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 
@@ -57,8 +57,8 @@ HEADERS += \
 	src/gui/widgets/primitives/items.h \
 	src/gui/widgets/primitives/layer.h \
 	src/gui/widgets/primitives/lattice.h \
-  	src/gui/widgets/primitives/sim_engine.h \
-  	src/gui/widgets/primitives/sim_job.h \
+  src/gui/widgets/primitives/sim_engine.h \
+  src/gui/widgets/primitives/sim_job.h \
 	src/gui/widgets/primitives/electrode.h
 
 SOURCES += \
@@ -70,8 +70,8 @@ SOURCES += \
 	src/gui/widgets/primitives/ghost.cc \
 	src/gui/widgets/primitives/layer.cc \
 	src/gui/widgets/primitives/lattice.cc \
-  	src/gui/widgets/primitives/sim_engine.cc \
-  	src/gui/widgets/primitives/sim_job.cc \
+	src/gui/widgets/primitives/sim_engine.cc \
+	src/gui/widgets/primitives/sim_job.cc \
 	src/gui/widgets/primitives/electrode.cc
 
 # widgets
@@ -82,9 +82,10 @@ HEADERS += \
 	src/gui/widgets/dialog_panel.h \
 	src/gui/widgets/input_field.h \
 	src/gui/widgets/info_panel.h \
-    src/gui/widgets/layer_editor.h \
-    src/gui/widgets/sim_manager.h \
-    src/gui/widgets/sim_visualize_panel.h
+  src/gui/widgets/layer_editor.h \
+  src/gui/widgets/sim_manager.h \
+  src/gui/widgets/sim_visualize_panel.h \
+	src/qcustomplot.h
 
 SOURCES += \
 	src/gui/application.cc \
@@ -92,9 +93,10 @@ SOURCES += \
 	src/gui/widgets/dialog_panel.cc \
 	src/gui/widgets/input_field.cc \
 	src/gui/widgets/info_panel.cc \
-    src/gui/widgets/layer_editor.cc \
-    src/gui/widgets/sim_manager.cc \
-    src/gui/widgets/sim_visualize_panel.cc
+  src/gui/widgets/layer_editor.cc \
+  src/gui/widgets/sim_manager.cc \
+  src/gui/widgets/sim_visualize_panel.cc \
+	src/qcustomplot.cpp
 
 #####################
 # BUILD DIRECTORIES #
