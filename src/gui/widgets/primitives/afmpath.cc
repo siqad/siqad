@@ -36,6 +36,12 @@ void AFMPath::initAFMPath(int lay_id, QList<prim::AFMNode*> nodes, QList<prim::A
   layer_id = lay_id;
   path_nodes = nodes;
   path_segs = segs;
+
+  for (prim::AFMNode* node : path_nodes)
+    prim::Emitter::instance()->addItemToScene(node);
+
+  for (prim::AFMSeg* seg : path_segs)
+    prim::Emitter::instance()->addItemToScene(seg);
   // TODO check that segments match up with the nodes
   // TODO regenerate segs if not
 
@@ -47,6 +53,9 @@ AFMPath::~AFMPath()
 {
   for (auto node : path_nodes)
     delete node;
+
+  for (auto seg : path_segs)
+    delete seg;
 }
 
 
@@ -70,6 +79,7 @@ void AFMPath::insertNode(prim::AFMNode *new_node, int index)
 {
   // insert the node to node list
   path_nodes.insert(index, new_node);
+  prim::Emitter::instance()->addItemToScene(new_node);
 
   int last_index = path_nodes.length()-1;
 
@@ -97,6 +107,7 @@ void AFMPath::removeNode(int index)
 
   // take the node out of nodes list
   prim::AFMNode *rm_node = path_nodes.takeAt(index);
+  prim::Emitter::instance()->removeItemFromScene(rm_node);
   delete rm_node;
 
   // remove segments associated with that node
@@ -114,13 +125,16 @@ void AFMPath::removeNode(int index)
 
 void AFMPath::insertSegment(int index)
 {
-  path_segs.insert(index, new prim::AFMSeg(layer_id, getNode(index), getNode(index+1)));
+  prim::AFMSeg *new_segment = new prim::AFMSeg(layer_id, getNode(index), getNode(index+1));
+  path_segs.insert(index, new_segment);
+  prim::Emitter::instance()->addItemToScene(new_segment);
 }
 
 
 void AFMPath::removeSegment(int index)
 {
   prim::AFMSeg *rm_seg = path_segs.takeAt(index);
+  prim::Emitter::instance()->removeItemFromScene(rm_seg);
   delete rm_seg;
 }
 

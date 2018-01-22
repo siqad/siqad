@@ -31,3 +31,14 @@ void prim::Emitter::selectClicked(prim::Item *item)
 {
   emit sig_selectClicked(item);
 }
+
+void prim::Emitter::addItemToScene(prim::Item *item)
+{
+  emit sig_addItemToScene(item);
+}
+
+void prim::Emitter::removeItemFromScene(prim::Item *item)
+{
+  emit sig_removeItemFromScene(item);
+}
+

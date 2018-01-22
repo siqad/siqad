@@ -35,8 +35,8 @@ namespace prim{
     // change/get segment origin / target
     void setOrigin(prim::AFMNode *orig_node) {origin_node = orig_node;}
     void setDestination(prim::AFMNode *dest_node) {destination_node = dest_node;}
-    prim::AFMNode* getOrigin() {return origin_node;}
-    prim::AFMNode* getDestination() {return destination_node;}
+    prim::AFMNode* originNode() {return origin_node;}
+    prim::AFMNode* destinationNode() {return destination_node;}
 
 
     // Graphics
@@ -75,6 +75,9 @@ namespace prim{
     // VARS
     prim::AFMNode *origin_node;
     prim::AFMNode *destination_node;
+
+    QPointF origin_loc;       // for boundingRect
+    QPointF destination_loc;  // for boundingRect
   };
 
 } // end of prim namespace

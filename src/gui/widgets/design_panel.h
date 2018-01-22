@@ -58,6 +58,15 @@ namespace gui{
     // remove the given Item from the given Layer if possible
     void removeItem(prim::Item *item, prim::Layer* layer);
 
+    // add a new Item to the graphics scene. This either means the Item is already owned
+    // by another class and only needs to be shown graphically, or the Item is merely
+    // a temporary graphics item for purely indicative purposes.
+    void addItemToScene(prim::Item *item);
+
+    // remove item from scene without deleting the item pointer. The caller has to handle
+    // the cleanup if so desired.
+    void removeItemFromScene(prim::Item *item);
+
     // add a new layer with the given name. If no name is given, a default scheme
     // is used. Checks if the layer already exists.
     void addLayer(const QString &name = QString(), const prim::Layer::LayerType cnt_type=prim::Layer::DB, const float zoffset = 0, const float zheight = 0);
@@ -123,6 +132,9 @@ namespace gui{
 
     void selectClicked(prim::Item *item);
     void simVisualizeDockVisibilityChanged(bool visible);
+
+    void addItemToSceneRequest(prim::Item *item) {addItemToScene(item);}
+    void removeItemFromSceneRequest(prim::Item *item) {removeItemFromScene(item);}
 
   signals:
     void sig_toolChange(ToolType tool);

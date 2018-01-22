@@ -50,6 +50,9 @@ namespace prim{
     // node count
     int nodeCount() {return path_nodes.length();}
 
+    // segment count
+    int segmentCount() {return path_segs.length();}
+
     // insert segment to index position with path_node[index] as origin and 
     // path_node[index+1] as destination
     void insertSegment(int index);
@@ -74,6 +77,10 @@ namespace prim{
 
     virtual Item *deepCopy() const;
 
+  /* TODO remove
+  signals:
+    void addSegmentToScene(prim::AFMSeg *add_segment);
+    void removeSegmentFromScene(prim::AFMSeg *remove_segment);*/
 
   private:
 

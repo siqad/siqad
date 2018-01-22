@@ -32,6 +32,12 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
             this, &gui::DesignPanel::selectClicked);
 
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_addItemToScene,
+            this, &gui::DesignPanel::addItemToSceneRequest);
+
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_removeItemFromScene,
+            this, &gui::DesignPanel::removeItemFromScene);
+
   // child widgets
   afm_panel = new AFMPanel(this);
 
@@ -178,6 +184,17 @@ void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
     scene->removeItem(item);
     delete item;
   }
+}
+
+void gui::DesignPanel::addItemToScene(prim::Item *item)
+{
+  scene->addItem(item);
+}
+
+void gui::DesignPanel::removeItemFromScene(prim::Item *item)
+{
+  scene->removeItem(item);
+  // item pointer delete should be handled by the caller
 }
 
 void gui::DesignPanel::addLayer(const QString &name, const prim::Layer::LayerType cnt_type, const float zoffset, const float zheight)
@@ -717,7 +734,6 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
         int afm_layer_index = getLayerIndex(afm_layer);
         prim::AFMNode *new_afm_node = new prim::AFMNode(afm_layer_index, 
             mapToScene(e->pos()), afm_layer->getZOffset());
-        addItem(new_afm_node, afm_layer_index);
 
         prim::AFMPath *focused_afm_path = afm_panel->getFocusedPath();
         if (focused_afm_path) {
@@ -725,6 +741,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
           qDebug() << tr("AFMPath exists, appending new node");
           focused_afm_path->appendNode(new_afm_node);
           qDebug() << tr("  Node appended to path, new node count=%1").arg(focused_afm_path->nodeCount());
+          qDebug() << tr("  New segment count=%1").arg(focused_afm_path->segmentCount());
           afm_panel->setFocusedNode(new_afm_node);
           qDebug() << tr("  New node set as focus");
           // TODO insert new node behind focused node (or back of path if no focused node)
@@ -732,9 +749,9 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
           // if there's no focused path, make a new one and insert new node
           qDebug() << "AFMPath doesn't exist, making new";
           // create new path and make it focused
-          qDebug() << "  AFMNode created and added to dp";
           prim::AFMPath *new_afm_path = new prim::AFMPath(afm_layer_index, new_afm_node);
-          qDebug() << tr("  AFMPath created, with length %1").arg(new_afm_path->nodeCount());
+          addItem(new_afm_path, afm_layer_index);
+          qDebug() << tr("  AFMPath created and added to DP, with length %1").arg(new_afm_path->nodeCount());
           afm_panel->setFocusedPath(new_afm_path);
           qDebug() << "  New AFMPath set to focused";
         }

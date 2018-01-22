@@ -30,6 +30,9 @@ void AFMSeg::initAFMSeg(int lay_id, prim::AFMNode *orig_node, prim::AFMNode *des
   layer_id = lay_id;
   setOrigin(orig_node);
   setDestination(dest_node);
+
+  origin_loc = originNode()->scenePos();
+  destination_loc = destinationNode()->scenePos();
 }
 
 
@@ -43,12 +46,14 @@ void AFMSeg::saveItems(QXmlStreamWriter *ws) const
 // Graphics
 QRectF AFMSeg::boundingRect() const
 {
-
+  return QRectF(origin_loc, destination_loc);
 }
 
 void AFMSeg::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-
+  painter->setPen(Qt::SolidLine);
+  painter->setBrush(QColor(255,255,255));
+  painter->drawLine(QLineF(originNode()->scenePos(), destinationNode()->scenePos()));
 }
 
 Item *AFMSeg::deepCopy() const
