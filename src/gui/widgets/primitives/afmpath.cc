@@ -10,6 +10,15 @@
 
 namespace prim {
 
+AFMPath::AFMPath(int lay_id, prim::AFMNode *node)
+  : prim::Item(prim::Item::AFMPath)
+{
+  QList<prim::AFMNode*> nodes;
+  QList<prim::AFMSeg*> segs;
+  nodes.append(node);
+  initAFMPath(lay_id, nodes, segs);
+}
+
 AFMPath::AFMPath(int lay_id, QList<prim::AFMNode*> nodes, QList<prim::AFMSeg*> segs)
   : prim::Item(prim::Item::AFMPath)
 {
@@ -28,7 +37,7 @@ void AFMPath::initAFMPath(int lay_id, QList<prim::AFMNode*> nodes, QList<prim::A
   path_nodes = nodes;
   path_segs = segs;
   // TODO check that segments match up with the nodes
-  // TODO ask Jake if there's a better way to store nodes and segments
+  // TODO regenerate segs if not
 
   // TODO init GUI elements related to path
 }
@@ -48,29 +57,37 @@ void AFMPath::saveItems(QXmlStreamWriter *) const
   // TODO save path properties like speed, loop
 }
 
-void AFMPath::insertNode(QPointF new_loc, int index, float z_offset)
+/*void AFMPath::insertNode(QPointF new_loc, int index, float z_offset)
 {
   if (z_offset == 0)
     z_offset = getNode(index-1)->getZOffset();
 
   insertNode(new prim::AFMNode(layer_id, new_loc, z_offset), index);
-}
+}*/
 
 
 void AFMPath::insertNode(prim::AFMNode *new_node, int index)
 {
-  int last_index = path_segs.length()-1;
-
   // insert the node to node list
   path_nodes.insert(index, new_node);
 
-  // reconnect preceding segment to this node
-  if (index != 0)
-    getSegment(index-1)->setDestination(getNode(index));
+  int last_index = path_nodes.length()-1;
 
-  // create new segment connecting this node to the next
-  if (index != last_index)
-    insertSegment(index);
+  if (index == last_index) {
+    qDebug() << QObject::tr("Appending new segment to AFMPath");
+    // appending
+    insertSegment(index-1);
+  } else {
+    // inserting
+    qDebug() << QObject::tr("Inserting new segment to AFMPath for node at index %1").arg(index);
+
+    // reconnect preceding segment to this node
+    if (index > 0)
+      getSegment(index-1)->setDestination(getNode(index));
+    // create new segment connecting this node to the next
+    if (index != last_index)
+      insertSegment(index);
+  }
 }
 
 
@@ -135,15 +152,15 @@ void AFMPath::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget
 
 }
 
-/*Item *AFMPath::deepCopy() const
+Item *AFMPath::deepCopy() const
 {
-  TODO look into aggregate's deep copy to figure out how this should be implemented.
+  /*TODO look into aggregate's deep copy to figure out how this should be implemented.
      Keep in mind that when pasting, all off the path_nodes and path_segs have to take
-     the new location, electrode code might have that implemented.
+     the new location, electrode code might have that implemented.*/
   AFMPath *cp = new AFMPath(layer_id, path_nodes, path_segs);
   cp->setPos(pos());
   return cp;
-}*/
+}
 
 
 /* could be reused in afmnode and afmseg

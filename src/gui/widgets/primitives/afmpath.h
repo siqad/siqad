@@ -11,7 +11,7 @@
 
 #include "item.h"
 #include "afmseg.h"
-#include "afmpath.h"
+#include "afmnode.h"
 
 namespace prim{
 
@@ -21,6 +21,7 @@ namespace prim{
 
     // Constructor
     // TODO consider QList types
+    AFMPath(int lay_id, prim::AFMNode *node);
     AFMPath(int lay_id, QList<prim::AFMNode*> nodes, QList<prim::AFMSeg*> segs);
     AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene);
     void initAFMPath(int lay_id, QList<prim::AFMNode*>, QList<prim::AFMSeg*>);
@@ -34,9 +35,9 @@ namespace prim{
     // Nodes
 
     // insert new node at specified index
-    void insertNode(QPointF new_loc, int index, float z_offset=0); // make node at new_loc and add to path
+    //void insertNode(QPointF new_loc, int index, float z_offset=0); // make node at new_loc and add to path
     void insertNode(prim::AFMNode *new_node, int index);
-    void appendNode(QPointF new_loc, float z_offset=0) {insertNode(new_loc, z_offset, path_nodes.length());}
+    //void appendNode(QPointF new_loc, float z_offset=0) {insertNode(new_loc, z_offset, path_nodes.length());}
     void appendNode(prim::AFMNode *new_node) {insertNode(new_node, path_nodes.length());}
 
     // remove node at indicated index
@@ -44,6 +45,10 @@ namespace prim{
 
     // get node at index
     prim::AFMNode *getNode(int index) {return path_nodes.at(index);}
+    prim::AFMNode *getLastNode() {return path_nodes.at(path_nodes.length()-1);}
+
+    // node count
+    int nodeCount() {return path_nodes.length();}
 
     // insert segment to index position with path_node[index] as origin and 
     // path_node[index+1] as destination
@@ -67,7 +72,7 @@ namespace prim{
     virtual QRectF boundingRect() const; // conform to segment shapes
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
 
-    // TODO virtual Item *deepCopy() const;
+    virtual Item *deepCopy() const;
 
 
   private:

@@ -90,7 +90,8 @@ HEADERS += \
 	src/gui/widgets/info_panel.h \
     src/gui/widgets/layer_editor.h \
     src/gui/widgets/sim_manager.h \
-    src/gui/widgets/sim_visualize_panel.h
+    src/gui/widgets/sim_visualize_panel.h \
+    src/gui/widgets/afm_panel.h
 
 SOURCES += \
 	src/gui/application.cc \
@@ -100,7 +101,8 @@ SOURCES += \
 	src/gui/widgets/info_panel.cc \
     src/gui/widgets/layer_editor.cc \
     src/gui/widgets/sim_manager.cc \
-    src/gui/widgets/sim_visualize_panel.cc
+    src/gui/widgets/sim_visualize_panel.cc \
+    src/gui/widgets/afm_panel.cc
 
 #####################
 # BUILD DIRECTORIES #

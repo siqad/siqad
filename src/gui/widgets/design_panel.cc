@@ -32,6 +32,9 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
             this, &gui::DesignPanel::selectClicked);
 
+  // child widgets
+  afm_panel = new AFMPanel(this);
+
   // setup flags
   clicked = ghosting = moving = false;
 
@@ -88,6 +91,9 @@ gui::DesignPanel::~DesignPanel()
 // clear design panel
 void gui::DesignPanel::clearDesignPanel(bool reset)
 {
+  // delete child widgets
+  delete afm_panel;
+
   // delete all graphical items from the scene
   scene->clear();
   if(!reset) delete scene;
@@ -109,6 +115,8 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
 // reset
 void gui::DesignPanel::resetDesignPanel()
 {
+  // TODO fold this into a single initDesignPanel function
+
   clearDesignPanel(true);
 
   // REBUILD
@@ -706,14 +714,29 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
           QGraphicsView::mousePressEvent(e);
         }
       } else if (tool_type == AFMPathTool) {
-        // if there's already a focused path and node, insert new node behind focused node
-        AFMPth *focused_afm_path = afm_manager->getFocusedPath();
+        int afm_layer_index = getLayerIndex(afm_layer);
+        prim::AFMNode *new_afm_node = new prim::AFMNode(afm_layer_index, 
+            mapToScene(e->pos()), afm_layer->getZOffset());
+        addItem(new_afm_node, afm_layer_index);
+
+        prim::AFMPath *focused_afm_path = afm_panel->getFocusedPath();
         if (focused_afm_path) {
-          // insert new node behind focused node (or back of path if no focused node)
-          afm_manager->
+          // if there's already a focused path and node, insert new node behind focused node
+          qDebug() << tr("AFMPath exists, appending new node");
+          focused_afm_path->appendNode(new_afm_node);
+          qDebug() << tr("  Node appended to path, new node count=%1").arg(focused_afm_path->nodeCount());
+          afm_panel->setFocusedNode(new_afm_node);
+          qDebug() << tr("  New node set as focus");
+          // TODO insert new node behind focused node (or back of path if no focused node)
         } else {
+          // if there's no focused path, make a new one and insert new node
+          qDebug() << "AFMPath doesn't exist, making new";
           // create new path and make it focused
-          // TODO
+          qDebug() << "  AFMNode created and added to dp";
+          prim::AFMPath *new_afm_path = new prim::AFMPath(afm_layer_index, new_afm_node);
+          qDebug() << tr("  AFMPath created, with length %1").arg(new_afm_path->nodeCount());
+          afm_panel->setFocusedPath(new_afm_path);
+          qDebug() << "  New AFMPath set to focused";
         }
       } else {
         QGraphicsView::mousePressEvent(e);
@@ -757,25 +780,29 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     QPointF scene_pos = mapToScene(e->pos());
     snapDB(scene_pos);
   }*/
-  else if (tool_type == AFMPathTool) {
-    // snap to the nearest possible location unless ctrl is held
-    if (keymods & Qt::ControlModifier) {
-      // node appears where cursor is
-      // TODO some var that stores the location of the node
-      // TODO AFM
-    } else {
-      // node appears at the nearest latdot / dbdot
-      // TODO some var that stores the location of the node
-      // TODO AFM
-      snap_cache = mapToScene(e->pos());
-    }
-  } else if (clicked) {
+  else if (clicked) {
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
       case Qt::LeftButton:
         if (clicked && (tool_type == SelectTool || tool_type == DBGenTool 
               || tool_type == ElectrodeTool)) {
           rubberBandUpdate(e->pos());
+        } else if (tool_type == AFMPathTool) {
+          // snap to the nearest possible location unless ctrl is held
+          //qDebug() << "Entered mouse move event for AFM Path";
+          if (keymods & Qt::ControlModifier) {
+            // node appears where cursor is
+            // TODO some var that stores the location of the node
+            // TODO AFM
+          } else {
+            // node appears at the nearest latdot / dbdot
+            prim::AFMNode *focused_node = afm_panel->getFocusedNode();
+            if (focused_node) {
+              QPointF from_loc = focused_node->scenePos();
+              QPointF new_loc = mapToScene(e->pos());
+              focused_node->moveBy(new_loc.x()-from_loc.x(), new_loc.y()-from_loc.y());
+            }
+          }
         }
         // use default behaviour for left mouse button
         QGraphicsView::mouseMoveEvent(e);
@@ -1888,13 +1915,7 @@ void gui::DesignPanel::createElectrodes(QPoint point1)
 
 void gui::DesignPanel::createAFMNode()
 {
-  qDebug() << "entered createAFMNode";
-  QPointF loc = snap_cache; // create node at cached mouse position
-  //int layer_index = layer_manager->getMruLayer(prim::LayerManager::AFMPath); // TODO implement something like this in Layer Manager in the future
-  int layer_index = layers.indexOf(afm_layer);
-  // TODO make the following UNDOable
-  addItem(new prim::AFMNode(layer_index, loc, afm_layer->getZOffset()), layer_index);
-  // TODO AFMNode is supposed to take physloc, account for that later
+  // TODO UNDOable version
 }
 
 void gui::DesignPanel::deleteSelection()

@@ -15,6 +15,8 @@
 #include <QtCore>
 #include <QDialog>
 
+#include "afm_panel.h"
+
 #include "primitives/layer.h"
 #include "primitives/lattice.h"
 #include "primitives/items.h"
@@ -158,6 +160,10 @@ namespace gui{
     ToolType tool_type;       // current cursor tool type
     DisplayMode display_mode; // current display mode
     QUndoStack *undo_stack;   // undo stack
+
+    // children panels
+    AFMPanel *afm_panel;
+    // TODO layer manager
 
     // copy/paste
     QList<prim::Item*> clipboard;  // cached deep copy of a set of items for pasting

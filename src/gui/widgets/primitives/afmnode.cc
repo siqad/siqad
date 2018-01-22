@@ -22,10 +22,10 @@ qreal AFMNode::diameter = -1;
 qreal AFMNode::edge_width = -1;
 
 // constructors
-AFMNode::AFMNode(int lay_id, QPointF physloc, float z_offset)
+AFMNode::AFMNode(int lay_id, QPointF sceneloc, float z_offset)
   : prim::Item(prim::Item::AFMNode)
 {
-  initAFMNode(lay_id, physloc, z_offset);
+  initAFMNode(lay_id, sceneloc, z_offset);
 }
 
 AFMNode::AFMNode(QXmlStreamReader *rs, QGraphicsScene *scene)
@@ -35,7 +35,7 @@ AFMNode::AFMNode(QXmlStreamReader *rs, QGraphicsScene *scene)
   // TODO call initAFMNode with read values
 }
 
-void AFMNode::initAFMNode(int lay_id, QPointF physloc, float z_offset)
+void AFMNode::initAFMNode(int lay_id, QPointF sceneloc, float z_offset)
 {
   // initialise static variables if not already
   if (diameter < 0)
@@ -43,11 +43,10 @@ void AFMNode::initAFMNode(int lay_id, QPointF physloc, float z_offset)
 
   layer_id = lay_id;
   setZOffset(z_offset);
-  setPhysLoc(physloc);
+  setPos(sceneloc);
 
   setAcceptHoverEvents(true);
 
-  setPos(physloc); // TODO scale_factor
 }
 
 

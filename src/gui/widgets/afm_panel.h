@@ -1,4 +1,4 @@
-// @file:     afm_manager.h
+// @file:     afm_panel.h
 // @author:   Samuel
 // @created:  2018.01.18
 // @editted:  2018.01.18 - Samuel
@@ -10,6 +10,7 @@
 #define _GUI_AFM_PANEL_H_
 
 // TODO includes
+#include "primitives/afmpath.h"
 
 namespace gui{
 
@@ -20,23 +21,23 @@ namespace gui{
   public:
 
     // constructor
-    AFMManager(QWidget *parent = 0);
+    AFMPanel(QWidget *parent = 0);
 
     // destructor
-    ~AFMManager() {};
+    ~AFMPanel() {};
 
 
     // focused path (either showing properties or editing)
-    void setFocusedPath(AFMPath *path_fo) {path_focused = path_fo;}
+    void setFocusedPath(prim::AFMPath *path_fo);
     void unsetFocusedPath() {path_focused = 0;} // TODO call this when not making path
-    AFMPath *getFocusedPath() {return path_focused;}
+    prim::AFMPath *getFocusedPath() {return path_focused;}
 
     // focused node (either showing properties or editing)
-    void setFocusedNode(AFMNode *node_fo) {node_focused = node_fo;}
+    void setFocusedNode(prim::AFMNode *node_fo) {node_focused = node_fo;}
     void unsetFocusedNode() {node_focused = 0;} // TODO call this when not making path
-    AFMNode *getFocusedNode() {return node_focused;}
+    prim::AFMNode *getFocusedNode() {return node_focused;}
 
-  public slot:
+  //public slot:
 
     // TODO connect to DesignPanel's sig_toolChange, call unsetFocusedPath and
     // unsetFocusedNode when the tool is changed to anything but AFM
@@ -44,8 +45,8 @@ namespace gui{
   private:
 
     // VAR
-    AFMPath *path_focused;
-    AFMNode *node_focused;
+    prim::AFMPath *path_focused = 0;
+    prim::AFMNode *node_focused = 0;
 
 
   };

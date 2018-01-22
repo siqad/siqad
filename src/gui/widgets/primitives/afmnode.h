@@ -18,9 +18,9 @@ namespace prim{
   public:
 
     // Constructor
-    AFMNode(int lay_id, QPointF physloc, float z_offset);
+    AFMNode(int lay_id, QPointF sceneloc, float z_offset);
     AFMNode(QXmlStreamReader *rs, QGraphicsScene *scene);
-    void initAFMNode(int lay_id, QPointF loc, float z_offset);
+    void initAFMNode(int lay_id, QPointF sceneloc, float z_offset);
 
     // Destructor
     ~AFMNode() {};
@@ -30,11 +30,6 @@ namespace prim{
 
 
     // Node manipulation
-
-    // change node location
-    void setPhysLoc(QPointF new_loc) {phys_loc = new_loc;}
-
-    QPointF getPhysLoc() {return phys_loc;}
 
     // change node zoffset (relative to surface) if it is within bounds of the layer
     void setZOffset(float z_offset);
