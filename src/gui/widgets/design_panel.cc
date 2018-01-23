@@ -415,7 +415,6 @@ void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
       setInteractive(true);
       break;
     case gui::DesignPanel::AFMPathTool:
-      setDragMode(QGraphicsView::NoDrag);
       setInteractive(true); // TODO check back later that this is the right mode
       break;
     default:
@@ -733,6 +732,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
         }
       } else if (tool_type == AFMPathTool) {
         int afm_layer_index = getLayerIndex(afm_layer);
+        // TODO pick nearest latdot / db position unless Ctrl is pressed
         prim::AFMNode *new_afm_node = new prim::AFMNode(afm_layer_index, 
             mapToScene(e->pos()), afm_layer->getZOffset());
 
@@ -805,24 +805,25 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
         if (clicked && (tool_type == SelectTool || tool_type == DBGenTool 
               || tool_type == ElectrodeTool)) {
           rubberBandUpdate(e->pos());
-        } else if (tool_type == AFMPathTool) {
+        } else if (tool_type == AFMPathTool && afm_panel->getFocusedNode()) {
           // snap to the nearest possible location unless ctrl is held
           //qDebug() << "Entered mouse move event for AFM Path";
+
+          prim::AFMNode *focused_node = afm_panel->getFocusedNode();
+          QPointF from_loc = focused_node->scenePos();
+          QPointF new_loc;
+
           if (keymods & Qt::ControlModifier) {
             // node appears where cursor is
-            // TODO some var that stores the location of the node
-            // TODO AFM
+            new_loc = mapToScene(e->pos());
           } else {
             // node appears at the nearest latdot / dbdot
-            prim::AFMNode *focused_node = afm_panel->getFocusedNode();
-            if (focused_node) {
-              QPointF from_loc = focused_node->scenePos();
-              QPointF new_loc = mapToScene(e->pos());
-              focused_node->moveBy(new_loc.x()-from_loc.x(), new_loc.y()-from_loc.y());
-              // TODO call prepareGeometryChange for Segment
-              // http://doc.qt.io/qt-5/qgraphicsitem.html#boundingRect
-            }
+            new_loc = mapToScene(e->pos()); // temporary
+            // TODO pick nearest latdot / db position
+            // TODO call prepareGeometryChange for Segment
+            // http://doc.qt.io/qt-5/qgraphicsitem.html#boundingRect
           }
+          focused_node->moveBy(new_loc.x()-from_loc.x(), new_loc.y()-from_loc.y());
         }
         // use default behaviour for left mouse button
         QGraphicsView::mouseMoveEvent(e);
