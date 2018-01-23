@@ -27,7 +27,7 @@ namespace prim{
     void initAFMPath(int lay_id, QList<prim::AFMNode*>, QList<prim::AFMSeg*>);
 
     // Destructor
-    ~AFMPath();
+    ~AFMPath() {}; // AFMNode and AFMSeg pointers are deleted by DesignPanel on scene clear
 
     // Save to XML
     virtual void saveItems(QXmlStreamWriter *) const;

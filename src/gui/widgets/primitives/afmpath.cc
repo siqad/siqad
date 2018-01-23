@@ -49,16 +49,6 @@ void AFMPath::initAFMPath(int lay_id, QList<prim::AFMNode*> nodes, QList<prim::A
 }
 
 
-AFMPath::~AFMPath()
-{
-  for (auto node : path_nodes)
-    delete node;
-
-  for (auto seg : path_segs)
-    delete seg;
-}
-
-
 // Save to XML
 void AFMPath::saveItems(QXmlStreamWriter *) const
 {
