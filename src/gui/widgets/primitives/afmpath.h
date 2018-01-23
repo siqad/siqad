@@ -47,6 +47,10 @@ namespace prim{
     prim::AFMNode *getNode(int index) {return path_nodes.at(index);}
     prim::AFMNode *getLastNode() {return path_nodes.at(path_nodes.length()-1);}
 
+    // get index position of node pointer in path_nodes list
+    // returns -1 if none exists
+    int getNodeIndex(prim::AFMNode *node) {return path_nodes.indexOf(node);}
+
     // node count
     int nodeCount() {return path_nodes.length();}
 
@@ -62,6 +66,10 @@ namespace prim{
 
     // get segment at index, or the last index if not specified
     prim::AFMSeg *getSegment(int index) {return path_segs.at(index);}
+
+    // get segments connected to the supplied node pointer / index
+    QList<prim::AFMSeg*> getConnectedSegments(prim::AFMNode *node);
+    QList<prim::AFMSeg*> getConnectedSegments(int node_ind);
 
     // create loop between the nodes at first and last indices, they must be at the same physical location
     void setLoop(bool loop_state);

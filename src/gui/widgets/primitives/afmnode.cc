@@ -45,8 +45,11 @@ void AFMNode::initAFMNode(int lay_id, QPointF sceneloc, float z_offset)
   setZOffset(z_offset);
   setPos(sceneloc);
 
+  // GUI properties
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
   setAcceptHoverEvents(true);
 
+  // TODO setup statics
 }
 
 
@@ -126,7 +129,8 @@ void AFMNode::prepareStatics()
 void AFMNode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
   // Show path config dialog when selected, with this node highlighted on the list
-  // TODO
+  // TODO select whole path if the whole path wasn't selected; select node if the parent path already is selected
+  prim::Item::mousePressEvent(e);
 }
 
 void AFMNode::hoverEnterEvent(QGraphicsSceneHoverEvent *)

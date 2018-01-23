@@ -46,6 +46,8 @@ void AFMPath::initAFMPath(int lay_id, QList<prim::AFMNode*> nodes, QList<prim::A
   // TODO regenerate segs if not
 
   // TODO init GUI elements related to path
+
+  // TODO prepareStatics if not valid
 }
 
 
@@ -55,14 +57,6 @@ void AFMPath::saveItems(QXmlStreamWriter *) const
   // TODO save included afmnodes and afmsegs
   // TODO save path properties like speed, loop
 }
-
-/*void AFMPath::insertNode(QPointF new_loc, int index, float z_offset)
-{
-  if (z_offset == 0)
-    z_offset = getNode(index-1)->getZOffset();
-
-  insertNode(new prim::AFMNode(layer_id, new_loc, z_offset), index);
-}*/
 
 
 void AFMPath::insertNode(prim::AFMNode *new_node, int index)
@@ -126,6 +120,32 @@ void AFMPath::removeSegment(int index)
   prim::AFMSeg *rm_seg = path_segs.takeAt(index);
   prim::Emitter::instance()->removeItemFromScene(rm_seg);
   delete rm_seg;
+}
+
+
+QList<prim::AFMSeg*> AFMPath::getConnectedSegments(prim::AFMNode *node)
+{
+  return getConnectedSegments(getNodeIndex(node));
+}
+
+QList<prim::AFMSeg*> AFMPath::getConnectedSegments(int node_ind)
+{
+  QList<prim::AFMSeg*> connected_segs;
+
+  if (node_ind == -1) {
+    qCritical() << QObject::tr("Cannot get connected segment for node index -1");
+    return connected_segs;
+  }
+
+  // get the preceding segment if not the first node
+  if (node_ind != 0)
+    connected_segs.append(getSegment(node_ind-1));
+
+  // get the proceeding segment if not the last node
+  if (node_ind != path_nodes.count()-1)
+    connected_segs.append(getSegment(node_ind));
+
+  return connected_segs;
 }
 
 

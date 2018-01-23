@@ -31,8 +31,9 @@ void AFMSeg::initAFMSeg(int lay_id, prim::AFMNode *orig_node, prim::AFMNode *des
   setOrigin(orig_node);
   setDestination(dest_node);
 
-  origin_loc = originNode()->scenePos();
-  destination_loc = destinationNode()->scenePos();
+  updatePoints();
+
+  // TODO prepareStatics if not valid
 }
 
 
@@ -43,10 +44,36 @@ void AFMSeg::saveItems(QXmlStreamWriter *ws) const
 }
 
 
+// Segment manipulation
+void AFMSeg::setOrigin(prim::AFMNode *orig_node)
+{
+  origin_node = orig_node;
+  updatePoints();
+}
+
+void AFMSeg::setDestination(prim::AFMNode *dest_node)
+{
+  destination_node = dest_node;
+  updatePoints();
+}
+
+
 // Graphics
+void AFMSeg::updatePoints()
+{
+  prepareGeometryChange();
+  origin_loc = originNode()->scenePos();
+  destination_loc = destinationNode()->scenePos();
+}
+
+
 QRectF AFMSeg::boundingRect() const
 {
-  return QRectF(origin_loc, destination_loc);
+  qreal x_min = qMin(origin_loc.x(), destination_loc.x());
+  qreal y_min = qMin(origin_loc.y(), destination_loc.y());
+  qreal dx = qMax(origin_loc.x(), destination_loc.x()) - x_min;
+  qreal dy = qMax(origin_loc.y(), destination_loc.y()) - y_min;
+  return QRectF(x_min, y_min, dx, dy);
 }
 
 void AFMSeg::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)

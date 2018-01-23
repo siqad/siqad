@@ -823,7 +823,12 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
             // TODO call prepareGeometryChange for Segment
             // http://doc.qt.io/qt-5/qgraphicsitem.html#boundingRect
           }
+          // move focused node and connected segments
           focused_node->moveBy(new_loc.x()-from_loc.x(), new_loc.y()-from_loc.y());
+          for (prim::AFMSeg *seg : 
+                  afm_panel->getFocusedPath()->getConnectedSegments(focused_node)) {
+            seg->updatePoints();
+          }
         }
         // use default behaviour for left mouse button
         QGraphicsView::mouseMoveEvent(e);

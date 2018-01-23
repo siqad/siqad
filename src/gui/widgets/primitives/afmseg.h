@@ -33,13 +33,15 @@ namespace prim{
     // Segment manipulation
 
     // change/get segment origin / target
-    void setOrigin(prim::AFMNode *orig_node) {origin_node = orig_node;}
-    void setDestination(prim::AFMNode *dest_node) {destination_node = dest_node;}
+    void setOrigin(prim::AFMNode *orig_node);
+    void setDestination(prim::AFMNode *dest_node);
     prim::AFMNode* originNode() {return origin_node;}
     prim::AFMNode* destinationNode() {return destination_node;}
 
 
     // Graphics
+    void updatePoints();
+
     virtual QRectF boundingRect() const;
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget*);
 
