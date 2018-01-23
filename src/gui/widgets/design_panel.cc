@@ -415,6 +415,7 @@ void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
       setInteractive(true);
       break;
     case gui::DesignPanel::AFMPathTool:
+      setDragMode(QGraphicsView::NoDrag);
       setInteractive(true); // TODO check back later that this is the right mode
       break;
     default:
@@ -818,6 +819,8 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
               QPointF from_loc = focused_node->scenePos();
               QPointF new_loc = mapToScene(e->pos());
               focused_node->moveBy(new_loc.x()-from_loc.x(), new_loc.y()-from_loc.y());
+              // TODO call prepareGeometryChange for Segment
+              // http://doc.qt.io/qt-5/qgraphicsitem.html#boundingRect
             }
           }
         }
