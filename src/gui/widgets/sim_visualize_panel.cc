@@ -8,6 +8,8 @@
 
 #include "sim_visualize_panel.h"
 #include "../../qcustomplot.h"
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 #include <QPixmap>
 
 
@@ -97,26 +99,51 @@ void SimVisualize::openPoisResult()
   customPlot->axisRect()->setupFullAxesBox(true);
   customPlot->xAxis->setLabel("x");
   customPlot->yAxis->setLabel("y");
+  // down on graph is increase in y.
+  customPlot->yAxis->setRangeReversed(true);
 
   // set up the QCPColorMap:
   QCPColorMap *colorMap = new QCPColorMap(customPlot->xAxis, customPlot->yAxis);
   // number of points in x and y direction
-  int nx = 200;
-  int ny = 200;
+  int nx = 50;
+  int ny = 50;
   colorMap->data()->setSize(nx, ny);
   // coordinate range for x and y
-  colorMap->data()->setRange(QCPRange(-4, 4), QCPRange(-4, 4));
+  QString path = "/tmp/db-sim/phys/" + combo_job_sel->currentText();
+  path += "/sim_result.xml";
+
+  qDebug() << tr("%1").arg(path);
+
+  boost::property_tree::ptree tree; // Create empty property tree object
+  boost::property_tree::read_xml(path.toStdString(), tree); // Parse the XML into the property tree.
+
+  QVector<qreal> x_vec;
+  QVector<qreal> y_vec;
+  QVector<qreal> val_vec;
+  double x, y, val;
+  for (boost::property_tree::ptree::value_type const &node_potential_map : tree.get_child("sim_out.potential_map")) {
+  // BOOST_FOREACH(boost::property_tree::ptree::value_type &node_potential_map, tree.get_child("sim_out.potential_map")) {
+    boost::property_tree::ptree subtree = node_potential_map.second; //get subtree with layer items at the top
+    if( node_potential_map.first == "potential_val"){ //go into potential_val.
+      x = node_potential_map.second.get<float>("<xmlattr>.x");
+      y = node_potential_map.second.get<float>("<xmlattr>.y");
+      val = node_potential_map.second.get<float>("<xmlattr>.val");
+      x_vec.append(x);
+      y_vec.append(y);
+      val_vec.append(val);
+    }
+  }
+
+  // set range for x and y in pixels.
+  colorMap->data()->setRange(QCPRange(x_vec.first(), x_vec.last()), QCPRange(y_vec.first(), y_vec.last()));
 
   // now we assign some data, by accessing the QCPColorMapData instance of the color map:
-  double x, y, z;
-  for (int xIndex=0; xIndex<nx; ++xIndex)
-  {
-    for (int yIndex=0; yIndex<ny; ++yIndex)
-    {
-      colorMap->data()->cellToCoord(xIndex, yIndex, &x, &y);
-      double r = 3*qSqrt(x*x+y*y)+1e-2;
-      z = 2*x*(qCos(r+2)/r-qSin(r+2)/r); // the B field strength of dipole radiation (modulo physical constants)
-      colorMap->data()->setCell(xIndex, yIndex, z);
+  int x_ind, y_ind;
+  for (int i=0; i<nx; ++i){
+    for (int j=0; j<ny; ++j){
+      // get corresponding cell index from coordinate
+      colorMap->data()->coordToCell(x_vec[i*nx + j], y_vec[i*nx + j], &x_ind, &y_ind);
+      colorMap->data()->setCell(x_ind, y_ind, val_vec[i*nx + j]);
     }
   }
 
@@ -222,8 +249,6 @@ void SimVisualize::updateOptions()
       // etc
   }
 }
-
-
 
 
 // PRIVATE
