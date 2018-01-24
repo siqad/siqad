@@ -484,7 +484,7 @@ namespace gui{
   public:
     // create an AFMNode with the given AFMPath and index in path
     CreateAFMNode(int layer_index, DesignPanel *dp, QPointF sceneloc, float z_offset,
-          prim::AFMPath *afm_path, int index_in_path=-1, bool invert=false, 
+          int afm_index, int index_in_path=-1, bool invert=false, 
           QUndoCommand *parent=0);
 
     // remove the AFMNode from its Path and destroy the node
@@ -501,8 +501,8 @@ namespace gui{
 
     int layer_index;
     DesignPanel *dp;
-    prim::AFMPath *afm_path; // NOTE might cause segfault
-    int node_index;
+    int afm_index;    // the Path's index in its layer
+    int node_index;   // the Node's index in the path
     QPointF sceneloc;
     float z_offset;
   };

@@ -1715,7 +1715,7 @@ void gui::DesignPanel::CreateAFMPath::redo()
 
 void gui::DesignPanel::CreateAFMPath::create()
 {
-  qDebug() << tr("Entered CreateAFMPath::creat()");
+  qDebug() << tr("Entered CreateAFMPath::create()");
   prim::AFMPath *new_path = new prim::AFMPath(layer_index);
   dp->addItem(new_path, layer_index, index);
   qDebug() << tr("Added AFMPath to designpanel");
@@ -1739,11 +1739,12 @@ void gui::DesignPanel::CreateAFMPath::destroy()
 // CreateAFMNode class
 
 gui::DesignPanel::CreateAFMNode::CreateAFMNode(int layer_index, gui::DesignPanel *dp,
-                        QPointF sceneloc, float z_offset, prim::AFMPath *afm_path,
+                        QPointF sceneloc, float z_offset, int afm_index,
                         int index_in_path, bool invert, QUndoCommand *parent)
   : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), 
-          sceneloc(sceneloc), z_offset(z_offset), afm_path(afm_path)
+          sceneloc(sceneloc), z_offset(z_offset), afm_index(afm_index)
 {
+  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
   node_index = (index_in_path == -1) ? afm_path->nodeCount() : index_in_path;
 }
 
@@ -1760,6 +1761,8 @@ void gui::DesignPanel::CreateAFMNode::redo()
 void gui::DesignPanel::CreateAFMNode::create()
 {
   qDebug() << tr("Entered CreateAFMNode::create()");
+  qDebug() << tr("Getting AFMPath from layer according to given index");
+  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
   prim::AFMNode *new_node = new prim::AFMNode(layer_index, sceneloc, z_offset);
   afm_path->insertNode(new_node, node_index);
   qDebug() << tr("Inserted node into path");
@@ -1770,6 +1773,7 @@ void gui::DesignPanel::CreateAFMNode::create()
 void gui::DesignPanel::CreateAFMNode::destroy()
 {
   qDebug() << tr("Entered CreateAFMNode::destroy()");
+  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
   afm_path->removeNode(node_index); // pointer cleanup is done by AFMPath
 }
 
@@ -2054,8 +2058,10 @@ void gui::DesignPanel::createAFMNode()
     qDebug() << tr("Pushed new AFMPath to undo stack (as part of macro)");
   }
   qDebug() << tr("About to push new AFMNode to undo stack");
+  int afm_path_index = afm_layer->getItemIndex(afm_panel->focusedPath());
+  qDebug() << tr("afm_path_index=%1").arg(afm_path_index);
   undo_stack->push(new CreateAFMNode(layer_index, this, scene_pos, afm_layer->getZOffset(),
-                                        afm_panel->focusedPath()));
+                                        afm_path_index));
   qDebug() << tr("Pushed new AFMNode to undo stack.");
   undo_stack->endMacro();
   qDebug() << tr("AFMNode creation macro ended");

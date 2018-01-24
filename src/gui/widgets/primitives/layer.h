@@ -97,6 +97,9 @@ namespace prim{
     // item stack; otherwise, return 0
     prim::Item *getItem(int i) { return i >= 0 && i<items.size() ? items.at(i) : 0;}
 
+    // get index of an item with the item's pointer
+    int getItemIndex(prim::Item *item) {return items.indexOf(item);}
+
     // get the Layer's items, needs to be a copy rather than a reference for Layer removal
     QStack<prim::Item*> &getItems() {return items;}
 
