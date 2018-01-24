@@ -139,6 +139,7 @@ namespace gui{
   signals:
     void sig_toolChange(ToolType tool);
     void sig_resetDesignPanel();
+    void sig_itemCreated(prim::Item::ItemType, prim::Item *);
 
   protected:
 
@@ -270,6 +271,9 @@ namespace gui{
     class MoveItem;         // move a single Item
 
     class CreateElectrode;  // create an electrode at the given points
+
+    class CreateAFMPath;    // create an empty AFMPath that should later contain AFMNodes
+    class CreateAFMNode;    // create AFMNodes that should be children of AFMPath
 
     // functions including undo/redo behaviour
 
@@ -446,6 +450,61 @@ namespace gui{
     // internals
     int index;              // index of electrode item in the layer item stack
 
+  };
+
+
+  class DesignPanel::CreateAFMPath : public QUndoCommand
+  {
+  public:
+    // create an empty AFMPath
+    CreateAFMPath(int layer_index, DesignPanel *dp, prim::AFMPath *afm_path=0, 
+                    bool invert=false, QUndoCommand *parent=0);
+
+    // destroy the AFMPath, which is not necessarily empty
+    virtual void undo();
+
+    // re-create the AFMPath
+    virtual void redo();
+
+  private:
+    void create();    // create the AFMPath
+    void destroy();   // destroy the AFMPath
+
+    bool invert;      // swaps create/delete on redo/undo
+
+    DesignPanel *dp;  // DesignPanel pointer
+    int layer_index;  // index of layer in dp->layers stack
+
+    int index;        // index of this path in the items stack
+  };
+
+
+  class DesignPanel::CreateAFMNode : public QUndoCommand
+  {
+  public:
+    // create an AFMNode with the given AFMPath and index in path
+    CreateAFMNode(int layer_index, DesignPanel *dp, QPointF sceneloc, float z_offset,
+          prim::AFMPath *afm_path, int index_in_path=-1, bool invert=false, 
+          QUndoCommand *parent=0);
+
+    // remove the AFMNode from its Path and destroy the node
+    virtual void undo();
+
+    // re-create the node
+    virtual void redo();
+
+  private:
+    void create();    // create the AFMNode
+    void destroy();   // destroy the AFMNode
+
+    bool invert;      // swaps create/delete on redo/undo
+
+    int layer_index;
+    DesignPanel *dp;
+    prim::AFMPath *afm_path; // NOTE might cause segfault
+    int node_index;
+    QPointF sceneloc;
+    float z_offset;
   };
 
 

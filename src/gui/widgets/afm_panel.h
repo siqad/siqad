@@ -30,14 +30,16 @@ namespace gui{
     // focused path (either showing properties or editing)
     void setFocusedPath(prim::AFMPath *path_fo);
     void unsetFocusedPath() {path_focused = 0;} // TODO call this when not making path
-    prim::AFMPath *getFocusedPath() {return path_focused;}
+    prim::AFMPath *focusedPath() {return path_focused;}
 
     // focused node (either showing properties or editing)
     void setFocusedNode(prim::AFMNode *node_fo) {node_focused = node_fo;}
     void unsetFocusedNode() {node_focused = 0;} // TODO call this when not making path
-    prim::AFMNode *getFocusedNode() {return node_focused;}
+    prim::AFMNode *focusedNode() {return node_focused;}
 
-  //public slot:
+  public slots:
+
+    void updateFocusedToNewItem(prim::Item::ItemType, prim::Item *);
 
     // TODO connect to DesignPanel's sig_toolChange, call unsetFocusedPath and
     // unsetFocusedNode when the tool is changed to anything but AFM

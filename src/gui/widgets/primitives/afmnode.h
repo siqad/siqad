@@ -57,7 +57,6 @@ namespace prim{
     static qreal diameter;
     static qreal edge_width;
 
-
   private:
 
     // initialise static class variables

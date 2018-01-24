@@ -21,6 +21,7 @@ namespace prim{
 
     // Constructor
     // TODO consider QList types
+    AFMPath(int lay_id);
     AFMPath(int lay_id, prim::AFMNode *node);
     AFMPath(int lay_id, const QList<prim::AFMNode*> &nodes, const QList<prim::AFMSeg*> &segs);
     AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene);
@@ -38,7 +39,7 @@ namespace prim{
     //void insertNode(QPointF new_loc, int index, float z_offset=0); // make node at new_loc and add to path
     void insertNode(prim::AFMNode *new_node, int index);
     //void appendNode(QPointF new_loc, float z_offset=0) {insertNode(new_loc, z_offset, path_nodes.length());}
-    void appendNode(prim::AFMNode *new_node) {insertNode(new_node, path_nodes.length());}
+    //void appendNode(prim::AFMNode *new_node) {insertNode(new_node, path_nodes.length());}
 
     // remove node at indicated index
     void removeNode(int index);

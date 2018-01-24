@@ -41,6 +41,10 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   // child widgets
   afm_panel = new AFMPanel(this);
 
+
+  // connections with child widgets
+  connect(this, &gui::DesignPanel::sig_itemCreated, afm_panel, &gui::AFMPanel::updateFocusedToNewItem);
+
   // setup flags
   clicked = ghosting = moving = false;
 
@@ -731,7 +735,13 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
           QGraphicsView::mousePressEvent(e);
         }
       } else if (tool_type == AFMPathTool) {
-        int afm_layer_index = getLayerIndex(afm_layer);
+        // TODO show AFMNode / Seg ghost during mouse move, place them at mouse release.
+        // basically do nothing at mouse press
+
+        createAFMNode();
+
+
+        /*int afm_layer_index = getLayerIndex(afm_layer);
         // TODO pick nearest latdot / db position unless Ctrl is pressed
         prim::AFMNode *new_afm_node = new prim::AFMNode(afm_layer_index, 
             mapToScene(e->pos()), afm_layer->getZOffset());
@@ -755,7 +765,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
           qDebug() << tr("  AFMPath created and added to DP, with length %1").arg(new_afm_path->nodeCount());
           afm_panel->setFocusedPath(new_afm_path);
           qDebug() << "  New AFMPath set to focused";
-        }
+        }*/
       } else {
         QGraphicsView::mousePressEvent(e);
       }
@@ -805,11 +815,14 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
         if (clicked && (tool_type == SelectTool || tool_type == DBGenTool 
               || tool_type == ElectrodeTool)) {
           rubberBandUpdate(e->pos());
-        } else if (tool_type == AFMPathTool && afm_panel->getFocusedNode()) {
+        } else if (tool_type == AFMPathTool && afm_panel->focusedNode()) {
+          // TODO move this whole thing to outside of clicked. Also, instead of 
+          // directly manipulating the nodes, manipulate ghosts of segments and nodes.
+
           // snap to the nearest possible location unless ctrl is held
           //qDebug() << "Entered mouse move event for AFM Path";
 
-          prim::AFMNode *focused_node = afm_panel->getFocusedNode();
+          prim::AFMNode *focused_node = afm_panel->focusedNode();
           QPointF from_loc = focused_node->scenePos();
           QPointF new_loc;
 
@@ -826,7 +839,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
           // move focused node and connected segments
           focused_node->moveBy(new_loc.x()-from_loc.x(), new_loc.y()-from_loc.y());
           for (prim::AFMSeg *seg : 
-                  afm_panel->getFocusedPath()->getConnectedSegments(focused_node)) {
+                  afm_panel->focusedPath()->getConnectedSegments(focused_node)) {
             seg->updatePoints();
           }
         }
@@ -896,12 +909,8 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             createElectrodes(e->pos());
             break;
           case gui::DesignPanel::AFMPathTool:
-            // for now, just make nodes to make something show on the screen
-            createAFMNode();
-            // TODO Actual implementation that takes into account whether there's
-            // already an existing path being worked on, or if a new path should be
-            // created. Also, decide whether to put these determination code in AFM
-            // Manager (to be created) or let design panel do the work.
+            // Make node at the ghost position
+            //createAFMNode();
             break;
           case gui::DesignPanel::DragTool:
             // pan ends
@@ -1644,6 +1653,7 @@ void gui::DesignPanel::CreateDB::destroy()
   }
 }
 
+
 // CreateElectrode class
 
 gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignPanel *dp, QPointF point1, QPointF point2, prim::Electrode *elec, bool invert, QUndoCommand *parent)
@@ -1678,6 +1688,91 @@ void gui::DesignPanel::CreateElectrode::destroy()
     electrode = 0;
   }
 }
+
+
+// CreateAFMPath class
+
+gui::DesignPanel::CreateAFMPath::CreateAFMPath(int layer_index, gui::DesignPanel *dp,
+                        prim::AFMPath *afm_path, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index)
+{
+  qDebug() << tr("Entered CreateAFMPath");
+  prim::Layer *layer = dp->getLayer(layer_index);
+  qDebug() << tr("Got layer index");
+  index = invert ? layer->getItems().indexOf(afm_path) : layer->getItems().size();
+  qDebug() << tr("CreateAFMPath constructor ends");
+}
+
+void gui::DesignPanel::CreateAFMPath::undo()
+{
+  invert ? create() : destroy();
+}
+
+void gui::DesignPanel::CreateAFMPath::redo()
+{
+  invert ? destroy() : create();
+}
+
+void gui::DesignPanel::CreateAFMPath::create()
+{
+  qDebug() << tr("Entered CreateAFMPath::creat()");
+  prim::AFMPath *new_path = new prim::AFMPath(layer_index);
+  dp->addItem(new_path, layer_index, index);
+  qDebug() << tr("Added AFMPath to designpanel");
+  emit dp->sig_itemCreated(prim::Item::AFMPath, new_path);
+  qDebug() << tr("Emitted itemCreated signal");
+}
+
+void gui::DesignPanel::CreateAFMPath::destroy()
+{
+  qDebug() << tr("Entered CreateAFMPath::destroy()");
+  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(index));
+
+  if (afm_path) {
+    // contained nodes and segments should be deleted automatically when deleting the path,
+    // since they're children items to the path.
+    dp->removeItem(afm_path, dp->getLayer(afm_path->layer_id));
+  }
+}
+
+
+// CreateAFMNode class
+
+gui::DesignPanel::CreateAFMNode::CreateAFMNode(int layer_index, gui::DesignPanel *dp,
+                        QPointF sceneloc, float z_offset, prim::AFMPath *afm_path,
+                        int index_in_path, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), 
+          sceneloc(sceneloc), z_offset(z_offset), afm_path(afm_path)
+{
+  node_index = (index_in_path == -1) ? afm_path->nodeCount() : index_in_path;
+}
+
+void gui::DesignPanel::CreateAFMNode::undo()
+{
+  invert ? create() : destroy();
+}
+
+void gui::DesignPanel::CreateAFMNode::redo()
+{
+  invert ? destroy() : create();
+}
+
+void gui::DesignPanel::CreateAFMNode::create()
+{
+  qDebug() << tr("Entered CreateAFMNode::create()");
+  prim::AFMNode *new_node = new prim::AFMNode(layer_index, sceneloc, z_offset);
+  afm_path->insertNode(new_node, node_index);
+  qDebug() << tr("Inserted node into path");
+  emit dp->sig_itemCreated(prim::Item::AFMNode, new_node);
+  qDebug() << tr("Emitted sig_itemCreated for node");
+}
+
+void gui::DesignPanel::CreateAFMNode::destroy()
+{
+  qDebug() << tr("Entered CreateAFMNode::destroy()");
+  afm_path->removeNode(node_index); // pointer cleanup is done by AFMPath
+}
+
 
 // FromAggregate class
 gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
@@ -1941,7 +2036,29 @@ void gui::DesignPanel::createElectrodes(QPoint point1)
 
 void gui::DesignPanel::createAFMNode()
 {
+  qDebug() << tr("Entered createAFMNode()");
+  int layer_index = getLayerIndex(afm_layer);
+  QPointF scene_pos = mapToScene(mouse_pos_cached); // mouse_pos_cached snapped to nearest site
+
   // TODO UNDOable version
+  undo_stack->beginMacro(tr("create AFMNode in the focused AFMPath after the focused AFMNode"));
+  qDebug() << tr("AFMNode creation macro began");
+  if (!afm_panel->focusedPath()) {
+    qDebug() << tr("No existing focused path, making new");
+    // create new path if there's no focused path
+    prim::AFMPath *new_path = new prim::AFMPath(layer_index);
+    qDebug() << "1";
+    afm_panel->setFocusedPath(new_path);
+    qDebug() << "2";
+    undo_stack->push(new CreateAFMPath(layer_index, this));
+    qDebug() << tr("Pushed new AFMPath to undo stack (as part of macro)");
+  }
+  qDebug() << tr("About to push new AFMNode to undo stack");
+  undo_stack->push(new CreateAFMNode(layer_index, this, scene_pos, afm_layer->getZOffset(),
+                                        afm_panel->focusedPath()));
+  qDebug() << tr("Pushed new AFMNode to undo stack.");
+  undo_stack->endMacro();
+  qDebug() << tr("AFMNode creation macro ended");
 }
 
 void gui::DesignPanel::deleteSelection()

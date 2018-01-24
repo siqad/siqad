@@ -19,7 +19,24 @@ AFMPanel::AFMPanel(QWidget *parent)
 void AFMPanel::setFocusedPath(prim::AFMPath *path_fo)
 {
   path_focused = path_fo;
-  setFocusedNode(path_focused->getLastNode());
+  if (path_fo->nodeCount() > 0)
+    setFocusedNode(path_focused->getLastNode());
+  else
+    setFocusedNode(0);
+}
+
+
+// SLOTS
+void AFMPanel::updateFocusedToNewItem(prim::Item::ItemType item_type, prim::Item *new_item)
+{
+  if (item_type == prim::Item::AFMNode) {
+    setFocusedPath(static_cast<prim::AFMPath*>(new_item->parentItem()));
+    setFocusedNode(static_cast<prim::AFMNode*>(new_item));
+  } else if (item_type == prim::Item::AFMPath) {
+    prim::AFMPath *new_path = static_cast<prim::AFMPath*>(new_item);
+    setFocusedPath(new_path);
+    //setFocusedNode(new_path->getLastNode());
+  }
 }
 
 

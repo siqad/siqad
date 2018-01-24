@@ -10,6 +10,12 @@
 
 namespace prim {
 
+AFMPath::AFMPath(int lay_id)
+  : prim::Item(prim::Item::AFMPath)
+{
+  initAFMPath(lay_id, QList<prim::AFMNode*>(), QList<prim::AFMSeg*>());
+}
+
 AFMPath::AFMPath(int lay_id, prim::AFMNode *node)
   : prim::Item(prim::Item::AFMPath)
 {
@@ -65,9 +71,10 @@ void AFMPath::insertNode(prim::AFMNode *new_node, int index)
 
   int last_index = path_nodes.length()-1;
 
-  if (index == last_index) {
+  if (index != 0 && index == last_index) {
+    // if the new node is appended to the previous last node, create a segment that
+    // originates from the last node to this one.
     qDebug() << QObject::tr("Appending new segment to AFMPath");
-    // appending
     insertSegment(index-1);
   } else {
     // inserting
@@ -92,6 +99,10 @@ void AFMPath::removeNode(int index)
   prim::AFMNode *rm_node = path_nodes.takeAt(index);
   prim::Emitter::instance()->removeItemFromScene(rm_node);
   delete rm_node;
+
+  // skip removing segments if there aren't any left
+  if (segmentCount() == 0)
+    return;
 
   // remove segments associated with that node
   if (index == 0) {
