@@ -187,14 +187,18 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("electrode/selected_col", QColor(0, 100, 255)); // edge color, selected
 
   // afm parameters
-  S->setValue("afmnode/fill_col_default", QColor(0, 90, 255, 160));   // default fill color
-  S->setValue("afmnode/fill_col_hovered", QColor(0, 170, 255, 160));  // hovered fill color
-  S->setValue("afmnode/fill_col_sel", QColor(130, 90, 255, 160));     // selected fill color
+  S->setValue("afmnode/fill_col_default", QColor(0, 90, 255, 200));   // default fill color
+  S->setValue("afmnode/fill_col_hovered", QColor(0, 170, 255, 200));  // hovered fill color
+  S->setValue("afmnode/fill_col_sel", QColor(130, 90, 255, 200));     // selected fill color
   S->setValue("afmnode/bd_col_default", QColor(255, 255, 255, 160));  // default border color
   S->setValue("afmnode/bd_col_hovered", QColor(255, 255, 255, 160));  // hovered border color
   S->setValue("afmnode/bd_col_sel", QColor(255, 255, 255, 160));      // selected border color
   S->setValue("afmnode/diameter", 2);     // node diameter
   S->setValue("afmnode/edge_width", .2);  // node edge width
+  S->setValue("afmseg/line_col_default", QColor(0, 255, 166, 160));
+  S->setValue("afmseg/line_col_hovered", QColor(43, 255, 0, 160));
+  S->setValue("afmseg/line_col_sel", QColor(0, 150, 110, 160));
+  S->setValue("afmseg/line_width", 10);
 
   return S;
 }

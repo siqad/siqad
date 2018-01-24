@@ -14,12 +14,11 @@ AFMPath::AFMPath(int lay_id, prim::AFMNode *node)
   : prim::Item(prim::Item::AFMPath)
 {
   QList<prim::AFMNode*> nodes;
-  QList<prim::AFMSeg*> segs;
   nodes.append(node);
-  initAFMPath(lay_id, nodes, segs);
+  initAFMPath(lay_id, nodes, QList<prim::AFMSeg*>());
 }
 
-AFMPath::AFMPath(int lay_id, QList<prim::AFMNode*> nodes, QList<prim::AFMSeg*> segs)
+AFMPath::AFMPath(int lay_id, const QList<prim::AFMNode*> &nodes, const QList<prim::AFMSeg*> &segs)
   : prim::Item(prim::Item::AFMPath)
 {
   initAFMPath(lay_id, nodes, segs);
@@ -31,23 +30,22 @@ AFMPath::AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene)
   // TODO load from file
 }
 
-void AFMPath::initAFMPath(int lay_id, QList<prim::AFMNode*> nodes, QList<prim::AFMSeg*> segs)
+void AFMPath::initAFMPath(int lay_id, const QList<prim::AFMNode*> &nodes, const QList<prim::AFMSeg*> &segs)
 {
   layer_id = lay_id;
   path_nodes = nodes;
   path_segs = segs;
 
   for (prim::AFMNode* node : path_nodes)
-    prim::Emitter::instance()->addItemToScene(node);
+    node->setParentItem(this);
 
   for (prim::AFMSeg* seg : path_segs)
-    prim::Emitter::instance()->addItemToScene(seg);
+    seg->setParentItem(this);
+
   // TODO check that segments match up with the nodes
   // TODO regenerate segs if not
 
-  // TODO init GUI elements related to path
-
-  // TODO prepareStatics if not valid
+  // TODO emit signal declaring this to be the focused path
 }
 
 
@@ -63,7 +61,7 @@ void AFMPath::insertNode(prim::AFMNode *new_node, int index)
 {
   // insert the node to node list
   path_nodes.insert(index, new_node);
-  prim::Emitter::instance()->addItemToScene(new_node);
+  new_node->setParentItem(this);
 
   int last_index = path_nodes.length()-1;
 
@@ -77,7 +75,7 @@ void AFMPath::insertNode(prim::AFMNode *new_node, int index)
 
     // reconnect preceding segment to this node
     if (index > 0)
-      getSegment(index-1)->setDestination(getNode(index));
+      getSegment(index-1)->setDestinationNode(getNode(index));
     // create new segment connecting this node to the next
     if (index != last_index)
       insertSegment(index);
@@ -90,6 +88,7 @@ void AFMPath::removeNode(int index)
   int last_index = path_nodes.length()-1;
 
   // take the node out of nodes list
+  // NOTE might segfault, look into delete behavior when deleting a child item for QGraphicsItem
   prim::AFMNode *rm_node = path_nodes.takeAt(index);
   prim::Emitter::instance()->removeItemFromScene(rm_node);
   delete rm_node;
@@ -102,7 +101,7 @@ void AFMPath::removeNode(int index)
   } else {
     removeSegment(index);
     // reconnect segment to new neighboring node
-    getSegment(index-1)->setDestination(getNode(index));
+    getSegment(index-1)->setDestinationNode(getNode(index));
   }
 }
 
@@ -110,8 +109,8 @@ void AFMPath::removeNode(int index)
 void AFMPath::insertSegment(int index)
 {
   prim::AFMSeg *new_segment = new prim::AFMSeg(layer_id, getNode(index), getNode(index+1));
+  new_segment->setParentItem(this);
   path_segs.insert(index, new_segment);
-  prim::Emitter::instance()->addItemToScene(new_segment);
 }
 
 
@@ -185,32 +184,6 @@ Item *AFMPath::deepCopy() const
   cp->setPos(pos());
   return cp;
 }
-
-
-/* could be reused in afmnode and afmseg
-void AFMPath::prepareStatics()
-{
-  settings::GUISettings *gui_settings = settings::GUISettings::instance();
-
-  // node properties
-  node_diameter = gui_settings->get<qreal>("afmpath/node_diameter");
-  node_fill.def = gui_settings->get<QColor>("afmpath/node_fill_col_default");
-  node_fill.hovered = gui_settings->get<QColor>("afmpath/node_fill_col_hovered");
-  node_fill.sel = gui_settings->get<QColor>("afmpath/node_fill_col_sel");
-  node_bd.def = gui_settings->get<QColor>("afmpath/node_bd_col_default");
-  node_bd.hovered = gui_settings->get<QColor>("afmpath/node_bd_col_hovered");
-  node_bd.sel = gui_settings->get<QColor>("afmpath/node_bd_col_sel");
-
-  // segment properties
-  seg_width = gui_settings->get<qreal>("afmpath/seg_width");
-  seg_fill.def = gui_settings->get<QColor>("afmpath/seg_fill_col_default");
-  seg_fill.hovered = gui_settings->get<QColor>("afmpath/seg_fill_col_hovered");
-  seg_fill.sel = gui_settings->get<QColor>("afmpath/seg_fill_col_sel");
-  seg_bd.def = gui_settings->get<QColor>("afmpath/seg_bd_col_default");
-  seg_bd.hovered = gui_settings->get<QColor>("afmpath/seg_bd_col_hovered");
-  seg_bd.sel = gui_settings->get<QColor>("afmpath/seg_bd_col_sel");
-
-}*/
 
 
 void AFMPath::mousePressEvent(QGraphicsSceneMouseEvent *e)

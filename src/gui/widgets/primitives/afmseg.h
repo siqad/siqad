@@ -33,8 +33,8 @@ namespace prim{
     // Segment manipulation
 
     // change/get segment origin / target
-    void setOrigin(prim::AFMNode *orig_node);
-    void setDestination(prim::AFMNode *dest_node);
+    void setOriginNode(prim::AFMNode *orig_node);
+    void setDestinationNode(prim::AFMNode *dest_node);
     prim::AFMNode* originNode() {return origin_node;}
     prim::AFMNode* destinationNode() {return destination_node;}
 
@@ -75,11 +75,19 @@ namespace prim{
 
 
     // VARS
-    prim::AFMNode *origin_node;
-    prim::AFMNode *destination_node;
+    prim::AFMNode *origin_node=0;
+    prim::AFMNode *destination_node=0;
 
     QPointF origin_loc;       // for boundingRect
     QPointF destination_loc;  // for boundingRect
+
+    QColor line_col;
+
+    // static
+    static QColor line_col_default;
+    static QColor line_col_hovered;
+    static QColor line_col_sel;
+    static qreal line_width;
   };
 
 } // end of prim namespace

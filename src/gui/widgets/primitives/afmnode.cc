@@ -48,8 +48,7 @@ void AFMNode::initAFMNode(int lay_id, QPointF sceneloc, float z_offset)
   // GUI properties
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setAcceptHoverEvents(true);
-
-  // TODO setup statics
+  setZValue(2);
 }
 
 

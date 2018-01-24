@@ -22,9 +22,9 @@ namespace prim{
     // Constructor
     // TODO consider QList types
     AFMPath(int lay_id, prim::AFMNode *node);
-    AFMPath(int lay_id, QList<prim::AFMNode*> nodes, QList<prim::AFMSeg*> segs);
+    AFMPath(int lay_id, const QList<prim::AFMNode*> &nodes, const QList<prim::AFMSeg*> &segs);
     AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene);
-    void initAFMPath(int lay_id, QList<prim::AFMNode*>, QList<prim::AFMSeg*>);
+    void initAFMPath(int lay_id, const QList<prim::AFMNode*> &, const QList<prim::AFMSeg*> &);
 
     // Destructor
     ~AFMPath() {}; // AFMNode and AFMSeg pointers are deleted by DesignPanel on scene clear

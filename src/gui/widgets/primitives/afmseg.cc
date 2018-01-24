@@ -10,7 +10,12 @@
 
 namespace prim{
 
-// TODO static stuff
+// Initialise statics
+QColor AFMSeg::line_col_default;
+QColor AFMSeg::line_col_hovered;
+QColor AFMSeg::line_col_sel;
+qreal AFMSeg::line_width = -1;
+
 
 // constructors
 AFMSeg::AFMSeg(int lay_id, prim::AFMNode *orig_node, prim::AFMNode *dest_node)
@@ -27,13 +32,16 @@ AFMSeg::AFMSeg(QXmlStreamReader *rs, QGraphicsScene *scene)
 
 void AFMSeg::initAFMSeg(int lay_id, prim::AFMNode *orig_node, prim::AFMNode *dest_node)
 {
+  if (line_width == -1)
+    prepareStatics();
+
   layer_id = lay_id;
-  setOrigin(orig_node);
-  setDestination(dest_node);
+  setOriginNode(orig_node);
+  setDestinationNode(dest_node);
 
   updatePoints();
 
-  // TODO prepareStatics if not valid
+  setZValue(1);
 }
 
 
@@ -45,13 +53,13 @@ void AFMSeg::saveItems(QXmlStreamWriter *ws) const
 
 
 // Segment manipulation
-void AFMSeg::setOrigin(prim::AFMNode *orig_node)
+void AFMSeg::setOriginNode(prim::AFMNode *orig_node)
 {
   origin_node = orig_node;
   updatePoints();
 }
 
-void AFMSeg::setDestination(prim::AFMNode *dest_node)
+void AFMSeg::setDestinationNode(prim::AFMNode *dest_node)
 {
   destination_node = dest_node;
   updatePoints();
@@ -61,6 +69,9 @@ void AFMSeg::setDestination(prim::AFMNode *dest_node)
 // Graphics
 void AFMSeg::updatePoints()
 {
+  if (!originNode() || !destinationNode())
+    return;
+
   prepareGeometryChange();
   origin_loc = originNode()->scenePos();
   destination_loc = destinationNode()->scenePos();
@@ -69,17 +80,41 @@ void AFMSeg::updatePoints()
 
 QRectF AFMSeg::boundingRect() const
 {
-  qreal x_min = qMin(origin_loc.x(), destination_loc.x());
-  qreal y_min = qMin(origin_loc.y(), destination_loc.y());
-  qreal dx = qMax(origin_loc.x(), destination_loc.x()) - x_min;
-  qreal dy = qMax(origin_loc.y(), destination_loc.y()) - y_min;
+  if (origin_loc.isNull() || destination_loc.isNull())
+    return QRectF();
+
+  qreal x_min = qMin(origin_loc.x(), destination_loc.x()) - line_width*0.5;
+  qreal y_min = qMin(origin_loc.y(), destination_loc.y()) - line_width*0.5;
+  qreal dx = qMax(origin_loc.x(), destination_loc.x()) - x_min + line_width;
+  qreal dy = qMax(origin_loc.y(), destination_loc.y()) - y_min + line_width;
+
+  // TODO expand a little to account for line width
+
   return QRectF(x_min, y_min, dx, dy);
 }
 
 void AFMSeg::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-  painter->setPen(Qt::SolidLine);
-  painter->setBrush(QColor(255,255,255));
+  if (!originNode() || !destinationNode())
+    return;
+
+  if (select_mode && upSelected()) {
+    line_col = line_col_sel;
+  } else if (isHovered()) {
+    line_col = line_col_hovered;
+  } else {
+    line_col = line_col_default;
+  }
+
+  QPen paint_pen = QPen();
+  paint_pen.setColor(line_col);
+  paint_pen.setCapStyle(Qt::RoundCap);
+  paint_pen.setJoinStyle(Qt::RoundJoin);
+  paint_pen.setWidth(line_width);
+
+
+  painter->setPen(paint_pen);
+  //painter->setBrush(QColor(255,255,255));
   painter->drawLine(QLineF(originNode()->scenePos(), destinationNode()->scenePos()));
 }
 
@@ -93,7 +128,13 @@ Item *AFMSeg::deepCopy() const
 
 void AFMSeg::prepareStatics()
 {
+  // Initialize statics
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
+  line_col_default = gui_settings->get<QColor>("afmseg/line_col_default");
+  line_col_hovered = gui_settings->get<QColor>("afmseg/line_col_hovered");
+  line_col_sel = gui_settings->get<QColor>("afmseg/line_col_sel");
+  line_width = gui_settings->get<qreal>("afmseg/line_width");
 }
 
 
