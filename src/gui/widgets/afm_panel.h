@@ -29,13 +29,17 @@ namespace gui{
 
     // focused path (either showing properties or editing)
     void setFocusedPath(prim::AFMPath *path_fo);
-    void unsetFocusedPath() {path_focused = 0;} // TODO call this when not making path
     prim::AFMPath *focusedPath() {return path_focused;}
 
     // focused node (either showing properties or editing)
     void setFocusedNode(prim::AFMNode *node_fo) {node_focused = node_fo;}
-    void unsetFocusedNode() {node_focused = 0;} // TODO call this when not making path
     prim::AFMNode *focusedNode() {return node_focused;}
+
+    // ghost node for indicating where the next AFMNode will be placed TODO remove
+    //prim::AFMNode *ghostNode() {return node_ghost;}
+
+    // show or hide the ghost TODO remove
+    //void showGhost(bool);
 
   public slots:
 
@@ -47,8 +51,12 @@ namespace gui{
   private:
 
     // VAR
-    prim::AFMPath *path_focused = 0;
-    prim::AFMNode *node_focused = 0;
+    prim::AFMPath *path_focused = 0;  // AFMPath currently being manipulated
+    prim::AFMNode *node_focused = 0;  // AFMNode currently being manipulated
+
+    /* TODO remove
+    prim::AFMNode *node_ghost = 0;    // Ghost AFMNode for showing where the next AFMNode will go
+    prim::AFMSeg  *seg_ghost = 0;     // Ghost AFMSeg for showing where the next AFMSeg will go*/
 
 
   };

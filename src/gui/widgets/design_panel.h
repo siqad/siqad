@@ -197,6 +197,10 @@ namespace gui{
     prim::LatticeDot *snap_target;  // current snap target, LatticeDot
     QPointF snap_cache;             // cursor position of last snap update
 
+    // AFM ghost
+    prim::AFMNode *ghost_afm_node=0;
+    prim::AFMSeg *ghost_afm_seg=0;
+
     // mouse functionality
     QPoint mouse_pos_old;     // old mouse position in pixels
     QPoint mouse_pos_cached;  // parameter for caching relevant mouse positions, in pixels

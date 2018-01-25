@@ -25,6 +25,23 @@ void AFMPanel::setFocusedPath(prim::AFMPath *path_fo)
     setFocusedNode(0);
 }
 
+void AFMPanel::setFocusedNode(prim::AFMNode *node_fo)
+{
+  node_focused = node_fo;
+  seg_ghost->setOrigin(node_focused);
+}
+
+/* TODO remove
+void showGhost(bool show)
+{
+  // alwayd show node ghost at cursor position
+  node_ghost->setVisible(show);
+
+  // only show seg ghost if there will be a segment connection
+  if (node_focused)
+    seg_ghost->setVisible(show);
+}*/
+
 
 // SLOTS
 void AFMPanel::updateFocusedToNewItem(prim::Item::ItemType item_type, prim::Item *new_item)

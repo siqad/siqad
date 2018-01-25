@@ -90,6 +90,10 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 
   // set display mode
   setDisplayMode(DesignMode);
+
+  // AFM ghosts (TODO move somewhere else)
+  ghost_afm_node = new prim::AFMNode(getLayerIndex(afm_layer), QPointF(0,0), afm_layer->zOffset());
+  ghost_afm_seg = new prim::AFMSeg(getLayerIndex(afm_layer), 0, ghost_afm_node);
 }
 
 // destructor
@@ -734,7 +738,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
         } else {
           QGraphicsView::mousePressEvent(e);
         }
-      } else if (tool_type == AFMPathTool) {
+    /*} else if (tool_type == AFMPathTool) {
         // TODO show AFMNode / Seg ghost during mouse move, place them at mouse release.
         // basically do nothing at mouse press
 
@@ -765,7 +769,8 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
           qDebug() << tr("  AFMPath created and added to DP, with length %1").arg(new_afm_path->nodeCount());
           afm_panel->setFocusedPath(new_afm_path);
           qDebug() << "  New AFMPath set to focused";
-        }*/
+        }
+      }*/
       } else {
         QGraphicsView::mousePressEvent(e);
       }
@@ -801,14 +806,25 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     QPointF offset;
     if(snapGhost(scene_pos, offset)) //if there are db dots
       prim::Ghost::instance()->moveBy(offset.x(), offset.y());
-  }
+
   /* TODO DB ghosting when DBGen tool is in use
-    else if(tool_type == gui::DesignPanel::DBGenTool){
+  } else if(tool_type == gui::DesignPanel::DBGenTool){
      show "ghost" of new DB
     QPointF scene_pos = mapToScene(e->pos());
-    snapDB(scene_pos);
-  }*/
-  else if (clicked) {
+    snapDB(scene_pos);*/
+
+  } else if (tool_type == AFMPathTool) {
+    // update ghost node and ghost segment if there is a focused node, only update
+    // ghost node if there's none.
+    ghost_afm_node->setPos(mapToScene(e->pos()));
+    ghost_afm_node->show();
+
+    if (afm_panel->focusedNode()) {
+      ghost_afm_seg->setOriginNode(afm_panel->focusedNode());
+      ghost_afm_seg->updatePoints();
+      ghost_afm_seg->show();
+    }
+  } else if (clicked) {
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
       case Qt::LeftButton:
@@ -910,7 +926,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             break;
           case gui::DesignPanel::AFMPathTool:
             // Make node at the ghost position
-            //createAFMNode();
+            createAFMNode();
             break;
           case gui::DesignPanel::DragTool:
             // pan ends
