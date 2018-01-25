@@ -363,7 +363,7 @@ void gui::ApplicationGUI::initActions()
             this, &gui::ApplicationGUI::parseInputField);
 
   // set tool
-  connect(design_pan, &gui::DesignPanel::sig_toolChange,
+  connect(design_pan, &gui::DesignPanel::sig_toolChangeRequest,
             this, &gui::ApplicationGUI::setTool);
 
   layer_editor->initLayerTable(); // TODO move to appropriate place

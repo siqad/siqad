@@ -53,11 +53,11 @@ namespace prim{
 
     // set / get the zoffset of the layer
     void setZOffset(const float z_offset) {zoffset = z_offset;}
-    float getZOffset() {return zoffset;}
+    float zOffset() {return zoffset;}
 
     // set / get the zheight of the layer
     void setZHeight(const float z_height) {zheight = z_height;}
-    float getZHeight() {return zheight;}
+    float zHeight() {return zheight;}
 
     // add a new Item to the current layer. If the Item is already in the layer,
     // do nothing.

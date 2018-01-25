@@ -28,7 +28,7 @@ void AFMPanel::setFocusedPath(prim::AFMPath *path_fo)
 void AFMPanel::setFocusedNode(prim::AFMNode *node_fo)
 {
   node_focused = node_fo;
-  seg_ghost->setOrigin(node_focused);
+  //seg_ghost->setOrigin(node_focused);
 }
 
 /* TODO remove

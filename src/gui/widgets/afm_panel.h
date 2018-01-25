@@ -32,7 +32,7 @@ namespace gui{
     prim::AFMPath *focusedPath() {return path_focused;}
 
     // focused node (either showing properties or editing)
-    void setFocusedNode(prim::AFMNode *node_fo) {node_focused = node_fo;}
+    void setFocusedNode(prim::AFMNode *node_fo);
     prim::AFMNode *focusedNode() {return node_focused;}
 
     // ghost node for indicating where the next AFMNode will be placed TODO remove

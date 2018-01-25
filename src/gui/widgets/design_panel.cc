@@ -90,10 +90,6 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 
   // set display mode
   setDisplayMode(DesignMode);
-
-  // AFM ghosts (TODO move somewhere else)
-  ghost_afm_node = new prim::AFMNode(getLayerIndex(afm_layer), QPointF(0,0), afm_layer->zOffset());
-  ghost_afm_seg = new prim::AFMSeg(getLayerIndex(afm_layer), 0, ghost_afm_node);
 }
 
 // destructor
@@ -398,9 +394,12 @@ void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
   scene->clearSelection();
 
   // inform all items of select mode
+  // TODO replace with signal based notification
   prim::Item::select_mode = tool==gui::DesignPanel::SelectTool;
   prim::Item::db_gen_mode = tool==gui::DesignPanel::DBGenTool;
   prim::Item::electrode_mode = tool==gui::DesignPanel::ElectrodeTool;
+
+  emit sig_toolChanged(tool);
 
   switch(tool){
     case gui::DesignPanel::SelectTool:
@@ -708,6 +707,14 @@ void gui::DesignPanel::simVisualizeDockVisibilityChanged(bool visible)
     clearSimResults();
 }
 
+void gui::DesignPanel::afmGhostVisibilityWithTool(ToolType tool)
+{
+  if (tool != AFMPathTool) {
+    ghost_afm_node->hide();
+    ghost_afm_seg->hide();
+  }
+}
+
 // INTERRUPTS
 
 // most behaviour will be connected to mouse move/release. However, when
@@ -748,7 +755,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
         /*int afm_layer_index = getLayerIndex(afm_layer);
         // TODO pick nearest latdot / db position unless Ctrl is pressed
         prim::AFMNode *new_afm_node = new prim::AFMNode(afm_layer_index, 
-            mapToScene(e->pos()), afm_layer->getZOffset());
+            mapToScene(e->pos()), afm_layer->zOffset());
 
         prim::AFMPath *focused_afm_path = afm_panel->getFocusedPath();
         if (focused_afm_path) {
@@ -795,7 +802,6 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
   Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
 
   QPoint mouse_pos_del;
-  //QTransform trans = transform();
   QScrollBar *vsb = verticalScrollBar();
   QScrollBar *hsb = horizontalScrollBar();
   qreal dx, dy;
@@ -814,6 +820,16 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     snapDB(scene_pos);*/
 
   } else if (tool_type == AFMPathTool) {
+    if (!ghost_afm_node) {
+      ghost_afm_node = new prim::AFMNode(getLayerIndex(afm_layer), QPointF(0,0), afm_layer->zOffset());
+      connect(this, &gui::DesignPanel::sig_toolChanged, this, &gui::DesignPanel::afmGhostVisibilityWithTool);
+      scene->addItem(ghost_afm_node);
+    }
+    if (!ghost_afm_seg) {
+      ghost_afm_seg = new prim::AFMSeg(getLayerIndex(afm_layer), 0, ghost_afm_node);
+      scene->addItem(ghost_afm_seg);
+    }
+
     // update ghost node and ghost segment if there is a focused node, only update
     // ghost node if there's none.
     ghost_afm_node->setPos(mapToScene(e->pos()));
@@ -1021,7 +1037,7 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
         if(tool_type != gui::DesignPanel::SelectTool){
           //qDebug() << tr("Esc pressed, drop back to select tool");
           // emit signal to be picked up by application.cc
-          emit sig_toolChange(gui::DesignPanel::SelectTool);
+          emit sig_toolChangeRequest(gui::DesignPanel::SelectTool);
         }
         break;
       case Qt::Key_G:
@@ -2076,7 +2092,7 @@ void gui::DesignPanel::createAFMNode()
   qDebug() << tr("About to push new AFMNode to undo stack");
   int afm_path_index = afm_layer->getItemIndex(afm_panel->focusedPath());
   qDebug() << tr("afm_path_index=%1").arg(afm_path_index);
-  undo_stack->push(new CreateAFMNode(layer_index, this, scene_pos, afm_layer->getZOffset(),
+  undo_stack->push(new CreateAFMNode(layer_index, this, scene_pos, afm_layer->zOffset(),
                                         afm_path_index));
   qDebug() << tr("Pushed new AFMNode to undo stack.");
   undo_stack->endMacro();

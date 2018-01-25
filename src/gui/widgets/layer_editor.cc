@@ -176,8 +176,8 @@ void LayerEditor::addLayerRow(prim::Layer *layer)
   curr_row_items->type->setToolTip(layer->getContentTypeString());
   
   curr_row_items->name = new QTableWidgetItem(layer->getName());
-  curr_row_items->zoffset = new QTableWidgetItem(QString::number(layer->getZOffset()));
-  curr_row_items->zheight = new QTableWidgetItem(QString::number(layer->getZHeight()));
+  curr_row_items->zoffset = new QTableWidgetItem(QString::number(layer->zOffset()));
+  curr_row_items->zheight = new QTableWidgetItem(QString::number(layer->zHeight()));
 
   // add to table
   addLayerRow(curr_row_items);

@@ -136,8 +136,11 @@ namespace gui{
     void addItemToSceneRequest(prim::Item *item) {addItemToScene(item);}
     void removeItemFromSceneRequest(prim::Item *item) {removeItemFromScene(item);}
 
+    void afmGhostVisibilityWithTool(ToolType tool);
+
   signals:
-    void sig_toolChange(ToolType tool);
+    void sig_toolChangeRequest(ToolType tool);  // request ApplicationGUI to change tool
+    void sig_toolChanged(ToolType tool);         // notify other subjects about tool change
     void sig_resetDesignPanel();
     void sig_itemCreated(prim::Item::ItemType, prim::Item *);
 
