@@ -73,7 +73,7 @@ void AFMSeg::setDestinationNode(prim::AFMNode *dest_node)
 // Graphics
 void AFMSeg::updatePoints()
 {
-  if (!originNode() || !destinationNode())
+  if (!segmentIsValid())
     return;
 
   prepareGeometryChange();
@@ -84,7 +84,7 @@ void AFMSeg::updatePoints()
 
 QRectF AFMSeg::boundingRect() const
 {
-  if (origin_loc.isNull() || destination_loc.isNull())
+  if (!segmentIsValid())
     return QRectF();
 
   qreal x_min = qMin(origin_loc.x(), destination_loc.x()) - line_width*0.5;
@@ -99,7 +99,7 @@ QRectF AFMSeg::boundingRect() const
 
 void AFMSeg::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-  if (!originNode() || !destinationNode())
+  if (!segmentIsValid())
     return;
 
   if (select_mode && upSelected()) {

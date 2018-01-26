@@ -29,6 +29,8 @@ namespace prim{
     // Save to XML
     virtual void saveItems(QXmlStreamWriter *) const;
 
+    // Segment status
+    bool segmentIsValid() const {return (origin_node && destination_node) ? true : false;}
 
     // Segment manipulation
 

@@ -742,39 +742,6 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
         } else {
           QGraphicsView::mousePressEvent(e);
         }
-    /*} else if (tool_type == AFMPathTool) {
-        // TODO show AFMNode / Seg ghost during mouse move, place them at mouse release.
-        // basically do nothing at mouse press
-
-        createAFMNode();
-
-
-        /*int afm_layer_index = getLayerIndex(afm_layer);
-        // TODO pick nearest latdot / db position unless Ctrl is pressed
-        prim::AFMNode *new_afm_node = new prim::AFMNode(afm_layer_index, 
-            mapToScene(e->pos()), afm_layer->zOffset());
-
-        prim::AFMPath *focused_afm_path = afm_panel->getFocusedPath();
-        if (focused_afm_path) {
-          // if there's already a focused path and node, insert new node behind focused node
-          qDebug() << tr("AFMPath exists, appending new node");
-          focused_afm_path->appendNode(new_afm_node);
-          qDebug() << tr("  Node appended to path, new node count=%1").arg(focused_afm_path->nodeCount());
-          qDebug() << tr("  New segment count=%1").arg(focused_afm_path->segmentCount());
-          afm_panel->setFocusedNode(new_afm_node);
-          qDebug() << tr("  New node set as focus");
-          // TODO insert new node behind focused node (or back of path if no focused node)
-        } else {
-          // if there's no focused path, make a new one and insert new node
-          qDebug() << "AFMPath doesn't exist, making new";
-          // create new path and make it focused
-          prim::AFMPath *new_afm_path = new prim::AFMPath(afm_layer_index, new_afm_node);
-          addItem(new_afm_path, afm_layer_index);
-          qDebug() << tr("  AFMPath created and added to DP, with length %1").arg(new_afm_path->nodeCount());
-          afm_panel->setFocusedPath(new_afm_path);
-          qDebug() << "  New AFMPath set to focused";
-        }
-      }*/
       } else {
         QGraphicsView::mousePressEvent(e);
       }
@@ -817,24 +784,18 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     snapDB(scene_pos);*/
 
   } else if (tool_type == AFMPathTool) {
-
     // update ghost node and ghost segment if there is a focused node, only update
     // ghost node if there's none.
-    afm_panel->ghostNode()->setPos(mapToScene(e->pos()));
-    afm_panel->showGhost(true);
+    //afm_panel->ghostNode()->setPos(mapToScene(e->pos()));
+    QList<prim::Item::ItemType> target_types;
+    target_types.append(prim::Item::LatticeDot);
+    target_types.append(prim::Item::DBDot);
+    prim::Item *snap_target = filteredSnapTarget(mapToScene(e->pos()), target_types, snap_diameter);
+    if (snap_target) {
+      afm_panel->ghostNode()->setPos(snap_target->scenePos());
+      afm_panel->showGhost(true);
+    }
 
-    /*if (afm_panel->focusedNodeIndex() > -1) {
-      qDebug() << tr("gonna show seg_ghost");
-      prim::AFMNode *focused_node = afm_panel->focusedPath()->getNode(afm_panel->focusedNodeIndex());
-      qDebug() << tr("Got focused node to connect seg_ghost to, index = %1").arg(afm_panel->focusedNodeIndex());
-      if (ghost_afm_seg->originNode() != focused_node) {
-        qDebug() << tr("Focused node differs from seg_ghost origin, updating seg_ghost");
-        ghost_afm_seg->setOriginNode(focused_node);
-      }
-      qDebug() << tr("Update ghost_seg location and show");
-      ghost_afm_seg->updatePoints();
-      ghost_afm_seg->show();
-    }*/
   } else if (clicked) {
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
@@ -1578,7 +1539,7 @@ void gui::DesignPanel::snapDB(QPointF scene_pos)
     return;
   }
 
-  // select the nearest db to cursor position
+  // select the nearest latdot to cursor position
   prim::LatticeDot *target=0;
   qreal mdist=-1, dist;
 
@@ -1602,6 +1563,41 @@ void gui::DesignPanel::snapDB(QPointF scene_pos)
   snap_target->setSelected(true); // select the new target
 
   return;
+}
+
+prim::Item *gui::DesignPanel::filteredSnapTarget(QPointF scene_pos, QList<prim::Item::ItemType> &target_types, qreal search_box_width)
+{
+  snap_cache = scene_pos;
+
+  // set search boundary
+  QRectF search_bound;
+  search_bound.setSize(QSizeF(snap_diameter, snap_diameter)); // use the same snap range as other snap functions
+  search_bound.moveCenter(scene_pos);
+  QList<QGraphicsItem*> near_items = scene->items(search_bound);
+
+  // if no items nearby, return a null pointer
+  if (near_items.count()==0) {
+    return 0;
+  }
+
+  // find the item nearest to cursor position that falls under the targeted item type
+  prim::Item *target=0;
+  qreal mdist=-1, dist;
+
+  for (QGraphicsItem *gitem : near_items) {
+    prim::Item *pitem = static_cast<prim::Item*>(gitem);
+    for (prim::Item::ItemType target_type : target_types) {
+      if (pitem->item_type == target_type) {
+        dist = (pitem->scenePos()-scene_pos).manhattanLength();
+        if (mdist < 0 || dist < mdist) {
+          mdist = dist;
+          target = pitem;
+        }
+      }
+    }
+  }
+  
+  return target;
 }
 
 // UNDO/REDO STACK METHODS
@@ -2044,8 +2040,12 @@ void gui::DesignPanel::createAFMNode()
 {
   qDebug() << tr("Entered createAFMNode()");
   int layer_index = getLayerIndex(afm_layer);
-  QPointF scene_pos = mapToScene(mouse_pos_cached); // mouse_pos_cached snapped to nearest site
-
+  QPointF scene_pos;
+  if (afm_panel->ghostNode())
+    scene_pos = afm_panel->ghostNode()->scenePos();
+  else
+    scene_pos = mapToScene(mouse_pos_cached);
+      
   // TODO UNDOable version
   undo_stack->beginMacro(tr("create AFMNode in the focused AFMPath after the focused AFMNode"));
   qDebug() << tr("AFMNode creation macro began");
