@@ -1901,16 +1901,8 @@ gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
                                       DesignPanel *dp, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), offset(offset)
 {
-  if(item->item_type != prim::Item::Electrode)
-  {
-    layer_index = item->layer_id;
-    item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
-  }
-  else if(item->item_type == prim::Item::Electrode)
-  {
-    layer_index = item->layer_id;
-    item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
-  }
+  layer_index = item->layer_id;
+  item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
 }
 
 
@@ -2092,6 +2084,17 @@ void gui::DesignPanel::deleteSelection()
                         QPointF(item->x() + static_cast<prim::Electrode*>(item)->getWidth(),
                         item->y() + static_cast<prim::Electrode*>(item)->getHeight()),
                         static_cast<prim::Electrode*>(item), true));
+        break;
+      case prim::Item::AFMPath:
+        // TODO implement destroyAFMPath(static_cast<prim::AFMPath*>(item));
+        break;
+      case prim::Item::AFMNode:
+        prim::AFMNode *afm_node = static_cast<prim::AFMNode*>(item);
+        prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(afm_node->parentItem());
+        int afm_index = getLayer(afm_node->layer_id)->getItemIndex(afm_path);
+        int node_index = afm_path->getNodeIndex(node);
+        undo_stack->push(new CreateAFMNode(node->layer_id, this, node->scenePos(),
+                          node->zOffset(), afm_index, node_index)
         break;
       default:
         break;
