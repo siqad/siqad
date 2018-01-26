@@ -144,7 +144,7 @@ namespace gui{
 
   signals:
     void sig_toolChangeRequest(gui::ToolType tool);  // request ApplicationGUI to change tool
-    void sig_toolChanged(gui::ToolType tool);         // notify other subjects about tool change
+    void sig_toolChanged(gui::ToolType tool);  // request ApplicationGUI to change tool
     void sig_resetDesignPanel();
 
   protected:
@@ -176,8 +176,8 @@ namespace gui{
   private:
 
     QGraphicsScene *scene;    // scene for the QGraphicsView
-    //ToolType tool_type;       // current cursor tool type
-    //DisplayMode display_mode; // current display mode
+    gui::ToolType tool_type;       // current cursor tool type
+    gui::DisplayMode display_mode; // current display mode
     QUndoStack *undo_stack;   // undo stack
 
     // children panels

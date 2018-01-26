@@ -12,6 +12,9 @@
 // Qt includes
 #include <QtWidgets>
 
+// Global
+#include "../global.h"
+
 // Widget includes
 #include "widgets/design_panel.h"
 #include "widgets/dialog_panel.h"
@@ -51,7 +54,7 @@ namespace gui{
   public slots:
 
     // cursor tool updating
-    void setTool(gui::DesignPanel::ToolType tool);
+    void setTool(gui::ToolType tool);
     void setToolSelect();
     void setToolDrag();
     void setToolDBGen();

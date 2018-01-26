@@ -38,10 +38,11 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   connect(prim::Emitter::instance(), &prim::Emitter::sig_removeItemFromScene,
             this, &gui::DesignPanel::removeItemFromScene);
 
-  // child widgets
-  afm_panel = new AFMPanel(this);
+  // construct widgets
+  afm_panel = new AFMPanel(getLayerIndex(afm_layer), this);
   scene->addItem(afm_panel->ghostNode());
   scene->addItem(afm_panel->ghostSegment());
+  connect(this, &gui::DesignPanel::sig_toolChanged, afm_panel, &gui::AFMPanel::toolChangeResponse);
 
 
   // setup flags
@@ -52,7 +53,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   qDebug() << tr("SD: %1").arg(snap_diameter);
   snap_target = 0;
 
-  tool_type = gui::DesignPanel::NoneTool;     // now setTool will update the tool
+  tool_type = gui::ToolType::NoneTool;     // now setTool will update the tool
 
   // set view behaviour
   setTransformationAnchor(QGraphicsView::NoAnchor);
@@ -131,7 +132,7 @@ void gui::DesignPanel::resetDesignPanel()
   // REBUILD
   // reset flags
   clicked = ghosting = moving = false;
-  tool_type = gui::DesignPanel::NoneTool;     // now setTool will update the tool
+  tool_type = gui::ToolType::NoneTool;     // now setTool will update the tool
 
   undo_stack = new QUndoStack();
   // TODO reset undo stack counter
@@ -156,6 +157,12 @@ void gui::DesignPanel::resetDesignPanel()
   //let application know that design panel has been reset.
   emit sig_resetDesignPanel();
   qDebug() << tr("Design Panel reset complete");
+
+  // reconstruct widgets
+  afm_panel = new AFMPanel(getLayerIndex(afm_layer), this);
+  scene->addItem(afm_panel->ghostNode());
+  scene->addItem(afm_panel->ghostSegment());
+  connect(this, &gui::DesignPanel::sig_toolChanged, afm_panel, &gui::AFMPanel::toolChangeResponse);
 }
 
 
@@ -394,11 +401,9 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
 
   // inform all items of select mode
   // TODO replace with signal based notification
-  prim::Item::select_mode = tool==gui::DesignPanel::SelectTool;
-  prim::Item::db_gen_mode = tool==gui::DesignPanel::DBGenTool;
-  prim::Item::electrode_mode = tool==gui::DesignPanel::ElectrodeTool;
-
-  emit sig_toolChanged(tool);
+  prim::Item::select_mode = tool==gui::ToolType::SelectTool;
+  prim::Item::db_gen_mode = tool==gui::ToolType::DBGenTool;
+  prim::Item::electrode_mode = tool==gui::ToolType::ElectrodeTool;
 
   switch(tool){
     case gui::ToolType::SelectTool:
@@ -429,6 +434,7 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
   }
 
   tool_type = tool;
+  emit sig_toolChanged(tool);
 }
 
 void gui::DesignPanel::setFills(float *fills)
@@ -695,7 +701,7 @@ void gui::DesignPanel::selectClicked(prim::Item *)
 {
   // for now, if an item is clicked in selection mode, act as though the highest
   // level aggregate was clicked
-  if(tool_type == gui::DesignPanel::SelectTool && display_mode == DesignMode)
+  if(tool_type == gui::ToolType::SelectTool && display_mode == DesignMode)
     initMove();
 
 }
@@ -814,10 +820,10 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 
     // update ghost node and ghost segment if there is a focused node, only update
     // ghost node if there's none.
-    ghost_afm_node->setPos(mapToScene(e->pos()));
-    ghost_afm_node->show();
+    afm_panel->ghostNode()->setPos(mapToScene(e->pos()));
+    afm_panel->showGhost(true);
 
-    if (afm_panel->focusedNodeIndex() > -1) {
+    /*if (afm_panel->focusedNodeIndex() > -1) {
       qDebug() << tr("gonna show seg_ghost");
       prim::AFMNode *focused_node = afm_panel->focusedPath()->getNode(afm_panel->focusedNodeIndex());
       qDebug() << tr("Got focused node to connect seg_ghost to, index = %1").arg(afm_panel->focusedNodeIndex());
@@ -828,7 +834,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
       qDebug() << tr("Update ghost_seg location and show");
       ghost_afm_seg->updatePoints();
       ghost_afm_seg->show();
-    }
+    }*/
   } else if (clicked) {
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
@@ -888,28 +894,28 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
       case Qt::LeftButton:
         // action based on chosen tool
         switch(tool_type){
-          case gui::DesignPanel::SelectTool:
+          case gui::ToolType::SelectTool:
             // filter out items in the lattice
             filterSelection(true);
             break;
-          case gui::DesignPanel::DBGenTool:
+          case gui::ToolType::DBGenTool:
             // identify free lattice sites and create dangling bonds
             filterSelection(false);
             createDBs();
             break;
-          case gui::DesignPanel::ElectrodeTool:
+          case gui::ToolType::ElectrodeTool:
             // get start and end locations, and create the electrode.
             filterSelection(false);
             createElectrodes(e->pos());
             break;
-          case gui::DesignPanel::AFMPathTool:
+          case gui::ToolType::AFMPathTool:
             // Make node at the ghost position
             createAFMNode();
             break;
-          case gui::DesignPanel::DragTool:
+          case gui::ToolType::DragTool:
             // pan ends
             break;
-          case gui::DesignPanel::MeasureTool:{
+          case gui::ToolType::MeasureTool:{
             // display measurement from start to finish
             QPointF delta = e->pos()-mouse_pos_cached;
             qreal dx = delta.x()*trans.m11()*prim::Item::scale_factor;
@@ -996,10 +1002,10 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
     switch(e->key()){
       case Qt::Key_Escape:
         // deactivate current tool
-        if(tool_type != gui::DesignPanel::SelectTool){
+        if(tool_type != gui::ToolType::SelectTool){
           //qDebug() << tr("Esc pressed, drop back to select tool");
           // emit signal to be picked up by application.cc
-          emit sig_toolChangeRequest(gui::DesignPanel::SelectTool);
+          emit sig_toolChangeRequest(gui::ToolType::SelectTool);
         }
         break;
       case Qt::Key_G:
@@ -1051,7 +1057,7 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
       case Qt::Key_Backspace:
       case Qt::Key_Delete:
         // delete selected items
-        if(tool_type == gui::DesignPanel::SelectTool && display_mode == DesignMode)
+        if(tool_type == gui::ToolType::SelectTool && display_mode == DesignMode)
           deleteSelection();
         break;
       case Qt::Key_S:
@@ -1217,7 +1223,7 @@ void gui::DesignPanel::pasteAction()
 
 void gui::DesignPanel::deleteAction()
 {
-  if(tool_type == gui::DesignPanel::SelectTool && display_mode == DesignMode)
+  if(tool_type == gui::ToolType::SelectTool && display_mode == DesignMode)
     deleteSelection();
 }
 
@@ -1297,7 +1303,7 @@ void gui::DesignPanel::createActions()
 void gui::DesignPanel::filterSelection(bool select_flag)
 {
   // should only be here if tool type is either select or dbgen
-  if(tool_type != gui::DesignPanel::SelectTool && tool_type != gui::DesignPanel::DBGenTool && tool_type != gui::DesignPanel::ElectrodeTool){
+  if(tool_type != gui::ToolType::SelectTool && tool_type != gui::ToolType::DBGenTool && tool_type != gui::ToolType::ElectrodeTool){
     qCritical() << tr("Filtering selection with invalid tool type...");
     return;
   }

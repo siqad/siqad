@@ -10,6 +10,7 @@
 #define _GUI_AFM_PANEL_H_
 
 // TODO includes
+#include "../../global.h"
 #include "primitives/afmpath.h"
 
 namespace gui{
@@ -48,7 +49,7 @@ namespace gui{
     void setFocusedNodeIndex(int node_ind);
 
     // tool change actions
-    // TODO void toolChangeActions(global::ToolType tool_type);
+    void toolChangeResponse(gui::ToolType tool_type);
 
     // TODO connect to layer manager's layer change signal, change ghost properties accordingly
 

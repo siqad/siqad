@@ -15,22 +15,23 @@ AFMPanel::AFMPanel(int active_afm_layer_index, QWidget *parent)
 {
   ghost_node = new prim::AFMNode(active_afm_layer_index, QPointF(0,0), 0);
   ghost_seg = new prim::AFMSeg(active_afm_layer_index, 0, ghost_node);
+  showGhost(false);
 
   // TODO global tool enum, connect toolchange to panel to determine afm ghost visibility
 
   // TODO init GUI
 
 
-      connect(this, &gui::DesignPanel::sig_toolChanged, this, &gui::DesignPanel::afmGhostVisibilityWithTool);
+      //connect(this, &gui::DesignPanel::sig_toolChanged, this, &gui::DesignPanel::afmGhostVisibilityWithTool);
 
-    if (!ghost_afm_node) {
+    /*if (!ghost_afm_node) {
       ghost_afm_node = new prim::AFMNode(getLayerIndex(afm_layer), QPointF(0,0), afm_layer->zOffset());
       scene->addItem(ghost_afm_node);
     }
     if (!ghost_afm_seg) {
       ghost_afm_seg = new prim::AFMSeg(getLayerIndex(afm_layer), 0, ghost_afm_node);
       scene->addItem(ghost_afm_seg);
-    }
+    }*/
 }
 
 void AFMPanel::setFocusedPath(prim::AFMPath *path_fo)
@@ -45,19 +46,34 @@ void AFMPanel::setFocusedPath(prim::AFMPath *path_fo)
 void AFMPanel::setFocusedNodeIndex(int node_ind)
 {
   node_index_focused = node_ind;
-  //ghost_seg->setOrigin(node_focused);
+
+  // generate ghost segment if a focused node exists
+  if (node_ind > -1)
+    ghost_seg->setOriginNode(path_focused->getNode(node_ind));
+  else
+    ghost_seg->setOriginNode(0);
 }
 
-/* TODO remove
-void showGhost(bool show)
+void AFMPanel::showGhost(bool show)
 {
   // alwayd show node ghost at cursor position
   ghost_node->setVisible(show);
 
   // only show seg ghost if there will be a segment connection
-  if (node_focused)
+  if (node_index_focused > -1) {
+    ghost_seg->updatePoints();
     ghost_seg->setVisible(show);
-}*/
+  } else {
+    ghost_seg->setVisible(false);
+  }
+}
+
+
+void AFMPanel::toolChangeResponse(gui::ToolType tool_type)
+{
+  if (tool_type != AFMPathTool)
+    showGhost(false);
+}
 
 
 // SLOTS
