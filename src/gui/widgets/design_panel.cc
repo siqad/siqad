@@ -40,10 +40,9 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 
   // child widgets
   afm_panel = new AFMPanel(this);
+  scene->addItem(afm_panel->ghostNode());
+  scene->addItem(afm_panel->ghostSegment());
 
-
-  // connections with child widgets
-  connect(this, &gui::DesignPanel::sig_itemCreated, afm_panel, &gui::AFMPanel::updateFocusedToNewItem);
 
   // setup flags
   clicked = ghosting = moving = false;
@@ -384,7 +383,7 @@ void gui::DesignPanel::setScenePadding(){
 }
 
 
-void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
+void gui::DesignPanel::setTool(gui::ToolType tool)
 {
   // do nothing if tool has not been changed
   if(tool==tool_type)
@@ -402,26 +401,26 @@ void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
   emit sig_toolChanged(tool);
 
   switch(tool){
-    case gui::DesignPanel::SelectTool:
+    case gui::ToolType::SelectTool:
       // replaced with custom rubberBandUpdate, delete this later
       setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
       break;
-    case gui::DesignPanel::DragTool:
+    case gui::ToolType::DragTool:
       setDragMode(QGraphicsView::ScrollHandDrag);
       setInteractive(false);
       break;
-    case gui::DesignPanel::DBGenTool:
+    case gui::ToolType::DBGenTool:
       // replaced with custom rubberBandUpdate, delete this later
       setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
       break;
-    case gui::DesignPanel::ElectrodeTool:
+    case gui::ToolType::ElectrodeTool:
       // replaced with custom rubberBandUpdate, delete this later
       setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
       break;
-    case gui::DesignPanel::AFMPathTool:
+    case gui::ToolType::AFMPathTool:
       setInteractive(true); // TODO check back later that this is the right mode
       break;
     default:
@@ -707,14 +706,6 @@ void gui::DesignPanel::simVisualizeDockVisibilityChanged(bool visible)
     clearSimResults();
 }
 
-void gui::DesignPanel::afmGhostVisibilityWithTool(ToolType tool)
-{
-  if (tool != AFMPathTool) {
-    ghost_afm_node->hide();
-    ghost_afm_seg->hide();
-  }
-}
-
 // INTERRUPTS
 
 // most behaviour will be connected to mouse move/release. However, when
@@ -820,23 +811,21 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     snapDB(scene_pos);*/
 
   } else if (tool_type == AFMPathTool) {
-    if (!ghost_afm_node) {
-      ghost_afm_node = new prim::AFMNode(getLayerIndex(afm_layer), QPointF(0,0), afm_layer->zOffset());
-      connect(this, &gui::DesignPanel::sig_toolChanged, this, &gui::DesignPanel::afmGhostVisibilityWithTool);
-      scene->addItem(ghost_afm_node);
-    }
-    if (!ghost_afm_seg) {
-      ghost_afm_seg = new prim::AFMSeg(getLayerIndex(afm_layer), 0, ghost_afm_node);
-      scene->addItem(ghost_afm_seg);
-    }
 
     // update ghost node and ghost segment if there is a focused node, only update
     // ghost node if there's none.
     ghost_afm_node->setPos(mapToScene(e->pos()));
     ghost_afm_node->show();
 
-    if (afm_panel->focusedNode()) {
-      ghost_afm_seg->setOriginNode(afm_panel->focusedNode());
+    if (afm_panel->focusedNodeIndex() > -1) {
+      qDebug() << tr("gonna show seg_ghost");
+      prim::AFMNode *focused_node = afm_panel->focusedPath()->getNode(afm_panel->focusedNodeIndex());
+      qDebug() << tr("Got focused node to connect seg_ghost to, index = %1").arg(afm_panel->focusedNodeIndex());
+      if (ghost_afm_seg->originNode() != focused_node) {
+        qDebug() << tr("Focused node differs from seg_ghost origin, updating seg_ghost");
+        ghost_afm_seg->setOriginNode(focused_node);
+      }
+      qDebug() << tr("Update ghost_seg location and show");
       ghost_afm_seg->updatePoints();
       ghost_afm_seg->show();
     }
@@ -847,33 +836,6 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
         if (clicked && (tool_type == SelectTool || tool_type == DBGenTool 
               || tool_type == ElectrodeTool)) {
           rubberBandUpdate(e->pos());
-        } else if (tool_type == AFMPathTool && afm_panel->focusedNode()) {
-          // TODO move this whole thing to outside of clicked. Also, instead of 
-          // directly manipulating the nodes, manipulate ghosts of segments and nodes.
-
-          // snap to the nearest possible location unless ctrl is held
-          //qDebug() << "Entered mouse move event for AFM Path";
-
-          prim::AFMNode *focused_node = afm_panel->focusedNode();
-          QPointF from_loc = focused_node->scenePos();
-          QPointF new_loc;
-
-          if (keymods & Qt::ControlModifier) {
-            // node appears where cursor is
-            new_loc = mapToScene(e->pos());
-          } else {
-            // node appears at the nearest latdot / dbdot
-            new_loc = mapToScene(e->pos()); // temporary
-            // TODO pick nearest latdot / db position
-            // TODO call prepareGeometryChange for Segment
-            // http://doc.qt.io/qt-5/qgraphicsitem.html#boundingRect
-          }
-          // move focused node and connected segments
-          focused_node->moveBy(new_loc.x()-from_loc.x(), new_loc.y()-from_loc.y());
-          for (prim::AFMSeg *seg : 
-                  afm_panel->focusedPath()->getConnectedSegments(focused_node)) {
-            seg->updatePoints();
-          }
         }
         // use default behaviour for left mouse button
         QGraphicsView::mouseMoveEvent(e);
@@ -1750,9 +1712,8 @@ void gui::DesignPanel::CreateAFMPath::create()
   qDebug() << tr("Entered CreateAFMPath::create()");
   prim::AFMPath *new_path = new prim::AFMPath(layer_index);
   dp->addItem(new_path, layer_index, index);
+  dp->afmPanel()->setFocusedPath(new_path);
   qDebug() << tr("Added AFMPath to designpanel");
-  emit dp->sig_itemCreated(prim::Item::AFMPath, new_path);
-  qDebug() << tr("Emitted itemCreated signal");
 }
 
 void gui::DesignPanel::CreateAFMPath::destroy()
@@ -1764,6 +1725,7 @@ void gui::DesignPanel::CreateAFMPath::destroy()
     // contained nodes and segments should be deleted automatically when deleting the path,
     // since they're children items to the path.
     dp->removeItem(afm_path, dp->getLayer(afm_path->layer_id));
+    dp->afmPanel()->setFocusedPath(0);
   }
 }
 
@@ -1798,8 +1760,9 @@ void gui::DesignPanel::CreateAFMNode::create()
   prim::AFMNode *new_node = new prim::AFMNode(layer_index, sceneloc, z_offset);
   afm_path->insertNode(new_node, node_index);
   qDebug() << tr("Inserted node into path");
-  emit dp->sig_itemCreated(prim::Item::AFMNode, new_node);
-  qDebug() << tr("Emitted sig_itemCreated for node");
+
+  dp->afmPanel()->setFocusedPath(afm_path);
+  dp->afmPanel()->setFocusedNodeIndex(node_index);
 }
 
 void gui::DesignPanel::CreateAFMNode::destroy()
@@ -1807,6 +1770,7 @@ void gui::DesignPanel::CreateAFMNode::destroy()
   qDebug() << tr("Entered CreateAFMNode::destroy()");
   prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
   afm_path->removeNode(node_index); // pointer cleanup is done by AFMPath
+  dp->afmPanel()->setFocusedNodeIndex(node_index-1);
 }
 
 
@@ -2083,9 +2047,7 @@ void gui::DesignPanel::createAFMNode()
     qDebug() << tr("No existing focused path, making new");
     // create new path if there's no focused path
     prim::AFMPath *new_path = new prim::AFMPath(layer_index);
-    qDebug() << "1";
     afm_panel->setFocusedPath(new_path);
-    qDebug() << "2";
     undo_stack->push(new CreateAFMPath(layer_index, this));
     qDebug() << tr("Pushed new AFMPath to undo stack (as part of macro)");
   }

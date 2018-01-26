@@ -10,51 +10,106 @@
 
 namespace gui{
 
-AFMPanel::AFMPanel(QWidget *parent)
+AFMPanel::AFMPanel(int active_afm_layer_index, QWidget *parent)
   : QWidget(parent)
 {
+  ghost_node = new prim::AFMNode(active_afm_layer_index, QPointF(0,0), 0);
+  ghost_seg = new prim::AFMSeg(active_afm_layer_index, 0, ghost_node);
+
+  // TODO global tool enum, connect toolchange to panel to determine afm ghost visibility
+
   // TODO init GUI
+
+
+      connect(this, &gui::DesignPanel::sig_toolChanged, this, &gui::DesignPanel::afmGhostVisibilityWithTool);
+
+    if (!ghost_afm_node) {
+      ghost_afm_node = new prim::AFMNode(getLayerIndex(afm_layer), QPointF(0,0), afm_layer->zOffset());
+      scene->addItem(ghost_afm_node);
+    }
+    if (!ghost_afm_seg) {
+      ghost_afm_seg = new prim::AFMSeg(getLayerIndex(afm_layer), 0, ghost_afm_node);
+      scene->addItem(ghost_afm_seg);
+    }
 }
 
 void AFMPanel::setFocusedPath(prim::AFMPath *path_fo)
 {
   path_focused = path_fo;
-  if (path_fo->nodeCount() > 0)
-    setFocusedNode(path_focused->getLastNode());
+  if (path_fo != 0 && path_fo->nodeCount() > 0)
+    setFocusedNodeIndex(path_focused->getLastNodeIndex());
   else
-    setFocusedNode(0);
+    setFocusedNodeIndex(-1);
 }
 
-void AFMPanel::setFocusedNode(prim::AFMNode *node_fo)
+void AFMPanel::setFocusedNodeIndex(int node_ind)
 {
-  node_focused = node_fo;
-  //seg_ghost->setOrigin(node_focused);
+  node_index_focused = node_ind;
+  //ghost_seg->setOrigin(node_focused);
 }
 
 /* TODO remove
 void showGhost(bool show)
 {
   // alwayd show node ghost at cursor position
-  node_ghost->setVisible(show);
+  ghost_node->setVisible(show);
 
   // only show seg ghost if there will be a segment connection
   if (node_focused)
-    seg_ghost->setVisible(show);
+    ghost_seg->setVisible(show);
 }*/
 
 
 // SLOTS
-void AFMPanel::updateFocusedToNewItem(prim::Item::ItemType item_type, prim::Item *new_item)
+/* TODO rm
+void AFMPanel::updateFocusToNewItem(prim::Item::ItemType item_type, prim::Item *new_item)
 {
-  if (item_type == prim::Item::AFMNode) {
-    setFocusedPath(static_cast<prim::AFMPath*>(new_item->parentItem()));
-    setFocusedNode(static_cast<prim::AFMNode*>(new_item));
-  } else if (item_type == prim::Item::AFMPath) {
-    prim::AFMPath *new_path = static_cast<prim::AFMPath*>(new_item);
-    setFocusedPath(new_path);
-    //setFocusedNode(new_path->getLastNode());
+  switch (item_type) {
+  case prim::Item::AFMNode:
+    {
+      setFocusedPath(static_cast<prim::AFMPath*>(new_item->parentItem()));
+      setFocusedNode(static_cast<prim::AFMNode*>(new_item));
+      break;
+    }
+  case prim::Item::AFMPath:
+    {
+      prim::AFMPath *new_path = static_cast<prim::AFMPath*>(new_item);
+      setFocusedPath(new_path);
+      //setFocusedNode(new_path->getLastNode());
+      break;
+    }
+  default:
+    break;
   }
-}
+}*/
+
+/* TODO rm
+void AFMPanel::updateFocusAfterItemRemoval(prim::Item::ItemType item_type, prim::Item *rm_item)
+{
+  switch (item_type) {
+  case prim::Item::AFMNode:
+    {
+      if (rm_item == focusedNode()) {
+        if (focusedPath()) {
+          // TODO update to select the node before the originally focused node
+          qDebug() << QObject::tr("Updating focused node after item removal");
+          setFocusedNode(focusedPath()->getLastNode());
+        } else {
+          setFocusedNode(0);
+        }
+      }
+      break;
+    }
+  case prim::Item::AFMPath:
+    {
+      setFocusedPath(0);
+      setFocusedNode(0);
+      break;
+    }
+  default:
+    break;
+  }
+}*/
 
 
 } // end of gui namespace

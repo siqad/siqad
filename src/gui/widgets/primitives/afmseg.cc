@@ -55,20 +55,18 @@ void AFMSeg::saveItems(QXmlStreamWriter *ws) const
 // Segment manipulation
 void AFMSeg::setOriginNode(prim::AFMNode *orig_node)
 {
-  if (!orig_node)
-    return;
-
   origin_node = orig_node;
-  updatePoints();
+
+  if (orig_node)
+    updatePoints();
 }
 
 void AFMSeg::setDestinationNode(prim::AFMNode *dest_node)
 {
-  if (!dest_node)
-    return;
-
   destination_node = dest_node;
-  updatePoints();
+
+  if (dest_node)
+    updatePoints();
 }
 
 

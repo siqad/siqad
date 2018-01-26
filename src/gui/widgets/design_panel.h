@@ -15,6 +15,8 @@
 #include <QtCore>
 #include <QDialog>
 
+#include "../../global.h"
+
 #include "afm_panel.h"
 
 #include "primitives/layer.h"
@@ -33,8 +35,8 @@ namespace gui{
 
   public:
 
-    enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool, ElectrodeTool, AFMPathTool};
-    enum DisplayMode{DesignMode, SimDisplayMode};
+    //enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool, ElectrodeTool, AFMPathTool};
+    //enum DisplayMode{DesignMode, SimDisplayMode};
 
     class UndoCommand;
 
@@ -98,7 +100,7 @@ namespace gui{
     void setScenePadding();
 
     // update the tool type
-    void setTool(ToolType tool);
+    void setTool(gui::ToolType tool);
 
     // update the fill values for the surface dangling bonds, no check for
     // array size/contents.
@@ -114,6 +116,9 @@ namespace gui{
     DisplayMode displayMode() {return display_mode;}
     void setDisplayMode(DisplayMode mode);
 
+    // get afm_panel pointer
+    AFMPanel *afmPanel() {return afm_panel;}
+
     // SAVE
 
     // flag if actions are performed after last saved
@@ -128,6 +133,7 @@ namespace gui{
     void displaySimResults(prim::SimJob *job, int dist_int);
     void clearSimResults();
 
+
   public slots:
 
     void selectClicked(prim::Item *item);
@@ -136,13 +142,10 @@ namespace gui{
     void addItemToSceneRequest(prim::Item *item) {addItemToScene(item);}
     void removeItemFromSceneRequest(prim::Item *item) {removeItemFromScene(item);}
 
-    void afmGhostVisibilityWithTool(ToolType tool);
-
   signals:
-    void sig_toolChangeRequest(ToolType tool);  // request ApplicationGUI to change tool
-    void sig_toolChanged(ToolType tool);         // notify other subjects about tool change
+    void sig_toolChangeRequest(gui::ToolType tool);  // request ApplicationGUI to change tool
+    void sig_toolChanged(gui::ToolType tool);         // notify other subjects about tool change
     void sig_resetDesignPanel();
-    void sig_itemCreated(prim::Item::ItemType, prim::Item *);
 
   protected:
 
@@ -173,8 +176,8 @@ namespace gui{
   private:
 
     QGraphicsScene *scene;    // scene for the QGraphicsView
-    ToolType tool_type;       // current cursor tool type
-    DisplayMode display_mode; // current display mode
+    //ToolType tool_type;       // current cursor tool type
+    //DisplayMode display_mode; // current display mode
     QUndoStack *undo_stack;   // undo stack
 
     // children panels

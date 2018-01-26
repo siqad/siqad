@@ -45,12 +45,13 @@ namespace prim{
     void removeNode(int index);
 
     // get node at index
-    prim::AFMNode *getNode(int index) {return path_nodes.at(index);}
-    prim::AFMNode *getLastNode() {return path_nodes.at(path_nodes.length()-1);}
+    prim::AFMNode *getNode(int index) {return (index < nodeCount()) ? path_nodes.at(index) : 0;}
+    prim::AFMNode *getLastNode() {return getNode(path_nodes.length()-1);}
 
     // get index position of node pointer in path_nodes list
     // returns -1 if none exists
     int getNodeIndex(prim::AFMNode *node) {return path_nodes.indexOf(node);}
+    int getLastNodeIndex() {return path_nodes.length()-1;}
 
     // node count
     int nodeCount() {return path_nodes.length();}

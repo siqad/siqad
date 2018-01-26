@@ -12,27 +12,11 @@
 #include <QTextStream>
 #include <QDebug>
 
-// text output
-namespace echo{
+namespace gui{
 
-  class MFatal{
-  public:
-    void operator<<(const QString &rhs){
-      qFatal(rhs.toLatin1().constData(), 0);
-    }
-  };
+  enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool, ElectrodeTool, AFMPathTool};
+  enum DisplayMode{DesignMode, SimDisplayMode};
 
-  MFatal& mFatal(){
-    static MFatal MFtl;
-    return MFtl;
-  }
-
-  // standard output
-  // QTextStream& qEcho(){
-  //   static QTextStream ts(stdout);
-  //   return ts;
-  // }
-
-} // end echo namespace
+} // end global namespace
 
 #endif
