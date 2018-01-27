@@ -13,21 +13,13 @@ namespace prim {
 AFMPath::AFMPath(int lay_id)
   : prim::Item(prim::Item::AFMPath)
 {
-  initAFMPath(lay_id, QList<prim::AFMNode*>(), QList<prim::AFMSeg*>());
+  initAFMPath(lay_id, QList<prim::AFMNode*>());
 }
 
-AFMPath::AFMPath(int lay_id, prim::AFMNode *node)
+AFMPath::AFMPath(int lay_id, const QList<prim::AFMNode*> &nodes)
   : prim::Item(prim::Item::AFMPath)
 {
-  QList<prim::AFMNode*> nodes;
-  nodes.append(node);
-  initAFMPath(lay_id, nodes, QList<prim::AFMSeg*>());
-}
-
-AFMPath::AFMPath(int lay_id, const QList<prim::AFMNode*> &nodes, const QList<prim::AFMSeg*> &segs)
-  : prim::Item(prim::Item::AFMPath)
-{
-  initAFMPath(lay_id, nodes, segs);
+  initAFMPath(lay_id, nodes);
 }
 
 AFMPath::AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene)
@@ -36,35 +28,42 @@ AFMPath::AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene)
   // TODO load from file
 }
 
-void AFMPath::initAFMPath(int lay_id, const QList<prim::AFMNode*> &nodes, const QList<prim::AFMSeg*> &segs)
+void AFMPath::initAFMPath(int lay_id, const QList<prim::AFMNode*> &nodes)
 {
   layer_id = lay_id;
   path_nodes = nodes;
-  path_segs = segs;
 
   for (prim::AFMNode* node : path_nodes)
-    node->setParentItem(this);
+    insertNode(node);
+    //node->setParentItem(this);
 
-  for (prim::AFMSeg* seg : path_segs)
-    seg->setParentItem(this);
-
-  // TODO check that segments match up with the nodes
-  // TODO regenerate segs if not
+  // TODO regenerate segs
 
   // TODO emit signal declaring this to be the focused path
 }
 
 
 // Save to XML
-void AFMPath::saveItems(QXmlStreamWriter *) const
+void AFMPath::saveItems(QXmlStreamWriter *ws) const
 {
-  // TODO save included afmnodes and afmsegs
-  // TODO save path properties like speed, loop
+  ws->writeStartElement("afmpath");
+  // TODO save path properties like speed, loop as attributes
+  ws->writeAttribute("layer_id", QString::number(layer_id));
+
+  // save included afmnodes
+  for (prim::AFMNode *node : path_nodes) {
+    node->saveItems(ws);
+  }
+
+  ws->writeEndElement();
 }
 
 
 void AFMPath::insertNode(prim::AFMNode *new_node, int index)
 {
+  if (index == -1)
+    index = getLastNodeIndex();
+
   // insert the node to node list
   path_nodes.insert(index, new_node);
   new_node->setParentItem(this);
@@ -191,7 +190,7 @@ Item *AFMPath::deepCopy() const
   /*TODO look into aggregate's deep copy to figure out how this should be implemented.
      Keep in mind that when pasting, all off the path_nodes and path_segs have to take
      the new location, electrode code might have that implemented.*/
-  AFMPath *cp = new AFMPath(layer_id, path_nodes, path_segs);
+  AFMPath *cp = new AFMPath(layer_id, path_nodes);
   cp->setPos(pos());
   return cp;
 }

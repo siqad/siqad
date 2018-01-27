@@ -33,7 +33,7 @@ namespace prim{
 
     // change node zoffset (relative to surface) if it is within bounds of the layer
     void setZOffset(float z_offset);
-    float zOffset() {return zoffset;}
+    float zOffset() const {return zoffset;}
 
 
     // Graphics

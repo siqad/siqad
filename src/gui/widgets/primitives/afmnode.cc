@@ -55,13 +55,24 @@ void AFMNode::initAFMNode(int lay_id, QPointF sceneloc, float z_offset)
 // Save to XML
 void AFMNode::saveItems(QXmlStreamWriter *ws) const
 {
-  // TODO
+  ws->writeStartElement("afmnode");
+
+  ws->writeEmptyElement("scenepos"); // TODO consider changing to saving physloc
+  ws->writeAttribute("x", QString::number(scenePos().x()));
+  ws->writeAttribute("y", QString::number(scenePos().y()));
+
+  ws->writeTextElement("zoffset", QString::number(zOffset()));
+
+  // TODO other properties
+
+  ws->writeEndElement();
 }
 
 
 // Node manipulation
 void AFMNode::setZOffset(float z_offset)
 {
+  zoffset = z_offset;
   // Check whether the z_offset is within bounds of the layer. If not, expand
   // the layer's Z-Offset or Z-Height to make it fit, or alert the user if the
   // desired z_offset is not valid, e.g. runs into the surface.
