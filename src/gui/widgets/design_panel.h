@@ -297,10 +297,11 @@ namespace gui{
 
     void createElectrodes(QPoint point1);
 
-    // create AFM node in given path
+    // create AFM node in focused path after focused node
     void createAFMNode();
-    // TODO create node in current path
-    // TODO make AFMNode/Path actions undoable
+
+    // destroy AFM path and included nodes
+    void destroyAFMPath(prim::AFMPath *afm_path);
 
     // delete all selected items
     void deleteSelection();
@@ -498,7 +499,7 @@ namespace gui{
   {
   public:
     // create an AFMNode with the given AFMPath and index in path
-    CreateAFMNode(int layer_index, DesignPanel *dp, QPointF sceneloc, float z_offset,
+    CreateAFMNode(int layer_index, DesignPanel *dp, QPointF scenepos, float z_offset,
           int afm_index, int index_in_path=-1, bool invert=false, 
           QUndoCommand *parent=0);
 
@@ -518,7 +519,7 @@ namespace gui{
     DesignPanel *dp;
     int afm_index;    // the Path's index in its layer
     int node_index;   // the Node's index in the path
-    QPointF sceneloc;
+    QPointF scenepos;
     float z_offset;
   };
 

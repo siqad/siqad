@@ -1735,10 +1735,10 @@ void gui::DesignPanel::CreateAFMPath::destroy()
 // CreateAFMNode class
 
 gui::DesignPanel::CreateAFMNode::CreateAFMNode(int layer_index, gui::DesignPanel *dp,
-                        QPointF sceneloc, float z_offset, int afm_index,
+                        QPointF scenepos, float z_offset, int afm_index,
                         int index_in_path, bool invert, QUndoCommand *parent)
   : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), 
-          sceneloc(sceneloc), z_offset(z_offset), afm_index(afm_index)
+          scenepos(scenepos), z_offset(z_offset), afm_index(afm_index)
 {
   prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
   node_index = (index_in_path == -1) ? afm_path->nodeCount() : index_in_path;
@@ -1759,7 +1759,7 @@ void gui::DesignPanel::CreateAFMNode::create()
   qDebug() << tr("Entered CreateAFMNode::create()");
   qDebug() << tr("Getting AFMPath from layer according to given index");
   prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
-  prim::AFMNode *new_node = new prim::AFMNode(layer_index, sceneloc, z_offset);
+  prim::AFMNode *new_node = new prim::AFMNode(layer_index, scenepos, z_offset);
   afm_path->insertNode(new_node, node_index);
   qDebug() << tr("Inserted node into path");
 
@@ -2059,6 +2059,27 @@ void gui::DesignPanel::createAFMNode()
   qDebug() << tr("AFMNode creation macro ended");
 }
 
+void gui::DesignPanel::destroyAFMPath(prim::AFMPath *afm_path)
+{
+  undo_stack->beginMacro(tr("Remove AFM Path and contained nodes"));
+
+  // destroy children nodes
+  prim::AFMNode *afm_node;
+  while (afm_path->getLastNode()) {
+    afm_node = afm_path->getLastNode();
+
+    int afm_index = getLayer(afm_node->layer_id)->getItemIndex(afm_path);
+    int node_index = afm_path->getNodeIndex(afm_node);
+    undo_stack->push(new CreateAFMNode(afm_node->layer_id, this, afm_node->scenePos(),
+          afm_node->zOffset(), afm_index, node_index, true));
+  }
+
+  // destroy empty path
+  undo_stack->push(new CreateAFMPath(afm_path->layer_id, this, afm_path, true));
+
+  undo_stack->endMacro();
+}
+
 void gui::DesignPanel::deleteSelection()
 {
   // do something only if there is a selection
@@ -2086,16 +2107,18 @@ void gui::DesignPanel::deleteSelection()
                         static_cast<prim::Electrode*>(item), true));
         break;
       case prim::Item::AFMPath:
-        // TODO implement destroyAFMPath(static_cast<prim::AFMPath*>(item));
+        destroyAFMPath(static_cast<prim::AFMPath*>(item));
         break;
       case prim::Item::AFMNode:
-        prim::AFMNode *afm_node = static_cast<prim::AFMNode*>(item);
-        prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(afm_node->parentItem());
-        int afm_index = getLayer(afm_node->layer_id)->getItemIndex(afm_path);
-        int node_index = afm_path->getNodeIndex(node);
-        undo_stack->push(new CreateAFMNode(node->layer_id, this, node->scenePos(),
-                          node->zOffset(), afm_index, node_index)
-        break;
+        {
+          prim::AFMNode *afm_node = static_cast<prim::AFMNode*>(item);
+          prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(afm_node->parentItem());
+          int afm_index = getLayer(afm_node->layer_id)->getItemIndex(afm_path);
+          int node_index = afm_path->getNodeIndex(afm_node);
+          undo_stack->push(new CreateAFMNode(afm_node->layer_id, this, afm_node->scenePos(),
+                            afm_node->zOffset(), afm_index, node_index, true));
+          break;
+        }
       default:
         break;
     }

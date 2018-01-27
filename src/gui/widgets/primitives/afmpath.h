@@ -46,7 +46,7 @@ namespace prim{
 
     // get node at index
     prim::AFMNode *getNode(int index) {return (index < nodeCount()) ? path_nodes.at(index) : 0;}
-    prim::AFMNode *getLastNode() {return getNode(path_nodes.length()-1);}
+    prim::AFMNode *getLastNode() {return (nodeCount() > 0) ? getNode(path_nodes.length()-1): 0;}
 
     // get index position of node pointer in path_nodes list
     // returns -1 if none exists
