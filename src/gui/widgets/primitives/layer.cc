@@ -10,6 +10,7 @@
 #include "aggregate.h"
 #include "dbdot.h"
 #include "electrode.h"
+#include "afmpath.h"
 
 
 // statics
@@ -170,35 +171,34 @@ void prim::Layer::loadItems(QXmlStreamReader *stream, QGraphicsScene *scene)
 {
   qDebug() << QObject::tr("Loading layer items for %1").arg(name);
   // create items according to hierarchy
-  while(!stream->atEnd()){
-    if(stream->isStartElement()){
-      if(stream->name() == "dbdot"){
+  while (!stream->atEnd()) {
+    if (stream->isStartElement()) {
+      if (stream->name() == "dbdot") {
         stream->readNext();
         addItem(new prim::DBDot(stream, scene));
-      }
-      else if(stream->name() == "aggregate"){
+      } else if (stream->name() == "aggregate") {
         stream->readNext();
         addItem(new prim::Aggregate(stream, scene));
-      }
-      if(stream->name() == "electrode"){
+      } else if (stream->name() == "electrode") {
         stream->readNext();
         addItem(new prim::Electrode(stream, scene));
-      }
-      else{
+      } else if (stream->name() == "afmpath") {
+        stream->readNext();
+        addItem(new prim::AFMPath(stream, scene));
+      } else {
         qDebug() << QObject::tr("Layer load item: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
         stream->readNext();
       }
-    }
-    else if(stream->isEndElement()){
+    } else if (stream->isEndElement()) {
       // break out of stream if the end of this element has been reached
-      if(stream->name() == "layer"){
+      if (stream->name() == "layer") {
         stream->readNext();
         break;
       }
       stream->readNext();
-    }
-    else
+    } else {
       stream->readNext();
+    }
   }
   
   // show error if any

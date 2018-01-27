@@ -25,19 +25,53 @@ AFMPath::AFMPath(int lay_id, const QList<prim::AFMNode*> &nodes)
 AFMPath::AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene)
   : prim::Item(prim::Item::AFMPath)
 {
-  // TODO load from file
+  int lay_id;
+  QList<prim::AFMNode*> ld_nodes;
+
+  // TODO read own attributes, e.g. zoffset
+  
+  while (!rs->atEnd()) {
+    if (rs->isStartElement()) {
+      if (rs->name() == "layer_id") {
+        lay_id = rs->readElementText().toInt();
+        rs->readNext();
+      } else if (rs->name() == "afmnode") {
+        qDebug() << QObject::tr("Adding node to path...");
+        ld_nodes.append(new prim::AFMNode(rs, scene));
+        qDebug() << QObject::tr("Added node to path");
+      } else {
+        rs->readNext();
+      }
+    } else if (rs->isEndElement()) {
+      // break out of read stream if the end of this element has been reached
+      if (rs->name() == "afmpath") {
+        rs->readNext();
+        break;
+      }
+      rs->readNext();
+    } else {
+      rs->readNext();
+    }
+  }
+
+  qDebug() << "Done reading path";
+
+  if (rs->hasError()) {
+    qCritical() << QObject::tr("XML error: ") << rs->errorString().data();
+  }
+
+  // initialise AFM Path with loaded information
+  initAFMPath(lay_id, ld_nodes);
+  scene->addItem(this);
 }
 
 void AFMPath::initAFMPath(int lay_id, const QList<prim::AFMNode*> &nodes)
 {
   layer_id = lay_id;
-  path_nodes = nodes;
 
-  for (prim::AFMNode* node : path_nodes)
+  for (prim::AFMNode* node : nodes)
     insertNode(node);
-    //node->setParentItem(this);
 
-  // TODO regenerate segs
 
   // TODO emit signal declaring this to be the focused path
 }
@@ -48,7 +82,7 @@ void AFMPath::saveItems(QXmlStreamWriter *ws) const
 {
   ws->writeStartElement("afmpath");
   // TODO save path properties like speed, loop as attributes
-  ws->writeAttribute("layer_id", QString::number(layer_id));
+  ws->writeTextElement("layer_id", QString::number(layer_id));
 
   // save included afmnodes
   for (prim::AFMNode *node : path_nodes) {
@@ -62,7 +96,7 @@ void AFMPath::saveItems(QXmlStreamWriter *ws) const
 void AFMPath::insertNode(prim::AFMNode *new_node, int index)
 {
   if (index == -1)
-    index = getLastNodeIndex();
+    index = path_nodes.length(); // append to back if index == -1
 
   // insert the node to node list
   path_nodes.insert(index, new_node);
@@ -73,11 +107,11 @@ void AFMPath::insertNode(prim::AFMNode *new_node, int index)
   if (index != 0 && index == last_index) {
     // if the new node is appended to the previous last node, create a segment that
     // originates from the last node to this one.
-    //qDebug() << QObject::tr("Appending new segment to AFMPath");
+    qDebug() << QObject::tr("Appending new segment to AFMPath");
     insertSegment(index-1);
   } else {
     // inserting
-    //qDebug() << QObject::tr("Inserting new segment to AFMPath for node at index %1").arg(index);
+    qDebug() << QObject::tr("Inserting new segment to AFMPath for node at index %1").arg(index);
 
     // reconnect preceding segment to this node
     if (index > 0)

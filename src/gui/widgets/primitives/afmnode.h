@@ -18,9 +18,9 @@ namespace prim{
   public:
 
     // Constructor
-    AFMNode(int lay_id, QPointF sceneloc, float z_offset);
+    AFMNode(int lay_id, QPointF scenepos, float z_offset);
     AFMNode(QXmlStreamReader *rs, QGraphicsScene *scene);
-    void initAFMNode(int lay_id, QPointF sceneloc, float z_offset);
+    void initAFMNode(int lay_id, QPointF scenepos, float z_offset);
 
     // Destructor
     ~AFMNode() {};

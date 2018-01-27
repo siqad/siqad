@@ -22,20 +22,61 @@ qreal AFMNode::diameter = -1;
 qreal AFMNode::edge_width = -1;
 
 // constructors
-AFMNode::AFMNode(int lay_id, QPointF sceneloc, float z_offset)
+AFMNode::AFMNode(int lay_id, QPointF scenepos, float z_offset)
   : prim::Item(prim::Item::AFMNode)
 {
-  initAFMNode(lay_id, sceneloc, z_offset);
+  initAFMNode(lay_id, scenepos, z_offset);
 }
 
 AFMNode::AFMNode(QXmlStreamReader *rs, QGraphicsScene *scene)
   : prim::Item(prim::Item::AFMNode)
 {
+  int lay_id = -1;
+  QPointF scenepos;
+  float z_offset;
 
-  // TODO call initAFMNode with read values
+  while (!rs->atEnd()) {
+    if (rs->isStartElement()) {
+      if (rs->name() == "layer_id") {
+        lay_id = rs->readElementText().toInt();
+        rs->readNext();
+      } else if (rs->name() == "scenepos") {
+        for (QXmlStreamAttribute &attr : rs->attributes()) {
+          if (attr.name().toString() == QLatin1String("x")) {
+            scenepos.setX(attr.value().toFloat());
+          } else if (attr.name().toString() == QLatin1String("y")) {
+            scenepos.setY(attr.value().toFloat());
+          }
+        }
+        qDebug() << QObject::tr("Found x=%1 and y=%2 for node").arg(scenepos.x()).arg(scenepos.y());
+        rs->readNext();
+      } else if (rs->name() == "zoffset") {
+        z_offset = rs->readElementText().toFloat();
+        qDebug() << QObject::tr("Found node zoffset=%1").arg(z_offset);
+        rs->readNext();
+      } else {
+        rs->readNext();
+      }
+    } else if (rs->isEndElement()) {
+      // break out of read stream if the end of this element has been reached
+      if (rs->name() == "afmnode") {
+        rs->readNext();
+        break;
+      }
+      rs->readNext();
+    } else {
+      rs->readNext();
+    }
+  }
+
+  if (rs->hasError()) {
+    qCritical() << QObject::tr("XML error: ") << rs->errorString().data();
+  }
+
+  initAFMNode(lay_id, scenepos, z_offset);
 }
 
-void AFMNode::initAFMNode(int lay_id, QPointF sceneloc, float z_offset)
+void AFMNode::initAFMNode(int lay_id, QPointF scenepos, float z_offset)
 {
   // initialise static variables if not already
   if (diameter < 0)
@@ -43,7 +84,7 @@ void AFMNode::initAFMNode(int lay_id, QPointF sceneloc, float z_offset)
 
   layer_id = lay_id;
   setZOffset(z_offset);
-  setPos(sceneloc);
+  setPos(scenepos);
 
   // GUI properties
   setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -56,6 +97,8 @@ void AFMNode::initAFMNode(int lay_id, QPointF sceneloc, float z_offset)
 void AFMNode::saveItems(QXmlStreamWriter *ws) const
 {
   ws->writeStartElement("afmnode");
+
+  ws->writeTextElement("layer_id", QString::number(layer_id));
 
   ws->writeEmptyElement("scenepos"); // TODO consider changing to saving physloc
   ws->writeAttribute("x", QString::number(scenePos().x()));
