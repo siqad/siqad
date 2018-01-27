@@ -1692,11 +1692,9 @@ gui::DesignPanel::CreateAFMPath::CreateAFMPath(int layer_index, gui::DesignPanel
                         prim::AFMPath *afm_path, bool invert, QUndoCommand *parent)
   : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index)
 {
-  qDebug() << tr("Entered CreateAFMPath");
+  //qDebug() << tr("Entered CreateAFMPath");
   prim::Layer *layer = dp->getLayer(layer_index);
-  qDebug() << tr("Got layer index");
   index = invert ? layer->getItems().indexOf(afm_path) : layer->getItems().size();
-  qDebug() << tr("CreateAFMPath constructor ends");
 }
 
 void gui::DesignPanel::CreateAFMPath::undo()
@@ -1711,16 +1709,15 @@ void gui::DesignPanel::CreateAFMPath::redo()
 
 void gui::DesignPanel::CreateAFMPath::create()
 {
-  qDebug() << tr("Entered CreateAFMPath::create()");
+  //qDebug() << tr("Entered CreateAFMPath::create()");
   prim::AFMPath *new_path = new prim::AFMPath(layer_index);
   dp->addItem(new_path, layer_index, index);
   dp->afmPanel()->setFocusedPath(new_path);
-  qDebug() << tr("Added AFMPath to designpanel");
 }
 
 void gui::DesignPanel::CreateAFMPath::destroy()
 {
-  qDebug() << tr("Entered CreateAFMPath::destroy()");
+  //qDebug() << tr("Entered CreateAFMPath::destroy()");
   prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(index));
 
   if (afm_path) {
@@ -1756,12 +1753,10 @@ void gui::DesignPanel::CreateAFMNode::redo()
 
 void gui::DesignPanel::CreateAFMNode::create()
 {
-  qDebug() << tr("Entered CreateAFMNode::create()");
-  qDebug() << tr("Getting AFMPath from layer according to given index");
+  //qDebug() << tr("Entered CreateAFMNode::create()");
   prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
   prim::AFMNode *new_node = new prim::AFMNode(layer_index, scenepos, z_offset);
   afm_path->insertNode(new_node, node_index);
-  qDebug() << tr("Inserted node into path");
 
   dp->afmPanel()->setFocusedPath(afm_path);
   dp->afmPanel()->setFocusedNodeIndex(node_index);
@@ -1769,7 +1764,7 @@ void gui::DesignPanel::CreateAFMNode::create()
 
 void gui::DesignPanel::CreateAFMNode::destroy()
 {
-  qDebug() << tr("Entered CreateAFMNode::destroy()");
+  //qDebug() << tr("Entered CreateAFMNode::destroy()");
   prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
   afm_path->removeNode(node_index); // pointer cleanup is done by AFMPath
   dp->afmPanel()->setFocusedNodeIndex(node_index-1);
@@ -2030,7 +2025,7 @@ void gui::DesignPanel::createElectrodes(QPoint point1)
 
 void gui::DesignPanel::createAFMNode()
 {
-  qDebug() << tr("Entered createAFMNode()");
+  //qDebug() << tr("Entered createAFMNode()");
   int layer_index = getLayerIndex(afm_layer);
   QPointF scene_pos;
   if (afm_panel->ghostNode())
@@ -2040,23 +2035,19 @@ void gui::DesignPanel::createAFMNode()
       
   // TODO UNDOable version
   undo_stack->beginMacro(tr("create AFMNode in the focused AFMPath after the focused AFMNode"));
-  qDebug() << tr("AFMNode creation macro began");
+  //qDebug() << tr("AFMNode creation macro began");
   if (!afm_panel->focusedPath()) {
-    qDebug() << tr("No existing focused path, making new");
+    //qDebug() << tr("No existing focused path, making new");
     // create new path if there's no focused path
     prim::AFMPath *new_path = new prim::AFMPath(layer_index);
     afm_panel->setFocusedPath(new_path);
     undo_stack->push(new CreateAFMPath(layer_index, this));
-    qDebug() << tr("Pushed new AFMPath to undo stack (as part of macro)");
   }
-  qDebug() << tr("About to push new AFMNode to undo stack");
   int afm_path_index = afm_layer->getItemIndex(afm_panel->focusedPath());
-  qDebug() << tr("afm_path_index=%1").arg(afm_path_index);
+  //qDebug() << tr("About to push new AFMNode to undo stack, afm_path_index=%1").arg(afm_path_index);
   undo_stack->push(new CreateAFMNode(layer_index, this, scene_pos, afm_layer->zOffset(),
                                         afm_path_index));
-  qDebug() << tr("Pushed new AFMNode to undo stack.");
   undo_stack->endMacro();
-  qDebug() << tr("AFMNode creation macro ended");
 }
 
 void gui::DesignPanel::destroyAFMPath(prim::AFMPath *afm_path)

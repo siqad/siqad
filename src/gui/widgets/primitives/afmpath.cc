@@ -74,11 +74,11 @@ void AFMPath::insertNode(prim::AFMNode *new_node, int index)
   if (index != 0 && index == last_index) {
     // if the new node is appended to the previous last node, create a segment that
     // originates from the last node to this one.
-    qDebug() << QObject::tr("Appending new segment to AFMPath");
+    //qDebug() << QObject::tr("Appending new segment to AFMPath");
     insertSegment(index-1);
   } else {
     // inserting
-    qDebug() << QObject::tr("Inserting new segment to AFMPath for node at index %1").arg(index);
+    //qDebug() << QObject::tr("Inserting new segment to AFMPath for node at index %1").arg(index);
 
     // reconnect preceding segment to this node
     if (index > 0)
