@@ -93,6 +93,9 @@ namespace prim{
 
   private:
 
+    // initialise static class vars
+    void prepareStatics();
+
     // show path config dialog when selected
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
@@ -100,6 +103,14 @@ namespace prim{
     // VARS
     QList<prim::AFMNode*> path_nodes;
     QList<prim::AFMSeg*> path_segs;
+
+    QColor line_col;
+
+    // static
+    static QColor line_col_default;
+    static QColor line_col_hovered;
+    static QColor line_col_sel;
+    static qreal line_width;
   };
 
 }

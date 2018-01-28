@@ -99,7 +99,7 @@ QRectF AFMSeg::boundingRect() const
 
 void AFMSeg::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-  if (!segmentIsValid())
+  /*if (!segmentIsValid())
     return;
 
   if (select_mode && upSelected()) {
@@ -119,7 +119,7 @@ void AFMSeg::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget 
 
   painter->setPen(paint_pen);
   //painter->setBrush(QColor(255,255,255));
-  painter->drawLine(QLineF(originNode()->scenePos(), destinationNode()->scenePos()));
+  painter->drawLine(QLineF(originNode()->scenePos(), destinationNode()->scenePos()));*/
 }
 
 Item *AFMSeg::deepCopy() const

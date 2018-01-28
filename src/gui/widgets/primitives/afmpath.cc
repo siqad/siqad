@@ -10,6 +10,13 @@
 
 namespace prim {
 
+// Initialise statics
+QColor AFMPath::line_col_default;
+QColor AFMPath::line_col_hovered;
+QColor AFMPath::line_col_sel;
+qreal AFMPath::line_width = -1;
+
+
 AFMPath::AFMPath(int lay_id)
   : prim::Item(prim::Item::AFMPath)
 {
@@ -73,6 +80,9 @@ void AFMPath::initAFMPath(int lay_id, const QList<prim::AFMNode*> &nodes)
     insertNode(node);
 
   setFlag(QGraphicsItem::ItemIsSelectable, true);
+
+  if (line_width == -1)
+    prepareStatics();
 
   // TODO emit signal declaring this to be the focused path
 }
@@ -244,7 +254,32 @@ QList<QPointF> AFMPath::unfoldedPath()
 
 void AFMPath::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+  if (select_mode && upSelected()) {
+    line_col = line_col_sel;
+  } else if (isHovered()) {
+    line_col = line_col_hovered;
+  } else {
+    line_col = line_col_default;
+  }
 
+  QPen paint_pen = QPen();
+  paint_pen.setColor(line_col);
+  paint_pen.setCapStyle(Qt::RoundCap);
+  paint_pen.setJoinStyle(Qt::RoundJoin);
+  paint_pen.setWidth(line_width);
+
+  painter->setPen(paint_pen);
+
+  QPointF* points = new QPointF[nodeCount()];
+  for (int i=0; i<nodeCount(); i++) {
+    points[i] = getNode(i)->scenePos();
+  }
+
+  painter->drawPolyline(points, nodeCount());
+
+  /*for (prim::AFMSeg *seg : path_segs) {
+    painter->drawLine(QLineF(seg->originNode()->scenePos(), seg->destinationNode()->scenePos()));
+  }*/
 }
 
 Item *AFMPath::deepCopy() const
@@ -255,6 +290,19 @@ Item *AFMPath::deepCopy() const
   AFMPath *cp = new AFMPath(layer_id, path_nodes);
   cp->setPos(pos());
   return cp;
+}
+
+
+
+void AFMPath::prepareStatics()
+{
+  // Initialize statics
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+
+  line_col_default = gui_settings->get<QColor>("afmseg/line_col_default");
+  line_col_hovered = gui_settings->get<QColor>("afmseg/line_col_hovered");
+  line_col_sel = gui_settings->get<QColor>("afmseg/line_col_sel");
+  line_width = gui_settings->get<qreal>("afmseg/line_width");
 }
 
 
