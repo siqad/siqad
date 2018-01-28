@@ -48,7 +48,7 @@ void AFMPanel::setFocusedNodeIndex(int node_ind)
   node_index_focused = node_ind;
 
   // generate ghost segment if a focused node exists
-  if (node_ind > -1)
+  if (focusedPath() && node_ind > -1)
     ghost_seg->setOriginNode(path_focused->getNode(node_ind));
   else
     ghost_seg->setOriginNode(0);

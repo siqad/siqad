@@ -25,7 +25,7 @@ AFMPath::AFMPath(int lay_id, const QList<prim::AFMNode*> &nodes)
 AFMPath::AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene)
   : prim::Item(prim::Item::AFMPath)
 {
-  int lay_id;
+  int lay_id = -1;
   QList<prim::AFMNode*> ld_nodes;
 
   // TODO read own attributes, e.g. zoffset
@@ -72,6 +72,7 @@ void AFMPath::initAFMPath(int lay_id, const QList<prim::AFMNode*> &nodes)
   for (prim::AFMNode* node : nodes)
     insertNode(node);
 
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
 
   // TODO emit signal declaring this to be the focused path
 }
@@ -98,9 +99,12 @@ void AFMPath::insertNode(prim::AFMNode *new_node, int index)
   if (index == -1)
     index = path_nodes.length(); // append to back if index == -1
 
+  prepareGeometryChange();
+
   // insert the node to node list
   path_nodes.insert(index, new_node);
   new_node->setParentItem(this);
+  new_node->setFlag(QGraphicsItem::ItemIsSelectable, false);
 
   int last_index = path_nodes.length()-1;
 
@@ -126,6 +130,8 @@ void AFMPath::insertNode(prim::AFMNode *new_node, int index)
 void AFMPath::removeNode(int index)
 {
   int last_index = path_nodes.length()-1;
+
+  prepareGeometryChange();
 
   // take the node out of nodes list
   // NOTE might segfault, look into delete behavior when deleting a child item for QGraphicsItem
@@ -204,7 +210,29 @@ void AFMPath::setLoop(bool loop_state)
 
 QRectF AFMPath::boundingRect() const
 {
+  qreal xmin, ymin, xmax, ymax, width, height;
+  bool unset = true;
 
+  for (prim::AFMNode *node : path_nodes) {
+    QRectF rect = node->boundingRect();
+    QPointF pos = node->pos();
+    if (unset) {
+      unset = false;
+      xmin = pos.x()+rect.left();
+      ymin = pos.y()+rect.top();
+      xmax = pos.x()+rect.right();
+      ymax = pos.y()+rect.bottom();
+    } else {
+      xmin = qMin(xmin, pos.x()+rect.left());
+      ymin = qMin(ymin, pos.y()+rect.top());
+      xmax = qMax(xmax, pos.x()+rect.right());
+      ymax = qMax(ymax, pos.y()+rect.bottom());
+    }
+  }
+
+  width = xmax-xmin;
+  height = ymax-ymin;
+  return QRectF(.5*(xmax+xmin-width), .5*(ymax+ymin-height), width, height);
 }
 
 
@@ -234,7 +262,8 @@ void AFMPath::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
   // Show path config dialog that allows users to edit AFM variables, node/path
   // related settings, etc.
-  // TODO
+
+  e->ignore();
 }
 
 

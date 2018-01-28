@@ -44,19 +44,19 @@ namespace prim{
     void removeNode(int index);
 
     // get node at index
-    prim::AFMNode *getNode(int index) {return (index < nodeCount()) ? path_nodes.at(index) : 0;}
-    prim::AFMNode *getLastNode() {return (nodeCount() > 0) ? getNode(path_nodes.length()-1): 0;}
+    prim::AFMNode *getNode(int index) const {return (index < nodeCount()) ? path_nodes.at(index) : 0;}
+    prim::AFMNode *getLastNode() const {return (nodeCount() > 0) ? getNode(path_nodes.length()-1): 0;}
 
     // get index position of node pointer in path_nodes list
     // returns -1 if none exists
-    int getNodeIndex(prim::AFMNode *node) {return path_nodes.indexOf(node);}
-    int getLastNodeIndex() {return path_nodes.length()-1;}
+    int getNodeIndex(prim::AFMNode *node) const {return path_nodes.indexOf(node);}
+    int getLastNodeIndex() const {return path_nodes.length()-1;}
 
     // node count
-    int nodeCount() {return path_nodes.length();}
+    int nodeCount() const {return path_nodes.length();}
 
     // segment count
-    int segmentCount() {return path_segs.length();}
+    int segmentCount() const {return path_segs.length();}
 
     // insert segment to index position with path_node[index] as origin and 
     // path_node[index+1] as destination
@@ -66,7 +66,7 @@ namespace prim{
     void removeSegment(int index);
 
     // get segment at index, or the last index if not specified
-    prim::AFMSeg *getSegment(int index) {return path_segs.at(index);}
+    prim::AFMSeg *getSegment(int index) const {return path_segs.at(index);}
 
     // get segments connected to the supplied node pointer / index
     QList<prim::AFMSeg*> getConnectedSegments(prim::AFMNode *node);

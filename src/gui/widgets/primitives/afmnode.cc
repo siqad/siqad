@@ -183,7 +183,10 @@ void AFMNode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
   // Show path config dialog when selected, with this node highlighted on the list
   // TODO select whole path if the whole path wasn't selected; select node if the parent path already is selected
-  prim::Item::mousePressEvent(e);
+  if (parentItem() != 0)
+    parentItem()->setSelected(true);
+  else
+    prim::Item::mousePressEvent(e);
 }
 
 void AFMNode::hoverEnterEvent(QGraphicsSceneHoverEvent *)

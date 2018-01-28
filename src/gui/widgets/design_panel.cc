@@ -1694,7 +1694,9 @@ gui::DesignPanel::CreateAFMPath::CreateAFMPath(int layer_index, gui::DesignPanel
 {
   //qDebug() << tr("Entered CreateAFMPath");
   prim::Layer *layer = dp->getLayer(layer_index);
-  index = invert ? layer->getItems().indexOf(afm_path) : layer->getItems().size();
+  index = invert ? layer->getItemIndex(afm_path) : layer->getItems().size();
+  if (index == -1)
+    qCritical() << tr("Index for AFMPath is -1, this shouldn't happen.");
 }
 
 void gui::DesignPanel::CreateAFMPath::undo()
@@ -1720,12 +1722,10 @@ void gui::DesignPanel::CreateAFMPath::destroy()
   //qDebug() << tr("Entered CreateAFMPath::destroy()");
   prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(index));
 
-  if (afm_path) {
-    // contained nodes and segments should be deleted automatically when deleting the path,
-    // since they're children items to the path.
-    dp->removeItem(afm_path, dp->getLayer(afm_path->layer_id));
-    dp->afmPanel()->setFocusedPath(0);
-  }
+  // contained nodes and segments should be deleted automatically when deleting the path 
+  // since they're children items to the path.
+  dp->removeItem(afm_path, dp->getLayer(afm_path->layer_id));
+  dp->afmPanel()->setFocusedPath(0);
 }
 
 
@@ -2055,17 +2055,22 @@ void gui::DesignPanel::destroyAFMPath(prim::AFMPath *afm_path)
   undo_stack->beginMacro(tr("Remove AFM Path and contained nodes"));
 
   // destroy children nodes
+  qDebug() << "delete children nodes";
   prim::AFMNode *afm_node;
   while (afm_path->getLastNode()) {
+    //qDebug() << "getting last node";
     afm_node = afm_path->getLastNode();
 
+    //qDebug() << "getting afm and node indices";
     int afm_index = getLayer(afm_node->layer_id)->getItemIndex(afm_path);
     int node_index = afm_path->getNodeIndex(afm_node);
+    //qDebug() << tr("pushing to undo stack. layer_id=%1, zoffset=%2, afm_index=%3, node_index=%4").arg(afm_node->layer_id).arg(afm_node->zOffset()).arg(afm_index).arg(node_index);
     undo_stack->push(new CreateAFMNode(afm_node->layer_id, this, afm_node->scenePos(),
           afm_node->zOffset(), afm_index, node_index, true));
   }
 
   // destroy empty path
+  //qDebug() << "delete afmpath";
   undo_stack->push(new CreateAFMPath(afm_path->layer_id, this, afm_path, true));
 
   undo_stack->endMacro();
@@ -2108,6 +2113,7 @@ void gui::DesignPanel::deleteSelection()
           int node_index = afm_path->getNodeIndex(afm_node);
           undo_stack->push(new CreateAFMNode(afm_node->layer_id, this, afm_node->scenePos(),
                             afm_node->zOffset(), afm_index, node_index, true));
+          qDebug() << "shouldn't be here yet";
           break;
         }
       default:
