@@ -276,6 +276,7 @@ void AFMPath::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget
   }
 
   painter->drawPolyline(points, nodeCount());
+  delete points;
 
   /*for (prim::AFMSeg *seg : path_segs) {
     painter->drawLine(QLineF(seg->originNode()->scenePos(), seg->destinationNode()->scenePos()));
