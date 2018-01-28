@@ -288,9 +288,10 @@ Item *AFMPath::deepCopy() const
   /*TODO look into aggregate's deep copy to figure out how this should be implemented.
      Keep in mind that when pasting, all off the path_nodes and path_segs have to take
      the new location, electrode code might have that implemented.*/
-  AFMPath *cp = new AFMPath(layer_id, path_nodes);
-  cp->setPos(pos());
-  return cp;
+  QList<prim::AFMNode*> cp_nodes;
+  for (prim::AFMNode *node : path_nodes)
+    cp_nodes.append(node->deepCopy());
+  return new prim::AFMPath(layer_id, cp_nodes);
 }
 
 
