@@ -36,9 +36,19 @@ namespace prim{
     // emit a signal indicating the given item has been clicked
     void selectClicked(Item *);
 
+    // emit a signal telling DesignPanel to add item to scene
+    void addItemToScene(Item *);
+
+    // emit a signal telling DesignPanel to remove item from scene
+    void removeItemFromScene(Item *);
+
   signals:
 
     void sig_selectClicked(Item *);
+
+    void sig_addItemToScene(Item *);
+
+    void sig_removeItemFromScene(Item *);
 
   private:
 

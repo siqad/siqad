@@ -57,9 +57,13 @@ HEADERS += \
 	src/gui/widgets/primitives/items.h \
 	src/gui/widgets/primitives/layer.h \
 	src/gui/widgets/primitives/lattice.h \
-  src/gui/widgets/primitives/sim_engine.h \
-  src/gui/widgets/primitives/sim_job.h \
-	src/gui/widgets/primitives/electrode.h
+	src/gui/widgets/primitives/sim_engine.h \
+	src/gui/widgets/primitives/sim_job.h \
+	src/gui/widgets/primitives/electrode.h \
+  src/gui/widgets/primitives/afmpath.h \
+  src/gui/widgets/primitives/afmnode.h \
+  src/gui/widgets/primitives/afmseg.h
+
 
 SOURCES += \
 	src/gui/widgets/primitives/emitter.cc \
@@ -72,7 +76,11 @@ SOURCES += \
 	src/gui/widgets/primitives/lattice.cc \
 	src/gui/widgets/primitives/sim_engine.cc \
 	src/gui/widgets/primitives/sim_job.cc \
-	src/gui/widgets/primitives/electrode.cc
+	src/gui/widgets/primitives/electrode.cc \
+	src/gui/widgets/primitives/afmpath.cc \
+	src/gui/widgets/primitives/afmnode.cc \
+	src/gui/widgets/primitives/afmseg.cc
+
 
 # widgets
 
@@ -82,10 +90,12 @@ HEADERS += \
 	src/gui/widgets/dialog_panel.h \
 	src/gui/widgets/input_field.h \
 	src/gui/widgets/info_panel.h \
+	src/qcustomplot.h\
   src/gui/widgets/layer_editor.h \
   src/gui/widgets/sim_manager.h \
   src/gui/widgets/sim_visualize_panel.h \
-	src/qcustomplot.h
+  src/gui/widgets/afm_panel.h
+
 
 SOURCES += \
 	src/gui/application.cc \
@@ -93,10 +103,12 @@ SOURCES += \
 	src/gui/widgets/dialog_panel.cc \
 	src/gui/widgets/input_field.cc \
 	src/gui/widgets/info_panel.cc \
+	src/qcustomplot.cpp\
   src/gui/widgets/layer_editor.cc \
   src/gui/widgets/sim_manager.cc \
   src/gui/widgets/sim_visualize_panel.cc \
-	src/qcustomplot.cpp
+  src/gui/widgets/afm_panel.cc
+
 
 #####################
 # BUILD DIRECTORIES #

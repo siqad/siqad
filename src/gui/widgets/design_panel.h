@@ -15,6 +15,10 @@
 #include <QtCore>
 #include <QDialog>
 
+#include "../../global.h"
+
+#include "afm_panel.h"
+
 #include "primitives/layer.h"
 #include "primitives/lattice.h"
 #include "primitives/items.h"
@@ -31,8 +35,8 @@ namespace gui{
 
   public:
 
-    enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool, ElectrodeTool};
-    enum DisplayMode{DesignMode, SimDisplayMode};
+    //enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool, ElectrodeTool, AFMPathTool};
+    //enum DisplayMode{DesignMode, SimDisplayMode};
 
     class UndoCommand;
 
@@ -56,9 +60,18 @@ namespace gui{
     // remove the given Item from the given Layer if possible
     void removeItem(prim::Item *item, prim::Layer* layer);
 
+    // add a new Item to the graphics scene. This either means the Item is already owned
+    // by another class and only needs to be shown graphically, or the Item is merely
+    // a temporary graphics item for purely indicative purposes.
+    void addItemToScene(prim::Item *item);
+
+    // remove item from scene without deleting the item pointer. The caller has to handle
+    // the cleanup if so desired.
+    void removeItemFromScene(prim::Item *item);
+
     // add a new layer with the given name. If no name is given, a default scheme
     // is used. Checks if the layer already exists.
-    void addLayer(const QString &name = QString(), const prim::Layer::LayerType cnt_type=prim::Layer::DB, const float zheight = 0);
+    void addLayer(const QString &name = QString(), const prim::Layer::LayerType cnt_type=prim::Layer::DB, const float zoffset = 0, const float zheight = 0);
 
     // attempt to remove a layer, either by name or index
     void removeLayer(const QString &name);
@@ -87,7 +100,7 @@ namespace gui{
     void setScenePadding();
 
     // update the tool type
-    void setTool(ToolType tool);
+    void setTool(gui::ToolType tool);
 
     // update the fill values for the surface dangling bonds, no check for
     // array size/contents.
@@ -103,6 +116,9 @@ namespace gui{
     DisplayMode displayMode() {return display_mode;}
     void setDisplayMode(DisplayMode mode);
 
+    // get afm_panel pointer
+    AFMPanel *afmPanel() {return afm_panel;}
+
     // SAVE
 
     // flag if actions are performed after last saved
@@ -117,13 +133,18 @@ namespace gui{
     void displaySimResults(prim::SimJob *job, int dist_int);
     void clearSimResults();
 
+
   public slots:
 
     void selectClicked(prim::Item *item);
     void simVisualizeDockVisibilityChanged(bool visible);
 
+    void addItemToSceneRequest(prim::Item *item) {addItemToScene(item);}
+    void removeItemFromSceneRequest(prim::Item *item) {removeItemFromScene(item);}
+
   signals:
-    void sig_toolChange(ToolType tool);
+    void sig_toolChangeRequest(gui::ToolType tool);  // request ApplicationGUI to change tool
+    void sig_toolChanged(gui::ToolType tool);  // request ApplicationGUI to change tool
     void sig_resetDesignPanel();
 
   protected:
@@ -155,9 +176,13 @@ namespace gui{
   private:
 
     QGraphicsScene *scene;    // scene for the QGraphicsView
-    ToolType tool_type;       // current cursor tool type
-    DisplayMode display_mode; // current display mode
+    gui::ToolType tool_type;       // current cursor tool type
+    gui::DisplayMode display_mode; // current display mode
     QUndoStack *undo_stack;   // undo stack
+
+    // children panels
+    AFMPanel *afm_panel;
+    // TODO layer manager
 
     // copy/paste
     QList<prim::Item*> clipboard;  // cached deep copy of a set of items for pasting
@@ -165,6 +190,7 @@ namespace gui{
     QStack<prim::Layer*> layers;  // stack of all layers, order immutable
     prim::Layer *top_layer;       // new items added to this layer
     prim::Layer *electrode_layer; // add electrodes to this layer
+    prim::Layer *afm_layer;       // add afm paths to this layer TODO request layers from Layer Manager instead of keeping pointers like these
 
     // flags, change later to bit flags
     bool clicked;   // mouse left button is clicked
@@ -176,6 +202,10 @@ namespace gui{
     qreal snap_diameter;            // size of region to search for snap points
     prim::LatticeDot *snap_target;  // current snap target, LatticeDot
     QPointF snap_cache;             // cursor position of last snap update
+
+    // AFM ghost
+    prim::AFMNode *ghost_afm_node=0;
+    prim::AFMSeg *ghost_afm_seg=0;
 
     // mouse functionality
     QPoint mouse_pos_old;     // old mouse position in pixels
@@ -236,6 +266,11 @@ namespace gui{
     // dbgen Location Indicator
     void snapDB(QPointF scene_pos);
 
+    // return the scene position of the nearest prim::Item with the specified item types.
+    // returns a null pointer if no eligible item falls within the search range.
+    prim::Item *filteredSnapTarget(QPointF scene_pos, QList<prim::Item::ItemType> &target_types, 
+        qreal search_box_width);
+
 
 
     // UNDO/class UndoCommand;redo base class
@@ -252,12 +287,21 @@ namespace gui{
 
     class CreateElectrode;  // create an electrode at the given points
 
+    class CreateAFMPath;    // create an empty AFMPath that should later contain AFMNodes
+    class CreateAFMNode;    // create AFMNodes that should be children of AFMPath
+
     // functions including undo/redo behaviour
 
     // create dangling bonds in the surface at all selected lattice dots
     void createDBs();
 
     void createElectrodes(QPoint point1);
+
+    // create AFM node in focused path after focused node
+    void createAFMNode();
+
+    // destroy AFM path and included nodes
+    void destroyAFMPath(prim::AFMPath *afm_path);
 
     // delete all selected items
     void deleteSelection();
@@ -422,6 +466,61 @@ namespace gui{
     // internals
     int index;              // index of electrode item in the layer item stack
 
+  };
+
+
+  class DesignPanel::CreateAFMPath : public QUndoCommand
+  {
+  public:
+    // create an empty AFMPath
+    CreateAFMPath(int layer_index, DesignPanel *dp, prim::AFMPath *afm_path=0, 
+                    bool invert=false, QUndoCommand *parent=0);
+
+    // destroy the AFMPath, which is not necessarily empty
+    virtual void undo();
+
+    // re-create the AFMPath
+    virtual void redo();
+
+  private:
+    void create();    // create the AFMPath
+    void destroy();   // destroy the AFMPath
+
+    bool invert;      // swaps create/delete on redo/undo
+
+    DesignPanel *dp;  // DesignPanel pointer
+    int layer_index;  // index of layer in dp->layers stack
+
+    int index;        // index of this path in the items stack
+  };
+
+
+  class DesignPanel::CreateAFMNode : public QUndoCommand
+  {
+  public:
+    // create an AFMNode with the given AFMPath and index in path
+    CreateAFMNode(int layer_index, DesignPanel *dp, QPointF scenepos, float z_offset,
+          int afm_index, int index_in_path=-1, bool invert=false, 
+          QUndoCommand *parent=0);
+
+    // remove the AFMNode from its Path and destroy the node
+    virtual void undo();
+
+    // re-create the node
+    virtual void redo();
+
+  private:
+    void create();    // create the AFMNode
+    void destroy();   // destroy the AFMNode
+
+    bool invert;      // swaps create/delete on redo/undo
+
+    int layer_index;
+    DesignPanel *dp;
+    int afm_index;    // the Path's index in its layer
+    int node_index;   // the Node's index in the path
+    QPointF scenepos;
+    float z_offset;
   };
 
 

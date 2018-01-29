@@ -10,14 +10,15 @@
 #include "aggregate.h"
 #include "dbdot.h"
 #include "electrode.h"
+#include "afmpath.h"
 
 
 // statics
 uint prim::Layer::layer_count = 0;
 
 
-prim::Layer::Layer(const QString &nm, LayerType cnt_type, const float z_height, int lay_id, QObject *parent)
-  : QObject(parent), visible(true), active(false), zheight(z_height)
+prim::Layer::Layer(const QString &nm, LayerType cnt_type, const float z_offset, const float z_height, int lay_id, QObject *parent)
+  : QObject(parent), visible(true), active(false), zoffset(z_offset), zheight(z_height)
 {
   layer_id = lay_id;
   name = nm.isEmpty() ? QString("Layer %1").arg(layer_count++) : nm;
@@ -146,6 +147,7 @@ void prim::Layer::saveLayer(QXmlStreamWriter *stream) const
 
   stream->writeTextElement("name", name);
   stream->writeTextElement("type", getContentTypeString());
+  stream->writeTextElement("zoffset", QString::number(zoffset));
   stream->writeTextElement("zheight", QString::number(zheight));
   stream->writeTextElement("visible", QString::number(visible));
   stream->writeTextElement("active", QString::number(active));
@@ -169,35 +171,34 @@ void prim::Layer::loadItems(QXmlStreamReader *stream, QGraphicsScene *scene)
 {
   qDebug() << QObject::tr("Loading layer items for %1").arg(name);
   // create items according to hierarchy
-  while(!stream->atEnd()){
-    if(stream->isStartElement()){
-      if(stream->name() == "dbdot"){
+  while (!stream->atEnd()) {
+    if (stream->isStartElement()) {
+      if (stream->name() == "dbdot") {
         stream->readNext();
         addItem(new prim::DBDot(stream, scene));
-      }
-      else if(stream->name() == "aggregate"){
+      } else if (stream->name() == "aggregate") {
         stream->readNext();
         addItem(new prim::Aggregate(stream, scene));
-      }
-      if(stream->name() == "electrode"){
+      } else if (stream->name() == "electrode") {
         stream->readNext();
         addItem(new prim::Electrode(stream, scene));
-      }
-      else{
+      } else if (stream->name() == "afmpath") {
+        stream->readNext();
+        addItem(new prim::AFMPath(stream, scene));
+      } else {
         qDebug() << QObject::tr("Layer load item: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
         stream->readNext();
       }
-    }
-    else if(stream->isEndElement()){
+    } else if (stream->isEndElement()) {
       // break out of stream if the end of this element has been reached
-      if(stream->name() == "layer"){
+      if (stream->name() == "layer") {
         stream->readNext();
         break;
       }
       stream->readNext();
-    }
-    else
+    } else {
       stream->readNext();
+    }
   }
   
   // show error if any

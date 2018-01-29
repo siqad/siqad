@@ -254,18 +254,21 @@ void gui::ApplicationGUI::initSideBar()
   action_drag_tool = side_bar->addAction(QIcon(":/ico/drag.svg"), tr("Drag tool"));
   action_dbgen_tool = side_bar->addAction(QIcon(":/ico/dbgen.svg"), tr("DB tool"));
   action_electrode_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"), tr("Electrode tool"));
+  action_afmpath_tool = side_bar->addAction(QIcon(":/ico/drawafmpath.svg"), tr("AFM Path tool"));
   //TODO action_label_tool = side_bar->addAction(QIcon(":/ico/drawlabel.svg"), tr("Label tool"));
 
   action_group->addAction(action_select_tool);
   action_group->addAction(action_drag_tool);
   action_group->addAction(action_dbgen_tool);
   action_group->addAction(action_electrode_tool);
+  action_group->addAction(action_afmpath_tool);
   //action_group->addAction(action_label_tool);
 
   action_select_tool->setCheckable(true);
   action_drag_tool->setCheckable(true);
   action_dbgen_tool->setCheckable(true);
   action_electrode_tool->setCheckable(true);
+  action_afmpath_tool->setCheckable(true);
   //action_label_tool->setCheckable(true);
 
   action_select_tool->setChecked(true);
@@ -274,6 +277,7 @@ void gui::ApplicationGUI::initSideBar()
   connect(action_drag_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolDrag);
   connect(action_dbgen_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolDBGen);
   connect(action_electrode_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolElectrode);
+  connect(action_afmpath_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolAFMPath);
   //connect(action_label_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolLabel);
 
   addToolBar(area, side_bar);
@@ -359,10 +363,10 @@ void gui::ApplicationGUI::initActions()
             this, &gui::ApplicationGUI::parseInputField);
 
   // set tool
-  connect(design_pan, &gui::DesignPanel::sig_toolChange,
+  connect(design_pan, &gui::DesignPanel::sig_toolChangeRequest,
             this, &gui::ApplicationGUI::setTool);
 
-  layer_editor->initLayerTable();
+  layer_editor->initLayerTable(); // TODO move to appropriate place
 }
 
 
@@ -370,7 +374,7 @@ void gui::ApplicationGUI::initState()
 {
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 
-  setTool(gui::DesignPanel::SelectTool);
+  setTool(gui::ToolType::SelectTool);
   working_path.clear();
   autosave_timer.start(1000*app_settings->get<int>("save/autosaveinterval"));
 
@@ -440,24 +444,28 @@ void gui::ApplicationGUI::saveSettings()
 
 // PUBLIC SLOTS
 
-void gui::ApplicationGUI::setTool(gui::DesignPanel::ToolType tool)
+void gui::ApplicationGUI::setTool(gui::ToolType tool)
 {
   switch(tool){
-    case gui::DesignPanel::SelectTool:
+    case gui::ToolType::SelectTool:
       action_select_tool->setChecked(true);
       setToolSelect();
       break;
-    case gui::DesignPanel::DragTool:
+    case gui::ToolType::DragTool:
       action_drag_tool->setChecked(true);
       setToolDrag();
       break;
-    case gui::DesignPanel::DBGenTool:
+    case gui::ToolType::DBGenTool:
       action_dbgen_tool->setChecked(true);
       setToolDBGen();
       break;
-    case gui::DesignPanel::ElectrodeTool:
+    case gui::ToolType::ElectrodeTool:
       action_electrode_tool->setChecked(true);
       setToolElectrode();
+      break;
+    case gui::ToolType::AFMPathTool:
+      action_afmpath_tool->setChecked(true);
+      setToolAFMPath();
       break;
     default:
       break;
@@ -467,29 +475,35 @@ void gui::ApplicationGUI::setTool(gui::DesignPanel::ToolType tool)
 void gui::ApplicationGUI::setToolSelect()
 {
   qDebug() << tr("selecting select tool");
-  design_pan->setTool(gui::DesignPanel::SelectTool);
+  design_pan->setTool(gui::ToolType::SelectTool);
 }
 
 void gui::ApplicationGUI::setToolDrag()
 {
   qDebug() << tr("selecting drag tool");
-  design_pan->setTool(gui::DesignPanel::DragTool);
+  design_pan->setTool(gui::ToolType::DragTool);
 }
 
 void gui::ApplicationGUI::setToolDBGen()
 {
-  if(design_pan->displayMode() != gui::DesignPanel::DesignMode){
+  if(design_pan->displayMode() != gui::DisplayMode::DesignMode){
     qDebug() << tr("dbgen tool not allowed outside of design mode");
     return;
   }
   qDebug() << tr("selecting dbgen tool");
-  design_pan->setTool(gui::DesignPanel::DBGenTool);
+  design_pan->setTool(gui::ToolType::DBGenTool);
 }
 
 void gui::ApplicationGUI::setToolElectrode()
 {
   qDebug() << tr("selecting electrode tool");
-  design_pan->setTool(gui::DesignPanel::ElectrodeTool);
+  design_pan->setTool(gui::ToolType::ElectrodeTool);
+}
+
+void gui::ApplicationGUI::setToolAFMPath()
+{
+  qDebug() << tr("selecting afmpath tool");
+  design_pan->setTool(gui::ToolType::AFMPathTool);
 }
 
 
@@ -535,7 +549,7 @@ void gui::ApplicationGUI::runSimulation(prim::SimJob *job)
     return;
   }
 
-  setTool(gui::DesignPanel::SelectTool);
+  setTool(gui::ToolType::SelectTool);
 
   qDebug() << tr("ApplicationGUI: About to run job '%1'").arg(job->name());
 

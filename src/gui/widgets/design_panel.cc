@@ -32,6 +32,19 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
             this, &gui::DesignPanel::selectClicked);
 
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_addItemToScene,
+            this, &gui::DesignPanel::addItemToSceneRequest);
+
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_removeItemFromScene,
+            this, &gui::DesignPanel::removeItemFromScene);
+
+  // construct widgets
+  afm_panel = new AFMPanel(getLayerIndex(afm_layer), this);
+  scene->addItem(afm_panel->ghostNode());
+  scene->addItem(afm_panel->ghostSegment());
+  connect(this, &gui::DesignPanel::sig_toolChanged, afm_panel, &gui::AFMPanel::toolChangeResponse);
+
+
   // setup flags
   clicked = ghosting = moving = false;
 
@@ -40,7 +53,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   qDebug() << tr("SD: %1").arg(snap_diameter);
   snap_target = 0;
 
-  tool_type = gui::DesignPanel::NoneTool;     // now setTool will update the tool
+  tool_type = gui::ToolType::NoneTool;     // now setTool will update the tool
 
   // set view behaviour
   setTransformationAnchor(QGraphicsView::NoAnchor);
@@ -88,6 +101,9 @@ gui::DesignPanel::~DesignPanel()
 // clear design panel
 void gui::DesignPanel::clearDesignPanel(bool reset)
 {
+  // delete child widgets
+  delete afm_panel;
+
   // delete all graphical items from the scene
   scene->clear();
   if(!reset) delete scene;
@@ -109,12 +125,14 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
 // reset
 void gui::DesignPanel::resetDesignPanel()
 {
+  // TODO fold this into a single initDesignPanel function
+
   clearDesignPanel(true);
 
   // REBUILD
   // reset flags
   clicked = ghosting = moving = false;
-  tool_type = gui::DesignPanel::NoneTool;     // now setTool will update the tool
+  tool_type = gui::ToolType::NoneTool;     // now setTool will update the tool
 
   undo_stack = new QUndoStack();
   // TODO reset undo stack counter
@@ -139,6 +157,12 @@ void gui::DesignPanel::resetDesignPanel()
   //let application know that design panel has been reset.
   emit sig_resetDesignPanel();
   qDebug() << tr("Design Panel reset complete");
+
+  // reconstruct widgets
+  afm_panel = new AFMPanel(getLayerIndex(afm_layer), this);
+  scene->addItem(afm_panel->ghostNode());
+  scene->addItem(afm_panel->ghostSegment());
+  connect(this, &gui::DesignPanel::sig_toolChanged, afm_panel, &gui::AFMPanel::toolChangeResponse);
 }
 
 
@@ -172,7 +196,18 @@ void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
   }
 }
 
-void gui::DesignPanel::addLayer(const QString &name, const prim::Layer::LayerType cnt_type, const float zheight)
+void gui::DesignPanel::addItemToScene(prim::Item *item)
+{
+  scene->addItem(item);
+}
+
+void gui::DesignPanel::removeItemFromScene(prim::Item *item)
+{
+  scene->removeItem(item);
+  // item pointer delete should be handled by the caller
+}
+
+void gui::DesignPanel::addLayer(const QString &name, const prim::Layer::LayerType cnt_type, const float zoffset, const float zheight)
 {
   // check if name already taken
   bool taken = false;
@@ -188,7 +223,7 @@ void gui::DesignPanel::addLayer(const QString &name, const prim::Layer::LayerTyp
   }
 
   // layer is added to the end of layers stack, so ID = layers.size() before it was added
-  prim::Layer *layer = new prim::Layer(name, cnt_type, zheight, layers.size());
+  prim::Layer *layer = new prim::Layer(name, cnt_type, zoffset, zheight, layers.size());
   layers.append(layer);
 }
 
@@ -326,13 +361,19 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   // add the lattice to the layers, as layer 0
   layers.append(lattice);
 
+  // TODO transfer all the hard-coded layer potitions to actual functions in LayerManager
+
   // add in the dangling bond surface
-  addLayer(tr("Surface"),prim::Layer::DB,0);
+  addLayer(tr("Surface"),prim::Layer::DB,0,0);
   top_layer = layers.at(1);
 
   // add in the metal layer for electrodes
-  addLayer(tr("Metal"),prim::Layer::Electrode,-1E-7);
+  addLayer(tr("Metal"),prim::Layer::Electrode,-100E-9,0);
   electrode_layer = layers.at(2);
+
+  // add in the AFM layer for AFM tip travel paths
+  addLayer(tr("AFM"), prim::Layer::AFMTip,500E-12,50E-12);
+  afm_layer = layers.at(3);
 
 }
 
@@ -349,7 +390,7 @@ void gui::DesignPanel::setScenePadding(){
 }
 
 
-void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
+void gui::DesignPanel::setTool(gui::ToolType tool)
 {
   // do nothing if tool has not been changed
   if(tool==tool_type)
@@ -359,29 +400,33 @@ void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
   scene->clearSelection();
 
   // inform all items of select mode
-  prim::Item::select_mode = tool==gui::DesignPanel::SelectTool;
-  prim::Item::db_gen_mode = tool==gui::DesignPanel::DBGenTool;
-  prim::Item::electrode_mode = tool==gui::DesignPanel::ElectrodeTool;
+  // TODO replace with signal based notification
+  prim::Item::select_mode = tool==gui::ToolType::SelectTool;
+  prim::Item::db_gen_mode = tool==gui::ToolType::DBGenTool;
+  prim::Item::electrode_mode = tool==gui::ToolType::ElectrodeTool;
 
   switch(tool){
-    case gui::DesignPanel::SelectTool:
+    case gui::ToolType::SelectTool:
       // replaced with custom rubberBandUpdate, delete this later
       setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
       break;
-    case gui::DesignPanel::DragTool:
+    case gui::ToolType::DragTool:
       setDragMode(QGraphicsView::ScrollHandDrag);
       setInteractive(false);
       break;
-    case gui::DesignPanel::DBGenTool:
+    case gui::ToolType::DBGenTool:
       // replaced with custom rubberBandUpdate, delete this later
       setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
       break;
-    case gui::DesignPanel::ElectrodeTool:
+    case gui::ToolType::ElectrodeTool:
       // replaced with custom rubberBandUpdate, delete this later
       setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
+      break;
+    case gui::ToolType::AFMPathTool:
+      setInteractive(true); // TODO check back later that this is the right mode
       break;
     default:
       qCritical() << tr("Invalid ToolType... should not have happened");
@@ -389,6 +434,7 @@ void gui::DesignPanel::setTool(gui::DesignPanel::ToolType tool)
   }
 
   tool_type = tool;
+  emit sig_toolChanged(tool);
 }
 
 void gui::DesignPanel::setFills(float *fills)
@@ -455,7 +501,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
 {
   int layer_id=0;
   QString layer_nm;
-  float zheight;
+  float zoffset, zheight;
   prim::Layer::LayerType layer_type;
   bool layer_visible, layer_active;
 
@@ -508,6 +554,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
         layer_nm = QString();
         layer_type = prim::Layer::DB;
         zheight = 0;
+        zoffset = 0;
         layer_visible = layer_active = false;
 
         // keep reading until end of layer_prop tag
@@ -519,6 +566,10 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
             }
             else if(stream->name() == "type"){
               layer_type = static_cast<prim::Layer::LayerType>(QMetaEnum::fromType<prim::Layer::LayerType>().keyToValue(stream->readElementText().toStdString().c_str()));
+              stream->readNext();
+            }
+            else if(stream->name() == "zoffset"){
+              zoffset = stream->readElementText().toFloat();
               stream->readNext();
             }
             else if(stream->name() == "zheight"){
@@ -550,6 +601,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
           load_layer = getLayer(layers.count()-1);
         }
         load_layer->setContentType(layer_type);
+        load_layer->setZOffset(zoffset);
         load_layer->setZHeight(zheight);
         load_layer->setVisible(layer_visible);
         load_layer->setActive(layer_active);
@@ -649,7 +701,7 @@ void gui::DesignPanel::selectClicked(prim::Item *)
 {
   // for now, if an item is clicked in selection mode, act as though the highest
   // level aggregate was clicked
-  if(tool_type == gui::DesignPanel::SelectTool && display_mode == DesignMode)
+  if(tool_type == gui::ToolType::SelectTool && display_mode == DesignMode)
     initMove();
 
 }
@@ -680,17 +732,17 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   clicked = true;
   switch(e->button()){
     case Qt::LeftButton:
-      if(tool_type == SelectTool || tool_type == DBGenTool || tool_type == ElectrodeTool){
+      if (tool_type == SelectTool || tool_type == DBGenTool || tool_type == ElectrodeTool) {
         // rubber band variables
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
         // save current selection if Shift is pressed
-        if(keymods & Qt::ShiftModifier)
+        if(keymods & Qt::ShiftModifier) {
           rb_shift_selected = scene->selectedItems();
-        else
+        } else {
           QGraphicsView::mousePressEvent(e);
-      }
-      else{
+        }
+      } else {
         QGraphicsView::mousePressEvent(e);
       }
       break;
@@ -711,33 +763,47 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 // the middle mouse button to always pan and right click for context menus.
 void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
+  Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
 
   QPoint mouse_pos_del;
-  //QTransform trans = transform();
   QScrollBar *vsb = verticalScrollBar();
   QScrollBar *hsb = horizontalScrollBar();
   qreal dx, dy;
 
-  if(ghosting){
+  if (ghosting) {
     // update snap
     QPointF scene_pos = mapToScene(e->pos());
     QPointF offset;
     if(snapGhost(scene_pos, offset)) //if there are db dots
       prim::Ghost::instance()->moveBy(offset.x(), offset.y());
-  }
+
   /* TODO DB ghosting when DBGen tool is in use
-    else if(tool_type == gui::DesignPanel::DBGenTool){
+  } else if(tool_type == gui::DesignPanel::DBGenTool){
      show "ghost" of new DB
     QPointF scene_pos = mapToScene(e->pos());
-    snapDB(scene_pos);
-  }*/
-  else if(clicked){
+    snapDB(scene_pos);*/
+
+  } else if (tool_type == AFMPathTool) {
+    // update ghost node and ghost segment if there is a focused node, only update
+    // ghost node if there's none.
+    //afm_panel->ghostNode()->setPos(mapToScene(e->pos()));
+    QList<prim::Item::ItemType> target_types;
+    target_types.append(prim::Item::LatticeDot);
+    target_types.append(prim::Item::DBDot);
+    prim::Item *snap_target = filteredSnapTarget(mapToScene(e->pos()), target_types, snap_diameter);
+    if (snap_target) {
+      afm_panel->ghostNode()->setPos(snap_target->scenePos());
+      afm_panel->showGhost(true);
+    }
+
+  } else if (clicked) {
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
       case Qt::LeftButton:
-        if(clicked && (tool_type == SelectTool || tool_type == DBGenTool || tool_type == ElectrodeTool))
+        if (clicked && (tool_type == SelectTool || tool_type == DBGenTool 
+              || tool_type == ElectrodeTool)) {
           rubberBandUpdate(e->pos());
-
+        }
         // use default behaviour for left mouse button
         QGraphicsView::mouseMoveEvent(e);
         break;
@@ -772,44 +838,45 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
   QTransform trans = transform();
 
   // end rubber band if active
-  if(rb)
+  if (rb)
     rubberBandEnd();
 
   // case specific behaviour
-  if(ghosting){
+  if (ghosting) {
     // plant ghost and end ghosting
-    if(moving)
-    {
+    if (moving)
       moveToGhost();
-    }
-    else{
+    else
       pasteAtGhost();
-    }
     clearGhost();
   }
-  else if(clicked){
+  else if (clicked) {
     switch(e->button()){
       case Qt::LeftButton:
         // action based on chosen tool
         switch(tool_type){
-          case gui::DesignPanel::SelectTool:
+          case gui::ToolType::SelectTool:
             // filter out items in the lattice
             filterSelection(true);
             break;
-          case gui::DesignPanel::DBGenTool:
+          case gui::ToolType::DBGenTool:
             // identify free lattice sites and create dangling bonds
             filterSelection(false);
             createDBs();
             break;
-          case gui::DesignPanel::ElectrodeTool:
-            //get start and end locations, and create the electrode.
+          case gui::ToolType::ElectrodeTool:
+            // get start and end locations, and create the electrode.
             filterSelection(false);
             createElectrodes(e->pos());
             break;
-          case gui::DesignPanel::DragTool:
+          case gui::ToolType::AFMPathTool:
+            // Make node at the ghost position
+            createAFMNode();
+            break;
+          case gui::ToolType::DragTool:
             // pan ends
             break;
-          case gui::DesignPanel::MeasureTool:{
+          case gui::ToolType::MeasureTool:{
             // display measurement from start to finish
             QPointF delta = e->pos()-mouse_pos_cached;
             qreal dx = delta.x()*trans.m11()*prim::Item::scale_factor;
@@ -896,10 +963,10 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
     switch(e->key()){
       case Qt::Key_Escape:
         // deactivate current tool
-        if(tool_type != gui::DesignPanel::SelectTool){
+        if(tool_type != gui::ToolType::SelectTool){
           //qDebug() << tr("Esc pressed, drop back to select tool");
           // emit signal to be picked up by application.cc
-          emit sig_toolChange(gui::DesignPanel::SelectTool);
+          emit sig_toolChangeRequest(gui::ToolType::SelectTool);
         }
         break;
       case Qt::Key_G:
@@ -951,7 +1018,7 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
       case Qt::Key_Backspace:
       case Qt::Key_Delete:
         // delete selected items
-        if(tool_type == gui::DesignPanel::SelectTool && display_mode == DesignMode)
+        if(tool_type == gui::ToolType::SelectTool && display_mode == DesignMode)
           deleteSelection();
         break;
       case Qt::Key_S:
@@ -1117,7 +1184,7 @@ void gui::DesignPanel::pasteAction()
 
 void gui::DesignPanel::deleteAction()
 {
-  if(tool_type == gui::DesignPanel::SelectTool && display_mode == DesignMode)
+  if(tool_type == gui::ToolType::SelectTool && display_mode == DesignMode)
     deleteSelection();
 }
 
@@ -1197,7 +1264,7 @@ void gui::DesignPanel::createActions()
 void gui::DesignPanel::filterSelection(bool select_flag)
 {
   // should only be here if tool type is either select or dbgen
-  if(tool_type != gui::DesignPanel::SelectTool && tool_type != gui::DesignPanel::DBGenTool && tool_type != gui::DesignPanel::ElectrodeTool){
+  if(tool_type != gui::ToolType::SelectTool && tool_type != gui::ToolType::DBGenTool && tool_type != gui::ToolType::ElectrodeTool){
     qCritical() << tr("Filtering selection with invalid tool type...");
     return;
   }
@@ -1472,7 +1539,7 @@ void gui::DesignPanel::snapDB(QPointF scene_pos)
     return;
   }
 
-  // select the nearest db to cursor position
+  // select the nearest latdot to cursor position
   prim::LatticeDot *target=0;
   qreal mdist=-1, dist;
 
@@ -1496,6 +1563,41 @@ void gui::DesignPanel::snapDB(QPointF scene_pos)
   snap_target->setSelected(true); // select the new target
 
   return;
+}
+
+prim::Item *gui::DesignPanel::filteredSnapTarget(QPointF scene_pos, QList<prim::Item::ItemType> &target_types, qreal search_box_width)
+{
+  snap_cache = scene_pos;
+
+  // set search boundary
+  QRectF search_bound;
+  search_bound.setSize(QSizeF(snap_diameter, snap_diameter)); // use the same snap range as other snap functions
+  search_bound.moveCenter(scene_pos);
+  QList<QGraphicsItem*> near_items = scene->items(search_bound);
+
+  // if no items nearby, return a null pointer
+  if (near_items.count()==0) {
+    return 0;
+  }
+
+  // find the item nearest to cursor position that falls under the targeted item type
+  prim::Item *target=0;
+  qreal mdist=-1, dist;
+
+  for (QGraphicsItem *gitem : near_items) {
+    prim::Item *pitem = static_cast<prim::Item*>(gitem);
+    for (prim::Item::ItemType target_type : target_types) {
+      if (pitem->item_type == target_type) {
+        dist = (pitem->scenePos()-scene_pos).manhattanLength();
+        if (mdist < 0 || dist < mdist) {
+          mdist = dist;
+          target = pitem;
+        }
+      }
+    }
+  }
+  
+  return target;
 }
 
 // UNDO/REDO STACK METHODS
@@ -1547,6 +1649,7 @@ void gui::DesignPanel::CreateDB::destroy()
   }
 }
 
+
 // CreateElectrode class
 
 gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignPanel *dp, QPointF point1, QPointF point2, prim::Electrode *elec, bool invert, QUndoCommand *parent)
@@ -1581,6 +1684,92 @@ void gui::DesignPanel::CreateElectrode::destroy()
     electrode = 0;
   }
 }
+
+
+// CreateAFMPath class
+
+gui::DesignPanel::CreateAFMPath::CreateAFMPath(int layer_index, gui::DesignPanel *dp,
+                        prim::AFMPath *afm_path, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index)
+{
+  //qDebug() << tr("Entered CreateAFMPath");
+  prim::Layer *layer = dp->getLayer(layer_index);
+  index = invert ? layer->getItemIndex(afm_path) : layer->getItems().size();
+  if (index == -1)
+    qCritical() << tr("Index for AFMPath is -1, this shouldn't happen.");
+}
+
+void gui::DesignPanel::CreateAFMPath::undo()
+{
+  invert ? create() : destroy();
+}
+
+void gui::DesignPanel::CreateAFMPath::redo()
+{
+  invert ? destroy() : create();
+}
+
+void gui::DesignPanel::CreateAFMPath::create()
+{
+  //qDebug() << tr("Entered CreateAFMPath::create()");
+  prim::AFMPath *new_path = new prim::AFMPath(layer_index);
+  dp->addItem(new_path, layer_index, index);
+  dp->afmPanel()->setFocusedPath(new_path);
+}
+
+void gui::DesignPanel::CreateAFMPath::destroy()
+{
+  //qDebug() << tr("Entered CreateAFMPath::destroy()");
+  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(index));
+
+  // contained nodes and segments should be deleted automatically when deleting the path 
+  // since they're children items to the path.
+  dp->removeItem(afm_path, dp->getLayer(afm_path->layer_id));
+  dp->afmPanel()->setFocusedPath(0);
+}
+
+
+// CreateAFMNode class
+
+gui::DesignPanel::CreateAFMNode::CreateAFMNode(int layer_index, gui::DesignPanel *dp,
+                        QPointF scenepos, float z_offset, int afm_index,
+                        int index_in_path, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), 
+          scenepos(scenepos), z_offset(z_offset), afm_index(afm_index)
+{
+  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
+  node_index = (index_in_path == -1) ? afm_path->nodeCount() : index_in_path;
+}
+
+void gui::DesignPanel::CreateAFMNode::undo()
+{
+  invert ? create() : destroy();
+}
+
+void gui::DesignPanel::CreateAFMNode::redo()
+{
+  invert ? destroy() : create();
+}
+
+void gui::DesignPanel::CreateAFMNode::create()
+{
+  //qDebug() << tr("Entered CreateAFMNode::create()");
+  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
+  prim::AFMNode *new_node = new prim::AFMNode(layer_index, scenepos, z_offset);
+  afm_path->insertNode(new_node, node_index);
+
+  dp->afmPanel()->setFocusedPath(afm_path);
+  dp->afmPanel()->setFocusedNodeIndex(node_index);
+}
+
+void gui::DesignPanel::CreateAFMNode::destroy()
+{
+  //qDebug() << tr("Entered CreateAFMNode::destroy()");
+  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
+  afm_path->removeNode(node_index); // pointer cleanup is done by AFMPath
+  dp->afmPanel()->setFocusedNodeIndex(node_index-1);
+}
+
 
 // FromAggregate class
 gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
@@ -1707,16 +1896,8 @@ gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
                                       DesignPanel *dp, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), offset(offset)
 {
-  if(item->item_type != prim::Item::Electrode)
-  {
-    layer_index = item->layer_id;
-    item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
-  }
-  else if(item->item_type == prim::Item::Electrode)
-  {
-    layer_index = item->layer_id;
-    item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
-  }
+  layer_index = item->layer_id;
+  item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
 }
 
 
@@ -1842,6 +2023,59 @@ void gui::DesignPanel::createElectrodes(QPoint point1)
   undo_stack->endMacro();
 }
 
+void gui::DesignPanel::createAFMNode()
+{
+  //qDebug() << tr("Entered createAFMNode()");
+  int layer_index = getLayerIndex(afm_layer);
+  QPointF scene_pos;
+  if (afm_panel->ghostNode())
+    scene_pos = afm_panel->ghostNode()->scenePos();
+  else
+    scene_pos = mapToScene(mouse_pos_cached);
+      
+  // TODO UNDOable version
+  undo_stack->beginMacro(tr("create AFMNode in the focused AFMPath after the focused AFMNode"));
+  //qDebug() << tr("AFMNode creation macro began");
+  if (!afm_panel->focusedPath()) {
+    //qDebug() << tr("No existing focused path, making new");
+    // create new path if there's no focused path
+    prim::AFMPath *new_path = new prim::AFMPath(layer_index);
+    afm_panel->setFocusedPath(new_path);
+    undo_stack->push(new CreateAFMPath(layer_index, this));
+  }
+  int afm_path_index = afm_layer->getItemIndex(afm_panel->focusedPath());
+  //qDebug() << tr("About to push new AFMNode to undo stack, afm_path_index=%1").arg(afm_path_index);
+  undo_stack->push(new CreateAFMNode(layer_index, this, scene_pos, afm_layer->zOffset(),
+                                        afm_path_index));
+  undo_stack->endMacro();
+}
+
+void gui::DesignPanel::destroyAFMPath(prim::AFMPath *afm_path)
+{
+  undo_stack->beginMacro(tr("Remove AFM Path and contained nodes"));
+
+  // destroy children nodes
+  qDebug() << "delete children nodes";
+  prim::AFMNode *afm_node;
+  while (afm_path->getLastNode()) {
+    //qDebug() << "getting last node";
+    afm_node = afm_path->getLastNode();
+
+    //qDebug() << "getting afm and node indices";
+    int afm_index = getLayer(afm_node->layer_id)->getItemIndex(afm_path);
+    int node_index = afm_path->getNodeIndex(afm_node);
+    //qDebug() << tr("pushing to undo stack. layer_id=%1, zoffset=%2, afm_index=%3, node_index=%4").arg(afm_node->layer_id).arg(afm_node->zOffset()).arg(afm_index).arg(node_index);
+    undo_stack->push(new CreateAFMNode(afm_node->layer_id, this, afm_node->scenePos(),
+          afm_node->zOffset(), afm_index, node_index, true));
+  }
+
+  // destroy empty path
+  //qDebug() << "delete afmpath";
+  undo_stack->push(new CreateAFMPath(afm_path->layer_id, this, afm_path, true));
+
+  undo_stack->endMacro();
+}
+
 void gui::DesignPanel::deleteSelection()
 {
   // do something only if there is a selection
@@ -1868,6 +2102,20 @@ void gui::DesignPanel::deleteSelection()
                         item->y() + static_cast<prim::Electrode*>(item)->getHeight()),
                         static_cast<prim::Electrode*>(item), true));
         break;
+      case prim::Item::AFMPath:
+        destroyAFMPath(static_cast<prim::AFMPath*>(item));
+        break;
+      case prim::Item::AFMNode:
+        {
+          prim::AFMNode *afm_node = static_cast<prim::AFMNode*>(item);
+          prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(afm_node->parentItem());
+          int afm_index = getLayer(afm_node->layer_id)->getItemIndex(afm_path);
+          int node_index = afm_path->getNodeIndex(afm_node);
+          undo_stack->push(new CreateAFMNode(afm_node->layer_id, this, afm_node->scenePos(),
+                            afm_node->zOffset(), afm_index, node_index, true));
+          qDebug() << "shouldn't be here yet";
+          break;
+        }
       default:
         break;
     }

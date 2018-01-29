@@ -15,5 +15,6 @@
 #include "latdot.h"
 #include "ghost.h"
 #include "electrode.h"
+#include "afmpath.h"
 
 #endif
