@@ -156,6 +156,7 @@ void AFMNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget
 Item *AFMNode::deepCopy() const
 {
   // TODO
+  return new prim::AFMNode(layer_id, scenePos(), zOffset());
 }
 
 

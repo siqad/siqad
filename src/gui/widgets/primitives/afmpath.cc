@@ -290,7 +290,7 @@ Item *AFMPath::deepCopy() const
      the new location, electrode code might have that implemented.*/
   QList<prim::AFMNode*> cp_nodes;
   for (prim::AFMNode *node : path_nodes)
-    cp_nodes.append(node->deepCopy());
+    cp_nodes.append(static_cast<prim::AFMNode*>(node->deepCopy()));
   return new prim::AFMPath(layer_id, cp_nodes);
 }
 
