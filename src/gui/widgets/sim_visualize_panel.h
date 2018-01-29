@@ -13,6 +13,7 @@
 #include <QtCore>
 #include "sim_manager.h"
 #include "primitives/sim_job.h"
+
 #include "src/settings/settings.h" // TODO probably need this later
 
 namespace gui{
@@ -34,6 +35,8 @@ namespace gui{
 
     void showJobTerminalOutput();
     void saveJobTerminalOutput();
+
+    void openPoisResult();
 
     void updateJobSelCombo();
     bool showElecDist(int dist_ind);
@@ -62,6 +65,7 @@ namespace gui{
     QLabel *text_job_start_time;
     QLabel *text_job_end_time;
     QPushButton *button_show_term_out;
+    QPushButton *button_open_window;
 
     QSlider *slider_dist_sel;
     QLabel *text_dist_selected;

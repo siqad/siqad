@@ -60,6 +60,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * ~~Visual feedback on which tool is currently in use (e.g. changed background of the button)~~ Implemented 17.07.12
 
 ### Layers
+
 * Layer editor updates in response to signals emitted from design panel
   * Reset layer editor after loading new layout
 * ~~Enumerated layer types~~ Implemented 18.01.15
@@ -146,6 +147,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 		* Translate size from Qt units to physical lengths
 		*	~Add buffer region surrounding simulation area~
 		* Location, dimensions, etc
+		* Implement heat map/colour map support for PoisSolver
 
 > general bugs
 ## Bugs
