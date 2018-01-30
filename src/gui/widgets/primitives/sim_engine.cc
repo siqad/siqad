@@ -7,19 +7,17 @@
 // @desc:     SimEngine classes
 
 #include "sim_engine.h"
+#include <QUiLoader>
 
 namespace prim{
 
-/*SimEngine::SimEngine(const QString &s_desc_file, QWidget *parent)
-  : QObject(parent), eng_desc_file(s_desc_file)
-{
-  // if(!readSimInfo()) throw error
-}*/
 
-// temporary constructor until desc file is implemented
-SimEngine::SimEngine(const QString &eng_nm, QWidget *parent)
-  : QObject(parent), eng_name(eng_nm)
-{}
+SimEngine::SimEngine(const QString &eng_nm, const QString &eng_root, QWidget *parent)
+  : QObject(parent), eng_name(eng_nm), eng_root(eng_root)
+{
+  // readEngineDecl
+  constructSimParamDialog();
+}
 
 
 bool SimEngine::readEngineDecl(QFile *in_f)
@@ -29,6 +27,36 @@ bool SimEngine::readEngineDecl(QFile *in_f)
   // start QXmlStreamReader
 
   // read simulator properties and desired parameters from simulator XML
+  return true;
+}
+
+
+bool SimEngine::constructSimParamDialog()
+{
+  // check if file exists
+  QDir eng_dir(eng_root);
+  if (!eng_dir.exists("option_dialog.ui")) {
+    qDebug() << tr("SimEngine: Skipping sim param dialog construction for %1, file not found.").arg(name());
+    return false;
+  }
+
+  // check file readability
+  QFile ui_file(eng_dir.absoluteFilePath("option_dialog.ui"));
+  if (!ui_file.open(QFile::ReadOnly | QFile::Text)) {
+    qCritical() << QObject::tr("SimEngine: cannot open UI file").arg(ui_file.fileName());
+    return false;
+  }
+
+  if (simParamDialog()) {
+    delete sim_param_dialog;
+    sim_param_dialog = 0;
+  }
+
+  // use QUiLoader to load the ui
+  QUiLoader ui_loader;
+  sim_param_dialog = ui_loader.load(&ui_file); // TODO in sim manager, set itself as the parent of this dialog
+  ui_file.close();
+
   return true;
 }
 

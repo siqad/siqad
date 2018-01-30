@@ -10,7 +10,7 @@
 CONFIG += c++11
 CONFIG += debug
 
-QT += core gui widgets svg printsupport
+QT += core gui widgets svg printsupport uitools
 
 greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 
@@ -139,9 +139,20 @@ sim_common.files = \
     $$PHYS_DIR/installing-new-engines.txt
 INSTALLS += sim_common
 
+# SimAnneal
+
 sim_simanneal.path = $$EXEC_DIR/src/phys/simanneal
 sim_simanneal.files = $$PHYS_DIR/simanneal/engine_description.xml
 linux: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal
 macx:  sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal
 win32: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal.exe
 INSTALLS += sim_simanneal
+
+# AFMMarcus
+
+sim_afmmarcus.path = $$EXEC_DIR/src/phys/afmmarcus
+sim_afmmarcus.files = $$PHYS_DIR/afmmarcus/engine_description.xml
+linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/afm.py
+linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/demo.py
+linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/marcus.py
+INSTALLS += sim_afmmarcus

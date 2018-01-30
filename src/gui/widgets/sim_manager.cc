@@ -56,6 +56,17 @@ bool SimManager::addJob(prim::SimJob *job)
 }
 
 
+prim::SimEngine *SimManager::getEngine(const QString &name)
+{
+  for (prim::SimEngine *engine : sim_engines) {
+    if (engine->name() == name)
+      return engine;
+  }
+  // not found
+  return 0;
+}
+
+
 
 // PRIVATE
 
@@ -116,7 +127,7 @@ void SimManager::initSimSetupDialog()
 
   combo_eng_sel = new QComboBox();
   combo_eng_sel->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  updateEngSelCombo();
+  updateEngineSelectionList();
   le_job_nm = new QLineEdit(job_nm_default);
 
   label_eng_sel->setBuddy(combo_eng_sel);
@@ -138,8 +149,11 @@ void SimManager::initSimSetupDialog()
   connect(combo_eng_sel, SIGNAL(currentIndexChanged(int)), this, SLOT(updateSimParams())); //updates parameter list based on selection
 
   // Sim Params Group, this will change depending on combo box selection.
+  sim_params_group = new QGroupBox(tr("Simulation Parameters"));
+  sim_params_vl = new QVBoxLayout;
+  updateSimParams();
+  sim_params_group->setLayout(sim_params_vl);
 
-  createParamGroup();
 
   // Buttons, these will have to be re-added every time the sim params are updated
 
@@ -175,11 +189,8 @@ void SimManager::createButtonLayout()
   bottom_buttons_hl->addWidget(button_cancel);
 }
 
-void SimManager::createParamGroup()
+/*void SimManager::createParamGroup()
 {
-  sim_params_group = new QGroupBox(tr("Simulation Parameters"));
-  sim_params_vl = new QVBoxLayout;
-
   if(combo_eng_sel->currentText() == QString("SimAnneal")){
     label_result_queue_size = new QLabel("Result Queue Size:");
     label_preanneal_cycles = new QLabel("Preanneal Cycles:");
@@ -232,27 +243,38 @@ void SimManager::createParamGroup()
     xml_path_hl->addWidget(le_xml_path);
     xml_path_hl->addWidget(button_xml_find);
     sim_params_vl->addLayout(xml_path_hl);
+  } else if (combo_eng_sel->currentText() == QString("AFMMarcus")) {
+    qDebug() << "About to show AFMMarcus dialog";
+    sim_params_vl->addWidget(getEngine("AFMMarcus")->simParamDialog());
   }
-
-  sim_params_group->setLayout(sim_params_vl);
-}
+}*/
 
 //only called when combo_eng_sel selection is changed.
 void SimManager::updateSimParams()
 {
-  //delete the old params
-  if(new_setup_dialog_l->takeAt(new_setup_dialog_l->indexOf(sim_params_group)) != 0){
-    delete sim_params_group;
+  // clear out existing sim params layout, don't delete the widget if we're using the one provided by the engine
+  QLayoutItem *child;
+  while ((child = sim_params_vl->takeAt(0)) != 0) {
+    if (using_engine_sim_param_dialog) {
+      child->widget()->hide();
+    } else {
+      delete child->widget();
+      delete child;
+    }
   }
-  //create and readd the params to the end of the list
-  createParamGroup();
-  new_setup_dialog_l->addWidget(sim_params_group);
-  //TODO: Find a way to get the button layout's index so we can SAFELY delete it.
-  //delete the old buttons, then readd them to the bottom
-  delete bottom_buttons_hl;
-  createButtonLayout();
-  new_setup_dialog_l->addLayout(bottom_buttons_hl);
-  //fit to content
+
+  // add the currently focused layout
+  QString curr_eng_name = combo_eng_sel->currentText();
+  QWidget *sim_param_dialog = getEngine(curr_eng_name)->simParamDialog();
+  if (sim_param_dialog) {
+    sim_param_dialog->show();
+    sim_params_vl->addWidget(sim_param_dialog);
+    using_engine_sim_param_dialog = true;
+  } else {
+    sim_params_vl->addWidget(new QLabel("No simulation parameters available for this engine."));
+    using_engine_sim_param_dialog = false;
+  }
+
   sim_setup_dialog->adjustSize();
 }
 
@@ -265,7 +287,7 @@ void SimManager::xmlFind()
 }
 
 
-void SimManager::updateEngSelCombo()
+void SimManager::updateEngineSelectionList()
 {
   if(!combo_eng_sel)
     return;
@@ -335,7 +357,8 @@ void SimManager::initEngines()
   QString engine_lib_dir_path = settings::AppSettings::instance()->getPath("phys/eng_lib_dir");
 
   QDir engine_lib_dir(engine_lib_dir_path);
-  QStringList engine_dir_paths = engine_lib_dir.entryList(QStringList({"*"}), QDir::AllDirs | QDir::NoDotAndDotDot);
+  QStringList engine_dir_paths = engine_lib_dir.entryList(QStringList({"*"}), 
+      QDir::AllDirs | QDir::NoDotAndDotDot);
 
   // find all existing engines in the engine library
   QList<QDir> engine_dirs;
@@ -366,17 +389,16 @@ void SimManager::initEngines()
           while(!(eng_s.isEndElement() && eng_s.name() == "physeng")){
             if(!eng_s.readNextStartElement())
               continue; // skip until a start element is encountered
+
             if(eng_s.name() == "name"){
               read_eng_nm = eng_s.readElementText();
-            }
-            else if(eng_s.name() == "version"){
+            } else if(eng_s.name() == "version") {
               read_eng_ver = eng_s.readElementText();
-            }
-            else if(eng_s.name() == "bin_path"){
+            } else if(eng_s.name() == "bin_path") {
               read_bin_path = eng_s.readElementText();
             }
           }
-          prim::SimEngine *eng = new prim::SimEngine(read_eng_nm);
+          prim::SimEngine *eng = new prim::SimEngine(read_eng_nm, engine_dir.absolutePath());
           eng->setVersion(read_eng_ver);
           eng->setBinaryPath(engine_dir.filePath(read_bin_path));
 
@@ -384,15 +406,13 @@ void SimManager::initEngines()
 
           read_eng_nm = read_eng_ver = read_bin_path = "";
           eng_s.readNext();
-        }
-        else{
+        } else {
           qDebug() << tr("SimManager: invalid element encountered on line %1 - %2").arg(eng_s.lineNumber()).arg(eng_s.name().toString());
         }
-      }
-      else
+      } else {
         eng_s.readNext();
+      }
     }
-
     eng_f.close();
   }
 

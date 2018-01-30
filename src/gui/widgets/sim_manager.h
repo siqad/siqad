@@ -39,6 +39,15 @@ public:
   void newSimSetup();               // walks user through simulation setup
   bool addJob(prim::SimJob *job);   // add a simulation job
 
+  // ACCESSORS
+
+  // various ways to get simulation engine
+  prim::SimEngine *getEngine(int index) {return (index >= 0 && index < sim_engines.length()) ? sim_engines.at(index) : 0;}  // by index
+  prim::SimEngine *getEngine(const QString &name);  // by name
+
+  // TODO get job by name
+  
+
   // variables
   QList<prim::SimEngine*>  sim_engines;  // stack of all simulators
   QList<prim::SimJob*>     sim_jobs;     // stack of all jobs
@@ -57,9 +66,8 @@ private:
   void initSimActionsPan();
 
   void initSimSetupDialog();
-  void updateEngSelCombo();
+  void updateEngineSelectionList();
   void submitSimSetup();
-  void createParamGroup();
   void createButtonLayout();
 
   void initEngines();
@@ -69,6 +77,7 @@ private:
   // dialogs
   QWidget *sim_manager_dialog;
   QWidget *sim_setup_dialog;        // TODO maybe make a subclass for this
+  bool using_engine_sim_param_dialog=false;
 
   // manager panes
   QListWidget *sim_list_pan;

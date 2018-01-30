@@ -2,5 +2,5 @@
 <physeng>
     <name>SimAnneal</name>
     <version>0.1</version>
-    <bin_path>simanneal</bin_path> <!-- relative to engines.xml -->
+    <bin_path>simanneal</bin_path> <!-- relative to engine_description.xml -->
 </physeng>

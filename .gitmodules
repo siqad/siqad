@@ -1,0 +1,3 @@
+[submodule "src/phys/afmmarcus"]
+	path = src/phys/afmmarcus
+	url = https://github.com/retallickj/afm-sim
