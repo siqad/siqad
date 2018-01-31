@@ -11,6 +11,7 @@
 
 #include <QtWidgets>
 #include <QtCore>
+#include <QXmlStreamReader>
 #include "src/settings/settings.h" // TODO probably need this later
 
 namespace prim{
@@ -20,10 +21,12 @@ namespace prim{
     Q_OBJECT
   public:
     // constructor
-    SimEngine(const QString &eng_nm, const QString &eng_root, QWidget *parent=0);
+    SimEngine(const QString &eng_desc_path, QWidget *parent=0);
+    SimEngine(const QString &eng_nm, const QString &eng_rt, QWidget *parent=0);
+    void initSimEngine(const QString &eng_nm, const QString &eng_rt);
 
     // destructor
-    ~SimEngine() {};
+    ~SimEngine();
 
     // read simulator definition from xml
     bool readEngineDecl(QFile *in_f);
@@ -31,10 +34,18 @@ namespace prim{
     // read sim param dialog from provided *.ui file (xml)
     bool constructSimParamDialog();
 
-    struct SimParamObjectSpec {
-      QString object_name;  // name of field element to read
-      QString object_type;  // type of field element for casting (only support QLineEdit so far)
+    // types of sim params expected for this engine
+    struct ExpectedSimParam {
+      ExpectedSimParam(const QString &param_nm, const QString &g_obj_nm, const QString &g_obj_type, const QString &g_def_txt = QString())
+        : name(param_nm), gui_object_name(g_obj_nm), gui_object_type(g_obj_type), gui_default_text(g_def_txt)
+      {}
+      QString name;       // name of the parameter
+      QString gui_object_name;  // name of field element to read
+      QString gui_object_type;  // type of field element for casting (only support QLineEdit so far)
+      QString gui_default_text; // default text to appear in the element TODO remove if not needed
     };
+    void addExpectedSimParam(const QString &param_nm, const QString &g_obj_nm, const QString &g_obj_type, const QString &g_def_txt) {expected_sim_params.append(new ExpectedSimParam(param_nm, g_obj_nm, g_obj_type, g_def_txt));}
+    QList<ExpectedSimParam*> *expectedSimParams() {return &expected_sim_params;}
 
     // ACCESSORS
     QString name() {return eng_name;}
@@ -63,7 +74,7 @@ namespace prim{
 
     // GUI
     QWidget *sim_param_dialog=0;// gui for setting sim params for this engine, loaded from *.ui
-    QList<SimParamObjectSpec> sim_param_object_specs;
+    QList<ExpectedSimParam*> expected_sim_params;
 
 
     // TODO some stack/dictionary/etc with simulator info, for showing up in manager

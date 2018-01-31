@@ -28,9 +28,14 @@ namespace prim{
 
     // JOB SETUP
 
+    // TODO emit signal from SimJob to save job, instead of letting design panel call
+    // invoke binary.
+    // bool saveJob(const QString &);
+
+
     // load job from XML (for jobs that keep running even if parent terminates)
     // TODO sim_manager probably needs to check folders for unfinished simulations
-    bool loadJob(const QString &job_path) {};
+    bool loadJob(const QString &) {return false;}
 
     // simulation parameters
     QList<QPair<QString, QString>> simParams() {return sim_params;}

@@ -36,6 +36,7 @@ SimManager::~SimManager()
 void SimManager::showSimSetupDialog()
 {
   sim_setup_dialog->show();
+  updateJobNameDateTime();
 }
 
 void SimManager::newSimSetup()
@@ -178,66 +179,6 @@ void SimManager::initSimSetupDialog()
   sim_setup_dialog->setLayout(new_setup_dialog_l);
 }
 
-/*void SimManager::createParamGroup()
-{
-  if(combo_eng_sel->currentText() == QString("SimAnneal")){
-    label_result_queue_size = new QLabel("Result Queue Size:");
-    label_preanneal_cycles = new QLabel("Preanneal Cycles:");
-    label_anneal_cycles = new QLabel("Anneal Cycles:");
-    label_global_v0 = new QLabel("Global Bias v_0:");
-    label_debye_length = new QLabel("Debye Length (m):");
-
-    le_result_queue_size = new QLineEdit("1000"); // TODO these default values should be read from the engine description file
-    le_preanneal_cycles = new QLineEdit("1000");
-    le_anneal_cycles = new QLineEdit("10000");
-    le_global_v0 = new QLineEdit("1.5");
-    le_debye_length = new QLineEdit("5E-9");
-
-    label_result_queue_size->setBuddy(le_result_queue_size);
-    label_preanneal_cycles->setBuddy(le_preanneal_cycles);
-    label_anneal_cycles->setBuddy(le_anneal_cycles);
-    label_global_v0->setBuddy(le_global_v0);
-    label_debye_length->setBuddy(le_debye_length);
-
-    QHBoxLayout *result_queue_size_hl = new QHBoxLayout;
-    QHBoxLayout *preanneal_cycles_hl = new QHBoxLayout;
-    QHBoxLayout *anneal_cycles_hl = new QHBoxLayout;
-    QHBoxLayout *global_v0_hl = new QHBoxLayout;
-    QHBoxLayout *debye_length_hl = new QHBoxLayout;
-    result_queue_size_hl->addWidget(label_result_queue_size);
-    result_queue_size_hl->addWidget(le_result_queue_size);
-    preanneal_cycles_hl->addWidget(label_preanneal_cycles);
-    preanneal_cycles_hl->addWidget(le_preanneal_cycles);
-    anneal_cycles_hl->addWidget(label_anneal_cycles);
-    anneal_cycles_hl->addWidget(le_anneal_cycles);
-    global_v0_hl->addWidget(label_global_v0);
-    global_v0_hl->addWidget(le_global_v0);
-    debye_length_hl->addWidget(label_debye_length);
-    debye_length_hl->addWidget(le_debye_length);
-
-    sim_params_vl->addLayout(result_queue_size_hl);
-    sim_params_vl->addLayout(preanneal_cycles_hl);
-    sim_params_vl->addLayout(anneal_cycles_hl);
-    sim_params_vl->addLayout(global_v0_hl);
-    sim_params_vl->addLayout(debye_length_hl);
-
-  }else if(combo_eng_sel->currentText() == QString("PoisSolver")){
-    button_xml_find = new QPushButton(tr("Find"));
-    connect(button_xml_find, &QAbstractButton::clicked, this, &gui::SimManager::xmlFind);
-    label_xml_path = new QLabel("XML Path:");
-    le_xml_path = new QLineEdit("");
-    label_xml_path->setBuddy(le_xml_path);
-    QHBoxLayout *xml_path_hl = new QHBoxLayout;
-    xml_path_hl->addWidget(label_xml_path);
-    xml_path_hl->addWidget(le_xml_path);
-    xml_path_hl->addWidget(button_xml_find);
-    sim_params_vl->addLayout(xml_path_hl);
-  } else if (combo_eng_sel->currentText() == QString("AFMMarcus")) {
-    qDebug() << "About to show AFMMarcus dialog";
-    sim_params_vl->addWidget(getEngine("AFMMarcus")->simParamDialog());
-  }
-}*/
-
 //only called when combo_eng_sel selection is changed.
 void SimManager::updateSimParams()
 {
@@ -268,12 +209,13 @@ void SimManager::updateSimParams()
 }
 
 
+/* NOTE doesn't seem to be needed anymore, Nathan delete if true
 void SimManager::xmlFind()
 {
   QString fileName = QFileDialog::getOpenFileName(this,
     tr("Open XML"), ".", tr("XML Files (*.xml)"));
   le_xml_path->setText(fileName);
-}
+}*/
 
 
 void SimManager::updateEngineSelectionList()
@@ -290,64 +232,35 @@ void SimManager::updateEngineSelectionList()
 }
 
 
+void SimManager::updateJobNameDateTime()
+{
+  if (!le_job_nm)
+    return;
+  le_job_nm->clear();
+
+  le_job_nm->setText("SIM_" + QDateTime::currentDateTime().toString("yyMMdd_HHmmss"));
+}
+
+
 void SimManager::submitSimSetup()
 {
-  int eng_ind = combo_eng_sel->currentIndex();
-  if(eng_ind < 0 || eng_ind >= sim_engines.size()){
-    qDebug() << tr("Invalid engine selection");
+  prim::SimEngine *curr_engine = getEngine(combo_eng_sel->currentIndex());
+
+  if (!curr_engine) {
+    qCritical() << tr("Invalid engine selection");
     return;
   }
 
   // hide setup dialog
   sim_setup_dialog->hide();
 
-  // create job object
-  prim::SimEngine *curr_engine = sim_engines.at(eng_ind);
+  // create job object and extract simulation parameters from the engine's parameter widget
   prim::SimJob *new_job = new prim::SimJob(le_job_nm->text(), curr_engine);
+  new_job->loadSimParamsFromEngineDialog();
 
-  // fill in job properties according to input fields
-  if(combo_eng_sel->currentText() == QString("SimAnneal")){
-    new_job->addSimParam("result_queue_size", le_result_queue_size->text());
-    new_job->addSimParam("preanneal_cycles", le_preanneal_cycles->text());
-    new_job->addSimParam("anneal_cycles", le_anneal_cycles->text());
-    new_job->addSimParam("global_v0", le_global_v0->text());
-    new_job->addSimParam("debye_length", le_debye_length->text());
-  } else if(combo_eng_sel->currentText() == QString("PoisSolver")){
-    //it is up to the user to make sure the design xml is provided.
-    new_job->addSimParam("xml_path", le_xml_path->text());
-  }
-
-  // extract parameters as defined by the engine if the engine has its own defined 
-  // simulation parameter dialog.
-  QWidget *spd = curr_engine->simParamDialog();
-  if (spd) {
-    qDebug() << tr("Reading Label=%1 with content: %2").arg(spd->findChild<QLabel *>("test_label")->text()).arg(spd->findChild<QLineEdit*>("le_testtext")->text());
-
-    // TODO consider moving this over to sim_engine
-    
-
-    return; // TODO remove this after complete implementation
-  }
   // engine
     // auto filled in: job export path, job result path
     // TODO option to change job export/result paths and option to keep the files after
-    // TODO somewhere else, delete files that aren't specified to be kept. Delete only files generated by the program.
-
-
-  // sim params TODO change code to be general, hard coded for SimAnneal right now
-  //new_job->
-
-  // arguments
-
-
-
-  // TODO add parameters to QStringList according according to input text
-  /*QStringList arguments;
-  arguments << "-p"; // preanneal cycles
-
-  arguments << "-a"; // anneal cycles
-
-  arguments << "-v"; // v_0*/
 
   addJob(new_job);
   emit emitSimJob(new_job);
@@ -363,59 +276,20 @@ void SimManager::initEngines()
       QDir::AllDirs | QDir::NoDotAndDotDot);
 
   // find all existing engines in the engine library
+  // TODO edit this part to store file names rather than QDirs
   QList<QDir> engine_dirs;
-  for(QString engine_dir_path : engine_dir_paths){
+  for (QString engine_dir_path : engine_dir_paths) {
     qDebug() << tr("SimManager: Checking %1 for engine description file").arg(engine_dir_path);
     QDir eng_dir(engine_lib_dir.filePath(engine_dir_path));
-    if(eng_dir.exists("engine_description.xml"))
+    if (eng_dir.exists("engine_description.xml"))
       engine_dirs.append(eng_dir);
   }
 
-  // read each engine description file
-  for(QDir engine_dir : engine_dirs) {
-    QFile eng_f(engine_dir.absoluteFilePath("engine_description.xml"));
-
-    if(!eng_f.open(QFile::ReadOnly | QFile::Text)){
-      qCritical() << tr("SimManager: cannot open engine description file %1").arg(eng_f.fileName());
-      return;
-    }
-
-    QXmlStreamReader eng_s(&eng_f);
-    qDebug() << tr("Reading engine library from %1").arg(eng_f.fileName());
-
-    QString read_eng_nm, read_eng_ver, read_bin_path;
-    while(!eng_s.atEnd()){
-      if(eng_s.isStartElement()){
-        if(eng_s.name() == "physeng"){
-          // TODO move the following to SimEngine
-          while(!(eng_s.isEndElement() && eng_s.name() == "physeng")){
-            if(!eng_s.readNextStartElement())
-              continue; // skip until a start element is encountered
-
-            if(eng_s.name() == "name"){
-              read_eng_nm = eng_s.readElementText();
-            } else if(eng_s.name() == "version") {
-              read_eng_ver = eng_s.readElementText();
-            } else if(eng_s.name() == "bin_path") {
-              read_bin_path = eng_s.readElementText();
-            }
-          }
-          prim::SimEngine *eng = new prim::SimEngine(read_eng_nm, engine_dir.absolutePath());
-          eng->setVersion(read_eng_ver);
-          eng->setBinaryPath(engine_dir.filePath(read_bin_path));
-
-          sim_engines.append(eng);
-
-          read_eng_nm = read_eng_ver = read_bin_path = "";
-          eng_s.readNext();
-        } else {
-          qDebug() << tr("SimManager: invalid element encountered on line %1 - %2").arg(eng_s.lineNumber()).arg(eng_s.name().toString());
-        }
-      } else {
-        eng_s.readNext();
-      }
-    }
-    eng_f.close();
+  // go through all directories that contain engine_description.xml
+  for (QDir engine_dir : engine_dirs) {
+    // read each engine description file and add to list
+    QString eng_desc_path = engine_dir.absoluteFilePath("engine_description.xml");
+    sim_engines.append(new prim::SimEngine(eng_desc_path));
   }
 
 

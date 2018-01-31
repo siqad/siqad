@@ -12,24 +12,96 @@
 namespace prim{
 
 
-SimEngine::SimEngine(const QString &eng_nm, const QString &eng_root, QWidget *parent)
-  : QObject(parent), eng_name(eng_nm), eng_root(eng_root)
+SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
+  : QObject(parent)
 {
-  // readEngineDecl
+  QString eng_nm, eng_rt;
+
+  QFile eng_f(eng_desc_path);
+  QFileInfo fileInfo(eng_desc_path);
+  eng_rt = fileInfo.absolutePath();
+  QDir eng_dir(eng_rt);
+
+  if (!eng_f.open(QFile::ReadOnly | QFile::Text)) {
+    qCritical() << tr("SimEngine: cannot open engine description file %1").arg(eng_f.fileName());
+    return;
+  }
+
+  QXmlStreamReader rs(&eng_f);
+  qDebug() << tr("Reading engine library from %1").arg(eng_f.fileName());
+
+  QString read_eng_nm, read_eng_ver, read_bin_path;
+  while (!rs.atEnd()) {
+    if (rs.isStartElement()) {
+      if (rs.name() == "physeng") {
+        // TODO move the following to SimEngine
+        while (!(rs.isEndElement() && rs.name() == "physeng")) {
+          if (!rs.readNextStartElement())
+            continue; // skip until a start element is encountered
+
+          if (rs.name() == "name") {
+            eng_nm = rs.readElementText();
+          } else if (rs.name() == "version") {
+            setVersion(rs.readElementText());
+          } else if (rs.name() == "bin_path") {
+            setBinaryPath(eng_dir.absoluteFilePath(rs.readElementText()));
+          } else if (rs.name() == "sim_params") {
+            while (!(rs.isEndElement() && rs.name() == "sim_params")) {
+              if (!rs.readNextStartElement())
+                continue;
+
+              if (rs.name() == "param") {
+                // add expectedSimParams entry
+                QString gui_obj_nm, gui_obj_type, gui_def_txt, param_nm;
+                for (QXmlStreamAttribute &attr : rs.attributes()) {
+                  if (attr.name().toString() == QLatin1String("gui_object_name")) {
+                    gui_obj_nm = attr.value().toString();
+                  } else if (attr.name().toString() == QLatin1String("gui_object_type")) {
+                    gui_obj_type = attr.value().toString();
+                  } else if (attr.name().toString() == QLatin1String("default_text")) {
+                    gui_def_txt = attr.value().toString();
+                  }
+                }
+                param_nm = rs.readElementText();
+                addExpectedSimParam(param_nm, gui_obj_nm, gui_obj_type, gui_def_txt);
+                qDebug() << QObject::tr("addExpectedSimParam(%1, %2, %3, %4)").arg(param_nm).arg(gui_obj_nm).arg(gui_obj_type).arg(gui_def_txt);
+              }
+            } // end of sim_params
+          }
+        } // end of physeng
+        rs.readNext();
+      } else {
+        qDebug() << tr("SimEngine: invalid element encountered on line %1 - %2").arg(rs.lineNumber()).arg(rs.name().toString());
+      }
+    } else {
+      rs.readNext();
+    }
+  }
+  eng_f.close();
+  
+  initSimEngine(eng_nm, eng_rt);
+}
+
+SimEngine::SimEngine(const QString &eng_nm, const QString &eng_rt, QWidget *parent)
+  : QObject(parent)
+{
+  initSimEngine(eng_nm, eng_rt);
+}
+
+void SimEngine::initSimEngine(const QString &eng_nm, const QString &eng_rt)
+{
+  eng_name = eng_nm;
+  eng_root = eng_rt;
+
   constructSimParamDialog();
 }
 
-
-bool SimEngine::readEngineDecl(QFile *in_f)
+SimEngine::~SimEngine()
 {
-  // check desc path readability
-
-  // start QXmlStreamReader
-
-  // read simulator properties and desired parameters from simulator XML
-  return true;
+  // delete pointers in expected_sim_params
+  for (auto param : expected_sim_params)
+    delete param;
 }
-
 
 bool SimEngine::constructSimParamDialog()
 {
@@ -43,7 +115,7 @@ bool SimEngine::constructSimParamDialog()
   // check file readability
   QFile ui_file(eng_dir.absoluteFilePath("option_dialog.ui"));
   if (!ui_file.open(QFile::ReadOnly | QFile::Text)) {
-    qCritical() << QObject::tr("SimEngine: cannot open UI file").arg(ui_file.fileName());
+    qCritical() << QObject::tr("SimEngine: cannot open UI file %1").arg(ui_file.fileName());
     return false;
   }
 

@@ -143,6 +143,7 @@ INSTALLS += sim_common
 
 sim_simanneal.path = $$EXEC_DIR/src/phys/simanneal
 sim_simanneal.files = $$PHYS_DIR/simanneal/engine_description.xml
+sim_simanneal.files += $$PHYS_DIR/simanneal/option_dialog.ui
 linux: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal
 macx:  sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal
 win32: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal.exe
@@ -152,6 +153,7 @@ INSTALLS += sim_simanneal
 
 sim_afmmarcus.path = $$EXEC_DIR/src/phys/afmmarcus
 sim_afmmarcus.files = $$PHYS_DIR/afmmarcus/engine_description.xml
+sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/option_dialog.ui
 linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/afm.py
 linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/demo.py
 linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/marcus.py

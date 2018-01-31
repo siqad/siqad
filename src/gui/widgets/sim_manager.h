@@ -57,7 +57,7 @@ signals:
 
 private slots:
   void updateSimParams();
-  void xmlFind();
+  //void xmlFind(); // NOTE doesn't seem to be needed anymore, Nathan delete if true
 
 private:
   // sim manager related (like showing all jobs, all engines, etc.)
@@ -69,6 +69,7 @@ private:
   // sim setup dialog is responsible for setting up new simulation jobs to run
   void initSimSetupDialog();
   void updateEngineSelectionList();
+  void updateJobNameDateTime();
   void submitSimSetup();
 
   void initEngines();
@@ -85,25 +86,12 @@ private:
   QGroupBox *sim_params_group;
   QVBoxLayout *sim_params_vl;
   QComboBox *combo_eng_sel;
-
-  // sim_setup_dialog fields
-  // SimAnneal
-  QLabel *label_result_queue_size;
-  QLabel *label_preanneal_cycles;
-  QLabel *label_anneal_cycles;
-  QLabel *label_global_v0;
-  QLabel *label_debye_length;
-  QLineEdit *le_result_queue_size;
   QLineEdit *le_job_nm;
-  QLineEdit *le_preanneal_cycles;
-  QLineEdit *le_anneal_cycles;
-  QLineEdit *le_global_v0;
-  QLineEdit *le_debye_length;
 
   // PoisSolver
-  QLabel *label_xml_path;
+  /*QLabel *label_xml_path;
   QLineEdit *le_xml_path;
-  QPushButton *button_xml_find;
+  QPushButton *button_xml_find;*/
 
   // button group
   QHBoxLayout *bottom_buttons_hl;

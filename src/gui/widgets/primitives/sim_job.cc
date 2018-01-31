@@ -24,18 +24,23 @@ SimJob::SimJob(const QString &nm, SimEngine *eng, QWidget *parent)
 void SimJob::loadSimParamsFromEngineDialog()
 {
   if (engine->simParamDialog()) {
-    prim::SimEngine::SimParamObjectSpec *sim_param_object_specs = &(engine->sim_param_object_specs);
-    for (auto param_spec : sim_param_object_specs) {
-      QWidget *find_widget = engine->simParamDialog()->findChild<QWidget*>(param_spec->object_name);
-      if (param_spec->object_type == "QLineEdit") {
-        addSimParam(param_spec->object_name, static_cast<QLineEdit*>(find_widget)->text());
+    // acquire all expected simulation parameters
+    QList<prim::SimEngine::ExpectedSimParam*> *expected_sim_params = engine->expectedSimParams();
+    for (prim::SimEngine::ExpectedSimParam *param : *expected_sim_params) {
+      QWidget *find_widget = engine->simParamDialog()->findChild<QWidget*>(param->gui_object_name);
+      if (param->gui_object_type == "QLineEdit") {
+        addSimParam(param->name, static_cast<QLineEdit*>(find_widget)->text());
+        qDebug() << QObject::tr("Added sim param %1 with content %2").arg(param->name).arg(static_cast<QLineEdit*>(find_widget)->text());
       }
     }
+  } else {
+    qDebug() << QObject::tr("Engine %1 doesn't have its own simulation parameter widget, skipping load.").arg(engine->name());
   }
 }
 
 
-// invoke the simulator binary
+// invoke the simulator binary. Assumes that the problem file has already been written to
+// the path specified by problemFile()
 bool SimJob::invokeBinary()
 {
   QFileInfo problem_file_info(problemFile());
