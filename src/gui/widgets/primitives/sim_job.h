@@ -26,76 +26,89 @@ namespace prim{
     // destructor
     ~SimJob() {};
 
-    // elec_dists struct
+    // JOB SETUP
+
+    // load job from XML (for jobs that keep running even if parent terminates)
+    // TODO sim_manager probably needs to check folders for unfinished simulations
+    bool loadJob(const QString &job_path) {};
+
+    // simulation parameters
+    QList<QPair<QString, QString>> simParams() {return sim_params;}
+    void addSimParam(QString field, QString value) {sim_params.append(qMakePair(field, value));}
+    void loadSimParamsFromEngineDialog();
+
+
+    // JOB EXECUTION
+
+    // call sim engine binary
+    bool invokeBinary();
+
+
+    // JOB RESULT
+
+    bool readResults();     // read result XML
+    bool processResults();  // process results
+
+    // result storage and access
+    // elec_dists struct for showing where electrons are
     struct elecDist{
       QString dist_str;
       QList<int> dist_ls; // TODO might not be necessary
       float energy;
     };
 
-    void setEngine(SimEngine *eng) {engine = eng;}
-
-
-    // load job from XML (for jobs that keep running even if parent terminates)
-    // TODO sim_manager probably needs to check folders for unfinished simulations
-    bool loadJob(const QString &job_path);
-
-    // call sim engine binary
-    bool invokeBinary();
-
-    // result related tasks
-    bool readResults();  // read result XML
-    bool processResults();                // process results
-
+    int distCount() {return dist_count;}  // return the number of charge distributions this has
 
     // ACCESSORS
-    QString name() {return job_name;}
-    QString engineName() {return engine ? engine->name() : "Undefined";} // TODO cheating here, change SimAnneal back to Undefined later
 
-    QList<QPair<QString, QString>> simulationParameters() {return sim_params;}
-    void addSimulationParameter(QString field, QString value) {sim_params.append(qMakePair(field, value));}
+    // job name
+    QString name() {return job_name;}
+
+    // engine used
+    void setEngine(SimEngine *eng) {engine = eng;}
+    //prim::SimEngine *engine() {return engine;}
+    QString engineName() {return engine ? engine->name() : "Undefined";}
 
     QString runtimeTempDir();     // runtime job directory
     QString problemFile();        // runtime problem file
     QString resultFile();         // runtime result file
+
     QDateTime startTime() {return start_time;}
     QDateTime endTime() {return end_time;}
+
     bool isComplete() {return completed;} // indicate whether the job has been completed
-    int distCount() {return dist_count;}  // return the number of charge distributions this has
 
     QString terminalOutput() {return terminal_output;}
     void saveTerminalOutput();
     
-
     // variables TODO put them back to private later, with proper accessors
     QList<QPair<float,float>> physlocs;   // physlocs[dot_ind].first or .second
     QList<QList<int>> elec_dists;         // elec_dists[result_ind][dot_ind] TODO change this to QList of QVectors
   private:
 
-    void deduplicateDist();               // deduplicate charge distribution results
+    void deduplicateDist();           // deduplicate charge distribution results
     
     // variables
-    // TODO struct job_desc
-    QString job_name;
-    SimEngine *engine;
-    QString run_job_dir;                  // job directory for storing runtime data, must access with accessor
-    QString problem_path;
-    QString result_path;
-    QString terminal_output;              // terminal output from the job
-    QDateTime start_time, end_time;
-    QProcess *sim_process;
-    QStringList arguments;
-    bool completed;                       // whether the job has completed simulation
+    QString job_name;         // job name for identification
+    SimEngine *engine;        // the engine used by this job
+    QString run_job_dir;      // job directory for storing runtime data
+    QString problem_path;     // path to problem file
+    QString result_path;      // path to result file
+    QString terminal_output;  // terminal output from the job
+    QDateTime start_time, end_time; // start and end times of the job
+    QProcess *sim_process;    // runtime process of the job
+    QStringList cml_arguments;// command line arguments when invoking the job
+    bool completed;           // whether the job has completed simulation
 
     // read xml
-    QStringList ignored_xml_elements;     // XML elements to ignore when reading results
+    QStringList ignored_xml_elements; // XML elements to ignore when reading results
 
     // parameters
     QList<QPair<QString, QString>> sim_params;
 
     // results
-    // TODO struct results
-    int dist_count;                       // number of distributions
+    // TODO flag storing what types of results are available
+    int dist_count; // number of distributions
   };
 
 } // end of prim namespace

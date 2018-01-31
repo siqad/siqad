@@ -774,7 +774,7 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   // save simulation parameters
   if(flag == Simulation && sim_job){
     stream.writeStartElement("sim_params");
-    QList<QPair<QString, QString>> sim_params = sim_job->simulationParameters();
+    QList<QPair<QString, QString>> sim_params = sim_job->simParams();
     for(auto sim_param_pair : sim_params)
       stream.writeTextElement(sim_param_pair.first, sim_param_pair.second);
 

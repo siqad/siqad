@@ -93,12 +93,6 @@ void SimManager::initSimManager()
   setWindowTitle(tr("Simulation Manager"));
 }
 
-void SimManager::initMenu()
-{}
-
-void SimManager::initListPan()
-{}
-
 void SimManager::initSimActionsPan()
 {
   QPushButton *new_simulation = new QPushButton(tr("&New Simulation"));
@@ -155,8 +149,7 @@ void SimManager::initSimSetupDialog()
   sim_params_group->setLayout(sim_params_vl);
 
 
-  // Buttons, these will have to be re-added every time the sim params are updated
-
+  // Buttons
   button_run = new QPushButton(tr("&Run"));
   //QPushButton *button_export = new QPushButton(tr("&Export"));
   //QPushButton *button_import = new QPushButton(tr("&Import"));
@@ -168,7 +161,13 @@ void SimManager::initSimSetupDialog()
 
   button_cancel->setShortcut(tr("Esc"));
 
-  createButtonLayout();
+  bottom_buttons_hl = new QHBoxLayout;
+  bottom_buttons_hl->addStretch(1);
+  bottom_buttons_hl->addWidget(button_run);
+  //bottom_buttons_hl->addWidget(button_export);
+  //bottom_buttons_hl->addWidget(button_import);
+  bottom_buttons_hl->addWidget(button_cancel);
+
 
   // Combine into one dialog
   new_setup_dialog_l = new QVBoxLayout;
@@ -177,16 +176,6 @@ void SimManager::initSimSetupDialog()
   new_setup_dialog_l->addLayout(bottom_buttons_hl);
 
   sim_setup_dialog->setLayout(new_setup_dialog_l);
-}
-
-void SimManager::createButtonLayout()
-{
-  bottom_buttons_hl = new QHBoxLayout;
-  bottom_buttons_hl->addStretch(1);
-  bottom_buttons_hl->addWidget(button_run);
-  //bottom_buttons_hl->addWidget(button_export);
-  //bottom_buttons_hl->addWidget(button_import);
-  bottom_buttons_hl->addWidget(button_cancel);
 }
 
 /*void SimManager::createParamGroup()
@@ -313,18 +302,31 @@ void SimManager::submitSimSetup()
   sim_setup_dialog->hide();
 
   // create job object
-  prim::SimJob *new_job = new prim::SimJob(le_job_nm->text(), sim_engines[combo_eng_sel->currentIndex()]);
+  prim::SimEngine *curr_engine = sim_engines.at(eng_ind);
+  prim::SimJob *new_job = new prim::SimJob(le_job_nm->text(), curr_engine);
 
   // fill in job properties according to input fields
   if(combo_eng_sel->currentText() == QString("SimAnneal")){
-    new_job->addSimulationParameter("result_queue_size", le_result_queue_size->text());
-    new_job->addSimulationParameter("preanneal_cycles", le_preanneal_cycles->text());
-    new_job->addSimulationParameter("anneal_cycles", le_anneal_cycles->text());
-    new_job->addSimulationParameter("global_v0", le_global_v0->text());
-    new_job->addSimulationParameter("debye_length", le_debye_length->text());
+    new_job->addSimParam("result_queue_size", le_result_queue_size->text());
+    new_job->addSimParam("preanneal_cycles", le_preanneal_cycles->text());
+    new_job->addSimParam("anneal_cycles", le_anneal_cycles->text());
+    new_job->addSimParam("global_v0", le_global_v0->text());
+    new_job->addSimParam("debye_length", le_debye_length->text());
   } else if(combo_eng_sel->currentText() == QString("PoisSolver")){
     //it is up to the user to make sure the design xml is provided.
-    new_job->addSimulationParameter("xml_path", le_xml_path->text());
+    new_job->addSimParam("xml_path", le_xml_path->text());
+  }
+
+  // extract parameters as defined by the engine if the engine has its own defined 
+  // simulation parameter dialog.
+  QWidget *spd = curr_engine->simParamDialog();
+  if (spd) {
+    qDebug() << tr("Reading Label=%1 with content: %2").arg(spd->findChild<QLabel *>("test_label")->text()).arg(spd->findChild<QLineEdit*>("le_testtext")->text());
+
+    // TODO consider moving this over to sim_engine
+    
+
+    return; // TODO remove this after complete implementation
   }
   // engine
     // auto filled in: job export path, job result path
@@ -418,11 +420,6 @@ void SimManager::initEngines()
 
 
   qDebug() << tr("Successfully read physics engine library");
-}
-
-void SimManager::simParamSetup()
-{
-  // take user options for simulation parameters
 }
 
 bool SimManager::exportSimProblem()

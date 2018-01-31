@@ -60,18 +60,18 @@ private slots:
   void xmlFind();
 
 private:
+  // sim manager related (like showing all jobs, all engines, etc.)
   void initSimManager();
-  void initMenu();
-  void initListPan();
+  void initMenu() {};
+  void initListPan() {};
   void initSimActionsPan();
 
+  // sim setup dialog is responsible for setting up new simulation jobs to run
   void initSimSetupDialog();
   void updateEngineSelectionList();
   void submitSimSetup();
-  void createButtonLayout();
 
   void initEngines();
-  void simParamSetup();             // take user options for simulation parameters
   bool exportSimProblem();          // generate problem XML
 
   // dialogs

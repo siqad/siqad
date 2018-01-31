@@ -20,34 +20,47 @@ SimJob::SimJob(const QString &nm, SimEngine *eng, QWidget *parent)
 }
 
 
+// load simulation parameters from engine sim params dialog
+void SimJob::loadSimParamsFromEngineDialog()
+{
+  if (engine->simParamDialog()) {
+    prim::SimEngine::SimParamObjectSpec *sim_param_object_specs = &(engine->sim_param_object_specs);
+    for (auto param_spec : sim_param_object_specs) {
+      QWidget *find_widget = engine->simParamDialog()->findChild<QWidget*>(param_spec->object_name);
+      if (param_spec->object_type == "QLineEdit") {
+        addSimParam(param_spec->object_name, static_cast<QLineEdit*>(find_widget)->text());
+      }
+    }
+  }
+}
+
+
 // invoke the simulator binary
 bool SimJob::invokeBinary()
 {
   QFileInfo problem_file_info(problemFile());
 
-  // check if file exists
+  // check if problem file exists
   if(!(problem_file_info.exists() && problem_file_info.isFile())){
     qDebug() << tr("SimJob: problem file '%1' doesn't exist.").arg(problem_file_info.filePath());
     return false;
   }
-  // check if binary path exists
+
+  // check if binary path of simulation engine exists
   QFileInfo bin_path_info(engine->binaryPath());
   if(!(bin_path_info.exists() && bin_path_info.isFile())){
     qDebug() << tr("SimJob: engine binary '%1' doesn't exist.").arg(bin_path_info.filePath());
     return false;
   }
 
-  // if(engine->name() == "PoisSolver"){ //give it the problem xml path from the sim manager.
-  //   arguments << sim_params[0].second;
-  // }
-  arguments << problem_file_info.canonicalFilePath();
-  arguments << resultFile();
+  cml_arguments << problem_file_info.canonicalFilePath();
+  cml_arguments << resultFile();
 
   start_time = QDateTime::currentDateTime();
 
   sim_process = new QProcess();
   sim_process->setProgram(engine->binaryPath());
-  sim_process->setArguments(arguments);
+  sim_process->setArguments(cml_arguments);
   sim_process->setProcessChannelMode(QProcess::MergedChannels);
   qDebug() << tr("SimJob: Starting process");
   sim_process->start();

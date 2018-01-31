@@ -31,6 +31,10 @@ namespace prim{
     // read sim param dialog from provided *.ui file (xml)
     bool constructSimParamDialog();
 
+    struct SimParamObjectSpec {
+      QString object_name;  // name of field element to read
+      QString object_type;  // type of field element for casting (only support QLineEdit so far)
+    };
 
     // ACCESSORS
     QString name() {return eng_name;}
@@ -59,6 +63,7 @@ namespace prim{
 
     // GUI
     QWidget *sim_param_dialog=0;// gui for setting sim params for this engine, loaded from *.ui
+    QList<SimParamObjectSpec> sim_param_object_specs;
 
 
     // TODO some stack/dictionary/etc with simulator info, for showing up in manager
