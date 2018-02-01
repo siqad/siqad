@@ -23,19 +23,7 @@ SimJob::SimJob(const QString &nm, SimEngine *eng, QWidget *parent)
 // load simulation parameters from engine sim params dialog
 void SimJob::loadSimParamsFromEngineDialog()
 {
-  if (engine->simParamDialog()) {
-    // acquire all expected simulation parameters
-    QList<prim::SimEngine::ExpectedSimParam*> *expected_sim_params = engine->expectedSimParams();
-    for (prim::SimEngine::ExpectedSimParam *param : *expected_sim_params) {
-      QWidget *find_widget = engine->simParamDialog()->findChild<QWidget*>(param->gui_object_name);
-      if (param->gui_object_type == "QLineEdit") {
-        addSimParam(param->name, static_cast<QLineEdit*>(find_widget)->text());
-        qDebug() << QObject::tr("Added sim param %1 with content %2").arg(param->name).arg(static_cast<QLineEdit*>(find_widget)->text());
-      }
-    }
-  } else {
-    qDebug() << QObject::tr("Engine %1 doesn't have its own simulation parameter widget, skipping load.").arg(engine->name());
-  }
+  addSimParams(engine->loadSimParamsFromDialog());
 }
 
 

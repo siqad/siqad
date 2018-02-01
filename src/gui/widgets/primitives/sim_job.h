@@ -38,8 +38,10 @@ namespace prim{
     bool loadJob(const QString &) {return false;}
 
     // simulation parameters
-    QList<QPair<QString, QString>> simParams() {return sim_params;}
-    void addSimParam(QString field, QString value) {sim_params.append(qMakePair(field, value));}
+    QList<QPair<QString, QString>> simParams() const {return sim_params;}
+    void addSimParam(const QString &field, const QString &value) {sim_params.append(qMakePair(field, value));}
+    void addSimParams(const QList<QPair<QString, QString>> &add_params) {sim_params.append(add_params);}
+    QList<QPair<QString, QString>> loadSimParamsFromDialog();
     void loadSimParamsFromEngineDialog();
 
 

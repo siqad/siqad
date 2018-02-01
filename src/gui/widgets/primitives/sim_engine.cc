@@ -96,13 +96,6 @@ void SimEngine::initSimEngine(const QString &eng_nm, const QString &eng_rt)
   constructSimParamDialog();
 }
 
-SimEngine::~SimEngine()
-{
-  // delete pointers in expected_sim_params
-  for (auto param : expected_sim_params)
-    delete param;
-}
-
 bool SimEngine::constructSimParamDialog()
 {
   // check if file exists
@@ -130,6 +123,26 @@ bool SimEngine::constructSimParamDialog()
   ui_file.close();
 
   return true;
+}
+
+QList<QPair<QString, QString>> SimEngine::loadSimParamsFromDialog()
+{
+  QList<QPair<QString, QString>> retrieved_sim_params;
+  if (!simParamDialog()) {
+    qDebug() << QObject::tr("Engine %1 doesn't have its own simulation parameter widget, skipping load.").arg(name());
+    return retrieved_sim_params;
+  }
+
+  // acquire all expected simulation parameters
+  for (ExpectedSimParam param : expected_sim_params) {
+    QWidget *find_widget = simParamDialog()->findChild<QWidget*>(param.gui_object_name);
+    if (param.gui_object_type == "QLineEdit") {
+      retrieved_sim_params.append(QPair<QString, QString>(param.name, static_cast<QLineEdit*>(find_widget)->text()));
+      qDebug() << QObject::tr("Added sim param %1 with content %2").arg(param.name).arg(static_cast<QLineEdit*>(find_widget)->text());
+    }
+  }
+
+  return retrieved_sim_params;
 }
 
 
