@@ -42,8 +42,22 @@ bool SimJob::invokeBinary()
   // check if binary path of simulation engine exists
   QFileInfo bin_path_info(engine->binaryPath());
   if(!(bin_path_info.exists() && bin_path_info.isFile())){
-    qDebug() << tr("SimJob: engine binary '%1' doesn't exist.").arg(bin_path_info.filePath());
+    qDebug() << tr("SimJob: engine binary/script '%1' doesn't exist.").arg(bin_path_info.filePath());
     return false;
+  }
+
+  // setup simulation process
+
+  sim_process = new QProcess();
+  if (!engine->runtimeInterpreter().isEmpty()) {
+    // using an interpreter, e.g. Python
+    // template: `python /path/to/script.py /path/to/problem/file /path/to/result/file`
+    sim_process->setProgram(engine->runtimeInterpreter());
+    cml_arguments << engine->binaryPath();
+  } else {
+    // calling a binary
+    // template: `/path/to/binary /path/to/problem/file /path/to/result/file`
+    sim_process->setProgram(engine->binaryPath());
   }
 
   cml_arguments << problem_file_info.canonicalFilePath();
@@ -51,8 +65,6 @@ bool SimJob::invokeBinary()
 
   start_time = QDateTime::currentDateTime();
 
-  sim_process = new QProcess();
-  sim_process->setProgram(engine->binaryPath());
   sim_process->setArguments(cml_arguments);
   sim_process->setProcessChannelMode(QProcess::MergedChannels);
   qDebug() << tr("SimJob: Starting process");

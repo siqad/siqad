@@ -51,6 +51,8 @@ namespace prim{
     void setName(const QString &nm) {eng_name = nm;}
     QString version() {return eng_version;}
     void setVersion(const QString &ver) {eng_version = ver;}
+    QString runtimeInterpreter() {return runtime_interpreter;}
+    void setRuntimeInterpreter(const QString &inter) {runtime_interpreter = inter;}
     QString binaryPath() {return bin_path;}
     void setBinaryPath(const QString &path) {bin_path = path;}
     QString runtimeTempDir();
@@ -68,6 +70,7 @@ namespace prim{
     QString eng_name;           // name of this engine
     QString eng_root;           // root directory of this engine containing description and more
     QString eng_version;
+    QString runtime_interpreter;// runtime interpreter (e.g. Python), blank if not applicable
     QString bin_path;           // binary path of this engine
     QString runtime_temp_dir;   // root directory for all problems files for this engine
 

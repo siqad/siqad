@@ -30,7 +30,7 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
   QXmlStreamReader rs(&eng_f);
   qDebug() << tr("Reading engine library from %1").arg(eng_f.fileName());
 
-  QString read_eng_nm, read_eng_ver, read_bin_path;
+  QString read_eng_nm, read_eng_ver, read_interpreter, read_bin_path;
   while (!rs.atEnd()) {
     if (rs.isStartElement()) {
       if (rs.name() == "physeng") {
@@ -45,6 +45,8 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
             setVersion(rs.readElementText());
           } else if (rs.name() == "bin_path") {
             setBinaryPath(eng_dir.absoluteFilePath(rs.readElementText()));
+          } else if (rs.name() == "interpreter") {
+            setRuntimeInterpreter(rs.readElementText());
           } else if (rs.name() == "sim_params") {
             while (!(rs.isEndElement() && rs.name() == "sim_params")) {
               if (!rs.readNextStartElement())

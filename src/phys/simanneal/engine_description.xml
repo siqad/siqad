@@ -2,7 +2,8 @@
 <physeng>
     <name>SimAnneal</name>
     <version>0.1</version>
-    <bin_path>simanneal</bin_path> <!-- relative to engine_description.xml -->
+    <interpreter></interpreter> <!-- used for calling a script with python, java, etc. Leave blank otherwise -->
+    <bin_path>simanneal</bin_path> <!-- path to binary or script, relative to the folder containing engine_description.xml -->
     <sim_params>
         <param gui_object_type="QLineEdit" gui_object_name="le_result_queue_size">result_queue_size</param>
         <param gui_object_type="QLineEdit" gui_object_name="le_preanneal_cycles">preanneal_cycles</param>
