@@ -230,6 +230,11 @@ namespace gui{
     // assert bounds on zooming
     void boundZoom(qreal &ds);
 
+    // scroll the viewport to the correct location with the provided delta in scene 
+    // coordinates, taking the transformation (zoom and rotate) into account. Used
+    // when rotating the view or anchoring during zoom.
+    void scrollDelta(QPointF delta);
+
     // filter selected items
     void filterSelection(bool select_flag);
 

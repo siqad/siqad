@@ -714,12 +714,22 @@ void gui::DesignPanel::simVisualizeDockVisibilityChanged(bool visible)
 
 void gui::DesignPanel::rotateCw()
 {
+  QPointF old_center = mapToScene(viewport()->rect().center());
   rotate(90);
+
+  // recenter the view to the original center before the rotation
+  QPointF delta = mapToScene(viewport()->rect().center()) - old_center;
+  scrollDelta(delta);
 }
 
 void gui::DesignPanel::rotateCcw()
 {
+  QPointF old_center = mapToScene(viewport()->rect().center());
   rotate(-90);
+
+  // recenter the view to the original center before the rotation
+  QPointF delta = mapToScene(viewport()->rect().center()) - old_center;
+  scrollDelta(delta);
 }
 
 // INTERRUPTS
@@ -1062,13 +1072,9 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
   if(ds!=0){
     // zoom under mouse, should be indep of transformationAnchor
     QPointF old_pos = mapToScene(e->pos());
-    scale(1+ds,1+ds);
+    scale(1+ds,1+ds);   // perform the zoom
     QPointF delta = mapToScene(e->pos()) - old_pos;
-    // anchoring has to take rotation into account
-    qreal scroll_delta_v = delta.y()*transform().m11() + delta.x()*transform().m12();
-    qreal scroll_delta_h = delta.y()*transform().m21() + delta.x()*transform().m22();
-    verticalScrollBar()->setValue(verticalScrollBar()->value()-scroll_delta_v);
-    horizontalScrollBar()->setValue(horizontalScrollBar()->value()-scroll_delta_h);
+    scrollDelta(delta); // scroll with anchoring
   }
 
   // reset both scrolls (avoid repeat from |x|>=120)
@@ -1124,6 +1130,15 @@ void gui::DesignPanel::boundZoom(qreal &ds)
   else
     ds = qMin(ds, gui_settings->get<qreal>("view/zoom_max")/m-1);
 }
+
+void gui::DesignPanel::scrollDelta(QPointF delta)
+{
+  qreal scroll_delta_v = delta.y()*transform().m11() + delta.x()*transform().m12();
+  qreal scroll_delta_h = delta.y()*transform().m21() + delta.x()*transform().m22();
+  verticalScrollBar()->setValue(verticalScrollBar()->value()-scroll_delta_v);
+  horizontalScrollBar()->setValue(horizontalScrollBar()->value()-scroll_delta_h);
+}
+
 
 void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
 {
