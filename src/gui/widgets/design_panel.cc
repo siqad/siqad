@@ -83,10 +83,8 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   prim::Ghost::instance()->setScene(scene);
 
   // set scroll to top left
-  QScrollBar *vsb = verticalScrollBar();
-  QScrollBar *hsb = horizontalScrollBar();
-  vsb->setValue(vsb->minimum());
-  hsb->setValue(hsb->minimum());
+  verticalScrollBar()->setValue(verticalScrollBar()->minimum());
+  horizontalScrollBar()->setValue(horizontalScrollBar()->minimum());
 
   // set display mode
   setDisplayMode(DesignMode);
@@ -146,10 +144,8 @@ void gui::DesignPanel::resetDesignPanel()
 
   // rotate scene and set scroll to top left
   //rotate(-90);
-  QScrollBar *vsb = verticalScrollBar();
-  QScrollBar *hsb = horizontalScrollBar();
-  vsb->setValue(vsb->minimum());
-  hsb->setValue(hsb->minimum());
+  verticalScrollBar()->setValue(verticalScrollBar()->minimum());
+  horizontalScrollBar()->setValue(horizontalScrollBar()->minimum());
 
   // set display mode
   setDisplayMode(DesignMode);
@@ -786,8 +782,6 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
   Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
 
   QPoint mouse_pos_del;
-  QScrollBar *vsb = verticalScrollBar();
-  QScrollBar *hsb = horizontalScrollBar();
   qreal dx, dy;
 
   if (ghosting) {
@@ -832,8 +826,8 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
         mouse_pos_del = e->pos()-mouse_pos_old;
         dx = mouse_pos_del.x();
         dy = mouse_pos_del.y();
-        vsb->setValue(vsb->value()-dy);
-        hsb->setValue(hsb->value()-dx);
+        verticalScrollBar()->setValue(verticalScrollBar()->value()-dy);
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value()-dx);
         mouse_pos_old = e->pos();
         break;
       case Qt::RightButton:
@@ -1081,7 +1075,7 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
   wheel_deg.setX(0);
   wheel_deg.setY(0);
 
-  qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
+  //qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
 }
 
 
@@ -1090,8 +1084,6 @@ void gui::DesignPanel::wheelPan(bool boost)
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
   qreal dx=0, dy=0;
-  QScrollBar *vsb = verticalScrollBar();
-  QScrollBar *hsb = horizontalScrollBar();
 
   // y scrolling
   if(wheel_deg.y()>0)
@@ -1114,8 +1106,8 @@ void gui::DesignPanel::wheelPan(bool boost)
     dy *= boost_fact;
   }
 
-  vsb->setValue(vsb->value()+dy);
-  hsb->setValue(hsb->value()+dx);
+  verticalScrollBar()->setValue(verticalScrollBar()->value()+dy);
+  horizontalScrollBar()->setValue(horizontalScrollBar()->value()+dx);
 }
 
 
