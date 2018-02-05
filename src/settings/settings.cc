@@ -211,10 +211,10 @@ QSettings* settings::LatticeSettings::m_defs()
   S->setValue("cell/N", 2);
 
   S->setValue("cell/b1", QPointF(0, 0));
-  S->setValue("cell/b2", QPointF(2.4, 0));
+  S->setValue("cell/b2", QPointF(0, 2.4));
 
-  S->setValue("lattice/a1", QPointF(7.68, 0));
-  S->setValue("lattice/a2", QPointF(0, 3.84));
+  S->setValue("lattice/a1", QPointF(3.84, 0));
+  S->setValue("lattice/a2", QPointF(0, 7.68));
 
 
   return S;

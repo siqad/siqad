@@ -117,6 +117,7 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 
 ### Lattice
 * Background lattice sites -> change to bitmap for efficiency
+* Order of a1 and a2 in getLatticeInds matters (segfault)
 
 
 > solvers, physics engine, and I/O formatting

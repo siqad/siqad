@@ -14,7 +14,6 @@
 #include <QtWidgets>
 #include <QtCore>
 #include <QDialog>
-#include <QtMath>
 
 #include "../../global.h"
 

@@ -142,8 +142,7 @@ void gui::DesignPanel::resetDesignPanel()
 
   resetMatrix(); // resets QTransform, which undoes the zoom
 
-  // rotate scene and set scroll to top left
-  //rotate(-90);
+  // set scroll to top left
   verticalScrollBar()->setValue(verticalScrollBar()->minimum());
   horizontalScrollBar()->setValue(horizontalScrollBar()->minimum());
 
@@ -1114,7 +1113,7 @@ void gui::DesignPanel::wheelPan(bool boost)
 void gui::DesignPanel::boundZoom(qreal &ds)
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
-  qreal m = qFabs(transform().m11()) + qFabs(transform().m12());  // m = m11 = m22
+  qreal m = qAbs(transform().m11()) + qAbs(transform().m12());  // m = m11 = m22
 
   // need zoom_min <= m11*(1+ds) <= zoom_max
   if(ds<0)
