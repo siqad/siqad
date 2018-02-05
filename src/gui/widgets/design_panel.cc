@@ -712,6 +712,16 @@ void gui::DesignPanel::simVisualizeDockVisibilityChanged(bool visible)
     clearSimResults();
 }
 
+void gui::DesignPanel::rotateCw()
+{
+  rotate(90);
+}
+
+void gui::DesignPanel::rotateCcw()
+{
+  rotate(-90);
+}
+
 // INTERRUPTS
 
 // most behaviour will be connected to mouse move/release. However, when
@@ -1054,15 +1064,18 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
     QPointF old_pos = mapToScene(e->pos());
     scale(1+ds,1+ds);
     QPointF delta = mapToScene(e->pos()) - old_pos;
-    verticalScrollBar()->setValue(verticalScrollBar()->value()-delta.y()*transform().m11());
-    horizontalScrollBar()->setValue(horizontalScrollBar()->value()-delta.x()*transform().m22());
+    // anchoring has to take rotation into account
+    qreal scroll_delta_v = delta.y()*transform().m11() + delta.x()*transform().m12();
+    qreal scroll_delta_h = delta.y()*transform().m21() + delta.x()*transform().m22();
+    verticalScrollBar()->setValue(verticalScrollBar()->value()-scroll_delta_v);
+    horizontalScrollBar()->setValue(horizontalScrollBar()->value()-scroll_delta_h);
   }
 
   // reset both scrolls (avoid repeat from |x|>=120)
   wheel_deg.setX(0);
   wheel_deg.setY(0);
 
-  //qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
+  qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
 }
 
 
@@ -1103,7 +1116,7 @@ void gui::DesignPanel::wheelPan(bool boost)
 void gui::DesignPanel::boundZoom(qreal &ds)
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
-  qreal m = transform().m11();  // m = m11 = m22
+  qreal m = qFabs(transform().m11()) + qFabs(transform().m12());  // m = m11 = m22
 
   // need zoom_min <= m11*(1+ds) <= zoom_max
   if(ds<0)

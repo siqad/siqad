@@ -14,6 +14,7 @@
 #include <QtWidgets>
 #include <QtCore>
 #include <QDialog>
+#include <QtMath>
 
 #include "../../global.h"
 
@@ -141,6 +142,9 @@ namespace gui{
 
     void addItemToSceneRequest(prim::Item *item) {addItemToScene(item);}
     void removeItemFromSceneRequest(prim::Item *item) {removeItemFromScene(item);}
+
+    void rotateCw();
+    void rotateCcw();
 
   signals:
     void sig_toolChangeRequest(gui::ToolType tool);  // request ApplicationGUI to change tool
