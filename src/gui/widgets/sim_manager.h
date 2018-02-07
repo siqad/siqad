@@ -57,7 +57,6 @@ signals:
 
 private slots:
   void updateSimParams();
-  //void xmlFind(); // NOTE doesn't seem to be needed anymore, Nathan delete if true
 
 private:
   // sim manager related (like showing all jobs, all engines, etc.)

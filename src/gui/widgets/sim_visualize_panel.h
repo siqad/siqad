@@ -47,7 +47,8 @@ namespace gui{
 
   signals:
     void showElecDistOnScene(prim::SimJob *job, int dist_ind);
-
+    void createPotentialPixmap(QPixmap potential_plot);
+    
   private:
     void initSimVisualize();
     void jobSelUpdate();

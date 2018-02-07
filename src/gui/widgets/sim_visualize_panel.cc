@@ -94,13 +94,6 @@ void SimVisualize::openPoisResult()
   window->resize(750, 750);
   QHBoxLayout *layout = new QHBoxLayout;
   QCustomPlot *customPlot = new QCustomPlot();
-  // configure axis rect:
-  customPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom); // this will also allow rescaling the color scale by dragging/zooming
-  customPlot->axisRect()->setupFullAxesBox(true);
-  customPlot->xAxis->setLabel("x");
-  customPlot->yAxis->setLabel("y");
-  // down on graph is increase in y.
-  customPlot->yAxis->setRangeReversed(true);
 
   // set up the QCPColorMap:
   QCPColorMap *colorMap = new QCPColorMap(customPlot->xAxis, customPlot->yAxis);
@@ -147,6 +140,16 @@ void SimVisualize::openPoisResult()
     }
   }
 
+  // configure axis rect:
+  customPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom); // this will also allow rescaling the color scale by dragging/zooming
+  customPlot->axisRect()->setupFullAxesBox(true);
+  customPlot->xAxis->setLabel("x");
+  customPlot->yAxis->setLabel("y");
+  // down on graph is increase in y.
+  customPlot->yAxis->setRangeReversed(true);
+
+
+
   // add a color scale:
   QCPColorScale *colorScale = new QCPColorScale(customPlot);
   customPlot->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
@@ -167,12 +170,25 @@ void SimVisualize::openPoisResult()
 
   // rescale the key (x) and value (y) axes so the whole color map is visible:
   customPlot->rescaleAxes();
+  QPixmap potential_plot = customPlot->toPixmap();
 
   layout->addWidget(customPlot); //customPlot doubles as a widget
   window->setLayout(layout);
   window->show();
+
+  // connect(this, SIGNAL(customPlot->mouseMove(QMouseEvent*)), this,SLOT(QCustomPlot::showPointToolTip(QMouseEvent*)));
+
 }
 
+
+// void QCustomPlot::showPointToolTip(QMouseEvent *event)
+// {
+//   qDebug() << tr("showPointToolTip");
+//   int x = this->xAxis->pixelToCoord(event->pos().x());
+//   int y = this->yAxis->pixelToCoord(event->pos().y());
+//
+//   setToolTip(QString("%1 , %2").arg(x).arg(y));
+// }
 
 void SimVisualize::updateJobSelCombo()
 {
