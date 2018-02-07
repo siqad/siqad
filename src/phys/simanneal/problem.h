@@ -6,6 +6,9 @@
 //
 // @desc:     Definition of the problem - dbdot loc, material properties, etc.
 
+#ifndef _SIM_ANNEAL_PHYS_PROBLEM_H_
+#define _SIM_ANNEAL_PHYS_PROBLEM_H_
+
 #include <vector>
 #include <stack>
 #include <memory>
@@ -49,7 +52,7 @@ namespace phys{
     };
 
     // aggregate
-    class Aggregate 
+    class Aggregate
     {
     public:
       std::vector<std::shared_ptr<Aggregate>> aggs;
@@ -117,3 +120,5 @@ namespace phys{
     std::map<std::string, std::string> sim_params;
   };
 }
+
+#endif

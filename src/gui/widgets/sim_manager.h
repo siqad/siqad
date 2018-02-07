@@ -7,8 +7,8 @@
 // @desc:     window that allows users to setup and dispatch new simulations,
 //            as well as manage ongoing or completed simulations.
 
-#ifndef _GUI_SIM_MANGER_H_
-#define _GUI_SIM_MANGER_H_
+#ifndef _GUI_SIM_MANAGER_H_
+#define _GUI_SIM_MANAGER_H_
 
 #include <QtWidgets>
 #include <QDialog>
@@ -46,7 +46,7 @@ public:
   prim::SimEngine *getEngine(const QString &name);  // by name
 
   // TODO get job by name
-  
+
 
   // variables
   QList<prim::SimEngine*>  sim_engines;  // stack of all simulators
