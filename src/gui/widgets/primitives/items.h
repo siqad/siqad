@@ -16,5 +16,6 @@
 #include "ghost.h"
 #include "electrode.h"
 #include "afmpath.h"
+#include "pot_plot.h"
 
 #endif

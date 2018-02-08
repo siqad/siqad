@@ -90,9 +90,9 @@ void SimVisualize::showJobTerminalOutput()
 
 void SimVisualize::openPoisResult()
 {
-  QWidget *window = new QWidget;
-  window->resize(750, 750);
-  QHBoxLayout *layout = new QHBoxLayout;
+  // QWidget *window = new QWidget;
+  // window->resize(750, 750);
+  // QHBoxLayout *layout = new QHBoxLayout;
   QCustomPlot *customPlot = new QCustomPlot();
 
   // set up the QCPColorMap:
@@ -118,9 +118,9 @@ void SimVisualize::openPoisResult()
   // BOOST_FOREACH(boost::property_tree::ptree::value_type &node_potential_map, tree.get_child("sim_out.potential_map")) {
     boost::property_tree::ptree subtree = node_potential_map.second; //get subtree with layer items at the top
     if( node_potential_map.first == "potential_val"){ //go into potential_val.
-      x = node_potential_map.second.get<float>("<xmlattr>.x");
-      y = node_potential_map.second.get<float>("<xmlattr>.y");
-      val = node_potential_map.second.get<float>("<xmlattr>.val");
+      x = node_potential_map.second.get<double>("<xmlattr>.x");
+      y = node_potential_map.second.get<double>("<xmlattr>.y");
+      val = node_potential_map.second.get<double>("<xmlattr>.val");
       x_vec.append(x);
       y_vec.append(y);
       val_vec.append(val);
@@ -141,21 +141,19 @@ void SimVisualize::openPoisResult()
   }
 
   // configure axis rect:
-  customPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom); // this will also allow rescaling the color scale by dragging/zooming
-  customPlot->axisRect()->setupFullAxesBox(true);
-  customPlot->xAxis->setLabel("x");
-  customPlot->yAxis->setLabel("y");
+  // customPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom); // this will also allow rescaling the color scale by dragging/zooming
+  // customPlot->axisRect()->setupFullAxesBox(true);
+  // customPlot->xAxis->setLabel("x");
+  // customPlot->yAxis->setLabel("y");
   // down on graph is increase in y.
   customPlot->yAxis->setRangeReversed(true);
 
-
-
   // add a color scale:
   QCPColorScale *colorScale = new QCPColorScale(customPlot);
-  customPlot->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
-  colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
+  // customPlot->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
+  // colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
   colorMap->setColorScale(colorScale); // associate the color map with the color scale
-  colorScale->axis()->setLabel("Magnetic Field Strength");
+  // colorScale->axis()->setLabel("Magnetic Field Strength");
 
   // set the color gradient of the color map to one of the presets:
   colorMap->setGradient(QCPColorGradient::gpPolar);
@@ -164,14 +162,23 @@ void SimVisualize::openPoisResult()
   colorMap->rescaleDataRange();
 
   // make sure the axis rect and color scale synchronize their bottom and top margins (so they line up):
-  QCPMarginGroup *marginGroup = new QCPMarginGroup(customPlot);
-  customPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
-  colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+  // QCPMarginGroup *marginGroup = new QCPMarginGroup(customPlot);
+  // customPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+  // colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
 
   // rescale the key (x) and value (y) axes so the whole color map is visible:
+
+
+  customPlot->xAxis->setVisible(false);
+  customPlot->yAxis->setVisible(false);
+  customPlot->setContentsMargins(0,0,0,0);
+  customPlot->axisRect()->setAutoMargins(QCP::msNone);
+  customPlot->axisRect()->setMargins(QMargins(0,0,0,0));
+
   customPlot->rescaleAxes();
   QPixmap potential_plot = customPlot->toPixmap();
-  emit createPotentialPixmap(potential_plot);
+  QRectF graph_container(QPointF(x_vec.first(),y_vec.first()), QPointF(x_vec.last(),y_vec.last()));
+  emit createPotentialPixmap(potential_plot, graph_container);
   // layout->addWidget(customPlot); //customPlot doubles as a widget
   // window->setLayout(layout);
   // window->show();

@@ -693,18 +693,23 @@ void gui::DesignPanel::clearSimResults()
       db->setShowElec(0);
 }
 
-void gui::DesignPanel::displayPotentialPlot(QPixmap potential_plot)
+void gui::DesignPanel::displayPotentialPlot(QPixmap potential_plot, QRectF graph_container)
 {
-
   qDebug() << tr("displayPotentialPlot");
-  QWidget *window = new QWidget;
-  window->resize(750, 750);
-  QHBoxLayout *layout = new QHBoxLayout;
-  QLabel *label = new QLabel;
-  label->setPixmap(potential_plot);
-  layout->addWidget(label); //customPlot doubles as a widget
-  window->setLayout(layout);
-  window->show();
+  qDebug() << tr("graph_container height: ") << graph_container.height();
+  qDebug() << tr("graph_container width: ") << graph_container.width();
+  qDebug() << tr("graph_container topLeft: ") << graph_container.topLeft().x() << tr(", ") << graph_container.topLeft().y();
+  createPotPlot(potential_plot, graph_container);
+  // QPainter painter(this);
+  // painter.drawRect(graph_container);
+  // QWidget *window = new QWidget;
+  // window->resize(750, 750);
+  // QHBoxLayout *layout = new QHBoxLayout;
+  // QLabel *label = new QLabel;
+  // label->setPixmap(potential_plot);
+  // layout->addWidget(label); //customPlot doubles as a widget
+  // window->setLayout(layout);
+  // window->show();
 }
 
 // SLOTS
@@ -1698,6 +1703,41 @@ void gui::DesignPanel::CreateElectrode::destroy()
 }
 
 
+// CreatePotPlot class
+gui::DesignPanel::CreatePotPlot::CreatePotPlot(int layer_index, gui::DesignPanel *dp, QPixmap potential_plot, QRectF graph_container, prim::PotPlot *pp, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), layer_index(layer_index), potential_plot(potential_plot), graph_container(graph_container), invert(invert)
+{  //if called to destroy, *elec points to selected electrode. if called to create, *elec = 0
+  prim::Layer *layer = dp->getLayer(layer_index);
+  index = invert ? layer->getItems().indexOf(pp) : layer->getItems().size();
+}
+
+void gui::DesignPanel::CreatePotPlot::undo()
+{
+  invert ? create() : destroy();
+}
+
+void gui::DesignPanel::CreatePotPlot::redo()
+{
+  invert ? destroy() : create();
+}
+
+
+void gui::DesignPanel::CreatePotPlot::create()
+{
+  dp->addItem(new prim::PotPlot(layer_index, potential_plot, graph_container), layer_index, index);
+}
+
+void gui::DesignPanel::CreatePotPlot::destroy()
+{
+  prim::PotPlot *pp = static_cast<prim::PotPlot*>(dp->getLayer(layer_index)->getItem(index));
+  if(pp != 0){
+    // destroy electrode
+    dp->removeItem(pp, dp->getLayer(pp->layer_id));  // deletes electrode
+    pp = 0;
+  }
+}
+
+
 // CreateAFMPath class
 
 gui::DesignPanel::CreateAFMPath::CreateAFMPath(int layer_index, gui::DesignPanel *dp,
@@ -2032,6 +2072,15 @@ void gui::DesignPanel::createElectrodes(QPoint point1)
   //only ever create one electrode at a time
   undo_stack->beginMacro(tr("create electrode with given corners"));
   undo_stack->push(new CreateElectrode(layer_index, this, mapToScene(point1).toPoint(), point2));
+  undo_stack->endMacro();
+}
+
+void gui::DesignPanel::createPotPlot(QPixmap potential_plot, QRectF graph_container)
+{
+  int layer_index = layers.indexOf(electrode_layer);
+  //only ever create one electrode at a time
+  undo_stack->beginMacro(tr("create electrode with given corners"));
+  undo_stack->push(new CreatePotPlot(layer_index, this, potential_plot, graph_container));
   undo_stack->endMacro();
 }
 
