@@ -132,6 +132,7 @@ namespace gui{
     // SIMULATION RESULT DISPLAY
     void displaySimResults(prim::SimJob *job, int dist_int);
     void clearSimResults();
+    void displayPotentialPlot(QPixmap potential_plot);
 
 
   public slots:
@@ -268,7 +269,7 @@ namespace gui{
 
     // return the scene position of the nearest prim::Item with the specified item types.
     // returns a null pointer if no eligible item falls within the search range.
-    prim::Item *filteredSnapTarget(QPointF scene_pos, QList<prim::Item::ItemType> &target_types, 
+    prim::Item *filteredSnapTarget(QPointF scene_pos, QList<prim::Item::ItemType> &target_types,
         qreal search_box_width);
 
 
@@ -473,7 +474,7 @@ namespace gui{
   {
   public:
     // create an empty AFMPath
-    CreateAFMPath(int layer_index, DesignPanel *dp, prim::AFMPath *afm_path=0, 
+    CreateAFMPath(int layer_index, DesignPanel *dp, prim::AFMPath *afm_path=0,
                     bool invert=false, QUndoCommand *parent=0);
 
     // destroy the AFMPath, which is not necessarily empty
@@ -500,7 +501,7 @@ namespace gui{
   public:
     // create an AFMNode with the given AFMPath and index in path
     CreateAFMNode(int layer_index, DesignPanel *dp, QPointF scenepos, float z_offset,
-          int afm_index, int index_in_path=-1, bool invert=false, 
+          int afm_index, int index_in_path=-1, bool invert=false,
           QUndoCommand *parent=0);
 
     // remove the AFMNode from its Path and destroy the node

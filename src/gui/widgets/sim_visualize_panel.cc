@@ -126,7 +126,7 @@ void SimVisualize::openPoisResult()
       val_vec.append(val);
     }
   }
-
+  // qDebug() << tr("Setting colurMap");
   // set range for x and y in pixels.
   colorMap->data()->setRange(QCPRange(x_vec.first(), x_vec.last()), QCPRange(y_vec.first(), y_vec.last()));
 
@@ -171,12 +171,10 @@ void SimVisualize::openPoisResult()
   // rescale the key (x) and value (y) axes so the whole color map is visible:
   customPlot->rescaleAxes();
   QPixmap potential_plot = customPlot->toPixmap();
-
-  layout->addWidget(customPlot); //customPlot doubles as a widget
-  window->setLayout(layout);
-  window->show();
-
-  // connect(this, SIGNAL(customPlot->mouseMove(QMouseEvent*)), this,SLOT(QCustomPlot::showPointToolTip(QMouseEvent*)));
+  emit createPotentialPixmap(potential_plot);
+  // layout->addWidget(customPlot); //customPlot doubles as a widget
+  // window->setLayout(layout);
+  // window->show();
 
 }
 

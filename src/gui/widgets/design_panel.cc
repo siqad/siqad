@@ -693,7 +693,19 @@ void gui::DesignPanel::clearSimResults()
       db->setShowElec(0);
 }
 
+void gui::DesignPanel::displayPotentialPlot(QPixmap potential_plot)
+{
 
+  qDebug() << tr("displayPotentialPlot");
+  QWidget *window = new QWidget;
+  window->resize(750, 750);
+  QHBoxLayout *layout = new QHBoxLayout;
+  QLabel *label = new QLabel;
+  label->setPixmap(potential_plot);
+  layout->addWidget(label); //customPlot doubles as a widget
+  window->setLayout(layout);
+  window->show();
+}
 
 // SLOTS
 
@@ -800,7 +812,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
       case Qt::LeftButton:
-        if (clicked && (tool_type == SelectTool || tool_type == DBGenTool 
+        if (clicked && (tool_type == SelectTool || tool_type == DBGenTool
               || tool_type == ElectrodeTool)) {
           rubberBandUpdate(e->pos());
         }
@@ -1596,7 +1608,7 @@ prim::Item *gui::DesignPanel::filteredSnapTarget(QPointF scene_pos, QList<prim::
       }
     }
   }
-  
+
   return target;
 }
 
@@ -1722,7 +1734,7 @@ void gui::DesignPanel::CreateAFMPath::destroy()
   //qDebug() << tr("Entered CreateAFMPath::destroy()");
   prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(index));
 
-  // contained nodes and segments should be deleted automatically when deleting the path 
+  // contained nodes and segments should be deleted automatically when deleting the path
   // since they're children items to the path.
   dp->removeItem(afm_path, dp->getLayer(afm_path->layer_id));
   dp->afmPanel()->setFocusedPath(0);
@@ -1734,7 +1746,7 @@ void gui::DesignPanel::CreateAFMPath::destroy()
 gui::DesignPanel::CreateAFMNode::CreateAFMNode(int layer_index, gui::DesignPanel *dp,
                         QPointF scenepos, float z_offset, int afm_index,
                         int index_in_path, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), 
+  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index),
           scenepos(scenepos), z_offset(z_offset), afm_index(afm_index)
 {
   prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
@@ -2032,7 +2044,7 @@ void gui::DesignPanel::createAFMNode()
     scene_pos = afm_panel->ghostNode()->scenePos();
   else
     scene_pos = mapToScene(mouse_pos_cached);
-      
+
   // TODO UNDOable version
   undo_stack->beginMacro(tr("create AFMNode in the focused AFMPath after the focused AFMNode"));
   //qDebug() << tr("AFMNode creation macro began");
