@@ -28,7 +28,8 @@ namespace prim{
 
     //initializer
     void initPotPlot(int lay_id, QPixmap potential_plot, QRectF graph_container);
-
+    QPixmap getPotentialPlot(void){return potential_plot;}
+    QRectF getGraphContainer(void){return graph_container;}
     // inherited abstract method implementations
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;

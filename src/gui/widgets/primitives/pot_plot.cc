@@ -35,8 +35,7 @@ void prim::PotPlot::initPotPlot(int lay_id, QPixmap potential_plot_in, QRectF gr
   setZValue(-1);
   setPos(mapToScene(graph_container.topLeft()).toPoint());
   // flags
-  // setFlag(QGraphicsItem::ItemIsSelectable, true);
-  // setFlag(QGraphicsItem::ItemIsFocusable, true);
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
 
 QRectF prim::PotPlot::boundingRect() const
@@ -50,19 +49,20 @@ QRectF prim::PotPlot::boundingRect() const
 // pre-rendered bitma for speed.
 void prim::PotPlot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-  QRectF rect = boundingRect();
-  qreal dxy = .5*edge_width;
-  rect.adjust(dxy,dxy,-dxy,-dxy); //make the bounding rectangle, and trim off the edges.
-  painter->setPen(QPen(edge_col, edge_width));
-  painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
+  // QRectF rect = boundingRect();
+  // qreal dxy = .5*edge_width;
+  // rect.adjust(dxy,dxy,-dxy,-dxy); //make the bounding rectangle, and trim off the edges.
+  painter->setOpacity(0.5);
+  // painter->setPen(QPen(edge_col, edge_width));
+  // painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
   // painter->drawRect(rect);
   painter->drawPixmap(graph_container, potential_plot.scaled(graph_container.width(), graph_container.height()), graph_container);
+  painter->setOpacity(1);
 }
 
 prim::Item *prim::PotPlot::deepCopy() const
 {
   prim::PotPlot *pp = new PotPlot(layer_id, potential_plot, graph_container);
-  // elec->setPos(pos());
   return pp;
 }
 

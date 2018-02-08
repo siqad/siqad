@@ -2177,6 +2177,13 @@ void gui::DesignPanel::deleteSelection()
           qDebug() << "shouldn't be here yet";
           break;
         }
+      case prim::Item::PotPlot:
+        {
+        prim::PotPlot *pp = static_cast<prim::PotPlot*>(item);
+        undo_stack->push(new CreatePotPlot( pp->layer_id, this, pp->getPotentialPlot(),
+          pp->getGraphContainer(), static_cast<prim::PotPlot*>(item), true));
+        break;
+        }
       default:
         break;
     }
