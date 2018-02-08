@@ -149,6 +149,8 @@ macx:  sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal
 win32: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal.exe
 INSTALLS += sim_simanneal
 
+
+
 # AFMMarcus
 
 sim_afmmarcus.path = $$EXEC_DIR/src/phys/afmmarcus
