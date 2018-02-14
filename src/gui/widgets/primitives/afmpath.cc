@@ -93,7 +93,7 @@ void AFMPath::saveItems(QXmlStreamWriter *ws) const
 {
   ws->writeStartElement("afmpath");
   // TODO save path properties like speed, loop as attributes
-  ws->writeTextElement("layer_id", QString::number(layer_id));
+  //ws->writeTextElement("layer_id", QString::number(layer_id));
 
   // save included afmnodes
   for (prim::AFMNode *node : path_nodes) {

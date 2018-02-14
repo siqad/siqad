@@ -21,6 +21,7 @@ SimAnneal::SimAnneal(const std::string& i_path, const std::string& o_path)
 bool SimAnneal::runSim()
 {
   // grab all physical locations (in original distance unit)
+  // TODO move to phys_engine
   std::cout << "Grab all physical locations..." << std::endl;
   n_dbs = 0;
   for(auto db : problem) {

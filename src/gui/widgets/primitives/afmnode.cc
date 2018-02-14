@@ -40,12 +40,12 @@ AFMNode::AFMNode(QXmlStreamReader *rs, QGraphicsScene *scene)
       if (rs->name() == "layer_id") {
         lay_id = rs->readElementText().toInt();
         rs->readNext();
-      } else if (rs->name() == "scenepos") {
+      } else if (rs->name() == "physloc") {
         for (QXmlStreamAttribute &attr : rs->attributes()) {
           if (attr.name().toString() == QLatin1String("x")) {
-            scenepos.setX(attr.value().toFloat());
+            scenepos.setX(attr.value().toFloat()*scale_factor);
           } else if (attr.name().toString() == QLatin1String("y")) {
-            scenepos.setY(attr.value().toFloat());
+            scenepos.setY(attr.value().toFloat()*scale_factor);
           }
         }
         qDebug() << QObject::tr("Found x=%1 and y=%2 for node").arg(scenepos.x()).arg(scenepos.y());
@@ -100,9 +100,9 @@ void AFMNode::saveItems(QXmlStreamWriter *ws) const
 
   ws->writeTextElement("layer_id", QString::number(layer_id));
 
-  ws->writeEmptyElement("scenepos"); // TODO consider changing to saving physloc
-  ws->writeAttribute("x", QString::number(scenePos().x()));
-  ws->writeAttribute("y", QString::number(scenePos().y()));
+  ws->writeEmptyElement("physloc"); // TODO consider changing to saving physloc
+  ws->writeAttribute("x", QString::number(scenePos().x()/scale_factor));
+  ws->writeAttribute("y", QString::number(scenePos().y()/scale_factor));
 
   ws->writeTextElement("zoffset", QString::number(zOffset()));
 
