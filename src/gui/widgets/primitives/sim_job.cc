@@ -60,8 +60,13 @@ bool SimJob::invokeBinary()
     sim_process->setProgram(engine->binaryPath());
   }
 
-  cml_arguments << problem_file_info.canonicalFilePath();
-  cml_arguments << resultFile();
+  cml_arguments << problem_file_info.canonicalFilePath(); // problem file
+  cml_arguments << resultFile();                          // result file
+
+  if (!engine->linkedScriptPath().isEmpty()) {
+    // script called by binary, if applicable
+    cml_arguments << engine->linkedScriptPath();
+  }
 
   start_time = QDateTime::currentDateTime();
 
