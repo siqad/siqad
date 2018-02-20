@@ -66,6 +66,12 @@ namespace prim{
 
     int distCount() {return dist_count;}  // return the number of charge distributions this has
 
+    struct LineScanPath {
+      QList<QPair<float,float>> afm_nodes;    // afm nodes in angstrom
+      QList<QPair<float,float>> db_locs_enc;  // db locs in angstrom
+      QList<QString> results;
+    };
+
     // ACCESSORS
 
     // job name
@@ -87,14 +93,15 @@ namespace prim{
 
     QString terminalOutput() {return terminal_output;}
     void saveTerminalOutput();
-    
+
     // variables TODO put them back to private later, with proper accessors
     QList<QPair<float,float>> physlocs;   // physlocs[dot_ind].first or .second
     QList<QList<int>> elec_dists;         // elec_dists[result_ind][dot_ind] TODO change this to QList of QVectors
+    QList<LineScanPath> line_scan_paths;  // line scan path props and results
   private:
 
     void deduplicateDist();           // deduplicate charge distribution results
-    
+
     // variables
     QString job_name;         // job name for identification
     SimEngine *engine;        // the engine used by this job

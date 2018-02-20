@@ -165,6 +165,38 @@ bool SimJob::readResults()
         }
         rs.readNext();
       }
+      else if (rs.name() == "line_scans") {
+        while (!(rs.isEndElement() && rs.name() == "line_scans")) {
+          if (!rs.readNextStartElement())
+            continue; // skip until a start element is encountered
+          if (rs.name() == "afm_path") {
+            // TODO add an AFM path entry to the job
+            line_scan_paths.append(LineScanPath());
+            LineScanPath &curr_path = line_scan_paths.back();
+            while (!(rs.isEndElement() && rs.name() == "afm_path")) {
+              if (!rs.readNextStartElement())
+                continue;
+              if (rs.name() == "db") {
+                float x=0,y=0;
+                // dbs encountered by this path
+                for (QXmlStreamAttribute &attr : rs.attributes()) {
+                  if (attr.name().toString() == QLatin1String("x"))
+                    x = attr.value().toFloat();
+                  else if (attr.name().toString() == QLatin1String("y"))
+                    y = attr.value().toFloat();
+                }
+                // TODO add these dbs to the AFM path struct thing
+                //line_scan_paths.last().afm_nodes.append(qMakePair(x,y));
+                curr_path.afm_nodes.append(qMakePair(x,y));
+              } else if (rs.name() == "line_scan") {
+                // individual line scan results
+                curr_path.results.append(rs.readElementText());
+              }
+            }
+          }
+        }
+        rs.readNext();
+      }
       // TODO make a QStringList of ignored stuff
       else{
         if(!ignored_xml_elements.contains(rs.name().toString()))
