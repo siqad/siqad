@@ -80,7 +80,7 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
     }
   }
   eng_f.close();
-  
+
   initSimEngine(eng_nm, eng_rt);
 }
 
@@ -142,6 +142,7 @@ QList<QPair<QString, QString>> SimEngine::loadSimParamsFromDialog()
       retrieved_sim_params.append(QPair<QString, QString>(param.name, static_cast<QLineEdit*>(find_widget)->text()));
       qDebug() << QObject::tr("Added sim param %1 with content %2").arg(param.name).arg(static_cast<QLineEdit*>(find_widget)->text());
     }
+    // TODO radio buttons
   }
 
   return retrieved_sim_params;
