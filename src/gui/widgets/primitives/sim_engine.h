@@ -58,6 +58,8 @@ namespace prim{
     QString runtimeTempDir();
     void setLinkedScriptPath(const QString &path) {linked_script_path = path;}
     QString linkedScriptPath() {return linked_script_path;}
+    QString paramDialogPath() {return param_dialog_path;}
+    void setParamDialogPath(const QString &path) {param_dialog_path = path;}
 
     // gui
     QWidget *simParamDialog() {return sim_param_dialog;}
@@ -75,6 +77,7 @@ namespace prim{
     QString runtime_interpreter;// runtime interpreter (e.g. Python), blank if not applicable
     QString bin_path;           // binary (standalone) or script (interpreted) path of this engine
     QString linked_script_path; // if the binary is a connector that calls another script, indicate the script here
+    QString param_dialog_path;  // path to the gui dialog, defaults to "option_dialog.ui"
     QString runtime_temp_dir;   // root directory for all problems files for this engine
 
     // GUI

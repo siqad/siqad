@@ -49,6 +49,8 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
             setRuntimeInterpreter(rs.readElementText());
           } else if (rs.name() == "linked_script_path") {
             setLinkedScriptPath(eng_dir.absoluteFilePath(rs.readElementText()));
+          } else if (rs.name() == "gui_dialog_path") {
+            setParamDialogPath(eng_dir.absoluteFilePath(rs.readElementText()));
           } else if (rs.name() == "sim_params") {
             while (!(rs.isEndElement() && rs.name() == "sim_params")) {
               if (!rs.readNextStartElement())
@@ -104,13 +106,16 @@ bool SimEngine::constructSimParamDialog()
 {
   // check if file exists
   QDir eng_dir(eng_root);
-  if (!eng_dir.exists("option_dialog.ui")) {
+  if (param_dialog_path.isEmpty())
+    param_dialog_path = eng_dir.absoluteFilePath("option_dialog.ui");
+
+  /*if (!eng_dir.exists("option_dialog.ui")) {
     qDebug() << tr("SimEngine: Skipping sim param dialog construction for %1, file not found.").arg(name());
     return false;
-  }
+  }*/
 
   // check file readability
-  QFile ui_file(eng_dir.absoluteFilePath("option_dialog.ui"));
+  QFile ui_file(param_dialog_path);
   if (!ui_file.open(QFile::ReadOnly | QFile::Text)) {
     qCritical() << QObject::tr("SimEngine: cannot open UI file %1").arg(ui_file.fileName());
     return false;

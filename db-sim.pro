@@ -152,11 +152,16 @@ INSTALLS += sim_simanneal
 # AFMMarcus
 
 sim_afmmarcus.path = $$EXEC_DIR/src/phys/afmmarcus
-sim_afmmarcus.files = $$PHYS_DIR/afmmarcus/engine_description.xml
-sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/option_dialog.ui
+sim_afmmarcus.files = $$PHYS_DIR/afmmarcus/afm_line_scan.physeng
+sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/hopping_animator.physeng
+sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/afm_line_scan.ui
+sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/hopping_animator.ui
 linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/afmmarcus
 linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/afm.py
-linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/demo.py
-linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/marcus.py
+linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/animator.py
+linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/channel.py
 linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/db-sim-connector.py
+linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/hopper.py
+linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/marcus.py
+linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/model.py
 INSTALLS += sim_afmmarcus
