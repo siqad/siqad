@@ -109,11 +109,6 @@ bool SimEngine::constructSimParamDialog()
   if (param_dialog_path.isEmpty())
     param_dialog_path = eng_dir.absoluteFilePath("option_dialog.ui");
 
-  /*if (!eng_dir.exists("option_dialog.ui")) {
-    qDebug() << tr("SimEngine: Skipping sim param dialog construction for %1, file not found.").arg(name());
-    return false;
-  }*/
-
   // check file readability
   QFile ui_file(param_dialog_path);
   if (!ui_file.open(QFile::ReadOnly | QFile::Text)) {

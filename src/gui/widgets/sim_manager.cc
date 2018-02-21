@@ -292,8 +292,6 @@ void SimManager::initEngines()
       engine_declaration_files << eng_dir.absoluteFilePath(matched_eng_file);
       qDebug() << tr("Found engine file: %1").arg(engine_declaration_files.back());
     }
-    //if (eng_dir.exists("engine_description.xml"))
-    //  engine_dirs.append(eng_dir);
   }
 
   // import engines found above
@@ -301,12 +299,6 @@ void SimManager::initEngines()
     // read each engine description file and add to list
     sim_engines.append(new prim::SimEngine(eng_dec_file));
   }
-  //for (QDir engine_dir : engine_dirs) {
-  //  // read each engine description file and add to list
-  //  QString eng_desc_path = engine_dir.absoluteFilePath("engine_description.xml");
-  //  sim_engines.append(new prim::SimEngine(eng_desc_path));
-  //}
-
 
   qDebug() << tr("Successfully read physics engine library");
 }
