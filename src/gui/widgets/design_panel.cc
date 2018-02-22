@@ -813,7 +813,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
       case Qt::LeftButton:
-        if (clicked && (tool_type == SelectTool || tool_type == DBGenTool 
+        if (clicked && (tool_type == SelectTool || tool_type == DBGenTool
               || tool_type == ElectrodeTool)) {
           rubberBandUpdate(e->pos());
         }
@@ -1615,7 +1615,7 @@ prim::Item *gui::DesignPanel::filteredSnapTarget(QPointF scene_pos, QList<prim::
       }
     }
   }
-  
+
   return target;
 }
 
@@ -1628,8 +1628,12 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
 {
   prim::DBDot *dbdot = ldot->getDBDot();
   // dbdot should be 0 if invert is false else non-zero
-  if( !(invert ^ (dbdot==0)) )
-    qFatal("Either trying to delete a non-existing DB or overwrite an existing one");
+  //if( !(invert ^ (dbdot==0)) )
+    //qFatal("Either trying to delete a non-existing DB or overwrite an existing one");
+  if (!invert && dbdot!=0)
+    qFatal("Trying to make a new db at a location that already has one");
+  if (invert && dbdot==0)
+    qFatal("Trying to delete a non-existing DB");
 
   // dbdot index in layer
   prim::Layer *layer = dp->getLayer(layer_index);
@@ -1741,7 +1745,7 @@ void gui::DesignPanel::CreateAFMPath::destroy()
   //qDebug() << tr("Entered CreateAFMPath::destroy()");
   prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(index));
 
-  // contained nodes and segments should be deleted automatically when deleting the path 
+  // contained nodes and segments should be deleted automatically when deleting the path
   // since they're children items to the path.
   dp->removeItem(afm_path, dp->getLayer(afm_path->layer_id));
   dp->afmPanel()->setFocusedPath(0);
@@ -1753,7 +1757,7 @@ void gui::DesignPanel::CreateAFMPath::destroy()
 gui::DesignPanel::CreateAFMNode::CreateAFMNode(int layer_index, gui::DesignPanel *dp,
                         QPointF scenepos, float z_offset, int afm_index,
                         int index_in_path, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), 
+  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index),
           scenepos(scenepos), z_offset(z_offset), afm_index(afm_index)
 {
   prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
@@ -2029,7 +2033,7 @@ void gui::DesignPanel::createDBs()
   for(QGraphicsItem *gitem : selection)
     undo_stack->push(new CreateDB(static_cast<prim::LatticeDot *>(gitem), layer_index, this));
   undo_stack->endMacro();
-  qDebug() << tr("Finished endMacro");
+  //qDebug() << tr("Finished endMacro");
 }
 
 void gui::DesignPanel::createElectrodes(QPoint point1)
@@ -2051,7 +2055,7 @@ void gui::DesignPanel::createAFMNode()
     scene_pos = afm_panel->ghostNode()->scenePos();
   else
     scene_pos = mapToScene(mouse_pos_cached);
-      
+
   // TODO UNDOable version
   undo_stack->beginMacro(tr("create AFMNode in the focused AFMPath after the focused AFMNode"));
   //qDebug() << tr("AFMNode creation macro began");
@@ -2190,11 +2194,12 @@ void gui::DesignPanel::splitAggregates()
     return;
 
   undo_stack->beginMacro(tr("Split %1 aggregates").arg(aggs.count()));
+  qDebug() << tr("Split %1 aggregates").arg(aggs.count());
   int offset=0;
   for(prim::Aggregate *agg : aggs){
     int temp = agg->getChildren().count()-1;
     undo_stack->push(new FormAggregate(agg, offset, this));
-    offset += temp;
+    //offset += temp;
   }
   undo_stack->endMacro();
 }
