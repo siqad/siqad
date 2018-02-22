@@ -1630,10 +1630,14 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
   // dbdot should be 0 if invert is false else non-zero
   //if( !(invert ^ (dbdot==0)) )
     //qFatal("Either trying to delete a non-existing DB or overwrite an existing one");
-  if (!invert && dbdot!=0)
+  if (!invert && dbdot!=0) {
     qFatal("Trying to make a new db at a location that already has one");
-  if (invert && dbdot==0)
+  }
+  if (invert && dbdot==0) {
+    //qDebug() << "******Trying to delete a non-existing DB******";
+    //qDebug() << tr("latdot loc: (%1, %2)").arg(ldot->x()).arg(ldot->y());
     qFatal("Trying to delete a non-existing DB");
+  }
 
   // dbdot index in layer
   prim::Layer *layer = dp->getLayer(layer_index);

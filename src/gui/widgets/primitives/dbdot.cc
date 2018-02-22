@@ -172,7 +172,7 @@ void prim::DBDot::setSource(prim::LatticeDot *src)
 {
   if(src){
     // unset the previous LatticeDot
-    if(source)
+    if(source && source->getDBDot() == this)
       source->setDBDot(0);
 
     // move to new LatticeDot
@@ -267,7 +267,8 @@ void prim::DBDot::constructStatics()
 
 void prim::DBDot::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
-  qDebug() << QObject::tr("DBDot has seen the mousePressEvent");
+  qDebug() << QObject::tr("DBDot (%1, %2) has seen the mousePressEvent").arg(x()).arg(y());
+  //qDebug() << QObject::tr("Latdot of this DB (%1, %2)").arg(source->x()).arg(source->y());
   qDebug() << QObject::tr("lay_id: %1").arg(layer_id);
   switch(e->buttons()){
     // toggling currently handled by context menu.
