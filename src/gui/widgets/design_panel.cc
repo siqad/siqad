@@ -202,6 +202,15 @@ void gui::DesignPanel::removeItemFromScene(prim::Item *item)
   // item pointer delete should be handled by the caller
 }
 
+
+QList<prim::Item*> gui::DesignPanel::selectedItems()
+{
+  QList<prim::Item*> casted_list;
+  for (QGraphicsItem *gitem : scene->selectedItems())
+    casted_list.append(static_cast<prim::Item*>(gitem));
+  return casted_list;
+}
+
 void gui::DesignPanel::addLayer(const QString &name, const prim::Layer::LayerType cnt_type, const float zoffset, const float zheight)
 {
   // check if name already taken
@@ -1213,7 +1222,7 @@ void gui::DesignPanel::electrodeSetPotentialAction()
   bool ok = false;
   double potential;
   // qDebug() << tr("electrodeSetPotential...");
-  QList<QGraphicsItem*> selection = scene->selectedItems();
+  QList<prim::Item*> selection = selectedItems();
   if(selection.isEmpty()){ //TODO:figure out how we want to handle right click without selection
     qDebug() << tr("Please select an item...");
   } else {
@@ -1227,9 +1236,9 @@ void gui::DesignPanel::electrodeSetPotentialAction()
                   -2147483647, 2147483647, 1, &ok);
     }
     if(ok){
-      for(QGraphicsItem *gitem : selection){
-        if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::Electrode)
-          static_cast<prim::Electrode*>(gitem)->setPotential(potential);
+      for(prim::Item *item : selection){
+        if(item->item_type == prim::Item::Electrode)
+          static_cast<prim::Electrode*>(item)->setPotential(potential);
       }
     }
   }
@@ -1240,13 +1249,13 @@ void gui::DesignPanel::toggleDBElecAction()
 {
   // toggling is not an un-doable action for now.
   // qDebug() << tr("toggleDBElecAction...");
-  QList<QGraphicsItem*> selection = scene->selectedItems();
+  QList<prim::Item*> selection = selectedItems();
   if(selection.isEmpty()){ //TODO:figure out how we want to handle right click without selection
     qDebug() << tr("Please select an item...");
   } else { //at least 1 item was selected, toggle elec in dots.
-    for(QGraphicsItem *gitem : selection){
-      if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::DBDot)
-        static_cast<prim::DBDot*>(gitem)->toggleElec();
+    for(prim::Item *item : selection){
+      if(item->item_type == prim::Item::DBDot)
+        static_cast<prim::DBDot*>(item)->toggleElec();
     }
   }
 }
@@ -1291,9 +1300,9 @@ void gui::DesignPanel::filterSelection(bool select_flag)
   // NOTE need to make sure than only active layers are selectable
 
   // if select_flag, deselect all items in the lattice. Otherwise, keep only items in the lattice
-  for(QGraphicsItem *gitem : scene->selectedItems()){
-    if( ( static_cast<prim::Item*>(gitem)->layer_id == 0) == select_flag)
-      gitem->setSelected(false);
+  for(prim::Item *item : selectedItems()){
+    if( (item->layer_id == 0) == select_flag)
+      item->setSelected(false);
   }
 }
 
@@ -1327,12 +1336,8 @@ void gui::DesignPanel::rubberBandUpdate(QPoint pos){
 
     // deselect items that are no longer contained
     QList<QGraphicsItem*> selected_items = scene->selectedItems();
-    for(QGraphicsItem* selected_item : selected_items){
-      // NOTE foregone the check code for now since it doesn't seem to be more efficient
-      //if(!rb_shift_selected.contains(selected_item)
-      //    || !rb_rect_scene.intersects(selected_item->boundingRect().toRect()))
+    for(QGraphicsItem* selected_item : selected_items)
       selected_item->setSelected(false);
-    }
 
     // select the new items
     QList<QGraphicsItem*> rb_items = scene->items(QRect(rb_start,mapToScene(pos).toPoint()).normalized());
@@ -1372,10 +1377,7 @@ void gui::DesignPanel::createGhost(bool paste)
     QPointF scene_pos = mapToScene(mapFromGlobal(QCursor::pos()));
     //get QList of selected Item object
     filterSelection(true);
-    QList<prim::Item*> items;
-    for(QGraphicsItem *qitem : scene->selectedItems())
-      items.append(static_cast<prim::Item*>(qitem));
-    ghost->prepare(items, scene_pos);
+    ghost->prepare(selectedItems(), scene_pos);
   }
 }
 
@@ -1391,28 +1393,32 @@ void gui::DesignPanel::clearGhost()
 
 bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
 {
-  bool isAllElectrodes = true;
+  bool is_all_electrodes = true;
+
   //check if holding any non-electrodes
-  if(pasting){
-    for(QGraphicsItem *gitem : clipboard){
-      if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode){
-        isAllElectrodes = false;
-        break;
-      }
+  for (prim::Item *item : pasting ? clipboard : selectedItems()) {
+    if (item->item_type != prim::Item::Electrode) {
+      is_all_electrodes = false;
+      break;
     }
   }
-  else{
-    for(QGraphicsItem *gitem : scene->selectedItems()){
-      if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode){
-        isAllElectrodes = false;
-        break;
-      }
-    }
-  }
+
   // if holding any non-electrodes (for now just db dots or lat dots)
   // don't need to recheck snap target unless the cursor has moved significantly
-  if(isAllElectrodes == false){
-    if((scene_pos-snap_cache).manhattanLength()<.3*snap_diameter)
+  if (is_all_electrodes) {
+    prim::Ghost *ghost = prim::Ghost::instance();
+    if (pasting) { //offset is in the first electrode item
+      ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos()))
+          - clipboard[0]->pos()
+          - QPointF(static_cast<prim::Electrode*>(clipboard[0])->getWidth()/2.0,
+              static_cast<prim::Electrode*>(clipboard[0])->getHeight()/2.0)
+      );
+    } else {
+      ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos())));
+    }
+    return false;
+  } else {
+    if ((scene_pos-snap_cache).manhattanLength()<.3*snap_diameter)
       return false;
     snap_cache = scene_pos;
 
@@ -1462,17 +1468,6 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
     snap_target = target;
     ghost->setValid(ghost->valid_hash[target]);
     return true;
-  } else {
-    //electrode only
-    prim::Ghost *ghost = prim::Ghost::instance();
-    if(pasting){ //offset is in the first electrode item
-      ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos())) - clipboard[0]->pos()
-                    - QPointF(static_cast<prim::Electrode*>(clipboard[0])->getWidth()/2.0,
-                              static_cast<prim::Electrode*>(clipboard[0])->getHeight()/2.0));
-    } else {
-      ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos())) - mapToScene(mouse_pos_old));
-    }
-    return false;
   }
 }
 
@@ -1481,8 +1476,8 @@ void gui::DesignPanel::initMove()
   createGhost(false);
 
   // set lattice dots of objects to be moved as selectable
-  for(QGraphicsItem *gitem : scene->selectedItems())
-    setLatticeDotSelectability(static_cast<prim::Item*>(gitem), true);
+  for(prim::Item *item : selectedItems())
+    setLatticeDotSelectability(item, true);
 
   moving = true;
 }
@@ -1511,7 +1506,7 @@ void gui::DesignPanel::setLatticeDotSelectability(prim::Item *item, bool flag)
 
 void gui::DesignPanel::copySelection()
 {
-  QList<QGraphicsItem*> selection = scene->selectedItems();
+  QList<prim::Item*> selection = selectedItems();
   if(selection.isEmpty())
     return;
 
@@ -1520,8 +1515,8 @@ void gui::DesignPanel::copySelection()
     delete item;
   clipboard.clear();
 
-  for(QGraphicsItem *gitem : selection)
-    clipboard.append(static_cast<prim::Item*>(gitem)->deepCopy());
+  for (prim::Item *item : selection)
+    clipboard.append(item->deepCopy());
 
   qDebug() << tr("Clipboard: %1 items").arg(clipboard.count());
   for(prim::Item *item : clipboard){
@@ -2015,14 +2010,12 @@ void gui::DesignPanel::MoveItem::moveElectrode(prim::Electrode *electrode, const
 void gui::DesignPanel::createDBs()
 {
   // do something only if there is a selection
-  QList<QGraphicsItem*> selection = scene->selectedItems();
+  QList<prim::Item*> selection = selectedItems();
   if(selection.isEmpty())
     return;
 
   // check that the selection is valid
-  prim::Item *item=0;
-  for(QGraphicsItem *gitem : selection){
-    item = static_cast<prim::Item*>(gitem);
+  for(prim::Item *item : selection){
     if(item->item_type != prim::Item::LatticeDot){
       qCritical() << tr("Dangling bond target is not a lattice dot...");
       return;
@@ -2032,8 +2025,8 @@ void gui::DesignPanel::createDBs()
   // push actions onto the QUndoStack
   int layer_index = layers.indexOf(top_layer);
   undo_stack->beginMacro(tr("create dangling bonds at selected sites"));
-  for(QGraphicsItem *gitem : selection)
-    undo_stack->push(new CreateDB(static_cast<prim::LatticeDot *>(gitem), layer_index, this));
+  for(prim::Item *item : selection)
+    undo_stack->push(new CreateDB(static_cast<prim::LatticeDot *>(item), layer_index, this));
   undo_stack->endMacro();
   //qDebug() << tr("Finished endMacro");
 }
@@ -2104,15 +2097,14 @@ void gui::DesignPanel::destroyAFMPath(prim::AFMPath *afm_path)
 void gui::DesignPanel::deleteSelection()
 {
   // do something only if there is a selection
-  QList<QGraphicsItem*> selection = scene->selectedItems();
+  QList<prim::Item*> selection = selectedItems();
   if(selection.isEmpty())
     return;
 
   qDebug() << tr("Deleting %1 items").arg(selection.count());
 
   undo_stack->beginMacro(tr("delete %1 items").arg(selection.count()));
-  for(QGraphicsItem *gitem : selection){
-    prim::Item *item = static_cast<prim::Item*>(gitem);
+  for(prim::Item *item : selection){
     switch(item->item_type){
       case prim::Item::DBDot:
         undo_stack->push(new CreateDB( static_cast<prim::DBDot*>(item)->getSource(),
@@ -2152,16 +2144,14 @@ void gui::DesignPanel::deleteSelection()
 void gui::DesignPanel::formAggregate()
 {
   // do something only if there is a selection
-  QList<QGraphicsItem*> selection = scene->selectedItems();
+  QList<prim::Item*> selection = selectedItems();
   if(selection.isEmpty())
     return;
 
-  // get selected items as prim::Item pointers
-  QList<prim::Item*> items;
-  for(QGraphicsItem *gitem : selection){
-    items.append(static_cast<prim::Item*>(gitem));
+  // check if selected items are on the surface
+  for(prim::Item *item : selection){
     // if(items.last()->layer != layers.at(1)){ DOUBLE CHECK WITH JAKE
-    if(items.last()->layer_id != 1){
+    if(item->layer_id != 1){
       qCritical() << tr("Selected aggregate item not in the surface...");
       return;
     }
@@ -2173,33 +2163,34 @@ void gui::DesignPanel::formAggregate()
   }
 
   // reversably create the aggregate
-  undo_stack->push(new FormAggregate(items, this));
+  undo_stack->push(new FormAggregate(selection, this));
 }
 
 void gui::DesignPanel::splitAggregates()
 {
   // do something only if there is a selection
-  QList<QGraphicsItem*> selection = scene->selectedItems();
-  if(selection.isEmpty())
+  QList<prim::Item*> selection = selectedItems();
+  if (selection.isEmpty())
     return;
 
   // get selected aggregates
   QList<prim::Aggregate*> aggs;
-  prim::Item *item=0;
-  for(QGraphicsItem *gitem : selection){
-    item = static_cast<prim::Item*>(gitem);
-    if(item->item_type == prim::Item::Aggregate)
+  for (prim::Item *item : selection) {
+    if (item->item_type == prim::Item::Aggregate) {
       aggs.append(static_cast<prim::Aggregate*>(item));
+    }
   }
 
-  if(aggs.count()==0)
+  if (aggs.count()==0)
     return;
 
   undo_stack->beginMacro(tr("Split %1 aggregates").arg(aggs.count()));
   qDebug() << tr("Split %1 aggregates").arg(aggs.count());
   int offset=0;
   for(prim::Aggregate *agg : aggs){
-    int temp = agg->getChildren().count()-1;
+    // the following commented lines are supposed to fix split aggregate issues,
+    // might have broken other things though
+    //int temp = agg->getChildren().count()-1;
     undo_stack->push(new FormAggregate(agg, offset, this));
     //offset += temp;
   }
@@ -2235,10 +2226,10 @@ void gui::DesignPanel::destroyAggregate(prim::Aggregate *agg)
 bool gui::DesignPanel::pasteAtGhost()
 {
   prim::Ghost *ghost = prim::Ghost::instance();
-  bool isAllElectrodes = true;
+  bool is_all_electrodes = true;
   for(QGraphicsItem *gitem : clipboard){
     if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode){
-      isAllElectrodes = false;
+      is_all_electrodes = false;
       break;
     }
   }
@@ -2246,7 +2237,7 @@ bool gui::DesignPanel::pasteAtGhost()
   if(clipboard.isEmpty())
     return false;
   else{
-    if( !isAllElectrodes && !ghost->valid_hash[snap_target])
+    if( !is_all_electrodes && !ghost->valid_hash[snap_target])
       return false;
   }
   undo_stack->beginMacro(tr("Paste %1 items").arg(clipboard.count()));
@@ -2321,7 +2312,7 @@ void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec)
 //       unselectable again.
 bool gui::DesignPanel::moveToGhost(bool kill)
 {
-  bool isAllElectrodes = true;
+  bool is_all_electrodes = true;
   prim::Ghost *ghost = prim::Ghost::instance();
   moving = false;
   // get the move offset
@@ -2330,13 +2321,13 @@ bool gui::DesignPanel::moveToGhost(bool kill)
   if(offset.isNull()){
     // There is no offset for dbs. Check if selection is all electrodes, and if it is, move them.
     // reset the original lattice dot selectability and return false
-    for(QGraphicsItem *gitem : scene->selectedItems())
+    for(prim::Item *item : selectedItems())
     {
-      if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode)
-        isAllElectrodes = false;
-      setLatticeDotSelectability(static_cast<prim::Item*>(gitem), false);
+      if(item->item_type != prim::Item::Electrode)
+        is_all_electrodes = false;
+      setLatticeDotSelectability(item, false);
     }
-    if(isAllElectrodes == true) //selection is all electrodes. try to move them without snapping.
+    if(is_all_electrodes == true) //selection is all electrodes. try to move them without snapping.
     { //offset is kept inside ghost->pos()
       for(prim::Item *item : ghost->getTopItems())
         undo_stack->push(new MoveItem(item, ghost->pos(), this));

@@ -65,9 +65,12 @@ namespace gui{
     // a temporary graphics item for purely indicative purposes.
     void addItemToScene(prim::Item *item);
 
-    // remove item from scene without deleting the item pointer. The caller has to handle
-    // the cleanup if so desired.
+    // remove item from scene without deleting the item pointer. The caller has
+    // to handle the cleanup if so desired.
     void removeItemFromScene(prim::Item *item);
+
+    // return a list of selected prim::Items
+    QList<prim::Item*> selectedItems();
 
     // add a new layer with the given name. If no name is given, a default scheme
     // is used. Checks if the layer already exists.
