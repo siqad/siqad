@@ -211,8 +211,8 @@ namespace gui{
     prim::AFMSeg *ghost_afm_seg=0;
 
     // mouse functionality
-    QPoint mouse_pos_old;     // old mouse position in pixels
-    QPoint mouse_pos_cached;  // parameter for caching relevant mouse positions, in pixels
+    QPoint mouse_pos_old;     // old mouse position in pixels on click
+    QPoint mouse_pos_cached;  // parameter for caching relevant mouse positions on click, in pixels
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
 
     // sim visualization
@@ -229,7 +229,7 @@ namespace gui{
     // assert bounds on zooming
     void boundZoom(qreal &ds);
 
-    // scroll the viewport to the correct location with the provided delta in scene 
+    // scroll the viewport to the correct location with the provided delta in scene
     // coordinates, taking the transformation (zoom and rotate) into account. Used
     // when rotating the view or anchoring during zoom.
     void scrollDelta(QPointF delta);
@@ -253,6 +253,7 @@ namespace gui{
 
 
     // GHOSTclass UndoCommand;e a Ghost for the current selection or clipboard
+    // create a ghost. scene_pos is only needed if not pasting
     void createGhost(bool paste);
 
     // clear the current Ghost
@@ -276,8 +277,8 @@ namespace gui{
 
     // return the scene position of the nearest prim::Item with the specified item types.
     // returns a null pointer if no eligible item falls within the search range.
-    prim::Item *filteredSnapTarget(QPointF scene_pos, QList<prim::Item::ItemType> &target_types, 
-        qreal search_box_width);
+    prim::Item *filteredSnapTarget(QPointF scene_pos, QList<prim::Item::ItemType>
+        &target_types, qreal search_box_width);
 
 
 
@@ -481,7 +482,7 @@ namespace gui{
   {
   public:
     // create an empty AFMPath
-    CreateAFMPath(int layer_index, DesignPanel *dp, prim::AFMPath *afm_path=0, 
+    CreateAFMPath(int layer_index, DesignPanel *dp, prim::AFMPath *afm_path=0,
                     bool invert=false, QUndoCommand *parent=0);
 
     // destroy the AFMPath, which is not necessarily empty
@@ -508,7 +509,7 @@ namespace gui{
   public:
     // create an AFMNode with the given AFMPath and index in path
     CreateAFMNode(int layer_index, DesignPanel *dp, QPointF scenepos, float z_offset,
-          int afm_index, int index_in_path=-1, bool invert=false, 
+          int afm_index, int index_in_path=-1, bool invert=false,
           QUndoCommand *parent=0);
 
     // remove the AFMNode from its Path and destroy the node

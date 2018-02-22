@@ -112,19 +112,19 @@ void prim::Ghost::cleanGhost()
 }
 
 
-void prim::Ghost::prepare(const QList<prim::Item*> &items)
+void prim::Ghost::prepare(const QList<prim::Item*> &items, QPointF scene_pos)
 {
   cleanGhost();
   for(prim::Item *item : items)
     prepareItem(item, &aggnode);
-  zeroGhost();
+  zeroGhost(scene_pos);
   setAnchor();
   show();
 }
 
 
 
-void prim::Ghost::prepare(prim::Item *item)
+void prim::Ghost::prepare(prim::Item *item, QPointF scene_pos)
 {
   QList<prim::Item*> items;
   items.append(item);
@@ -339,8 +339,12 @@ void prim::Ghost::updateValid()
 }
 
 
-void prim::Ghost::zeroGhost()
+void prim::Ghost::zeroGhost(QPointF scene_pos)
 {
+  if (!scene_pos.isNull()) {
+    zero_offset = scene_pos;
+    return;
+  }
   // compute center of effective bounding rect for all items
   qreal xmin=0, xmax=0, ymin=0, ymax=0;
   bool unset=true;

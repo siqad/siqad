@@ -1363,19 +1363,19 @@ void gui::DesignPanel::createGhost(bool paste)
   ghosting=true;
   snap_cache = QPointF();
 
-  if(paste){
+  if (paste) {
     ghost->prepare(clipboard);
     QPointF offset;
     if(snapGhost(mapToScene(mapFromGlobal(QCursor::pos())), offset))
       ghost->moveBy(offset.x(), offset.y());
-  }
-  else{
+  } else {
+    QPointF scene_pos = mapToScene(mapFromGlobal(QCursor::pos()));
     //get QList of selected Item object
     filterSelection(true);
     QList<prim::Item*> items;
     for(QGraphicsItem *qitem : scene->selectedItems())
       items.append(static_cast<prim::Item*>(qitem));
-    ghost->prepare(items);
+    ghost->prepare(items, scene_pos);
   }
 }
 
@@ -1462,18 +1462,16 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
     snap_target = target;
     ghost->setValid(ghost->valid_hash[target]);
     return true;
-  }
-  else
-  {
+  } else {
     //electrode only
     prim::Ghost *ghost = prim::Ghost::instance();
     if(pasting){ //offset is in the first electrode item
       ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos())) - clipboard[0]->pos()
                     - QPointF(static_cast<prim::Electrode*>(clipboard[0])->getWidth()/2.0,
                               static_cast<prim::Electrode*>(clipboard[0])->getHeight()/2.0));
-    }
-    else
+    } else {
       ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos())) - mapToScene(mouse_pos_old));
+    }
     return false;
   }
 }
