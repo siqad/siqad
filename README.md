@@ -38,7 +38,7 @@ git clone --recurse-submodules https://github.com/retallickj/qsi-sim.git
 You may be prompted for your Github credentials as this is a private repository. Next, install required dependencies:
 
 ```
-sudo apt install python3-pip make gcc g++ qtchooser qt5-default libqt5svg5* qttools5-dev qttools5-dev-tools libboost-dev
+sudo apt install python3-pip make gcc g++ qtchooser qt5-default libqt5svg5* qttools5-dev qttools5-dev-tools libboost-dev libboost-filesystem-dev libboost-system-dev
 sudo pip3 install matplotlib numpy pyqt5
 ```
 
