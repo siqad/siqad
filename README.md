@@ -60,7 +60,7 @@ Don't be alarmed by the `make install`, this won't install the simulator to your
 
 Finally, run `./build/debug/db-sim` (from the qsi-sim directory) to run the GUI. In order to run a hopping animation, create a DB layout, click on the play button on the top bar, choose the "Hopping Animator" engine and run. To run a line scan (which only supports one line for now, the top one), choose the "AFM Line Scan" engine. Test that the engine actually works by running a small layout first. If the Sim Visualize side bar appears on the right side without a pop-up window showing the line scan or the hopping animation, click "Show Terminal Output" and send Samuel the content for debugging. If you're running a large layout (a few QCA cells are already large), it might just take longer for the animation to show up.
 
-The simulation parameters form is very barebones right now consisting of only textboxes, improvements will be made shortly. Electrode and AFM paths have not been integrated into the GUI yet.
+The simulation parameters form is very barebones right now consisting of only textboxes, improvements will be made shortly. Electrode and AFM paths have not been fully integrated for simulation yet, they will also be added soon.
 
 
 ## Licensing
