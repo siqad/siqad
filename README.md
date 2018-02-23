@@ -42,23 +42,25 @@ sudo apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt
 sudo pip3 install matplotlib numpy pyqt5
 ```
 
-Next, compile the physics engines. The Marcus simulator is the exciting deal now so that will be the only one built in this tutorial. Navigate to `qsi-sim/src/phys/afmmarcus/src` (`qsi-sim` being the root folder of the cloned repository) and run:
+Next, compile the physics engines. The Marcus simulator is the exciting deal now so that will be the only one built in this tutorial. Build the AFM Marcus simulator:
 
 ```
+cd qsi-sim/src/phys/afmmarcus/src
 make
 ```
 
-Then navigate back to qsi-sim (`cd ../../../..`) and run (without sudo!):
+Then compile the GUI (without sudo):
 
 ```
+cd ../../../..
 qmake && make install
 ```
 
-Don't be alarmed by the `make install`, this won't install the simulator to your system as long as you don't run it as sudo. All it does is compile the binaries and copy the physics simulation files over to the compiled folders. I know, I know, this will be improved in the future.
+Don't be alarmed by the `make install`, this won't install the simulator to your system as long as you don't run it as sudo. All it does is compile the binaries and copy the physics simulation files over to the compiled folders.
 
-Finally, run `./build/debug/db-sim` (from the qsi-sim directory) to run the GUI. In order to run a hopping animation, create a DB layout, click on the play button on the top bar, choose the "Hopping Animator" engine and run. To run a line scan (which only supports one line for now, the top one), choose the "AFM Line Scan" engine. The simulation parameters form is very barebones right now consisting of only textboxes, improvements will be made shortly.
+Finally, run `./build/debug/db-sim` (from the qsi-sim directory) to run the GUI. In order to run a hopping animation, create a DB layout, click on the play button on the top bar, choose the "Hopping Animator" engine and run. To run a line scan (which only supports one line for now, the top one), choose the "AFM Line Scan" engine. Test that the engine actually works by running a small layout first. If the Sim Visualize side bar appears on the right side without a pop-up window showing the line scan or the hopping animation, click "Show Terminal Output" and send Samuel the content for debugging. If you're running a large layout (a few QCA cells are already large), it might just take longer for the animation to show up.
 
-Electrode and AFM paths have not been integrated into the GUI yet.
+The simulation parameters form is very barebones right now consisting of only textboxes, improvements will be made shortly. Electrode and AFM paths have not been integrated into the GUI yet.
 
 
 ## Licensing
