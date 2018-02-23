@@ -735,16 +735,27 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   clicked = true;
   switch(e->button()){
     case Qt::LeftButton:
-      if (tool_type == SelectTool || tool_type == DBGenTool || tool_type == ElectrodeTool) {
+      if (tool_type == SelectTool || tool_type == ElectrodeTool) {
         // rubber band variables
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
-        // save current selection if Shift is pressed
+
         if(keymods & Qt::ShiftModifier) {
+          // save current selection if Shift is pressed
           rb_shift_selected = scene->selectedItems();
         } else {
+          // pass the press event on to the view
           QGraphicsView::mousePressEvent(e);
         }
+
+      } else if (tool_type == DBGenTool) {
+        // start the rubber band at the snap_target if it exists
+        if (tool_type == DBGenTool && snap_target)
+          rb_start = snap_target->pos().toPoint();
+        else
+          rb_start = mapToScene(e->pos()).toPoint();
+        rb_cache = e->pos();
+
       } else {
         QGraphicsView::mousePressEvent(e);
       }
@@ -778,12 +789,6 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     if(snapGhost(scene_pos, offset)) //if there are db dots
       prim::Ghost::instance()->moveBy(offset.x(), offset.y());
 
-  /* TODO DB ghosting when DBGen tool is in use
-  } else if(tool_type == gui::DesignPanel::DBGenTool){
-     show "ghost" of new DB
-    QPointF scene_pos = mapToScene(e->pos());
-    snapDB(scene_pos);*/
-
   } else if (tool_type == AFMPathTool) {
     // update ghost node and ghost segment if there is a focused node, only update
     // ghost node if there's none.
@@ -797,12 +802,17 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
       afm_panel->showGhost(true);
     }
 
+  } else if (!clicked && tool_type == DBGenTool) {
+    // show preview location of new DB
+    QPointF scene_pos = mapToScene(e->pos());
+    snapDBPreview(scene_pos);
+
   } else if (clicked) {
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
       case Qt::LeftButton:
-        if (clicked && (tool_type == SelectTool || tool_type == DBGenTool
-              || tool_type == ElectrodeTool)) {
+        if (tool_type == SelectTool || tool_type == DBGenTool
+              || tool_type == ElectrodeTool) {
           rubberBandUpdate(e->pos());
         }
         // use default behaviour for left mouse button
@@ -1508,7 +1518,7 @@ void gui::DesignPanel::copySelection()
   }
 }
 
-void gui::DesignPanel::snapDB(QPointF scene_pos)
+void gui::DesignPanel::snapDBPreview(QPointF scene_pos)
 {
   // don't need to recheck snap target unless the cursor has moved significantly
   if(snap_target != 0 && (scene_pos-snap_cache).manhattanLength()<.1*snap_diameter)

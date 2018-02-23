@@ -277,7 +277,7 @@ namespace gui{
     void copySelection();
 
     // dbgen Location Indicator
-    void snapDB(QPointF scene_pos);
+    void snapDBPreview(QPointF scene_pos);
 
     // return the scene position of the nearest prim::Item with the specified item types.
     // returns a null pointer if no eligible item falls within the search range.
