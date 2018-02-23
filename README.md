@@ -27,6 +27,39 @@ There is currently no installer binary so the tool must be built from source. De
 
 If you are going to load the source as a project in Qt Creator, make a copy of the .pro file before first compile to prevent including unnecessary formatting in the official version. When committing your code, move only the necessary changes into the official .pro file with comments as needed.
 
+### Ubuntu compilation
+
+This tutorial is based off Ubuntu 17.10. First, clone the repository (including submodules) onto your local machine using the following command:
+
+```
+git clone --recurse-submodules https://github.com/retallickj/qsi-sim.git
+```
+
+You may be prompted for your Github credentials as this is a private repository. Next, install required dependencies:
+
+```
+sudo apt install python3-pip make gcc g++ qtchooser qt5-default libqt5svg5* qttools5-dev qttools5-dev-tools libboost-dev
+sudo pip3 install matplotlib numpy pyqt5
+```
+
+Next, compile the physics engine. At this point, only the Marcus simulator looks good enough for public use so that will be the only one mentioned here. Navigate to `[qsi-sim]/src/phys/afmmarcus/src` ([qsi-sim] being the root folder of the cloned repository) and run:
+
+```
+make
+```
+
+Then navigate back to [qsi-sim] and run (without sudo!):
+
+```
+qmake && make install
+```
+
+Don't be alarmed by the `make install`, this won't install the simulator to your system as long as you don't run it as sudo. All it does is compile the binaries and copy the physics simulation files over to the compiled folders. I know, I know, this will be improved in the future.
+
+Finally, run `[qsi-sim]/build/debug/db-sim` to run the GUI. In order to run a hopping animation, create a DB layout, click on the play button on the top bar, choose the "Hopping Animator" engine and run. To run a line scan (which only supports one line for now, the top one), choose the "AFM Line Scan" engine. The simulation parameters form is very barebones right now consisting of only textboxes, improvements will be made shortly.
+
+Electrode and AFM paths have not been integrated into the GUI yet.
+
 
 ## Licensing
 
