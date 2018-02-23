@@ -373,7 +373,7 @@ void gui::ApplicationGUI::initActions()
   connect(design_pan, &gui::DesignPanel::sig_toolChangeRequest,
             this, &gui::ApplicationGUI::setTool);
 
-  layer_editor->initLayerTable(); // TODO move to appropriate place
+  layer_editor->populateLayerTable(); // TODO move to appropriate place
 }
 
 
@@ -540,6 +540,7 @@ void gui::ApplicationGUI::parseInputField()
 void gui::ApplicationGUI::designPanelReset()
 {
   initState();
+  layer_editor->populateLayerTable();
 }
 
 

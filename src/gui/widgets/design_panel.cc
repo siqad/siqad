@@ -15,11 +15,27 @@
 gui::DesignPanel::DesignPanel(QWidget *parent)
   : QGraphicsView(parent)
 {
-  //rotate(-90);
-
   // set-up scale_factor in prim::Item
   prim::Item::init();
 
+  initDesignPanel();
+
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
+            this, &gui::DesignPanel::selectClicked);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_addItemToScene,
+            this, &gui::DesignPanel::addItemToSceneRequest);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_removeItemFromScene,
+            this, &gui::DesignPanel::removeItemFromScene);
+}
+
+// destructor
+gui::DesignPanel::~DesignPanel()
+{
+  clearDesignPanel(false);
+}
+
+// initialise design panel on first init or after reset
+void gui::DesignPanel::initDesignPanel() {
   undo_stack = new QUndoStack();
 
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
@@ -29,21 +45,12 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   setScene(scene);
   setMouseTracking(true);
 
-  connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
-            this, &gui::DesignPanel::selectClicked);
-
-  connect(prim::Emitter::instance(), &prim::Emitter::sig_addItemToScene,
-            this, &gui::DesignPanel::addItemToSceneRequest);
-
-  connect(prim::Emitter::instance(), &prim::Emitter::sig_removeItemFromScene,
-            this, &gui::DesignPanel::removeItemFromScene);
-
   // construct widgets
   afm_panel = new AFMPanel(getLayerIndex(afm_layer), this);
   scene->addItem(afm_panel->ghostNode());
   scene->addItem(afm_panel->ghostSegment());
-  connect(this, &gui::DesignPanel::sig_toolChanged, afm_panel, &gui::AFMPanel::toolChangeResponse);
-
+  connect(this, &gui::DesignPanel::sig_toolChanged,
+            afm_panel, &gui::AFMPanel::toolChangeResponse);
 
   // setup flags
   clicked = ghosting = moving = false;
@@ -58,6 +65,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   // set view behaviour
   setTransformationAnchor(QGraphicsView::NoAnchor);
   setResizeAnchor(QGraphicsView::AnchorViewCenter);
+  resetMatrix(); // resets QTransform, which undoes the zoom
 
   setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing |
             QPainter::HighQualityAntialiasing | QPainter::SmoothPixmapTransform);
@@ -90,12 +98,6 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   setDisplayMode(DesignMode);
 }
 
-// destructor
-gui::DesignPanel::~DesignPanel()
-{
-  clearDesignPanel(false);
-}
-
 // clear design panel
 void gui::DesignPanel::clearDesignPanel(bool reset)
 {
@@ -104,7 +106,8 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
 
   // delete all graphical items from the scene
   scene->clear();
-  if(!reset) delete scene;
+  //if(!reset) delete scene;
+  delete scene;
 
   // purge the clipboard
   for(prim::Item *item : clipboard)
@@ -127,37 +130,13 @@ void gui::DesignPanel::resetDesignPanel()
 
   clearDesignPanel(true);
 
+  initDesignPanel();
+
   // REBUILD
-  // reset flags
-  clicked = ghosting = moving = false;
-  tool_type = gui::ToolType::NoneTool;     // now setTool will update the tool
-
-  undo_stack = new QUndoStack();
-  // TODO reset undo stack counter
-
-  buildLattice();
-  top_layer = layers.at(1);
-  electrode_layer = layers.at(2);
-  prim::Ghost::instance()->setScene(scene);
-
-  resetMatrix(); // resets QTransform, which undoes the zoom
-
-  // set scroll to top left
-  verticalScrollBar()->setValue(verticalScrollBar()->minimum());
-  horizontalScrollBar()->setValue(horizontalScrollBar()->minimum());
-
-  // set display mode
-  setDisplayMode(DesignMode);
 
   //let application know that design panel has been reset.
   emit sig_resetDesignPanel();
   qDebug() << tr("Design Panel reset complete");
-
-  // reconstruct widgets
-  afm_panel = new AFMPanel(getLayerIndex(afm_layer), this);
-  scene->addItem(afm_panel->ghostNode());
-  scene->addItem(afm_panel->ghostSegment());
-  connect(this, &gui::DesignPanel::sig_toolChanged, afm_panel, &gui::AFMPanel::toolChangeResponse);
 }
 
 

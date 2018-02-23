@@ -47,8 +47,9 @@ namespace gui{
     ~DesignPanel();
 
     // clear and reset
-    void clearDesignPanel(bool reset=false);
-    void resetDesignPanel();
+    void initDesignPanel();              // used on first init or after reset
+    void clearDesignPanel(bool reset=false);  // used on exit or before reset
+    void resetDesignPanel();             // call for reset
 
     // ACCESSORS
 
