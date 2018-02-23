@@ -42,13 +42,13 @@ sudo apt install python3-pip make gcc g++ qtchooser qt5-default libqt5svg5* qtto
 sudo pip3 install matplotlib numpy pyqt5
 ```
 
-Next, compile the physics engine. At this point, only the Marcus simulator looks good enough for public use so that will be the only one mentioned here. Navigate to `[qsi-sim]/src/phys/afmmarcus/src` ([qsi-sim] being the root folder of the cloned repository) and run:
+Next, compile the physics engine. At this point, only the Marcus simulator looks good enough for public use so that will be the only one mentioned here. Navigate to `qsi-sim/src/phys/afmmarcus/src` (`qsi-sim` being the root folder of the cloned repository) and run:
 
 ```
 make
 ```
 
-Then navigate back to [qsi-sim] and run (without sudo!):
+Then navigate back to qsi-sim (`cd ../../../..`) and run (without sudo!):
 
 ```
 qmake && make install
@@ -56,7 +56,7 @@ qmake && make install
 
 Don't be alarmed by the `make install`, this won't install the simulator to your system as long as you don't run it as sudo. All it does is compile the binaries and copy the physics simulation files over to the compiled folders. I know, I know, this will be improved in the future.
 
-Finally, run `[qsi-sim]/build/debug/db-sim` to run the GUI. In order to run a hopping animation, create a DB layout, click on the play button on the top bar, choose the "Hopping Animator" engine and run. To run a line scan (which only supports one line for now, the top one), choose the "AFM Line Scan" engine. The simulation parameters form is very barebones right now consisting of only textboxes, improvements will be made shortly.
+Finally, run `./build/debug/db-sim` (from the qsi-sim directory) to run the GUI. In order to run a hopping animation, create a DB layout, click on the play button on the top bar, choose the "Hopping Animator" engine and run. To run a line scan (which only supports one line for now, the top one), choose the "AFM Line Scan" engine. The simulation parameters form is very barebones right now consisting of only textboxes, improvements will be made shortly.
 
 Electrode and AFM paths have not been integrated into the GUI yet.
 
