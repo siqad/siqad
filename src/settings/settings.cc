@@ -93,9 +93,9 @@ QSettings *settings::AppSettings::m_defs()
   // overwrites existing default values with same keys... no check
   S->setValue("view/hidpi_support", false);
 
-  S->setValue("log/override", false);
+  S->setValue("log/override", true);
   S->setValue("log/tofile", true);
-  S->setValue("log/logfile", QString("src/log/log.txt"));
+  S->setValue("log/logfile", QString("<SYSTMP>/db-sim/log/log.txt"));
 
   S->setValue("snap/diameter", 5.); //relative to scale_fact
 
