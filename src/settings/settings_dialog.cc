@@ -7,8 +7,6 @@
 // @desc:     Settings dialog for users to alter settings
 
 #include "settings_dialog.h"
-#include "settings.h"
-
 
 namespace settings{
 
@@ -24,19 +22,30 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 }
 
 
+// public slots
+void SettingsDialog::boolUpdate(bool new_state)
+{
+  QObject *sender = const_cast<QObject*>(QObject::sender());
+
+  app_settings->setValue(sender->objectName(), QVariant(new_state));
+  qDebug() << "Changed setting!";
+}
+
+
+// private
 void SettingsDialog::initSettingsDialog()
 {
   // all settings panes in a stacked widget, only one is shown at a time
   QStackedWidget *stacked_settings_panes = new QStackedWidget(this);
   stacked_settings_panes->addWidget(appSettingsPane());
-  stacked_settings_panes->addWidget(guiSettingsPane());
-  stacked_settings_panes->addWidget(latticeSettingsPane());
+  //stacked_settings_panes->addWidget(guiSettingsPane());
+  //stacked_settings_panes->addWidget(latticeSettingsPane());
 
   // list of all categories
   QListWidget *settings_category_list = new QListWidget(this);
   settings_category_list->addItem("Application");
-  settings_category_list->addItem("Interface");
-  settings_category_list->addItem("Lattice");
+  //settings_category_list->addItem("Interface");
+  //settings_category_list->addItem("Lattice");
 
   connect(settings_category_list, SIGNAL(currentRowChanged(int)),
           stacked_settings_panes, SLOT(setCurrentIndex(int)));
@@ -60,7 +69,25 @@ QWidget *SettingsDialog::appSettingsPane()
   if (app_settings_pane)
     return app_settings_pane;
 
-  // TODO implement
+  QLabel *label_hidpi = new QLabel(QObject::tr("HiDPI Mode"));
+
+  QCheckBox *cb_hidpi = new QCheckBox(QObject::tr("Enabled"));
+  cb_hidpi->setObjectName("view/hidpi_support");
+  cb_hidpi->setChecked(app_settings->get<bool>(cb_hidpi->objectName()));
+
+  connect(cb_hidpi, SIGNAL(toggled(bool)),
+          this, SLOT(boolUpdate(bool)));
+
+  QHBoxLayout *hidpi_hl = new QHBoxLayout;
+  hidpi_hl->addWidget(label_hidpi);
+  hidpi_hl->addWidget(cb_hidpi);
+
+  QVBoxLayout *app_settings_pane_vl = new QVBoxLayout;
+  app_settings_pane_vl->addLayout(hidpi_hl);
+
+  app_settings_pane = new QWidget(this);
+  app_settings_pane->setLayout(app_settings_pane_vl);
+  return app_settings_pane;
 }
 
 QWidget *SettingsDialog::guiSettingsPane()

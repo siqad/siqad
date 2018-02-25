@@ -42,8 +42,13 @@ SOURCES += src/main.cc
 
 # settings
 
-HEADERS += src/settings/settings.h
-SOURCES += src/settings/settings.cc
+HEADERS += \
+	src/settings/settings.h \
+	src/settings/settings_dialog.h
+
+SOURCES += \
+	src/settings/settings.cc \
+	src/settings/settings_dialog.cc
 
 # primitives for widgets
 

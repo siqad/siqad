@@ -10,13 +10,23 @@
 #ifndef _SETTINGS_DIALOG_H_
 #define _SETTINGS_DIALOG_H_
 
+#include <QtWidgets>
+#include <QtCore>
+
+#include "settings.h"
+
 namespace settings{
 
-  class SettingsDialog: public QtWidgets
+  class SettingsDialog: public QWidget
   {
+    Q_OBJECT
+
   public:
-    SettingsDialog(QWidget *parent);
+    SettingsDialog(QWidget *parent=0);
     ~SettingsDialog() {};
+
+  public slots:
+    void boolUpdate(bool new_state);
 
   private:
     // initialise the dialog and panes

@@ -15,6 +15,9 @@
 // Global
 #include "../global.h"
 
+// Settings Dialog
+#include "../settings/settings_dialog.h"
+
 // Widget includes
 #include "widgets/design_panel.h"
 #include "widgets/dialog_panel.h"
@@ -85,6 +88,9 @@ namespace gui{
     void screenshot();  // take an svg capture of the GUI
     void designScreenshot();         // take an svg capture ofthe design window
 
+    // show pop-up dialogs
+    void showSettingsDialog() {settings_dialog->show();}
+
     // FILE HANDLING
     bool resolveUnsavedChanges();       // returns whether to proceed or not
     void newFile();                     // create a new file
@@ -145,6 +151,7 @@ namespace gui{
     gui::LayerEditor  *layer_editor;// pop-up layer editor
     gui::SimManager   *sim_manager; // pop-up simulator manager
     gui::SimVisualize *sim_visualize; // simulation visualizer that goes in sim visualize dock
+    settings::SettingsDialog *settings_dialog;  // dialog for changing settings
 
     // dockable widgets
     QDockWidget *dialog_dock; // bottom panel for terminal dialog
