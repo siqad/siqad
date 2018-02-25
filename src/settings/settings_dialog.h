@@ -11,7 +11,6 @@
 #define _SETTINGS_DIALOG_H_
 
 #include <QtWidgets>
-#include <QtCore>
 
 #include "settings.h"
 

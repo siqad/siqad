@@ -55,7 +55,7 @@ void SettingsDialog::initSettingsDialog()
   settings_hl->addWidget(settings_category_list);
   settings_hl->addWidget(stacked_settings_panes);
 
-  // TODO bottom buttons for Apply, OK, Cancel
+  // TODO bottom buttons for Apply, Confirm, Cancel
 
   // wrap everything together in a neat layout
   QVBoxLayout *main_layout = new QVBoxLayout;
@@ -69,21 +69,33 @@ QWidget *SettingsDialog::appSettingsPane()
   if (app_settings_pane)
     return app_settings_pane;
 
-  QLabel *label_hidpi = new QLabel(QObject::tr("HiDPI Mode"));
+  QLabel *label_hidpi = new QLabel(QObject::tr("HiDPI Mode*"));
+  QLabel *label_show_debug_output = new QLabel(QObject::tr("Show debug messages*"));
+  QLabel *label_req_restart = new QLabel(QObject::tr("Settings with the * indicator only take effect after restart."));
 
   QCheckBox *cb_hidpi = new QCheckBox(QObject::tr("Enabled"));
+  QCheckBox *cb_show_debug_output = new QCheckBox(QObject::tr("Enabled"));
+
   cb_hidpi->setObjectName("view/hidpi_support");
   cb_hidpi->setChecked(app_settings->get<bool>(cb_hidpi->objectName()));
+  cb_show_debug_output->setObjectName("log/override");
+  cb_show_debug_output->setChecked(app_settings->get<bool>(cb_show_debug_output->objectName()));
 
-  connect(cb_hidpi, SIGNAL(toggled(bool)),
-          this, SLOT(boolUpdate(bool)));
+  connect(cb_hidpi, SIGNAL(toggled(bool)), this, SLOT(boolUpdate(bool)));
+  connect(cb_show_debug_output, SIGNAL(toggled(bool)), this, SLOT(boolUpdate(bool)));
 
   QHBoxLayout *hidpi_hl = new QHBoxLayout;
   hidpi_hl->addWidget(label_hidpi);
   hidpi_hl->addWidget(cb_hidpi);
 
+  QHBoxLayout *show_debug_output_hl = new QHBoxLayout;
+  show_debug_output_hl->addWidget(label_show_debug_output);
+  show_debug_output_hl->addWidget(cb_show_debug_output);
+
   QVBoxLayout *app_settings_pane_vl = new QVBoxLayout;
   app_settings_pane_vl->addLayout(hidpi_hl);
+  app_settings_pane_vl->addLayout(show_debug_output_hl);
+  app_settings_pane_vl->addWidget(label_req_restart);
 
   app_settings_pane = new QWidget(this);
   app_settings_pane->setLayout(app_settings_pane_vl);

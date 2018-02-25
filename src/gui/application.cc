@@ -319,7 +319,7 @@ void gui::ApplicationGUI::initDialogDock()
   dialog_dock->setMinimumHeight(gui_settings->get<int>("DDOCK/mh")); // size TODO add to settings
 
   dialog_dock->setWidget(dialog_dock_main);
-  dialog_dock->show();
+  dialog_dock->setVisible(settings::AppSettings::instance()->get<bool>("log/override"));
   addDockWidget(area, dialog_dock);
 }
 
