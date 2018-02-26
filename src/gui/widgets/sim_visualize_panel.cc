@@ -88,17 +88,8 @@ void SimVisualize::showJobTerminalOutput()
   w_job_term->show();
 }
 
-bool SimVisualize::showPotPlot()
-{
 
-  qDebug() << tr("showPotPlot");
-  if(!show_job)
-    return false;
-  // emit showPotPlotOnScene(show_job);
-  return true;
-}
-
-void SimVisualize::openPoisResult()
+void SimVisualize::showPotPlot()
 {
   // QWidget *window = new QWidget;
   // window->resize(750, 750);
@@ -122,7 +113,7 @@ void SimVisualize::openPoisResult()
     x_vec.append((*iter)[0]);
     y_vec.append((*iter)[1]);
     val_vec.append((*iter)[2]);
-    qDebug() << tr("x: %1, y: %2, val: %3").arg((*iter)[0]).arg((*iter)[1]).arg((*iter)[2]);
+    // qDebug() << tr("x: %1, y: %2, val: %3").arg((*iter)[0]).arg((*iter)[1]).arg((*iter)[2]);
   }
 
 
@@ -179,7 +170,7 @@ void SimVisualize::openPoisResult()
   customPlot->rescaleAxes();
   QPixmap potential_plot = customPlot->toPixmap();
   QRectF graph_container(QPointF(x_vec.first(),y_vec.first()), QPointF(x_vec.last(),y_vec.last()));
-  emit createPotentialPixmap(potential_plot, graph_container);
+  emit showPotPlotOnScene(potential_plot, graph_container);
   // layout->addWidget(customPlot); //customPlot doubles as a widget
   // window->setLayout(layout);
   // window->show();
@@ -261,9 +252,16 @@ void SimVisualize::updateOptions()
       // name - button for rename
 
     // TODO result type selector (not needed for now)
+    if(show_job->engineName() == "SimAnneal"){
+      // elec dist selection
+      updateElecDistOptions();
+    }
+    else if(show_job->engineName() == "PoisSolver"){
+      showPotPlot();
+    }
 
-    // elec dist selection
-    updateElecDistOptions();
+
+    qDebug() << tr("Engine Name: %1").arg(show_job->engineName());
 
     // group box result filter
       // energies
@@ -293,7 +291,6 @@ void SimVisualize::initSimVisualize()
   text_job_end_time = new QLabel;
 
   button_show_term_out = new QPushButton("Show Terminal Output");
-  button_open_window = new QPushButton("Open Window");
 
   text_job_engine->setAlignment(Qt::AlignRight);
   text_job_start_time->setAlignment(Qt::AlignRight);
@@ -323,7 +320,6 @@ void SimVisualize::initSimVisualize()
   job_info_layout->addLayout(job_start_time_hl);
   job_info_layout->addLayout(job_end_time_hl);
   job_info_layout->addWidget(button_show_term_out);
-  job_info_layout->addWidget(button_open_window);
   job_info_group->setLayout(job_info_layout);
 
   // Elec Distribution Group
@@ -356,7 +352,6 @@ void SimVisualize::initSimVisualize()
 
   // signal connection
   connect(button_show_term_out, &QAbstractButton::clicked, this, &gui::SimVisualize::showJobTerminalOutput);
-  connect(button_open_window, &QAbstractButton::clicked, this, &gui::SimVisualize::openPoisResult);
   connect(combo_job_sel, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &gui::SimVisualize::jobSelUpdate);
   connect(slider_dist_sel, static_cast<void(QSlider::*)(int)>(&QSlider::valueChanged), this, &gui::SimVisualize::distSelUpdate);
   connect(button_dist_prev, &QAbstractButton::clicked, this, &gui::SimVisualize::distPrev);
