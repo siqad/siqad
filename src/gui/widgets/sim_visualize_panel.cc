@@ -8,8 +8,8 @@
 
 #include "sim_visualize_panel.h"
 #include "../../qcustomplot.h"
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
+// #include <boost/property_tree/ptree.hpp>
+// #include <boost/property_tree/xml_parser.hpp>
 #include <QPixmap>
 
 
@@ -88,6 +88,16 @@ void SimVisualize::showJobTerminalOutput()
   w_job_term->show();
 }
 
+bool SimVisualize::showPotPlot()
+{
+
+  qDebug() << tr("showPotPlot");
+  if(!show_job)
+    return false;
+  // emit showPotPlotOnScene(show_job);
+  return true;
+}
+
 void SimVisualize::openPoisResult()
 {
   // QWidget *window = new QWidget;
@@ -102,30 +112,21 @@ void SimVisualize::openPoisResult()
   int ny = 50;
   colorMap->data()->setSize(nx, ny);
   // coordinate range for x and y
-  QString path = "/tmp/db-sim/phys/" + combo_job_sel->currentText();
-  path += "/sim_result.xml";
-
-  qDebug() << tr("%1").arg(path);
-
-  boost::property_tree::ptree tree; // Create empty property tree object
-  boost::property_tree::read_xml(path.toStdString(), tree); // Parse the XML into the property tree.
 
   QVector<qreal> x_vec;
   QVector<qreal> y_vec;
   QVector<qreal> val_vec;
-  double x, y, val;
-  for (boost::property_tree::ptree::value_type const &node_potential_map : tree.get_child("sim_out.potential_map")) {
-  // BOOST_FOREACH(boost::property_tree::ptree::value_type &node_potential_map, tree.get_child("sim_out.potential_map")) {
-    boost::property_tree::ptree subtree = node_potential_map.second; //get subtree with layer items at the top
-    if( node_potential_map.first == "potential_val"){ //go into potential_val.
-      x = node_potential_map.second.get<double>("<xmlattr>.x");
-      y = node_potential_map.second.get<double>("<xmlattr>.y");
-      val = node_potential_map.second.get<double>("<xmlattr>.val");
-      x_vec.append(x);
-      y_vec.append(y);
-      val_vec.append(val);
-    }
+
+  QList<QVector<float>>::iterator iter;
+  for(iter=show_job->potentials.begin(); iter!=show_job->potentials.end(); ++iter){
+    x_vec.append((*iter)[0]);
+    y_vec.append((*iter)[1]);
+    val_vec.append((*iter)[2]);
+    qDebug() << tr("x: %1, y: %2, val: %3").arg((*iter)[0]).arg((*iter)[1]).arg((*iter)[2]);
   }
+
+
+
   // qDebug() << tr("Setting colurMap");
   // set range for x and y in pixels.
   colorMap->data()->setRange(QCPRange(x_vec.first(), x_vec.last()), QCPRange(y_vec.first(), y_vec.last()));
@@ -379,6 +380,7 @@ void SimVisualize::jobSelUpdate()
 
 void SimVisualize::distSelUpdate()
 {
+  qDebug() << tr("distSelUpdate()");
   text_dist_selected->setText(tr("%1/%2").arg(slider_dist_sel->value()).arg(show_job->elec_dists.size()));
   showElecDist(slider_dist_sel->sliderPosition());
 }

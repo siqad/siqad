@@ -687,16 +687,6 @@ void gui::DesignPanel::displayPotentialPlot(QPixmap potential_plot, QRectF graph
   qDebug() << tr("graph_container width: ") << graph_container.width();
   qDebug() << tr("graph_container topLeft: ") << graph_container.topLeft().x() << tr(", ") << graph_container.topLeft().y();
   createPotPlot(potential_plot, graph_container);
-  // QPainter painter(this);
-  // painter.drawRect(graph_container);
-  // QWidget *window = new QWidget;
-  // window->resize(750, 750);
-  // QHBoxLayout *layout = new QHBoxLayout;
-  // QLabel *label = new QLabel;
-  // label->setPixmap(potential_plot);
-  // layout->addWidget(label); //customPlot doubles as a widget
-  // window->setLayout(layout);
-  // window->show();
 }
 
 // SLOTS

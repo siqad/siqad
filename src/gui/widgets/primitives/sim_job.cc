@@ -202,6 +202,32 @@ bool SimJob::readResults()
         }
         rs.readNext();
       }
+      else if(rs.name() == "potential_map"){
+        QVector<float> potentials_vec;
+        while(!(rs.isEndElement() && rs.name() == "potential_map")){
+          if(!rs.readNextStartElement())
+            continue; // skip until a start element is encountered
+          if(rs.name() == "potential_val"){
+            float x=0,y=0,pot_val;
+            for(QXmlStreamAttribute &attr : rs.attributes()){
+              if(attr.name().toString() == QLatin1String("x"))
+                x = attr.value().toFloat();
+              else if(attr.name().toString() == QLatin1String("y"))
+                y = attr.value().toFloat();
+              else if(attr.name().toString() == QLatin1String("val"))
+                pot_val = attr.value().toFloat();
+            }
+            //build the vector to insert into the QList
+            potentials_vec.clear();
+            potentials_vec.append(x);
+            potentials_vec.append(y);
+            potentials_vec.append(pot_val);
+            potentials.append(potentials_vec);
+            //qDebug() << tr("SimJob: Physloc identified at x=%1, y=%2").arg(x).arg(y);
+          }
+        }
+        rs.readNext();
+      }
       // TODO make a QStringList of ignored stuff
       else{
         if(!ignored_xml_elements.contains(rs.name().toString()))

@@ -13,6 +13,7 @@
 #include <QtCore>
 #include "sim_engine.h"
 #include "src/settings/settings.h" // TODO probably need this later
+#include <tuple> //std::tuple for 3+ article data structure, std::get for accessing the tuples
 
 namespace prim{
 
@@ -95,6 +96,7 @@ namespace prim{
     void saveTerminalOutput();
 
     // variables TODO put them back to private later, with proper accessors
+    QList<QVector<float>> potentials; // potentials[result_ind][0] is x, ...[1] is y, ...[2] is potential value
     QList<QPair<float,float>> physlocs;   // physlocs[dot_ind].first or .second
     QList<QList<int>> elec_dists;         // elec_dists[result_ind][dot_ind] TODO change this to QList of QVectors
     QList<LineScanPath> line_scan_paths;  // line scan path props and results

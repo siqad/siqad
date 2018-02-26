@@ -90,6 +90,7 @@ void gui::ApplicationGUI::initGUI()
   connect(sim_manager, &gui::SimManager::emitSimJob, this, &gui::ApplicationGUI::runSimulation);
   connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene, design_pan, &gui::DesignPanel::displaySimResults);
   connect(design_pan, &gui::DesignPanel::sig_resetDesignPanel, this, &gui::ApplicationGUI::designPanelReset);
+  // connect(sim_visualize, &gui::SimVisualize::showPotPlotOnScene, design_pan, &gui::DesignPanel::displaySimResults);
   connect(sim_visualize, &gui::SimVisualize::createPotentialPixmap, design_pan, &gui::DesignPanel::displayPotentialPlot);
 
   // layout management

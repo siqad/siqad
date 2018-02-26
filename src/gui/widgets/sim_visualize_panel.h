@@ -40,6 +40,7 @@ namespace gui{
 
     void updateJobSelCombo();
     bool showElecDist(int dist_ind);
+    bool showPotPlot();
     void updateElecDistOptions();
     void updateOptions();
 
@@ -47,6 +48,7 @@ namespace gui{
 
   signals:
     void showElecDistOnScene(prim::SimJob *job, int dist_ind);
+    void showPotPlotOnScene(prim::SimJob *job);
     void createPotentialPixmap(QPixmap potential_plot, QRectF graph_container);
 
   private:
