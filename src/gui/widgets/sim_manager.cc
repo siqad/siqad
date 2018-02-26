@@ -272,26 +272,33 @@ void SimManager::initEngines()
   QString engine_lib_dir_path = settings::AppSettings::instance()->getPath("phys/eng_lib_dir");
 
   QDir engine_lib_dir(engine_lib_dir_path);
-  QStringList engine_dir_paths = engine_lib_dir.entryList(QStringList({"*"}), 
+  QStringList engine_dir_paths = engine_lib_dir.entryList(QStringList({"*"}),
       QDir::AllDirs | QDir::NoDotAndDotDot);
 
   // find all existing engines in the engine library
   // TODO edit this part to store file names rather than QDirs
   QList<QDir> engine_dirs;
+  QStringList engine_declaration_files;
+  QStringList engine_filter(QStringList() << "*.physeng" << "engine_description.xml");
   for (QString engine_dir_path : engine_dir_paths) {
     qDebug() << tr("SimManager: Checking %1 for engine description file").arg(engine_dir_path);
     QDir eng_dir(engine_lib_dir.filePath(engine_dir_path));
-    if (eng_dir.exists("engine_description.xml"))
-      engine_dirs.append(eng_dir);
+    QStringList matched_eng_files = eng_dir.entryList(engine_filter, QDir::Files);
+
+    qDebug() << tr("Found %1 engine files").arg(matched_eng_files.length());
+
+    // add engine declaration files to a list
+    for (QString matched_eng_file : matched_eng_files) {
+      engine_declaration_files << eng_dir.absoluteFilePath(matched_eng_file);
+      qDebug() << tr("Found engine file: %1").arg(engine_declaration_files.back());
+    }
   }
 
-  // go through all directories that contain engine_description.xml
-  for (QDir engine_dir : engine_dirs) {
+  // import engines found above
+  for (QString eng_dec_file : engine_declaration_files) {
     // read each engine description file and add to list
-    QString eng_desc_path = engine_dir.absoluteFilePath("engine_description.xml");
-    sim_engines.append(new prim::SimEngine(eng_desc_path));
+    sim_engines.append(new prim::SimEngine(eng_dec_file));
   }
-
 
   qDebug() << tr("Successfully read physics engine library");
 }

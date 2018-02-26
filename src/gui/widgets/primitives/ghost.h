@@ -103,8 +103,9 @@ namespace prim{
     void setScene(QGraphicsScene *sc){sc->addItem(this);}
 
     // create a ghost image from a list of Item objects or a single Item
-    void prepare(const QList<prim::Item*> &items);
-    void prepare(Item *item);
+    // if moving, scene_pos gives the current mouse location
+    void prepare(const QList<prim::Item*> &items, QPointF scene_pos=QPointF());
+    void prepare(Item *item, QPointF scene_pos=QPointF());
 
     // move center of Ghost to the given position
     void moveTo(QPointF pos);
@@ -186,7 +187,8 @@ namespace prim{
     void updateValid();
 
     // compute the offset such that the Ghost remains under the cursor
-    void zeroGhost();
+    // unless a scene_pos is given, then that becomes the zero offset
+    void zeroGhost(QPointF scene_pos=QPointF());
 
     // set the snap anchor to the Dangling Bond GhostDot nearest the center of
     // the Ghost. If there is no Dangling Bond GhostDot, returns 0

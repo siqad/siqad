@@ -36,7 +36,7 @@ AFMPath::AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene)
   QList<prim::AFMNode*> ld_nodes;
 
   // TODO read own attributes, e.g. zoffset
-  
+
   while (!rs->atEnd()) {
     if (rs->isStartElement()) {
       if (rs->name() == "layer_id") {
@@ -93,7 +93,7 @@ void AFMPath::saveItems(QXmlStreamWriter *ws) const
 {
   ws->writeStartElement("afmpath");
   // TODO save path properties like speed, loop as attributes
-  ws->writeTextElement("layer_id", QString::number(layer_id));
+  //ws->writeTextElement("layer_id", QString::number(layer_id));
 
   // save included afmnodes
   for (prim::AFMNode *node : path_nodes) {
@@ -254,6 +254,7 @@ QList<QPointF> AFMPath::unfoldedPath()
 
 void AFMPath::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+  /* draw line
   if (select_mode && upSelected()) {
     line_col = line_col_sel;
   } else if (isHovered()) {
@@ -276,11 +277,7 @@ void AFMPath::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget
   }
 
   painter->drawPolyline(points, nodeCount());
-  delete points;
-
-  /*for (prim::AFMSeg *seg : path_segs) {
-    painter->drawLine(QLineF(seg->originNode()->scenePos(), seg->destinationNode()->scenePos()));
-  }*/
+  delete points;*/
 }
 
 Item *AFMPath::deepCopy() const

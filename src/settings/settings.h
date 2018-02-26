@@ -42,37 +42,35 @@ public:
   // found, it checks for default values. If a default value is found, the
   // value is stored in the current settings file; otherwise, the app terminates
   template<typename T>
-  T get(const QString &key)
-  {
+  T get(const QString &key) {
     QVariant var = DEFAULT_OVERRIDE ? defaults->value(key) : this->value(key);
     T val;
     // if key not found, get value from defaults
-    if(!var.isValid() && defaults != 0){
+    if (!var.isValid() && defaults != 0) {
       var = defaults->value(key);
 
       // if key not in defaults, prompt and abort
-      if(!var.isValid()){   // terminate
+      if (!var.isValid()) {   // terminate
         qDebug() << tr("Searching for key: %1").arg(key);
         qFatal(tr("Requested key missing in defaults... terminating").toLatin1().constData(),0);
-      }
-      else
+      } else {
         val = var.value<T>();
+      }
 
       // save default value to current local settings
       this->setValue(key, val);
-    }
-    else if(defaults==0)    // terminate if no defaults
+    } else if (defaults==0) {   // terminate if no defaults
       qFatal(tr("No default settings available... terminating").toLatin1().constData(),0);
-    else if(var.isValid())
+    } else if (var.isValid()) {
       val = var.value<T>();
-    else
+    } else {
       qFatal(tr("Unexpected key in Settings::get").toLatin1().constData(),0);
+    }
 
     return val;
   }
 
-  QString getPath(const QString &key)
-  {
+  QString getPath(const QString &key) {
     QString path_stored = get<QString>(key);
 
     // TODO put map in the constructor
@@ -84,9 +82,11 @@ public:
 
     // perform replacement
     QRegExp regex("<(.*)?>");
-    while(path_stored.indexOf(regex) != -1){
-      if(!path_map.contains(regex.capturedTexts().first()))
-        qFatal(tr("Path replacement failed, key '%1' not found.").arg(regex.capturedTexts().first()).toLatin1().constData(),0);
+    while (path_stored.indexOf(regex) != -1) {
+      if(!path_map.contains(regex.capturedTexts().first())) {
+        qFatal(tr("Path replacement failed, key '%1' not found.")
+            .arg(regex.capturedTexts().first()).toLatin1().constData(),0);
+      }
       path_stored.replace(regex, path_map[regex.capturedTexts().first()]);
     }
     return path_stored;

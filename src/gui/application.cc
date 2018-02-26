@@ -155,9 +155,14 @@ void gui::ApplicationGUI::initMenuBar()
   action_sim_visualize->setIcon(QIcon(":/ico/simvisual.svg"));
   action_layer_sel->setIcon(QIcon(":/ico/layer.svg"));
   action_dialog_dock_visibility->setIcon(QIcon(":/ico/term.svg"));
+  QAction *rotate_view_cw = new QAction(tr("Rotate 90 deg CW"), this);
+  QAction *rotate_view_ccw = new QAction(tr("Rotate 90 deg CCW"), this);
   view->addAction(action_sim_visualize);
   view->addAction(action_layer_sel);
   view->addAction(action_dialog_dock_visibility);
+  view->addSeparator();
+  view->addAction(rotate_view_cw);
+  view->addAction(rotate_view_ccw);
 
   // tools menu actions
   QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
@@ -181,6 +186,8 @@ void gui::ApplicationGUI::initMenuBar()
   connect(save_as, &QAction::triggered, this, &gui::ApplicationGUI::saveNew);
   connect(open_save, &QAction::triggered, this, &gui::ApplicationGUI::openFromFile);
   connect(export_lvm, &QAction::triggered, this, &gui::ApplicationGUI::exportToLabview);
+  connect(rotate_view_cw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCw);
+  connect(rotate_view_ccw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCcw);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
@@ -367,7 +374,7 @@ void gui::ApplicationGUI::initActions()
   connect(design_pan, &gui::DesignPanel::sig_toolChangeRequest,
             this, &gui::ApplicationGUI::setTool);
 
-  layer_editor->initLayerTable(); // TODO move to appropriate place
+  layer_editor->populateLayerTable(); // TODO move to appropriate place
 }
 
 
@@ -534,6 +541,7 @@ void gui::ApplicationGUI::parseInputField()
 void gui::ApplicationGUI::designPanelReset()
 {
   initState();
+  layer_editor->populateLayerTable();
 }
 
 

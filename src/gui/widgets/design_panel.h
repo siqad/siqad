@@ -47,8 +47,9 @@ namespace gui{
     ~DesignPanel();
 
     // clear and reset
-    void clearDesignPanel(bool reset=false);
-    void resetDesignPanel();
+    void initDesignPanel();              // used on first init or after reset
+    void clearDesignPanel(bool reset=false);  // used on exit or before reset
+    void resetDesignPanel();             // call for reset
 
     // ACCESSORS
 
@@ -65,9 +66,12 @@ namespace gui{
     // a temporary graphics item for purely indicative purposes.
     void addItemToScene(prim::Item *item);
 
-    // remove item from scene without deleting the item pointer. The caller has to handle
-    // the cleanup if so desired.
+    // remove item from scene without deleting the item pointer. The caller has
+    // to handle the cleanup if so desired.
     void removeItemFromScene(prim::Item *item);
+
+    // return a list of selected prim::Items
+    QList<prim::Item*> selectedItems();
 
     // add a new layer with the given name. If no name is given, a default scheme
     // is used. Checks if the layer already exists.
@@ -143,6 +147,9 @@ namespace gui{
     void addItemToSceneRequest(prim::Item *item) {addItemToScene(item);}
     void removeItemFromSceneRequest(prim::Item *item) {removeItemFromScene(item);}
 
+    void rotateCw();
+    void rotateCcw();
+
   signals:
     void sig_toolChangeRequest(gui::ToolType tool);  // request ApplicationGUI to change tool
     void sig_toolChanged(gui::ToolType tool);  // request ApplicationGUI to change tool
@@ -210,8 +217,8 @@ namespace gui{
     prim::AFMSeg *ghost_afm_seg=0;
 
     // mouse functionality
-    QPoint mouse_pos_old;     // old mouse position in pixels
-    QPoint mouse_pos_cached;  // parameter for caching relevant mouse positions, in pixels
+    QPoint mouse_pos_old;     // old mouse position in pixels on click
+    QPoint mouse_pos_cached;  // parameter for caching relevant mouse positions on click, in pixels
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
 
     // sim visualization
@@ -227,6 +234,11 @@ namespace gui{
 
     // assert bounds on zooming
     void boundZoom(qreal &ds);
+
+    // scroll the viewport to the correct location with the provided delta in scene
+    // coordinates, taking the transformation (zoom and rotate) into account. Used
+    // when rotating the view or anchoring during zoom.
+    void scrollDelta(QPointF delta);
 
     // filter selected items
     void filterSelection(bool select_flag);
@@ -247,6 +259,7 @@ namespace gui{
 
 
     // GHOSTclass UndoCommand;e a Ghost for the current selection or clipboard
+    // create a ghost. scene_pos is only needed if not pasting
     void createGhost(bool paste);
 
     // clear the current Ghost
@@ -266,12 +279,12 @@ namespace gui{
     void copySelection();
 
     // dbgen Location Indicator
-    void snapDB(QPointF scene_pos);
+    void snapDBPreview(QPointF scene_pos);
 
     // return the scene position of the nearest prim::Item with the specified item types.
     // returns a null pointer if no eligible item falls within the search range.
-    prim::Item *filteredSnapTarget(QPointF scene_pos, QList<prim::Item::ItemType> &target_types,
-        qreal search_box_width);
+    prim::Item *filteredSnapTarget(QPointF scene_pos, QList<prim::Item::ItemType>
+        &target_types, qreal search_box_width);
 
 
 

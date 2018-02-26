@@ -14,7 +14,6 @@ namespace gui {
 LayerEditor::LayerEditor(gui::DesignPanel *design_pan, QWidget *parent)
   : QWidget(parent, Qt::Dialog), dp(design_pan)
 {
-  layers = dp->getLayers();
   initLayerEditor();
 }
 
@@ -38,6 +37,7 @@ void LayerEditor::initLayerEditor()
 
   // grid layout that show all layers
   layer_table = new QTableWidget(this);
+  initLayerTableHeaders();
 
   // Main layout
   QVBoxLayout *main_vl = new QVBoxLayout;
@@ -50,11 +50,9 @@ void LayerEditor::initLayerEditor()
 }
 
 
-void LayerEditor::initLayerTable()
+void LayerEditor::initLayerTableHeaders()
 {
-  //clearLayerTable();
-
-  qDebug() << "Initializing layer table";
+  qDebug() << "Initializing layer table headers";
   QStringList table_headers;
   // TODO take enum type instead of this stringlist
   table_headers <<
@@ -73,21 +71,34 @@ void LayerEditor::initLayerTable()
   layer_table->resizeColumnToContents(static_cast<int>(Editability)); // reduce width of visibility column
 
   // header tooltips
-  layer_table->horizontalHeaderItem(static_cast<int>(Type))->setToolTip("Layer Type: lattice, db, or electrode");
-  layer_table->horizontalHeaderItem(static_cast<int>(Name))->setToolTip("Layer Name");
-  layer_table->horizontalHeaderItem(static_cast<int>(ZOffset))->setToolTip("Z-Offset: vertical offset from surface.\nPosition for objects above surface, negative for objects below surface.");
-  layer_table->horizontalHeaderItem(static_cast<int>(ZHeight))->setToolTip("Z-Height: vertical height of the layer");
-  layer_table->horizontalHeaderItem(static_cast<int>(Visibility))->setToolTip("Visibility of the layer");
-  layer_table->horizontalHeaderItem(static_cast<int>(Editability))->setToolTip("Editability of the layer");
+  layer_table->horizontalHeaderItem(static_cast<int>(Type))->
+      setToolTip("Layer Type: lattice, db, or electrode");
+  layer_table->horizontalHeaderItem(static_cast<int>(Name))->
+      setToolTip("Layer Name");
+  layer_table->horizontalHeaderItem(static_cast<int>(ZOffset))->
+      setToolTip("Z-Offset: vertical offset from surface.\nPosition for objects above surface, negative for objects below surface.");
+  layer_table->horizontalHeaderItem(static_cast<int>(ZHeight))->
+      setToolTip("Z-Height: vertical height of the layer");
+  layer_table->horizontalHeaderItem(static_cast<int>(Visibility))->
+      setToolTip("Visibility of the layer");
+  layer_table->horizontalHeaderItem(static_cast<int>(Editability))->
+      setToolTip("Editability of the layer");
+}
+
+
+void LayerEditor::populateLayerTable()
+{
+  clearLayerTable();
+  layers = dp->getLayers();
 
   // populate table with layer info
   qDebug() << "Populating layer table";
-  int layer_i = 0;
   for (prim::Layer* layer : *layers)
     addLayerRow(layer);
 
   // signals originating from the table
-  connect(layer_table, SIGNAL(cellChanged(int,int)), this, SLOT(updateLayerPropFromTable(int,int)));
+  connect(layer_table, SIGNAL(cellChanged(int,int)),
+            this, SLOT(updateLayerPropFromTable(int,int)));
   // TODO UNDOable z-height change
   // TODO UNDOable layer creation in DesignPanel
 }
@@ -104,12 +115,13 @@ void LayerEditor::clearLayerTable()
 {
   // Delete layer rows and disconnect all signals within the table.
   // Called by destructor on exit or by design panel when loading new file.
-
-  for (auto row_item : table_row_items) {
-    row_item->bt_visibility->disconnect();
-    row_item->bt_editability->disconnect();
-    delete row_item;
+  while (!table_row_contents.isEmpty()) {
+    LayerTableRowContent *row_content = table_row_contents.takeLast();
+    row_content->bt_visibility->disconnect();
+    row_content->bt_editability->disconnect();
+    delete row_content;
   }
+  layer_table->setRowCount(0);  // delete all rows from layer table
 }
 
 
@@ -153,54 +165,60 @@ void LayerEditor::updateLayerPropFromTable(int row, int column)
 // update widget
 void LayerEditor::addLayerRow(prim::Layer *layer)
 {
-  LayerTableRowItems *curr_row_items = new LayerTableRowItems;
-  curr_row_items->layer = layer;
+  LayerTableRowContent *curr_row_content = new LayerTableRowContent;
+  curr_row_content->layer = layer;
 
-  //qDebug() << tr("Constructing layer row GUI elements for layer %1").arg(layer->getName());
+  qDebug() << tr("Constructing layer row GUI elements for layer %1").arg(layer->getName());
 
   // items that require signal disconnection at removal
-  curr_row_items->bt_visibility = new QPushButton(QIcon(":/ico/visible.svg"), "", this);
-  curr_row_items->bt_editability = new QPushButton(QIcon(":/ico/editable.svg"), "", this);
+  curr_row_content->bt_visibility = new QPushButton(QIcon(":/ico/visible.svg"), "", this);
+  curr_row_content->bt_editability = new QPushButton(QIcon(":/ico/editable.svg"), "", this);
 
-  curr_row_items->bt_visibility->setCheckable(true);
-  curr_row_items->bt_visibility->setChecked(layer->isVisible());
-  curr_row_items->bt_editability->setCheckable(true);
-  curr_row_items->bt_editability->setChecked(layer->isActive());
+  curr_row_content->bt_visibility->setCheckable(true);
+  curr_row_content->bt_visibility->setChecked(layer->isVisible());
+  curr_row_content->bt_editability->setCheckable(true);
+  curr_row_content->bt_editability->setChecked(layer->isActive());
 
-  connect(curr_row_items->bt_visibility, SIGNAL(toggled(bool)), layer, SLOT(visibilityPushButtonChanged(bool)));
-  connect(curr_row_items->bt_editability, SIGNAL(toggled(bool)), layer, SLOT(editabilityPushButtonChanged(bool)));
+  connect(curr_row_content->bt_visibility, SIGNAL(toggled(bool)), layer, SLOT(visibilityPushButtonChanged(bool)));
+  connect(curr_row_content->bt_editability, SIGNAL(toggled(bool)), layer, SLOT(editabilityPushButtonChanged(bool)));
 
   // other items
-  curr_row_items->type = new QTableWidgetItem(layer->getContentTypeString());
-  curr_row_items->type->setIcon(layerType2Icon(layer->getContentType()));
-  curr_row_items->type->setToolTip(layer->getContentTypeString());
+  curr_row_content->type = new QTableWidgetItem(layer->getContentTypeString());
+  curr_row_content->type->setIcon(layerType2Icon(layer->getContentType()));
+  curr_row_content->type->setToolTip(layer->getContentTypeString());
 
-  curr_row_items->name = new QTableWidgetItem(layer->getName());
-  curr_row_items->zoffset = new QTableWidgetItem(QString::number(layer->zOffset()));
-  curr_row_items->zheight = new QTableWidgetItem(QString::number(layer->zHeight()));
+  curr_row_content->name = new QTableWidgetItem(layer->getName());
+  curr_row_content->zoffset = new QTableWidgetItem(QString::number(layer->zOffset()));
+  curr_row_content->zheight = new QTableWidgetItem(QString::number(layer->zHeight()));
+
+  qDebug() << QObject::tr("type=%1").arg(curr_row_content->type->text());
 
   // add to table
-  addLayerRow(curr_row_items);
+  addLayerRow(curr_row_content);
 }
 
 
-void LayerEditor::addLayerRow(LayerTableRowItems *row_items)
+void LayerEditor::addLayerRow(LayerTableRowContent *row_content)
 {
-  table_row_items.append(row_items);
+  qDebug() << "7";
+  table_row_contents.append(row_content);
 
   // add elems to table
   int curr_row = layer_table->rowCount();
+  qDebug() << QObject::tr("curr_row is %1").arg(curr_row);
 
   //qDebug() << tr("Inserting layer GUI elements to table into row %1").arg(curr_row);
 
   layer_table->insertRow(curr_row);
-  layer_table->setItem(curr_row, static_cast<int>(Type), row_items->type);
-  layer_table->setItem(curr_row, static_cast<int>(Name), row_items->name);
-  layer_table->setItem(curr_row, static_cast<int>(ZOffset), row_items->zoffset);
-  layer_table->setItem(curr_row, static_cast<int>(ZHeight), row_items->zheight);
+  qDebug() << QObject::tr("type=%1").arg(row_content->type->text());
+  layer_table->setItem(curr_row, static_cast<int>(Name), row_content->name);
+  // segfault would occur when loading files if type was placed before name...
+  layer_table->setItem(curr_row, static_cast<int>(Type), row_content->type);
+  layer_table->setItem(curr_row, static_cast<int>(ZOffset), row_content->zoffset);
+  layer_table->setItem(curr_row, static_cast<int>(ZHeight), row_content->zheight);
 
-  layer_table->setCellWidget(curr_row, static_cast<int>(Visibility), row_items->bt_visibility);
-  layer_table->setCellWidget(curr_row, static_cast<int>(Editability), row_items->bt_editability);
+  layer_table->setCellWidget(curr_row, static_cast<int>(Visibility), row_content->bt_visibility);
+  layer_table->setCellWidget(curr_row, static_cast<int>(Editability), row_content->bt_editability);
 }
 
 

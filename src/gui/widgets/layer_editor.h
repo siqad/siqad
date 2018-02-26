@@ -32,7 +32,7 @@ namespace gui{
     ~LayerEditor();
 
     // GUI items in layer list grid TODO remove if not needed
-    struct LayerTableRowItems
+    struct LayerTableRowContent
     {
       prim::Layer *layer;           // layer that this row corresponds to
       QTableWidgetItem *name;       // layer name (identifier in *layers)
@@ -43,7 +43,8 @@ namespace gui{
       QPushButton *bt_editability;  // layer editability (layer isActive)
     };
 
-    void initLayerTable();
+    void initLayerEditor();
+    void populateLayerTable();
     void refreshLayerTable();
     void clearLayerTable();
 
@@ -51,12 +52,12 @@ namespace gui{
     void updateLayerPropFromTable(int row, int column);
 
   private:
-    void initLayerEditor();
+    void initLayerTableHeaders();
 
     // functions for adding / removing layers
     void addLayerRow(); // wrapper, prompt user for new layer info and add to layer table
     void addLayerRow(prim::Layer *layer); // wrapper, add a row to layer table with layer pointer
-    void addLayerRow(LayerTableRowItems *row_items); // actually adds the layer
+    void addLayerRow(LayerTableRowContent *row_content); // actually adds the layer
     void removeLayerRow(prim::Layer *layer);
 
     // return the icon corresponding to a layer type
@@ -69,7 +70,7 @@ namespace gui{
     // TODO table column order (mapped with string)
 
     // GUI
-    QList<LayerTableRowItems*> table_row_items;
+    QList<LayerTableRowContent*> table_row_contents;
 
     QVBoxLayout *layer_list_vl;
     QTableWidget *layer_table;

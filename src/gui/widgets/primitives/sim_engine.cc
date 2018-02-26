@@ -30,11 +30,11 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
   QXmlStreamReader rs(&eng_f);
   qDebug() << tr("Reading engine library from %1").arg(eng_f.fileName());
 
-  QString read_eng_nm, read_eng_ver, read_interpreter, read_bin_path;
+  QString read_eng_nm, read_eng_ver;
+  QString read_interpreter, read_bin_path, read_linked_script_path;
   while (!rs.atEnd()) {
     if (rs.isStartElement()) {
       if (rs.name() == "physeng") {
-        // TODO move the following to SimEngine
         while (!(rs.isEndElement() && rs.name() == "physeng")) {
           if (!rs.readNextStartElement())
             continue; // skip until a start element is encountered
@@ -47,6 +47,10 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
             setBinaryPath(eng_dir.absoluteFilePath(rs.readElementText()));
           } else if (rs.name() == "interpreter") {
             setRuntimeInterpreter(rs.readElementText());
+          } else if (rs.name() == "linked_script_path") {
+            setLinkedScriptPath(eng_dir.absoluteFilePath(rs.readElementText()));
+          } else if (rs.name() == "gui_dialog_path") {
+            setParamDialogPath(eng_dir.absoluteFilePath(rs.readElementText()));
           } else if (rs.name() == "sim_params") {
             while (!(rs.isEndElement() && rs.name() == "sim_params")) {
               if (!rs.readNextStartElement())
@@ -80,7 +84,7 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
     }
   }
   eng_f.close();
-  
+
   initSimEngine(eng_nm, eng_rt);
 }
 
@@ -102,13 +106,11 @@ bool SimEngine::constructSimParamDialog()
 {
   // check if file exists
   QDir eng_dir(eng_root);
-  if (!eng_dir.exists("option_dialog.ui")) {
-    qDebug() << tr("SimEngine: Skipping sim param dialog construction for %1, file not found.").arg(name());
-    return false;
-  }
+  if (param_dialog_path.isEmpty())
+    param_dialog_path = eng_dir.absoluteFilePath("option_dialog.ui");
 
   // check file readability
-  QFile ui_file(eng_dir.absoluteFilePath("option_dialog.ui"));
+  QFile ui_file(param_dialog_path);
   if (!ui_file.open(QFile::ReadOnly | QFile::Text)) {
     qCritical() << QObject::tr("SimEngine: cannot open UI file %1").arg(ui_file.fileName());
     return false;
@@ -142,6 +144,7 @@ QList<QPair<QString, QString>> SimEngine::loadSimParamsFromDialog()
       retrieved_sim_params.append(QPair<QString, QString>(param.name, static_cast<QLineEdit*>(find_widget)->text()));
       qDebug() << QObject::tr("Added sim param %1 with content %2").arg(param.name).arg(static_cast<QLineEdit*>(find_widget)->text());
     }
+    // TODO radio buttons
   }
 
   return retrieved_sim_params;

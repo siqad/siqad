@@ -93,9 +93,9 @@ QSettings *settings::AppSettings::m_defs()
   // overwrites existing default values with same keys... no check
   S->setValue("view/hidpi_support", false);
 
-  S->setValue("log/override", false);
+  S->setValue("log/override", true);
   S->setValue("log/tofile", true);
-  S->setValue("log/logfile", QString("src/log/log.txt"));
+  S->setValue("log/logfile", QString("<SYSTMP>/db-sim/log/log.txt"));
 
   S->setValue("snap/diameter", 5.); //relative to scale_fact
 
@@ -211,10 +211,10 @@ QSettings* settings::LatticeSettings::m_defs()
   S->setValue("cell/N", 2);
 
   S->setValue("cell/b1", QPointF(0, 0));
-  S->setValue("cell/b2", QPointF(2.4, 0));
+  S->setValue("cell/b2", QPointF(0, 2.4));
 
-  S->setValue("lattice/a1", QPointF(7.68, 0));
-  S->setValue("lattice/a2", QPointF(0, 3.84));
+  S->setValue("lattice/a1", QPointF(3.84, 0));
+  S->setValue("lattice/a2", QPointF(0, 7.68));
 
 
   return S;
