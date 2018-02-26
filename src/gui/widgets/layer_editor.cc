@@ -4,7 +4,7 @@
 // @editted:  2017.12.22 - Samuel
 // @license:  GNU LGPL v3
 //
-// @desc:     widget for configuring 
+// @desc:     widget for configuring
 
 #include "layer_editor.h"
 
@@ -57,7 +57,7 @@ void LayerEditor::initLayerTable()
   qDebug() << "Initializing layer table";
   QStringList table_headers;
   // TODO take enum type instead of this stringlist
-  table_headers << 
+  table_headers <<
     "ID" <<       // Layer ID, layer's position in layers* stack
     "Type" <<     // Type (lattice, db, electrode) TODO types of default layers can't be changed
     "Name" <<     // Name TODO names of default layers can't be changed
@@ -174,7 +174,7 @@ void LayerEditor::addLayerRow(prim::Layer *layer)
   curr_row_items->type = new QTableWidgetItem(layer->getContentTypeString());
   curr_row_items->type->setIcon(layerType2Icon(layer->getContentType()));
   curr_row_items->type->setToolTip(layer->getContentTypeString());
-  
+
   curr_row_items->name = new QTableWidgetItem(layer->getName());
   curr_row_items->zoffset = new QTableWidgetItem(QString::number(layer->zOffset()));
   curr_row_items->zheight = new QTableWidgetItem(QString::number(layer->zHeight()));

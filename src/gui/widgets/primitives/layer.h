@@ -30,7 +30,7 @@ namespace prim{
 
   public:
 
-    enum LayerType{Lattice, DB, Electrode, AFMTip};
+    enum LayerType{Lattice, DB, Electrode, AFMTip, Plot};
     Q_ENUM(LayerType)
 
 
@@ -47,7 +47,7 @@ namespace prim{
     static void resetLayers();
 
     // accessors
-    
+
     // set layer index and update layer_id of contained items
     void setLayerIndex(int lay_id);
 

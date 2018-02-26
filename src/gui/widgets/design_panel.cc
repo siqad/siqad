@@ -375,6 +375,10 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   addLayer(tr("AFM"), prim::Layer::AFMTip,500E-12,50E-12);
   afm_layer = layers.at(3);
 
+  // add in the potential layer for potential plots
+  addLayer(tr("Plot"), prim::Layer::Plot,-50E-9,0);
+  plot_layer = layers.at(4);
+
 }
 
 
@@ -2077,7 +2081,7 @@ void gui::DesignPanel::createElectrodes(QPoint point1)
 
 void gui::DesignPanel::createPotPlot(QPixmap potential_plot, QRectF graph_container)
 {
-  int layer_index = layers.indexOf(electrode_layer);
+  int layer_index = layers.indexOf(plot_layer);
   //only ever create one electrode at a time
   undo_stack->beginMacro(tr("create electrode with given corners"));
   undo_stack->push(new CreatePotPlot(layer_index, this, potential_plot, graph_container));
