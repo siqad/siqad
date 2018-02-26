@@ -20,14 +20,9 @@
 
 namespace settings{
 
-// TODO: should move the default settings .ini files into the resources and the
-//      .qrc to make the path more reobust.
-
-// default settings .ini files
-const QString app_settings_default = "src/settings/app_settings.ini";
-const QString gui_settings_default = "src/settings/gui_settings.ini";
-const QString lattice_settings_default = "src/settings/lattices/si_100_2x1.ini";
-
+const QString app_settings_path = "<CONFIG>/app_settings.ini";
+const QString gui_settings_path = "<CONFIG>/gui_settings.ini";
+const QString lattice_settings_path = "<CONFIG>/lattices/si_100_2x1.ini";
 
 // abstract container class for settings with a templated accessor function.
 // The typical use case is throintoor now, assert .ini format for OS compatability.
@@ -42,7 +37,8 @@ public:
   // found, it checks for default values. If a default value is found, the
   // value is stored in the current settings file; otherwise, the app terminates
   template<typename T>
-  T get(const QString &key) {
+  T get(const QString &key)
+  {
     QVariant var = DEFAULT_OVERRIDE ? defaults->value(key) : this->value(key);
     T val;
     // if key not found, get value from defaults
@@ -70,32 +66,45 @@ public:
     return val;
   }
 
-  QString getPath(const QString &key) {
-    QString path_stored = get<QString>(key);
+  QString getPath(const QString &key)
+  {
+    return pathReplacement(get<QString>(key));
+  }
 
-    // TODO put map in the constructor
-    QMap<QString, QString> path_map;
-    path_map["<BINPATH>"] = QCoreApplication::applicationDirPath();
-    path_map["<HOME>"] = QDir::homePath();
-    path_map["<ROOT>"] = QDir::rootPath();
-    path_map["<SYSTMP>"] = QDir::tempPath();
+  static QString pathReplacement(QString path)
+  {
+    constructPathMap();
 
     // perform replacement
     QRegExp regex("<(.*)?>");
-    while (path_stored.indexOf(regex) != -1) {
+    while (path.indexOf(regex) != -1) {
       if(!path_map.contains(regex.capturedTexts().first())) {
         qFatal(tr("Path replacement failed, key '%1' not found.")
             .arg(regex.capturedTexts().first()).toLatin1().constData(),0);
       }
-      path_stored.replace(regex, path_map[regex.capturedTexts().first()]);
+      path.replace(regex, path_map[regex.capturedTexts().first()]);
     }
-    return path_stored;
+    return path;
   }
+
+  // default settings .ini files
 
 protected:
 
   // pointer to defaults, no special considerations for derived classes
   QSettings *defaults;
+
+private:
+  static void constructPathMap()
+  {
+    path_map["<BINPATH>"] = QCoreApplication::applicationDirPath();
+    path_map["<HOME>"] = QDir::homePath();
+    path_map["<ROOT>"] = QDir::rootPath();
+    path_map["<SYSTMP>"] = QDir::tempPath() + "/db-sim";
+    path_map["<CONFIG>"] = QStandardPaths::writableLocation(
+        QStandardPaths::ConfigLocation) + "/db-sim";
+  }
+  static QMap<QString, QString> path_map;
 };
 
 
@@ -115,7 +124,7 @@ private:
   static AppSettings *inst;   // static pointer to the instance
 
   // constructor private: singleton
-  AppSettings() : Settings(app_settings_default){defaults = defs;}
+  AppSettings() : Settings(pathReplacement(app_settings_path)){defaults = defs;}
 
   // default values
   static QSettings *defs;     // pointer to default settings, initalized before first call
@@ -139,7 +148,7 @@ private:
   static GUISettings *inst;   // static pointer to the instance
 
   // constructor private: singleton
-  GUISettings() : Settings(gui_settings_default){defaults = defs;}
+  GUISettings() : Settings(pathReplacement(gui_settings_path)){defaults = defs;}
 
   // default values
   static QSettings *defs;     // pointer to default settings, initalized before first call
@@ -166,7 +175,7 @@ private:
   static LatticeSettings *inst;   // static pointer to the instance
 
   // constructors private: singleton
-  LatticeSettings() : Settings(lattice_settings_default){defaults = defs;}
+  LatticeSettings() : Settings(pathReplacement(lattice_settings_path)){defaults = defs;}
   LatticeSettings(const QString &fname) : Settings(fname){defaults = defs;}
 
   // default values

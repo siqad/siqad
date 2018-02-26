@@ -270,6 +270,7 @@ void SimManager::submitSimSetup()
 void SimManager::initEngines()
 {
   QString engine_lib_dir_path = settings::AppSettings::instance()->getPath("phys/eng_lib_dir");
+  qDebug() << tr("Engine lib path: %1").arg(engine_lib_dir_path);
 
   QDir engine_lib_dir(engine_lib_dir_path);
   QStringList engine_dir_paths = engine_lib_dir.entryList(QStringList({"*"}),
