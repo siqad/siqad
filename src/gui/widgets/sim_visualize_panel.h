@@ -36,7 +36,7 @@ namespace gui{
     void showJobTerminalOutput();
     void saveJobTerminalOutput();
 
-    void openPoisResult();
+    void showPotPlot();
 
     void updateJobSelCombo();
     bool showElecDist(int dist_ind);
@@ -47,6 +47,7 @@ namespace gui{
 
   signals:
     void showElecDistOnScene(prim::SimJob *job, int dist_ind);
+    void showPotPlotOnScene(QPixmap potential_plot, QRectF graph_container);
 
   private:
     void initSimVisualize();
@@ -65,7 +66,6 @@ namespace gui{
     QLabel *text_job_start_time;
     QLabel *text_job_end_time;
     QPushButton *button_show_term_out;
-    QPushButton *button_open_window;
 
     QSlider *slider_dist_sel;
     QLabel *text_dist_selected;

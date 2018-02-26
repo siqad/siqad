@@ -6,6 +6,9 @@
 //
 // @desc:     Base class for physics engines
 
+#ifndef _SIM_ANNEAL_PHYS_PHYS_ENGINE_H_
+#define _SIM_ANNEAL_PHYS_PHYS_ENGINE_H_
+
 #include "problem.h"
 
 #include <string>
@@ -42,3 +45,5 @@ namespace phys{
   };
 
 }
+
+#endif

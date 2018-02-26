@@ -8,8 +8,8 @@
 
 #include "sim_visualize_panel.h"
 #include "../../qcustomplot.h"
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
+// #include <boost/property_tree/ptree.hpp>
+// #include <boost/property_tree/xml_parser.hpp>
 #include <QPixmap>
 
 
@@ -88,19 +88,13 @@ void SimVisualize::showJobTerminalOutput()
   w_job_term->show();
 }
 
-void SimVisualize::openPoisResult()
+
+void SimVisualize::showPotPlot()
 {
-  QWidget *window = new QWidget;
-  window->resize(750, 750);
-  QHBoxLayout *layout = new QHBoxLayout;
+  // QWidget *window = new QWidget;
+  // window->resize(750, 750);
+  // QHBoxLayout *layout = new QHBoxLayout;
   QCustomPlot *customPlot = new QCustomPlot();
-  // configure axis rect:
-  customPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom); // this will also allow rescaling the color scale by dragging/zooming
-  customPlot->axisRect()->setupFullAxesBox(true);
-  customPlot->xAxis->setLabel("x");
-  customPlot->yAxis->setLabel("y");
-  // down on graph is increase in y.
-  customPlot->yAxis->setRangeReversed(true);
 
   // set up the QCPColorMap:
   QCPColorMap *colorMap = new QCPColorMap(customPlot->xAxis, customPlot->yAxis);
@@ -109,31 +103,22 @@ void SimVisualize::openPoisResult()
   int ny = 50;
   colorMap->data()->setSize(nx, ny);
   // coordinate range for x and y
-  QString path = "/tmp/db-sim/phys/" + combo_job_sel->currentText();
-  path += "/sim_result.xml";
-
-  qDebug() << tr("%1").arg(path);
-
-  boost::property_tree::ptree tree; // Create empty property tree object
-  boost::property_tree::read_xml(path.toStdString(), tree); // Parse the XML into the property tree.
 
   QVector<qreal> x_vec;
   QVector<qreal> y_vec;
   QVector<qreal> val_vec;
-  double x, y, val;
-  for (boost::property_tree::ptree::value_type const &node_potential_map : tree.get_child("sim_out.potential_map")) {
-  // BOOST_FOREACH(boost::property_tree::ptree::value_type &node_potential_map, tree.get_child("sim_out.potential_map")) {
-    boost::property_tree::ptree subtree = node_potential_map.second; //get subtree with layer items at the top
-    if( node_potential_map.first == "potential_val"){ //go into potential_val.
-      x = node_potential_map.second.get<float>("<xmlattr>.x");
-      y = node_potential_map.second.get<float>("<xmlattr>.y");
-      val = node_potential_map.second.get<float>("<xmlattr>.val");
-      x_vec.append(x);
-      y_vec.append(y);
-      val_vec.append(val);
-    }
+
+  QList<QVector<float>>::iterator iter;
+  for(iter=show_job->potentials.begin(); iter!=show_job->potentials.end(); ++iter){
+    x_vec.append((*iter)[0]);
+    y_vec.append((*iter)[1]);
+    val_vec.append((*iter)[2]);
+    // qDebug() << tr("x: %1, y: %2, val: %3").arg((*iter)[0]).arg((*iter)[1]).arg((*iter)[2]);
   }
 
+
+
+  // qDebug() << tr("Setting colurMap");
   // set range for x and y in pixels.
   colorMap->data()->setRange(QCPRange(x_vec.first(), x_vec.last()), QCPRange(y_vec.first(), y_vec.last()));
 
@@ -147,12 +132,20 @@ void SimVisualize::openPoisResult()
     }
   }
 
+  // configure axis rect:
+  // customPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom); // this will also allow rescaling the color scale by dragging/zooming
+  // customPlot->axisRect()->setupFullAxesBox(true);
+  // customPlot->xAxis->setLabel("x");
+  // customPlot->yAxis->setLabel("y");
+  // down on graph is increase in y.
+  customPlot->yAxis->setRangeReversed(true);
+
   // add a color scale:
   QCPColorScale *colorScale = new QCPColorScale(customPlot);
-  customPlot->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
-  colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
+  // customPlot->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
+  // colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
   colorMap->setColorScale(colorScale); // associate the color map with the color scale
-  colorScale->axis()->setLabel("Magnetic Field Strength");
+  // colorScale->axis()->setLabel("Magnetic Field Strength");
 
   // set the color gradient of the color map to one of the presets:
   colorMap->setGradient(QCPColorGradient::gpPolar);
@@ -161,18 +154,38 @@ void SimVisualize::openPoisResult()
   colorMap->rescaleDataRange();
 
   // make sure the axis rect and color scale synchronize their bottom and top margins (so they line up):
-  QCPMarginGroup *marginGroup = new QCPMarginGroup(customPlot);
-  customPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
-  colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+  // QCPMarginGroup *marginGroup = new QCPMarginGroup(customPlot);
+  // customPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+  // colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
 
   // rescale the key (x) and value (y) axes so the whole color map is visible:
-  customPlot->rescaleAxes();
 
-  layout->addWidget(customPlot); //customPlot doubles as a widget
-  window->setLayout(layout);
-  window->show();
+
+  customPlot->xAxis->setVisible(false);
+  customPlot->yAxis->setVisible(false);
+  customPlot->setContentsMargins(0,0,0,0);
+  customPlot->axisRect()->setAutoMargins(QCP::msNone);
+  customPlot->axisRect()->setMargins(QMargins(0,0,0,0));
+
+  customPlot->rescaleAxes();
+  QPixmap potential_plot = customPlot->toPixmap();
+  QRectF graph_container(QPointF(x_vec.first(),y_vec.first()), QPointF(x_vec.last(),y_vec.last()));
+  emit showPotPlotOnScene(potential_plot, graph_container);
+  // layout->addWidget(customPlot); //customPlot doubles as a widget
+  // window->setLayout(layout);
+  // window->show();
+
 }
 
+
+// void QCustomPlot::showPointToolTip(QMouseEvent *event)
+// {
+//   qDebug() << tr("showPointToolTip");
+//   int x = this->xAxis->pixelToCoord(event->pos().x());
+//   int y = this->yAxis->pixelToCoord(event->pos().y());
+//
+//   setToolTip(QString("%1 , %2").arg(x).arg(y));
+// }
 
 void SimVisualize::updateJobSelCombo()
 {
@@ -239,9 +252,16 @@ void SimVisualize::updateOptions()
       // name - button for rename
 
     // TODO result type selector (not needed for now)
+    if(show_job->engineName() == "SimAnneal"){
+      // elec dist selection
+      updateElecDistOptions();
+    }
+    else if(show_job->engineName() == "PoisSolver"){
+      showPotPlot();
+    }
 
-    // elec dist selection
-    updateElecDistOptions();
+
+    qDebug() << tr("Engine Name: %1").arg(show_job->engineName());
 
     // group box result filter
       // energies
@@ -271,7 +291,6 @@ void SimVisualize::initSimVisualize()
   text_job_end_time = new QLabel;
 
   button_show_term_out = new QPushButton("Show Terminal Output");
-  button_open_window = new QPushButton("Open Window");
 
   text_job_engine->setAlignment(Qt::AlignRight);
   text_job_start_time->setAlignment(Qt::AlignRight);
@@ -301,7 +320,6 @@ void SimVisualize::initSimVisualize()
   job_info_layout->addLayout(job_start_time_hl);
   job_info_layout->addLayout(job_end_time_hl);
   job_info_layout->addWidget(button_show_term_out);
-  job_info_layout->addWidget(button_open_window);
   job_info_group->setLayout(job_info_layout);
 
   // Elec Distribution Group
@@ -334,7 +352,6 @@ void SimVisualize::initSimVisualize()
 
   // signal connection
   connect(button_show_term_out, &QAbstractButton::clicked, this, &gui::SimVisualize::showJobTerminalOutput);
-  connect(button_open_window, &QAbstractButton::clicked, this, &gui::SimVisualize::openPoisResult);
   connect(combo_job_sel, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &gui::SimVisualize::jobSelUpdate);
   connect(slider_dist_sel, static_cast<void(QSlider::*)(int)>(&QSlider::valueChanged), this, &gui::SimVisualize::distSelUpdate);
   connect(button_dist_prev, &QAbstractButton::clicked, this, &gui::SimVisualize::distPrev);
@@ -358,6 +375,7 @@ void SimVisualize::jobSelUpdate()
 
 void SimVisualize::distSelUpdate()
 {
+  qDebug() << tr("distSelUpdate()");
   text_dist_selected->setText(tr("%1/%2").arg(slider_dist_sel->value()).arg(show_job->elec_dists.size()));
   showElecDist(slider_dist_sel->sliderPosition());
 }

@@ -200,7 +200,7 @@ void prim::Layer::loadItems(QXmlStreamReader *stream, QGraphicsScene *scene)
       stream->readNext();
     }
   }
-  
+
   // show error if any
   if(stream->hasError()){
     qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
@@ -209,6 +209,7 @@ void prim::Layer::loadItems(QXmlStreamReader *stream, QGraphicsScene *scene)
 
 void prim::Layer::visibilityCheckBoxChanged(int check_state)
 {
+  // qDebug() << QObject::tr("visibilityCheckBoxChanged: %1").arg(check_state);
   if(check_state == Qt::Checked)
     setVisible(true);
   else

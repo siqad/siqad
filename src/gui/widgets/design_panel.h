@@ -136,6 +136,7 @@ namespace gui{
     // SIMULATION RESULT DISPLAY
     void displaySimResults(prim::SimJob *job, int dist_int);
     void clearSimResults();
+    void displayPotentialPlot(QPixmap potential_plot, QRectF graph_container);
 
 
   public slots:
@@ -198,6 +199,7 @@ namespace gui{
     prim::Layer *top_layer;       // new items added to this layer
     prim::Layer *electrode_layer; // add electrodes to this layer
     prim::Layer *afm_layer;       // add afm paths to this layer TODO request layers from Layer Manager instead of keeping pointers like these
+    prim::Layer *plot_layer;      // add potential plots to this layer
 
     // flags, change later to bit flags
     bool clicked;   // mouse left button is clicked
@@ -300,6 +302,8 @@ namespace gui{
 
     class CreateElectrode;  // create an electrode at the given points
 
+    class CreatePotPlot;  // create an electrode at the given points
+
     class CreateAFMPath;    // create an empty AFMPath that should later contain AFMNodes
     class CreateAFMNode;    // create AFMNodes that should be children of AFMPath
 
@@ -309,6 +313,9 @@ namespace gui{
     void createDBs();
 
     void createElectrodes(QPoint point1);
+
+    //create potential plot on panel
+    void createPotPlot(QPixmap potential_plot, QRectF graph_container);
 
     // create AFM node in focused path after focused node
     void createAFMNode();
@@ -479,6 +486,35 @@ namespace gui{
     // internals
     int index;              // index of electrode item in the layer item stack
 
+  };
+
+  class DesignPanel::CreatePotPlot : public QUndoCommand
+  {
+  public:
+    // create an electrode at the given points
+    CreatePotPlot(int layer_index, gui::DesignPanel *dp, QPixmap potential_plot, QRectF graph_container,
+      prim::PotPlot *pp = 0, bool invert=false, QUndoCommand *parent=0);
+
+  private:
+
+    // destroy the dangling bond and update the lattice dot
+    virtual void undo();
+    // re-create the dangling bond
+    virtual void redo();
+
+    void create();  // create the dangling bond
+    void destroy(); // destroy the dangling bond
+
+    DesignPanel *dp;  // DesignPanel pointer
+    int layer_index;  // index of layer in dp->layers stack
+
+    QPixmap potential_plot;
+    QRectF graph_container;
+
+    bool invert;
+
+    // internals
+    int index;              // index of electrode item in the layer item stack
   };
 
 

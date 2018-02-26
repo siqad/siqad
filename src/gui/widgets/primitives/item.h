@@ -30,7 +30,7 @@ namespace prim{
     // to distinguish them in functions which accept Item objects. Derived
     // classes can be declared and implemented elsewhere as long as they are
     // defined before use
-    enum ItemType{Aggregate, DBDot, LatticeDot, Ghost, GhostDot, Text, Electrode, GhostBox, AFMPath, AFMNode, AFMSeg};
+    enum ItemType{Aggregate, DBDot, LatticeDot, Ghost, GhostDot, Text, Electrode, GhostBox, AFMPath, AFMNode, AFMSeg, PotPlot};
 
     // constructor, layer = 0 should indicate temporary objects that do not
     // belong to any particular layer

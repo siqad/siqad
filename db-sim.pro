@@ -67,7 +67,8 @@ HEADERS += \
 	src/gui/widgets/primitives/electrode.h \
   src/gui/widgets/primitives/afmpath.h \
   src/gui/widgets/primitives/afmnode.h \
-  src/gui/widgets/primitives/afmseg.h
+  src/gui/widgets/primitives/afmseg.h \
+  src/gui/widgets/primitives/pot_plot.h
 
 
 SOURCES += \
@@ -84,7 +85,8 @@ SOURCES += \
 	src/gui/widgets/primitives/electrode.cc \
 	src/gui/widgets/primitives/afmpath.cc \
 	src/gui/widgets/primitives/afmnode.cc \
-	src/gui/widgets/primitives/afmseg.cc
+	src/gui/widgets/primitives/afmseg.cc \
+  src/gui/widgets/primitives/pot_plot.cc
 
 
 # widgets
@@ -170,3 +172,11 @@ linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/hopper.py
 linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/marcus.py
 linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/model.py
 INSTALLS += sim_afmmarcus
+
+# PoisSolver
+
+sim_poissolver.path = $$EXEC_DIR/src/phys/poissolver
+sim_poissolver.files = $$PHYS_DIR/poissolver/PoisFFT/engine_description.xml
+#sim_poissolver.files += $$PHYS_DIR/simanneal/option_dialog.ui
+linux: sim_poissolver.files += $$PHYS_DIR/poissolver/PoisFFT/bin/objs/poissolver
+INSTALLS += sim_poissolver
