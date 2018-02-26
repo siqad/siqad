@@ -93,6 +93,10 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * ~~Esc cancels paste operation~~ Implemented 17.07.13
 * ~~Esc cancels DB Tool~~ Implemented 17.07.13
 * ~~Visual feedback on which tool is currently in use (e.g. changed background of the button)~~ Implemented 17.07.12
+* Content Menu
+	* ~~Generic Undo, Redo, Cut, Copy, Paste, Delete~~ 17.12.07
+	* ~~Dot specific: Toggle selected dots between LatticeDot and DBDot~~ 18.01.15
+	* ~~Electrode specific: Set potential value~~ 17.12.06
 
 ### Layers
 
@@ -140,11 +144,12 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 
 ### Electrode Design
 * Side view of vertical electrode stack
-* ~~Top view of electrode layers~~
-* ~~Creating, moving, and deleting electrodes~~
+* ~~Top view of electrode layers~~ 17.10.31
+* ~~Creating, moving, copying, pasting, and deleting electrodes~~ 17.11.30
 * Snapping, aligning and distributing like Inkscape
-* ~~Save/Load~~
-* ~~Setting potentials individually, by batch~~
+* ~~Save/Load~~ 17.12.11
+* ~~Setting potentials (individual and batch)~~ 17.11.03
+* ~~Ghosting when moving Electrodes (individual and batch)~~
 
 ### Config
 * Make config file paths configurable
@@ -178,12 +183,13 @@ The open source version of Qt5 falls under the GNU LGPL v3 license, as does the 
 * SimAnneal
   * Distance dependent hopping: precompute the probability of hopping from each site to any other site, put into matrix
 * PoisSolver
-	* Custom class containing physical structure
-		* ~~Import size and potential data for electrodes into solver~~
-		* Translate size from Qt units to physical lengths
-		*	~Add buffer region surrounding simulation area~
-		* Location, dimensions, etc
-		* Implement heat map/colour map support for PoisSolver
+	* ~~Import size and potential data for electrodes into solver~~ 18.02.05
+	* ~~Translate size from Qt units to physical lengths~~ 18.01.05
+	*	~~Add buffer region surrounding simulation area~~ 18.01.05
+	* ~~Location, dimensions, etc~~ 17.10.18
+	* ~~Implement heat map/colour map support~~ 18.02.08
+	* Create a UI file in Qt Designer
+	* Add simulation parameter config similar to SimAnneal
 
 > general bugs
 ## Bugs

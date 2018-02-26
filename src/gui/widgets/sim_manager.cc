@@ -209,15 +209,6 @@ void SimManager::updateSimParams()
 }
 
 
-/* NOTE doesn't seem to be needed anymore, Nathan delete if true
-void SimManager::xmlFind()
-{
-  QString fileName = QFileDialog::getOpenFileName(this,
-    tr("Open XML"), ".", tr("XML Files (*.xml)"));
-  le_xml_path->setText(fileName);
-}*/
-
-
 void SimManager::updateEngineSelectionList()
 {
   if(!combo_eng_sel)

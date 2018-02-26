@@ -8,8 +8,6 @@
 
 #include "sim_visualize_panel.h"
 #include "../../qcustomplot.h"
-// #include <boost/property_tree/ptree.hpp>
-// #include <boost/property_tree/xml_parser.hpp>
 #include <QPixmap>
 
 
