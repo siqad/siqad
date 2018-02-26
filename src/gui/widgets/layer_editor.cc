@@ -168,7 +168,7 @@ void LayerEditor::addLayerRow(prim::Layer *layer)
   LayerTableRowContent *curr_row_content = new LayerTableRowContent;
   curr_row_content->layer = layer;
 
-  qDebug() << tr("Constructing layer row GUI elements for layer %1").arg(layer->getName());
+  //qDebug() << tr("Constructing layer row GUI elements for layer %1").arg(layer->getName());
 
   // items that require signal disconnection at removal
   curr_row_content->bt_visibility = new QPushButton(QIcon(":/ico/visible.svg"), "", this);
@@ -191,7 +191,7 @@ void LayerEditor::addLayerRow(prim::Layer *layer)
   curr_row_content->zoffset = new QTableWidgetItem(QString::number(layer->zOffset()));
   curr_row_content->zheight = new QTableWidgetItem(QString::number(layer->zHeight()));
 
-  qDebug() << QObject::tr("type=%1").arg(curr_row_content->type->text());
+  //qDebug() << QObject::tr("type=%1").arg(curr_row_content->type->text());
 
   // add to table
   addLayerRow(curr_row_content);
@@ -200,17 +200,16 @@ void LayerEditor::addLayerRow(prim::Layer *layer)
 
 void LayerEditor::addLayerRow(LayerTableRowContent *row_content)
 {
-  qDebug() << "7";
   table_row_contents.append(row_content);
 
   // add elems to table
   int curr_row = layer_table->rowCount();
-  qDebug() << QObject::tr("curr_row is %1").arg(curr_row);
+  //qDebug() << QObject::tr("curr_row is %1").arg(curr_row);
 
   //qDebug() << tr("Inserting layer GUI elements to table into row %1").arg(curr_row);
 
   layer_table->insertRow(curr_row);
-  qDebug() << QObject::tr("type=%1").arg(row_content->type->text());
+  //qDebug() << QObject::tr("type=%1").arg(row_content->type->text());
   layer_table->setItem(curr_row, static_cast<int>(Name), row_content->name);
   // segfault would occur when loading files if type was placed before name...
   layer_table->setItem(curr_row, static_cast<int>(Type), row_content->type);

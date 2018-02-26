@@ -19,6 +19,8 @@
 //      from the .ini files: QColor and QPointF get mapped to QVariant hex strings
 //      which aren't very edittable.
 
+QMap<QString, QString> settings::Settings::path_map = QMap<QString, QString>();
+
 // initialize default settings
 QSettings *settings::AppSettings::defs = settings::AppSettings::m_defs();
 QSettings *settings::GUISettings::defs = settings::GUISettings::m_defs();
@@ -88,14 +90,20 @@ void settings::LatticeSettings::updateLattice(const QString &fname)
 QSettings *settings::AppSettings::m_defs()
 {
   qDebug("Loading default application settings...");
-  QSettings *S = new QSettings("src/settings/defaults/app_settings.ini", QSettings::IniFormat);
+  // TODO remove QSettings *S = new QSettings("src/settings/defaults/app_settings.ini", QSettings::IniFormat);
+  QString the_path = pathReplacement("<CONFIG>/defaults/app_settings.ini");
+  qDebug() << QObject::tr("app settings path: %1").arg(the_path);
+  QSettings *S = new QSettings(
+      pathReplacement("<CONFIG>/defaults/app_settings.ini"),
+      QSettings::IniFormat
+  );
 
   // overwrites existing default values with same keys... no check
   S->setValue("view/hidpi_support", false);
 
-  S->setValue("log/override", true);
-  S->setValue("log/tofile", true);
-  S->setValue("log/logfile", QString("<SYSTMP>/db-sim/log/log.txt"));
+  S->setValue("log/override", false);
+  S->setValue("log/tofile", false);
+  S->setValue("log/logfile", QString("<SYSTMP>/log/log.txt"));
 
   S->setValue("snap/diameter", 5.); //relative to scale_fact
 
@@ -105,9 +113,9 @@ QSettings *settings::AppSettings::m_defs()
   S->setValue("phys/epsr", 10);
 
   S->setValue("phys/eng_lib_dir", QString("<BINPATH>/src/phys/"));
-  S->setValue("phys/runtime_temp_dir", QString("<SYSTMP>/db-sim/phys/"));
+  S->setValue("phys/runtime_temp_dir", QString("<SYSTMP>/phys/"));
 
-  S->setValue("save/autosaveroot", QString("<SYSTMP>/db-sim/autosave/"));
+  S->setValue("save/autosaveroot", QString("<SYSTMP>/autosave/"));
   S->setValue("save/autosavenum", 3);
   S->setValue("save/autosaveinterval", 300); // in seconds
 
@@ -117,7 +125,11 @@ QSettings *settings::AppSettings::m_defs()
 QSettings* settings::GUISettings::m_defs()
 {
   qDebug("Loading default gui settings...");
-  QSettings *S = new QSettings("src/settings/defaults/gui_settings.ini", QSettings::IniFormat);
+  // TODO remove QSettings *S = new QSettings("src/settings/defaults/gui_settings.ini", QSettings::IniFormat);
+  QSettings *S = new QSettings(
+      pathReplacement("<CONFIG>/defaults/gui_settings.ini"),
+      QSettings::IniFormat
+  );
 
   S->setValue("MWIN/size", QSize(1400, 800));
   S->setValue("TBAR/mh", 60);
@@ -206,7 +218,11 @@ QSettings* settings::GUISettings::m_defs()
 QSettings* settings::LatticeSettings::m_defs()
 {
   qDebug("Loading default lattice settings...");
-  QSettings *S = new QSettings("src/settings/defaults/lattices/si_100_2x1.ini", QSettings::IniFormat);
+  // TODO remove QSettings *S = new QSettings("src/settings/defaults/lattices/si_100_2x1.ini", QSettings::IniFormat);
+  QSettings *S = new QSettings(
+      pathReplacement(QString("<CONFIG>/defaults/lattices/si_100_2x1.ini")),
+      QSettings::IniFormat
+  );
 
   S->setValue("cell/N", 2);
 

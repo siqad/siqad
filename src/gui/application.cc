@@ -76,6 +76,9 @@ void gui::ApplicationGUI::initGUI()
   sim_manager = new gui::SimManager(this);
   sim_visualize = new gui::SimVisualize(sim_manager, this);
 
+  // individual pop-up widgets
+  settings_dialog = new settings::SettingsDialog(this);
+
   // initialise docks
   initSimVisualizeDock();
   initDialogDock();
@@ -169,11 +172,14 @@ void gui::ApplicationGUI::initMenuBar()
   QAction *select_color = new QAction(tr("Select Color..."), this);
   QAction *screenshot = new QAction(tr("Full Screenshot..."), this);
   QAction *design_screenshot = new QAction(tr("Design Screenshot..."), this);
+  QAction *action_settings_dialog = new QAction(tr("Settings"), this);
 
   tools->addAction(change_lattice);
   tools->addAction(select_color);
   tools->addAction(screenshot);
   tools->addAction(design_screenshot);
+  tools->addSeparator();
+  tools->addAction(action_settings_dialog);
 
   // help menu actions
   QAction *about_version = new QAction(tr("About"), this);
@@ -192,6 +198,7 @@ void gui::ApplicationGUI::initMenuBar()
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
   connect(design_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::designScreenshot);
+  connect(action_settings_dialog, &QAction::triggered, this, &gui::ApplicationGUI::showSettingsDialog);
   connect(about_version, &QAction::triggered, this, &gui::ApplicationGUI::aboutVersion);
 
 }
@@ -313,7 +320,7 @@ void gui::ApplicationGUI::initDialogDock()
   dialog_dock->setMinimumHeight(gui_settings->get<int>("DDOCK/mh")); // size TODO add to settings
 
   dialog_dock->setWidget(dialog_dock_main);
-  dialog_dock->show();
+  dialog_dock->setVisible(settings::AppSettings::instance()->get<bool>("log/override"));
   addDockWidget(area, dialog_dock);
 }
 
