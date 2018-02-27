@@ -176,7 +176,7 @@ INSTALLS += sim_afmmarcus
 # PoisSolver
 
 sim_poissolver.path = $$EXEC_DIR/src/phys/poissolver
-sim_poissolver.files = $$PHYS_DIR/poissolver/PoisFFT/engine_description.xml
-#sim_poissolver.files += $$PHYS_DIR/simanneal/option_dialog.ui
+sim_poissolver.files = $$PHYS_DIR/poissolver/engine_description.xml
+sim_poissolver.files += $$PHYS_DIR/poissolver/option_dialog.ui
 linux: sim_poissolver.files += $$PHYS_DIR/poissolver/PoisFFT/bin/objs/poissolver
 INSTALLS += sim_poissolver
