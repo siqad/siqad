@@ -9,6 +9,7 @@
 #include "sim_visualize_panel.h"
 #include "../../qcustomplot.h"
 #include <QPixmap>
+#include <QtMath>
 
 
 namespace gui{
@@ -95,17 +96,17 @@ void SimVisualize::showPotPlot()
   QCustomPlot *customPlot = new QCustomPlot();
 
   // set up the QCPColorMap:
-  QCPColorMap *colorMap = new QCPColorMap(customPlot->xAxis, customPlot->yAxis);
   // number of points in x and y direction
-  int nx = 50;
-  int ny = 50;
-  colorMap->data()->setSize(nx, ny);
+  // int nx = 50;
+  // int ny = 50;
   // coordinate range for x and y
 
   QVector<qreal> x_vec;
   QVector<qreal> y_vec;
   QVector<qreal> val_vec;
 
+
+  qDebug() << tr("fill QVectors");
   QList<QVector<float>>::iterator iter;
   for(iter=show_job->potentials.begin(); iter!=show_job->potentials.end(); ++iter){
     x_vec.append((*iter)[0]);
@@ -113,22 +114,29 @@ void SimVisualize::showPotPlot()
     val_vec.append((*iter)[2]);
     // qDebug() << tr("x: %1, y: %2, val: %3").arg((*iter)[0]).arg((*iter)[1]).arg((*iter)[2]);
   }
+  qDebug() << tr("QVectors filled. Size of vectors: %1").arg(x_vec.size());
 
 
-
+  QCPColorMap *colorMap = new QCPColorMap(customPlot->xAxis, customPlot->yAxis);
+  int nx = qSqrt(x_vec.size());
+  int ny = qSqrt(y_vec.size());
+  colorMap->data()->setSize(nx, ny);
   // qDebug() << tr("Setting colurMap");
   // set range for x and y in pixels.
   colorMap->data()->setRange(QCPRange(x_vec.first(), x_vec.last()), QCPRange(y_vec.first(), y_vec.last()));
 
+  qDebug() << tr("fill colorMap");
   // now we assign some data, by accessing the QCPColorMapData instance of the color map:
   int x_ind, y_ind;
   for (int i=0; i<nx; ++i){
     for (int j=0; j<ny; ++j){
       // get corresponding cell index from coordinate
+      // qDebug() << tr("i: %1, j: %2").arg(i).arg(j);
       colorMap->data()->coordToCell(x_vec[i*nx + j], y_vec[i*nx + j], &x_ind, &y_ind);
       colorMap->data()->setCell(x_ind, y_ind, val_vec[i*nx + j]);
     }
   }
+  qDebug() << tr("colorMap filled");
 
   // configure axis rect:
   // customPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom); // this will also allow rescaling the color scale by dragging/zooming
