@@ -1,10 +1,11 @@
-// @file:     pot_plot.h
-// @author:   Nathan
-// @created:  2017.10.27
-// @editted:  2018.01.17 - Nathan
-// @license:  GNU LGPL v3
-//
-// @desc:     pot_plot objects for creation of potential plots on design panel.
+/** @file:     pot_plot.h
+ *  @author:   Nathan
+ *  @created:  2017.10.27
+ *   @editted:  2018.01.17 - Nathan
+ *  @license:  GNU LGPL v3
+ *
+ *  @brief:     Function prototypes for the PotPlot object.
+ */
 
 #ifndef _GUI_PR_POT_PLOT_H_
 #define _GUI_PR_POT_PLOT_H_
@@ -20,10 +21,11 @@ namespace prim{
   class PotPlot: public prim::Item
   {
   public:
-    // constructor, create an electrode given two points
+    //! constructor, create a PotPlot given a QPixmap of the plot,
+    //! and a QRectF to contain it.
     PotPlot(int lay_id, QPixmap potential_plot, QRectF graph_container);
 
-    // destructor
+    //! destructor
     ~PotPlot(){}
 
     //initializer

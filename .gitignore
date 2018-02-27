@@ -13,6 +13,9 @@ src/log/
 *.log
 Makefile
 
+#documentation
+doxygen
+
 #PoissonSolver outputs
 *outfile.txt
 *outrho.txt
