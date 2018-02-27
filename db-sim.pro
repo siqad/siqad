@@ -98,10 +98,10 @@ HEADERS += \
 	src/gui/widgets/input_field.h \
 	src/gui/widgets/info_panel.h \
 	src/qcustomplot.h\
-  src/gui/widgets/layer_editor.h \
-  src/gui/widgets/sim_manager.h \
-  src/gui/widgets/sim_visualize_panel.h \
-  src/gui/widgets/afm_panel.h
+    src/gui/widgets/layer_editor.h \
+    src/gui/widgets/sim_manager.h \
+    src/gui/widgets/sim_visualize_panel.h \
+    src/gui/widgets/afm_panel.h
 
 
 SOURCES += \
@@ -111,10 +111,10 @@ SOURCES += \
 	src/gui/widgets/input_field.cc \
 	src/gui/widgets/info_panel.cc \
 	src/qcustomplot.cpp\
-  src/gui/widgets/layer_editor.cc \
-  src/gui/widgets/sim_manager.cc \
-  src/gui/widgets/sim_visualize_panel.cc \
-  src/gui/widgets/afm_panel.cc
+    src/gui/widgets/layer_editor.cc \
+    src/gui/widgets/sim_manager.cc \
+    src/gui/widgets/sim_visualize_panel.cc \
+    src/gui/widgets/afm_panel.cc
 
 
 #####################
@@ -149,8 +149,9 @@ INSTALLS += sim_common
 # SimAnneal
 
 sim_simanneal.path = $$EXEC_DIR/src/phys/simanneal
-sim_simanneal.files = $$PHYS_DIR/simanneal/engine_description.xml
-sim_simanneal.files += $$PHYS_DIR/simanneal/option_dialog.ui
+sim_simanneal.files = \
+    $$PHYS_DIR/simanneal/engine_description.xml \
+    $$PHYS_DIR/simanneal/option_dialog.ui
 linux: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal
 macx:  sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal
 win32: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal.exe
@@ -159,18 +160,20 @@ INSTALLS += sim_simanneal
 # AFMMarcus
 
 sim_afmmarcus.path = $$EXEC_DIR/src/phys/afmmarcus
-sim_afmmarcus.files = $$PHYS_DIR/afmmarcus/afm_line_scan.physeng
-sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/hopping_animator.physeng
-sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/afm_line_scan.ui
-sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/hopping_animator.ui
-linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/afmmarcus
-linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/afm.py
-linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/animator.py
-linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/channel.py
-linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/db-sim-connector.py
-linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/hopper.py
-linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/marcus.py
-linux: sim_afmmarcus.files += $$PHYS_DIR/afmmarcus/src/python/model.py
+sim_afmmarcus.files = \
+    $$PHYS_DIR/afmmarcus/afm_line_scan.physeng \
+    $$PHYS_DIR/afmmarcus/hopping_animator.physeng \
+    $$PHYS_DIR/afmmarcus/afm_line_scan.ui \
+    $$PHYS_DIR/afmmarcus/hopping_animator.ui
+!win32: sim_afmmarcus.files += \
+    $$PHYS_DIR/afmmarcus/src/afmmarcus \
+    $$PHYS_DIR/afmmarcus/src/python/afm.py \
+    $$PHYS_DIR/afmmarcus/src/python/animator.py \
+    $$PHYS_DIR/afmmarcus/src/python/channel.py \
+    $$PHYS_DIR/afmmarcus/src/python/db-sim-connector.py \
+    $$PHYS_DIR/afmmarcus/src/python/hopper.py \
+    $$PHYS_DIR/afmmarcus/src/python/marcus.py \
+    $$PHYS_DIR/afmmarcus/src/python/model.py
 INSTALLS += sim_afmmarcus
 
 # PoisSolver
