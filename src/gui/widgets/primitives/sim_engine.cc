@@ -143,6 +143,9 @@ QList<QPair<QString, QString>> SimEngine::loadSimParamsFromDialog()
     if (param.gui_object_type == "QLineEdit") {
       retrieved_sim_params.append(QPair<QString, QString>(param.name, static_cast<QLineEdit*>(find_widget)->text()));
       qDebug() << QObject::tr("Added sim param %1 with content %2").arg(param.name).arg(static_cast<QLineEdit*>(find_widget)->text());
+    } else if (param.gui_object_type == "QComboBox") {
+      retrieved_sim_params.append(QPair<QString, QString>(param.name, static_cast<QComboBox*>(find_widget)->currentText()));
+      qDebug() << QObject::tr("Added sim param %1 with content %2").arg(param.name).arg(static_cast<QComboBox*>(find_widget)->currentText());
     }
     // TODO radio buttons
   }
