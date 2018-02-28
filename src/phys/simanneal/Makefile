@@ -1,12 +1,16 @@
 #### PROJECT SETTINGS ####
 # The name of the executable to be created
 ifeq ($(FOR_OS),win)
+	# MXE paths
+	MXE_INCLUDE_PATH=/opt/mxe/usr/i686-w64-mingw32.static/include
+	MXE_LIB_PATH=/opt/mxe/usr/i686-w64-mingw32.static/lib
+
 	# Boost compiled with mingw32
-	MINGW_BOOST_INC = /usr/local/win32/include
-	MINGW_BOOST_LIB = /usr/local/win32/lib
+	BOOST_INCLUDE_PATH = $(MXE_INCLUDE_PATH)/boost
+	BOOST_LIB_PATH=$(MXE_LIB_PATH)
 
 	BIN_EXT = .exe
-	CXX = i686-w64-mingw32.static-g++ -I $(MINGW_BOOST_INC) -L $(MINGW_BOOST_LIB)
+	CXX = i686-w64-mingw32.static-g++ -I $(MXE_INCLUDE_PATH) -L $(MXE_LIB_PATH)
 	PKG_CONFIG = i686-w64-mingw32.static-pkg-config
 endif
 BIN_NAME := simanneal$(BIN_EXT)
