@@ -18,6 +18,8 @@ namespace prim{
   // forward declarations
   class Layer;
 
+  //! An item that implements a colour map of the electrostatic potential due to
+  //! electrodes in the system.
   class PotPlot: public prim::Item
   {
   public:

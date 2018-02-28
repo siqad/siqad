@@ -33,8 +33,10 @@ namespace prim{
     // Initializer for initial attribute values.
     void initElectrode(int lay_id, QPointF point1_in, QPointF point2_in, double potential_in=0, int electrode_type_in=0);
 
-    // sets the electrode potential to givenPotential.
+    //! sets the electrode potential to givenPotential.
     void setPotential(double givenPotential);
+    //! gets the electrode potential to givenPotential.
+    double getPotential(void) const {return potential;}
 
     // accessors
     QPointF getPoint1(void){return point1;}
@@ -44,7 +46,6 @@ namespace prim{
     qreal getWidth(void){return elec_width;}
     qreal getHeight(void){return elec_height;}
     qreal getDepth(void){return elec_depth;}
-    double getPotential(void) const {return potential;}
 
     //! Updates the electrode with its new location. Call this after moving the electrode.
     void updatePoints(QPointF);

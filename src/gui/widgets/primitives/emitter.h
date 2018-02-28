@@ -1,12 +1,12 @@
-// @file:     emitter.h
-// @author:   Jake
-// @created:  2016.11.24
-// @editted:  2017.05.09  - Jake
-// @license:  GNU LGPL v3
-//
-// @desc:     Assistance class Emitter which allows non QWidget object to trigger
-//            an interrupt to the DesignWidet when clicked.
-
+/** @file:     emitter.h
+ *  @author:   Jake
+ *  @created:  2016.11.24
+ *  @editted:  2017.05.09  - Jake
+ *  @license:  GNU LGPL v3
+ *
+ *  @brief:     Assistance class Emitter which allows non QWidget object to trigger
+ *             an interrupt to the DesignWidet when clicked.
+ */
 
 #ifndef _PRIM_EMITTER_H_
 #define _PRIM_EMITTER_H_
@@ -27,19 +27,19 @@ namespace prim{
 
   public:
 
-    // get or create static instance of Emitter object
+    //! get or create static instance of Emitter object
     static Emitter *instance();
 
-    // delete the static instance
+    //! delete the static instance
     static void clear();
 
-    // emit a signal indicating the given item has been clicked
+    //! emit a signal indicating the given item has been clicked
     void selectClicked(Item *);
 
-    // emit a signal telling DesignPanel to add item to scene
+    //! emit a signal telling DesignPanel to add item to scene
     void addItemToScene(Item *);
 
-    // emit a signal telling DesignPanel to remove item from scene
+    //! emit a signal telling DesignPanel to remove item from scene
     void removeItemFromScene(Item *);
 
   signals:
