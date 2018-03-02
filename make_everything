@@ -12,26 +12,32 @@ qmake_dir=$(cd `dirname $0` && pwd)
 
 # figure out which qmake command to use
 if [ "$FOR_OS" == "win32" ]; then
+    export FOR_OS
     QMAKE_COMMAND=i686-w64-mingw32.static-qmake-qt5
+    make_flag=release
 elif [ "$FOR_OS" == "win64" ]; then
+    export FOR_OS
     QMAKE_COMMAND=x86_64-w64-mingw32.static-qmake-qt5
+    make_flag=release
 else
     QMAKE_COMMAND=qmake
 fi
 
 
 # use qmake to create Make files for the GUI
+echo "Running qmake..."
 $QMAKE_COMMAND "$qmake_dir"
 
 # make simanneal
-cd $qmake_dir/src/phys/simanneal && make $multicore_compile
+echo "Building SimAnneal... $FOR_OS"
+cd $qmake_dir/src/phys/simanneal
+make $multicore_compile FOR_OS=$FOR_OS
 
 # make afmmarcus
-cd $qmake_dir/src/phys/afmmarcus/src && make $multicore_compile
-
-# use qmake to create Makefiles for the GUI
-#cd ../../../.. && qmake
+echo "Building AFMMarcus... $FOR_OS"
+cd $qmake_dir/src/phys/afmmarcus/src
+make $multicore_compile FOR_OS=$FOR_OS
 
 # make the GUI and copy physics engine files over
-cd $make_dir
-make $multicore_compile install
+echo "Building GUI..."
+cd $make_dir && make $make_flag $multicore_compile install

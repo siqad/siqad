@@ -7,6 +7,8 @@ db-sim
 *.pyc
 qrc_application.cpp
 build
+win32
+win64
 
 # logs and databases
 src/log/

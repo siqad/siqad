@@ -1,18 +1,4 @@
 #### PROJECT SETTINGS ####
-# The name of the executable to be created
-ifeq ($(FOR_OS),win)
-	# MXE paths
-	MXE_INCLUDE_PATH=/opt/mxe/usr/i686-w64-mingw32.static/include
-	MXE_LIB_PATH=/opt/mxe/usr/i686-w64-mingw32.static/lib
-
-	# Boost compiled with mingw32
-	BOOST_INCLUDE_PATH = $(MXE_INCLUDE_PATH)/boost
-	BOOST_LIB_PATH=$(MXE_LIB_PATH)
-
-	BIN_EXT = .exe
-	CXX = i686-w64-mingw32.static-g++ -I $(MXE_INCLUDE_PATH) -L $(MXE_LIB_PATH)
-	PKG_CONFIG = i686-w64-mingw32.static-pkg-config
-endif
 BIN_NAME := simanneal$(BIN_EXT)
 # Compiler used
 CXX ?= g++
@@ -42,6 +28,46 @@ DLINK_FLAGS =
 DESTDIR = /
 # Install path (bin/ is appended automatically)
 INSTALL_PREFIX = usr/local
+
+# Special settings for cross-compiling for Windows
+ifeq ($(FOR_OS),win32)
+	# MXE paths
+	MXE_INCLUDE_PATH=/opt/mxe/usr/i686-w64-mingw32.static/include
+	MXE_LIB_PATH=/opt/mxe/usr/i686-w64-mingw32.static/lib
+
+	# Boost compiled with mingw32
+	BOOST_INCLUDE_PATH=$(MXE_INCLUDE_PATH)/boost
+	BOOST_LIB_PATH=$(MXE_LIB_PATH)
+
+	# Windows Python files
+	PYTHON_INCLUDE_PATH=/home/samuelngsh/Python36-32/include
+	PYTHON_LIB_PATH=/home/samuelngsh/Python36-32/libs
+
+	BIN_NAME=simanneal.exe
+	CXX=i686-w64-mingw32.static-g++ -I $(PYTHON_INCLUDE_PATH) -L $(PYTHON_LIB_PATH) -I $(BOOST_INCLUDE_PATH) -L $(BOOST_LIB_PATH)
+	LIBS=
+	LINK_FLAGS = -lboost_system-mt -lboost_filesystem-mt -lpython36
+	PKG_CONFIG=i686-w64-mingw32.static-pkg-config
+endif
+ifeq ($(FOR_OS),win64)
+	# MXE paths
+	MXE_INCLUDE_PATH=/opt/mxe/usr/x86_64-w64-mingw32.static/include
+	MXE_LIB_PATH=/opt/mxe/usr/x86_64-w64-mingw32.static/lib
+
+	# Boost compiled with mingw32
+	BOOST_INCLUDE_PATH=$(MXE_INCLUDE_PATH)/boost
+	BOOST_LIB_PATH=$(MXE_LIB_PATH)
+
+	# Windows Python files
+	PYTHON_INCLUDE_PATH=/home/samuelngsh/Python36-64/include
+	PYTHON_LIB_PATH=/home/samuelngsh/Python36-64/libs
+
+	BIN_NAME=simanneal.exe
+	CXX=x86_64-w64-mingw32.static-g++ -I $(PYTHON_INCLUDE_PATH) -L $(PYTHON_LIB_PATH) -I $(BOOST_INCLUDE_PATH) -L $(BOOST_LIB_PATH)
+	LIBS=
+	LINK_FLAGS=-lboost_system-mt -lboost_filesystem-mt -lpython36
+	PKG_CONFIG=x86_64-w64-mingw32.static-pkg-config
+endif
 
 #### END PROJECT SETTINGS ####
 
