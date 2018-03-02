@@ -135,7 +135,10 @@ UI_DIR		= $$DESTDIR/.ui
 
 # official physics engines
 
-EXEC_DIR = $$DESTDIR
+# directory holding the binary, $$OUT_PWD makes it relative to the 
+# directory containing the Makefile
+EXEC_DIR = $$OUT_PWD/$$DESTDIR
+# directory holding the physics engines, relative to db-sim.pro
 PHYS_DIR = src/phys
 
 macx:   EXEC_DIR = $${DESTDIR}/$${TARGET}.app/Contents/MacOS

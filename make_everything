@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -e
+
+# determine number of physical cores to use for compilation
+cpu_cores=$(grep "^core id" /proc/cpuinfo | sort -u | wc -l)
+multicore_compile="-j $cpu_cores"
+
+# store handy directories
+make_dir=$(pwd)
+qmake_dir=$(cd `dirname $0` && pwd)
+
+# figure out which qmake command to use
+if [ "$FOR_OS" == "win32" ]; then
+    QMAKE_COMMAND=i686-w64-mingw32.static-qmake-qt5
+elif [ "$FOR_OS" == "win64" ]; then
+    QMAKE_COMMAND=x86_64-w64-mingw32.static-qmake-qt5
+else
+    QMAKE_COMMAND=qmake
+fi
+
+
+# use qmake to create Make files for the GUI
+$QMAKE_COMMAND "$qmake_dir"
+
+# make simanneal
+cd $qmake_dir/src/phys/simanneal && make $multicore_compile
+
+# make afmmarcus
+cd $qmake_dir/src/phys/afmmarcus/src && make $multicore_compile
+
+# use qmake to create Makefiles for the GUI
+#cd ../../../.. && qmake
+
+# make the GUI and copy physics engine files over
+cd $make_dir
+make $multicore_compile install
