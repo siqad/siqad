@@ -19,7 +19,7 @@ h1.groupheader {
 }
 
 h2.groupheader {
-	border-bottom: 1px solid #A9A9A9;
+	border-bottom: 1px solid #505050;
   color: #d1d1d1;
 	font-size: 150%;
 	font-weight: normal;
@@ -122,12 +122,12 @@ div.tabs, div.tabs2, div.tabs3{
   background-color: #333333;
   color: #d1d1d1;
   text-shadow: none;
-	border: 1px solid #404040;
+	border: 1px solid #505050;
 }
 
 .tablist li.current a{
   background-image: none;
-  background-color: #404040;
+  background-color: #505050;
   color: #d1d1d1;
   text-shadow: none;
 }
@@ -141,7 +141,7 @@ div.tabs, div.tabs2, div.tabs3{
 
 .tablist a:hover{
   background-image: none;
-  background-color: #404040;
+  background-color: #505050;
   color: #d1d1d1;
   text-shadow: none;
 }
@@ -362,7 +362,8 @@ div.center {
 
 img {
   background-color: #333333;
-	border: 0px;
+	border: none;
+  border-color: none;
   filter: invert(79%);
 }
 
@@ -372,7 +373,8 @@ address.footer {
 }
 
 img.footer {
-	border: 0px;
+	border: none;
+  border-color: none;
 	vertical-align: middle;
 }
 
@@ -515,7 +517,7 @@ table.memberdecls {
 }
 
 .memSeparator {
-        border-bottom: 1px solid #DEE4F0;
+        border-bottom: 1px solid #505050;
         line-height: 1px;
         margin: 0px;
         padding: 0px;
@@ -983,7 +985,7 @@ table.fieldtable {
 	height:30px;
 	line-height:30px;
 	color:#ABABAB;
-	border:solid 1px #D3D3D3;
+	border:solid 1px #505050;
 	overflow:hidden;
 	margin:0px;
 	padding:0px;
@@ -998,6 +1000,7 @@ table.fieldtable {
 	background-image: none;
 	background-repeat:no-repeat;
 	background-position:right;
+	border:solid 1px #505050;
 	color:#d1d1d1;
 }
 
@@ -1009,13 +1012,13 @@ table.fieldtable {
 	outline: none;
   color: #d1d1d1;
 	font-family: 'Lucida Grande',Geneva,Helvetica,Arial,sans-serif;
-	text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9);
+	text-shadow: none;
 	text-decoration: none;
 }
 
 .navpath li.navelem a:hover
 {
-	color:#404040;
+	color:#505050;
 }
 
 .navpath li.footer
@@ -1076,7 +1079,7 @@ div.header
         background-repeat:repeat-x;
 	background-color: #333333;
 	margin:  0px;
-	border-bottom: 1px solid #D5D5D5;
+	border-bottom: 1px solid #505050;
 }
 
 div
