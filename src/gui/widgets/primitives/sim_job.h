@@ -1,10 +1,11 @@
-// @file:     sim_job.h
-// @author:   Samuel
-// @created:  2017.10.10
-// @editted:  2017.10.10 - Samuel
-// @license:  GNU LGPL v3
-//
-// @desc:     SimJob object that describes a simulation job and stores the results from that job
+/** @file:     sim_job.h
+ *  @author:   Samuel
+ *  @created:  2017.10.10
+ *  @editted:  2017.10.10 - Samuel
+ *  @license:  GNU LGPL v3
+ *
+ *  @desc:     SimJob object that describes a simulation job and stores the results from that job
+ */
 
 #ifndef _PRIM_SIM_JOB_H_
 #define _PRIM_SIM_JOB_H_
@@ -17,14 +18,17 @@
 
 namespace prim{
 
+  //! A single run of a simulation engine. Takes care of setting up simulation
+  //! parameters, calling simulation engine binaries, and reading simulation
+  //! results.
   class SimJob : public QObject
   {
     Q_OBJECT
   public:
-    // constructor
+    //! constructor
     SimJob(const QString &nm, SimEngine *eng=0, QWidget *parent=0);
 
-    // destructor
+    //! destructor
     ~SimJob() {};
 
     // JOB SETUP
@@ -39,67 +43,72 @@ namespace prim{
     bool loadJob(const QString &) {return false;}
 
     // simulation parameters
+    //! Returns a list key-value pairs representing simulation parameters.
     QList<QPair<QString, QString>> simParams() const {return sim_params;}
+    //! Appends two strings to the list of simulation parametres as a key-value pair
     void addSimParam(const QString &field, const QString &value) {sim_params.append(qMakePair(field, value));}
+    //! Appends a key-value pair to the list of simulation parameters
     void addSimParams(const QList<QPair<QString, QString>> &add_params) {sim_params.append(add_params);}
     QList<QPair<QString, QString>> loadSimParamsFromDialog();
+    //! Loads simulation parameters from the SimManager dialog.
     void loadSimParamsFromEngineDialog();
 
 
     // JOB EXECUTION
 
-    // call sim engine binary
+    //! call sim engine binary
     bool invokeBinary();
 
 
     // JOB RESULT
 
-    bool readResults();     // read result XML
-    bool processResults();  // process results
+    bool readResults();     //!< read result XML
+    bool processResults();  //!< process results
 
     // result storage and access
-    // elec_dists struct for showing where electrons are
+    //! elec_dists struct for showing where electrons are
     struct elecDist{
       QString dist_str;
       QList<int> dist_ls; // TODO might not be necessary
       float energy;
     };
 
-    int distCount() {return dist_count;}  // return the number of charge distributions this has
+    int distCount() {return dist_count;}  //!< return the number of charge distributions this has
 
     struct LineScanPath {
-      QList<QPair<float,float>> afm_nodes;    // afm nodes in angstrom
-      QList<QPair<float,float>> db_locs_enc;  // db locs in angstrom
+      QList<QPair<float,float>> afm_nodes;    //!< afm nodes in angstrom
+      QList<QPair<float,float>> db_locs_enc;  //!< db locs in angstrom
       QList<QString> results;
     };
 
     // ACCESSORS
 
-    // job name
+    //! job name
     QString name() {return job_name;}
 
-    // engine used
+    //! engine setter
     void setEngine(SimEngine *eng) {engine = eng;}
     //prim::SimEngine *engine() {return engine;}
+    //! getter for engine name
     QString engineName() {return engine ? engine->name() : "Undefined";}
 
-    QString runtimeTempDir();     // runtime job directory
-    QString problemFile();        // runtime problem file
-    QString resultFile();         // runtime result file
+    QString runtimeTempDir();     //!< runtime job directory
+    QString problemFile();        //!< runtime problem file
+    QString resultFile();         //!< runtime result file
 
     QDateTime startTime() {return start_time;}
     QDateTime endTime() {return end_time;}
 
-    bool isComplete() {return completed;} // indicate whether the job has been completed
+    bool isComplete() {return completed;} //!< indicate whether the job has been completed
 
     QString terminalOutput() {return terminal_output;}
     void saveTerminalOutput();
 
     // variables TODO put them back to private later, with proper accessors
-    QList<QVector<float>> potentials; // potentials[result_ind][0] is x, ...[1] is y, ...[2] is potential value
-    QList<QPair<float,float>> physlocs;   // physlocs[dot_ind].first or .second
-    QList<QList<int>> elec_dists;         // elec_dists[result_ind][dot_ind] TODO change this to QList of QVectors
-    QList<LineScanPath> line_scan_paths;  // line scan path props and results
+    QList<QVector<float>> potentials; //!< potentials[result_ind][0] is x, ...[1] is y, ...[2] is potential value
+    QList<QPair<float,float>> physlocs;   //!< physlocs[dot_ind].first or .second
+    QList<QList<int>> elec_dists;         //!< elec_dists[result_ind][dot_ind] TODO change this to QList of QVectors
+    QList<LineScanPath> line_scan_paths;  //!< line scan path props and results
   private:
 
     void deduplicateDist();           // deduplicate charge distribution results

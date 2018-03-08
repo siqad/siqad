@@ -1,36 +1,36 @@
-// @file:     dbdot.h
-// @author:   Jake
-// @created:  2016.11.15
-// @editted:  2017.06.07  - Jake
-// @license:  GNU LGPL v3
-//
-// @desc:     DBDot Widget for functionality of dangling bonds
+/** @file:     dbdot.h
+ *  @author:   Jake
+ *  @created:  2016.11.15
+ *  @editted:  2017.06.07  - Jake
+ *  @license:  GNU LGPL v3
+ *
+ *  @brief:     DBDot Widget for functionality of dangling bonds
+ */
 
 #ifndef _GUI_PR_DBDOT_H_
 #define _GUI_PR_DBDOT_H_
 
 
 #include <QtWidgets>
-
 #include "item.h"
 #include "latdot.h"
 
-
-
 namespace prim{
 
-  // Specific Item derived class for a dangling bond on the lattice. Each
-  // dangling bond should correspond to a source lattice dot. For
-  // generality, each DBDot has its own physical location that will typically
-  // be the same as the source LatticeDot.
-
+  //! Specific Item derived class for a dangling bond on the lattice. Each
+  //! dangling bond should correspond to a source lattice dot. For
+  //! generality, each DBDot has its own physical location that will typically
+  //! be the same as the source LatticeDot.
   class DBDot: public prim::Item
   {
   public:
 
-    // constructor
+    //! constructor, creating DBDot using the DBGenTool.
     DBDot(int lay_id, prim::LatticeDot *src=0, int elec_in=0);
+    //! constructor, creating DBDot from a design file.
     DBDot(QXmlStreamReader *, QGraphicsScene *);
+
+    // initializer
     void initDBDot(int lay_id, prim::LatticeDot *src=0, int elec_in=0);
 
     // destructor
@@ -39,12 +39,19 @@ namespace prim{
     // accessors
     QPointF getPhysLoc() const {return phys_loc;}
 
+    //! Toggle between occupied and unoccupied.
     void toggleElec();
+    //! Set electron occupancy.
     void setElec(int e_in);
+    //! Get electron occupancy.
     int getElec() {return elec;}
+
+    //! Set electron occupant visibility
     void setShowElec(int se_in);
 
+    //! Set the DBDot source as src, and update phys_loc to that of src.
     void setSource(prim::LatticeDot *src);
+    //! Get the DBDot source.
     prim::LatticeDot *getSource() const {return source;}
 
     void setFill(float fill){fill_fact = fill;}

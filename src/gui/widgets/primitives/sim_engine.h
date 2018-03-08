@@ -16,23 +16,28 @@
 
 namespace prim{
 
+  //! A simulation engine that can be used with the design tool. 
   class SimEngine : public QObject
   {
     Q_OBJECT
   public:
-    // constructor
+    //! constructor, uses engine_description.xml
     SimEngine(const QString &eng_desc_path, QWidget *parent=0);
+    //! constructor, uses an engine name and root path
     SimEngine(const QString &eng_nm, const QString &eng_rt, QWidget *parent=0);
+
+    //initializer
     void initSimEngine(const QString &eng_nm, const QString &eng_rt);
 
-    // destructor
+    //! destructor
     ~SimEngine() {};
 
-    // read sim param dialog from provided *.ui file (xml)
+    //! read sim param dialog from provided *.ui file (xml)
     bool constructSimParamDialog();
+    //! loads the simulation parameters entered in the SimManager dialog.
     QList<QPair<QString, QString>> loadSimParamsFromDialog();
 
-    // types of sim params expected for this engine
+    //! types of sim params expected for this engine
     struct ExpectedSimParam {
       ExpectedSimParam(const QString &param_nm, const QString &g_obj_nm, const QString &g_obj_type, const QString &g_def_txt = QString())
         : name(param_nm), gui_object_name(g_obj_nm), gui_object_type(g_obj_type), gui_default_text(g_def_txt)
@@ -43,7 +48,9 @@ namespace prim{
       QString gui_object_type;  // type of field element for casting (only support QLineEdit so far)
       QString gui_default_text; // default text to appear in the element TODO remove if not needed
     };
+    //! Add an expected simulation parameter, based on the option_dialog.ui file.
     void addExpectedSimParam(const QString &param_nm, const QString &g_obj_nm, const QString &g_obj_type, const QString &g_def_txt) {expected_sim_params.append(ExpectedSimParam(param_nm, g_obj_nm, g_obj_type, g_def_txt));}
+    //! Get a list of the expected simulation parameters.
     QList<ExpectedSimParam> *expectedSimParams() {return &expected_sim_params;}
 
     // ACCESSORS

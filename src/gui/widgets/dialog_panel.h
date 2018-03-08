@@ -1,11 +1,11 @@
-// @file:     dialog_panel.h
-// @author:   Jake
-// @created:  2016.11.02
-// @editted:  2017.05.11  - Jake
-// @license:  GNU LGPL v3
-//
-// @desc:     PlainTextEdit field in which to display stdout when instructed.
-
+/** @file:     dialog_panel.h
+ *  @author:   Jake
+ *  @created:  2016.11.02
+ *  @editted:  2017.05.11  - Jake
+ *  @license:  GNU LGPL v3
+ *
+ *  @brief:     PlainTextEdit field in which to display stdout when instructed.
+ */
 
 #ifndef _GUI_DIALOG_PANEL_H_
 #define _GUI_DIALOG_PANEL_H_
@@ -22,13 +22,14 @@ namespace gui{
 
   public:
 
-    // constructor
+    //! constructor
     explicit DialogPanel(QWidget *parent=0);
 
-    // destructor
+    //! destructor
     ~DialogPanel();
 
     // public methods
+    //! Write QString s into the QPlainTextEdit widget
     void echo(const QString& s);
 
   protected:

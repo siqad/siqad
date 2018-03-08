@@ -1,12 +1,13 @@
-// @file:     design_panel.h
-// @author:   Jake
-// @created:  2016.11.02
-// @editted:  2017.06.07  - Jake
-// @license:  GNU LGPL v3
-//
-// @desc:     Top level widget for the design panel. Contains all layers and
-//            functionality for reating, selecting, moving, etc. object in the
-//            design.
+/** @file:     design_panel.h
+ *  @author:   Jake
+ *  @created:  2016.11.02
+ *  @editted:  2017.06.07  - Jake
+ *  @license:  GNU LGPL v3
+ *
+ *  @brief:     Top level widget for the design panel. Contains all layers and
+ *            functionality for reating, selecting, moving, etc. object in the
+ *            design.
+ */
 
 #ifndef _GUI_DESIGN_PANEL_H_
 #define _GUI_DESIGN_PANEL_H_
@@ -27,8 +28,8 @@
 
 namespace gui{
 
-  // Highest level of the design window visualization. Contains all
-  // functionality for creating and viewing dangling bonds.
+  //! Highest level of the design window visualization. Contains all
+  //! functionality for creating and viewing dangling bonds.
   class DesignPanel : public QGraphicsView
   {
     Q_OBJECT
@@ -38,89 +39,94 @@ namespace gui{
     //enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool, ElectrodeTool, AFMPathTool};
     //enum DisplayMode{DesignMode, SimDisplayMode};
 
+
     class UndoCommand;
 
-    // constructor
+    //! constructor
     DesignPanel(QWidget *parent=0);
 
-    // destructor
+    //! destructor
     ~DesignPanel();
 
     // clear and reset
-    void initDesignPanel();              // used on first init or after reset
-    void clearDesignPanel(bool reset=false);  // used on exit or before reset
-    void resetDesignPanel();             // call for reset
+    void initDesignPanel();              //!< used on first init or after reset
+    void clearDesignPanel(bool reset=false);  //!< used on exit or before reset
+    void resetDesignPanel();             //!< call for reset
 
     // ACCESSORS
 
-    // add a new Item to the Layer at the given index of the stack. If layer_index==-1,
-    // add the new item to the top_layer. If ind != -1, inserts the Item into the given
-    // location of the Layer Item stack.
+    //! add a new Item to the Layer at the given index of the stack. If layer_index==-1,
+    //! add the new item to the top_layer. If ind != -1, inserts the Item into the given
+    //! location of the Layer Item stack.
     void addItem(prim::Item *item, int layer_index=-1, int ind=-1);
 
-    // remove the given Item from the given Layer if possible
+    //! remove the given Item from the given Layer if possible
     void removeItem(prim::Item *item, prim::Layer* layer);
 
-    // add a new Item to the graphics scene. This either means the Item is already owned
-    // by another class and only needs to be shown graphically, or the Item is merely
-    // a temporary graphics item for purely indicative purposes.
+    //! add a new Item to the graphics scene. This either means the Item is already owned
+    //! by another class and only needs to be shown graphically, or the Item is merely
+    //! a temporary graphics item for purely indicative purposes.
     void addItemToScene(prim::Item *item);
 
-    // remove item from scene without deleting the item pointer. The caller has
-    // to handle the cleanup if so desired.
+    //! remove item from scene without deleting the item pointer. The caller has
+    //! to handle the cleanup if so desired.
     void removeItemFromScene(prim::Item *item);
 
-    // return a list of selected prim::Items
+    //! return a list of selected prim::Items
     QList<prim::Item*> selectedItems();
 
-    // add a new layer with the given name. If no name is given, a default scheme
-    // is used. Checks if the layer already exists.
+    //! add a new layer with the given name. If no name is given, a default scheme
+    //! is used. Checks if the layer already exists.
     void addLayer(const QString &name = QString(), const prim::Layer::LayerType cnt_type=prim::Layer::DB, const float zoffset = 0, const float zheight = 0);
 
-    // attempt to remove a layer, either by name or index
+    //! attempt to remove a layer, by name
     void removeLayer(const QString &name);
+    //! attempt to remove a layer, by index
     void removeLayer(int n);
 
-    // retreieve entire layer stack TODO might not be needed, delete if true
+    //! retreieve entire layer stack
+    //TODO might not be needed, delete if true
     QStack<prim::Layer*>* getLayers() {return &layers;}
 
-    // returns a pointer to the requested layer if it exists, else 0
+    //! returns a pointer to the requested layer if it exists, else 0
     prim::Layer* getLayer(const QString &name) const;
+    //! returns a pointer to the requested layer if it exists, else 0
     prim::Layer* getLayer(int n) const;
 
-    // get the top_layer index
+    //! get the top_layer index
     int getLayerIndex(prim::Layer *layer=0) const;
 
-    // get a list of all the surface dangling bonds
+    //! get a list of all the surface dangling bonds
     QList<prim::DBDot *> getSurfaceDBs() const;
 
-    // change the top layer to the requested layer
+    //! change the top layer to the requested layer
     void setLayer(const QString &name);
+    //! change the top layer to the requested layer
     void setLayer(int n);
 
-    // resets the drawing layer and builds a lattice from the given <lattice>.ini
-    // file. If no file is given, the default lattice is used
+    //! resets the drawing layer and builds a lattice from the given <lattice>.ini
+    //! file. If no file is given, the default lattice is used
     void buildLattice(const QString &fname=QString());
     void setScenePadding();
 
-    // update the tool type
+    //! update the tool type
     void setTool(gui::ToolType tool);
 
-    // update the fill values for the surface dangling bonds, no check for
-    // array size/contents.
+    //! update the fill values for the surface dangling bonds, no check for
+    //! array size/contents.
     void setFills(float *fills);
 
-    // set the undo stack as clean at the current index
+    //! set the undo stack as clean at the current index
     void stateSet() {undo_stack->setClean();}
 
-    // check if the contents of the DesignPanel have changed
+    //! check if the contents of the DesignPanel have changed
     bool stateChanged() const {return !undo_stack->isClean();}
 
-    // return the current display mode
+    //! return the current display mode
     DisplayMode displayMode() {return display_mode;}
     void setDisplayMode(DisplayMode mode);
 
-    // get afm_panel pointer
+    //! get afm_panel pointer
     AFMPanel *afmPanel() {return afm_panel;}
 
     // SAVE
@@ -134,13 +140,15 @@ namespace gui{
 
 
     // SIMULATION RESULT DISPLAY
+    //! Display the simulation result from SimAnneal
     void displaySimResults(prim::SimJob *job, int dist_int);
+    //! Clear the simulation result from SimAnneal
     void clearSimResults();
+    //! Display the simulation result from PoisSolver
     void displayPotentialPlot(QPixmap potential_plot, QRectF graph_container);
 
 
   public slots:
-
     void selectClicked(prim::Item *item);
     void simVisualizeDockVisibilityChanged(bool visible);
 

@@ -1,12 +1,12 @@
-// @file:     lattice.h
-// @author:   Jake
-// @created:  2016.11.15
-// @editted:  2017.06.07  - Jake
-// @license:  GNU LGPL v3
-//
-// @desc:     Specialized Layer class, Lattice, which details the dangling
-//            bond locations.
-
+/** @file:     lattice.h
+ *  @author:   Jake
+ *  @created:  2016.11.15
+ *  @editted:  2017.06.07  - Jake
+ *  @license:  GNU LGPL v3
+ *
+ *  @desc:     Specialized Layer class, Lattice, which details the dangling
+ *             bond locations.
+ */
 
 #ifndef _GUI_PR_LATTICE_H_
 #define _GUI_PR_LATTICE_H_
@@ -20,10 +20,10 @@ namespace prim{
   {
   public:
 
-    // constructor
+    //! constructor
     Lattice(const QString &fname = QString(), int lay_id=-1);
 
-    // destructor
+    //! destructor
     ~Lattice() {}
 
   private:

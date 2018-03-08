@@ -1,10 +1,11 @@
-// @file:     ghost.h
-// @author:   Jake
-// @created:  2016.11.24
-// @editted:  2017.06.07  - Jake
-// @license:  GNU LGPL v3
-//
-// @desc:     Graphical objects for moving Items and copy/paste
+/** @file:     ghost.h
+ *  @author:   Jake
+ *  @created:  2016.11.24
+ *  @editted:  2017.06.07  - Jake
+ *  @license:  GNU LGPL v3
+ *
+ *  @brief:     Graphical objects for moving Items and copy/paste
+ */
 
 #ifndef _PRIM_GHOST_H_
 #define _PRIM_GHOST_H_
@@ -15,10 +16,10 @@
 
 namespace prim{
 
-  // node structure for describing which sources belong to which aggregate
+  //! node structure for describing which sources belong to which aggregate
   struct AggNode{
-    int index;              // index of source if not an Aggregate
-    QList<AggNode*> nodes;  // children of the Aggregate if any
+    int index;              //!< index of source if not an Aggregate
+    QList<AggNode*> nodes;  //!< children of the Aggregate if any
     enum SourceType{DBDot, Aggregate, Electrode};
 
     SourceType source_type;
@@ -36,14 +37,15 @@ namespace prim{
 
   };
 
+  //! The ghost associated with DBDots and LatticeDots. Used during move and previews.
   class GhostDot : public Item
   {
   public:
 
-    // constructor
+    //! constructor
     GhostDot(Item *item, Item *parent, QColor *pcol);
 
-    // destructor
+    //! destructor
     ~GhostDot(){}
 
     // virtual methods
@@ -60,14 +62,15 @@ namespace prim{
     QColor *pcol;           // pointer to the GhostDot color
   };
 
+  //! The ghost associated with Electrodes. Used during move and previews.
   class GhostBox : public Item
   {
   public:
 
-    // constructor
+    //! constructor
     GhostBox(Item *item, Item *parent);
 
-    // destructor
+    //! destructor
     ~GhostBox(){}
 
     // virtual methods
@@ -85,73 +88,81 @@ namespace prim{
     QColor ghost_box_color;
   };
 
-  // collection of GhostDot objects for moving Items or copy/paste, singleton
+  //! collection of GhostDot and GhostBox objects for moving Items or copy/paste, singleton
   class Ghost : public Item
   {
   public:
 
-    QHash<prim::LatticeDot*, bool> valid_hash;  // hash table for valid snap points
+    QHash<prim::LatticeDot*, bool> valid_hash;  //!< hash table for valid snap points
 
-    // get or create the static Ghost instance
+    //! get or create the static Ghost instance
     static Ghost *instance();
 
-    // destructor, potentially useful later
+    //! destructor, potentially useful later
     ~Ghost(){inst=0;}
 
-    void cleanGhost();  // reset Ghost to its empty state
+    void cleanGhost();  //!< reset Ghost to its empty state
 
+    //! Add the current Ghost to sc.
     void setScene(QGraphicsScene *sc){sc->addItem(this);}
 
-    // create a ghost image from a list of Item objects or a single Item
-    // if moving, scene_pos gives the current mouse location
+    //! create a ghost image from a list of Item objects
+    //! if moving, scene_pos gives the current mouse location
     void prepare(const QList<prim::Item*> &items, QPointF scene_pos=QPointF());
+    //! create a ghost image from a single Item
+    //! if moving, scene_pos gives the current mouse location
     void prepare(Item *item, QPointF scene_pos=QPointF());
 
-    // move center of Ghost to the given position
+    //! move center of Ghost to the given position
     void moveTo(QPointF pos);
 
+    //! get the items associated with the GhostDots
     QList<prim::Item*>& getSources() {return sources;}
+    //! get the GhostDots
     QList<prim::GhostDot*> getDots() {return dots;}
 
+    //! get the items associated with the GhostBoxes
     QList<prim::Item*>& getBoxSources() {return box_sources;}
+    //! get the GhostBoxes
     QList<prim::GhostBox*> getBoxes() {return boxes;}
 
-    // get a list of the highest level Items associated with the sources
+    //! get a list of the highest level Items associated with the sources
     QList<prim::Item*> getTopItems() const;
 
-    // get a nested list of the items included in each high level item, must
-    // free IndexList pointer after use
+    //! get a nested list of the items included in each high level item, must
+    //! free IndexList pointer after use
     prim::AggNode &getTopIndices(){return aggnode;}
 
-    // get a list corresponding to the LatticeDot associated with each GhostDot.
-    // If the Item associated with the GhostDot is not a dangling bond the list
-    // will contain a 0.
+    //! get a list corresponding to the LatticeDot associated with each GhostDot.
+    //! If the Item associated with the GhostDot is not a dangling bond the list
+    //! will contain a 0.
     QList<prim::LatticeDot*> getLattice(const QPointF &offset = QPointF()) const;
 
-    // attempt to get the lattice dot under the GhostDot correponding to the given
-    // DBDot item.
+    //! attempt to get the lattice dot under the GhostDot correponding to the given
+    //! DBDot item.
     prim::LatticeDot* getLatticeDot(prim::DBDot *db);
 
-    // get the GhostDot nearest to the center of the Ghost. If db is set, will
-    // return the neatest dangling bond GhostDot if any exists else 0.
+    //! get the GhostDot nearest to the center of the Ghost. If db is set, will
+    //! return the neatest dangling bond GhostDot if any exists else 0.
     prim::GhostDot *snapAnchor() {return anchor;}
 
-    // location of the anchor dot if the Ghost were centered at the given scene
-    // position.
+    //! location of the anchor dot if the Ghost were centered at the given scene
+    //! position.
     QPointF freeAnchor(QPointF scene_pos);
 
 
-    // accessors for ghost color
+    //! getter for ghost color
     QColor* getCol() {return &col;}
+    //! setter for ghost color
     void setCol(QColor &color) {col = color;}
 
-    // manual set the validity of the current position
+    //! manual set for the validity of the current position
     void setValid(bool val);
 
-    // check if the current position is valid.
+    //! check if the current position is valid.
     bool checkValid(const QPointF &offset = QPointF());
 
-    // change in position between the first source and GhostDot, for moving Items
+    //! change in position between the first source and GhostDot, for moving Items
     QPointF moveOffset() const;
 
 
