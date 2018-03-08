@@ -1,0 +1,335 @@
+\hypertarget{classQCPColorGradient}{}\section{Q\+C\+P\+Color\+Gradient Class Reference}
+\label{classQCPColorGradient}\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+
+
+Defines a color gradient for use with e.\+g. \hyperlink{classQCPColorMap}{Q\+C\+P\+Color\+Map}.  
+
+
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classQCPColorGradient_ac5dca17cc24336e6ca176610e7f77fc1}{Color\+Interpolation} \{ \hyperlink{classQCPColorGradient_ac5dca17cc24336e6ca176610e7f77fc1a5e30f725c9cfe93999e268a9f92afbe7}{ci\+R\+GB}, 
+\hyperlink{classQCPColorGradient_ac5dca17cc24336e6ca176610e7f77fc1af14ae62fcae11ecc07234eeaec5856cb}{ci\+H\+SV}
+ \}
+\item 
+enum \hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072}{Gradient\+Preset} \{ \\*
+\hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072add11ae369a86f3b1b6205ec72e5021fb}{gp\+Grayscale}, 
+\hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072a4f42e534cf6cff5a29a5388094d099b5}{gp\+Hot}, 
+\hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072aec8c001f62c0d5cb853db5fd85309557}{gp\+Cold}, 
+\hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072a1bb89351b6def7d220973443fe059c62}{gp\+Night}, 
+\\*
+\hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072a9e72663bf6b94b65945f7843f24e0721}{gp\+Candy}, 
+\hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072a382f0b07cec1a59d8a533438aea815d2}{gp\+Geography}, 
+\hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072a4297f4f9e212a819cd65e8e34567182b}{gp\+Ion}, 
+\hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072af1676b129f9f458ace453f280c731cf7}{gp\+Thermal}, 
+\\*
+\hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072ab7414ce4e36dc3e82e0132a7f0f41b52}{gp\+Polar}, 
+\hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072ad63adc100ef46f6b4a8a6deacec4642f}{gp\+Spectrum}, 
+\hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072a5f8a9e67b64c17ddfe4f069fe2b9fb02}{gp\+Jet}, 
+\hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072a30efe58407acfb67939032f70213a130}{gp\+Hues}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPColorGradient_a96bcc490ff9dc32b22941ce00800bce0}{Q\+C\+P\+Color\+Gradient} ()
+\item 
+\hyperlink{classQCPColorGradient_a4e570b4004fd60bd135e52d685ed2b66}{Q\+C\+P\+Color\+Gradient} (\hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072}{Gradient\+Preset} preset)
+\item 
+bool {\bfseries operator==} (const \hyperlink{classQCPColorGradient}{Q\+C\+P\+Color\+Gradient} \&other) const \hypertarget{classQCPColorGradient_aada47d8206bf2cec77462653bf471c13}{}\label{classQCPColorGradient_aada47d8206bf2cec77462653bf471c13}
+
+\item 
+bool {\bfseries operator!=} (const \hyperlink{classQCPColorGradient}{Q\+C\+P\+Color\+Gradient} \&other) const \hypertarget{classQCPColorGradient_ac641f5d2dc1686201d3cb602c871791d}{}\label{classQCPColorGradient_ac641f5d2dc1686201d3cb602c871791d}
+
+\item 
+int {\bfseries level\+Count} () const \hypertarget{classQCPColorGradient_ae7537a8e6d0fed3f1928328062bb0f4e}{}\label{classQCPColorGradient_ae7537a8e6d0fed3f1928328062bb0f4e}
+
+\item 
+Q\+Map$<$ double, Q\+Color $>$ {\bfseries color\+Stops} () const \hypertarget{classQCPColorGradient_a64f8aba7826f9c6363aacff8376cef37}{}\label{classQCPColorGradient_a64f8aba7826f9c6363aacff8376cef37}
+
+\item 
+\hyperlink{classQCPColorGradient_ac5dca17cc24336e6ca176610e7f77fc1}{Color\+Interpolation} {\bfseries color\+Interpolation} () const \hypertarget{classQCPColorGradient_a731616fabe6f2e33f71f58dd382359d8}{}\label{classQCPColorGradient_a731616fabe6f2e33f71f58dd382359d8}
+
+\item 
+bool {\bfseries periodic} () const \hypertarget{classQCPColorGradient_a860b7048f877195d2a0fb8d5a7cf5d73}{}\label{classQCPColorGradient_a860b7048f877195d2a0fb8d5a7cf5d73}
+
+\item 
+void \hyperlink{classQCPColorGradient_a18da587eb4f7fc788ea28ba15b6a12de}{set\+Level\+Count} (int n)
+\item 
+void \hyperlink{classQCPColorGradient_a724e828aa6f0ba5011a9392477c35d3a}{set\+Color\+Stops} (const Q\+Map$<$ double, Q\+Color $>$ \&color\+Stops)
+\item 
+void \hyperlink{classQCPColorGradient_a3b48be5e78079db1bb2a1188a4c3390e}{set\+Color\+Stop\+At} (double position, const Q\+Color \&color)
+\item 
+void \hyperlink{classQCPColorGradient_aa13fda86406e1d896a465a409ae63b38}{set\+Color\+Interpolation} (\hyperlink{classQCPColorGradient_ac5dca17cc24336e6ca176610e7f77fc1}{Color\+Interpolation} interpolation)
+\item 
+void \hyperlink{classQCPColorGradient_a39d6448155fc00a219f239220d14bb39}{set\+Periodic} (bool enabled)
+\item 
+void \hyperlink{classQCPColorGradient_aaf423ceb943e177b0ed2c48c811d83dc}{colorize} (const double $\ast$data, const \hyperlink{classQCPRange}{Q\+C\+P\+Range} \&range, Q\+Rgb $\ast$scan\+Line, int n, int data\+Index\+Factor=1, bool logarithmic=false)
+\item 
+void \hyperlink{classQCPColorGradient_acf0cc7fba83ef21f7b8d5d5258519db3}{colorize} (const double $\ast$data, const unsigned char $\ast$alpha, const \hyperlink{classQCPRange}{Q\+C\+P\+Range} \&range, Q\+Rgb $\ast$scan\+Line, int n, int data\+Index\+Factor=1, bool logarithmic=false)
+\item 
+Q\+Rgb {\bfseries color} (double position, const \hyperlink{classQCPRange}{Q\+C\+P\+Range} \&range, bool logarithmic=false)\hypertarget{classQCPColorGradient_a0599545c859268b025d2060dea741cea}{}\label{classQCPColorGradient_a0599545c859268b025d2060dea741cea}
+
+\item 
+void \hyperlink{classQCPColorGradient_aa0aeec1528241728b9671bf8e60b1622}{load\+Preset} (\hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072}{Gradient\+Preset} preset)
+\item 
+void \hyperlink{classQCPColorGradient_a939213e85f0d1279519d555c5fcfb6ad}{clear\+Color\+Stops} ()
+\item 
+\hyperlink{classQCPColorGradient}{Q\+C\+P\+Color\+Gradient} \hyperlink{classQCPColorGradient_abe04e1d1ccab3d7aa78f2924faed4916}{inverted} () const 
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bfseries stops\+Use\+Alpha} () const \hypertarget{classQCPColorGradient_a0eee10f4daef2cce01f0832d36cd1a8d}{}\label{classQCPColorGradient_a0eee10f4daef2cce01f0832d36cd1a8d}
+
+\item 
+void {\bfseries update\+Color\+Buffer} ()\hypertarget{classQCPColorGradient_a353f15ab3ab586eebf1f6b58c3e2707b}{}\label{classQCPColorGradient_a353f15ab3ab586eebf1f6b58c3e2707b}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int {\bfseries m\+Level\+Count}\hypertarget{classQCPColorGradient_a98fb68e359904b2c991fcae3e38a211a}{}\label{classQCPColorGradient_a98fb68e359904b2c991fcae3e38a211a}
+
+\item 
+Q\+Map$<$ double, Q\+Color $>$ {\bfseries m\+Color\+Stops}\hypertarget{classQCPColorGradient_a9e11a2b0974ef289d12c324822bc3a3e}{}\label{classQCPColorGradient_a9e11a2b0974ef289d12c324822bc3a3e}
+
+\item 
+\hyperlink{classQCPColorGradient_ac5dca17cc24336e6ca176610e7f77fc1}{Color\+Interpolation} {\bfseries m\+Color\+Interpolation}\hypertarget{classQCPColorGradient_a028cef73d863800a9ee93ffd641cce01}{}\label{classQCPColorGradient_a028cef73d863800a9ee93ffd641cce01}
+
+\item 
+bool {\bfseries m\+Periodic}\hypertarget{classQCPColorGradient_a4b07deeb20ca1ee2d5ea7e01bf0420af}{}\label{classQCPColorGradient_a4b07deeb20ca1ee2d5ea7e01bf0420af}
+
+\item 
+Q\+Vector$<$ Q\+Rgb $>$ {\bfseries m\+Color\+Buffer}\hypertarget{classQCPColorGradient_af8b5f0739faa5f8295154d47ce38ecff}{}\label{classQCPColorGradient_af8b5f0739faa5f8295154d47ce38ecff}
+
+\item 
+bool {\bfseries m\+Color\+Buffer\+Invalidated}\hypertarget{classQCPColorGradient_abacf55e11f67d6722a687af1bb2687bd}{}\label{classQCPColorGradient_abacf55e11f67d6722a687af1bb2687bd}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Defines a color gradient for use with e.\+g. \hyperlink{classQCPColorMap}{Q\+C\+P\+Color\+Map}. 
+
+This class describes a color gradient which can be used to encode data with color. For example, \hyperlink{classQCPColorMap}{Q\+C\+P\+Color\+Map} and \hyperlink{classQCPColorScale}{Q\+C\+P\+Color\+Scale} have \hyperlink{classQCPColorMap_a7313c78360471cead3576341a2c50377}{set\+Gradient} methods which take an instance of this class. Colors are set with \hyperlink{classQCPColorGradient_a3b48be5e78079db1bb2a1188a4c3390e}{set\+Color\+Stop\+At(double position, const Q\+Color \&color)} with a {\itshape position} from 0 to 1. In between these defined color positions, the color will be interpolated linearly either in R\+GB or H\+SV space, see \hyperlink{classQCPColorGradient_aa13fda86406e1d896a465a409ae63b38}{set\+Color\+Interpolation}.
+
+Alternatively, load one of the preset color gradients shown in the image below, with \hyperlink{classQCPColorGradient_aa0aeec1528241728b9671bf8e60b1622}{load\+Preset}, or by directly specifying the preset in the constructor.
+
+Apart from red, green and blue components, the gradient also interpolates the alpha values of the configured color stops. This allows to display some portions of the data range as transparent in the plot.
+
+
+
+The \hyperlink{classQCPColorGradient}{ructor} allows directly converting a \hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072}{Gradient\+Preset} to a \hyperlink{classQCPColorGradient}{Q\+C\+P\+Color\+Gradient}. This means that you can directly pass \hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072}{Gradient\+Preset} to all the {\itshape set\+Gradient} methods, e.\+g.\+: 
+\begin{DoxyCodeInclude}
+\end{DoxyCodeInclude}
+ The total number of levels used in the gradient can be set with \hyperlink{classQCPColorGradient_a18da587eb4f7fc788ea28ba15b6a12de}{set\+Level\+Count}. Whether the color gradient shall be applied periodically (wrapping around) to data values that lie outside the data range specified on the plottable instance can be controlled with \hyperlink{classQCPColorGradient_a39d6448155fc00a219f239220d14bb39}{set\+Periodic}. 
+
+\subsection{Member Enumeration Documentation}
+\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!Color\+Interpolation@{Color\+Interpolation}}
+\index{Color\+Interpolation@{Color\+Interpolation}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\subsubsection[{\texorpdfstring{Color\+Interpolation}{ColorInterpolation}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Q\+C\+P\+Color\+Gradient\+::\+Color\+Interpolation}}\hypertarget{classQCPColorGradient_ac5dca17cc24336e6ca176610e7f77fc1}{}\label{classQCPColorGradient_ac5dca17cc24336e6ca176610e7f77fc1}
+Defines the color spaces in which color interpolation between gradient stops can be performed.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPColorGradient_aa13fda86406e1d896a465a409ae63b38}{set\+Color\+Interpolation} 
+\end{DoxySeeAlso}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{ci\+R\+GB@{ci\+R\+GB}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!ci\+R\+GB@{ci\+R\+GB}}\item[{\em 
+ci\+R\+GB\hypertarget{classQCPColorGradient_ac5dca17cc24336e6ca176610e7f77fc1a5e30f725c9cfe93999e268a9f92afbe7}{}\label{classQCPColorGradient_ac5dca17cc24336e6ca176610e7f77fc1a5e30f725c9cfe93999e268a9f92afbe7}
+}]Color channels red, green and blue are linearly interpolated. \index{ci\+H\+SV@{ci\+H\+SV}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!ci\+H\+SV@{ci\+H\+SV}}\item[{\em 
+ci\+H\+SV\hypertarget{classQCPColorGradient_ac5dca17cc24336e6ca176610e7f77fc1af14ae62fcae11ecc07234eeaec5856cb}{}\label{classQCPColorGradient_ac5dca17cc24336e6ca176610e7f77fc1af14ae62fcae11ecc07234eeaec5856cb}
+}]Color channels hue, saturation and value are linearly interpolated (The hue is interpolated over the shortest angle distance) \end{description}
+\end{Desc}
+\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!Gradient\+Preset@{Gradient\+Preset}}
+\index{Gradient\+Preset@{Gradient\+Preset}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\subsubsection[{\texorpdfstring{Gradient\+Preset}{GradientPreset}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Q\+C\+P\+Color\+Gradient\+::\+Gradient\+Preset}}\hypertarget{classQCPColorGradient_aed6569828fee337023670272910c9072}{}\label{classQCPColorGradient_aed6569828fee337023670272910c9072}
+Defines the available presets that can be loaded with \hyperlink{classQCPColorGradient_aa0aeec1528241728b9671bf8e60b1622}{load\+Preset}. See the documentation there for an image of the presets. \begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{gp\+Grayscale@{gp\+Grayscale}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!gp\+Grayscale@{gp\+Grayscale}}\item[{\em 
+gp\+Grayscale\hypertarget{classQCPColorGradient_aed6569828fee337023670272910c9072add11ae369a86f3b1b6205ec72e5021fb}{}\label{classQCPColorGradient_aed6569828fee337023670272910c9072add11ae369a86f3b1b6205ec72e5021fb}
+}]Continuous lightness from black to white (suited for non-\/biased data representation) \index{gp\+Hot@{gp\+Hot}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!gp\+Hot@{gp\+Hot}}\item[{\em 
+gp\+Hot\hypertarget{classQCPColorGradient_aed6569828fee337023670272910c9072a4f42e534cf6cff5a29a5388094d099b5}{}\label{classQCPColorGradient_aed6569828fee337023670272910c9072a4f42e534cf6cff5a29a5388094d099b5}
+}]Continuous lightness from black over firey colors to white (suited for non-\/biased data representation) \index{gp\+Cold@{gp\+Cold}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!gp\+Cold@{gp\+Cold}}\item[{\em 
+gp\+Cold\hypertarget{classQCPColorGradient_aed6569828fee337023670272910c9072aec8c001f62c0d5cb853db5fd85309557}{}\label{classQCPColorGradient_aed6569828fee337023670272910c9072aec8c001f62c0d5cb853db5fd85309557}
+}]Continuous lightness from black over icey colors to white (suited for non-\/biased data representation) \index{gp\+Night@{gp\+Night}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!gp\+Night@{gp\+Night}}\item[{\em 
+gp\+Night\hypertarget{classQCPColorGradient_aed6569828fee337023670272910c9072a1bb89351b6def7d220973443fe059c62}{}\label{classQCPColorGradient_aed6569828fee337023670272910c9072a1bb89351b6def7d220973443fe059c62}
+}]Continuous lightness from black over weak blueish colors to white (suited for non-\/biased data representation) \index{gp\+Candy@{gp\+Candy}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!gp\+Candy@{gp\+Candy}}\item[{\em 
+gp\+Candy\hypertarget{classQCPColorGradient_aed6569828fee337023670272910c9072a9e72663bf6b94b65945f7843f24e0721}{}\label{classQCPColorGradient_aed6569828fee337023670272910c9072a9e72663bf6b94b65945f7843f24e0721}
+}]Blue over pink to white. \index{gp\+Geography@{gp\+Geography}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!gp\+Geography@{gp\+Geography}}\item[{\em 
+gp\+Geography\hypertarget{classQCPColorGradient_aed6569828fee337023670272910c9072a382f0b07cec1a59d8a533438aea815d2}{}\label{classQCPColorGradient_aed6569828fee337023670272910c9072a382f0b07cec1a59d8a533438aea815d2}
+}]Colors suitable to represent different elevations on geographical maps. \index{gp\+Ion@{gp\+Ion}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!gp\+Ion@{gp\+Ion}}\item[{\em 
+gp\+Ion\hypertarget{classQCPColorGradient_aed6569828fee337023670272910c9072a4297f4f9e212a819cd65e8e34567182b}{}\label{classQCPColorGradient_aed6569828fee337023670272910c9072a4297f4f9e212a819cd65e8e34567182b}
+}]Half hue spectrum from black over purple to blue and finally green (creates banding illusion but allows more precise magnitude estimates) \index{gp\+Thermal@{gp\+Thermal}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!gp\+Thermal@{gp\+Thermal}}\item[{\em 
+gp\+Thermal\hypertarget{classQCPColorGradient_aed6569828fee337023670272910c9072af1676b129f9f458ace453f280c731cf7}{}\label{classQCPColorGradient_aed6569828fee337023670272910c9072af1676b129f9f458ace453f280c731cf7}
+}]Colors suitable for thermal imaging, ranging from dark blue over purple to orange, yellow and white. \index{gp\+Polar@{gp\+Polar}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!gp\+Polar@{gp\+Polar}}\item[{\em 
+gp\+Polar\hypertarget{classQCPColorGradient_aed6569828fee337023670272910c9072ab7414ce4e36dc3e82e0132a7f0f41b52}{}\label{classQCPColorGradient_aed6569828fee337023670272910c9072ab7414ce4e36dc3e82e0132a7f0f41b52}
+}]Colors suitable to emphasize polarity around the center, with blue for negative, black in the middle and red for positive values. \index{gp\+Spectrum@{gp\+Spectrum}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!gp\+Spectrum@{gp\+Spectrum}}\item[{\em 
+gp\+Spectrum\hypertarget{classQCPColorGradient_aed6569828fee337023670272910c9072ad63adc100ef46f6b4a8a6deacec4642f}{}\label{classQCPColorGradient_aed6569828fee337023670272910c9072ad63adc100ef46f6b4a8a6deacec4642f}
+}]An approximation of the visible light spectrum (creates banding illusion but allows more precise magnitude estimates) \index{gp\+Jet@{gp\+Jet}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!gp\+Jet@{gp\+Jet}}\item[{\em 
+gp\+Jet\hypertarget{classQCPColorGradient_aed6569828fee337023670272910c9072a5f8a9e67b64c17ddfe4f069fe2b9fb02}{}\label{classQCPColorGradient_aed6569828fee337023670272910c9072a5f8a9e67b64c17ddfe4f069fe2b9fb02}
+}]Hue variation similar to a spectrum, often used in numerical visualization (creates banding illusion but allows more precise magnitude estimates) \index{gp\+Hues@{gp\+Hues}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!gp\+Hues@{gp\+Hues}}\item[{\em 
+gp\+Hues\hypertarget{classQCPColorGradient_aed6569828fee337023670272910c9072a30efe58407acfb67939032f70213a130}{}\label{classQCPColorGradient_aed6569828fee337023670272910c9072a30efe58407acfb67939032f70213a130}
+}]Full hue cycle, with highest and lowest color red (suitable for periodic data, such as angles and phases, see \hyperlink{classQCPColorGradient_a39d6448155fc00a219f239220d14bb39}{set\+Periodic}) \end{description}
+\end{Desc}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Color\+Gradient()}{QCPColorGradient()}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+C\+P\+Color\+Gradient\+::\+Q\+C\+P\+Color\+Gradient (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorGradient_a96bcc490ff9dc32b22941ce00800bce0}{}\label{classQCPColorGradient_a96bcc490ff9dc32b22941ce00800bce0}
+Constructs a new, empty \hyperlink{classQCPColorGradient}{Q\+C\+P\+Color\+Gradient} with no predefined color stops. You can add own color stops with \hyperlink{classQCPColorGradient_a3b48be5e78079db1bb2a1188a4c3390e}{set\+Color\+Stop\+At}.
+
+The color level count is initialized to 350. \index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Color\+Gradient(\+Gradient\+Preset preset)}{QCPColorGradient(GradientPreset preset)}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+C\+P\+Color\+Gradient\+::\+Q\+C\+P\+Color\+Gradient (
+\begin{DoxyParamCaption}
+\item[{{\bf Gradient\+Preset}}]{preset}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorGradient_a4e570b4004fd60bd135e52d685ed2b66}{}\label{classQCPColorGradient_a4e570b4004fd60bd135e52d685ed2b66}
+Constructs a new \hyperlink{classQCPColorGradient}{Q\+C\+P\+Color\+Gradient} initialized with the colors and color interpolation according to {\itshape preset}.
+
+The color level count is initialized to 350. 
+
+\subsection{Member Function Documentation}
+\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!clear\+Color\+Stops@{clear\+Color\+Stops}}
+\index{clear\+Color\+Stops@{clear\+Color\+Stops}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\subsubsection[{\texorpdfstring{clear\+Color\+Stops()}{clearColorStops()}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Gradient\+::clear\+Color\+Stops (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorGradient_a939213e85f0d1279519d555c5fcfb6ad}{}\label{classQCPColorGradient_a939213e85f0d1279519d555c5fcfb6ad}
+Clears all color stops.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPColorGradient_a724e828aa6f0ba5011a9392477c35d3a}{set\+Color\+Stops}, \hyperlink{classQCPColorGradient_a3b48be5e78079db1bb2a1188a4c3390e}{set\+Color\+Stop\+At} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!colorize@{colorize}}
+\index{colorize@{colorize}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\subsubsection[{\texorpdfstring{colorize(const double $\ast$data, const Q\+C\+P\+Range \&range, Q\+Rgb $\ast$scan\+Line, int n, int data\+Index\+Factor=1, bool logarithmic=false)}{colorize(const double *data, const QCPRange &range, QRgb *scanLine, int n, int dataIndexFactor=1, bool logarithmic=false)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Gradient\+::colorize (
+\begin{DoxyParamCaption}
+\item[{const double $\ast$}]{data, }
+\item[{const {\bf Q\+C\+P\+Range} \&}]{range, }
+\item[{Q\+Rgb $\ast$}]{scan\+Line, }
+\item[{int}]{n, }
+\item[{int}]{data\+Index\+Factor = {\ttfamily 1}, }
+\item[{bool}]{logarithmic = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorGradient_aaf423ceb943e177b0ed2c48c811d83dc}{}\label{classQCPColorGradient_aaf423ceb943e177b0ed2c48c811d83dc}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+This method is used to quickly convert a {\itshape data} array to colors. The colors will be output in the array {\itshape scan\+Line}. Both {\itshape data} and {\itshape scan\+Line} must have the length {\itshape n} when passed to this function. The data range that shall be used for mapping the data value to the gradient is passed in {\itshape range}. {\itshape logarithmic} indicates whether the data values shall be mapped to colors logarithmically.
+
+if {\itshape data} actually contains 2\+D-\/data linearized via {\ttfamily \mbox{[}row$\ast$column\+Count + column\mbox{]}}, you can set {\itshape data\+Index\+Factor} to {\ttfamily column\+Count} to convert a column instead of a row of the data array, in {\itshape scan\+Line}. {\itshape scan\+Line} will remain a regular (1D) array. This works because {\itshape data} is addressed {\ttfamily data\mbox{[}i$\ast$data\+Index\+Factor\mbox{]}}.
+
+Use the overloaded method to additionally provide alpha map data.
+
+The Q\+Rgb values that are placed in {\itshape scan\+Line} have their r, g and b components premultiplied with alpha (see Q\+Image\+::\+Format\+\_\+\+A\+R\+G\+B32\+\_\+\+Premultiplied). \index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!colorize@{colorize}}
+\index{colorize@{colorize}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\subsubsection[{\texorpdfstring{colorize(const double $\ast$data, const unsigned char $\ast$alpha, const Q\+C\+P\+Range \&range, Q\+Rgb $\ast$scan\+Line, int n, int data\+Index\+Factor=1, bool logarithmic=false)}{colorize(const double *data, const unsigned char *alpha, const QCPRange &range, QRgb *scanLine, int n, int dataIndexFactor=1, bool logarithmic=false)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Gradient\+::colorize (
+\begin{DoxyParamCaption}
+\item[{const double $\ast$}]{data, }
+\item[{const unsigned char $\ast$}]{alpha, }
+\item[{const {\bf Q\+C\+P\+Range} \&}]{range, }
+\item[{Q\+Rgb $\ast$}]{scan\+Line, }
+\item[{int}]{n, }
+\item[{int}]{data\+Index\+Factor = {\ttfamily 1}, }
+\item[{bool}]{logarithmic = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorGradient_acf0cc7fba83ef21f7b8d5d5258519db3}{}\label{classQCPColorGradient_acf0cc7fba83ef21f7b8d5d5258519db3}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Additionally to the other overload of \hyperlink{classQCPColorGradient_aaf423ceb943e177b0ed2c48c811d83dc}{colorize}, this method takes the array {\itshape alpha}, which has the same size and structure as {\itshape data} and encodes the alpha information per data point.
+
+The Q\+Rgb values that are placed in {\itshape scan\+Line} have their r, g and b components premultiplied with alpha (see Q\+Image\+::\+Format\+\_\+\+A\+R\+G\+B32\+\_\+\+Premultiplied). \index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!inverted@{inverted}}
+\index{inverted@{inverted}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\subsubsection[{\texorpdfstring{inverted() const }{inverted() const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Color\+Gradient} Q\+C\+P\+Color\+Gradient\+::inverted (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCPColorGradient_abe04e1d1ccab3d7aa78f2924faed4916}{}\label{classQCPColorGradient_abe04e1d1ccab3d7aa78f2924faed4916}
+Returns an inverted gradient. The inverted gradient has all properties as this \hyperlink{classQCPColorGradient}{Q\+C\+P\+Color\+Gradient}, but the order of the color stops is inverted.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPColorGradient_a724e828aa6f0ba5011a9392477c35d3a}{set\+Color\+Stops}, \hyperlink{classQCPColorGradient_a3b48be5e78079db1bb2a1188a4c3390e}{set\+Color\+Stop\+At} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!load\+Preset@{load\+Preset}}
+\index{load\+Preset@{load\+Preset}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\subsubsection[{\texorpdfstring{load\+Preset(\+Gradient\+Preset preset)}{loadPreset(GradientPreset preset)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Gradient\+::load\+Preset (
+\begin{DoxyParamCaption}
+\item[{{\bf Gradient\+Preset}}]{preset}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorGradient_aa0aeec1528241728b9671bf8e60b1622}{}\label{classQCPColorGradient_aa0aeec1528241728b9671bf8e60b1622}
+Clears the current color stops and loads the specified {\itshape preset}. A preset consists of predefined color stops and the corresponding color interpolation method.
+
+The available presets are\+:  \index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!set\+Color\+Interpolation@{set\+Color\+Interpolation}}
+\index{set\+Color\+Interpolation@{set\+Color\+Interpolation}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\subsubsection[{\texorpdfstring{set\+Color\+Interpolation(\+Color\+Interpolation interpolation)}{setColorInterpolation(ColorInterpolation interpolation)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Gradient\+::set\+Color\+Interpolation (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Color\+Gradient\+::\+Color\+Interpolation}}]{interpolation}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorGradient_aa13fda86406e1d896a465a409ae63b38}{}\label{classQCPColorGradient_aa13fda86406e1d896a465a409ae63b38}
+Sets whether the colors in between the configured color stops (see \hyperlink{classQCPColorGradient_a3b48be5e78079db1bb2a1188a4c3390e}{set\+Color\+Stop\+At}) shall be interpolated linearly in R\+GB or in H\+SV color space.
+
+For example, a sweep in R\+GB space from red to green will have a muddy brown intermediate color, whereas in H\+SV space the intermediate color is yellow. \index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!set\+Color\+Stop\+At@{set\+Color\+Stop\+At}}
+\index{set\+Color\+Stop\+At@{set\+Color\+Stop\+At}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\subsubsection[{\texorpdfstring{set\+Color\+Stop\+At(double position, const Q\+Color \&color)}{setColorStopAt(double position, const QColor &color)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Gradient\+::set\+Color\+Stop\+At (
+\begin{DoxyParamCaption}
+\item[{double}]{position, }
+\item[{const Q\+Color \&}]{color}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorGradient_a3b48be5e78079db1bb2a1188a4c3390e}{}\label{classQCPColorGradient_a3b48be5e78079db1bb2a1188a4c3390e}
+Sets the {\itshape color} the gradient will have at the specified {\itshape position} (from 0 to 1). In between these color stops, the color is interpolated according to \hyperlink{classQCPColorGradient_aa13fda86406e1d896a465a409ae63b38}{set\+Color\+Interpolation}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPColorGradient_a724e828aa6f0ba5011a9392477c35d3a}{set\+Color\+Stops}, \hyperlink{classQCPColorGradient_a939213e85f0d1279519d555c5fcfb6ad}{clear\+Color\+Stops} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!set\+Color\+Stops@{set\+Color\+Stops}}
+\index{set\+Color\+Stops@{set\+Color\+Stops}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\subsubsection[{\texorpdfstring{set\+Color\+Stops(const Q\+Map$<$ double, Q\+Color $>$ \&color\+Stops)}{setColorStops(const QMap< double, QColor > &colorStops)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Gradient\+::set\+Color\+Stops (
+\begin{DoxyParamCaption}
+\item[{const Q\+Map$<$ double, Q\+Color $>$ \&}]{color\+Stops}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorGradient_a724e828aa6f0ba5011a9392477c35d3a}{}\label{classQCPColorGradient_a724e828aa6f0ba5011a9392477c35d3a}
+Sets at which positions from 0 to 1 which color shall occur. The positions are the keys, the colors are the values of the passed Q\+Map {\itshape color\+Stops}. In between these color stops, the color is interpolated according to \hyperlink{classQCPColorGradient_aa13fda86406e1d896a465a409ae63b38}{set\+Color\+Interpolation}.
+
+A more convenient way to create a custom gradient may be to clear all color stops with \hyperlink{classQCPColorGradient_a939213e85f0d1279519d555c5fcfb6ad}{clear\+Color\+Stops} (or creating a new, empty \hyperlink{classQCPColorGradient}{Q\+C\+P\+Color\+Gradient}) and then adding them one by one with \hyperlink{classQCPColorGradient_a3b48be5e78079db1bb2a1188a4c3390e}{set\+Color\+Stop\+At}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPColorGradient_a939213e85f0d1279519d555c5fcfb6ad}{clear\+Color\+Stops} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!set\+Level\+Count@{set\+Level\+Count}}
+\index{set\+Level\+Count@{set\+Level\+Count}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\subsubsection[{\texorpdfstring{set\+Level\+Count(int n)}{setLevelCount(int n)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Gradient\+::set\+Level\+Count (
+\begin{DoxyParamCaption}
+\item[{int}]{n}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorGradient_a18da587eb4f7fc788ea28ba15b6a12de}{}\label{classQCPColorGradient_a18da587eb4f7fc788ea28ba15b6a12de}
+Sets the number of discretization levels of the color gradient to {\itshape n}. The default is 350 which is typically enough to create a smooth appearance. The minimum number of levels is 2.
+
+ \index{Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}!set\+Periodic@{set\+Periodic}}
+\index{set\+Periodic@{set\+Periodic}!Q\+C\+P\+Color\+Gradient@{Q\+C\+P\+Color\+Gradient}}
+\subsubsection[{\texorpdfstring{set\+Periodic(bool enabled)}{setPeriodic(bool enabled)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Gradient\+::set\+Periodic (
+\begin{DoxyParamCaption}
+\item[{bool}]{enabled}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorGradient_a39d6448155fc00a219f239220d14bb39}{}\label{classQCPColorGradient_a39d6448155fc00a219f239220d14bb39}
+Sets whether data points that are outside the configured data range (e.\+g. \hyperlink{classQCPColorMap_a980b42837821159786a85b4b7dcb8774}{Q\+C\+P\+Color\+Map\+::set\+Data\+Range}) are colored by periodically repeating the color gradient or whether they all have the same color, corresponding to the respective gradient boundary color.
+
+
+
+As shown in the image above, gradients that have the same start and end color are especially suitable for a periodic gradient mapping, since they produce smooth color transitions throughout the color map. A preset that has this property is \hyperlink{classQCPColorGradient_aed6569828fee337023670272910c9072a30efe58407acfb67939032f70213a130}{gp\+Hues}.
+
+In practice, using periodic color gradients makes sense when the data corresponds to a periodic dimension, such as an angle or a phase. If this is not the case, the color encoding might become ambiguous, because multiple different data values are shown as the same color. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/qcustomplot.\+h\item 
+src/qcustomplot.\+cpp\end{DoxyCompactItemize}

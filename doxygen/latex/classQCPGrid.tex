@@ -1,0 +1,185 @@
+\hypertarget{classQCPGrid}{}\section{Q\+C\+P\+Grid Class Reference}
+\label{classQCPGrid}\index{Q\+C\+P\+Grid@{Q\+C\+P\+Grid}}
+
+
+Responsible for drawing the grid of a \hyperlink{classQCPAxis}{Q\+C\+P\+Axis}.  
+
+
+
+
+Inheritance diagram for Q\+C\+P\+Grid\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=160pt]{classQCPGrid__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Q\+C\+P\+Grid\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classQCPGrid__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPGrid_acd1cdd2909625388a13048b698494a17}{Q\+C\+P\+Grid} (\hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$parent\+Axis)
+\item 
+bool {\bfseries sub\+Grid\+Visible} () const \hypertarget{classQCPGrid_a0a8963e384d53cd77cbab7df96147458}{}\label{classQCPGrid_a0a8963e384d53cd77cbab7df96147458}
+
+\item 
+bool {\bfseries antialiased\+Sub\+Grid} () const \hypertarget{classQCPGrid_abfa6c638a05b45b2ed31b680fc9b31fc}{}\label{classQCPGrid_abfa6c638a05b45b2ed31b680fc9b31fc}
+
+\item 
+bool {\bfseries antialiased\+Zero\+Line} () const \hypertarget{classQCPGrid_a4dfbc1cee989d8cae1434b765ab2a13b}{}\label{classQCPGrid_a4dfbc1cee989d8cae1434b765ab2a13b}
+
+\item 
+Q\+Pen {\bfseries pen} () const \hypertarget{classQCPGrid_aca20b67548e3ae31fd02e6398ffd6cb9}{}\label{classQCPGrid_aca20b67548e3ae31fd02e6398ffd6cb9}
+
+\item 
+Q\+Pen {\bfseries sub\+Grid\+Pen} () const \hypertarget{classQCPGrid_ac698f8c6864b1d8f0e2af97ca4b39cc6}{}\label{classQCPGrid_ac698f8c6864b1d8f0e2af97ca4b39cc6}
+
+\item 
+Q\+Pen {\bfseries zero\+Line\+Pen} () const \hypertarget{classQCPGrid_a06ea986b651860446e1224d2097259b9}{}\label{classQCPGrid_a06ea986b651860446e1224d2097259b9}
+
+\item 
+void \hyperlink{classQCPGrid_ad4ad6bf714ec45e08845456355a1b700}{set\+Sub\+Grid\+Visible} (bool visible)
+\item 
+void \hyperlink{classQCPGrid_a5692310ba183721a413d60951407d114}{set\+Antialiased\+Sub\+Grid} (bool enabled)
+\item 
+void \hyperlink{classQCPGrid_a3cc6d54647393ee71afb6da56af07aa4}{set\+Antialiased\+Zero\+Line} (bool enabled)
+\item 
+void \hyperlink{classQCPGrid_aa05ab9816ffb440908171e45e833b593}{set\+Pen} (const Q\+Pen \&pen)
+\item 
+void \hyperlink{classQCPGrid_a9edd3593f384d1f0b0202a39cef4453d}{set\+Sub\+Grid\+Pen} (const Q\+Pen \&pen)
+\item 
+void \hyperlink{classQCPGrid_a209f40fdb252397b418b82d3494d8ea0}{set\+Zero\+Line\+Pen} (const Q\+Pen \&pen)
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void {\bfseries apply\+Default\+Antialiasing\+Hint} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPGrid_a64fa48e16b4629f5df2a5029ab6e761c}{}\label{classQCPGrid_a64fa48e16b4629f5df2a5029ab6e761c}
+
+\item 
+virtual void {\bfseries draw} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPGrid_aad9a312d998e2d170956334d4cb80be2}{}\label{classQCPGrid_aad9a312d998e2d170956334d4cb80be2}
+
+\item 
+void {\bfseries draw\+Grid\+Lines} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter) const \hypertarget{classQCPGrid_a3aff10e993f6625e255c19e4f97a09d8}{}\label{classQCPGrid_a3aff10e993f6625e255c19e4f97a09d8}
+
+\item 
+void {\bfseries draw\+Sub\+Grid\+Lines} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter) const \hypertarget{classQCPGrid_afa5d9d12de419e881f381f2ab7cb414d}{}\label{classQCPGrid_afa5d9d12de419e881f381f2ab7cb414d}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bfseries m\+Sub\+Grid\+Visible}\hypertarget{classQCPGrid_a4e4a0400d6319bb44c06341f6298c87b}{}\label{classQCPGrid_a4e4a0400d6319bb44c06341f6298c87b}
+
+\item 
+bool {\bfseries m\+Antialiased\+Sub\+Grid}\hypertarget{classQCPGrid_a71b7051f833f0c5de3094998d6afdd87}{}\label{classQCPGrid_a71b7051f833f0c5de3094998d6afdd87}
+
+\item 
+bool {\bfseries m\+Antialiased\+Zero\+Line}\hypertarget{classQCPGrid_a8c0df56ae86440408c050895dcdb922b}{}\label{classQCPGrid_a8c0df56ae86440408c050895dcdb922b}
+
+\item 
+Q\+Pen {\bfseries m\+Pen}\hypertarget{classQCPGrid_a1cdc4a3bccf6a40c2d4360def9fefa40}{}\label{classQCPGrid_a1cdc4a3bccf6a40c2d4360def9fefa40}
+
+\item 
+Q\+Pen {\bfseries m\+Sub\+Grid\+Pen}\hypertarget{classQCPGrid_aa9004bc139ad3ea92629f0aaae81d83f}{}\label{classQCPGrid_aa9004bc139ad3ea92629f0aaae81d83f}
+
+\item 
+Q\+Pen {\bfseries m\+Zero\+Line\+Pen}\hypertarget{classQCPGrid_a379481871f17655c27eda30af233554f}{}\label{classQCPGrid_a379481871f17655c27eda30af233554f}
+
+\item 
+\hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$ {\bfseries m\+Parent\+Axis}\hypertarget{classQCPGrid_a9a8a76731e6e737b65b929fd1995cc88}{}\label{classQCPGrid_a9a8a76731e6e737b65b929fd1995cc88}
+
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class {\bfseries Q\+C\+P\+Axis}\hypertarget{classQCPGrid_af123edeca169ec7a31958a1d714e1a8a}{}\label{classQCPGrid_af123edeca169ec7a31958a1d714e1a8a}
+
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+Responsible for drawing the grid of a \hyperlink{classQCPAxis}{Q\+C\+P\+Axis}. 
+
+This class is tightly bound to \hyperlink{classQCPAxis}{Q\+C\+P\+Axis}. Every axis owns a grid instance and uses it to draw the grid lines, sub grid lines and zero-\/line. You can interact with the grid of an axis via \hyperlink{classQCPAxis_ac4fb913cce3072b5e75a4635e0f6cd04}{Q\+C\+P\+Axis\+::grid}. Normally, you don\textquotesingle{}t need to create an instance of \hyperlink{classQCPGrid}{Q\+C\+P\+Grid} yourself.
+
+The axis and grid drawing was split into two classes to allow them to be placed on different layers (both \hyperlink{classQCPAxis}{Q\+C\+P\+Axis} and \hyperlink{classQCPGrid}{Q\+C\+P\+Grid} inherit from \hyperlink{classQCPLayerable}{Q\+C\+P\+Layerable}). Thus it is possible to have the grid in the background and the axes in the foreground, and any plottables/items in between. This described situation is the default setup, see the \hyperlink{classQCPLayer}{Q\+C\+P\+Layer} documentation. 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Q\+C\+P\+Grid@{Q\+C\+P\+Grid}!Q\+C\+P\+Grid@{Q\+C\+P\+Grid}}
+\index{Q\+C\+P\+Grid@{Q\+C\+P\+Grid}!Q\+C\+P\+Grid@{Q\+C\+P\+Grid}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Grid(\+Q\+C\+P\+Axis $\ast$parent\+Axis)}{QCPGrid(QCPAxis *parentAxis)}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+C\+P\+Grid\+::\+Q\+C\+P\+Grid (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Axis} $\ast$}]{parent\+Axis}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [explicit]}}\hypertarget{classQCPGrid_acd1cdd2909625388a13048b698494a17}{}\label{classQCPGrid_acd1cdd2909625388a13048b698494a17}
+Creates a \hyperlink{classQCPGrid}{Q\+C\+P\+Grid} instance and sets default values.
+
+You shouldn\textquotesingle{}t instantiate grids on their own, since every \hyperlink{classQCPAxis}{Q\+C\+P\+Axis} brings its own \hyperlink{classQCPGrid}{Q\+C\+P\+Grid}. 
+
+\subsection{Member Function Documentation}
+\index{Q\+C\+P\+Grid@{Q\+C\+P\+Grid}!set\+Antialiased\+Sub\+Grid@{set\+Antialiased\+Sub\+Grid}}
+\index{set\+Antialiased\+Sub\+Grid@{set\+Antialiased\+Sub\+Grid}!Q\+C\+P\+Grid@{Q\+C\+P\+Grid}}
+\subsubsection[{\texorpdfstring{set\+Antialiased\+Sub\+Grid(bool enabled)}{setAntialiasedSubGrid(bool enabled)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Grid\+::set\+Antialiased\+Sub\+Grid (
+\begin{DoxyParamCaption}
+\item[{bool}]{enabled}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPGrid_a5692310ba183721a413d60951407d114}{}\label{classQCPGrid_a5692310ba183721a413d60951407d114}
+Sets whether sub grid lines are drawn antialiased. \index{Q\+C\+P\+Grid@{Q\+C\+P\+Grid}!set\+Antialiased\+Zero\+Line@{set\+Antialiased\+Zero\+Line}}
+\index{set\+Antialiased\+Zero\+Line@{set\+Antialiased\+Zero\+Line}!Q\+C\+P\+Grid@{Q\+C\+P\+Grid}}
+\subsubsection[{\texorpdfstring{set\+Antialiased\+Zero\+Line(bool enabled)}{setAntialiasedZeroLine(bool enabled)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Grid\+::set\+Antialiased\+Zero\+Line (
+\begin{DoxyParamCaption}
+\item[{bool}]{enabled}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPGrid_a3cc6d54647393ee71afb6da56af07aa4}{}\label{classQCPGrid_a3cc6d54647393ee71afb6da56af07aa4}
+Sets whether zero lines are drawn antialiased. \index{Q\+C\+P\+Grid@{Q\+C\+P\+Grid}!set\+Pen@{set\+Pen}}
+\index{set\+Pen@{set\+Pen}!Q\+C\+P\+Grid@{Q\+C\+P\+Grid}}
+\subsubsection[{\texorpdfstring{set\+Pen(const Q\+Pen \&pen)}{setPen(const QPen &pen)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Grid\+::set\+Pen (
+\begin{DoxyParamCaption}
+\item[{const Q\+Pen \&}]{pen}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPGrid_aa05ab9816ffb440908171e45e833b593}{}\label{classQCPGrid_aa05ab9816ffb440908171e45e833b593}
+Sets the pen with which (major) grid lines are drawn. \index{Q\+C\+P\+Grid@{Q\+C\+P\+Grid}!set\+Sub\+Grid\+Pen@{set\+Sub\+Grid\+Pen}}
+\index{set\+Sub\+Grid\+Pen@{set\+Sub\+Grid\+Pen}!Q\+C\+P\+Grid@{Q\+C\+P\+Grid}}
+\subsubsection[{\texorpdfstring{set\+Sub\+Grid\+Pen(const Q\+Pen \&pen)}{setSubGridPen(const QPen &pen)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Grid\+::set\+Sub\+Grid\+Pen (
+\begin{DoxyParamCaption}
+\item[{const Q\+Pen \&}]{pen}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPGrid_a9edd3593f384d1f0b0202a39cef4453d}{}\label{classQCPGrid_a9edd3593f384d1f0b0202a39cef4453d}
+Sets the pen with which sub grid lines are drawn. \index{Q\+C\+P\+Grid@{Q\+C\+P\+Grid}!set\+Sub\+Grid\+Visible@{set\+Sub\+Grid\+Visible}}
+\index{set\+Sub\+Grid\+Visible@{set\+Sub\+Grid\+Visible}!Q\+C\+P\+Grid@{Q\+C\+P\+Grid}}
+\subsubsection[{\texorpdfstring{set\+Sub\+Grid\+Visible(bool visible)}{setSubGridVisible(bool visible)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Grid\+::set\+Sub\+Grid\+Visible (
+\begin{DoxyParamCaption}
+\item[{bool}]{visible}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPGrid_ad4ad6bf714ec45e08845456355a1b700}{}\label{classQCPGrid_ad4ad6bf714ec45e08845456355a1b700}
+Sets whether grid lines at sub tick marks are drawn.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPGrid_a9edd3593f384d1f0b0202a39cef4453d}{set\+Sub\+Grid\+Pen} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Grid@{Q\+C\+P\+Grid}!set\+Zero\+Line\+Pen@{set\+Zero\+Line\+Pen}}
+\index{set\+Zero\+Line\+Pen@{set\+Zero\+Line\+Pen}!Q\+C\+P\+Grid@{Q\+C\+P\+Grid}}
+\subsubsection[{\texorpdfstring{set\+Zero\+Line\+Pen(const Q\+Pen \&pen)}{setZeroLinePen(const QPen &pen)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Grid\+::set\+Zero\+Line\+Pen (
+\begin{DoxyParamCaption}
+\item[{const Q\+Pen \&}]{pen}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPGrid_a209f40fdb252397b418b82d3494d8ea0}{}\label{classQCPGrid_a209f40fdb252397b418b82d3494d8ea0}
+Sets the pen with which zero lines are drawn.
+
+Zero lines are lines at value coordinate 0 which may be drawn with a different pen than other grid lines. To disable zero lines and just draw normal grid lines at zero, set {\itshape pen} to Qt\+::\+No\+Pen. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/qcustomplot.\+h\item 
+src/qcustomplot.\+cpp\end{DoxyCompactItemize}

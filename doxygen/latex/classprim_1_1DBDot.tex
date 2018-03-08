@@ -1,0 +1,96 @@
+\hypertarget{classprim_1_1DBDot}{}\section{prim\+:\+:D\+B\+Dot Class Reference}
+\label{classprim_1_1DBDot}\index{prim\+::\+D\+B\+Dot@{prim\+::\+D\+B\+Dot}}
+
+
+Specific \hyperlink{classprim_1_1Item}{Item} derived class for a dangling bond on the lattice. Each dangling bond should correspond to a source lattice dot. For generality, each \hyperlink{classprim_1_1DBDot}{D\+B\+Dot} has its own physical location that will typically be the same as the source \hyperlink{classprim_1_1LatticeDot}{Lattice\+Dot}.  
+
+
+
+
+{\ttfamily \#include $<$dbdot.\+h$>$}
+
+
+
+Inheritance diagram for prim\+:\+:D\+B\+Dot\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=163pt]{classprim_1_1DBDot__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for prim\+:\+:D\+B\+Dot\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=163pt]{classprim_1_1DBDot__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classprim_1_1DBDot_abf4a801bc53ad15aeb6b9463e223e9b2}{D\+B\+Dot} (int lay\+\_\+id, \hyperlink{classprim_1_1LatticeDot}{prim\+::\+Lattice\+Dot} $\ast$src=0, int elec\+\_\+in=0)\hypertarget{classprim_1_1DBDot_abf4a801bc53ad15aeb6b9463e223e9b2}{}\label{classprim_1_1DBDot_abf4a801bc53ad15aeb6b9463e223e9b2}
+
+\begin{DoxyCompactList}\small\item\em constructor, creating \hyperlink{classprim_1_1DBDot}{D\+B\+Dot} using the D\+B\+Gen\+Tool. \end{DoxyCompactList}\item 
+\hyperlink{classprim_1_1DBDot_acfb0c7c5503e1559c3287c2d8f2a9579}{D\+B\+Dot} (Q\+Xml\+Stream\+Reader $\ast$, Q\+Graphics\+Scene $\ast$)\hypertarget{classprim_1_1DBDot_acfb0c7c5503e1559c3287c2d8f2a9579}{}\label{classprim_1_1DBDot_acfb0c7c5503e1559c3287c2d8f2a9579}
+
+\begin{DoxyCompactList}\small\item\em constructor, creating \hyperlink{classprim_1_1DBDot}{D\+B\+Dot} from a design file. \end{DoxyCompactList}\item 
+void {\bfseries init\+D\+B\+Dot} (int lay\+\_\+id, \hyperlink{classprim_1_1LatticeDot}{prim\+::\+Lattice\+Dot} $\ast$src=0, int elec\+\_\+in=0)\hypertarget{classprim_1_1DBDot_a47fe9dc50d797d35a2cb48dd4ca512d1}{}\label{classprim_1_1DBDot_a47fe9dc50d797d35a2cb48dd4ca512d1}
+
+\item 
+Q\+PointF {\bfseries get\+Phys\+Loc} () const \hypertarget{classprim_1_1DBDot_aa4bdc68527c825257e42bae1ef06c299}{}\label{classprim_1_1DBDot_aa4bdc68527c825257e42bae1ef06c299}
+
+\item 
+void \hyperlink{classprim_1_1DBDot_afbb7f014b561e3b75b9b1d81dee4833c}{toggle\+Elec} ()\hypertarget{classprim_1_1DBDot_afbb7f014b561e3b75b9b1d81dee4833c}{}\label{classprim_1_1DBDot_afbb7f014b561e3b75b9b1d81dee4833c}
+
+\begin{DoxyCompactList}\small\item\em Toggle between occupied and unoccupied. \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1DBDot_a9b3da606577dc4a76aabf18e4a064bb6}{set\+Elec} (int e\+\_\+in)\hypertarget{classprim_1_1DBDot_a9b3da606577dc4a76aabf18e4a064bb6}{}\label{classprim_1_1DBDot_a9b3da606577dc4a76aabf18e4a064bb6}
+
+\begin{DoxyCompactList}\small\item\em Set electron occupancy. \end{DoxyCompactList}\item 
+int \hyperlink{classprim_1_1DBDot_a0cf330485eab096e564495d7420213bc}{get\+Elec} ()\hypertarget{classprim_1_1DBDot_a0cf330485eab096e564495d7420213bc}{}\label{classprim_1_1DBDot_a0cf330485eab096e564495d7420213bc}
+
+\begin{DoxyCompactList}\small\item\em Get electron occupancy. \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1DBDot_a1ae039b78cafd8ee28b1f8f064b59b77}{set\+Show\+Elec} (int se\+\_\+in)\hypertarget{classprim_1_1DBDot_a1ae039b78cafd8ee28b1f8f064b59b77}{}\label{classprim_1_1DBDot_a1ae039b78cafd8ee28b1f8f064b59b77}
+
+\begin{DoxyCompactList}\small\item\em Set electron occupant visibility. \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1DBDot_a7eaa80cc7a9eef5f1b5d866393cf5071}{set\+Source} (\hyperlink{classprim_1_1LatticeDot}{prim\+::\+Lattice\+Dot} $\ast$src)\hypertarget{classprim_1_1DBDot_a7eaa80cc7a9eef5f1b5d866393cf5071}{}\label{classprim_1_1DBDot_a7eaa80cc7a9eef5f1b5d866393cf5071}
+
+\begin{DoxyCompactList}\small\item\em Set the \hyperlink{classprim_1_1DBDot}{D\+B\+Dot} source as src, and update phys\+\_\+loc to that of src. \end{DoxyCompactList}\item 
+\hyperlink{classprim_1_1LatticeDot}{prim\+::\+Lattice\+Dot} $\ast$ \hyperlink{classprim_1_1DBDot_ac9a25ede31a8741b560f2f977c26f58d}{get\+Source} () const \hypertarget{classprim_1_1DBDot_ac9a25ede31a8741b560f2f977c26f58d}{}\label{classprim_1_1DBDot_ac9a25ede31a8741b560f2f977c26f58d}
+
+\begin{DoxyCompactList}\small\item\em Get the \hyperlink{classprim_1_1DBDot}{D\+B\+Dot} source. \end{DoxyCompactList}\item 
+void {\bfseries set\+Fill} (float fill)\hypertarget{classprim_1_1DBDot_a4f87ecc0589fa5eb3c7065e776b63477}{}\label{classprim_1_1DBDot_a4f87ecc0589fa5eb3c7065e776b63477}
+
+\item 
+void {\bfseries set\+Fill\+Col} (Q\+Color col, Q\+Color col\+\_\+sel)\hypertarget{classprim_1_1DBDot_a7808bfd2be17d3ef52f950d877bda4b1}{}\label{classprim_1_1DBDot_a7808bfd2be17d3ef52f950d877bda4b1}
+
+\item 
+Q\+RectF {\bfseries bounding\+Rect} () const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classprim_1_1DBDot_a4ee820c9566c8de80bd41456cb1c1461}{}\label{classprim_1_1DBDot_a4ee820c9566c8de80bd41456cb1c1461}
+
+\item 
+void {\bfseries paint} (Q\+Painter $\ast$, const Q\+Style\+Option\+Graphics\+Item $\ast$, Q\+Widget $\ast$) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classprim_1_1DBDot_add84a5f6ceecb3312d4f7f9501528ce6}{}\label{classprim_1_1DBDot_add84a5f6ceecb3312d4f7f9501528ce6}
+
+\item 
+\hyperlink{classprim_1_1Item}{prim\+::\+Item} $\ast$ \hyperlink{classprim_1_1DBDot_ac362bbff76cb0537708bbd43fb189114}{deep\+Copy} () const \hypertarget{classprim_1_1DBDot_ac362bbff76cb0537708bbd43fb189114}{}\label{classprim_1_1DBDot_ac362bbff76cb0537708bbd43fb189114}
+
+\begin{DoxyCompactList}\small\item\em create a deep copy of the \hyperlink{classprim_1_1Item}{Item} for the clipboard. Deep-\/copied items should have no parent or scene and need only to have the information necessary to create a new copy somewhere in the scene \end{DoxyCompactList}\item 
+virtual void {\bfseries save\+Items} (Q\+Xml\+Stream\+Writer $\ast$) const \hypertarget{classprim_1_1DBDot_a8cff2080b4b633bafe0aed9012b9325c}{}\label{classprim_1_1DBDot_a8cff2080b4b633bafe0aed9012b9325c}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void {\bfseries mouse\+Press\+Event} (Q\+Graphics\+Scene\+Mouse\+Event $\ast$e) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classprim_1_1DBDot_a9c7a8a7aeb3a1b312e4d4c5b0cb10934}{}\label{classprim_1_1DBDot_a9c7a8a7aeb3a1b312e4d4c5b0cb10934}
+
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+Specific \hyperlink{classprim_1_1Item}{Item} derived class for a dangling bond on the lattice. Each dangling bond should correspond to a source lattice dot. For generality, each \hyperlink{classprim_1_1DBDot}{D\+B\+Dot} has its own physical location that will typically be the same as the source \hyperlink{classprim_1_1LatticeDot}{Lattice\+Dot}. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/gui/widgets/primitives/\hyperlink{dbdot_8h}{dbdot.\+h}\item 
+src/gui/widgets/primitives/dbdot.\+cc\end{DoxyCompactItemize}

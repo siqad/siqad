@@ -1,0 +1,91 @@
+To be used as a collection of numerical solvers of the Poisson\textquotesingle{}s equation using various implementations.
+
+Pois\+F\+FT Uses the fftw library to implement a Fourier transform based solver. This solution is used to verify the simple case for poissonsolver below.
+
+poissonsolver Uses the Successive Over-\/relaxation method to solve a generalised Poisson\textquotesingle{}s equation. The generalised equation takes into account variable permittivity, and allows for electrodes to be arbitrarily placed within the solving range.
+
+\section*{Pois\+Solvers}
+
+A C++ solver for the 3D Poisson\textquotesingle{}s equation using the Pois\+F\+FT implementation for the Fourier transform
+
+\subsection*{Getting Started}
+
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+
+\subsubsection*{Prerequisites}
+
+\paragraph*{Pois\+F\+FT}
+
+You will need to install Pois\+F\+FT for the Fourier transform implementation. Visit their github page and follow the installation instructions at
+
+
+\begin{DoxyCode}
+1 https://github.com/LadaF/PoisFFT
+\end{DoxyCode}
+
+
+\subsubsection*{Setting up}
+
+
+\begin{DoxyEnumerate}
+\item Install Pois\+F\+FT
+\item Clone this repository to your preferred directory.
+\end{DoxyEnumerate}
+
+Done!
+
+\subsection*{Description}
+
+The solver an iterative solver that uses the F\+FT to complete its iterations. The solver allows for electrodes to be defined within the sample body, essentially setting an internal boundary condition at the defined electrode surface. The F\+FT is able to handle boundary conditions at the sample edges, but cannot easily handle internal boundary conditions. The solver overcomes this by going through an iterative algorithm, and checking the potential at the electrode at each iteration. It then tweaks the volumetric charge density at the electrode surfaces until the potentials at electrode surfaces are within defined error ranges. The solver continues on tweaking the volumetric charge density until it arrives at a sufficiently correct 3D potential.
+
+\subsection*{Running the tool}
+
+In testpoisson.\+cc, changes can be made to customize the problem to be solved by the solver.
+
+\subsubsection*{Setting electrodes}
+
+\hyperlink{classElectrodes}{Electrodes} can be set by calling
+
+
+\begin{DoxyCode}
+1 Electrodes electrodenamehere(xmin, xmax, ymin, ymax, zmin, zmax, potential, workfunction)
+\end{DoxyCode}
+
+
+Remember to draw the electrode into electrodemap with
+
+
+\begin{DoxyCode}
+1 electrodenamehere.draw(ns, ds, Ls, RHS, electrodemap, chi)
+\end{DoxyCode}
+
+
+\subsubsection*{Setting physical parameters}
+
+Physical parameters such as permittivity and the volumetric charge density can be set by pointing eps or R\+HS respectively towards to data set. Please ensure that the data is of size (ns\mbox{[}0\mbox{]}$\ast$ns\mbox{[}1\mbox{]}$\ast$ns\mbox{[}2\mbox{]}). An initial guess for the potential can be set by pointing arr to the intial assumption data set.
+
+\subsubsection*{}
+
+in the Pois\+F\+F\+T/src/ directory, do\+:
+
+
+\begin{DoxyCode}
+1 ./compileandrun.sh
+\end{DoxyCode}
+
+
+This will compile the code using g++, and run the resulting executable file. 2D plots of the potential and the associated charge density will also be produced using G\+N\+Uplot.
+
+\subsection*{Authors}
+
+
+\begin{DoxyItemize}
+\item {\bfseries Nathan Chiu}
+\end{DoxyItemize}
+
+\subsection*{Acknowledgments}
+
+
+\begin{DoxyItemize}
+\item Vladimir Fuka\+: Pois\+F\+FT -\/ a free parallel fast Poisson solver, Applied Mathematics and Computation, 2015 available online\+: \href{http://dx.doi.org/10.1016/j.amc.2015.03.011}{\tt http\+://dx.\+doi.\+org/10.\+1016/j.\+amc.\+2015.\+03.\+011} preprint\+: \href{http://arxiv.org/abs/1409.8116}{\tt http\+://arxiv.\+org/abs/1409.\+8116} 
+\end{DoxyItemize}

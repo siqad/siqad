@@ -1,0 +1,168 @@
+\hypertarget{classSolver}{}\section{Solver Class Reference}
+\label{classSolver}\index{Solver@{Solver}}
+
+
+Collaboration diagram for Solver\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=125pt]{classSolver__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries relaxmg} (int, bool $\ast$, bool $\ast$, bool $\ast$, double $\ast$, double $\ast$$\ast$, int, int, double $\ast$, double $\ast$, int, int, int, double $\ast$)\hypertarget{classSolver_ab26d9f628828b28aab2cd6c69ca71d67}{}\label{classSolver_ab26d9f628828b28aab2cd6c69ca71d67}
+
+\item 
+void {\bfseries calc\+\_\+\+Neumann} (int, int, int)\hypertarget{classSolver_a97bde2efed1151333997fa8ada1e7d83}{}\label{classSolver_a97bde2efed1151333997fa8ada1e7d83}
+
+\item 
+void {\bfseries calc\+\_\+\+Periodic} (int, int, int, double $\ast$)\hypertarget{classSolver_a09b78b3c0d4d45a9b9c10dc8aef9fbd6}{}\label{classSolver_a09b78b3c0d4d45a9b9c10dc8aef9fbd6}
+
+\item 
+void {\bfseries set\+\_\+N} (int, int, int)\hypertarget{classSolver_a0ea8216ab12bbc285535caf8369c43f6}{}\label{classSolver_a0ea8216ab12bbc285535caf8369c43f6}
+
+\item 
+void {\bfseries set\+\_\+L} (double, double, double)\hypertarget{classSolver_aec7901ddc5b034d4d4a31b59c5024e0c}{}\label{classSolver_aec7901ddc5b034d4d4a31b59c5024e0c}
+
+\item 
+void {\bfseries set\+\_\+val} (int, int, int, int $\ast$)\hypertarget{classSolver_af703281640b14a6d6c3c10981f5996de}{}\label{classSolver_af703281640b14a6d6c3c10981f5996de}
+
+\item 
+double $\ast$ {\bfseries set\+\_\+val} (double, double)\hypertarget{classSolver_a5ceb7e78c6b9083b22747c63e96a9b22}{}\label{classSolver_a5ceb7e78c6b9083b22747c63e96a9b22}
+
+\item 
+void {\bfseries set\+\_\+val} (double, double, double, double $\ast$)\hypertarget{classSolver_ab3f0233a64efbf5fbfcd55676c95f512}{}\label{classSolver_ab3f0233a64efbf5fbfcd55676c95f512}
+
+\item 
+double $\ast$ {\bfseries init\+\_\+val} (double, double $\ast$)\hypertarget{classSolver_a1c5f9712a36b957469c886b5a25bcff1}{}\label{classSolver_a1c5f9712a36b957469c886b5a25bcff1}
+
+\item 
+std\+::pair$<$ double, double $>$ $\ast$ {\bfseries init\+\_\+val} (double, std\+::pair$<$ double, double $>$ $\ast$)\hypertarget{classSolver_a1503790b3c572e0dd3761e8ffa159ef7}{}\label{classSolver_a1503790b3c572e0dd3761e8ffa159ef7}
+
+\item 
+void {\bfseries init\+\_\+rho} (void)\hypertarget{classSolver_aaae2b9d2acb1cabf8f7b949660b85285}{}\label{classSolver_aaae2b9d2acb1cabf8f7b949660b85285}
+
+\item 
+void {\bfseries init\+\_\+eps} (void)\hypertarget{classSolver_a1aaa610e19503aa2d69069ffa4bd8e96}{}\label{classSolver_a1aaa610e19503aa2d69069ffa4bd8e96}
+
+\item 
+void {\bfseries solve} (void)\hypertarget{classSolver_a4eac571b3023459e045fc0222eef9ca8}{}\label{classSolver_a4eac571b3023459e045fc0222eef9ca8}
+
+\item 
+void {\bfseries poisson3\+D\+S\+O\+R\+\_\+\+B\+L\+AS} (void)\hypertarget{classSolver_a285860ed16dd0d26d60dd224f424a183}{}\label{classSolver_a285860ed16dd0d26d60dd224f424a183}
+
+\item 
+void {\bfseries poisson3\+D\+S\+O\+R\+\_\+gen} (void)\hypertarget{classSolver_a7a035b835487ca6dba08ba6c83182703}{}\label{classSolver_a7a035b835487ca6dba08ba6c83182703}
+
+\item 
+void {\bfseries poisson3\+Dmultigrid} (void)\hypertarget{classSolver_afa4e3c2a5659e5a43fb5380d6ff2ab77}{}\label{classSolver_afa4e3c2a5659e5a43fb5380d6ff2ab77}
+
+\item 
+void {\bfseries poisson3\+D\+S\+OR} (void)\hypertarget{classSolver_ad068c30b00e28888787050ced515e4fd}{}\label{classSolver_ad068c30b00e28888787050ced515e4fd}
+
+\item 
+void {\bfseries poisson3\+D\+Jacobi} (void)\hypertarget{classSolver_a7a7d9f182332e724b1c706383d1d0d89}{}\label{classSolver_a7a7d9f182332e724b1c706383d1d0d89}
+
+\item 
+void {\bfseries poisson3\+D\+Gauss\+Seidel} (void)\hypertarget{classSolver_ab2eaf2b57f815535966fc04358ef6f81}{}\label{classSolver_ab2eaf2b57f815535966fc04358ef6f81}
+
+\item 
+void {\bfseries set\+\_\+\+B\+Cs} (double, double, double, double, double, double)\hypertarget{classSolver_af657268408584afd8dc9b91d33684657}{}\label{classSolver_af657268408584afd8dc9b91d33684657}
+
+\item 
+void {\bfseries write} (std\+::vector$<$ double $>$ \&, std\+::string)\hypertarget{classSolver_a3aea87f02ba29399f566a44aa6329942}{}\label{classSolver_a3aea87f02ba29399f566a44aa6329942}
+
+\item 
+void {\bfseries write\+\_\+2D} (std\+::vector$<$ double $>$ \&, std\+::string)\hypertarget{classSolver_a70288ca19a07085c42116ad1115f1c6c}{}\label{classSolver_a70288ca19a07085c42116ad1115f1c6c}
+
+\item 
+void {\bfseries write\+\_\+2D} (double $\ast$vals, std\+::string filename)\hypertarget{classSolver_a428a48baa11f5530c442bb2aa8de73aa}{}\label{classSolver_a428a48baa11f5530c442bb2aa8de73aa}
+
+\item 
+void {\bfseries get\+\_\+a} (double $\ast$, double $\ast$, int)\hypertarget{classSolver_a12b589b62d1354f402e9d4bd6de0109a}{}\label{classSolver_a12b589b62d1354f402e9d4bd6de0109a}
+
+\item 
+void {\bfseries check\+\_\+eps} (double $\ast$, bool $\ast$)\hypertarget{classSolver_afa8d3f8bf9ab9e379111eaa6dafc7de9}{}\label{classSolver_afa8d3f8bf9ab9e379111eaa6dafc7de9}
+
+\item 
+void {\bfseries del} (int $\ast$)\hypertarget{classSolver_ad66df5d232f0c04e4b8467fb65927e1e}{}\label{classSolver_ad66df5d232f0c04e4b8467fb65927e1e}
+
+\item 
+void {\bfseries del} (double $\ast$)\hypertarget{classSolver_a982ee85405686716231c715e9411bb95}{}\label{classSolver_a982ee85405686716231c715e9411bb95}
+
+\item 
+void {\bfseries del} (std\+::pair$<$ double, double $>$ $\ast$)\hypertarget{classSolver_ae9120b4a8988af81958011426f9b1a7b}{}\label{classSolver_ae9120b4a8988af81958011426f9b1a7b}
+
+\item 
+void {\bfseries create\+\_\+a} (double $\ast$$\ast$)\hypertarget{classSolver_a7885df3c61b622913fbef2ad4301c603}{}\label{classSolver_a7885df3c61b622913fbef2ad4301c603}
+
+\item 
+void {\bfseries check\+\_\+exterior} (bool $\ast$, int, int, int)\hypertarget{classSolver_a2def6a66bb6086556af38868bee73198}{}\label{classSolver_a2def6a66bb6086556af38868bee73198}
+
+\item 
+void {\bfseries check\+\_\+elec} (bool $\ast$)\hypertarget{classSolver_a9e0c1178a23582e0b281290f73ae871a}{}\label{classSolver_a9e0c1178a23582e0b281290f73ae871a}
+
+\item 
+double {\bfseries ohmic\+\_\+contact} (unsigned long int)\hypertarget{classSolver_a7d1087ed448131f4eb83c76f8a962365}{}\label{classSolver_a7d1087ed448131f4eb83c76f8a962365}
+
+\item 
+double {\bfseries normal\+\_\+eps} (unsigned long int, double $\ast$, double $\ast$)\hypertarget{classSolver_a36cdb7a42a13d2f197b6f8e6479a7b8c}{}\label{classSolver_a36cdb7a42a13d2f197b6f8e6479a7b8c}
+
+\item 
+double {\bfseries normal} (unsigned long int, double $\ast$)\hypertarget{classSolver_a40bb7bbd0cfb364aa4df0bd431fd9ee0}{}\label{classSolver_a40bb7bbd0cfb364aa4df0bd431fd9ee0}
+
+\item 
+void {\bfseries check\+\_\+diag} (boost\+::numeric\+::ublas\+::compressed\+\_\+matrix$<$ double $>$)\hypertarget{classSolver_a42587f1a50e213322cc70c4083b37682}{}\label{classSolver_a42587f1a50e213322cc70c4083b37682}
+
+\item 
+void {\bfseries save\+\_\+voltage} (boost\+::numeric\+::ublas\+::vector$<$ double $>$)\hypertarget{classSolver_a1e1374c106d3b0ffaff3f02851e69ca1}{}\label{classSolver_a1e1374c106d3b0ffaff3f02851e69ca1}
+
+\item 
+void {\bfseries mgrestriction} (double $\ast$, double $\ast$)\hypertarget{classSolver_a20e94820139dd1e3876d8e7ba6d9a6e9}{}\label{classSolver_a20e94820139dd1e3876d8e7ba6d9a6e9}
+
+\item 
+void {\bfseries mgprolongation} (double $\ast$, double $\ast$)\hypertarget{classSolver_a0ba739221bfa49be6e8619325c3c612b}{}\label{classSolver_a0ba739221bfa49be6e8619325c3c612b}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int $\ast$ {\bfseries N}\hypertarget{classSolver_a543cef6df4261245fa40d30f9b727d60}{}\label{classSolver_a543cef6df4261245fa40d30f9b727d60}
+
+\item 
+int {\bfseries solvemethod}\hypertarget{classSolver_aa76b0e2cf4871cc1936451a9037ada30}{}\label{classSolver_aa76b0e2cf4871cc1936451a9037ada30}
+
+\item 
+int {\bfseries boundarytype}\hypertarget{classSolver_af72c9d151bd70d33c0700c4e5ffec6ed}{}\label{classSolver_af72c9d151bd70d33c0700c4e5ffec6ed}
+
+\item 
+double $\ast$ {\bfseries V}\hypertarget{classSolver_a4dff3173b431f1c6989efe3510331603}{}\label{classSolver_a4dff3173b431f1c6989efe3510331603}
+
+\item 
+double $\ast$ {\bfseries rho}\hypertarget{classSolver_a39d4f60391c4c6b58ffc70cd29a48921}{}\label{classSolver_a39d4f60391c4c6b58ffc70cd29a48921}
+
+\item 
+double $\ast$ {\bfseries L}\hypertarget{classSolver_a3356ba94b805f34af408ddee10461994}{}\label{classSolver_a3356ba94b805f34af408ddee10461994}
+
+\item 
+double $\ast$ {\bfseries eps}\hypertarget{classSolver_a4535d93397fe5545954971c831b960af}{}\label{classSolver_a4535d93397fe5545954971c831b960af}
+
+\item 
+double {\bfseries h2}\hypertarget{classSolver_af80ed186f40803cd3ba6998fae2818b0}{}\label{classSolver_af80ed186f40803cd3ba6998fae2818b0}
+
+\item 
+double {\bfseries h}\hypertarget{classSolver_a8cc4b2bf572c6efa2a06b63af5259d6e}{}\label{classSolver_a8cc4b2bf572c6efa2a06b63af5259d6e}
+
+\item 
+std\+::pair$<$ double, double $>$ $\ast$ {\bfseries electrodemap}\hypertarget{classSolver_a9af6d11b188e12844a9ab32697f5d153}{}\label{classSolver_a9af6d11b188e12844a9ab32697f5d153}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/phys/poissolver/poissonsolver/src/solver.\+h\item 
+src/phys/poissolver/poissonsolver/src/solver.\+cpp\end{DoxyCompactItemize}

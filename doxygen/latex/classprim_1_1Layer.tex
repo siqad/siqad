@@ -1,0 +1,144 @@
+\hypertarget{classprim_1_1Layer}{}\section{prim\+:\+:Layer Class Reference}
+\label{classprim_1_1Layer}\index{prim\+::\+Layer@{prim\+::\+Layer}}
+
+
+Base Class for design layers, layers do not delete their items when destroyed.  
+
+
+
+
+{\ttfamily \#include $<$layer.\+h$>$}
+
+
+
+Inheritance diagram for prim\+:\+:Layer\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=151pt]{classprim_1_1Layer__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for prim\+:\+:Layer\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=145pt]{classprim_1_1Layer__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classprim_1_1Layer_a9a9c22ae767c4671a07293b69c540547}{Layer\+Type} \{ \\*
+{\bfseries Lattice}, 
+{\bfseries DB}, 
+{\bfseries Electrode}, 
+{\bfseries A\+F\+M\+Tip}, 
+\\*
+{\bfseries Plot}
+ \}\hypertarget{classprim_1_1Layer_a9a9c22ae767c4671a07293b69c540547}{}\label{classprim_1_1Layer_a9a9c22ae767c4671a07293b69c540547}
+\begin{DoxyCompactList}\small\item\em enum type for different layer contents \end{DoxyCompactList}
+\end{DoxyCompactItemize}
+\subsection*{Public Slots}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries visibility\+Check\+Box\+Changed} (int check\+\_\+state)\hypertarget{classprim_1_1Layer_a107df2ecd3c62a8a2850ab16b259cd97}{}\label{classprim_1_1Layer_a107df2ecd3c62a8a2850ab16b259cd97}
+
+\item 
+void {\bfseries visibility\+Push\+Button\+Changed} (bool checked)\hypertarget{classprim_1_1Layer_aff089bee001dceb4a6ef0d8bdc46c18b}{}\label{classprim_1_1Layer_aff089bee001dceb4a6ef0d8bdc46c18b}
+
+\item 
+void {\bfseries editability\+Push\+Button\+Changed} (bool checked)\hypertarget{classprim_1_1Layer_aadf868aa24684752991db0354f01fed9}{}\label{classprim_1_1Layer_aadf868aa24684752991db0354f01fed9}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classprim_1_1Layer_a0aa88b44c1ca33a9fb37048d1955e9e4}{Layer} (const Q\+String \&nm=Q\+String(), const \hyperlink{classprim_1_1Layer_a9a9c22ae767c4671a07293b69c540547}{Layer\+Type} cnt\+\_\+type=DB, const float z\+\_\+offset=0, const float z\+\_\+height=0, int lay\+\_\+id=-\/1, Q\+Object $\ast$parent=0)\hypertarget{classprim_1_1Layer_a0aa88b44c1ca33a9fb37048d1955e9e4}{}\label{classprim_1_1Layer_a0aa88b44c1ca33a9fb37048d1955e9e4}
+
+\begin{DoxyCompactList}\small\item\em constructor, create a \hyperlink{classprim_1_1Layer}{Layer} with the given name. If no name is given, use the default naming scheme with layer\+\_\+count. \end{DoxyCompactList}\item 
+\hyperlink{classprim_1_1Layer_adcfacc407024def1aba20b83337209d1}{Layer} (Q\+Xml\+Stream\+Reader $\ast$stream)\hypertarget{classprim_1_1Layer_adcfacc407024def1aba20b83337209d1}{}\label{classprim_1_1Layer_adcfacc407024def1aba20b83337209d1}
+
+\begin{DoxyCompactList}\small\item\em constructor, create a \hyperlink{classprim_1_1Layer}{Layer} from the design file. \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1Layer_a7a49a82ff912a32d028352b48784ae1a}{set\+Layer\+Index} (int lay\+\_\+id)\hypertarget{classprim_1_1Layer_a7a49a82ff912a32d028352b48784ae1a}{}\label{classprim_1_1Layer_a7a49a82ff912a32d028352b48784ae1a}
+
+\begin{DoxyCompactList}\small\item\em set layer index and update layer\+\_\+id of contained items \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1Layer_aa9ab5f693f5f2526b34422b5c29606d7}{set\+Z\+Offset} (const float z\+\_\+offset)\hypertarget{classprim_1_1Layer_aa9ab5f693f5f2526b34422b5c29606d7}{}\label{classprim_1_1Layer_aa9ab5f693f5f2526b34422b5c29606d7}
+
+\begin{DoxyCompactList}\small\item\em set the zoffset of the layer \end{DoxyCompactList}\item 
+float \hyperlink{classprim_1_1Layer_a7ae3cbed96ce075e56e444538805ed09}{z\+Offset} ()\hypertarget{classprim_1_1Layer_a7ae3cbed96ce075e56e444538805ed09}{}\label{classprim_1_1Layer_a7ae3cbed96ce075e56e444538805ed09}
+
+\begin{DoxyCompactList}\small\item\em get the zoffset of the layer \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1Layer_a5947e3dc1ad3a3d7657b6bf7cc3ed439}{set\+Z\+Height} (const float z\+\_\+height)\hypertarget{classprim_1_1Layer_a5947e3dc1ad3a3d7657b6bf7cc3ed439}{}\label{classprim_1_1Layer_a5947e3dc1ad3a3d7657b6bf7cc3ed439}
+
+\begin{DoxyCompactList}\small\item\em set the zheight of the layer \end{DoxyCompactList}\item 
+float \hyperlink{classprim_1_1Layer_a04fba2a5c8347f7a249b28018581018f}{z\+Height} ()\hypertarget{classprim_1_1Layer_a04fba2a5c8347f7a249b28018581018f}{}\label{classprim_1_1Layer_a04fba2a5c8347f7a249b28018581018f}
+
+\begin{DoxyCompactList}\small\item\em get the zheight of the layer \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1Layer_a688a2d06a43c128f9e98dc60e3b0157e}{add\+Item} (\hyperlink{classprim_1_1Item}{prim\+::\+Item} $\ast$item, int index=-\/1)\hypertarget{classprim_1_1Layer_a688a2d06a43c128f9e98dc60e3b0157e}{}\label{classprim_1_1Layer_a688a2d06a43c128f9e98dc60e3b0157e}
+
+\begin{DoxyCompactList}\small\item\em add a new \hyperlink{classprim_1_1Item}{Item} to the current layer. If the \hyperlink{classprim_1_1Item}{Item} is already in the layer, do nothing. \end{DoxyCompactList}\item 
+bool \hyperlink{classprim_1_1Layer_a760643f11d83c0c9f841de211787f7cc}{remove\+Item} (\hyperlink{classprim_1_1Item}{prim\+::\+Item} $\ast$item)\hypertarget{classprim_1_1Layer_a760643f11d83c0c9f841de211787f7cc}{}\label{classprim_1_1Layer_a760643f11d83c0c9f841de211787f7cc}
+
+\begin{DoxyCompactList}\small\item\em attempt to remove the given \hyperlink{classprim_1_1Item}{Item} from the layer. Returns true if the \hyperlink{classprim_1_1Item}{Item} is found and removed, false otherwise. \end{DoxyCompactList}\item 
+\hyperlink{classprim_1_1Item}{prim\+::\+Item} $\ast$ \hyperlink{classprim_1_1Layer_ad8ab05f2dc4eb37b3cb1b58ce465e9d9}{take\+Item} (int ind=-\/1)\hypertarget{classprim_1_1Layer_ad8ab05f2dc4eb37b3cb1b58ce465e9d9}{}\label{classprim_1_1Layer_ad8ab05f2dc4eb37b3cb1b58ce465e9d9}
+
+\begin{DoxyCompactList}\small\item\em pop the \hyperlink{classprim_1_1Item}{Item} given by the index. Returns 0 if invalid index. \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1Layer_aa9ec922e6147d213b7a391f23e2fe764}{set\+Visible} (bool vis)\hypertarget{classprim_1_1Layer_aa9ec922e6147d213b7a391f23e2fe764}{}\label{classprim_1_1Layer_aa9ec922e6147d213b7a391f23e2fe764}
+
+\begin{DoxyCompactList}\small\item\em update the layer visibility, calls set\+Visible(vis) for all Items in the layer. If vis==visibility, do nothing. \end{DoxyCompactList}\item 
+bool \hyperlink{classprim_1_1Layer_a6fff1ee8d18b3d7951277dddffb89257}{is\+Visible} () const \hypertarget{classprim_1_1Layer_a6fff1ee8d18b3d7951277dddffb89257}{}\label{classprim_1_1Layer_a6fff1ee8d18b3d7951277dddffb89257}
+
+\begin{DoxyCompactList}\small\item\em check if the layer should be visible \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1Layer_af7e5d87a863fa06328ec71473f6a4910}{set\+Active} (bool act)\hypertarget{classprim_1_1Layer_af7e5d87a863fa06328ec71473f6a4910}{}\label{classprim_1_1Layer_af7e5d87a863fa06328ec71473f6a4910}
+
+\begin{DoxyCompactList}\small\item\em update the layer activity, calls set\+Active(act) for all Items in the layer \end{DoxyCompactList}\item 
+bool \hyperlink{classprim_1_1Layer_af2e5a5c51de236881c68a7dbfafe4d77}{is\+Active} () const \hypertarget{classprim_1_1Layer_af2e5a5c51de236881c68a7dbfafe4d77}{}\label{classprim_1_1Layer_af2e5a5c51de236881c68a7dbfafe4d77}
+
+\begin{DoxyCompactList}\small\item\em check if the layer should be active \end{DoxyCompactList}\item 
+const Q\+String \& \hyperlink{classprim_1_1Layer_aba036a8f047a91e7629f81130bbcb7bb}{get\+Name} () const \hypertarget{classprim_1_1Layer_aba036a8f047a91e7629f81130bbcb7bb}{}\label{classprim_1_1Layer_aba036a8f047a91e7629f81130bbcb7bb}
+
+\begin{DoxyCompactList}\small\item\em get the \hyperlink{classprim_1_1Layer}{Layer} name, possibly change return to const Q\+String\& \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1Layer_a477672eee633e7a908abdc3648905d74}{set\+Content\+Type} (\hyperlink{classprim_1_1Layer_a9a9c22ae767c4671a07293b69c540547}{Layer\+Type} type)\hypertarget{classprim_1_1Layer_a477672eee633e7a908abdc3648905d74}{}\label{classprim_1_1Layer_a477672eee633e7a908abdc3648905d74}
+
+\begin{DoxyCompactList}\small\item\em set the \hyperlink{classprim_1_1Layer}{Layer} content type \end{DoxyCompactList}\item 
+\hyperlink{classprim_1_1Layer_a9a9c22ae767c4671a07293b69c540547}{Layer\+Type} \hyperlink{classprim_1_1Layer_af009cb8e716255926c14abea588a8362}{get\+Content\+Type} ()\hypertarget{classprim_1_1Layer_af009cb8e716255926c14abea588a8362}{}\label{classprim_1_1Layer_af009cb8e716255926c14abea588a8362}
+
+\begin{DoxyCompactList}\small\item\em get the \hyperlink{classprim_1_1Layer}{Layer} content type, like \char`\"{}electrode\char`\"{}, \char`\"{}dbdots\char`\"{}, etc. \end{DoxyCompactList}\item 
+const Q\+String {\bfseries get\+Content\+Type\+String} () const \hypertarget{classprim_1_1Layer_aa98e5ea74d0d956e06f71ab07c15903a}{}\label{classprim_1_1Layer_aa98e5ea74d0d956e06f71ab07c15903a}
+
+\item 
+\hyperlink{classprim_1_1Item}{prim\+::\+Item} $\ast$ \hyperlink{classprim_1_1Layer_a1d2ef0cb4f5607b1768f9b23bad42d24}{get\+Item} (int i)\hypertarget{classprim_1_1Layer_a1d2ef0cb4f5607b1768f9b23bad42d24}{}\label{classprim_1_1Layer_a1d2ef0cb4f5607b1768f9b23bad42d24}
+
+\begin{DoxyCompactList}\small\item\em if i is within bounds, return a pointer to the indexed item in the \hyperlink{classprim_1_1Layer}{Layer} item stack; otherwise, return 0 \end{DoxyCompactList}\item 
+int \hyperlink{classprim_1_1Layer_a071458923f67767d195db5b5648fa319}{get\+Item\+Index} (\hyperlink{classprim_1_1Item}{prim\+::\+Item} $\ast$item)\hypertarget{classprim_1_1Layer_a071458923f67767d195db5b5648fa319}{}\label{classprim_1_1Layer_a071458923f67767d195db5b5648fa319}
+
+\begin{DoxyCompactList}\small\item\em get index of an item with the item\textquotesingle{}s pointer \end{DoxyCompactList}\item 
+Q\+Stack$<$ \hyperlink{classprim_1_1Item}{prim\+::\+Item} $\ast$ $>$ \& \hyperlink{classprim_1_1Layer_a022327a92847e76871302f38e690353c}{get\+Items} ()\hypertarget{classprim_1_1Layer_a022327a92847e76871302f38e690353c}{}\label{classprim_1_1Layer_a022327a92847e76871302f38e690353c}
+
+\begin{DoxyCompactList}\small\item\em get the \hyperlink{classprim_1_1Layer}{Layer}\textquotesingle{}s items, needs to be a copy rather than a reference for \hyperlink{classprim_1_1Layer}{Layer} removal \end{DoxyCompactList}\item 
+virtual void {\bfseries save\+Layer} (Q\+Xml\+Stream\+Writer $\ast$) const \hypertarget{classprim_1_1Layer_a753a4827ef2d94d0088954fc5547ba70}{}\label{classprim_1_1Layer_a753a4827ef2d94d0088954fc5547ba70}
+
+\item 
+virtual void {\bfseries save\+Items} (Q\+Xml\+Stream\+Writer $\ast$) const \hypertarget{classprim_1_1Layer_ab4b8201df3846ac6298b5e8118e2ee74}{}\label{classprim_1_1Layer_ab4b8201df3846ac6298b5e8118e2ee74}
+
+\item 
+virtual void {\bfseries load\+Items} (Q\+Xml\+Stream\+Reader $\ast$, Q\+Graphics\+Scene $\ast$)\hypertarget{classprim_1_1Layer_a2921e285a2636f675fa23269393697b6}{}\label{classprim_1_1Layer_a2921e285a2636f675fa23269393697b6}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \hyperlink{classprim_1_1Layer_a572709dd85ef0834cf91883be17b3909}{reset\+Layers} ()\hypertarget{classprim_1_1Layer_a572709dd85ef0834cf91883be17b3909}{}\label{classprim_1_1Layer_a572709dd85ef0834cf91883be17b3909}
+
+\begin{DoxyCompactList}\small\item\em reset layers for new document \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Base Class for design layers, layers do not delete their items when destroyed. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/gui/widgets/primitives/\hyperlink{layer_8h}{layer.\+h}\item 
+src/gui/widgets/primitives/layer.\+cc\end{DoxyCompactItemize}

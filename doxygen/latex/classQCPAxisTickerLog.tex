@@ -1,0 +1,118 @@
+\hypertarget{classQCPAxisTickerLog}{}\section{Q\+C\+P\+Axis\+Ticker\+Log Class Reference}
+\label{classQCPAxisTickerLog}\index{Q\+C\+P\+Axis\+Ticker\+Log@{Q\+C\+P\+Axis\+Ticker\+Log}}
+
+
+Specialized axis ticker suited for logarithmic axes.  
+
+
+
+
+Inheritance diagram for Q\+C\+P\+Axis\+Ticker\+Log\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=181pt]{classQCPAxisTickerLog__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Q\+C\+P\+Axis\+Ticker\+Log\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=268pt]{classQCPAxisTickerLog__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPAxisTickerLog_af3cb86ea5eef2023c0b96b5260c4cbdf}{Q\+C\+P\+Axis\+Ticker\+Log} ()
+\item 
+double {\bfseries log\+Base} () const \hypertarget{classQCPAxisTickerLog_abba2a2aead5551b433940fa39a53ca09}{}\label{classQCPAxisTickerLog_abba2a2aead5551b433940fa39a53ca09}
+
+\item 
+int {\bfseries sub\+Tick\+Count} () const \hypertarget{classQCPAxisTickerLog_ad7a648bfa6ee3ad33b1c43bd7b84e9ab}{}\label{classQCPAxisTickerLog_ad7a648bfa6ee3ad33b1c43bd7b84e9ab}
+
+\item 
+void \hyperlink{classQCPAxisTickerLog_ac6e3b4e03baea3816f898869ab9751ef}{set\+Log\+Base} (double base)
+\item 
+void \hyperlink{classQCPAxisTickerLog_ad51989c798c0cfd50936d77aac57c56a}{set\+Sub\+Tick\+Count} (int sub\+Ticks)
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual double {\bfseries get\+Tick\+Step} (const \hyperlink{classQCPRange}{Q\+C\+P\+Range} \&range) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPAxisTickerLog_a57be974214a065d3247406331f02fa49}{}\label{classQCPAxisTickerLog_a57be974214a065d3247406331f02fa49}
+
+\item 
+virtual int {\bfseries get\+Sub\+Tick\+Count} (double tick\+Step) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPAxisTickerLog_a352fef7ae68837acd26e35188aa86167}{}\label{classQCPAxisTickerLog_a352fef7ae68837acd26e35188aa86167}
+
+\item 
+virtual Q\+Vector$<$ double $>$ {\bfseries create\+Tick\+Vector} (double tick\+Step, const \hyperlink{classQCPRange}{Q\+C\+P\+Range} \&range) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPAxisTickerLog_af8873a8d1d2b9392d8f7a73218c889ab}{}\label{classQCPAxisTickerLog_af8873a8d1d2b9392d8f7a73218c889ab}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+double {\bfseries m\+Log\+Base}\hypertarget{classQCPAxisTickerLog_a4108bcc1cd68dcec54dc75667440d328}{}\label{classQCPAxisTickerLog_a4108bcc1cd68dcec54dc75667440d328}
+
+\item 
+int {\bfseries m\+Sub\+Tick\+Count}\hypertarget{classQCPAxisTickerLog_a3d92b729bedbbbd34ee5f74565defd95}{}\label{classQCPAxisTickerLog_a3d92b729bedbbbd34ee5f74565defd95}
+
+\item 
+double {\bfseries m\+Log\+Base\+Ln\+Inv}\hypertarget{classQCPAxisTickerLog_aeba719bbeec39957f475ef89d6ae2fe7}{}\label{classQCPAxisTickerLog_aeba719bbeec39957f475ef89d6ae2fe7}
+
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+Specialized axis ticker suited for logarithmic axes. 
+
+
+
+This \hyperlink{classQCPAxisTicker}{Q\+C\+P\+Axis\+Ticker} subclass generates ticks with unequal tick intervals suited for logarithmic axis scales. The ticks are placed at powers of the specified log base (\hyperlink{classQCPAxisTickerLog_ac6e3b4e03baea3816f898869ab9751ef}{set\+Log\+Base}).
+
+Especially in the case of a log base equal to 10 (the default), it might be desirable to have tick labels in the form of powers of ten without mantissa display. To achieve this, set the number precision (\hyperlink{classQCPAxis_a21dc8023ad7500382ad9574b48137e63}{Q\+C\+P\+Axis\+::set\+Number\+Precision}) to zero and the number format (\hyperlink{classQCPAxis_ae585a54dc2aac662e90a2ca82f002590}{Q\+C\+P\+Axis\+::set\+Number\+Format}) to scientific (exponential) display with beautifully typeset decimal powers, so a format string of {\ttfamily \char`\"{}eb\char`\"{}}. This will result in the following axis tick labels\+:
+
+
+
+The ticker can be created and assigned to an axis like this\+: 
+\begin{DoxyCodeInclude}
+\end{DoxyCodeInclude}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Q\+C\+P\+Axis\+Ticker\+Log@{Q\+C\+P\+Axis\+Ticker\+Log}!Q\+C\+P\+Axis\+Ticker\+Log@{Q\+C\+P\+Axis\+Ticker\+Log}}
+\index{Q\+C\+P\+Axis\+Ticker\+Log@{Q\+C\+P\+Axis\+Ticker\+Log}!Q\+C\+P\+Axis\+Ticker\+Log@{Q\+C\+P\+Axis\+Ticker\+Log}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Axis\+Ticker\+Log()}{QCPAxisTickerLog()}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+C\+P\+Axis\+Ticker\+Log\+::\+Q\+C\+P\+Axis\+Ticker\+Log (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPAxisTickerLog_af3cb86ea5eef2023c0b96b5260c4cbdf}{}\label{classQCPAxisTickerLog_af3cb86ea5eef2023c0b96b5260c4cbdf}
+Constructs the ticker and sets reasonable default values. Axis tickers are commonly created managed by a Q\+Shared\+Pointer, which then can be passed to \hyperlink{classQCPAxis_a4ee03fcd2c74d05cd1a419b9af5cfbdc}{Q\+C\+P\+Axis\+::set\+Ticker}. 
+
+\subsection{Member Function Documentation}
+\index{Q\+C\+P\+Axis\+Ticker\+Log@{Q\+C\+P\+Axis\+Ticker\+Log}!set\+Log\+Base@{set\+Log\+Base}}
+\index{set\+Log\+Base@{set\+Log\+Base}!Q\+C\+P\+Axis\+Ticker\+Log@{Q\+C\+P\+Axis\+Ticker\+Log}}
+\subsubsection[{\texorpdfstring{set\+Log\+Base(double base)}{setLogBase(double base)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Axis\+Ticker\+Log\+::set\+Log\+Base (
+\begin{DoxyParamCaption}
+\item[{double}]{base}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPAxisTickerLog_ac6e3b4e03baea3816f898869ab9751ef}{}\label{classQCPAxisTickerLog_ac6e3b4e03baea3816f898869ab9751ef}
+Sets the logarithm base used for tick coordinate generation. The ticks will be placed at integer powers of {\itshape base}. \index{Q\+C\+P\+Axis\+Ticker\+Log@{Q\+C\+P\+Axis\+Ticker\+Log}!set\+Sub\+Tick\+Count@{set\+Sub\+Tick\+Count}}
+\index{set\+Sub\+Tick\+Count@{set\+Sub\+Tick\+Count}!Q\+C\+P\+Axis\+Ticker\+Log@{Q\+C\+P\+Axis\+Ticker\+Log}}
+\subsubsection[{\texorpdfstring{set\+Sub\+Tick\+Count(int sub\+Ticks)}{setSubTickCount(int subTicks)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Axis\+Ticker\+Log\+::set\+Sub\+Tick\+Count (
+\begin{DoxyParamCaption}
+\item[{int}]{sub\+Ticks}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPAxisTickerLog_ad51989c798c0cfd50936d77aac57c56a}{}\label{classQCPAxisTickerLog_ad51989c798c0cfd50936d77aac57c56a}
+Sets the number of sub ticks in a tick interval. Within each interval, the sub ticks are spaced linearly to provide a better visual guide, so the sub tick density increases toward the higher tick.
+
+Note that {\itshape sub\+Ticks} is the number of sub ticks (not sub intervals) in one tick interval. So in the case of logarithm base 10 an intuitive sub tick spacing would be achieved with eight sub ticks (the default). This means e.\+g. between the ticks 10 and 100 there will be eight ticks, namely at 20, 30, 40, 50, 60, 70, 80 and 90. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/qcustomplot.\+h\item 
+src/qcustomplot.\+cpp\end{DoxyCompactItemize}

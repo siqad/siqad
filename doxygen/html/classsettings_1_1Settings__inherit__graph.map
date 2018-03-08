@@ -1,0 +1,5 @@
+<map id="settings::Settings" name="settings::Settings">
+<area shape="rect" id="node3" href="$classsettings_1_1AppSettings.html" title="settings::AppSettings" alt="" coords="5,155,152,181"/>
+<area shape="rect" id="node4" href="$classsettings_1_1GUISettings.html" title="settings::GUISettings" alt="" coords="177,155,325,181"/>
+<area shape="rect" id="node5" href="$classsettings_1_1LatticeSettings.html" title="settings::LatticeSettings" alt="" coords="349,155,512,181"/>
+</map>

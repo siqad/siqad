@@ -1,0 +1,544 @@
+\hypertarget{classQCPFinancial}{}\section{Q\+C\+P\+Financial Class Reference}
+\label{classQCPFinancial}\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+
+
+A plottable representing a financial stock chart.  
+
+
+
+
+Inheritance diagram for Q\+C\+P\+Financial\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{classQCPFinancial__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Q\+C\+P\+Financial\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classQCPFinancial__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classQCPFinancial_aef1761dda71a53dc5269685e9e492626}{Width\+Type} \{ \hyperlink{classQCPFinancial_aef1761dda71a53dc5269685e9e492626a0758d53bb6d7b4858e6bf8771edc934a}{wt\+Absolute}, 
+\hyperlink{classQCPFinancial_aef1761dda71a53dc5269685e9e492626a806518350ea5814d28c29b0056e33ecd}{wt\+Axis\+Rect\+Ratio}, 
+\hyperlink{classQCPFinancial_aef1761dda71a53dc5269685e9e492626af676bc8dbe700b96b333329c9dbfc30f}{wt\+Plot\+Coords}
+ \}
+\item 
+enum \hyperlink{classQCPFinancial_a0f800e21ee98d646dfc6f8f89d10ebfb}{Chart\+Style} \{ \hyperlink{classQCPFinancial_a0f800e21ee98d646dfc6f8f89d10ebfba3a516016c9298d3e95dd82aa203c4390}{cs\+Ohlc}, 
+\hyperlink{classQCPFinancial_a0f800e21ee98d646dfc6f8f89d10ebfbac803cbd39f26e3f206bcc7028679e62f}{cs\+Candlestick}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPFinancial_a4702d5248feeb9d1ec6e3ce725b10b32}{Q\+C\+P\+Financial} (\hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$key\+Axis, \hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$value\+Axis)
+\item 
+Q\+Shared\+Pointer$<$ \hyperlink{classQCPDataContainer}{Q\+C\+P\+Financial\+Data\+Container} $>$ \hyperlink{classQCPFinancial_ad37e283817eff038a05ccba7ae22a630}{data} () const 
+\item 
+\hyperlink{classQCPFinancial_a0f800e21ee98d646dfc6f8f89d10ebfb}{Chart\+Style} {\bfseries chart\+Style} () const \hypertarget{classQCPFinancial_a0888c9308cc5fcb4daa70184f9582412}{}\label{classQCPFinancial_a0888c9308cc5fcb4daa70184f9582412}
+
+\item 
+double {\bfseries width} () const \hypertarget{classQCPFinancial_a71ccaa04cdade0ec08a2117db6e4a4ce}{}\label{classQCPFinancial_a71ccaa04cdade0ec08a2117db6e4a4ce}
+
+\item 
+\hyperlink{classQCPFinancial_aef1761dda71a53dc5269685e9e492626}{Width\+Type} {\bfseries width\+Type} () const \hypertarget{classQCPFinancial_a25f86eaa756b12655af0f45d0e1e7168}{}\label{classQCPFinancial_a25f86eaa756b12655af0f45d0e1e7168}
+
+\item 
+bool {\bfseries two\+Colored} () const \hypertarget{classQCPFinancial_a2bab30fc4eee38a0da3a05846b8d7ac7}{}\label{classQCPFinancial_a2bab30fc4eee38a0da3a05846b8d7ac7}
+
+\item 
+Q\+Brush {\bfseries brush\+Positive} () const \hypertarget{classQCPFinancial_acb69536a334fae7fc31b2bfd4eca81f5}{}\label{classQCPFinancial_acb69536a334fae7fc31b2bfd4eca81f5}
+
+\item 
+Q\+Brush {\bfseries brush\+Negative} () const \hypertarget{classQCPFinancial_a91e09b31ce341c17b917e77fdc68d84e}{}\label{classQCPFinancial_a91e09b31ce341c17b917e77fdc68d84e}
+
+\item 
+Q\+Pen {\bfseries pen\+Positive} () const \hypertarget{classQCPFinancial_a544899bde79d06e17ccefcb9926d87ce}{}\label{classQCPFinancial_a544899bde79d06e17ccefcb9926d87ce}
+
+\item 
+Q\+Pen {\bfseries pen\+Negative} () const \hypertarget{classQCPFinancial_a557fe911aa04f70c1734c8fa09994148}{}\label{classQCPFinancial_a557fe911aa04f70c1734c8fa09994148}
+
+\item 
+void \hyperlink{classQCPFinancial_a72089e75b8a50d18097526c3c79fdb85}{set\+Data} (Q\+Shared\+Pointer$<$ \hyperlink{classQCPDataContainer}{Q\+C\+P\+Financial\+Data\+Container} $>$ \hyperlink{classQCPFinancial_ad37e283817eff038a05ccba7ae22a630}{data})
+\item 
+void \hyperlink{classQCPFinancial_a12992e669ed19d7bb48dbe601570cc05}{set\+Data} (const Q\+Vector$<$ double $>$ \&keys, const Q\+Vector$<$ double $>$ \&open, const Q\+Vector$<$ double $>$ \&high, const Q\+Vector$<$ double $>$ \&low, const Q\+Vector$<$ double $>$ \&close, bool already\+Sorted=false)
+\item 
+void \hyperlink{classQCPFinancial_a5a59175d36279d71596e64d7bb65596f}{set\+Chart\+Style} (\hyperlink{classQCPFinancial_a0f800e21ee98d646dfc6f8f89d10ebfb}{Chart\+Style} style)
+\item 
+void \hyperlink{classQCPFinancial_a99633f8bac86a61d534ae5eeb1a3068f}{set\+Width} (double width)
+\item 
+void \hyperlink{classQCPFinancial_a204b7b710352796593a432b723e34089}{set\+Width\+Type} (\hyperlink{classQCPFinancial_aef1761dda71a53dc5269685e9e492626}{Width\+Type} width\+Type)
+\item 
+void \hyperlink{classQCPFinancial_a138e44aac160a17a9676652e240c5f08}{set\+Two\+Colored} (bool two\+Colored)
+\item 
+void \hyperlink{classQCPFinancial_a5ebff2b1764efd07cc44942e67821829}{set\+Brush\+Positive} (const Q\+Brush \&brush)
+\item 
+void \hyperlink{classQCPFinancial_a8bbdd87629f9144b3ef51af660c0961a}{set\+Brush\+Negative} (const Q\+Brush \&brush)
+\item 
+void \hyperlink{classQCPFinancial_ac58aa3adc7a35aab0088764b840683e5}{set\+Pen\+Positive} (const Q\+Pen \&pen)
+\item 
+void \hyperlink{classQCPFinancial_afe5c07e94ccea01a75b3a2476993c346}{set\+Pen\+Negative} (const Q\+Pen \&pen)
+\item 
+void \hyperlink{classQCPFinancial_a372ac031e44a7a6c912d203556af96f7}{add\+Data} (const Q\+Vector$<$ double $>$ \&keys, const Q\+Vector$<$ double $>$ \&open, const Q\+Vector$<$ double $>$ \&high, const Q\+Vector$<$ double $>$ \&low, const Q\+Vector$<$ double $>$ \&close, bool already\+Sorted=false)
+\item 
+void \hyperlink{classQCPFinancial_a688bbd052e00a02954ddb0068b378170}{add\+Data} (double key, double open, double high, double low, double close)
+\item 
+virtual \hyperlink{classQCPDataSelection}{Q\+C\+P\+Data\+Selection} \hyperlink{classQCPFinancial_a3c5beb1ab028a1dba845fc9dcffc7cf4}{select\+Test\+Rect} (const Q\+RectF \&rect, bool only\+Selectable) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+virtual double \hyperlink{classQCPFinancial_aac8e91622ac58330fa9ce81cc8fd40ee}{select\+Test} (const Q\+PointF \&pos, bool only\+Selectable, Q\+Variant $\ast$details=0) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+virtual \hyperlink{classQCPRange}{Q\+C\+P\+Range} \hyperlink{classQCPFinancial_a15d68fb257113fef697356d65fa76559}{get\+Key\+Range} (bool \&found\+Range, \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9}{Q\+C\+P\+::\+Sign\+Domain} in\+Sign\+Domain=\hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9aa38352ef02d51ddfa4399d9551566e24}{Q\+C\+P\+::sd\+Both}) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+virtual \hyperlink{classQCPRange}{Q\+C\+P\+Range} \hyperlink{classQCPFinancial_a82d862aa134d78853f98f8c57a03415b}{get\+Value\+Range} (bool \&found\+Range, \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9}{Q\+C\+P\+::\+Sign\+Domain} in\+Sign\+Domain=\hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9aa38352ef02d51ddfa4399d9551566e24}{Q\+C\+P\+::sd\+Both}, const \hyperlink{classQCPRange}{Q\+C\+P\+Range} \&in\+Key\+Range=\hyperlink{classQCPRange}{Q\+C\+P\+Range}()) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \hyperlink{classQCPDataContainer}{Q\+C\+P\+Financial\+Data\+Container} \hyperlink{classQCPFinancial_a9a058c035040d3939b8884f4aaccb1a7}{time\+Series\+To\+Ohlc} (const Q\+Vector$<$ double $>$ \&time, const Q\+Vector$<$ double $>$ \&value, double time\+Bin\+Size, double time\+Bin\+Offset=0)
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void {\bfseries draw} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPFinancial_a4d62b7a618d609321adb5f5f1e31f446}{}\label{classQCPFinancial_a4d62b7a618d609321adb5f5f1e31f446}
+
+\item 
+virtual void {\bfseries draw\+Legend\+Icon} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter, const Q\+RectF \&rect) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPFinancial_a53f6ef2cddb650993f04c66e39a04942}{}\label{classQCPFinancial_a53f6ef2cddb650993f04c66e39a04942}
+
+\item 
+void {\bfseries draw\+Ohlc\+Plot} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter, const Q\+C\+P\+Financial\+Data\+Container\+::const\+\_\+iterator \&begin, const Q\+C\+P\+Financial\+Data\+Container\+::const\+\_\+iterator \&end, bool is\+Selected)\hypertarget{classQCPFinancial_a2c77aab636f6bce6e0407b3f94e90d08}{}\label{classQCPFinancial_a2c77aab636f6bce6e0407b3f94e90d08}
+
+\item 
+void {\bfseries draw\+Candlestick\+Plot} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter, const Q\+C\+P\+Financial\+Data\+Container\+::const\+\_\+iterator \&begin, const Q\+C\+P\+Financial\+Data\+Container\+::const\+\_\+iterator \&end, bool is\+Selected)\hypertarget{classQCPFinancial_ade6b703369d8acb3bfa0b8e244df4b06}{}\label{classQCPFinancial_ade6b703369d8acb3bfa0b8e244df4b06}
+
+\item 
+double {\bfseries get\+Pixel\+Width} (double key, double key\+Pixel) const \hypertarget{classQCPFinancial_a86706190fc71b009b67a183f1f247729}{}\label{classQCPFinancial_a86706190fc71b009b67a183f1f247729}
+
+\item 
+double {\bfseries ohlc\+Select\+Test} (const Q\+PointF \&pos, const Q\+C\+P\+Financial\+Data\+Container\+::const\+\_\+iterator \&begin, const Q\+C\+P\+Financial\+Data\+Container\+::const\+\_\+iterator \&end, Q\+C\+P\+Financial\+Data\+Container\+::const\+\_\+iterator \&closest\+Data\+Point) const \hypertarget{classQCPFinancial_aea6f07a7140694a59e1a2a8477af2bdd}{}\label{classQCPFinancial_aea6f07a7140694a59e1a2a8477af2bdd}
+
+\item 
+double {\bfseries candlestick\+Select\+Test} (const Q\+PointF \&pos, const Q\+C\+P\+Financial\+Data\+Container\+::const\+\_\+iterator \&begin, const Q\+C\+P\+Financial\+Data\+Container\+::const\+\_\+iterator \&end, Q\+C\+P\+Financial\+Data\+Container\+::const\+\_\+iterator \&closest\+Data\+Point) const \hypertarget{classQCPFinancial_a34bf41e29ade0ea6840536279c10b58c}{}\label{classQCPFinancial_a34bf41e29ade0ea6840536279c10b58c}
+
+\item 
+void {\bfseries get\+Visible\+Data\+Bounds} (Q\+C\+P\+Financial\+Data\+Container\+::const\+\_\+iterator \&begin, Q\+C\+P\+Financial\+Data\+Container\+::const\+\_\+iterator \&end) const \hypertarget{classQCPFinancial_ad650d7fd0f498f6ca65460a031c37515}{}\label{classQCPFinancial_ad650d7fd0f498f6ca65460a031c37515}
+
+\item 
+Q\+RectF {\bfseries selection\+Hit\+Box} (Q\+C\+P\+Financial\+Data\+Container\+::const\+\_\+iterator it) const \hypertarget{classQCPFinancial_ae31f1142fadc67b2721698ec3153b7d5}{}\label{classQCPFinancial_ae31f1142fadc67b2721698ec3153b7d5}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPFinancial_a0f800e21ee98d646dfc6f8f89d10ebfb}{Chart\+Style} {\bfseries m\+Chart\+Style}\hypertarget{classQCPFinancial_ab65c2ce8d6354451870bb44b894c1e92}{}\label{classQCPFinancial_ab65c2ce8d6354451870bb44b894c1e92}
+
+\item 
+double {\bfseries m\+Width}\hypertarget{classQCPFinancial_af630e5eb8485146b9c777e63fd1cf993}{}\label{classQCPFinancial_af630e5eb8485146b9c777e63fd1cf993}
+
+\item 
+\hyperlink{classQCPFinancial_aef1761dda71a53dc5269685e9e492626}{Width\+Type} {\bfseries m\+Width\+Type}\hypertarget{classQCPFinancial_a7926204997e04c9de9dbe1f092df125a}{}\label{classQCPFinancial_a7926204997e04c9de9dbe1f092df125a}
+
+\item 
+bool {\bfseries m\+Two\+Colored}\hypertarget{classQCPFinancial_a6afe919190b884d9bac026cefcc8c0a8}{}\label{classQCPFinancial_a6afe919190b884d9bac026cefcc8c0a8}
+
+\item 
+Q\+Brush {\bfseries m\+Brush\+Positive}\hypertarget{classQCPFinancial_ab7e6eed16260a2f88ca6bd940dffea79}{}\label{classQCPFinancial_ab7e6eed16260a2f88ca6bd940dffea79}
+
+\item 
+Q\+Brush {\bfseries m\+Brush\+Negative}\hypertarget{classQCPFinancial_acb0e31874b7a1deb56bd42e8ab3e68f2}{}\label{classQCPFinancial_acb0e31874b7a1deb56bd42e8ab3e68f2}
+
+\item 
+Q\+Pen {\bfseries m\+Pen\+Positive}\hypertarget{classQCPFinancial_aa6599186f417ba615caebb3f6c762bd8}{}\label{classQCPFinancial_aa6599186f417ba615caebb3f6c762bd8}
+
+\item 
+Q\+Pen {\bfseries m\+Pen\+Negative}\hypertarget{classQCPFinancial_a263fbfefde2cc19c8d4024a8319c2bbb}{}\label{classQCPFinancial_a263fbfefde2cc19c8d4024a8319c2bbb}
+
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class {\bfseries Q\+Custom\+Plot}\hypertarget{classQCPFinancial_a1cdf9df76adcfae45261690aa0ca2198}{}\label{classQCPFinancial_a1cdf9df76adcfae45261690aa0ca2198}
+
+\item 
+class {\bfseries Q\+C\+P\+Legend}\hypertarget{classQCPFinancial_a8429035e7adfbd7f05805a6530ad5e3b}{}\label{classQCPFinancial_a8429035e7adfbd7f05805a6530ad5e3b}
+
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+A plottable representing a financial stock chart. 
+
+
+
+This plottable represents time series data binned to certain intervals, mainly used for stock charts. The two common representations O\+H\+LC (Open-\/\+High-\/\+Low-\/\+Close) bars and Candlesticks can be set via \hyperlink{classQCPFinancial_a5a59175d36279d71596e64d7bb65596f}{set\+Chart\+Style}.
+
+The data is passed via \hyperlink{classQCPFinancial_a72089e75b8a50d18097526c3c79fdb85}{set\+Data} as a set of open/high/low/close values at certain keys (typically times). This means the data must be already binned appropriately. If data is only available as a series of values (e.\+g. {\itshape price} against {\itshape time}), you can use the static convenience function \hyperlink{classQCPFinancial_a9a058c035040d3939b8884f4aaccb1a7}{time\+Series\+To\+Ohlc} to generate binned O\+H\+L\+C-\/data which can then be passed to \hyperlink{classQCPFinancial_a72089e75b8a50d18097526c3c79fdb85}{set\+Data}.
+
+The width of the O\+H\+LC bars/candlesticks can be controlled with \hyperlink{classQCPFinancial_a99633f8bac86a61d534ae5eeb1a3068f}{set\+Width} and \hyperlink{classQCPFinancial_a204b7b710352796593a432b723e34089}{set\+Width\+Type}. A typical choice is to set the width type to \hyperlink{classQCPFinancial_aef1761dda71a53dc5269685e9e492626af676bc8dbe700b96b333329c9dbfc30f}{wt\+Plot\+Coords} (the default) and the width to (or slightly less than) one time bin interval width.\hypertarget{classQCPFinancial_qcpfinancial-appearance}{}\subsection{Changing the appearance}\label{classQCPFinancial_qcpfinancial-appearance}
+Charts can be either single-\/ or two-\/colored (\hyperlink{classQCPFinancial_a138e44aac160a17a9676652e240c5f08}{set\+Two\+Colored}). If set to be single-\/colored, lines are drawn with the plottable\textquotesingle{}s pen (\hyperlink{classQCPAbstractPlottable_ab74b09ae4c0e7e13142fe4b5bf46cac7}{set\+Pen}) and fills with the brush (\hyperlink{classQCPAbstractPlottable_a7a4b92144dca6453a1f0f210e27edc74}{set\+Brush}).
+
+If set to two-\/colored, positive changes of the value during an interval ({\itshape close} $>$= {\itshape open}) are represented with a different pen and brush than negative changes ({\itshape close} $<$ {\itshape open}). These can be configured with \hyperlink{classQCPFinancial_ac58aa3adc7a35aab0088764b840683e5}{set\+Pen\+Positive}, \hyperlink{classQCPFinancial_afe5c07e94ccea01a75b3a2476993c346}{set\+Pen\+Negative}, \hyperlink{classQCPFinancial_a5ebff2b1764efd07cc44942e67821829}{set\+Brush\+Positive}, and \hyperlink{classQCPFinancial_a8bbdd87629f9144b3ef51af660c0961a}{set\+Brush\+Negative}. In two-\/colored mode, the normal plottable pen/brush is ignored. Upon selection however, the normal selected pen/brush (provided by the \hyperlink{classQCPAbstractPlottable_a33e6f2b8d6008e4ac59ff8d92b509c97}{selection\+Decorator}) is used, irrespective of whether the chart is single-\/ or two-\/colored.\hypertarget{classQCPFinancial_qcpfinancial-usage}{}\subsection{Usage}\label{classQCPFinancial_qcpfinancial-usage}
+Like all data representing objects in \hyperlink{classQCustomPlot}{Q\+Custom\+Plot}, the \hyperlink{classQCPFinancial}{Q\+C\+P\+Financial} is a plottable (\hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable}). So the plottable-\/interface of \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} applies (\hyperlink{classQCustomPlot_a32de81ff53e263e785b83b52ecd99d6f}{Q\+Custom\+Plot\+::plottable}, \hyperlink{classQCustomPlot_af3dafd56884208474f311d6226513ab2}{Q\+Custom\+Plot\+::remove\+Plottable}, etc.)
+
+Usually, you first create an instance\+:
+
+
+\begin{DoxyCodeInclude}
+\end{DoxyCodeInclude}
+which registers it with the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance of the passed axes. Note that this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance takes ownership of the plottable, so do not delete it manually but use \hyperlink{classQCustomPlot_af3dafd56884208474f311d6226513ab2}{Q\+Custom\+Plot\+::remove\+Plottable()} instead. The newly created plottable can be modified, e.\+g.\+:
+
+
+\begin{DoxyCodeInclude}
+\end{DoxyCodeInclude}
+Here we have used the static helper method \hyperlink{classQCPFinancial_a9a058c035040d3939b8884f4aaccb1a7}{time\+Series\+To\+Ohlc}, to turn a time-\/price data series into a 24-\/hour binned open-\/high-\/low-\/close data series as \hyperlink{classQCPFinancial}{Q\+C\+P\+Financial} uses. 
+
+\subsection{Member Enumeration Documentation}
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!Chart\+Style@{Chart\+Style}}
+\index{Chart\+Style@{Chart\+Style}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{Chart\+Style}{ChartStyle}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Q\+C\+P\+Financial\+::\+Chart\+Style}}\hypertarget{classQCPFinancial_a0f800e21ee98d646dfc6f8f89d10ebfb}{}\label{classQCPFinancial_a0f800e21ee98d646dfc6f8f89d10ebfb}
+Defines the possible representations of O\+H\+LC data in the plot.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPFinancial_a5a59175d36279d71596e64d7bb65596f}{set\+Chart\+Style} 
+\end{DoxySeeAlso}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{cs\+Ohlc@{cs\+Ohlc}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!cs\+Ohlc@{cs\+Ohlc}}\item[{\em 
+cs\+Ohlc\hypertarget{classQCPFinancial_a0f800e21ee98d646dfc6f8f89d10ebfba3a516016c9298d3e95dd82aa203c4390}{}\label{classQCPFinancial_a0f800e21ee98d646dfc6f8f89d10ebfba3a516016c9298d3e95dd82aa203c4390}
+}]Open-\/\+High-\/\+Low-\/\+Close bar representation. \index{cs\+Candlestick@{cs\+Candlestick}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!cs\+Candlestick@{cs\+Candlestick}}\item[{\em 
+cs\+Candlestick\hypertarget{classQCPFinancial_a0f800e21ee98d646dfc6f8f89d10ebfbac803cbd39f26e3f206bcc7028679e62f}{}\label{classQCPFinancial_a0f800e21ee98d646dfc6f8f89d10ebfbac803cbd39f26e3f206bcc7028679e62f}
+}]Candlestick representation. \end{description}
+\end{Desc}
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!Width\+Type@{Width\+Type}}
+\index{Width\+Type@{Width\+Type}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{Width\+Type}{WidthType}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Q\+C\+P\+Financial\+::\+Width\+Type}}\hypertarget{classQCPFinancial_aef1761dda71a53dc5269685e9e492626}{}\label{classQCPFinancial_aef1761dda71a53dc5269685e9e492626}
+Defines the ways the width of the financial bar can be specified. Thus it defines what the number passed to \hyperlink{classQCPFinancial_a99633f8bac86a61d534ae5eeb1a3068f}{set\+Width} actually means.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPFinancial_a204b7b710352796593a432b723e34089}{set\+Width\+Type}, \hyperlink{classQCPFinancial_a99633f8bac86a61d534ae5eeb1a3068f}{set\+Width} 
+\end{DoxySeeAlso}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{wt\+Absolute@{wt\+Absolute}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!wt\+Absolute@{wt\+Absolute}}\item[{\em 
+wt\+Absolute\hypertarget{classQCPFinancial_aef1761dda71a53dc5269685e9e492626a0758d53bb6d7b4858e6bf8771edc934a}{}\label{classQCPFinancial_aef1761dda71a53dc5269685e9e492626a0758d53bb6d7b4858e6bf8771edc934a}
+}]width is in absolute pixels \index{wt\+Axis\+Rect\+Ratio@{wt\+Axis\+Rect\+Ratio}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!wt\+Axis\+Rect\+Ratio@{wt\+Axis\+Rect\+Ratio}}\item[{\em 
+wt\+Axis\+Rect\+Ratio\hypertarget{classQCPFinancial_aef1761dda71a53dc5269685e9e492626a806518350ea5814d28c29b0056e33ecd}{}\label{classQCPFinancial_aef1761dda71a53dc5269685e9e492626a806518350ea5814d28c29b0056e33ecd}
+}]width is given by a fraction of the axis rect size \index{wt\+Plot\+Coords@{wt\+Plot\+Coords}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!wt\+Plot\+Coords@{wt\+Plot\+Coords}}\item[{\em 
+wt\+Plot\+Coords\hypertarget{classQCPFinancial_aef1761dda71a53dc5269685e9e492626af676bc8dbe700b96b333329c9dbfc30f}{}\label{classQCPFinancial_aef1761dda71a53dc5269685e9e492626af676bc8dbe700b96b333329c9dbfc30f}
+}]width is in key coordinates and thus scales with the key axis range \end{description}
+\end{Desc}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Financial(\+Q\+C\+P\+Axis $\ast$key\+Axis, Q\+C\+P\+Axis $\ast$value\+Axis)}{QCPFinancial(QCPAxis *keyAxis, QCPAxis *valueAxis)}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+C\+P\+Financial\+::\+Q\+C\+P\+Financial (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Axis} $\ast$}]{key\+Axis, }
+\item[{{\bf Q\+C\+P\+Axis} $\ast$}]{value\+Axis}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [explicit]}}\hypertarget{classQCPFinancial_a4702d5248feeb9d1ec6e3ce725b10b32}{}\label{classQCPFinancial_a4702d5248feeb9d1ec6e3ce725b10b32}
+Constructs a financial chart which uses {\itshape key\+Axis} as its key axis (\char`\"{}x\char`\"{}) and {\itshape value\+Axis} as its value axis (\char`\"{}y\char`\"{}). {\itshape key\+Axis} and {\itshape value\+Axis} must reside in the same \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance and not have the same orientation. If either of these restrictions is violated, a corresponding message is printed to the debug output (q\+Debug), the construction is not aborted, though.
+
+The created \hyperlink{classQCPFinancial}{Q\+C\+P\+Financial} is automatically registered with the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance inferred from {\itshape key\+Axis}. This \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance takes ownership of the \hyperlink{classQCPFinancial}{Q\+C\+P\+Financial}, so do not delete it manually but use \hyperlink{classQCustomPlot_af3dafd56884208474f311d6226513ab2}{Q\+Custom\+Plot\+::remove\+Plottable()} instead. 
+
+\subsection{Member Function Documentation}
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!add\+Data@{add\+Data}}
+\index{add\+Data@{add\+Data}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{add\+Data(const Q\+Vector$<$ double $>$ \&keys, const Q\+Vector$<$ double $>$ \&open, const Q\+Vector$<$ double $>$ \&high, const Q\+Vector$<$ double $>$ \&low, const Q\+Vector$<$ double $>$ \&close, bool already\+Sorted=false)}{addData(const QVector< double > &keys, const QVector< double > &open, const QVector< double > &high, const QVector< double > &low, const QVector< double > &close, bool alreadySorted=false)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Financial\+::add\+Data (
+\begin{DoxyParamCaption}
+\item[{const Q\+Vector$<$ double $>$ \&}]{keys, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{open, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{high, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{low, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{close, }
+\item[{bool}]{already\+Sorted = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPFinancial_a372ac031e44a7a6c912d203556af96f7}{}\label{classQCPFinancial_a372ac031e44a7a6c912d203556af96f7}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Adds the provided points in {\itshape keys}, {\itshape open}, {\itshape high}, {\itshape low} and {\itshape close} to the current data. The provided vectors should have equal length. Else, the number of added points will be the size of the smallest vector.
+
+If you can guarantee that the passed data points are sorted by {\itshape keys} in ascending order, you can set {\itshape already\+Sorted} to true, to improve performance by saving a sorting run.
+
+Alternatively, you can also access and modify the data directly via the \hyperlink{classQCPFinancial_ad37e283817eff038a05ccba7ae22a630}{data} method, which returns a pointer to the internal data container.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPFinancial_a9a058c035040d3939b8884f4aaccb1a7}{time\+Series\+To\+Ohlc} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!add\+Data@{add\+Data}}
+\index{add\+Data@{add\+Data}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{add\+Data(double key, double open, double high, double low, double close)}{addData(double key, double open, double high, double low, double close)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Financial\+::add\+Data (
+\begin{DoxyParamCaption}
+\item[{double}]{key, }
+\item[{double}]{open, }
+\item[{double}]{high, }
+\item[{double}]{low, }
+\item[{double}]{close}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPFinancial_a688bbd052e00a02954ddb0068b378170}{}\label{classQCPFinancial_a688bbd052e00a02954ddb0068b378170}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Adds the provided data point as {\itshape key}, {\itshape open}, {\itshape high}, {\itshape low} and {\itshape close} to the current data.
+
+Alternatively, you can also access and modify the data directly via the \hyperlink{classQCPFinancial_ad37e283817eff038a05ccba7ae22a630}{data} method, which returns a pointer to the internal data container.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPFinancial_a9a058c035040d3939b8884f4aaccb1a7}{time\+Series\+To\+Ohlc} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!data@{data}}
+\index{data@{data}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{data() const }{data() const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Financial\+Data\+Container} $\ast$ Q\+C\+P\+Financial\+::data (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPFinancial_ad37e283817eff038a05ccba7ae22a630}{}\label{classQCPFinancial_ad37e283817eff038a05ccba7ae22a630}
+Returns a pointer to the internal data storage of type Q\+C\+P\+Financial\+Data\+Container. You may use it to directly manipulate the data, which may be more convenient and faster than using the regular \hyperlink{classQCPFinancial_a72089e75b8a50d18097526c3c79fdb85}{set\+Data} or \hyperlink{classQCPFinancial_a372ac031e44a7a6c912d203556af96f7}{add\+Data} methods, in certain situations. \index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!get\+Key\+Range@{get\+Key\+Range}}
+\index{get\+Key\+Range@{get\+Key\+Range}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{get\+Key\+Range(bool \&found\+Range, Q\+C\+P\+::\+Sign\+Domain in\+Sign\+Domain=\+Q\+C\+P\+::sd\+Both) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{getKeyRange(bool &foundRange, QCP::SignDomain inSignDomain=QCP::sdBoth) const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Range} Q\+C\+P\+Financial\+::get\+Key\+Range (
+\begin{DoxyParamCaption}
+\item[{bool \&}]{found\+Range, }
+\item[{{\bf Q\+C\+P\+::\+Sign\+Domain}}]{in\+Sign\+Domain = {\ttfamily {\bf Q\+C\+P\+::sd\+Both}}}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPFinancial_a15d68fb257113fef697356d65fa76559}{}\label{classQCPFinancial_a15d68fb257113fef697356d65fa76559}
+Returns the coordinate range that all data in this plottable span in the key axis dimension. For logarithmic plots, one can set {\itshape in\+Sign\+Domain} to either \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a2d18af0bc58f6528d1e82ce699fe4829}{Q\+C\+P\+::sd\+Negative} or \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a584784b75fb816abcc627cf743bb699f}{Q\+C\+P\+::sd\+Positive} in order to restrict the returned range to that sign domain. E.\+g. when only negative range is wanted, set {\itshape in\+Sign\+Domain} to \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a2d18af0bc58f6528d1e82ce699fe4829}{Q\+C\+P\+::sd\+Negative} and all positive points will be ignored for range calculation. For no restriction, just set {\itshape in\+Sign\+Domain} to \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9aa38352ef02d51ddfa4399d9551566e24}{Q\+C\+P\+::sd\+Both} (default). {\itshape found\+Range} is an output parameter that indicates whether a range could be found or not. If this is false, you shouldn\textquotesingle{}t use the returned range (e.\+g. no points in data).
+
+Note that {\itshape found\+Range} is not the same as \hyperlink{classQCPRange_ab38bd4841c77c7bb86c9eea0f142dcc0}{Q\+C\+P\+Range\+::valid\+Range}, since the range returned by this function may have size zero (e.\+g. when there is only one data point). In this case {\itshape found\+Range} would return true, but the returned range is not a valid range in terms of \hyperlink{classQCPRange_ab38bd4841c77c7bb86c9eea0f142dcc0}{Q\+C\+P\+Range\+::valid\+Range}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPAbstractPlottable_a7e8fc3be43c27ccacd70a7bf9d74a5cd}{rescale\+Axes}, \hyperlink{classQCPFinancial_a82d862aa134d78853f98f8c57a03415b}{get\+Value\+Range} 
+\end{DoxySeeAlso}
+
+
+Implements \hyperlink{classQCPAbstractPlottable_a4da16d3cd4b509e1104a9b0275623c96}{Q\+C\+P\+Abstract\+Plottable}.
+
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!get\+Value\+Range@{get\+Value\+Range}}
+\index{get\+Value\+Range@{get\+Value\+Range}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{get\+Value\+Range(bool \&found\+Range, Q\+C\+P\+::\+Sign\+Domain in\+Sign\+Domain=\+Q\+C\+P\+::sd\+Both, const Q\+C\+P\+Range \&in\+Key\+Range=\+Q\+C\+P\+Range()) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{getValueRange(bool &foundRange, QCP::SignDomain inSignDomain=QCP::sdBoth, const QCPRange &inKeyRange=QCPRange()) const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Range} Q\+C\+P\+Financial\+::get\+Value\+Range (
+\begin{DoxyParamCaption}
+\item[{bool \&}]{found\+Range, }
+\item[{{\bf Q\+C\+P\+::\+Sign\+Domain}}]{in\+Sign\+Domain = {\ttfamily {\bf Q\+C\+P\+::sd\+Both}}, }
+\item[{const {\bf Q\+C\+P\+Range} \&}]{in\+Key\+Range = {\ttfamily {\bf Q\+C\+P\+Range}()}}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPFinancial_a82d862aa134d78853f98f8c57a03415b}{}\label{classQCPFinancial_a82d862aa134d78853f98f8c57a03415b}
+Returns the coordinate range that the data points in the specified key range ({\itshape in\+Key\+Range}) span in the value axis dimension. For logarithmic plots, one can set {\itshape in\+Sign\+Domain} to either \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a2d18af0bc58f6528d1e82ce699fe4829}{Q\+C\+P\+::sd\+Negative} or \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a584784b75fb816abcc627cf743bb699f}{Q\+C\+P\+::sd\+Positive} in order to restrict the returned range to that sign domain. E.\+g. when only negative range is wanted, set {\itshape in\+Sign\+Domain} to \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a2d18af0bc58f6528d1e82ce699fe4829}{Q\+C\+P\+::sd\+Negative} and all positive points will be ignored for range calculation. For no restriction, just set {\itshape in\+Sign\+Domain} to \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9aa38352ef02d51ddfa4399d9551566e24}{Q\+C\+P\+::sd\+Both} (default). {\itshape found\+Range} is an output parameter that indicates whether a range could be found or not. If this is false, you shouldn\textquotesingle{}t use the returned range (e.\+g. no points in data).
+
+If {\itshape in\+Key\+Range} has both lower and upper bound set to zero (is equal to {\ttfamily \hyperlink{classQCPRange}{Q\+C\+P\+Range()}}), all data points are considered, without any restriction on the keys.
+
+Note that {\itshape found\+Range} is not the same as \hyperlink{classQCPRange_ab38bd4841c77c7bb86c9eea0f142dcc0}{Q\+C\+P\+Range\+::valid\+Range}, since the range returned by this function may have size zero (e.\+g. when there is only one data point). In this case {\itshape found\+Range} would return true, but the returned range is not a valid range in terms of \hyperlink{classQCPRange_ab38bd4841c77c7bb86c9eea0f142dcc0}{Q\+C\+P\+Range\+::valid\+Range}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPAbstractPlottable_a7e8fc3be43c27ccacd70a7bf9d74a5cd}{rescale\+Axes}, \hyperlink{classQCPFinancial_a15d68fb257113fef697356d65fa76559}{get\+Key\+Range} 
+\end{DoxySeeAlso}
+
+
+Implements \hyperlink{classQCPAbstractPlottable_a4de773988b21ed090fddd27c6a3a3dcb}{Q\+C\+P\+Abstract\+Plottable}.
+
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!select\+Test@{select\+Test}}
+\index{select\+Test@{select\+Test}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{select\+Test(const Q\+Point\+F \&pos, bool only\+Selectable, Q\+Variant $\ast$details=0) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{selectTest(const QPointF &pos, bool onlySelectable, QVariant *details=0) const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}double Q\+C\+P\+Financial\+::select\+Test (
+\begin{DoxyParamCaption}
+\item[{const Q\+PointF \&}]{pos, }
+\item[{bool}]{only\+Selectable, }
+\item[{Q\+Variant $\ast$}]{details = {\ttfamily 0}}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPFinancial_aac8e91622ac58330fa9ce81cc8fd40ee}{}\label{classQCPFinancial_aac8e91622ac58330fa9ce81cc8fd40ee}
+Implements a point-\/selection algorithm assuming the data (accessed via the 1D data interface) is point-\/like. Most subclasses will want to reimplement this method again, to provide a more accurate hit test based on the true data visualization geometry.
+
+Reimplemented from \hyperlink{classQCPAbstractPlottable1D_a4611b43bcb6441b2154eb4f4e0a33db2}{Q\+C\+P\+Abstract\+Plottable1\+D$<$ Q\+C\+P\+Financial\+Data $>$}.
+
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!select\+Test\+Rect@{select\+Test\+Rect}}
+\index{select\+Test\+Rect@{select\+Test\+Rect}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{select\+Test\+Rect(const Q\+Rect\+F \&rect, bool only\+Selectable) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{selectTestRect(const QRectF &rect, bool onlySelectable) const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Data\+Selection} Q\+C\+P\+Financial\+::select\+Test\+Rect (
+\begin{DoxyParamCaption}
+\item[{const Q\+RectF \&}]{rect, }
+\item[{bool}]{only\+Selectable}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPFinancial_a3c5beb1ab028a1dba845fc9dcffc7cf4}{}\label{classQCPFinancial_a3c5beb1ab028a1dba845fc9dcffc7cf4}
+
+
+
+
+Returns a data selection containing all the data points of this plottable which are contained (or hit by) {\itshape rect}. This is used mainly in the selection rect interaction for data selection (data selection mechanism).
+
+If {\itshape only\+Selectable} is true, an empty \hyperlink{classQCPDataSelection}{Q\+C\+P\+Data\+Selection} is returned if this plottable is not selectable (i.\+e. if \hyperlink{classQCPAbstractPlottable_ac238d6e910f976f1f30d41c2bca44ac3}{Q\+C\+P\+Abstract\+Plottable\+::set\+Selectable} is \hyperlink{namespaceQCP_ac6cb9db26a564b27feda362a438db038aa64628e338a2dd1e6f0dc84dec0b63fe}{Q\+C\+P\+::st\+None}).
+
+\begin{DoxyNote}{Note}
+{\itshape rect} must be a normalized rect (positive or zero width and height). This is especially important when using the rect of \hyperlink{classQCPSelectionRect_a15a43542e1f7b953a44c260b419e6d2c}{Q\+C\+P\+Selection\+Rect\+::accepted}, which is not necessarily normalized. Use {\ttfamily Q\+Rect\+::normalized()} when passing a rect which might not be normalized. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classQCPAbstractPlottable1D_a22377bf6e57ab7eedbc9e489250c6ded}{Q\+C\+P\+Abstract\+Plottable1\+D$<$ Q\+C\+P\+Financial\+Data $>$}.
+
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!set\+Brush\+Negative@{set\+Brush\+Negative}}
+\index{set\+Brush\+Negative@{set\+Brush\+Negative}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{set\+Brush\+Negative(const Q\+Brush \&brush)}{setBrushNegative(const QBrush &brush)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Financial\+::set\+Brush\+Negative (
+\begin{DoxyParamCaption}
+\item[{const Q\+Brush \&}]{brush}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPFinancial_a8bbdd87629f9144b3ef51af660c0961a}{}\label{classQCPFinancial_a8bbdd87629f9144b3ef51af660c0961a}
+If \hyperlink{classQCPFinancial_a138e44aac160a17a9676652e240c5f08}{set\+Two\+Colored} is set to true, this function controls the brush that is used to draw fills of data points with a negative trend (i.\+e. bars/candlesticks with close $<$ open).
+
+If {\itshape two\+Colored} is false, the normal plottable\textquotesingle{}s pen and brush are used (\hyperlink{classQCPAbstractPlottable_ab74b09ae4c0e7e13142fe4b5bf46cac7}{set\+Pen}, \hyperlink{classQCPAbstractPlottable_a7a4b92144dca6453a1f0f210e27edc74}{set\+Brush}).
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPFinancial_a5ebff2b1764efd07cc44942e67821829}{set\+Brush\+Positive}, \hyperlink{classQCPFinancial_afe5c07e94ccea01a75b3a2476993c346}{set\+Pen\+Negative}, \hyperlink{classQCPFinancial_ac58aa3adc7a35aab0088764b840683e5}{set\+Pen\+Positive} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!set\+Brush\+Positive@{set\+Brush\+Positive}}
+\index{set\+Brush\+Positive@{set\+Brush\+Positive}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{set\+Brush\+Positive(const Q\+Brush \&brush)}{setBrushPositive(const QBrush &brush)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Financial\+::set\+Brush\+Positive (
+\begin{DoxyParamCaption}
+\item[{const Q\+Brush \&}]{brush}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPFinancial_a5ebff2b1764efd07cc44942e67821829}{}\label{classQCPFinancial_a5ebff2b1764efd07cc44942e67821829}
+If \hyperlink{classQCPFinancial_a138e44aac160a17a9676652e240c5f08}{set\+Two\+Colored} is set to true, this function controls the brush that is used to draw fills of data points with a positive trend (i.\+e. bars/candlesticks with close $>$= open).
+
+If {\itshape two\+Colored} is false, the normal plottable\textquotesingle{}s pen and brush are used (\hyperlink{classQCPAbstractPlottable_ab74b09ae4c0e7e13142fe4b5bf46cac7}{set\+Pen}, \hyperlink{classQCPAbstractPlottable_a7a4b92144dca6453a1f0f210e27edc74}{set\+Brush}).
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPFinancial_a8bbdd87629f9144b3ef51af660c0961a}{set\+Brush\+Negative}, \hyperlink{classQCPFinancial_ac58aa3adc7a35aab0088764b840683e5}{set\+Pen\+Positive}, \hyperlink{classQCPFinancial_afe5c07e94ccea01a75b3a2476993c346}{set\+Pen\+Negative} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!set\+Chart\+Style@{set\+Chart\+Style}}
+\index{set\+Chart\+Style@{set\+Chart\+Style}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{set\+Chart\+Style(\+Chart\+Style style)}{setChartStyle(ChartStyle style)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Financial\+::set\+Chart\+Style (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Financial\+::\+Chart\+Style}}]{style}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPFinancial_a5a59175d36279d71596e64d7bb65596f}{}\label{classQCPFinancial_a5a59175d36279d71596e64d7bb65596f}
+Sets which representation style shall be used to display the O\+H\+LC data. \index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!set\+Data@{set\+Data}}
+\index{set\+Data@{set\+Data}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{set\+Data(\+Q\+Shared\+Pointer$<$ Q\+C\+P\+Financial\+Data\+Container $>$ data)}{setData(QSharedPointer< QCPFinancialDataContainer > data)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Financial\+::set\+Data (
+\begin{DoxyParamCaption}
+\item[{Q\+Shared\+Pointer$<$ {\bf Q\+C\+P\+Financial\+Data\+Container} $>$}]{data}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPFinancial_a72089e75b8a50d18097526c3c79fdb85}{}\label{classQCPFinancial_a72089e75b8a50d18097526c3c79fdb85}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Replaces the current data container with the provided {\itshape data} container.
+
+Since a Q\+Shared\+Pointer is used, multiple Q\+C\+P\+Financials may share the same data container safely. Modifying the data in the container will then affect all financials that share the container. Sharing can be achieved by simply exchanging the data containers wrapped in shared pointers\+: 
+\begin{DoxyCodeInclude}
+\end{DoxyCodeInclude}
+ If you do not wish to share containers, but create a copy from an existing container, rather use the \hyperlink{classQCPDataContainer_ae7042bd534fc3ce7befa2ce3f790b5bf}{Q\+C\+P\+Data\+Container$<$\+Data\+Type$>$\+::set} method on the financial\textquotesingle{}s data container directly\+: 
+\begin{DoxyCodeInclude}
+\end{DoxyCodeInclude}
+ \begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPFinancial_a372ac031e44a7a6c912d203556af96f7}{add\+Data}, \hyperlink{classQCPFinancial_a9a058c035040d3939b8884f4aaccb1a7}{time\+Series\+To\+Ohlc} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!set\+Data@{set\+Data}}
+\index{set\+Data@{set\+Data}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{set\+Data(const Q\+Vector$<$ double $>$ \&keys, const Q\+Vector$<$ double $>$ \&open, const Q\+Vector$<$ double $>$ \&high, const Q\+Vector$<$ double $>$ \&low, const Q\+Vector$<$ double $>$ \&close, bool already\+Sorted=false)}{setData(const QVector< double > &keys, const QVector< double > &open, const QVector< double > &high, const QVector< double > &low, const QVector< double > &close, bool alreadySorted=false)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Financial\+::set\+Data (
+\begin{DoxyParamCaption}
+\item[{const Q\+Vector$<$ double $>$ \&}]{keys, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{open, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{high, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{low, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{close, }
+\item[{bool}]{already\+Sorted = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPFinancial_a12992e669ed19d7bb48dbe601570cc05}{}\label{classQCPFinancial_a12992e669ed19d7bb48dbe601570cc05}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Replaces the current data with the provided points in {\itshape keys}, {\itshape open}, {\itshape high}, {\itshape low} and {\itshape close}. The provided vectors should have equal length. Else, the number of added points will be the size of the smallest vector.
+
+If you can guarantee that the passed data points are sorted by {\itshape keys} in ascending order, you can set {\itshape already\+Sorted} to true, to improve performance by saving a sorting run.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPFinancial_a372ac031e44a7a6c912d203556af96f7}{add\+Data}, \hyperlink{classQCPFinancial_a9a058c035040d3939b8884f4aaccb1a7}{time\+Series\+To\+Ohlc} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!set\+Pen\+Negative@{set\+Pen\+Negative}}
+\index{set\+Pen\+Negative@{set\+Pen\+Negative}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{set\+Pen\+Negative(const Q\+Pen \&pen)}{setPenNegative(const QPen &pen)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Financial\+::set\+Pen\+Negative (
+\begin{DoxyParamCaption}
+\item[{const Q\+Pen \&}]{pen}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPFinancial_afe5c07e94ccea01a75b3a2476993c346}{}\label{classQCPFinancial_afe5c07e94ccea01a75b3a2476993c346}
+If \hyperlink{classQCPFinancial_a138e44aac160a17a9676652e240c5f08}{set\+Two\+Colored} is set to true, this function controls the pen that is used to draw outlines of data points with a negative trend (i.\+e. bars/candlesticks with close $<$ open).
+
+If {\itshape two\+Colored} is false, the normal plottable\textquotesingle{}s pen and brush are used (\hyperlink{classQCPAbstractPlottable_ab74b09ae4c0e7e13142fe4b5bf46cac7}{set\+Pen}, \hyperlink{classQCPAbstractPlottable_a7a4b92144dca6453a1f0f210e27edc74}{set\+Brush}).
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPFinancial_ac58aa3adc7a35aab0088764b840683e5}{set\+Pen\+Positive}, \hyperlink{classQCPFinancial_a8bbdd87629f9144b3ef51af660c0961a}{set\+Brush\+Negative}, \hyperlink{classQCPFinancial_a5ebff2b1764efd07cc44942e67821829}{set\+Brush\+Positive} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!set\+Pen\+Positive@{set\+Pen\+Positive}}
+\index{set\+Pen\+Positive@{set\+Pen\+Positive}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{set\+Pen\+Positive(const Q\+Pen \&pen)}{setPenPositive(const QPen &pen)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Financial\+::set\+Pen\+Positive (
+\begin{DoxyParamCaption}
+\item[{const Q\+Pen \&}]{pen}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPFinancial_ac58aa3adc7a35aab0088764b840683e5}{}\label{classQCPFinancial_ac58aa3adc7a35aab0088764b840683e5}
+If \hyperlink{classQCPFinancial_a138e44aac160a17a9676652e240c5f08}{set\+Two\+Colored} is set to true, this function controls the pen that is used to draw outlines of data points with a positive trend (i.\+e. bars/candlesticks with close $>$= open).
+
+If {\itshape two\+Colored} is false, the normal plottable\textquotesingle{}s pen and brush are used (\hyperlink{classQCPAbstractPlottable_ab74b09ae4c0e7e13142fe4b5bf46cac7}{set\+Pen}, \hyperlink{classQCPAbstractPlottable_a7a4b92144dca6453a1f0f210e27edc74}{set\+Brush}).
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPFinancial_afe5c07e94ccea01a75b3a2476993c346}{set\+Pen\+Negative}, \hyperlink{classQCPFinancial_a5ebff2b1764efd07cc44942e67821829}{set\+Brush\+Positive}, \hyperlink{classQCPFinancial_a8bbdd87629f9144b3ef51af660c0961a}{set\+Brush\+Negative} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!set\+Two\+Colored@{set\+Two\+Colored}}
+\index{set\+Two\+Colored@{set\+Two\+Colored}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{set\+Two\+Colored(bool two\+Colored)}{setTwoColored(bool twoColored)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Financial\+::set\+Two\+Colored (
+\begin{DoxyParamCaption}
+\item[{bool}]{two\+Colored}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPFinancial_a138e44aac160a17a9676652e240c5f08}{}\label{classQCPFinancial_a138e44aac160a17a9676652e240c5f08}
+Sets whether this chart shall contrast positive from negative trends per data point by using two separate colors to draw the respective bars/candlesticks.
+
+If {\itshape two\+Colored} is false, the normal plottable\textquotesingle{}s pen and brush are used (\hyperlink{classQCPAbstractPlottable_ab74b09ae4c0e7e13142fe4b5bf46cac7}{set\+Pen}, \hyperlink{classQCPAbstractPlottable_a7a4b92144dca6453a1f0f210e27edc74}{set\+Brush}).
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPFinancial_ac58aa3adc7a35aab0088764b840683e5}{set\+Pen\+Positive}, \hyperlink{classQCPFinancial_afe5c07e94ccea01a75b3a2476993c346}{set\+Pen\+Negative}, \hyperlink{classQCPFinancial_a5ebff2b1764efd07cc44942e67821829}{set\+Brush\+Positive}, \hyperlink{classQCPFinancial_a8bbdd87629f9144b3ef51af660c0961a}{set\+Brush\+Negative} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!set\+Width@{set\+Width}}
+\index{set\+Width@{set\+Width}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{set\+Width(double width)}{setWidth(double width)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Financial\+::set\+Width (
+\begin{DoxyParamCaption}
+\item[{double}]{width}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPFinancial_a99633f8bac86a61d534ae5eeb1a3068f}{}\label{classQCPFinancial_a99633f8bac86a61d534ae5eeb1a3068f}
+Sets the width of the individual bars/candlesticks to {\itshape width} in plot key coordinates.
+
+A typical choice is to set it to (or slightly less than) one bin interval width. \index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!set\+Width\+Type@{set\+Width\+Type}}
+\index{set\+Width\+Type@{set\+Width\+Type}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{set\+Width\+Type(\+Width\+Type width\+Type)}{setWidthType(WidthType widthType)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Financial\+::set\+Width\+Type (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Financial\+::\+Width\+Type}}]{width\+Type}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPFinancial_a204b7b710352796593a432b723e34089}{}\label{classQCPFinancial_a204b7b710352796593a432b723e34089}
+Sets how the width of the financial bars is defined. See the documentation of \hyperlink{classQCPFinancial_aef1761dda71a53dc5269685e9e492626}{Width\+Type} for an explanation of the possible values for {\itshape width\+Type}.
+
+The default value is \hyperlink{classQCPFinancial_aef1761dda71a53dc5269685e9e492626af676bc8dbe700b96b333329c9dbfc30f}{wt\+Plot\+Coords}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPFinancial_a99633f8bac86a61d534ae5eeb1a3068f}{set\+Width} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Financial@{Q\+C\+P\+Financial}!time\+Series\+To\+Ohlc@{time\+Series\+To\+Ohlc}}
+\index{time\+Series\+To\+Ohlc@{time\+Series\+To\+Ohlc}!Q\+C\+P\+Financial@{Q\+C\+P\+Financial}}
+\subsubsection[{\texorpdfstring{time\+Series\+To\+Ohlc(const Q\+Vector$<$ double $>$ \&time, const Q\+Vector$<$ double $>$ \&value, double time\+Bin\+Size, double time\+Bin\+Offset=0)}{timeSeriesToOhlc(const QVector< double > &time, const QVector< double > &value, double timeBinSize, double timeBinOffset=0)}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Financial\+Data\+Container} Q\+C\+P\+Financial\+::time\+Series\+To\+Ohlc (
+\begin{DoxyParamCaption}
+\item[{const Q\+Vector$<$ double $>$ \&}]{time, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{value, }
+\item[{double}]{time\+Bin\+Size, }
+\item[{double}]{time\+Bin\+Offset = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{classQCPFinancial_a9a058c035040d3939b8884f4aaccb1a7}{}\label{classQCPFinancial_a9a058c035040d3939b8884f4aaccb1a7}
+A convenience function that converts time series data ({\itshape value} against {\itshape time}) to O\+H\+LC binned data points. The return value can then be passed on to \hyperlink{classQCPDataContainer_ae7042bd534fc3ce7befa2ce3f790b5bf}{Q\+C\+P\+Financial\+Data\+Container\+::set}(const Q\+C\+P\+Financial\+Data\+Container\&).
+
+The size of the bins can be controlled with {\itshape time\+Bin\+Size} in the same units as {\itshape time} is given. For example, if the unit of {\itshape time} is seconds and single O\+H\+L\+C/\+Candlesticks should span an hour each, set {\itshape time\+Bin\+Size} to 3600.
+
+{\itshape time\+Bin\+Offset} allows to control precisely at what {\itshape time} coordinate a bin should start. The value passed as {\itshape time\+Bin\+Offset} doesn\textquotesingle{}t need to be in the range encompassed by the {\itshape time} keys. It merely defines the mathematical offset/phase of the bins that will be used to process the data. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/qcustomplot.\+h\item 
+src/qcustomplot.\+cpp\end{DoxyCompactItemize}

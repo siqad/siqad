@@ -1,0 +1,6 @@
+<map id="src/gui/widgets/primitives/layer.h" name="src/gui/widgets/primitives/layer.h">
+<area shape="rect" id="node2" href="$design__panel_8h.html" title=": Top level widget for the design panel. Contains all layers and functionality for reating..." alt="" coords="33,184,185,225"/>
+<area shape="rect" id="node4" href="$layer__editor_8h_source.html" title="src/gui/widgets/layer\l_editor.h" alt="" coords="147,273,290,315"/>
+<area shape="rect" id="node5" href="$lattice_8h.html" title="src/gui/widgets/primitives\l/lattice.h" alt="" coords="24,95,194,136"/>
+<area shape="rect" id="node3" href="$application_8h_source.html" title="src/gui/application.h" alt="" coords="94,363,233,389"/>
+</map>

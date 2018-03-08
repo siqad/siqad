@@ -1,0 +1,9 @@
+<map id="src/gui/widgets/primitives/latdot.h" name="src/gui/widgets/primitives/latdot.h">
+<area shape="rect" id="node2" href="$lattice_8h.html" title="src/gui/widgets/primitives\l/lattice.h" alt="" coords="5,184,176,225"/>
+<area shape="rect" id="node6" href="$dbdot_8h.html" title=": DBDot Widget for functionality of dangling bonds " alt="" coords="128,95,299,136"/>
+<area shape="rect" id="node7" href="$items_8h_source.html" title="src/gui/widgets/primitives\l/items.h" alt="" coords="220,184,391,225"/>
+<area shape="rect" id="node3" href="$design__panel_8h.html" title=": Top level widget for the design panel. Contains all layers and functionality for reating..." alt="" coords="15,273,167,315"/>
+<area shape="rect" id="node4" href="$application_8h_source.html" title="src/gui/application.h" alt="" coords="76,452,215,479"/>
+<area shape="rect" id="node5" href="$layer__editor_8h_source.html" title="src/gui/widgets/layer\l_editor.h" alt="" coords="129,363,271,404"/>
+<area shape="rect" id="node8" href="$ghost_8h.html" title=": Graphical objects for moving Items and copy/paste " alt="" coords="241,273,412,315"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="QCPLayoutGrid" name="QCPLayoutGrid">
+<area shape="rect" id="node6" href="$classQCPLegend.html" title="Manages a legend inside a QCustomPlot. " alt="" coords="28,379,121,405"/>
+<area shape="rect" id="node2" href="$classQCPLayout.html" title="The abstract base class for layouts. " alt="" coords="29,229,120,256"/>
+<area shape="rect" id="node3" href="$classQCPLayoutElement.html" title="The abstract base class for all objects that form the layout system. " alt="" coords="5,155,144,181"/>
+<area shape="rect" id="node4" href="$classQCPLayerable.html" title="Base class for all drawable objects. " alt="" coords="21,80,128,107"/>
+</map>

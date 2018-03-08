@@ -1,0 +1,18 @@
+<map id="src/gui/widgets/primitives/item.h" name="src/gui/widgets/primitives/item.h">
+<area shape="rect" id="node2" href="$afmpath_8h_source.html" title="src/gui/widgets/primitives\l/afmpath.h" alt="" coords="630,273,801,315"/>
+<area shape="rect" id="node7" href="$items_8h_source.html" title="src/gui/widgets/primitives\l/items.h" alt="" coords="296,363,466,404"/>
+<area shape="rect" id="node9" href="$afmseg_8h_source.html" title="src/gui/widgets/primitives\l/afmseg.h" alt="" coords="630,184,801,225"/>
+<area shape="rect" id="node10" href="$afmnode_8h_source.html" title="src/gui/widgets/primitives\l/afmnode.h" alt="" coords="630,95,801,136"/>
+<area shape="rect" id="node11" href="$layer_8h.html" title="src/gui/widgets/primitives\l/layer.h" alt="" coords="825,273,996,315"/>
+<area shape="rect" id="node13" href="$latdot_8h.html" title="src/gui/widgets/primitives\l/latdot.h" alt="" coords="436,184,606,225"/>
+<area shape="rect" id="node14" href="$dbdot_8h.html" title=": DBDot Widget for functionality of dangling bonds " alt="" coords="316,273,486,315"/>
+<area shape="rect" id="node15" href="$aggregate_8h.html" title=": Base class for Aggregate Item type " alt="" coords="20,184,190,225"/>
+<area shape="rect" id="node16" href="$electrode_8h.html" title=": Function prototypes for the Electrode object. " alt="" coords="70,95,241,136"/>
+<area shape="rect" id="node17" href="$pot__plot_8h.html" title=": Function prototypes for the PotPlot object. " alt="" coords="265,95,436,136"/>
+<area shape="rect" id="node3" href="$afm__panel_8h_source.html" title="src/gui/widgets/afm\l_panel.h" alt="" coords="685,363,821,404"/>
+<area shape="rect" id="node4" href="$design__panel_8h.html" title=": Top level widget for the design panel. Contains all layers and functionality for reating..." alt="" coords="609,452,761,493"/>
+<area shape="rect" id="node5" href="$application_8h_source.html" title="src/gui/application.h" alt="" coords="616,631,754,657"/>
+<area shape="rect" id="node6" href="$layer__editor_8h_source.html" title="src/gui/widgets/layer\l_editor.h" alt="" coords="668,541,811,583"/>
+<area shape="rect" id="node8" href="$ghost_8h.html" title=": Graphical objects for moving Items and copy/paste " alt="" coords="296,452,466,493"/>
+<area shape="rect" id="node12" href="$lattice_8h.html" title="src/gui/widgets/primitives\l/lattice.h" alt="" coords="490,363,661,404"/>
+</map>

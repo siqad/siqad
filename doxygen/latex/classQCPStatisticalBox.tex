@@ -1,0 +1,448 @@
+\hypertarget{classQCPStatisticalBox}{}\section{Q\+C\+P\+Statistical\+Box Class Reference}
+\label{classQCPStatisticalBox}\index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+
+
+A plottable representing a single statistical box in a plot.  
+
+
+
+
+Inheritance diagram for Q\+C\+P\+Statistical\+Box\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{classQCPStatisticalBox__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Q\+C\+P\+Statistical\+Box\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classQCPStatisticalBox__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPStatisticalBox_a75c2b3e7fcd0741cc981693a2ba63b27}{Q\+C\+P\+Statistical\+Box} (\hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$key\+Axis, \hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$value\+Axis)
+\item 
+Q\+Shared\+Pointer$<$ \hyperlink{classQCPDataContainer}{Q\+C\+P\+Statistical\+Box\+Data\+Container} $>$ \hyperlink{classQCPStatisticalBox_a99de828ddad81bb79aaed7db54b87e3f}{data} () const 
+\item 
+double {\bfseries width} () const \hypertarget{classQCPStatisticalBox_a0733a7bd575fc5929ce6d507bcc2a04c}{}\label{classQCPStatisticalBox_a0733a7bd575fc5929ce6d507bcc2a04c}
+
+\item 
+double {\bfseries whisker\+Width} () const \hypertarget{classQCPStatisticalBox_ab02392dd54ebd6dd7c8d6fb5c3f0421c}{}\label{classQCPStatisticalBox_ab02392dd54ebd6dd7c8d6fb5c3f0421c}
+
+\item 
+Q\+Pen {\bfseries whisker\+Pen} () const \hypertarget{classQCPStatisticalBox_a26d2b34cbaeac2dd639bb21590f317c4}{}\label{classQCPStatisticalBox_a26d2b34cbaeac2dd639bb21590f317c4}
+
+\item 
+Q\+Pen {\bfseries whisker\+Bar\+Pen} () const \hypertarget{classQCPStatisticalBox_ab151a727fb0b6396acb3b6c72505a4fe}{}\label{classQCPStatisticalBox_ab151a727fb0b6396acb3b6c72505a4fe}
+
+\item 
+bool {\bfseries whisker\+Antialiased} () const \hypertarget{classQCPStatisticalBox_a1385fb66ed6a1e8edd9128eb7dca73d6}{}\label{classQCPStatisticalBox_a1385fb66ed6a1e8edd9128eb7dca73d6}
+
+\item 
+Q\+Pen {\bfseries median\+Pen} () const \hypertarget{classQCPStatisticalBox_a96aa0bb650b83e9dfa0387ca4db7fa05}{}\label{classQCPStatisticalBox_a96aa0bb650b83e9dfa0387ca4db7fa05}
+
+\item 
+\hyperlink{classQCPScatterStyle}{Q\+C\+P\+Scatter\+Style} {\bfseries outlier\+Style} () const \hypertarget{classQCPStatisticalBox_ab7e5a68bce97ba43a7ff18e074c4dcad}{}\label{classQCPStatisticalBox_ab7e5a68bce97ba43a7ff18e074c4dcad}
+
+\item 
+void \hyperlink{classQCPStatisticalBox_a08a6da55822bad825ee25a8069b9b52f}{set\+Data} (Q\+Shared\+Pointer$<$ \hyperlink{classQCPDataContainer}{Q\+C\+P\+Statistical\+Box\+Data\+Container} $>$ \hyperlink{classQCPStatisticalBox_a99de828ddad81bb79aaed7db54b87e3f}{data})
+\item 
+void \hyperlink{classQCPStatisticalBox_a4ae198e66243d8cc57ad8893c37bf9d4}{set\+Data} (const Q\+Vector$<$ double $>$ \&keys, const Q\+Vector$<$ double $>$ \&minimum, const Q\+Vector$<$ double $>$ \&lower\+Quartile, const Q\+Vector$<$ double $>$ \&median, const Q\+Vector$<$ double $>$ \&upper\+Quartile, const Q\+Vector$<$ double $>$ \&maximum, bool already\+Sorted=false)
+\item 
+void \hyperlink{classQCPStatisticalBox_a0b62775bd67301b1eba5c785f2b26f14}{set\+Width} (double width)
+\item 
+void \hyperlink{classQCPStatisticalBox_adf378812446bd66f34d1f7f293d991cd}{set\+Whisker\+Width} (double width)
+\item 
+void \hyperlink{classQCPStatisticalBox_a4a5034cb3b9b040444df05ab1684620b}{set\+Whisker\+Pen} (const Q\+Pen \&pen)
+\item 
+void \hyperlink{classQCPStatisticalBox_aa8d3e503897788e1abf68dc74b5f147f}{set\+Whisker\+Bar\+Pen} (const Q\+Pen \&pen)
+\item 
+void \hyperlink{classQCPStatisticalBox_a61bcd458fba002f72304d11319051843}{set\+Whisker\+Antialiased} (bool enabled)
+\item 
+void \hyperlink{classQCPStatisticalBox_a7260ac55b669f5d0a74f16d5ca84c52c}{set\+Median\+Pen} (const Q\+Pen \&pen)
+\item 
+void \hyperlink{classQCPStatisticalBox_ad5241943422eb8e58360a97e99ad6aa7}{set\+Outlier\+Style} (const \hyperlink{classQCPScatterStyle}{Q\+C\+P\+Scatter\+Style} \&style)
+\item 
+void \hyperlink{classQCPStatisticalBox_a9a8739c5b8291db8fd839e892fc8f478}{add\+Data} (const Q\+Vector$<$ double $>$ \&keys, const Q\+Vector$<$ double $>$ \&minimum, const Q\+Vector$<$ double $>$ \&lower\+Quartile, const Q\+Vector$<$ double $>$ \&median, const Q\+Vector$<$ double $>$ \&upper\+Quartile, const Q\+Vector$<$ double $>$ \&maximum, bool already\+Sorted=false)
+\item 
+void \hyperlink{classQCPStatisticalBox_a026f2790b530d6f29312254ecb1e7c1e}{add\+Data} (double key, double minimum, double lower\+Quartile, double median, double upper\+Quartile, double maximum, const Q\+Vector$<$ double $>$ \&outliers=Q\+Vector$<$ double $>$())
+\item 
+virtual \hyperlink{classQCPDataSelection}{Q\+C\+P\+Data\+Selection} \hyperlink{classQCPStatisticalBox_a42febad6ad5e924a151434cc434b4ffc}{select\+Test\+Rect} (const Q\+RectF \&rect, bool only\+Selectable) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+virtual double \hyperlink{classQCPStatisticalBox_a1607fa92f829c631107c20ccb2d70a6d}{select\+Test} (const Q\+PointF \&pos, bool only\+Selectable, Q\+Variant $\ast$details=0) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+virtual \hyperlink{classQCPRange}{Q\+C\+P\+Range} \hyperlink{classQCPStatisticalBox_a77d2d13301dfe60c13adfaa17fc1802f}{get\+Key\+Range} (bool \&found\+Range, \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9}{Q\+C\+P\+::\+Sign\+Domain} in\+Sign\+Domain=\hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9aa38352ef02d51ddfa4399d9551566e24}{Q\+C\+P\+::sd\+Both}) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+virtual \hyperlink{classQCPRange}{Q\+C\+P\+Range} \hyperlink{classQCPStatisticalBox_ab3388a21d0c2e86fbc0cba9c06ceb49b}{get\+Value\+Range} (bool \&found\+Range, \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9}{Q\+C\+P\+::\+Sign\+Domain} in\+Sign\+Domain=\hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9aa38352ef02d51ddfa4399d9551566e24}{Q\+C\+P\+::sd\+Both}, const \hyperlink{classQCPRange}{Q\+C\+P\+Range} \&in\+Key\+Range=\hyperlink{classQCPRange}{Q\+C\+P\+Range}()) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void {\bfseries draw} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPStatisticalBox_afcff35fa79728cfe10e80e0702014fea}{}\label{classQCPStatisticalBox_afcff35fa79728cfe10e80e0702014fea}
+
+\item 
+virtual void {\bfseries draw\+Legend\+Icon} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter, const Q\+RectF \&rect) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPStatisticalBox_ad286c63a79c21d5231a4b6c6fdbb914f}{}\label{classQCPStatisticalBox_ad286c63a79c21d5231a4b6c6fdbb914f}
+
+\item 
+virtual void \hyperlink{classQCPStatisticalBox_a11077e9144b7bd22cc2a109ac6255b6e}{draw\+Statistical\+Box} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter, Q\+C\+P\+Statistical\+Box\+Data\+Container\+::const\+\_\+iterator it, const \hyperlink{classQCPScatterStyle}{Q\+C\+P\+Scatter\+Style} \&outlier\+Style) const 
+\item 
+void {\bfseries get\+Visible\+Data\+Bounds} (Q\+C\+P\+Statistical\+Box\+Data\+Container\+::const\+\_\+iterator \&begin, Q\+C\+P\+Statistical\+Box\+Data\+Container\+::const\+\_\+iterator \&end) const \hypertarget{classQCPStatisticalBox_a13c6eaa963579b5a5c5f05c560e447ab}{}\label{classQCPStatisticalBox_a13c6eaa963579b5a5c5f05c560e447ab}
+
+\item 
+Q\+RectF {\bfseries get\+Quartile\+Box} (Q\+C\+P\+Statistical\+Box\+Data\+Container\+::const\+\_\+iterator it) const \hypertarget{classQCPStatisticalBox_af7fea1fd0b342ae6ecb228c5d4edd765}{}\label{classQCPStatisticalBox_af7fea1fd0b342ae6ecb228c5d4edd765}
+
+\item 
+Q\+Vector$<$ Q\+LineF $>$ {\bfseries get\+Whisker\+Backbone\+Lines} (Q\+C\+P\+Statistical\+Box\+Data\+Container\+::const\+\_\+iterator it) const \hypertarget{classQCPStatisticalBox_ace6152baecc4376dafbc5192e3bab20f}{}\label{classQCPStatisticalBox_ace6152baecc4376dafbc5192e3bab20f}
+
+\item 
+Q\+Vector$<$ Q\+LineF $>$ {\bfseries get\+Whisker\+Bar\+Lines} (Q\+C\+P\+Statistical\+Box\+Data\+Container\+::const\+\_\+iterator it) const \hypertarget{classQCPStatisticalBox_a7d1d9d9cbffba6fa9c37d3051b9d80c7}{}\label{classQCPStatisticalBox_a7d1d9d9cbffba6fa9c37d3051b9d80c7}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+double {\bfseries m\+Width}\hypertarget{classQCPStatisticalBox_af365e40b0f706c3d76f857c7957f629d}{}\label{classQCPStatisticalBox_af365e40b0f706c3d76f857c7957f629d}
+
+\item 
+double {\bfseries m\+Whisker\+Width}\hypertarget{classQCPStatisticalBox_a4d166474f845d5db626e8b11a0815a6f}{}\label{classQCPStatisticalBox_a4d166474f845d5db626e8b11a0815a6f}
+
+\item 
+Q\+Pen {\bfseries m\+Whisker\+Pen}\hypertarget{classQCPStatisticalBox_a25b7552499f0f090fcff02858b2265a5}{}\label{classQCPStatisticalBox_a25b7552499f0f090fcff02858b2265a5}
+
+\item 
+Q\+Pen {\bfseries m\+Whisker\+Bar\+Pen}\hypertarget{classQCPStatisticalBox_aa719b1d722a9f82364df1497a6dc1da8}{}\label{classQCPStatisticalBox_aa719b1d722a9f82364df1497a6dc1da8}
+
+\item 
+bool {\bfseries m\+Whisker\+Antialiased}\hypertarget{classQCPStatisticalBox_a714bb91efb423c7b7ec3a6a50c2910b9}{}\label{classQCPStatisticalBox_a714bb91efb423c7b7ec3a6a50c2910b9}
+
+\item 
+Q\+Pen {\bfseries m\+Median\+Pen}\hypertarget{classQCPStatisticalBox_a1af5b601049c575f778ae270f40c9443}{}\label{classQCPStatisticalBox_a1af5b601049c575f778ae270f40c9443}
+
+\item 
+\hyperlink{classQCPScatterStyle}{Q\+C\+P\+Scatter\+Style} {\bfseries m\+Outlier\+Style}\hypertarget{classQCPStatisticalBox_ae102e4187e1e6ba1f2df0f622b5171a4}{}\label{classQCPStatisticalBox_ae102e4187e1e6ba1f2df0f622b5171a4}
+
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class {\bfseries Q\+Custom\+Plot}\hypertarget{classQCPStatisticalBox_a1cdf9df76adcfae45261690aa0ca2198}{}\label{classQCPStatisticalBox_a1cdf9df76adcfae45261690aa0ca2198}
+
+\item 
+class {\bfseries Q\+C\+P\+Legend}\hypertarget{classQCPStatisticalBox_a8429035e7adfbd7f05805a6530ad5e3b}{}\label{classQCPStatisticalBox_a8429035e7adfbd7f05805a6530ad5e3b}
+
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+A plottable representing a single statistical box in a plot. 
+
+
+
+To plot data, assign it with the \hyperlink{classQCPStatisticalBox_a08a6da55822bad825ee25a8069b9b52f}{set\+Data} or \hyperlink{classQCPStatisticalBox_a9a8739c5b8291db8fd839e892fc8f478}{add\+Data} functions. Alternatively, you can also access and modify the data via the \hyperlink{classQCPStatisticalBox_a99de828ddad81bb79aaed7db54b87e3f}{data} method, which returns a pointer to the internal Q\+C\+P\+Statistical\+Box\+Data\+Container.
+
+Additionally each data point can itself have a list of outliers, drawn as scatter points at the key coordinate of the respective statistical box data point. They can either be set by using the respective \hyperlink{classQCPStatisticalBox_a026f2790b530d6f29312254ecb1e7c1e}{add\+Data} method or accessing the individual data points through \hyperlink{classQCPStatisticalBox_a99de828ddad81bb79aaed7db54b87e3f}{data}, and setting the {\ttfamily Q\+Vector$<$double$>$ outliers} of the data points directly.\hypertarget{classQCPStatisticalBox_qcpstatisticalbox-appearance}{}\subsection{Changing the appearance}\label{classQCPStatisticalBox_qcpstatisticalbox-appearance}
+The appearance of each data point box, ranging from the lower to the upper quartile, is controlled via \hyperlink{classQCPAbstractPlottable_ab74b09ae4c0e7e13142fe4b5bf46cac7}{set\+Pen} and \hyperlink{classQCPAbstractPlottable_a7a4b92144dca6453a1f0f210e27edc74}{set\+Brush}. You may change the width of the boxes with \hyperlink{classQCPStatisticalBox_a0b62775bd67301b1eba5c785f2b26f14}{set\+Width} in plot coordinates.
+
+Each data point\textquotesingle{}s visual representation also consists of two whiskers. Whiskers are the lines which reach from the upper quartile to the maximum, and from the lower quartile to the minimum. The appearance of the whiskers can be modified with\+: \hyperlink{classQCPStatisticalBox_a4a5034cb3b9b040444df05ab1684620b}{set\+Whisker\+Pen}, \hyperlink{classQCPStatisticalBox_aa8d3e503897788e1abf68dc74b5f147f}{set\+Whisker\+Bar\+Pen}, \hyperlink{classQCPStatisticalBox_adf378812446bd66f34d1f7f293d991cd}{set\+Whisker\+Width}. The whisker width is the width of the bar perpendicular to the whisker at the top (for maximum) and bottom (for minimum). If the whisker pen is changed, make sure to set the {\ttfamily cap\+Style} to {\ttfamily Qt\+::\+Flat\+Cap}. Otherwise the backbone line might exceed the whisker bars by a few pixels due to the pen cap being not perfectly flat.
+
+The median indicator line inside the box has its own pen, \hyperlink{classQCPStatisticalBox_a7260ac55b669f5d0a74f16d5ca84c52c}{set\+Median\+Pen}.
+
+The outlier data points are drawn as normal scatter points. Their look can be controlled with \hyperlink{classQCPStatisticalBox_ad5241943422eb8e58360a97e99ad6aa7}{set\+Outlier\+Style}\hypertarget{classQCPStatisticalBox_qcpstatisticalbox-usage}{}\subsection{Usage}\label{classQCPStatisticalBox_qcpstatisticalbox-usage}
+Like all data representing objects in \hyperlink{classQCustomPlot}{Q\+Custom\+Plot}, the \hyperlink{classQCPStatisticalBox}{Q\+C\+P\+Statistical\+Box} is a plottable (\hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable}). So the plottable-\/interface of \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} applies (\hyperlink{classQCustomPlot_a32de81ff53e263e785b83b52ecd99d6f}{Q\+Custom\+Plot\+::plottable}, \hyperlink{classQCustomPlot_af3dafd56884208474f311d6226513ab2}{Q\+Custom\+Plot\+::remove\+Plottable}, etc.)
+
+Usually, you first create an instance\+: 
+\begin{DoxyCodeInclude}
+\end{DoxyCodeInclude}
+which registers it with the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance of the passed axes. Note that this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance takes ownership of the plottable, so do not delete it manually but use \hyperlink{classQCustomPlot_af3dafd56884208474f311d6226513ab2}{Q\+Custom\+Plot\+::remove\+Plottable()} instead. The newly created plottable can be modified, e.\+g.\+: 
+\begin{DoxyCodeInclude}
+\end{DoxyCodeInclude}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Statistical\+Box(\+Q\+C\+P\+Axis $\ast$key\+Axis, Q\+C\+P\+Axis $\ast$value\+Axis)}{QCPStatisticalBox(QCPAxis *keyAxis, QCPAxis *valueAxis)}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+C\+P\+Statistical\+Box\+::\+Q\+C\+P\+Statistical\+Box (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Axis} $\ast$}]{key\+Axis, }
+\item[{{\bf Q\+C\+P\+Axis} $\ast$}]{value\+Axis}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [explicit]}}\hypertarget{classQCPStatisticalBox_a75c2b3e7fcd0741cc981693a2ba63b27}{}\label{classQCPStatisticalBox_a75c2b3e7fcd0741cc981693a2ba63b27}
+Constructs a statistical box which uses {\itshape key\+Axis} as its key axis (\char`\"{}x\char`\"{}) and {\itshape value\+Axis} as its value axis (\char`\"{}y\char`\"{}). {\itshape key\+Axis} and {\itshape value\+Axis} must reside in the same \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance and not have the same orientation. If either of these restrictions is violated, a corresponding message is printed to the debug output (q\+Debug), the construction is not aborted, though.
+
+The created \hyperlink{classQCPStatisticalBox}{Q\+C\+P\+Statistical\+Box} is automatically registered with the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance inferred from {\itshape key\+Axis}. This \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance takes ownership of the \hyperlink{classQCPStatisticalBox}{Q\+C\+P\+Statistical\+Box}, so do not delete it manually but use \hyperlink{classQCustomPlot_af3dafd56884208474f311d6226513ab2}{Q\+Custom\+Plot\+::remove\+Plottable()} instead. 
+
+\subsection{Member Function Documentation}
+\index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!add\+Data@{add\+Data}}
+\index{add\+Data@{add\+Data}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{add\+Data(const Q\+Vector$<$ double $>$ \&keys, const Q\+Vector$<$ double $>$ \&minimum, const Q\+Vector$<$ double $>$ \&lower\+Quartile, const Q\+Vector$<$ double $>$ \&median, const Q\+Vector$<$ double $>$ \&upper\+Quartile, const Q\+Vector$<$ double $>$ \&maximum, bool already\+Sorted=false)}{addData(const QVector< double > &keys, const QVector< double > &minimum, const QVector< double > &lowerQuartile, const QVector< double > &median, const QVector< double > &upperQuartile, const QVector< double > &maximum, bool alreadySorted=false)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Statistical\+Box\+::add\+Data (
+\begin{DoxyParamCaption}
+\item[{const Q\+Vector$<$ double $>$ \&}]{keys, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{minimum, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{lower\+Quartile, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{median, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{upper\+Quartile, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{maximum, }
+\item[{bool}]{already\+Sorted = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPStatisticalBox_a9a8739c5b8291db8fd839e892fc8f478}{}\label{classQCPStatisticalBox_a9a8739c5b8291db8fd839e892fc8f478}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Adds the provided points in {\itshape keys}, {\itshape minimum}, {\itshape lower\+Quartile}, {\itshape median}, {\itshape upper\+Quartile} and {\itshape maximum} to the current data. The provided vectors should have equal length. Else, the number of added points will be the size of the smallest vector.
+
+If you can guarantee that the passed data points are sorted by {\itshape keys} in ascending order, you can set {\itshape already\+Sorted} to true, to improve performance by saving a sorting run.
+
+Alternatively, you can also access and modify the data directly via the \hyperlink{classQCPStatisticalBox_a99de828ddad81bb79aaed7db54b87e3f}{data} method, which returns a pointer to the internal data container. \index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!add\+Data@{add\+Data}}
+\index{add\+Data@{add\+Data}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{add\+Data(double key, double minimum, double lower\+Quartile, double median, double upper\+Quartile, double maximum, const Q\+Vector$<$ double $>$ \&outliers=\+Q\+Vector$<$ double $>$())}{addData(double key, double minimum, double lowerQuartile, double median, double upperQuartile, double maximum, const QVector< double > &outliers=QVector< double >())}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Statistical\+Box\+::add\+Data (
+\begin{DoxyParamCaption}
+\item[{double}]{key, }
+\item[{double}]{minimum, }
+\item[{double}]{lower\+Quartile, }
+\item[{double}]{median, }
+\item[{double}]{upper\+Quartile, }
+\item[{double}]{maximum, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{outliers = {\ttfamily QVector$<$double$>$()}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPStatisticalBox_a026f2790b530d6f29312254ecb1e7c1e}{}\label{classQCPStatisticalBox_a026f2790b530d6f29312254ecb1e7c1e}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Adds the provided data point as {\itshape key}, {\itshape minimum}, {\itshape lower\+Quartile}, {\itshape median}, {\itshape upper\+Quartile} and {\itshape maximum} to the current data.
+
+Alternatively, you can also access and modify the data directly via the \hyperlink{classQCPStatisticalBox_a99de828ddad81bb79aaed7db54b87e3f}{data} method, which returns a pointer to the internal data container. \index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!data@{data}}
+\index{data@{data}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{data() const }{data() const }}]{\setlength{\rightskip}{0pt plus 5cm}Q\+Shared\+Pointer$<$ {\bf Q\+C\+P\+Statistical\+Box\+Data\+Container} $>$ Q\+C\+P\+Statistical\+Box\+::data (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPStatisticalBox_a99de828ddad81bb79aaed7db54b87e3f}{}\label{classQCPStatisticalBox_a99de828ddad81bb79aaed7db54b87e3f}
+Returns a shared pointer to the internal data storage of type Q\+C\+P\+Statistical\+Box\+Data\+Container. You may use it to directly manipulate the data, which may be more convenient and faster than using the regular \hyperlink{classQCPStatisticalBox_a08a6da55822bad825ee25a8069b9b52f}{set\+Data} or \hyperlink{classQCPStatisticalBox_a9a8739c5b8291db8fd839e892fc8f478}{add\+Data} methods. \index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!draw\+Statistical\+Box@{draw\+Statistical\+Box}}
+\index{draw\+Statistical\+Box@{draw\+Statistical\+Box}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{draw\+Statistical\+Box(\+Q\+C\+P\+Painter $\ast$painter, Q\+C\+P\+Statistical\+Box\+Data\+Container\+::const\+\_\+iterator it, const Q\+C\+P\+Scatter\+Style \&outlier\+Style) const }{drawStatisticalBox(QCPPainter *painter, QCPStatisticalBoxDataContainer::const_iterator it, const QCPScatterStyle &outlierStyle) const }}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Statistical\+Box\+::draw\+Statistical\+Box (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Painter} $\ast$}]{painter, }
+\item[{Q\+C\+P\+Statistical\+Box\+Data\+Container\+::const\+\_\+iterator}]{it, }
+\item[{const {\bf Q\+C\+P\+Scatter\+Style} \&}]{outlier\+Style}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\hypertarget{classQCPStatisticalBox_a11077e9144b7bd22cc2a109ac6255b6e}{}\label{classQCPStatisticalBox_a11077e9144b7bd22cc2a109ac6255b6e}
+Draws the graphical representation of a single statistical box with the data given by the iterator {\itshape it} with the provided {\itshape painter}.
+
+If the statistical box has a set of outlier data points, they are drawn with {\itshape outlier\+Style}.
+
+\begin{DoxySeeAlso}{See also}
+get\+Quartile\+Box, get\+Whisker\+Backbone\+Lines, get\+Whisker\+Bar\+Lines 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!get\+Key\+Range@{get\+Key\+Range}}
+\index{get\+Key\+Range@{get\+Key\+Range}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{get\+Key\+Range(bool \&found\+Range, Q\+C\+P\+::\+Sign\+Domain in\+Sign\+Domain=\+Q\+C\+P\+::sd\+Both) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{getKeyRange(bool &foundRange, QCP::SignDomain inSignDomain=QCP::sdBoth) const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Range} Q\+C\+P\+Statistical\+Box\+::get\+Key\+Range (
+\begin{DoxyParamCaption}
+\item[{bool \&}]{found\+Range, }
+\item[{{\bf Q\+C\+P\+::\+Sign\+Domain}}]{in\+Sign\+Domain = {\ttfamily {\bf Q\+C\+P\+::sd\+Both}}}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPStatisticalBox_a77d2d13301dfe60c13adfaa17fc1802f}{}\label{classQCPStatisticalBox_a77d2d13301dfe60c13adfaa17fc1802f}
+Returns the coordinate range that all data in this plottable span in the key axis dimension. For logarithmic plots, one can set {\itshape in\+Sign\+Domain} to either \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a2d18af0bc58f6528d1e82ce699fe4829}{Q\+C\+P\+::sd\+Negative} or \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a584784b75fb816abcc627cf743bb699f}{Q\+C\+P\+::sd\+Positive} in order to restrict the returned range to that sign domain. E.\+g. when only negative range is wanted, set {\itshape in\+Sign\+Domain} to \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a2d18af0bc58f6528d1e82ce699fe4829}{Q\+C\+P\+::sd\+Negative} and all positive points will be ignored for range calculation. For no restriction, just set {\itshape in\+Sign\+Domain} to \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9aa38352ef02d51ddfa4399d9551566e24}{Q\+C\+P\+::sd\+Both} (default). {\itshape found\+Range} is an output parameter that indicates whether a range could be found or not. If this is false, you shouldn\textquotesingle{}t use the returned range (e.\+g. no points in data).
+
+Note that {\itshape found\+Range} is not the same as \hyperlink{classQCPRange_ab38bd4841c77c7bb86c9eea0f142dcc0}{Q\+C\+P\+Range\+::valid\+Range}, since the range returned by this function may have size zero (e.\+g. when there is only one data point). In this case {\itshape found\+Range} would return true, but the returned range is not a valid range in terms of \hyperlink{classQCPRange_ab38bd4841c77c7bb86c9eea0f142dcc0}{Q\+C\+P\+Range\+::valid\+Range}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPAbstractPlottable_a7e8fc3be43c27ccacd70a7bf9d74a5cd}{rescale\+Axes}, \hyperlink{classQCPStatisticalBox_ab3388a21d0c2e86fbc0cba9c06ceb49b}{get\+Value\+Range} 
+\end{DoxySeeAlso}
+
+
+Implements \hyperlink{classQCPAbstractPlottable_a4da16d3cd4b509e1104a9b0275623c96}{Q\+C\+P\+Abstract\+Plottable}.
+
+\index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!get\+Value\+Range@{get\+Value\+Range}}
+\index{get\+Value\+Range@{get\+Value\+Range}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{get\+Value\+Range(bool \&found\+Range, Q\+C\+P\+::\+Sign\+Domain in\+Sign\+Domain=\+Q\+C\+P\+::sd\+Both, const Q\+C\+P\+Range \&in\+Key\+Range=\+Q\+C\+P\+Range()) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{getValueRange(bool &foundRange, QCP::SignDomain inSignDomain=QCP::sdBoth, const QCPRange &inKeyRange=QCPRange()) const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Range} Q\+C\+P\+Statistical\+Box\+::get\+Value\+Range (
+\begin{DoxyParamCaption}
+\item[{bool \&}]{found\+Range, }
+\item[{{\bf Q\+C\+P\+::\+Sign\+Domain}}]{in\+Sign\+Domain = {\ttfamily {\bf Q\+C\+P\+::sd\+Both}}, }
+\item[{const {\bf Q\+C\+P\+Range} \&}]{in\+Key\+Range = {\ttfamily {\bf Q\+C\+P\+Range}()}}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPStatisticalBox_ab3388a21d0c2e86fbc0cba9c06ceb49b}{}\label{classQCPStatisticalBox_ab3388a21d0c2e86fbc0cba9c06ceb49b}
+Returns the coordinate range that the data points in the specified key range ({\itshape in\+Key\+Range}) span in the value axis dimension. For logarithmic plots, one can set {\itshape in\+Sign\+Domain} to either \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a2d18af0bc58f6528d1e82ce699fe4829}{Q\+C\+P\+::sd\+Negative} or \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a584784b75fb816abcc627cf743bb699f}{Q\+C\+P\+::sd\+Positive} in order to restrict the returned range to that sign domain. E.\+g. when only negative range is wanted, set {\itshape in\+Sign\+Domain} to \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a2d18af0bc58f6528d1e82ce699fe4829}{Q\+C\+P\+::sd\+Negative} and all positive points will be ignored for range calculation. For no restriction, just set {\itshape in\+Sign\+Domain} to \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9aa38352ef02d51ddfa4399d9551566e24}{Q\+C\+P\+::sd\+Both} (default). {\itshape found\+Range} is an output parameter that indicates whether a range could be found or not. If this is false, you shouldn\textquotesingle{}t use the returned range (e.\+g. no points in data).
+
+If {\itshape in\+Key\+Range} has both lower and upper bound set to zero (is equal to {\ttfamily \hyperlink{classQCPRange}{Q\+C\+P\+Range()}}), all data points are considered, without any restriction on the keys.
+
+Note that {\itshape found\+Range} is not the same as \hyperlink{classQCPRange_ab38bd4841c77c7bb86c9eea0f142dcc0}{Q\+C\+P\+Range\+::valid\+Range}, since the range returned by this function may have size zero (e.\+g. when there is only one data point). In this case {\itshape found\+Range} would return true, but the returned range is not a valid range in terms of \hyperlink{classQCPRange_ab38bd4841c77c7bb86c9eea0f142dcc0}{Q\+C\+P\+Range\+::valid\+Range}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPAbstractPlottable_a7e8fc3be43c27ccacd70a7bf9d74a5cd}{rescale\+Axes}, \hyperlink{classQCPStatisticalBox_a77d2d13301dfe60c13adfaa17fc1802f}{get\+Key\+Range} 
+\end{DoxySeeAlso}
+
+
+Implements \hyperlink{classQCPAbstractPlottable_a4de773988b21ed090fddd27c6a3a3dcb}{Q\+C\+P\+Abstract\+Plottable}.
+
+\index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!select\+Test@{select\+Test}}
+\index{select\+Test@{select\+Test}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{select\+Test(const Q\+Point\+F \&pos, bool only\+Selectable, Q\+Variant $\ast$details=0) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{selectTest(const QPointF &pos, bool onlySelectable, QVariant *details=0) const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}double Q\+C\+P\+Statistical\+Box\+::select\+Test (
+\begin{DoxyParamCaption}
+\item[{const Q\+PointF \&}]{pos, }
+\item[{bool}]{only\+Selectable, }
+\item[{Q\+Variant $\ast$}]{details = {\ttfamily 0}}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPStatisticalBox_a1607fa92f829c631107c20ccb2d70a6d}{}\label{classQCPStatisticalBox_a1607fa92f829c631107c20ccb2d70a6d}
+Implements a point-\/selection algorithm assuming the data (accessed via the 1D data interface) is point-\/like. Most subclasses will want to reimplement this method again, to provide a more accurate hit test based on the true data visualization geometry.
+
+Reimplemented from \hyperlink{classQCPAbstractPlottable1D_a4611b43bcb6441b2154eb4f4e0a33db2}{Q\+C\+P\+Abstract\+Plottable1\+D$<$ Q\+C\+P\+Statistical\+Box\+Data $>$}.
+
+\index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!select\+Test\+Rect@{select\+Test\+Rect}}
+\index{select\+Test\+Rect@{select\+Test\+Rect}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{select\+Test\+Rect(const Q\+Rect\+F \&rect, bool only\+Selectable) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{selectTestRect(const QRectF &rect, bool onlySelectable) const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Data\+Selection} Q\+C\+P\+Statistical\+Box\+::select\+Test\+Rect (
+\begin{DoxyParamCaption}
+\item[{const Q\+RectF \&}]{rect, }
+\item[{bool}]{only\+Selectable}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPStatisticalBox_a42febad6ad5e924a151434cc434b4ffc}{}\label{classQCPStatisticalBox_a42febad6ad5e924a151434cc434b4ffc}
+
+
+
+
+Returns a data selection containing all the data points of this plottable which are contained (or hit by) {\itshape rect}. This is used mainly in the selection rect interaction for data selection (data selection mechanism).
+
+If {\itshape only\+Selectable} is true, an empty \hyperlink{classQCPDataSelection}{Q\+C\+P\+Data\+Selection} is returned if this plottable is not selectable (i.\+e. if \hyperlink{classQCPAbstractPlottable_ac238d6e910f976f1f30d41c2bca44ac3}{Q\+C\+P\+Abstract\+Plottable\+::set\+Selectable} is \hyperlink{namespaceQCP_ac6cb9db26a564b27feda362a438db038aa64628e338a2dd1e6f0dc84dec0b63fe}{Q\+C\+P\+::st\+None}).
+
+\begin{DoxyNote}{Note}
+{\itshape rect} must be a normalized rect (positive or zero width and height). This is especially important when using the rect of \hyperlink{classQCPSelectionRect_a15a43542e1f7b953a44c260b419e6d2c}{Q\+C\+P\+Selection\+Rect\+::accepted}, which is not necessarily normalized. Use {\ttfamily Q\+Rect\+::normalized()} when passing a rect which might not be normalized. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classQCPAbstractPlottable1D_a22377bf6e57ab7eedbc9e489250c6ded}{Q\+C\+P\+Abstract\+Plottable1\+D$<$ Q\+C\+P\+Statistical\+Box\+Data $>$}.
+
+\index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!set\+Data@{set\+Data}}
+\index{set\+Data@{set\+Data}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{set\+Data(\+Q\+Shared\+Pointer$<$ Q\+C\+P\+Statistical\+Box\+Data\+Container $>$ data)}{setData(QSharedPointer< QCPStatisticalBoxDataContainer > data)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Statistical\+Box\+::set\+Data (
+\begin{DoxyParamCaption}
+\item[{Q\+Shared\+Pointer$<$ {\bf Q\+C\+P\+Statistical\+Box\+Data\+Container} $>$}]{data}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPStatisticalBox_a08a6da55822bad825ee25a8069b9b52f}{}\label{classQCPStatisticalBox_a08a6da55822bad825ee25a8069b9b52f}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Replaces the current data container with the provided {\itshape data} container.
+
+Since a Q\+Shared\+Pointer is used, multiple Q\+C\+P\+Statistical\+Boxes may share the same data container safely. Modifying the data in the container will then affect all statistical boxes that share the container. Sharing can be achieved by simply exchanging the data containers wrapped in shared pointers\+: 
+\begin{DoxyCodeInclude}
+\end{DoxyCodeInclude}
+ If you do not wish to share containers, but create a copy from an existing container, rather use the \hyperlink{classQCPDataContainer_ae7042bd534fc3ce7befa2ce3f790b5bf}{Q\+C\+P\+Data\+Container$<$\+Data\+Type$>$\+::set} method on the statistical box data container directly\+: 
+\begin{DoxyCodeInclude}
+\end{DoxyCodeInclude}
+ \begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPStatisticalBox_a9a8739c5b8291db8fd839e892fc8f478}{add\+Data} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!set\+Data@{set\+Data}}
+\index{set\+Data@{set\+Data}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{set\+Data(const Q\+Vector$<$ double $>$ \&keys, const Q\+Vector$<$ double $>$ \&minimum, const Q\+Vector$<$ double $>$ \&lower\+Quartile, const Q\+Vector$<$ double $>$ \&median, const Q\+Vector$<$ double $>$ \&upper\+Quartile, const Q\+Vector$<$ double $>$ \&maximum, bool already\+Sorted=false)}{setData(const QVector< double > &keys, const QVector< double > &minimum, const QVector< double > &lowerQuartile, const QVector< double > &median, const QVector< double > &upperQuartile, const QVector< double > &maximum, bool alreadySorted=false)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Statistical\+Box\+::set\+Data (
+\begin{DoxyParamCaption}
+\item[{const Q\+Vector$<$ double $>$ \&}]{keys, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{minimum, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{lower\+Quartile, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{median, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{upper\+Quartile, }
+\item[{const Q\+Vector$<$ double $>$ \&}]{maximum, }
+\item[{bool}]{already\+Sorted = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPStatisticalBox_a4ae198e66243d8cc57ad8893c37bf9d4}{}\label{classQCPStatisticalBox_a4ae198e66243d8cc57ad8893c37bf9d4}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Replaces the current data with the provided points in {\itshape keys}, {\itshape minimum}, {\itshape lower\+Quartile}, {\itshape median}, {\itshape upper\+Quartile} and {\itshape maximum}. The provided vectors should have equal length. Else, the number of added points will be the size of the smallest vector.
+
+If you can guarantee that the passed data points are sorted by {\itshape keys} in ascending order, you can set {\itshape already\+Sorted} to true, to improve performance by saving a sorting run.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPStatisticalBox_a9a8739c5b8291db8fd839e892fc8f478}{add\+Data} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!set\+Median\+Pen@{set\+Median\+Pen}}
+\index{set\+Median\+Pen@{set\+Median\+Pen}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{set\+Median\+Pen(const Q\+Pen \&pen)}{setMedianPen(const QPen &pen)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Statistical\+Box\+::set\+Median\+Pen (
+\begin{DoxyParamCaption}
+\item[{const Q\+Pen \&}]{pen}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPStatisticalBox_a7260ac55b669f5d0a74f16d5ca84c52c}{}\label{classQCPStatisticalBox_a7260ac55b669f5d0a74f16d5ca84c52c}
+Sets the pen used for drawing the median indicator line inside the statistical boxes. \index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!set\+Outlier\+Style@{set\+Outlier\+Style}}
+\index{set\+Outlier\+Style@{set\+Outlier\+Style}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{set\+Outlier\+Style(const Q\+C\+P\+Scatter\+Style \&style)}{setOutlierStyle(const QCPScatterStyle &style)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Statistical\+Box\+::set\+Outlier\+Style (
+\begin{DoxyParamCaption}
+\item[{const {\bf Q\+C\+P\+Scatter\+Style} \&}]{style}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPStatisticalBox_ad5241943422eb8e58360a97e99ad6aa7}{}\label{classQCPStatisticalBox_ad5241943422eb8e58360a97e99ad6aa7}
+Sets the appearance of the outlier data points.
+
+Outliers can be specified with the method \hyperlink{classQCPStatisticalBox_a026f2790b530d6f29312254ecb1e7c1e}{add\+Data(double key, double minimum, double lower\+Quartile, double median, double upper\+Quartile, double maximum, const Q\+Vector$<$double$>$ \&outliers)} \index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!set\+Whisker\+Antialiased@{set\+Whisker\+Antialiased}}
+\index{set\+Whisker\+Antialiased@{set\+Whisker\+Antialiased}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{set\+Whisker\+Antialiased(bool enabled)}{setWhiskerAntialiased(bool enabled)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Statistical\+Box\+::set\+Whisker\+Antialiased (
+\begin{DoxyParamCaption}
+\item[{bool}]{enabled}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPStatisticalBox_a61bcd458fba002f72304d11319051843}{}\label{classQCPStatisticalBox_a61bcd458fba002f72304d11319051843}
+Sets whether the statistical boxes whiskers are drawn with antialiasing or not.
+
+Note that antialiasing settings may be overridden by \hyperlink{classQCustomPlot_af6f91e5eab1be85f67c556e98c3745e8}{Q\+Custom\+Plot\+::set\+Antialiased\+Elements} and \hyperlink{classQCustomPlot_ae10d685b5eabea2999fb8775ca173c24}{Q\+Custom\+Plot\+::set\+Not\+Antialiased\+Elements}. \index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!set\+Whisker\+Bar\+Pen@{set\+Whisker\+Bar\+Pen}}
+\index{set\+Whisker\+Bar\+Pen@{set\+Whisker\+Bar\+Pen}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{set\+Whisker\+Bar\+Pen(const Q\+Pen \&pen)}{setWhiskerBarPen(const QPen &pen)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Statistical\+Box\+::set\+Whisker\+Bar\+Pen (
+\begin{DoxyParamCaption}
+\item[{const Q\+Pen \&}]{pen}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPStatisticalBox_aa8d3e503897788e1abf68dc74b5f147f}{}\label{classQCPStatisticalBox_aa8d3e503897788e1abf68dc74b5f147f}
+Sets the pen used for drawing the whisker bars. Those are the lines parallel to the key axis at each end of the whisker backbone.
+
+Whiskers are the lines which reach from the upper quartile to the maximum, and from the lower quartile to the minimum.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPStatisticalBox_a4a5034cb3b9b040444df05ab1684620b}{set\+Whisker\+Pen} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!set\+Whisker\+Pen@{set\+Whisker\+Pen}}
+\index{set\+Whisker\+Pen@{set\+Whisker\+Pen}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{set\+Whisker\+Pen(const Q\+Pen \&pen)}{setWhiskerPen(const QPen &pen)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Statistical\+Box\+::set\+Whisker\+Pen (
+\begin{DoxyParamCaption}
+\item[{const Q\+Pen \&}]{pen}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPStatisticalBox_a4a5034cb3b9b040444df05ab1684620b}{}\label{classQCPStatisticalBox_a4a5034cb3b9b040444df05ab1684620b}
+Sets the pen used for drawing the whisker backbone.
+
+Whiskers are the lines which reach from the upper quartile to the maximum, and from the lower quartile to the minimum.
+
+Make sure to set the {\ttfamily cap\+Style} of the passed {\itshape pen} to {\ttfamily Qt\+::\+Flat\+Cap}. Otherwise the backbone line might exceed the whisker bars by a few pixels due to the pen cap being not perfectly flat.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPStatisticalBox_aa8d3e503897788e1abf68dc74b5f147f}{set\+Whisker\+Bar\+Pen} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!set\+Whisker\+Width@{set\+Whisker\+Width}}
+\index{set\+Whisker\+Width@{set\+Whisker\+Width}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{set\+Whisker\+Width(double width)}{setWhiskerWidth(double width)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Statistical\+Box\+::set\+Whisker\+Width (
+\begin{DoxyParamCaption}
+\item[{double}]{width}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPStatisticalBox_adf378812446bd66f34d1f7f293d991cd}{}\label{classQCPStatisticalBox_adf378812446bd66f34d1f7f293d991cd}
+Sets the width of the whiskers in key coordinates.
+
+Whiskers are the lines which reach from the upper quartile to the maximum, and from the lower quartile to the minimum.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPStatisticalBox_a0b62775bd67301b1eba5c785f2b26f14}{set\+Width} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}!set\+Width@{set\+Width}}
+\index{set\+Width@{set\+Width}!Q\+C\+P\+Statistical\+Box@{Q\+C\+P\+Statistical\+Box}}
+\subsubsection[{\texorpdfstring{set\+Width(double width)}{setWidth(double width)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Statistical\+Box\+::set\+Width (
+\begin{DoxyParamCaption}
+\item[{double}]{width}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPStatisticalBox_a0b62775bd67301b1eba5c785f2b26f14}{}\label{classQCPStatisticalBox_a0b62775bd67301b1eba5c785f2b26f14}
+Sets the width of the boxes in key coordinates.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPStatisticalBox_adf378812446bd66f34d1f7f293d991cd}{set\+Whisker\+Width} 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/qcustomplot.\+h\item 
+src/qcustomplot.\+cpp\end{DoxyCompactItemize}

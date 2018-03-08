@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node2" href="$classprim_1_1Emitter.html" title="prim::Emitter" alt="" coords="135,5,232,32"/>
+<area shape="rect" id="node3" href="$classprim_1_1Layer.html" title="Base Class for design layers, layers do not delete their items when destroyed. " alt="" coords="140,56,227,83"/>
+<area shape="rect" id="node5" href="$classprim_1_1SimEngine.html" title="A simulation engine that can be used with the design tool. " alt="" coords="124,107,243,133"/>
+<area shape="rect" id="node6" href="$classprim_1_1SimJob.html" title="A single run of a simulation engine. Takes care of setting up simulation parameters, calling simulation engine binaries, and reading simulation results. " alt="" coords="134,157,233,184"/>
+<area shape="rect" id="node4" href="$classprim_1_1Lattice.html" title="prim::Lattice" alt="" coords="291,56,385,83"/>
+</map>

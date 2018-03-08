@@ -1,0 +1,4 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classQCPSelectionDecorator.html" title="Controls how a plottable&#39;s data selection is drawn. " alt="" coords="5,5,168,32"/>
+<area shape="rect" id="node2" href="$classQCPSelectionDecoratorBracket.html" title="A selection decorator which draws brackets around each selected data segment. " alt="" coords="216,5,423,32"/>
+</map>

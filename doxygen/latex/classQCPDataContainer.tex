@@ -1,0 +1,493 @@
+\hypertarget{classQCPDataContainer}{}\section{Q\+C\+P\+Data\+Container$<$ Data\+Type $>$ Class Template Reference}
+\label{classQCPDataContainer}\index{Q\+C\+P\+Data\+Container$<$ Data\+Type $>$@{Q\+C\+P\+Data\+Container$<$ Data\+Type $>$}}
+
+
+The generic data container for one-\/dimensional plottables.  
+
+
+
+
+{\ttfamily \#include $<$qcustomplot.\+h$>$}
+
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Q\+Vector$<$ Data\+Type $>$\+::const\+\_\+iterator {\bfseries const\+\_\+iterator}\hypertarget{classQCPDataContainer_ae40a91f5cb0bcac61d727427449b7d15}{}\label{classQCPDataContainer_ae40a91f5cb0bcac61d727427449b7d15}
+
+\item 
+typedef Q\+Vector$<$ Data\+Type $>$\+::iterator {\bfseries iterator}\hypertarget{classQCPDataContainer_a1bb453c3ae37d1ee5268878acb3a9d29}{}\label{classQCPDataContainer_a1bb453c3ae37d1ee5268878acb3a9d29}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPDataContainer_af86c0c63719f92c360ff67cc06c6fe6f}{Q\+C\+P\+Data\+Container} ()
+\item 
+int \hyperlink{classQCPDataContainer_a09003591d8812dea7a548c500b62750a}{size} () const 
+\item 
+bool \hyperlink{classQCPDataContainer_af2a4d189394da4a3e78bf52ff6945f1d}{is\+Empty} () const 
+\item 
+bool {\bfseries auto\+Squeeze} () const \hypertarget{classQCPDataContainer_a998f6e133f162f32818ca529a0be7355}{}\label{classQCPDataContainer_a998f6e133f162f32818ca529a0be7355}
+
+\item 
+void \hyperlink{classQCPDataContainer_a233f866760a78950d2a393c1a4bc54b5}{set\+Auto\+Squeeze} (bool enabled)
+\item 
+void \hyperlink{classQCPDataContainer_ae7042bd534fc3ce7befa2ce3f790b5bf}{set} (const \hyperlink{classQCPDataContainer}{Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$ \&data)
+\item 
+void \hyperlink{classQCPDataContainer_aff99fffbb26597a354c4bc8312596ab2}{set} (const Q\+Vector$<$ Data\+Type $>$ \&data, bool already\+Sorted=false)
+\item 
+void \hyperlink{classQCPDataContainer_a42b98bd994307ccd163a43d576f91ad9}{add} (const \hyperlink{classQCPDataContainer}{Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$ \&data)
+\item 
+void \hyperlink{classQCPDataContainer_a51d2a4c9ce4baf5e950b767d26673972}{add} (const Q\+Vector$<$ Data\+Type $>$ \&data, bool already\+Sorted=false)
+\item 
+void \hyperlink{classQCPDataContainer_a715e8e9972466804954a2f8fbd5288b7}{add} (const Data\+Type \&data)
+\item 
+void \hyperlink{classQCPDataContainer_aa7f74cbce304b0369e1626c3798e1eda}{remove\+Before} (double sort\+Key)
+\item 
+void \hyperlink{classQCPDataContainer_abbe5d87ffc10b5aeffa5bb42cf03aa3c}{remove\+After} (double sort\+Key)
+\item 
+void \hyperlink{classQCPDataContainer_ae5f569a120648b167efa78835f12fd38}{remove} (double sort\+Key\+From, double sort\+Key\+To)
+\item 
+void \hyperlink{classQCPDataContainer_a2dbded7f0732bacf9db48fdfbbb620bc}{remove} (double sort\+Key)
+\item 
+void \hyperlink{classQCPDataContainer_a7e2b29736c6fd761649bda1a54ba967f}{clear} ()
+\item 
+void \hyperlink{classQCPDataContainer_a75da92e33063b63d6da5014683591d45}{sort} ()
+\item 
+void \hyperlink{classQCPDataContainer_a82fcc511def22287fc62579d0706387c}{squeeze} (bool pre\+Allocation=true, bool post\+Allocation=true)
+\item 
+const\+\_\+iterator \hyperlink{classQCPDataContainer_a02360beeb3484df7c20f20c8f3ed4bb2}{const\+Begin} () const 
+\item 
+const\+\_\+iterator \hyperlink{classQCPDataContainer_ad007d9955a4fb2ec1f7e07532b59d169}{const\+End} () const 
+\item 
+iterator \hyperlink{classQCPDataContainer_a80032518413ab8f418f7c81182fd06cb}{begin} ()
+\item 
+iterator \hyperlink{classQCPDataContainer_acf66dfad83fe041380f5e0491e7676f2}{end} ()
+\item 
+const\+\_\+iterator \hyperlink{classQCPDataContainer_a8ffcab551fd06dd037874ef644c73467}{find\+Begin} (double sort\+Key, bool expanded\+Range=true) const 
+\item 
+const\+\_\+iterator \hyperlink{classQCPDataContainer_ad9b6b0343252eb3bbd591ee28aaa4e9d}{find\+End} (double sort\+Key, bool expanded\+Range=true) const 
+\item 
+const\+\_\+iterator \hyperlink{classQCPDataContainer_a6e92717af67e5e93a80f1f44ce040c74}{at} (int index) const 
+\item 
+\hyperlink{classQCPRange}{Q\+C\+P\+Range} \hyperlink{classQCPDataContainer_aba6e1a93c21ccc56a432b4a02c9d0ed2}{key\+Range} (bool \&found\+Range, \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9}{Q\+C\+P\+::\+Sign\+Domain} sign\+Domain=\hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9aa38352ef02d51ddfa4399d9551566e24}{Q\+C\+P\+::sd\+Both})
+\item 
+\hyperlink{classQCPRange}{Q\+C\+P\+Range} \hyperlink{classQCPDataContainer_a35a102dc2424d1228fc374d9313efbe9}{value\+Range} (bool \&found\+Range, \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9}{Q\+C\+P\+::\+Sign\+Domain} sign\+Domain=\hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9aa38352ef02d51ddfa4399d9551566e24}{Q\+C\+P\+::sd\+Both}, const \hyperlink{classQCPRange}{Q\+C\+P\+Range} \&in\+Key\+Range=\hyperlink{classQCPRange}{Q\+C\+P\+Range}())
+\item 
+\hyperlink{classQCPDataRange}{Q\+C\+P\+Data\+Range} \hyperlink{classQCPDataContainer_a0aa30487aa557b38c2e10f918454c085}{data\+Range} () const 
+\item 
+void \hyperlink{classQCPDataContainer_ad55f9e9c95ab4414b477d2f08ffd9bd7}{limit\+Iterators\+To\+Data\+Range} (const\+\_\+iterator \&\hyperlink{classQCPDataContainer_a80032518413ab8f418f7c81182fd06cb}{begin}, const\+\_\+iterator \&\hyperlink{classQCPDataContainer_acf66dfad83fe041380f5e0491e7676f2}{end}, const \hyperlink{classQCPDataRange}{Q\+C\+P\+Data\+Range} \&\hyperlink{classQCPDataContainer_a0aa30487aa557b38c2e10f918454c085}{data\+Range}) const 
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries preallocate\+Grow} (int minimum\+Prealloc\+Size)\hypertarget{classQCPDataContainer_aae8cdb2bcc3b900ec22f26df3e7d67c7}{}\label{classQCPDataContainer_aae8cdb2bcc3b900ec22f26df3e7d67c7}
+
+\item 
+void {\bfseries perform\+Auto\+Squeeze} ()\hypertarget{classQCPDataContainer_a83c25ac14be1c920df85e797ee75c982}{}\label{classQCPDataContainer_a83c25ac14be1c920df85e797ee75c982}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bfseries m\+Auto\+Squeeze}\hypertarget{classQCPDataContainer_aae64c517d64511ad7a81ff8ee7b29147}{}\label{classQCPDataContainer_aae64c517d64511ad7a81ff8ee7b29147}
+
+\item 
+Q\+Vector$<$ Data\+Type $>$ {\bfseries m\+Data}\hypertarget{classQCPDataContainer_a74906b4da829849c4062b5337c72585d}{}\label{classQCPDataContainer_a74906b4da829849c4062b5337c72585d}
+
+\item 
+int {\bfseries m\+Prealloc\+Size}\hypertarget{classQCPDataContainer_a3554d3ad00e69f7ce057efa00ea6f4b2}{}\label{classQCPDataContainer_a3554d3ad00e69f7ce057efa00ea6f4b2}
+
+\item 
+int {\bfseries m\+Prealloc\+Iteration}\hypertarget{classQCPDataContainer_ab2115bf023c29691f441eaf1889de84a}{}\label{classQCPDataContainer_ab2115bf023c29691f441eaf1889de84a}
+
+\end{DoxyCompactItemize}
+\subsection*{Related Functions}
+(Note that these are not member functions.) \begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class Data\+Type $>$ }\\bool \hyperlink{classQCPDataContainer_a74c5e06728cb6fa778a25d9ec0c4bd36}{qcp\+Less\+Than\+Sort\+Key} (const Data\+Type \&a, const Data\+Type \&b)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$class Data\+Type$>$\\*
+class Q\+C\+P\+Data\+Container$<$ Data\+Type $>$}
+
+The generic data container for one-\/dimensional plottables. 
+
+This class template provides a fast container for data storage of one-\/dimensional data. The data type is specified as template parameter (called {\itshape Data\+Type} in the following) and must provide some methods as described in the \hyperlink{classQCPDataContainer_qcpdatacontainer-datatype}{next section}.
+
+The data is stored in a sorted fashion, which allows very quick lookups by the sorted key as well as retrieval of ranges (see \hyperlink{classQCPDataContainer_a8ffcab551fd06dd037874ef644c73467}{find\+Begin}, \hyperlink{classQCPDataContainer_ad9b6b0343252eb3bbd591ee28aaa4e9d}{find\+End}, \hyperlink{classQCPDataContainer_aba6e1a93c21ccc56a432b4a02c9d0ed2}{key\+Range}) using binary search. The container uses a preallocation and a postallocation scheme, such that appending and prepending data (with respect to the sort key) is very fast and minimizes reallocations. If data is added which needs to be inserted between existing keys, the merge usually can be done quickly too, using the fact that existing data is always sorted. The user can further improve performance by specifying that added data is already itself sorted by key, if he can guarantee that this is the case (see for example \hyperlink{classQCPDataContainer_a51d2a4c9ce4baf5e950b767d26673972}{add(const Q\+Vector$<$\+Data\+Type$>$ \&data, bool already\+Sorted)}).
+
+The data can be accessed with the provided const iterators (\hyperlink{classQCPDataContainer_a02360beeb3484df7c20f20c8f3ed4bb2}{const\+Begin}, \hyperlink{classQCPDataContainer_ad007d9955a4fb2ec1f7e07532b59d169}{const\+End}). If it is necessary to alter existing data in-\/place, the non-\/const iterators can be used (\hyperlink{classQCPDataContainer_a80032518413ab8f418f7c81182fd06cb}{begin}, \hyperlink{classQCPDataContainer_acf66dfad83fe041380f5e0491e7676f2}{end}). Changing data members that are not the sort key (for most data types called {\itshape key}) is safe from the container\textquotesingle{}s perspective.
+
+Great care must be taken however if the sort key is modified through the non-\/const iterators. For performance reasons, the iterators don\textquotesingle{}t automatically cause a re-\/sorting upon their manipulation. It is thus the responsibility of the user to leave the container in a sorted state when finished with the data manipulation, before calling any other methods on the container. A complete re-\/sort (e.\+g. after finishing all sort key manipulation) can be done by calling \hyperlink{classQCPDataContainer_a75da92e33063b63d6da5014683591d45}{sort}. Failing to do so can not be detected by the container efficiently and will cause both rendering artifacts and potential data loss.
+
+Implementing one-\/dimensional plottables that make use of a \hyperlink{classQCPDataContainer}{Q\+C\+P\+Data\+Container$<$\+T$>$} is usually done by subclassing from \hyperlink{classQCPAbstractPlottable1D}{Q\+C\+P\+Abstract\+Plottable1D$<$T$>$}, which introduces an according {\itshape m\+Data\+Container} member and some convenience methods.\hypertarget{classQCPDataContainer_qcpdatacontainer-datatype}{}\subsection{Requirements for the Data\+Type template parameter}\label{classQCPDataContainer_qcpdatacontainer-datatype}
+The template parameter {\ttfamily Data\+Type} is the type of the stored data points. It must be trivially copyable and have the following public methods, preferably inline\+:
+
+\begin{DoxyItemize}
+\item {\ttfamily double sort\+Key() const}~\newline
+ Returns the member variable of this data point that is the sort key, defining the ordering in the container. Often this variable is simply called {\itshape key}.\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\ttfamily static Data\+Type from\+Sort\+Key(double sort\+Key)}~\newline
+ Returns a new instance of the data type initialized with its sort key set to {\itshape sort\+Key}.\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\ttfamily static bool sort\+Key\+Is\+Main\+Key()}~\newline
+ Returns true if the sort key is equal to the main key (see method {\ttfamily main\+Key} below). For most plottables this is the case. It is not the case for example for \hyperlink{classQCPCurve}{Q\+C\+P\+Curve}, which uses {\itshape t} as sort key and {\itshape key} as main key. This is the reason why \hyperlink{classQCPCurve}{Q\+C\+P\+Curve} unlike \hyperlink{classQCPGraph}{Q\+C\+P\+Graph} can display parametric curves with loops.\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\ttfamily double main\+Key() const}~\newline
+ Returns the variable of this data point considered the main key. This is commonly the variable that is used as the coordinate of this data point on the key axis of the plottable. This method is used for example when determining the automatic axis rescaling of key axes (\hyperlink{classQCPAxis_a499345f02ebce4b23d8ccec96e58daa9}{Q\+C\+P\+Axis\+::rescale}).\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\ttfamily double main\+Value() const}~\newline
+ Returns the variable of this data point considered the main value. This is commonly the variable that is used as the coordinate of this data point on the value axis of the plottable.\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\ttfamily \hyperlink{classQCPRange}{Q\+C\+P\+Range} value\+Range() const}~\newline
+ Returns the range this data point spans in the value axis coordinate. If the data is single-\/valued (e.\+g. \hyperlink{classQCPGraphData}{Q\+C\+P\+Graph\+Data}), this is simply a range with both lower and upper set to the main data point value. However if the data points can represent multiple values at once (e.\+g \hyperlink{classQCPFinancialData}{Q\+C\+P\+Financial\+Data} with its {\itshape high}, {\itshape low}, {\itshape open} and {\itshape close} values at each {\itshape key}) this method should return the range those values span. This method is used for example when determining the automatic axis rescaling of value axes (\hyperlink{classQCPAxis_a499345f02ebce4b23d8ccec96e58daa9}{Q\+C\+P\+Axis\+::rescale}). \end{DoxyItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Data\+Container()}{QCPDataContainer()}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::{\bf Q\+C\+P\+Data\+Container} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_af86c0c63719f92c360ff67cc06c6fe6f}{}\label{classQCPDataContainer_af86c0c63719f92c360ff67cc06c6fe6f}
+Constructs a \hyperlink{classQCPDataContainer}{Q\+C\+P\+Data\+Container} used for plottable classes that represent a series of key-\/sorted data 
+
+\subsection{Member Function Documentation}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!add@{add}}
+\index{add@{add}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{add(const Q\+C\+P\+Data\+Container$<$ Data\+Type $>$ \&data)}{add(const QCPDataContainer< DataType > &data)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::add (
+\begin{DoxyParamCaption}
+\item[{const {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$ \&}]{data}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_a42b98bd994307ccd163a43d576f91ad9}{}\label{classQCPDataContainer_a42b98bd994307ccd163a43d576f91ad9}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Adds the provided {\itshape data} to the current data in this container.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPDataContainer_ae7042bd534fc3ce7befa2ce3f790b5bf}{set}, \hyperlink{classQCPDataContainer_ae5f569a120648b167efa78835f12fd38}{remove} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!add@{add}}
+\index{add@{add}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{add(const Q\+Vector$<$ Data\+Type $>$ \&data, bool already\+Sorted=false)}{add(const QVector< DataType > &data, bool alreadySorted=false)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::add (
+\begin{DoxyParamCaption}
+\item[{const Q\+Vector$<$ Data\+Type $>$ \&}]{data, }
+\item[{bool}]{already\+Sorted = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_a51d2a4c9ce4baf5e950b767d26673972}{}\label{classQCPDataContainer_a51d2a4c9ce4baf5e950b767d26673972}
+Adds the provided data points in {\itshape data} to the current data.
+
+If you can guarantee that the data points in {\itshape data} have ascending order with respect to the Data\+Type\textquotesingle{}s sort key, set {\itshape already\+Sorted} to true to avoid an unnecessary sorting run.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPDataContainer_ae7042bd534fc3ce7befa2ce3f790b5bf}{set}, \hyperlink{classQCPDataContainer_ae5f569a120648b167efa78835f12fd38}{remove} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!add@{add}}
+\index{add@{add}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{add(const Data\+Type \&data)}{add(const DataType &data)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::add (
+\begin{DoxyParamCaption}
+\item[{const Data\+Type \&}]{data}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_a715e8e9972466804954a2f8fbd5288b7}{}\label{classQCPDataContainer_a715e8e9972466804954a2f8fbd5288b7}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Adds the provided single data point to the current data.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPDataContainer_ae5f569a120648b167efa78835f12fd38}{remove} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!at@{at}}
+\index{at@{at}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{at(int index) const }{at(int index) const }}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type$>$ Q\+C\+P\+Data\+Container\+::const\+\_\+iterator {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::at (
+\begin{DoxyParamCaption}
+\item[{int}]{index}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPDataContainer_a6e92717af67e5e93a80f1f44ce040c74}{}\label{classQCPDataContainer_a6e92717af67e5e93a80f1f44ce040c74}
+Returns a const iterator to the element with the specified {\itshape index}. If {\itshape index} points beyond the available elements in this container, returns \hyperlink{classQCPDataContainer_ad007d9955a4fb2ec1f7e07532b59d169}{const\+End}, i.\+e. an iterator past the last valid element.
+
+You can use this method to easily obtain iterators from a \hyperlink{classQCPDataRange}{Q\+C\+P\+Data\+Range}, see the data selection page for an example. \index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!begin@{begin}}
+\index{begin@{begin}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{begin()}{begin()}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type$>$ Q\+C\+P\+Data\+Container\+::iterator {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::begin (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPDataContainer_a80032518413ab8f418f7c81182fd06cb}{}\label{classQCPDataContainer_a80032518413ab8f418f7c81182fd06cb}
+Returns a non-\/const iterator to the first data point in this container.
+
+You can manipulate the data points in-\/place through the non-\/const iterators, but great care must be taken when manipulating the sort key of a data point, see \hyperlink{classQCPDataContainer_a75da92e33063b63d6da5014683591d45}{sort}, or the detailed description of this class. \index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!clear@{clear}}
+\index{clear@{clear}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{clear()}{clear()}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::clear (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_a7e2b29736c6fd761649bda1a54ba967f}{}\label{classQCPDataContainer_a7e2b29736c6fd761649bda1a54ba967f}
+Removes all data points.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPDataContainer_ae5f569a120648b167efa78835f12fd38}{remove}, \hyperlink{classQCPDataContainer_abbe5d87ffc10b5aeffa5bb42cf03aa3c}{remove\+After}, \hyperlink{classQCPDataContainer_aa7f74cbce304b0369e1626c3798e1eda}{remove\+Before} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!const\+Begin@{const\+Begin}}
+\index{const\+Begin@{const\+Begin}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{const\+Begin() const }{constBegin() const }}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type$>$ Q\+C\+P\+Data\+Container\+::const\+\_\+iterator {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::const\+Begin (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPDataContainer_a02360beeb3484df7c20f20c8f3ed4bb2}{}\label{classQCPDataContainer_a02360beeb3484df7c20f20c8f3ed4bb2}
+Returns a const iterator to the first data point in this container. \index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!const\+End@{const\+End}}
+\index{const\+End@{const\+End}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{const\+End() const }{constEnd() const }}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type$>$ Q\+C\+P\+Data\+Container\+::const\+\_\+iterator {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::const\+End (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPDataContainer_ad007d9955a4fb2ec1f7e07532b59d169}{}\label{classQCPDataContainer_ad007d9955a4fb2ec1f7e07532b59d169}
+Returns a const iterator to the element past the last data point in this container. \index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!data\+Range@{data\+Range}}
+\index{data\+Range@{data\+Range}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{data\+Range() const }{dataRange() const }}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type$>$ {\bf Q\+C\+P\+Data\+Range} {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::data\+Range (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPDataContainer_a0aa30487aa557b38c2e10f918454c085}{}\label{classQCPDataContainer_a0aa30487aa557b38c2e10f918454c085}
+Returns a \hyperlink{classQCPDataRange}{Q\+C\+P\+Data\+Range} encompassing the entire data set of this container. This means the begin index of the returned range is 0, and the end index is \hyperlink{classQCPDataContainer_a09003591d8812dea7a548c500b62750a}{size}. \index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!end@{end}}
+\index{end@{end}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{end()}{end()}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type$>$ Q\+C\+P\+Data\+Container\+::iterator {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::end (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPDataContainer_acf66dfad83fe041380f5e0491e7676f2}{}\label{classQCPDataContainer_acf66dfad83fe041380f5e0491e7676f2}
+Returns a non-\/const iterator to the element past the last data point in this container.
+
+You can manipulate the data points in-\/place through the non-\/const iterators, but great care must be taken when manipulating the sort key of a data point, see \hyperlink{classQCPDataContainer_a75da92e33063b63d6da5014683591d45}{sort}, or the detailed description of this class. \index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!find\+Begin@{find\+Begin}}
+\index{find\+Begin@{find\+Begin}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{find\+Begin(double sort\+Key, bool expanded\+Range=true) const }{findBegin(double sortKey, bool expandedRange=true) const }}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::const\+\_\+iterator {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::find\+Begin (
+\begin{DoxyParamCaption}
+\item[{double}]{sort\+Key, }
+\item[{bool}]{expanded\+Range = {\ttfamily true}}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCPDataContainer_a8ffcab551fd06dd037874ef644c73467}{}\label{classQCPDataContainer_a8ffcab551fd06dd037874ef644c73467}
+Returns an iterator to the data point with a (sort-\/)key that is equal to, just below, or just above {\itshape sort\+Key}. If {\itshape expanded\+Range} is true, the data point just below {\itshape sort\+Key} will be considered, otherwise the one just above.
+
+This can be used in conjunction with \hyperlink{classQCPDataContainer_ad9b6b0343252eb3bbd591ee28aaa4e9d}{find\+End} to iterate over data points within a given key range, including or excluding the bounding data points that are just beyond the specified range.
+
+If {\itshape expanded\+Range} is true but there are no data points below {\itshape sort\+Key}, \hyperlink{classQCPDataContainer_a02360beeb3484df7c20f20c8f3ed4bb2}{const\+Begin} is returned.
+
+If the container is empty, returns \hyperlink{classQCPDataContainer_ad007d9955a4fb2ec1f7e07532b59d169}{const\+End}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPDataContainer_ad9b6b0343252eb3bbd591ee28aaa4e9d}{find\+End}, \hyperlink{classQCPPlottableInterface1D_a5b95783271306a4de97be54eac1e7d13}{Q\+C\+P\+Plottable\+Interface1\+D\+::find\+Begin} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!find\+End@{find\+End}}
+\index{find\+End@{find\+End}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{find\+End(double sort\+Key, bool expanded\+Range=true) const }{findEnd(double sortKey, bool expandedRange=true) const }}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::const\+\_\+iterator {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::find\+End (
+\begin{DoxyParamCaption}
+\item[{double}]{sort\+Key, }
+\item[{bool}]{expanded\+Range = {\ttfamily true}}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCPDataContainer_ad9b6b0343252eb3bbd591ee28aaa4e9d}{}\label{classQCPDataContainer_ad9b6b0343252eb3bbd591ee28aaa4e9d}
+Returns an iterator to the element after the data point with a (sort-\/)key that is equal to, just above or just below {\itshape sort\+Key}. If {\itshape expanded\+Range} is true, the data point just above {\itshape sort\+Key} will be considered, otherwise the one just below.
+
+This can be used in conjunction with \hyperlink{classQCPDataContainer_a8ffcab551fd06dd037874ef644c73467}{find\+Begin} to iterate over data points within a given key range, including the bounding data points that are just below and above the specified range.
+
+If {\itshape expanded\+Range} is true but there are no data points above {\itshape sort\+Key}, \hyperlink{classQCPDataContainer_ad007d9955a4fb2ec1f7e07532b59d169}{const\+End} is returned.
+
+If the container is empty, \hyperlink{classQCPDataContainer_ad007d9955a4fb2ec1f7e07532b59d169}{const\+End} is returned.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPDataContainer_a8ffcab551fd06dd037874ef644c73467}{find\+Begin}, \hyperlink{classQCPPlottableInterface1D_a5deced1016bc55a41a2339619045b295}{Q\+C\+P\+Plottable\+Interface1\+D\+::find\+End} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!is\+Empty@{is\+Empty}}
+\index{is\+Empty@{is\+Empty}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{is\+Empty() const }{isEmpty() const }}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type$>$ bool {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::is\+Empty (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPDataContainer_af2a4d189394da4a3e78bf52ff6945f1d}{}\label{classQCPDataContainer_af2a4d189394da4a3e78bf52ff6945f1d}
+Returns whether this container holds no data points. \index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!key\+Range@{key\+Range}}
+\index{key\+Range@{key\+Range}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{key\+Range(bool \&found\+Range, Q\+C\+P\+::\+Sign\+Domain sign\+Domain=\+Q\+C\+P\+::sd\+Both)}{keyRange(bool &foundRange, QCP::SignDomain signDomain=QCP::sdBoth)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ {\bf Q\+C\+P\+Range} {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::key\+Range (
+\begin{DoxyParamCaption}
+\item[{bool \&}]{found\+Range, }
+\item[{{\bf Q\+C\+P\+::\+Sign\+Domain}}]{sign\+Domain = {\ttfamily {\bf Q\+C\+P\+::sd\+Both}}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_aba6e1a93c21ccc56a432b4a02c9d0ed2}{}\label{classQCPDataContainer_aba6e1a93c21ccc56a432b4a02c9d0ed2}
+Returns the range encompassed by the (main-\/)key coordinate of all data points. The output parameter {\itshape found\+Range} indicates whether a sensible range was found. If this is false, you should not use the returned \hyperlink{classQCPRange}{Q\+C\+P\+Range} (e.\+g. the data container is empty or all points have the same key).
+
+Use {\itshape sign\+Domain} to control which sign of the key coordinates should be considered. This is relevant e.\+g. for logarithmic plots which can mathematically only display one sign domain at a time.
+
+If the Data\+Type reports that its main key is equal to the sort key ({\itshape sort\+Key\+Is\+Main\+Key}), as is the case for most plottables, this method uses this fact and finds the range very quickly.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPDataContainer_a35a102dc2424d1228fc374d9313efbe9}{value\+Range} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!limit\+Iterators\+To\+Data\+Range@{limit\+Iterators\+To\+Data\+Range}}
+\index{limit\+Iterators\+To\+Data\+Range@{limit\+Iterators\+To\+Data\+Range}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{limit\+Iterators\+To\+Data\+Range(const\+\_\+iterator \&begin, const\+\_\+iterator \&end, const Q\+C\+P\+Data\+Range \&data\+Range) const }{limitIteratorsToDataRange(const_iterator &begin, const_iterator &end, const QCPDataRange &dataRange) const }}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::limit\+Iterators\+To\+Data\+Range (
+\begin{DoxyParamCaption}
+\item[{const\+\_\+iterator \&}]{begin, }
+\item[{const\+\_\+iterator \&}]{end, }
+\item[{const {\bf Q\+C\+P\+Data\+Range} \&}]{data\+Range}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCPDataContainer_ad55f9e9c95ab4414b477d2f08ffd9bd7}{}\label{classQCPDataContainer_ad55f9e9c95ab4414b477d2f08ffd9bd7}
+Makes sure {\itshape begin} and {\itshape end} mark a data range that is both within the bounds of this data container\textquotesingle{}s data, as well as within the specified {\itshape data\+Range}. The initial range described by the passed iterators {\itshape begin} and {\itshape end} is never expanded, only contracted if necessary.
+
+This function doesn\textquotesingle{}t require for {\itshape data\+Range} to be within the bounds of this data container\textquotesingle{}s valid range. \index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!remove@{remove}}
+\index{remove@{remove}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{remove(double sort\+Key\+From, double sort\+Key\+To)}{remove(double sortKeyFrom, double sortKeyTo)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::remove (
+\begin{DoxyParamCaption}
+\item[{double}]{sort\+Key\+From, }
+\item[{double}]{sort\+Key\+To}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_ae5f569a120648b167efa78835f12fd38}{}\label{classQCPDataContainer_ae5f569a120648b167efa78835f12fd38}
+Removes all data points with (sort-\/)keys between {\itshape sort\+Key\+From} and {\itshape sort\+Key\+To}. if {\itshape sort\+Key\+From} is greater or equal to {\itshape sort\+Key\+To}, the function does nothing. To remove a single data point with known (sort-\/)key, use \hyperlink{classQCPDataContainer_a2dbded7f0732bacf9db48fdfbbb620bc}{remove(double sort\+Key)}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPDataContainer_aa7f74cbce304b0369e1626c3798e1eda}{remove\+Before}, \hyperlink{classQCPDataContainer_abbe5d87ffc10b5aeffa5bb42cf03aa3c}{remove\+After}, \hyperlink{classQCPDataContainer_a7e2b29736c6fd761649bda1a54ba967f}{clear} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!remove@{remove}}
+\index{remove@{remove}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{remove(double sort\+Key)}{remove(double sortKey)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::remove (
+\begin{DoxyParamCaption}
+\item[{double}]{sort\+Key}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_a2dbded7f0732bacf9db48fdfbbb620bc}{}\label{classQCPDataContainer_a2dbded7f0732bacf9db48fdfbbb620bc}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Removes a single data point at {\itshape sort\+Key}. If the position is not known with absolute (binary) precision, consider using \hyperlink{classQCPDataContainer_ae5f569a120648b167efa78835f12fd38}{remove(double sort\+Key\+From, double sort\+Key\+To)} with a small fuzziness interval around the suspected position, depeding on the precision with which the (sort-\/)key is known.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPDataContainer_aa7f74cbce304b0369e1626c3798e1eda}{remove\+Before}, \hyperlink{classQCPDataContainer_abbe5d87ffc10b5aeffa5bb42cf03aa3c}{remove\+After}, \hyperlink{classQCPDataContainer_a7e2b29736c6fd761649bda1a54ba967f}{clear} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!remove\+After@{remove\+After}}
+\index{remove\+After@{remove\+After}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{remove\+After(double sort\+Key)}{removeAfter(double sortKey)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::remove\+After (
+\begin{DoxyParamCaption}
+\item[{double}]{sort\+Key}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_abbe5d87ffc10b5aeffa5bb42cf03aa3c}{}\label{classQCPDataContainer_abbe5d87ffc10b5aeffa5bb42cf03aa3c}
+Removes all data points with (sort-\/)keys greater than or equal to {\itshape sort\+Key}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPDataContainer_aa7f74cbce304b0369e1626c3798e1eda}{remove\+Before}, \hyperlink{classQCPDataContainer_ae5f569a120648b167efa78835f12fd38}{remove}, \hyperlink{classQCPDataContainer_a7e2b29736c6fd761649bda1a54ba967f}{clear} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!remove\+Before@{remove\+Before}}
+\index{remove\+Before@{remove\+Before}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{remove\+Before(double sort\+Key)}{removeBefore(double sortKey)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::remove\+Before (
+\begin{DoxyParamCaption}
+\item[{double}]{sort\+Key}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_aa7f74cbce304b0369e1626c3798e1eda}{}\label{classQCPDataContainer_aa7f74cbce304b0369e1626c3798e1eda}
+Removes all data points with (sort-\/)keys smaller than or equal to {\itshape sort\+Key}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPDataContainer_abbe5d87ffc10b5aeffa5bb42cf03aa3c}{remove\+After}, \hyperlink{classQCPDataContainer_ae5f569a120648b167efa78835f12fd38}{remove}, \hyperlink{classQCPDataContainer_a7e2b29736c6fd761649bda1a54ba967f}{clear} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!set@{set}}
+\index{set@{set}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{set(const Q\+C\+P\+Data\+Container$<$ Data\+Type $>$ \&data)}{set(const QCPDataContainer< DataType > &data)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::set (
+\begin{DoxyParamCaption}
+\item[{const {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$ \&}]{data}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_ae7042bd534fc3ce7befa2ce3f790b5bf}{}\label{classQCPDataContainer_ae7042bd534fc3ce7befa2ce3f790b5bf}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Replaces the current data in this container with the provided {\itshape data}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPDataContainer_a42b98bd994307ccd163a43d576f91ad9}{add}, \hyperlink{classQCPDataContainer_ae5f569a120648b167efa78835f12fd38}{remove} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!set@{set}}
+\index{set@{set}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{set(const Q\+Vector$<$ Data\+Type $>$ \&data, bool already\+Sorted=false)}{set(const QVector< DataType > &data, bool alreadySorted=false)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::set (
+\begin{DoxyParamCaption}
+\item[{const Q\+Vector$<$ Data\+Type $>$ \&}]{data, }
+\item[{bool}]{already\+Sorted = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_aff99fffbb26597a354c4bc8312596ab2}{}\label{classQCPDataContainer_aff99fffbb26597a354c4bc8312596ab2}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Replaces the current data in this container with the provided {\itshape data} 
+
+If you can guarantee that the data points in {\itshape data} have ascending order with respect to the Data\+Type\textquotesingle{}s sort key, set {\itshape already\+Sorted} to true to avoid an unnecessary sorting run.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPDataContainer_a42b98bd994307ccd163a43d576f91ad9}{add}, \hyperlink{classQCPDataContainer_ae5f569a120648b167efa78835f12fd38}{remove} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!set\+Auto\+Squeeze@{set\+Auto\+Squeeze}}
+\index{set\+Auto\+Squeeze@{set\+Auto\+Squeeze}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{set\+Auto\+Squeeze(bool enabled)}{setAutoSqueeze(bool enabled)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::set\+Auto\+Squeeze (
+\begin{DoxyParamCaption}
+\item[{bool}]{enabled}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_a233f866760a78950d2a393c1a4bc54b5}{}\label{classQCPDataContainer_a233f866760a78950d2a393c1a4bc54b5}
+Sets whether the container automatically decides when to release memory from its post-\/ and preallocation pools when data points are removed. By default this is enabled and for typical applications shouldn\textquotesingle{}t be changed.
+
+If auto squeeze is disabled, you can manually decide when to release pre-\//postallocation with \hyperlink{classQCPDataContainer_a82fcc511def22287fc62579d0706387c}{squeeze}. \index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!size@{size}}
+\index{size@{size}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{size() const }{size() const }}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type$>$ int {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::size (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPDataContainer_a09003591d8812dea7a548c500b62750a}{}\label{classQCPDataContainer_a09003591d8812dea7a548c500b62750a}
+Returns the number of data points in the container. \index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!sort@{sort}}
+\index{sort@{sort}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{sort()}{sort()}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::sort (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_a75da92e33063b63d6da5014683591d45}{}\label{classQCPDataContainer_a75da92e33063b63d6da5014683591d45}
+Re-\/sorts all data points in the container by their sort key.
+
+When setting, adding or removing points using the \hyperlink{classQCPDataContainer}{Q\+C\+P\+Data\+Container} interface (\hyperlink{classQCPDataContainer_ae7042bd534fc3ce7befa2ce3f790b5bf}{set}, \hyperlink{classQCPDataContainer_a42b98bd994307ccd163a43d576f91ad9}{add}, \hyperlink{classQCPDataContainer_ae5f569a120648b167efa78835f12fd38}{remove}, etc.), the container makes sure to always stay in a sorted state such that a full resort is never necessary. However, if you choose to directly manipulate the sort key on data points by accessing and modifying it through the non-\/const iterators (\hyperlink{classQCPDataContainer_a80032518413ab8f418f7c81182fd06cb}{begin}, \hyperlink{classQCPDataContainer_acf66dfad83fe041380f5e0491e7676f2}{end}), it is your responsibility to bring the container back into a sorted state before any other methods are called on it. This can be achieved by calling this method immediately after finishing the sort key manipulation. \index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!squeeze@{squeeze}}
+\index{squeeze@{squeeze}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{squeeze(bool pre\+Allocation=true, bool post\+Allocation=true)}{squeeze(bool preAllocation=true, bool postAllocation=true)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::squeeze (
+\begin{DoxyParamCaption}
+\item[{bool}]{pre\+Allocation = {\ttfamily true}, }
+\item[{bool}]{post\+Allocation = {\ttfamily true}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_a82fcc511def22287fc62579d0706387c}{}\label{classQCPDataContainer_a82fcc511def22287fc62579d0706387c}
+Frees all unused memory that is currently in the preallocation and postallocation pools.
+
+Note that \hyperlink{classQCPDataContainer}{Q\+C\+P\+Data\+Container} automatically decides whether squeezing is necessary, if \hyperlink{classQCPDataContainer_a233f866760a78950d2a393c1a4bc54b5}{set\+Auto\+Squeeze} is left enabled. It should thus not be necessary to use this method for typical applications.
+
+The parameters {\itshape pre\+Allocation} and {\itshape post\+Allocation} control whether pre-\/ and/or post allocation should be freed, respectively. \index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!value\+Range@{value\+Range}}
+\index{value\+Range@{value\+Range}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{value\+Range(bool \&found\+Range, Q\+C\+P\+::\+Sign\+Domain sign\+Domain=\+Q\+C\+P\+::sd\+Both, const Q\+C\+P\+Range \&in\+Key\+Range=\+Q\+C\+P\+Range())}{valueRange(bool &foundRange, QCP::SignDomain signDomain=QCP::sdBoth, const QCPRange &inKeyRange=QCPRange())}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ {\bf Q\+C\+P\+Range} {\bf Q\+C\+P\+Data\+Container}$<$ Data\+Type $>$\+::value\+Range (
+\begin{DoxyParamCaption}
+\item[{bool \&}]{found\+Range, }
+\item[{{\bf Q\+C\+P\+::\+Sign\+Domain}}]{sign\+Domain = {\ttfamily {\bf Q\+C\+P\+::sd\+Both}}, }
+\item[{const {\bf Q\+C\+P\+Range} \&}]{in\+Key\+Range = {\ttfamily {\bf Q\+C\+P\+Range}()}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPDataContainer_a35a102dc2424d1228fc374d9313efbe9}{}\label{classQCPDataContainer_a35a102dc2424d1228fc374d9313efbe9}
+Returns the range encompassed by the value coordinates of the data points in the specified key range ({\itshape in\+Key\+Range}), using the full {\itshape Data\+Type\+::value\+Range} reported by the data points. The output parameter {\itshape found\+Range} indicates whether a sensible range was found. If this is false, you should not use the returned \hyperlink{classQCPRange}{Q\+C\+P\+Range} (e.\+g. the data container is empty or all points have the same value).
+
+If {\itshape in\+Key\+Range} has both lower and upper bound set to zero (is equal to {\ttfamily \hyperlink{classQCPRange}{Q\+C\+P\+Range()}}), all data points are considered, without any restriction on the keys.
+
+Use {\itshape sign\+Domain} to control which sign of the value coordinates should be considered. This is relevant e.\+g. for logarithmic plots which can mathematically only display one sign domain at a time.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPDataContainer_aba6e1a93c21ccc56a432b4a02c9d0ed2}{key\+Range} 
+\end{DoxySeeAlso}
+
+
+\subsection{Friends And Related Function Documentation}
+\index{Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}!qcp\+Less\+Than\+Sort\+Key@{qcp\+Less\+Than\+Sort\+Key}}
+\index{qcp\+Less\+Than\+Sort\+Key@{qcp\+Less\+Than\+Sort\+Key}!Q\+C\+P\+Data\+Container@{Q\+C\+P\+Data\+Container}}
+\subsubsection[{\texorpdfstring{qcp\+Less\+Than\+Sort\+Key(const Data\+Type \&a, const Data\+Type \&b)}{qcpLessThanSortKey(const DataType &a, const DataType &b)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ bool qcp\+Less\+Than\+Sort\+Key (
+\begin{DoxyParamCaption}
+\item[{const Data\+Type \&}]{a, }
+\item[{const Data\+Type \&}]{b}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [related]}}\hypertarget{classQCPDataContainer_a74c5e06728cb6fa778a25d9ec0c4bd36}{}\label{classQCPDataContainer_a74c5e06728cb6fa778a25d9ec0c4bd36}
+Returns whether the sort key of {\itshape a} is less than the sort key of {\itshape b}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPDataContainer_a75da92e33063b63d6da5014683591d45}{Q\+C\+P\+Data\+Container\+::sort} 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/qcustomplot.\+h\end{DoxyCompactItemize}

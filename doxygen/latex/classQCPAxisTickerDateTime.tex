@@ -1,0 +1,222 @@
+\hypertarget{classQCPAxisTickerDateTime}{}\section{Q\+C\+P\+Axis\+Ticker\+Date\+Time Class Reference}
+\label{classQCPAxisTickerDateTime}\index{Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}}
+
+
+Specialized axis ticker for calendar dates and times as axis ticks.  
+
+
+
+
+Inheritance diagram for Q\+C\+P\+Axis\+Ticker\+Date\+Time\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{classQCPAxisTickerDateTime__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Q\+C\+P\+Axis\+Ticker\+Date\+Time\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{classQCPAxisTickerDateTime__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPAxisTickerDateTime_a84cc5c6bbc7c99c1f9bd4b3a392e1b9d}{Q\+C\+P\+Axis\+Ticker\+Date\+Time} ()
+\item 
+Q\+String {\bfseries date\+Time\+Format} () const \hypertarget{classQCPAxisTickerDateTime_a19d4302f3d58b5c05e7e943c6e7c5b57}{}\label{classQCPAxisTickerDateTime_a19d4302f3d58b5c05e7e943c6e7c5b57}
+
+\item 
+Qt\+::\+Time\+Spec {\bfseries date\+Time\+Spec} () const \hypertarget{classQCPAxisTickerDateTime_a231ff3f1e970255bf874b50fd742ff18}{}\label{classQCPAxisTickerDateTime_a231ff3f1e970255bf874b50fd742ff18}
+
+\item 
+void \hyperlink{classQCPAxisTickerDateTime_ad52660a82f688395468674d555f6a86b}{set\+Date\+Time\+Format} (const Q\+String \&format)
+\item 
+void \hyperlink{classQCPAxisTickerDateTime_afbd987c7197e42ab61e67fb1c38abebc}{set\+Date\+Time\+Spec} (Qt\+::\+Time\+Spec spec)
+\item 
+void \hyperlink{classQCPAxisTickerDateTime_a5388e048cbd32cf1ba730b9f1859eb5c}{set\+Tick\+Origin} (double origin)
+\item 
+void \hyperlink{classQCPAxisTickerDateTime_a2ea905872b8171847a49a5e093fb0c48}{set\+Tick\+Origin} (const Q\+Date\+Time \&origin)
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static Q\+Date\+Time \hyperlink{classQCPAxisTickerDateTime_a4c1761ad057f5564804a53f942629b53}{key\+To\+Date\+Time} (double key)
+\item 
+static double \hyperlink{classQCPAxisTickerDateTime_aa24f293f16fff0f937bf71f4140033f1}{date\+Time\+To\+Key} (const Q\+Date\+Time date\+Time)
+\item 
+static double \hyperlink{classQCPAxisTickerDateTime_ad87afc7dba65843f68da5ca88bc004f4}{date\+Time\+To\+Key} (const Q\+Date date)
+\end{DoxyCompactItemize}
+\subsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+enum {\bfseries Date\+Strategy} \{ {\bfseries ds\+None}, 
+{\bfseries ds\+Uniform\+Time\+In\+Day}, 
+{\bfseries ds\+Uniform\+Day\+In\+Month}
+ \}\hypertarget{classQCPAxisTickerDateTime_af2c7c60821a6234ca7a172f42ef7f1d8}{}\label{classQCPAxisTickerDateTime_af2c7c60821a6234ca7a172f42ef7f1d8}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual double {\bfseries get\+Tick\+Step} (const \hyperlink{classQCPRange}{Q\+C\+P\+Range} \&range) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPAxisTickerDateTime_a0560c14a3f87bb99ab136aca8321b32a}{}\label{classQCPAxisTickerDateTime_a0560c14a3f87bb99ab136aca8321b32a}
+
+\item 
+virtual int {\bfseries get\+Sub\+Tick\+Count} (double tick\+Step) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPAxisTickerDateTime_a78dece0d51426a3c310528d413e09193}{}\label{classQCPAxisTickerDateTime_a78dece0d51426a3c310528d413e09193}
+
+\item 
+virtual Q\+String {\bfseries get\+Tick\+Label} (double tick, const Q\+Locale \&locale, Q\+Char format\+Char, int precision) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPAxisTickerDateTime_a4dc6a03f7ea5c619477528a683ed5c18}{}\label{classQCPAxisTickerDateTime_a4dc6a03f7ea5c619477528a683ed5c18}
+
+\item 
+virtual Q\+Vector$<$ double $>$ {\bfseries create\+Tick\+Vector} (double tick\+Step, const \hyperlink{classQCPRange}{Q\+C\+P\+Range} \&range) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPAxisTickerDateTime_a44c2c09a303d281801b69226e243047d}{}\label{classQCPAxisTickerDateTime_a44c2c09a303d281801b69226e243047d}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Q\+String {\bfseries m\+Date\+Time\+Format}\hypertarget{classQCPAxisTickerDateTime_adbbb25add598377998c0c57dbd29adaf}{}\label{classQCPAxisTickerDateTime_adbbb25add598377998c0c57dbd29adaf}
+
+\item 
+Qt\+::\+Time\+Spec {\bfseries m\+Date\+Time\+Spec}\hypertarget{classQCPAxisTickerDateTime_a5f5abe83c371f13eb3415585e638dba9}{}\label{classQCPAxisTickerDateTime_a5f5abe83c371f13eb3415585e638dba9}
+
+\item 
+enum Q\+C\+P\+Axis\+Ticker\+Date\+Time\+::\+Date\+Strategy {\bfseries m\+Date\+Strategy}\hypertarget{classQCPAxisTickerDateTime_a93fca912446ca341bee277cb2cc84e49}{}\label{classQCPAxisTickerDateTime_a93fca912446ca341bee277cb2cc84e49}
+
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+Specialized axis ticker for calendar dates and times as axis ticks. 
+
+
+
+This \hyperlink{classQCPAxisTicker}{Q\+C\+P\+Axis\+Ticker} subclass generates ticks that correspond to real calendar dates and times. The plot axis coordinate is interpreted as Unix Time, so seconds since Epoch (January 1, 1970, 00\+:00 U\+TC). This is also used for example by Q\+Date\+Time in the {\ttfamily to\+Time\+\_\+t()/set\+Time\+\_\+t()} methods with a precision of one second. Since Qt 4.\+7, millisecond accuracy can be obtained from Q\+Date\+Time by using {\ttfamily Q\+Date\+Time\+::from\+M\+Secs\+Since\+Epoch()/1000.0}. The static methods \hyperlink{classQCPAxisTickerDateTime_aa24f293f16fff0f937bf71f4140033f1}{date\+Time\+To\+Key} and \hyperlink{classQCPAxisTickerDateTime_a4c1761ad057f5564804a53f942629b53}{key\+To\+Date\+Time} conveniently perform this conversion achieving a precision of one millisecond on all Qt versions.
+
+The format of the date/time display in the tick labels is controlled with \hyperlink{classQCPAxisTickerDateTime_ad52660a82f688395468674d555f6a86b}{set\+Date\+Time\+Format}. If a different time spec (time zone) shall be used, see \hyperlink{classQCPAxisTickerDateTime_afbd987c7197e42ab61e67fb1c38abebc}{set\+Date\+Time\+Spec}.
+
+This ticker produces unequal tick spacing in order to provide intuitive date and time-\/of-\/day ticks. For example, if the axis range spans a few years such that there is one tick per year, ticks will be positioned on 1. January of every year. This is intuitive but, due to leap years, will result in slightly unequal tick intervals (visually unnoticeable). The same can be seen in the image above\+: even though the number of days varies month by month, this ticker generates ticks on the same day of each month.
+
+If you would like to change the date/time that is used as a (mathematical) starting date for the ticks, use the \hyperlink{classQCPAxisTickerDateTime_a2ea905872b8171847a49a5e093fb0c48}{set\+Tick\+Origin(const Q\+Date\+Time \&origin)} method overload, which takes a Q\+Date\+Time. If you pass 15. July, 9\+:45 to this method, the yearly ticks will end up on 15. July at 9\+:45 of every year.
+
+The ticker can be created and assigned to an axis like this\+: 
+\begin{DoxyCodeInclude}
+\end{DoxyCodeInclude}
+ \begin{DoxyNote}{Note}
+If you rather wish to display relative times in terms of days, hours, minutes, seconds and milliseconds, and are not interested in the intricacies of real calendar dates with months and (leap) years, have a look at \hyperlink{classQCPAxisTickerTime}{Q\+C\+P\+Axis\+Ticker\+Time} instead. 
+\end{DoxyNote}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}!Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}}
+\index{Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}!Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Axis\+Ticker\+Date\+Time()}{QCPAxisTickerDateTime()}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+C\+P\+Axis\+Ticker\+Date\+Time\+::\+Q\+C\+P\+Axis\+Ticker\+Date\+Time (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPAxisTickerDateTime_a84cc5c6bbc7c99c1f9bd4b3a392e1b9d}{}\label{classQCPAxisTickerDateTime_a84cc5c6bbc7c99c1f9bd4b3a392e1b9d}
+Constructs the ticker and sets reasonable default values. Axis tickers are commonly created managed by a Q\+Shared\+Pointer, which then can be passed to \hyperlink{classQCPAxis_a4ee03fcd2c74d05cd1a419b9af5cfbdc}{Q\+C\+P\+Axis\+::set\+Ticker}. 
+
+\subsection{Member Function Documentation}
+\index{Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}!date\+Time\+To\+Key@{date\+Time\+To\+Key}}
+\index{date\+Time\+To\+Key@{date\+Time\+To\+Key}!Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}}
+\subsubsection[{\texorpdfstring{date\+Time\+To\+Key(const Q\+Date\+Time date\+Time)}{dateTimeToKey(const QDateTime dateTime)}}]{\setlength{\rightskip}{0pt plus 5cm}double Q\+C\+P\+Axis\+Ticker\+Date\+Time\+::date\+Time\+To\+Key (
+\begin{DoxyParamCaption}
+\item[{const Q\+Date\+Time}]{date\+Time}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{classQCPAxisTickerDateTime_aa24f293f16fff0f937bf71f4140033f1}{}\label{classQCPAxisTickerDateTime_aa24f293f16fff0f937bf71f4140033f1}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+A convenience method which turns a Q\+Date\+Time object into a double value that corresponds to seconds since Epoch (1. Jan 1970, 00\+:00 U\+TC). This is the format used as axis coordinates by \hyperlink{classQCPAxisTickerDateTime}{Q\+C\+P\+Axis\+Ticker\+Date\+Time}.
+
+The accuracy achieved by this method is one millisecond, irrespective of the used Qt version (it works around the lack of a Q\+Date\+Time\+::to\+M\+Secs\+Since\+Epoch in Qt 4.\+6)
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPAxisTickerDateTime_a4c1761ad057f5564804a53f942629b53}{key\+To\+Date\+Time} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}!date\+Time\+To\+Key@{date\+Time\+To\+Key}}
+\index{date\+Time\+To\+Key@{date\+Time\+To\+Key}!Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}}
+\subsubsection[{\texorpdfstring{date\+Time\+To\+Key(const Q\+Date date)}{dateTimeToKey(const QDate date)}}]{\setlength{\rightskip}{0pt plus 5cm}double Q\+C\+P\+Axis\+Ticker\+Date\+Time\+::date\+Time\+To\+Key (
+\begin{DoxyParamCaption}
+\item[{const Q\+Date}]{date}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{classQCPAxisTickerDateTime_ad87afc7dba65843f68da5ca88bc004f4}{}\label{classQCPAxisTickerDateTime_ad87afc7dba65843f68da5ca88bc004f4}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+A convenience method which turns a Q\+Date object into a double value that corresponds to seconds since Epoch (1. Jan 1970, 00\+:00 U\+TC). This is the format used as axis coordinates by \hyperlink{classQCPAxisTickerDateTime}{Q\+C\+P\+Axis\+Ticker\+Date\+Time}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPAxisTickerDateTime_a4c1761ad057f5564804a53f942629b53}{key\+To\+Date\+Time} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}!key\+To\+Date\+Time@{key\+To\+Date\+Time}}
+\index{key\+To\+Date\+Time@{key\+To\+Date\+Time}!Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}}
+\subsubsection[{\texorpdfstring{key\+To\+Date\+Time(double key)}{keyToDateTime(double key)}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+Date\+Time Q\+C\+P\+Axis\+Ticker\+Date\+Time\+::key\+To\+Date\+Time (
+\begin{DoxyParamCaption}
+\item[{double}]{key}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{classQCPAxisTickerDateTime_a4c1761ad057f5564804a53f942629b53}{}\label{classQCPAxisTickerDateTime_a4c1761ad057f5564804a53f942629b53}
+A convenience method which turns {\itshape key} (in seconds since Epoch 1. Jan 1970, 00\+:00 U\+TC) into a Q\+Date\+Time object. This can be used to turn axis coordinates to actual Q\+Date\+Times.
+
+The accuracy achieved by this method is one millisecond, irrespective of the used Qt version (it works around the lack of a Q\+Date\+Time\+::from\+M\+Secs\+Since\+Epoch in Qt 4.\+6)
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPAxisTickerDateTime_aa24f293f16fff0f937bf71f4140033f1}{date\+Time\+To\+Key} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}!set\+Date\+Time\+Format@{set\+Date\+Time\+Format}}
+\index{set\+Date\+Time\+Format@{set\+Date\+Time\+Format}!Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}}
+\subsubsection[{\texorpdfstring{set\+Date\+Time\+Format(const Q\+String \&format)}{setDateTimeFormat(const QString &format)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Axis\+Ticker\+Date\+Time\+::set\+Date\+Time\+Format (
+\begin{DoxyParamCaption}
+\item[{const Q\+String \&}]{format}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPAxisTickerDateTime_ad52660a82f688395468674d555f6a86b}{}\label{classQCPAxisTickerDateTime_ad52660a82f688395468674d555f6a86b}
+Sets the format in which dates and times are displayed as tick labels. For details about the {\itshape format} string, see the documentation of Q\+Date\+Time\+::to\+String().
+
+Newlines can be inserted with \char`\"{}\textbackslash{}n\char`\"{}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPAxisTickerDateTime_afbd987c7197e42ab61e67fb1c38abebc}{set\+Date\+Time\+Spec} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}!set\+Date\+Time\+Spec@{set\+Date\+Time\+Spec}}
+\index{set\+Date\+Time\+Spec@{set\+Date\+Time\+Spec}!Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}}
+\subsubsection[{\texorpdfstring{set\+Date\+Time\+Spec(\+Qt\+::\+Time\+Spec spec)}{setDateTimeSpec(Qt::TimeSpec spec)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Axis\+Ticker\+Date\+Time\+::set\+Date\+Time\+Spec (
+\begin{DoxyParamCaption}
+\item[{Qt\+::\+Time\+Spec}]{spec}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPAxisTickerDateTime_afbd987c7197e42ab61e67fb1c38abebc}{}\label{classQCPAxisTickerDateTime_afbd987c7197e42ab61e67fb1c38abebc}
+Sets the time spec that is used for creating the tick labels from corresponding dates/times.
+
+The default value of Q\+Date\+Time objects (and also \hyperlink{classQCPAxisTickerDateTime}{Q\+C\+P\+Axis\+Ticker\+Date\+Time}) is {\ttfamily Qt\+::\+Local\+Time}. However, if the date time values passed to \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} (e.\+g. in the form of axis ranges or keys of a plottable) are given in the U\+TC spec, set {\itshape spec} to {\ttfamily Qt\+::\+U\+TC} to get the correct axis labels.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPAxisTickerDateTime_ad52660a82f688395468674d555f6a86b}{set\+Date\+Time\+Format} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}!set\+Tick\+Origin@{set\+Tick\+Origin}}
+\index{set\+Tick\+Origin@{set\+Tick\+Origin}!Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}}
+\subsubsection[{\texorpdfstring{set\+Tick\+Origin(double origin)}{setTickOrigin(double origin)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Axis\+Ticker\+Date\+Time\+::set\+Tick\+Origin (
+\begin{DoxyParamCaption}
+\item[{double}]{origin}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPAxisTickerDateTime_a5388e048cbd32cf1ba730b9f1859eb5c}{}\label{classQCPAxisTickerDateTime_a5388e048cbd32cf1ba730b9f1859eb5c}
+Sets the tick origin (see \hyperlink{classQCPAxisTicker_ab509c7e500293bf66a8409f0d7c23943}{Q\+C\+P\+Axis\+Ticker\+::set\+Tick\+Origin}) in seconds since Epoch (1. Jan 1970, 00\+:00 U\+TC). For the date time ticker it might be more intuitive to use the overload which directly takes a Q\+Date\+Time, see \hyperlink{classQCPAxisTickerDateTime_a2ea905872b8171847a49a5e093fb0c48}{set\+Tick\+Origin(const Q\+Date\+Time \&origin)}.
+
+This is useful to define the month/day/time recurring at greater tick interval steps. For example, If you pass 15. July, 9\+:45 to this method and the tick interval happens to be one tick per year, the ticks will end up on 15. July at 9\+:45 of every year. \index{Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}!set\+Tick\+Origin@{set\+Tick\+Origin}}
+\index{set\+Tick\+Origin@{set\+Tick\+Origin}!Q\+C\+P\+Axis\+Ticker\+Date\+Time@{Q\+C\+P\+Axis\+Ticker\+Date\+Time}}
+\subsubsection[{\texorpdfstring{set\+Tick\+Origin(const Q\+Date\+Time \&origin)}{setTickOrigin(const QDateTime &origin)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Axis\+Ticker\+Date\+Time\+::set\+Tick\+Origin (
+\begin{DoxyParamCaption}
+\item[{const Q\+Date\+Time \&}]{origin}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPAxisTickerDateTime_a2ea905872b8171847a49a5e093fb0c48}{}\label{classQCPAxisTickerDateTime_a2ea905872b8171847a49a5e093fb0c48}
+Sets the tick origin (see \hyperlink{classQCPAxisTicker_ab509c7e500293bf66a8409f0d7c23943}{Q\+C\+P\+Axis\+Ticker\+::set\+Tick\+Origin}) as a Q\+Date\+Time {\itshape origin}.
+
+This is useful to define the month/day/time recurring at greater tick interval steps. For example, If you pass 15. July, 9\+:45 to this method and the tick interval happens to be one tick per year, the ticks will end up on 15. July at 9\+:45 of every year. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/qcustomplot.\+h\item 
+src/qcustomplot.\+cpp\end{DoxyCompactItemize}

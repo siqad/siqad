@@ -1,0 +1,21 @@
+<map id="QCPSelectionDecoratorBracket" name="QCPSelectionDecoratorBracket">
+<area shape="rect" id="node2" href="$classQCPSelectionDecorator.html" title="Controls how a plottable&#39;s data selection is drawn. " alt="" coords="900,705,1063,732"/>
+<area shape="rect" id="node3" href="$classQCPAbstractPlottable.html" title="The abstract base class for all data representing objects in a plot. " alt="" coords="1037,811,1187,837"/>
+<area shape="rect" id="node4" href="$classQCPLayerable.html" title="Base class for all drawable objects. " alt="" coords="391,81,497,108"/>
+<area shape="rect" id="node11" href="$classQCPLayoutElement.html" title="The abstract base class for all objects that form the layout system. " alt="" coords="1029,157,1168,184"/>
+<area shape="rect" id="node13" href="$classQCPSelectionRect.html" title="Provides rect/rubber&#45;band data selection and range zoom interaction. " alt="" coords="163,208,296,235"/>
+<area shape="rect" id="node14" href="$classQCPAxis.html" title="Manages a single axis inside a QCustomPlot. " alt="" coords="557,811,635,837"/>
+<area shape="rect" id="node18" href="$classQCPGrid.html" title="Responsible for drawing the grid of a QCPAxis. " alt="" coords="669,900,744,927"/>
+<area shape="rect" id="node6" href="$classQCPLayer.html" title="A layer that may contain objects, to control the rendering order. " alt="" coords="132,705,215,732"/>
+<area shape="rect" id="node7" href="$classQCustomPlot.html" title="The central class of the library. This is the QWidget which displays the plot and interacts with the ..." alt="" coords="236,584,337,611"/>
+<area shape="rect" id="node16" href="$classQCPAxisPainterPrivate.html" title="QCPAxisPainterPrivate" alt="" coords="446,705,605,732"/>
+<area shape="rect" id="node9" href="$classQCPLayoutGrid.html" title="A layout that arranges child elements in a grid. " alt="" coords="377,348,492,375"/>
+<area shape="rect" id="node21" href="$classQCPLegend.html" title="Manages a legend inside a QCustomPlot. " alt="" coords="293,449,387,476"/>
+<area shape="rect" id="node10" href="$classQCPLayout.html" title="The abstract base class for layouts. " alt="" coords="1009,259,1100,285"/>
+<area shape="rect" id="node20" href="$classQCPLayoutInset.html" title="A layout that places child elements aligned to the border or arbitrarily positioned. " alt="" coords="1014,399,1133,425"/>
+<area shape="rect" id="node19" href="$classQCPAxisRect.html" title="Holds multiple axes and arranges them in a rectangular shape. " alt="" coords="894,584,999,611"/>
+<area shape="rect" id="node15" href="$classQCPRange.html" title="Represents the range an axis is encompassing. " alt="" coords="689,637,778,664"/>
+<area shape="rect" id="node17" href="$classQCPLineEnding.html" title="Handles the different ending decorations for line&#45;like items. " alt="" coords="657,584,772,611"/>
+<area shape="rect" id="node23" href="$classQCPScatterStyle.html" title="Represents the visual appearance of scatter points. " alt="" coords="1044,584,1167,611"/>
+<area shape="rect" id="node22" href="$classQCPDataSelection.html" title="Describes a data set by holding multiple QCPDataRange instances. " alt="" coords="1087,705,1220,732"/>
+</map>

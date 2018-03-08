@@ -1,0 +1,78 @@
+\hypertarget{classQCPErrorBarsData}{}\section{Q\+C\+P\+Error\+Bars\+Data Class Reference}
+\label{classQCPErrorBarsData}\index{Q\+C\+P\+Error\+Bars\+Data@{Q\+C\+P\+Error\+Bars\+Data}}
+
+
+Holds the data of one single error bar for \hyperlink{classQCPErrorBars}{Q\+C\+P\+Error\+Bars}.  
+
+
+
+
+Collaboration diagram for Q\+C\+P\+Error\+Bars\+Data\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=181pt]{classQCPErrorBarsData__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPErrorBarsData_ac18bdb46dec56f8df7f3c99d058cc725}{Q\+C\+P\+Error\+Bars\+Data} ()
+\item 
+\hyperlink{classQCPErrorBarsData_a73ebdaa55fa7f0052b70895b28edb444}{Q\+C\+P\+Error\+Bars\+Data} (double error)
+\item 
+\hyperlink{classQCPErrorBarsData_a7c61e42d87aea3312262d5429bc28387}{Q\+C\+P\+Error\+Bars\+Data} (double error\+Minus, double error\+Plus)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+double {\bfseries error\+Minus}\hypertarget{classQCPErrorBarsData_af8aaea160e52c14c57836224ee78020b}{}\label{classQCPErrorBarsData_af8aaea160e52c14c57836224ee78020b}
+
+\item 
+double {\bfseries error\+Plus}\hypertarget{classQCPErrorBarsData_ad1283c99fbfccf37a0226b1df52f0776}{}\label{classQCPErrorBarsData_ad1283c99fbfccf37a0226b1df52f0776}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Holds the data of one single error bar for \hyperlink{classQCPErrorBars}{Q\+C\+P\+Error\+Bars}. 
+
+The stored data is\+: \begin{DoxyItemize}
+\item {\itshape error\+Minus\+:} how much the error bar extends towards negative coordinates from the data point position \item {\itshape error\+Plus\+:} how much the error bar extends towards positive coordinates from the data point position\end{DoxyItemize}
+The container for storing the error bar information is Q\+C\+P\+Error\+Bars\+Data\+Container. It is a typedef for {\ttfamily Q\+Vector$<$\hyperlink{classQCPErrorBarsData}{Q\+C\+P\+Error\+Bars\+Data}$>$}.
+
+\begin{DoxySeeAlso}{See also}
+Q\+C\+P\+Error\+Bars\+Data\+Container 
+\end{DoxySeeAlso}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Q\+C\+P\+Error\+Bars\+Data@{Q\+C\+P\+Error\+Bars\+Data}!Q\+C\+P\+Error\+Bars\+Data@{Q\+C\+P\+Error\+Bars\+Data}}
+\index{Q\+C\+P\+Error\+Bars\+Data@{Q\+C\+P\+Error\+Bars\+Data}!Q\+C\+P\+Error\+Bars\+Data@{Q\+C\+P\+Error\+Bars\+Data}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Error\+Bars\+Data()}{QCPErrorBarsData()}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+C\+P\+Error\+Bars\+Data\+::\+Q\+C\+P\+Error\+Bars\+Data (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPErrorBarsData_ac18bdb46dec56f8df7f3c99d058cc725}{}\label{classQCPErrorBarsData_ac18bdb46dec56f8df7f3c99d058cc725}
+Constructs an error bar with errors set to zero. \index{Q\+C\+P\+Error\+Bars\+Data@{Q\+C\+P\+Error\+Bars\+Data}!Q\+C\+P\+Error\+Bars\+Data@{Q\+C\+P\+Error\+Bars\+Data}}
+\index{Q\+C\+P\+Error\+Bars\+Data@{Q\+C\+P\+Error\+Bars\+Data}!Q\+C\+P\+Error\+Bars\+Data@{Q\+C\+P\+Error\+Bars\+Data}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Error\+Bars\+Data(double error)}{QCPErrorBarsData(double error)}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+C\+P\+Error\+Bars\+Data\+::\+Q\+C\+P\+Error\+Bars\+Data (
+\begin{DoxyParamCaption}
+\item[{double}]{error}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [explicit]}}\hypertarget{classQCPErrorBarsData_a73ebdaa55fa7f0052b70895b28edb444}{}\label{classQCPErrorBarsData_a73ebdaa55fa7f0052b70895b28edb444}
+Constructs an error bar with equal {\itshape error} in both negative and positive direction. \index{Q\+C\+P\+Error\+Bars\+Data@{Q\+C\+P\+Error\+Bars\+Data}!Q\+C\+P\+Error\+Bars\+Data@{Q\+C\+P\+Error\+Bars\+Data}}
+\index{Q\+C\+P\+Error\+Bars\+Data@{Q\+C\+P\+Error\+Bars\+Data}!Q\+C\+P\+Error\+Bars\+Data@{Q\+C\+P\+Error\+Bars\+Data}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Error\+Bars\+Data(double error\+Minus, double error\+Plus)}{QCPErrorBarsData(double errorMinus, double errorPlus)}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+C\+P\+Error\+Bars\+Data\+::\+Q\+C\+P\+Error\+Bars\+Data (
+\begin{DoxyParamCaption}
+\item[{double}]{error\+Minus, }
+\item[{double}]{error\+Plus}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPErrorBarsData_a7c61e42d87aea3312262d5429bc28387}{}\label{classQCPErrorBarsData_a7c61e42d87aea3312262d5429bc28387}
+Constructs an error bar with negative and positive errors set to {\itshape error\+Minus} and {\itshape error\+Plus}, respectively. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/qcustomplot.\+h\item 
+src/qcustomplot.\+cpp\end{DoxyCompactItemize}

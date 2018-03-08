@@ -1,0 +1,217 @@
+\hypertarget{classQCPSelectionDecorator}{}\section{Q\+C\+P\+Selection\+Decorator Class Reference}
+\label{classQCPSelectionDecorator}\index{Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}}
+
+
+Controls how a plottable\textquotesingle{}s data selection is drawn.  
+
+
+
+
+Inheritance diagram for Q\+C\+P\+Selection\+Decorator\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=235pt]{classQCPSelectionDecorator__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Q\+C\+P\+Selection\+Decorator\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classQCPSelectionDecorator__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPSelectionDecorator_aa145480d9a062cd176fe30900bb7bca8}{Q\+C\+P\+Selection\+Decorator} ()
+\item 
+Q\+Pen {\bfseries pen} () const \hypertarget{classQCPSelectionDecorator_a8365eaa0543756dd6758efa32fbe8041}{}\label{classQCPSelectionDecorator_a8365eaa0543756dd6758efa32fbe8041}
+
+\item 
+Q\+Brush {\bfseries brush} () const \hypertarget{classQCPSelectionDecorator_a661b4703ebd3115dc4b07810dd148b20}{}\label{classQCPSelectionDecorator_a661b4703ebd3115dc4b07810dd148b20}
+
+\item 
+\hyperlink{classQCPScatterStyle}{Q\+C\+P\+Scatter\+Style} {\bfseries scatter\+Style} () const \hypertarget{classQCPSelectionDecorator_a347df79afebbfd5b5a2c9143214ee5b9}{}\label{classQCPSelectionDecorator_a347df79afebbfd5b5a2c9143214ee5b9}
+
+\item 
+Q\+C\+P\+Scatter\+Style\+::\+Scatter\+Properties {\bfseries used\+Scatter\+Properties} () const \hypertarget{classQCPSelectionDecorator_ab82ebdb4915fa7f5c1b253e23e780b13}{}\label{classQCPSelectionDecorator_ab82ebdb4915fa7f5c1b253e23e780b13}
+
+\item 
+void \hyperlink{classQCPSelectionDecorator_ac2c8192e1e294aa3a4a7f32a859e3d76}{set\+Pen} (const Q\+Pen \&pen)
+\item 
+void \hyperlink{classQCPSelectionDecorator_aa74b626be518ea17055f918d423c8c2d}{set\+Brush} (const Q\+Brush \&brush)
+\item 
+void \hyperlink{classQCPSelectionDecorator_ab403a613289714ff4fd4a0c0371ab116}{set\+Scatter\+Style} (const \hyperlink{classQCPScatterStyle}{Q\+C\+P\+Scatter\+Style} \&scatter\+Style, Q\+C\+P\+Scatter\+Style\+::\+Scatter\+Properties used\+Properties=\hyperlink{classQCPScatterStyle_a8974f6a20f8f6eea7781f0e6af9deb46aa04d012e7c03e455db2b68fdd55c2a04}{Q\+C\+P\+Scatter\+Style\+::sp\+Pen})
+\item 
+void \hyperlink{classQCPSelectionDecorator_a808c1607cd4e83869c04986e332455c0}{set\+Used\+Scatter\+Properties} (const Q\+C\+P\+Scatter\+Style\+::\+Scatter\+Properties \&properties)
+\item 
+void \hyperlink{classQCPSelectionDecorator_a9a0e62f544971034fec60e62748768b8}{apply\+Pen} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter) const 
+\item 
+void \hyperlink{classQCPSelectionDecorator_aa7ecaa5c307cc65285cdf62364c69e56}{apply\+Brush} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter) const 
+\item 
+\hyperlink{classQCPScatterStyle}{Q\+C\+P\+Scatter\+Style} \hyperlink{classQCPSelectionDecorator_aa0c630c41103809985f41b3b81b0c308}{get\+Final\+Scatter\+Style} (const \hyperlink{classQCPScatterStyle}{Q\+C\+P\+Scatter\+Style} \&unselected\+Style) const 
+\item 
+virtual void \hyperlink{classQCPSelectionDecorator_a467a8d5cfcab27e862a17c797ac27b8a}{copy\+From} (const \hyperlink{classQCPSelectionDecorator}{Q\+C\+P\+Selection\+Decorator} $\ast$other)
+\item 
+virtual void \hyperlink{classQCPSelectionDecorator_a4f8eb49e277063845391e803ae23054a}{draw\+Decoration} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter, \hyperlink{classQCPDataSelection}{Q\+C\+P\+Data\+Selection} selection)
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual bool {\bfseries register\+With\+Plottable} (\hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable} $\ast$plottable)\hypertarget{classQCPSelectionDecorator_af66cb39e308da0285ae5d533e1e85027}{}\label{classQCPSelectionDecorator_af66cb39e308da0285ae5d533e1e85027}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Q\+Pen {\bfseries m\+Pen}\hypertarget{classQCPSelectionDecorator_a684a691c146a5bac927c0146bd28d557}{}\label{classQCPSelectionDecorator_a684a691c146a5bac927c0146bd28d557}
+
+\item 
+Q\+Brush {\bfseries m\+Brush}\hypertarget{classQCPSelectionDecorator_a4e3a3a01fdec5b018c0c59a0b6ae9f70}{}\label{classQCPSelectionDecorator_a4e3a3a01fdec5b018c0c59a0b6ae9f70}
+
+\item 
+\hyperlink{classQCPScatterStyle}{Q\+C\+P\+Scatter\+Style} {\bfseries m\+Scatter\+Style}\hypertarget{classQCPSelectionDecorator_a5b822197a1bf802c5cf8c3dc43ca549a}{}\label{classQCPSelectionDecorator_a5b822197a1bf802c5cf8c3dc43ca549a}
+
+\item 
+Q\+C\+P\+Scatter\+Style\+::\+Scatter\+Properties {\bfseries m\+Used\+Scatter\+Properties}\hypertarget{classQCPSelectionDecorator_acb4f6af085283c9ce7d5c168fb53e855}{}\label{classQCPSelectionDecorator_acb4f6af085283c9ce7d5c168fb53e855}
+
+\item 
+\hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable} $\ast$ {\bfseries m\+Plottable}\hypertarget{classQCPSelectionDecorator_a25250a1d29b0723c4fa59a97e62f5758}{}\label{classQCPSelectionDecorator_a25250a1d29b0723c4fa59a97e62f5758}
+
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class {\bfseries Q\+C\+P\+Abstract\+Plottable}\hypertarget{classQCPSelectionDecorator_a53cf0e76aca814550c796fed79e345d6}{}\label{classQCPSelectionDecorator_a53cf0e76aca814550c796fed79e345d6}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Controls how a plottable\textquotesingle{}s data selection is drawn. 
+
+Each \hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable} instance has one \hyperlink{classQCPSelectionDecorator}{Q\+C\+P\+Selection\+Decorator} (accessible via \hyperlink{classQCPAbstractPlottable_a33e6f2b8d6008e4ac59ff8d92b509c97}{Q\+C\+P\+Abstract\+Plottable\+::selection\+Decorator}) and uses it when drawing selected segments of its data.
+
+The selection decorator controls both pen (\hyperlink{classQCPSelectionDecorator_ac2c8192e1e294aa3a4a7f32a859e3d76}{set\+Pen}) and brush (\hyperlink{classQCPSelectionDecorator_aa74b626be518ea17055f918d423c8c2d}{set\+Brush}), as well as the scatter style (\hyperlink{classQCPSelectionDecorator_ab403a613289714ff4fd4a0c0371ab116}{set\+Scatter\+Style}) if the plottable draws scatters. Since a \hyperlink{classQCPScatterStyle}{Q\+C\+P\+Scatter\+Style} is itself composed of different properties such as color shape and size, the decorator allows specifying exactly which of those properties shall be used for the selected data point, via \hyperlink{classQCPSelectionDecorator_a808c1607cd4e83869c04986e332455c0}{set\+Used\+Scatter\+Properties}.
+
+A \hyperlink{classQCPSelectionDecorator}{Q\+C\+P\+Selection\+Decorator} subclass instance can be passed to a plottable via \hyperlink{classQCPAbstractPlottable_a20e266ad646f8c4a7e4631040510e5d9}{Q\+C\+P\+Abstract\+Plottable\+::set\+Selection\+Decorator}, allowing greater customizability of the appearance of selected segments.
+
+Use \hyperlink{classQCPSelectionDecorator_a467a8d5cfcab27e862a17c797ac27b8a}{copy\+From} to easily transfer the settings of one decorator to another one. This is especially useful since plottables take ownership of the passed selection decorator, and thus the same decorator instance can not be passed to multiple plottables.
+
+Selection decorators can also themselves perform drawing operations by reimplementing \hyperlink{classQCPSelectionDecorator_a4f8eb49e277063845391e803ae23054a}{draw\+Decoration}, which is called by the plottable\textquotesingle{}s draw method. The base class \hyperlink{classQCPSelectionDecorator}{Q\+C\+P\+Selection\+Decorator} does not make use of this however. For example, \hyperlink{classQCPSelectionDecoratorBracket}{Q\+C\+P\+Selection\+Decorator\+Bracket} draws brackets around selected data segments. 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}!Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}}
+\index{Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}!Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Selection\+Decorator()}{QCPSelectionDecorator()}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+C\+P\+Selection\+Decorator\+::\+Q\+C\+P\+Selection\+Decorator (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPSelectionDecorator_aa145480d9a062cd176fe30900bb7bca8}{}\label{classQCPSelectionDecorator_aa145480d9a062cd176fe30900bb7bca8}
+Creates a new \hyperlink{classQCPSelectionDecorator}{Q\+C\+P\+Selection\+Decorator} instance with default values 
+
+\subsection{Member Function Documentation}
+\index{Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}!apply\+Brush@{apply\+Brush}}
+\index{apply\+Brush@{apply\+Brush}!Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}}
+\subsubsection[{\texorpdfstring{apply\+Brush(\+Q\+C\+P\+Painter $\ast$painter) const }{applyBrush(QCPPainter *painter) const }}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Selection\+Decorator\+::apply\+Brush (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Painter} $\ast$}]{painter}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCPSelectionDecorator_aa7ecaa5c307cc65285cdf62364c69e56}{}\label{classQCPSelectionDecorator_aa7ecaa5c307cc65285cdf62364c69e56}
+Sets the brush of {\itshape painter} to the brush of this selection decorator.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPSelectionDecorator_a9a0e62f544971034fec60e62748768b8}{apply\+Pen}, \hyperlink{classQCPSelectionDecorator_aa0c630c41103809985f41b3b81b0c308}{get\+Final\+Scatter\+Style} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}!apply\+Pen@{apply\+Pen}}
+\index{apply\+Pen@{apply\+Pen}!Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}}
+\subsubsection[{\texorpdfstring{apply\+Pen(\+Q\+C\+P\+Painter $\ast$painter) const }{applyPen(QCPPainter *painter) const }}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Selection\+Decorator\+::apply\+Pen (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Painter} $\ast$}]{painter}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCPSelectionDecorator_a9a0e62f544971034fec60e62748768b8}{}\label{classQCPSelectionDecorator_a9a0e62f544971034fec60e62748768b8}
+Sets the pen of {\itshape painter} to the pen of this selection decorator.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPSelectionDecorator_aa7ecaa5c307cc65285cdf62364c69e56}{apply\+Brush}, \hyperlink{classQCPSelectionDecorator_aa0c630c41103809985f41b3b81b0c308}{get\+Final\+Scatter\+Style} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}!copy\+From@{copy\+From}}
+\index{copy\+From@{copy\+From}!Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}}
+\subsubsection[{\texorpdfstring{copy\+From(const Q\+C\+P\+Selection\+Decorator $\ast$other)}{copyFrom(const QCPSelectionDecorator *other)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Selection\+Decorator\+::copy\+From (
+\begin{DoxyParamCaption}
+\item[{const {\bf Q\+C\+P\+Selection\+Decorator} $\ast$}]{other}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPSelectionDecorator_a467a8d5cfcab27e862a17c797ac27b8a}{}\label{classQCPSelectionDecorator_a467a8d5cfcab27e862a17c797ac27b8a}
+Copies all properties (e.\+g. color, fill, scatter style) of the {\itshape other} selection decorator to this selection decorator. \index{Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}!draw\+Decoration@{draw\+Decoration}}
+\index{draw\+Decoration@{draw\+Decoration}!Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}}
+\subsubsection[{\texorpdfstring{draw\+Decoration(\+Q\+C\+P\+Painter $\ast$painter, Q\+C\+P\+Data\+Selection selection)}{drawDecoration(QCPPainter *painter, QCPDataSelection selection)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Selection\+Decorator\+::draw\+Decoration (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Painter} $\ast$}]{painter, }
+\item[{{\bf Q\+C\+P\+Data\+Selection}}]{selection}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPSelectionDecorator_a4f8eb49e277063845391e803ae23054a}{}\label{classQCPSelectionDecorator_a4f8eb49e277063845391e803ae23054a}
+This method is called by all plottables\textquotesingle{} draw methods to allow custom selection decorations to be drawn. Use the passed {\itshape painter} to perform the drawing operations. {\itshape selection} carries the data selection for which the decoration shall be drawn.
+
+The default base class implementation of \hyperlink{classQCPSelectionDecorator}{Q\+C\+P\+Selection\+Decorator} has no special decoration, so this method does nothing. 
+
+Reimplemented in \hyperlink{classQCPSelectionDecoratorBracket_a9ebe2e729b5012c0a995d788f87fac22}{Q\+C\+P\+Selection\+Decorator\+Bracket}.
+
+\index{Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}!get\+Final\+Scatter\+Style@{get\+Final\+Scatter\+Style}}
+\index{get\+Final\+Scatter\+Style@{get\+Final\+Scatter\+Style}!Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}}
+\subsubsection[{\texorpdfstring{get\+Final\+Scatter\+Style(const Q\+C\+P\+Scatter\+Style \&unselected\+Style) const }{getFinalScatterStyle(const QCPScatterStyle &unselectedStyle) const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Scatter\+Style} Q\+C\+P\+Selection\+Decorator\+::get\+Final\+Scatter\+Style (
+\begin{DoxyParamCaption}
+\item[{const {\bf Q\+C\+P\+Scatter\+Style} \&}]{unselected\+Style}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCPSelectionDecorator_aa0c630c41103809985f41b3b81b0c308}{}\label{classQCPSelectionDecorator_aa0c630c41103809985f41b3b81b0c308}
+Returns the scatter style that the parent plottable shall use for selected scatter points. The plottable\textquotesingle{}s original (unselected) scatter style must be passed as {\itshape unselected\+Style}. Depending on the setting of \hyperlink{classQCPSelectionDecorator_a808c1607cd4e83869c04986e332455c0}{set\+Used\+Scatter\+Properties}, the returned scatter style is a mixture of this selecion decorator\textquotesingle{}s scatter style (\hyperlink{classQCPSelectionDecorator_ab403a613289714ff4fd4a0c0371ab116}{set\+Scatter\+Style}), and {\itshape unselected\+Style}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPSelectionDecorator_a9a0e62f544971034fec60e62748768b8}{apply\+Pen}, \hyperlink{classQCPSelectionDecorator_aa7ecaa5c307cc65285cdf62364c69e56}{apply\+Brush}, \hyperlink{classQCPSelectionDecorator_ab403a613289714ff4fd4a0c0371ab116}{set\+Scatter\+Style} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}!set\+Brush@{set\+Brush}}
+\index{set\+Brush@{set\+Brush}!Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}}
+\subsubsection[{\texorpdfstring{set\+Brush(const Q\+Brush \&brush)}{setBrush(const QBrush &brush)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Selection\+Decorator\+::set\+Brush (
+\begin{DoxyParamCaption}
+\item[{const Q\+Brush \&}]{brush}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPSelectionDecorator_aa74b626be518ea17055f918d423c8c2d}{}\label{classQCPSelectionDecorator_aa74b626be518ea17055f918d423c8c2d}
+Sets the brush that will be used by the parent plottable to draw selected data segments. \index{Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}!set\+Pen@{set\+Pen}}
+\index{set\+Pen@{set\+Pen}!Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}}
+\subsubsection[{\texorpdfstring{set\+Pen(const Q\+Pen \&pen)}{setPen(const QPen &pen)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Selection\+Decorator\+::set\+Pen (
+\begin{DoxyParamCaption}
+\item[{const Q\+Pen \&}]{pen}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPSelectionDecorator_ac2c8192e1e294aa3a4a7f32a859e3d76}{}\label{classQCPSelectionDecorator_ac2c8192e1e294aa3a4a7f32a859e3d76}
+Sets the pen that will be used by the parent plottable to draw selected data segments. \index{Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}!set\+Scatter\+Style@{set\+Scatter\+Style}}
+\index{set\+Scatter\+Style@{set\+Scatter\+Style}!Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}}
+\subsubsection[{\texorpdfstring{set\+Scatter\+Style(const Q\+C\+P\+Scatter\+Style \&scatter\+Style, Q\+C\+P\+Scatter\+Style\+::\+Scatter\+Properties used\+Properties=\+Q\+C\+P\+Scatter\+Style\+::sp\+Pen)}{setScatterStyle(const QCPScatterStyle &scatterStyle, QCPScatterStyle::ScatterProperties usedProperties=QCPScatterStyle::spPen)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Selection\+Decorator\+::set\+Scatter\+Style (
+\begin{DoxyParamCaption}
+\item[{const {\bf Q\+C\+P\+Scatter\+Style} \&}]{scatter\+Style, }
+\item[{Q\+C\+P\+Scatter\+Style\+::\+Scatter\+Properties}]{used\+Properties = {\ttfamily {\bf Q\+C\+P\+Scatter\+Style\+::sp\+Pen}}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPSelectionDecorator_ab403a613289714ff4fd4a0c0371ab116}{}\label{classQCPSelectionDecorator_ab403a613289714ff4fd4a0c0371ab116}
+Sets the scatter style that will be used by the parent plottable to draw scatters in selected data segments.
+
+{\itshape used\+Properties} specifies which parts of the passed {\itshape scatter\+Style} will be used by the plottable. The used properties can also be changed via \hyperlink{classQCPSelectionDecorator_a808c1607cd4e83869c04986e332455c0}{set\+Used\+Scatter\+Properties}. \index{Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}!set\+Used\+Scatter\+Properties@{set\+Used\+Scatter\+Properties}}
+\index{set\+Used\+Scatter\+Properties@{set\+Used\+Scatter\+Properties}!Q\+C\+P\+Selection\+Decorator@{Q\+C\+P\+Selection\+Decorator}}
+\subsubsection[{\texorpdfstring{set\+Used\+Scatter\+Properties(const Q\+C\+P\+Scatter\+Style\+::\+Scatter\+Properties \&properties)}{setUsedScatterProperties(const QCPScatterStyle::ScatterProperties &properties)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Selection\+Decorator\+::set\+Used\+Scatter\+Properties (
+\begin{DoxyParamCaption}
+\item[{const Q\+C\+P\+Scatter\+Style\+::\+Scatter\+Properties \&}]{properties}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPSelectionDecorator_a808c1607cd4e83869c04986e332455c0}{}\label{classQCPSelectionDecorator_a808c1607cd4e83869c04986e332455c0}
+Use this method to define which properties of the scatter style (set via \hyperlink{classQCPSelectionDecorator_ab403a613289714ff4fd4a0c0371ab116}{set\+Scatter\+Style}) will be used for selected data segments. All properties of the scatter style that are not specified in {\itshape properties} will remain as specified in the plottable\textquotesingle{}s original scatter style.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPScatterStyle_a8974f6a20f8f6eea7781f0e6af9deb46}{Q\+C\+P\+Scatter\+Style\+::\+Scatter\+Property} 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/qcustomplot.\+h\item 
+src/qcustomplot.\+cpp\end{DoxyCompactItemize}

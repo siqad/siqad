@@ -1,0 +1,624 @@
+\hypertarget{classQCPLayoutGrid}{}\section{Q\+C\+P\+Layout\+Grid Class Reference}
+\label{classQCPLayoutGrid}\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+
+
+A layout that arranges child elements in a grid.  
+
+
+
+
+Inheritance diagram for Q\+C\+P\+Layout\+Grid\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=184pt]{classQCPLayoutGrid__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Q\+C\+P\+Layout\+Grid\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classQCPLayoutGrid__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353cca}{Fill\+Order} \{ \hyperlink{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353ccaa0202730954e26c474cc820164aedce3e}{fo\+Rows\+First}, 
+\hyperlink{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353ccaac4cb4b796ec4822d5894b47b51627fb3}{fo\+Columns\+First}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPLayoutGrid_ab2a4c1587dc8aed4c41c509c8d8d2a64}{Q\+C\+P\+Layout\+Grid} ()
+\item 
+int \hyperlink{classQCPLayoutGrid_af8e6c7a05864ebe610c87756c7b9079c}{row\+Count} () const 
+\item 
+int \hyperlink{classQCPLayoutGrid_ac39074eafd148b82d0762090f258189e}{column\+Count} () const 
+\item 
+Q\+List$<$ double $>$ {\bfseries column\+Stretch\+Factors} () const \hypertarget{classQCPLayoutGrid_a39bd7994d00687d1b9defef6f1bda835}{}\label{classQCPLayoutGrid_a39bd7994d00687d1b9defef6f1bda835}
+
+\item 
+Q\+List$<$ double $>$ {\bfseries row\+Stretch\+Factors} () const \hypertarget{classQCPLayoutGrid_a3744496abf73c8e3b464181d63bb20a7}{}\label{classQCPLayoutGrid_a3744496abf73c8e3b464181d63bb20a7}
+
+\item 
+int {\bfseries column\+Spacing} () const \hypertarget{classQCPLayoutGrid_a3de19753fdca81194458cb15156f7315}{}\label{classQCPLayoutGrid_a3de19753fdca81194458cb15156f7315}
+
+\item 
+int {\bfseries row\+Spacing} () const \hypertarget{classQCPLayoutGrid_abccdd33c1b284feb6df90fa02f23d9a3}{}\label{classQCPLayoutGrid_abccdd33c1b284feb6df90fa02f23d9a3}
+
+\item 
+int {\bfseries wrap} () const \hypertarget{classQCPLayoutGrid_aa7fc0bff4591a6be44af2fb038dd85d9}{}\label{classQCPLayoutGrid_aa7fc0bff4591a6be44af2fb038dd85d9}
+
+\item 
+\hyperlink{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353cca}{Fill\+Order} {\bfseries fill\+Order} () const \hypertarget{classQCPLayoutGrid_a2ed8e2fc298652ec67d6a8848e58bad1}{}\label{classQCPLayoutGrid_a2ed8e2fc298652ec67d6a8848e58bad1}
+
+\item 
+void \hyperlink{classQCPLayoutGrid_ae38f31a71687b9d7ee3104852528fb50}{set\+Column\+Stretch\+Factor} (int column, double factor)
+\item 
+void \hyperlink{classQCPLayoutGrid_a6c2591d1a7e2534ce036989543b49e57}{set\+Column\+Stretch\+Factors} (const Q\+List$<$ double $>$ \&factors)
+\item 
+void \hyperlink{classQCPLayoutGrid_a7b0273de5369bd93d942edbaf5b166ec}{set\+Row\+Stretch\+Factor} (int row, double factor)
+\item 
+void \hyperlink{classQCPLayoutGrid_a200b45f9c908f96ebadaa3c8d87a2782}{set\+Row\+Stretch\+Factors} (const Q\+List$<$ double $>$ \&factors)
+\item 
+void \hyperlink{classQCPLayoutGrid_a3a49272aba32bb0fddc3bb2a45a3dba0}{set\+Column\+Spacing} (int pixels)
+\item 
+void \hyperlink{classQCPLayoutGrid_aaef2cd2d456197ee06a208793678e436}{set\+Row\+Spacing} (int pixels)
+\item 
+void \hyperlink{classQCPLayoutGrid_ab36af18d77e4428386d02970382ee598}{set\+Wrap} (int count)
+\item 
+void \hyperlink{classQCPLayoutGrid_affc2f3cfd22f28698c5b29b960d2a391}{set\+Fill\+Order} (\hyperlink{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353cca}{Fill\+Order} order, bool rearrange=true)
+\item 
+virtual void {\bfseries update\+Layout} () Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPLayoutGrid_a6cf43f14d3fa335fd8758561ccf1f78c}{}\label{classQCPLayoutGrid_a6cf43f14d3fa335fd8758561ccf1f78c}
+
+\item 
+virtual int \hyperlink{classQCPLayoutGrid_a9a8942aface780a02445ebcf14c48513}{element\+Count} () const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+virtual \hyperlink{classQCPLayoutElement}{Q\+C\+P\+Layout\+Element} $\ast$ \hyperlink{classQCPLayoutGrid_a4288f174082555f6bd92021bdedb75dc}{element\+At} (int index) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+virtual \hyperlink{classQCPLayoutElement}{Q\+C\+P\+Layout\+Element} $\ast$ \hyperlink{classQCPLayoutGrid_a17dd220234d1bbf8835abcc666384d45}{take\+At} (int index) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+virtual bool \hyperlink{classQCPLayoutGrid_aee961c2eb6cf8a85dcbc5a7d7b6c1a00}{take} (\hyperlink{classQCPLayoutElement}{Q\+C\+P\+Layout\+Element} $\ast$\hyperlink{classQCPLayoutGrid_a525f25e6ba43ee228151d074251b4e6a}{element}) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+virtual Q\+List$<$ \hyperlink{classQCPLayoutElement}{Q\+C\+P\+Layout\+Element} $\ast$ $>$ \hyperlink{classQCPLayoutGrid_a7d5b968b4cf57393e9e387976d91f8f7}{elements} (bool recursive) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+virtual void \hyperlink{classQCPLayoutGrid_a38621ca7aa633b6a9a88617df7f08672}{simplify} () Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+virtual Q\+Size \hyperlink{classQCPLayoutGrid_a0438bc58b4d3894d01db95b08d4268df}{minimum\+Outer\+Size\+Hint} () const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+virtual Q\+Size \hyperlink{classQCPLayoutGrid_a41ce0014c220d77b909e2ca937f0e599}{maximum\+Outer\+Size\+Hint} () const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+\hyperlink{classQCPLayoutElement}{Q\+C\+P\+Layout\+Element} $\ast$ \hyperlink{classQCPLayoutGrid_a525f25e6ba43ee228151d074251b4e6a}{element} (int row, int column) const 
+\item 
+bool \hyperlink{classQCPLayoutGrid_adff1a2ca691ed83d2d24a4cd1fe17012}{add\+Element} (int row, int column, \hyperlink{classQCPLayoutElement}{Q\+C\+P\+Layout\+Element} $\ast$\hyperlink{classQCPLayoutGrid_a525f25e6ba43ee228151d074251b4e6a}{element})
+\item 
+bool \hyperlink{classQCPLayoutGrid_a4c44025dd25acd27e053cadfd448ad7b}{add\+Element} (\hyperlink{classQCPLayoutElement}{Q\+C\+P\+Layout\+Element} $\ast$\hyperlink{classQCPLayoutGrid_a525f25e6ba43ee228151d074251b4e6a}{element})
+\item 
+bool \hyperlink{classQCPLayoutGrid_ab0cf4f7edc9414a3bfaddac0f46dc0a0}{has\+Element} (int row, int column)
+\item 
+void \hyperlink{classQCPLayoutGrid_a886c0dcbabd51a45da399e044552b685}{expand\+To} (int new\+Row\+Count, int new\+Column\+Count)
+\item 
+void \hyperlink{classQCPLayoutGrid_a48af3dd7c3a653d9c3d7dd99bd02e838}{insert\+Row} (int new\+Index)
+\item 
+void \hyperlink{classQCPLayoutGrid_a1e880a321dbe8b43b471ccd764433dc4}{insert\+Column} (int new\+Index)
+\item 
+int \hyperlink{classQCPLayoutGrid_a3cefc5fe391722b653958ab6e984c706}{row\+Col\+To\+Index} (int row, int column) const 
+\item 
+void \hyperlink{classQCPLayoutGrid_a964d4e6284af1cfc4da0292c2e0b5ac0}{index\+To\+Row\+Col} (int index, int \&row, int \&column) const 
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries get\+Minimum\+Row\+Col\+Sizes} (Q\+Vector$<$ int $>$ $\ast$min\+Col\+Widths, Q\+Vector$<$ int $>$ $\ast$min\+Row\+Heights) const \hypertarget{classQCPLayoutGrid_ac645fb9b1c4257b08a9f09dee10b9b3f}{}\label{classQCPLayoutGrid_ac645fb9b1c4257b08a9f09dee10b9b3f}
+
+\item 
+void {\bfseries get\+Maximum\+Row\+Col\+Sizes} (Q\+Vector$<$ int $>$ $\ast$max\+Col\+Widths, Q\+Vector$<$ int $>$ $\ast$max\+Row\+Heights) const \hypertarget{classQCPLayoutGrid_af348d903e3b8bc416f1fe1b8125d1173}{}\label{classQCPLayoutGrid_af348d903e3b8bc416f1fe1b8125d1173}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Q\+List$<$ Q\+List$<$ \hyperlink{classQCPLayoutElement}{Q\+C\+P\+Layout\+Element} $\ast$ $>$ $>$ {\bfseries m\+Elements}\hypertarget{classQCPLayoutGrid_a3577d3855bf8ad20ef9079291a49f397}{}\label{classQCPLayoutGrid_a3577d3855bf8ad20ef9079291a49f397}
+
+\item 
+Q\+List$<$ double $>$ {\bfseries m\+Column\+Stretch\+Factors}\hypertarget{classQCPLayoutGrid_ac6aabe62339f94f18b9f8adab94b1840}{}\label{classQCPLayoutGrid_ac6aabe62339f94f18b9f8adab94b1840}
+
+\item 
+Q\+List$<$ double $>$ {\bfseries m\+Row\+Stretch\+Factors}\hypertarget{classQCPLayoutGrid_a36c85a7eaf342680fb9b8a4977486f16}{}\label{classQCPLayoutGrid_a36c85a7eaf342680fb9b8a4977486f16}
+
+\item 
+int {\bfseries m\+Column\+Spacing}\hypertarget{classQCPLayoutGrid_ae9ac48f0791be07ead0a96dbd5622770}{}\label{classQCPLayoutGrid_ae9ac48f0791be07ead0a96dbd5622770}
+
+\item 
+int {\bfseries m\+Row\+Spacing}\hypertarget{classQCPLayoutGrid_a8b67f183f4645739cc4c794d75843b40}{}\label{classQCPLayoutGrid_a8b67f183f4645739cc4c794d75843b40}
+
+\item 
+int {\bfseries m\+Wrap}\hypertarget{classQCPLayoutGrid_a17d90c289139847f68cca9e75d64b0fd}{}\label{classQCPLayoutGrid_a17d90c289139847f68cca9e75d64b0fd}
+
+\item 
+\hyperlink{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353cca}{Fill\+Order} {\bfseries m\+Fill\+Order}\hypertarget{classQCPLayoutGrid_a35a20072cbca5659dd75ca74eae87beb}{}\label{classQCPLayoutGrid_a35a20072cbca5659dd75ca74eae87beb}
+
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+A layout that arranges child elements in a grid. 
+
+Elements are laid out in a grid with configurable stretch factors (\hyperlink{classQCPLayoutGrid_ae38f31a71687b9d7ee3104852528fb50}{set\+Column\+Stretch\+Factor}, \hyperlink{classQCPLayoutGrid_a7b0273de5369bd93d942edbaf5b166ec}{set\+Row\+Stretch\+Factor}) and spacing (\hyperlink{classQCPLayoutGrid_a3a49272aba32bb0fddc3bb2a45a3dba0}{set\+Column\+Spacing}, \hyperlink{classQCPLayoutGrid_aaef2cd2d456197ee06a208793678e436}{set\+Row\+Spacing}).
+
+Elements can be added to cells via \hyperlink{classQCPLayoutGrid_adff1a2ca691ed83d2d24a4cd1fe17012}{add\+Element}. The grid is expanded if the specified row or column doesn\textquotesingle{}t exist yet. Whether a cell contains a valid layout element can be checked with \hyperlink{classQCPLayoutGrid_ab0cf4f7edc9414a3bfaddac0f46dc0a0}{has\+Element}, that element can be retrieved with \hyperlink{classQCPLayoutGrid_a525f25e6ba43ee228151d074251b4e6a}{element}. If rows and columns that only have empty cells shall be removed, call \hyperlink{classQCPLayoutGrid_a38621ca7aa633b6a9a88617df7f08672}{simplify}. Removal of elements is either done by just adding the element to a different layout or by using the \hyperlink{classQCPLayout}{Q\+C\+P\+Layout} interface \hyperlink{classQCPLayoutGrid_aee961c2eb6cf8a85dcbc5a7d7b6c1a00}{take} or \hyperlink{classQCPLayout_a6c58f537d8086f352576ab7c5b15d0bc}{remove}.
+
+If you use \hyperlink{classQCPLayoutGrid_a4c44025dd25acd27e053cadfd448ad7b}{add\+Element(\+Q\+C\+P\+Layout\+Element$\ast$)} without explicit parameters for {\itshape row} and {\itshape column}, the grid layout will choose the position according to the current \hyperlink{classQCPLayoutGrid_affc2f3cfd22f28698c5b29b960d2a391}{set\+Fill\+Order} and the wrapping (\hyperlink{classQCPLayoutGrid_ab36af18d77e4428386d02970382ee598}{set\+Wrap}).
+
+Row and column insertion can be performed with \hyperlink{classQCPLayoutGrid_a48af3dd7c3a653d9c3d7dd99bd02e838}{insert\+Row} and \hyperlink{classQCPLayoutGrid_a1e880a321dbe8b43b471ccd764433dc4}{insert\+Column}. 
+
+\subsection{Member Enumeration Documentation}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!Fill\+Order@{Fill\+Order}}
+\index{Fill\+Order@{Fill\+Order}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{Fill\+Order}{FillOrder}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Q\+C\+P\+Layout\+Grid\+::\+Fill\+Order}}\hypertarget{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353cca}{}\label{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353cca}
+Defines in which direction the grid is filled when using \hyperlink{classQCPLayoutGrid_a4c44025dd25acd27e053cadfd448ad7b}{add\+Element(\+Q\+C\+P\+Layout\+Element$\ast$)}. The column/row at which wrapping into the next row/column occurs can be specified with \hyperlink{classQCPLayoutGrid_ab36af18d77e4428386d02970382ee598}{set\+Wrap}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_affc2f3cfd22f28698c5b29b960d2a391}{set\+Fill\+Order} 
+\end{DoxySeeAlso}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{fo\+Rows\+First@{fo\+Rows\+First}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!fo\+Rows\+First@{fo\+Rows\+First}}\item[{\em 
+fo\+Rows\+First\hypertarget{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353ccaa0202730954e26c474cc820164aedce3e}{}\label{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353ccaa0202730954e26c474cc820164aedce3e}
+}]Rows are filled first, and a new element is wrapped to the next column if the row count would exceed \hyperlink{classQCPLayoutGrid_ab36af18d77e4428386d02970382ee598}{set\+Wrap}. \index{fo\+Columns\+First@{fo\+Columns\+First}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!fo\+Columns\+First@{fo\+Columns\+First}}\item[{\em 
+fo\+Columns\+First\hypertarget{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353ccaac4cb4b796ec4822d5894b47b51627fb3}{}\label{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353ccaac4cb4b796ec4822d5894b47b51627fb3}
+}]Columns are filled first, and a new element is wrapped to the next row if the column count would exceed \hyperlink{classQCPLayoutGrid_ab36af18d77e4428386d02970382ee598}{set\+Wrap}. \end{description}
+\end{Desc}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Layout\+Grid()}{QCPLayoutGrid()}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+C\+P\+Layout\+Grid\+::\+Q\+C\+P\+Layout\+Grid (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [explicit]}}\hypertarget{classQCPLayoutGrid_ab2a4c1587dc8aed4c41c509c8d8d2a64}{}\label{classQCPLayoutGrid_ab2a4c1587dc8aed4c41c509c8d8d2a64}
+Creates an instance of \hyperlink{classQCPLayoutGrid}{Q\+C\+P\+Layout\+Grid} and sets default values. 
+
+\subsection{Member Function Documentation}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!add\+Element@{add\+Element}}
+\index{add\+Element@{add\+Element}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{add\+Element(int row, int column, Q\+C\+P\+Layout\+Element $\ast$element)}{addElement(int row, int column, QCPLayoutElement *element)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+C\+P\+Layout\+Grid\+::add\+Element (
+\begin{DoxyParamCaption}
+\item[{int}]{row, }
+\item[{int}]{column, }
+\item[{{\bf Q\+C\+P\+Layout\+Element} $\ast$}]{element}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutGrid_adff1a2ca691ed83d2d24a4cd1fe17012}{}\label{classQCPLayoutGrid_adff1a2ca691ed83d2d24a4cd1fe17012}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Adds the {\itshape element} to cell with {\itshape row} and {\itshape column}. If {\itshape element} is already in a layout, it is first removed from there. If {\itshape row} or {\itshape column} don\textquotesingle{}t exist yet, the layout is expanded accordingly.
+
+Returns true if the element was added successfully, i.\+e. if the cell at {\itshape row} and {\itshape column} didn\textquotesingle{}t already have an element.
+
+Use the overload of this method without explicit row/column index to place the element according to the configured fill order and wrapping settings.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_a525f25e6ba43ee228151d074251b4e6a}{element}, \hyperlink{classQCPLayoutGrid_ab0cf4f7edc9414a3bfaddac0f46dc0a0}{has\+Element}, \hyperlink{classQCPLayoutGrid_aee961c2eb6cf8a85dcbc5a7d7b6c1a00}{take}, \hyperlink{classQCPLayout_a6c58f537d8086f352576ab7c5b15d0bc}{remove} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!add\+Element@{add\+Element}}
+\index{add\+Element@{add\+Element}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{add\+Element(\+Q\+C\+P\+Layout\+Element $\ast$element)}{addElement(QCPLayoutElement *element)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+C\+P\+Layout\+Grid\+::add\+Element (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Layout\+Element} $\ast$}]{element}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutGrid_a4c44025dd25acd27e053cadfd448ad7b}{}\label{classQCPLayoutGrid_a4c44025dd25acd27e053cadfd448ad7b}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Adds the {\itshape element} to the next empty cell according to the current fill order (\hyperlink{classQCPLayoutGrid_affc2f3cfd22f28698c5b29b960d2a391}{set\+Fill\+Order}) and wrapping (\hyperlink{classQCPLayoutGrid_ab36af18d77e4428386d02970382ee598}{set\+Wrap}). If {\itshape element} is already in a layout, it is first removed from there. If necessary, the layout is expanded to hold the new element.
+
+Returns true if the element was added successfully.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_affc2f3cfd22f28698c5b29b960d2a391}{set\+Fill\+Order}, \hyperlink{classQCPLayoutGrid_ab36af18d77e4428386d02970382ee598}{set\+Wrap}, \hyperlink{classQCPLayoutGrid_a525f25e6ba43ee228151d074251b4e6a}{element}, \hyperlink{classQCPLayoutGrid_ab0cf4f7edc9414a3bfaddac0f46dc0a0}{has\+Element}, \hyperlink{classQCPLayoutGrid_aee961c2eb6cf8a85dcbc5a7d7b6c1a00}{take}, \hyperlink{classQCPLayout_a6c58f537d8086f352576ab7c5b15d0bc}{remove} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!column\+Count@{column\+Count}}
+\index{column\+Count@{column\+Count}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{column\+Count() const }{columnCount() const }}]{\setlength{\rightskip}{0pt plus 5cm}int Q\+C\+P\+Layout\+Grid\+::column\+Count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPLayoutGrid_ac39074eafd148b82d0762090f258189e}{}\label{classQCPLayoutGrid_ac39074eafd148b82d0762090f258189e}
+Returns the number of columns in the layout.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_af8e6c7a05864ebe610c87756c7b9079c}{row\+Count} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!element@{element}}
+\index{element@{element}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{element(int row, int column) const }{element(int row, int column) const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Layout\+Element} $\ast$ Q\+C\+P\+Layout\+Grid\+::element (
+\begin{DoxyParamCaption}
+\item[{int}]{row, }
+\item[{int}]{column}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCPLayoutGrid_a525f25e6ba43ee228151d074251b4e6a}{}\label{classQCPLayoutGrid_a525f25e6ba43ee228151d074251b4e6a}
+Returns the element in the cell in {\itshape row} and {\itshape column}.
+
+Returns 0 if either the row/column is invalid or if the cell is empty. In those cases, a q\+Debug message is printed. To check whether a cell exists and isn\textquotesingle{}t empty, use \hyperlink{classQCPLayoutGrid_ab0cf4f7edc9414a3bfaddac0f46dc0a0}{has\+Element}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_adff1a2ca691ed83d2d24a4cd1fe17012}{add\+Element}, \hyperlink{classQCPLayoutGrid_ab0cf4f7edc9414a3bfaddac0f46dc0a0}{has\+Element} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!element\+At@{element\+At}}
+\index{element\+At@{element\+At}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{element\+At(int index) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{elementAt(int index) const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Layout\+Element} $\ast$ Q\+C\+P\+Layout\+Grid\+::element\+At (
+\begin{DoxyParamCaption}
+\item[{int}]{index}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPLayoutGrid_a4288f174082555f6bd92021bdedb75dc}{}\label{classQCPLayoutGrid_a4288f174082555f6bd92021bdedb75dc}
+Note that the association of the linear {\itshape index} to the row/column based cells depends on the current setting of \hyperlink{classQCPLayoutGrid_affc2f3cfd22f28698c5b29b960d2a391}{set\+Fill\+Order}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_a3cefc5fe391722b653958ab6e984c706}{row\+Col\+To\+Index} 
+\end{DoxySeeAlso}
+
+
+Implements \hyperlink{classQCPLayout_afa73ca7d859f8a3ee5c73c9b353d2a56}{Q\+C\+P\+Layout}.
+
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!element\+Count@{element\+Count}}
+\index{element\+Count@{element\+Count}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{element\+Count() const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{elementCount() const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}virtual int Q\+C\+P\+Layout\+Grid\+::element\+Count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}\hypertarget{classQCPLayoutGrid_a9a8942aface780a02445ebcf14c48513}{}\label{classQCPLayoutGrid_a9a8942aface780a02445ebcf14c48513}
+Returns the number of elements/cells in the layout.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_a7d5b968b4cf57393e9e387976d91f8f7}{elements}, \hyperlink{classQCPLayoutGrid_a4288f174082555f6bd92021bdedb75dc}{element\+At} 
+\end{DoxySeeAlso}
+
+
+Implements \hyperlink{classQCPLayout_a39d3e9ef5d9b82ab1885ba1cb9597e56}{Q\+C\+P\+Layout}.
+
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!elements@{elements}}
+\index{elements@{elements}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{elements(bool recursive) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{elements(bool recursive) const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+List$<$ {\bf Q\+C\+P\+Layout\+Element} $\ast$ $>$ Q\+C\+P\+Layout\+Grid\+::elements (
+\begin{DoxyParamCaption}
+\item[{bool}]{recursive}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPLayoutGrid_a7d5b968b4cf57393e9e387976d91f8f7}{}\label{classQCPLayoutGrid_a7d5b968b4cf57393e9e387976d91f8f7}
+Returns a list of all child elements in this layout element. If {\itshape recursive} is true, all sub-\/child elements are included in the list, too.
+
+\begin{DoxyWarning}{Warning}
+There may be entries with value 0 in the returned list. (For example, \hyperlink{classQCPLayoutGrid}{Q\+C\+P\+Layout\+Grid} may have empty cells which yield 0 at the respective index.) 
+\end{DoxyWarning}
+
+
+Reimplemented from \hyperlink{classQCPLayout_aca129722c019f91d3367046f80abfa77}{Q\+C\+P\+Layout}.
+
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!expand\+To@{expand\+To}}
+\index{expand\+To@{expand\+To}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{expand\+To(int new\+Row\+Count, int new\+Column\+Count)}{expandTo(int newRowCount, int newColumnCount)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Grid\+::expand\+To (
+\begin{DoxyParamCaption}
+\item[{int}]{new\+Row\+Count, }
+\item[{int}]{new\+Column\+Count}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutGrid_a886c0dcbabd51a45da399e044552b685}{}\label{classQCPLayoutGrid_a886c0dcbabd51a45da399e044552b685}
+Expands the layout to have {\itshape new\+Row\+Count} rows and {\itshape new\+Column\+Count} columns. So the last valid row index will be {\itshape new\+Row\+Count-\/1}, the last valid column index will be {\itshape new\+Column\+Count-\/1}.
+
+If the current column/row count is already larger or equal to {\itshape new\+Column\+Count/{\itshape new\+Row\+Count},} this function does nothing in that dimension.
+
+Newly created cells are empty, new rows and columns have the stretch factor 1.
+
+Note that upon a call to \hyperlink{classQCPLayoutGrid_adff1a2ca691ed83d2d24a4cd1fe17012}{add\+Element}, the layout is expanded automatically to contain the specified row and column, using this function.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_a38621ca7aa633b6a9a88617df7f08672}{simplify} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!has\+Element@{has\+Element}}
+\index{has\+Element@{has\+Element}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{has\+Element(int row, int column)}{hasElement(int row, int column)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+C\+P\+Layout\+Grid\+::has\+Element (
+\begin{DoxyParamCaption}
+\item[{int}]{row, }
+\item[{int}]{column}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutGrid_ab0cf4f7edc9414a3bfaddac0f46dc0a0}{}\label{classQCPLayoutGrid_ab0cf4f7edc9414a3bfaddac0f46dc0a0}
+Returns whether the cell at {\itshape row} and {\itshape column} exists and contains a valid element, i.\+e. isn\textquotesingle{}t empty.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_a525f25e6ba43ee228151d074251b4e6a}{element} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!index\+To\+Row\+Col@{index\+To\+Row\+Col}}
+\index{index\+To\+Row\+Col@{index\+To\+Row\+Col}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{index\+To\+Row\+Col(int index, int \&row, int \&column) const }{indexToRowCol(int index, int &row, int &column) const }}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Grid\+::index\+To\+Row\+Col (
+\begin{DoxyParamCaption}
+\item[{int}]{index, }
+\item[{int \&}]{row, }
+\item[{int \&}]{column}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCPLayoutGrid_a964d4e6284af1cfc4da0292c2e0b5ac0}{}\label{classQCPLayoutGrid_a964d4e6284af1cfc4da0292c2e0b5ac0}
+Converts the linear index to row and column indices and writes the result to {\itshape row} and {\itshape column}.
+
+The way the cells are indexed depends on \hyperlink{classQCPLayoutGrid_affc2f3cfd22f28698c5b29b960d2a391}{set\+Fill\+Order}. If it is \hyperlink{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353ccaa0202730954e26c474cc820164aedce3e}{fo\+Rows\+First}, the indices increase left to right and then top to bottom. If it is \hyperlink{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353ccaac4cb4b796ec4822d5894b47b51627fb3}{fo\+Columns\+First}, the indices increase top to bottom and then left to right.
+
+If there are no cells (i.\+e. column or row count is zero), sets {\itshape row} and {\itshape column} to -\/1.
+
+For the retrieved {\itshape row} and {\itshape column} to be valid, the passed {\itshape index} must be valid itself, i.\+e. greater or equal to zero and smaller than the current \hyperlink{classQCPLayoutGrid_a9a8942aface780a02445ebcf14c48513}{element\+Count}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_a3cefc5fe391722b653958ab6e984c706}{row\+Col\+To\+Index} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!insert\+Column@{insert\+Column}}
+\index{insert\+Column@{insert\+Column}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{insert\+Column(int new\+Index)}{insertColumn(int newIndex)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Grid\+::insert\+Column (
+\begin{DoxyParamCaption}
+\item[{int}]{new\+Index}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutGrid_a1e880a321dbe8b43b471ccd764433dc4}{}\label{classQCPLayoutGrid_a1e880a321dbe8b43b471ccd764433dc4}
+Inserts a new column with empty cells at the column index {\itshape new\+Index}. Valid values for {\itshape new\+Index} range from 0 (inserts a column at the left) to {\itshape column\+Count} (appends a column at the right).
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_a48af3dd7c3a653d9c3d7dd99bd02e838}{insert\+Row} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!insert\+Row@{insert\+Row}}
+\index{insert\+Row@{insert\+Row}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{insert\+Row(int new\+Index)}{insertRow(int newIndex)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Grid\+::insert\+Row (
+\begin{DoxyParamCaption}
+\item[{int}]{new\+Index}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutGrid_a48af3dd7c3a653d9c3d7dd99bd02e838}{}\label{classQCPLayoutGrid_a48af3dd7c3a653d9c3d7dd99bd02e838}
+Inserts a new row with empty cells at the row index {\itshape new\+Index}. Valid values for {\itshape new\+Index} range from 0 (inserts a row at the top) to {\itshape row\+Count} (appends a row at the bottom).
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_a1e880a321dbe8b43b471ccd764433dc4}{insert\+Column} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!maximum\+Outer\+Size\+Hint@{maximum\+Outer\+Size\+Hint}}
+\index{maximum\+Outer\+Size\+Hint@{maximum\+Outer\+Size\+Hint}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{maximum\+Outer\+Size\+Hint() const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{maximumOuterSizeHint() const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+Size Q\+C\+P\+Layout\+Grid\+::maximum\+Outer\+Size\+Hint (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPLayoutGrid_a41ce0014c220d77b909e2ca937f0e599}{}\label{classQCPLayoutGrid_a41ce0014c220d77b909e2ca937f0e599}
+Returns the suggested maximum size this layout element (the \hyperlink{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}{outer\+Rect}) may be expanded to, if no manual maximum size is set.
+
+if a maximum size (\hyperlink{classQCPLayoutElement_a74eb5280a737ab44833d506db65efd95}{set\+Maximum\+Size}) was not set manually, parent layouts use the returned size (usually indirectly through Q\+C\+P\+Layout\+::get\+Final\+Maximum\+Outer\+Size) to determine the maximum allowed size of this layout element.
+
+A manual maximum size is considered set if it is smaller than Qt\textquotesingle{}s {\ttfamily Q\+W\+I\+D\+G\+E\+T\+S\+I\+Z\+E\+\_\+\+M\+AX}.
+
+The default implementation simply returns {\ttfamily Q\+W\+I\+D\+G\+E\+T\+S\+I\+Z\+E\+\_\+\+M\+AX} for both width and height, implying no suggested maximum size. Reimplementations may use their detailed knowledge about the layout element\textquotesingle{}s content to provide size hints. 
+
+Reimplemented from \hyperlink{classQCPLayoutElement_ad60d20664d3950e93c3584e0e7b761bd}{Q\+C\+P\+Layout\+Element}.
+
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!minimum\+Outer\+Size\+Hint@{minimum\+Outer\+Size\+Hint}}
+\index{minimum\+Outer\+Size\+Hint@{minimum\+Outer\+Size\+Hint}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{minimum\+Outer\+Size\+Hint() const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{minimumOuterSizeHint() const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+Size Q\+C\+P\+Layout\+Grid\+::minimum\+Outer\+Size\+Hint (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPLayoutGrid_a0438bc58b4d3894d01db95b08d4268df}{}\label{classQCPLayoutGrid_a0438bc58b4d3894d01db95b08d4268df}
+Returns the suggested minimum size this layout element (the \hyperlink{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}{outer\+Rect}) may be compressed to, if no manual minimum size is set.
+
+if a minimum size (\hyperlink{classQCPLayoutElement_a5dd29a3c8bc88440c97c06b67be7886b}{set\+Minimum\+Size}) was not set manually, parent layouts use the returned size (usually indirectly through Q\+C\+P\+Layout\+::get\+Final\+Minimum\+Outer\+Size) to determine the minimum allowed size of this layout element.
+
+A manual minimum size is considered set if it is non-\/zero.
+
+The default implementation simply returns the sum of the horizontal margins for the width and the sum of the vertical margins for the height. Reimplementations may use their detailed knowledge about the layout element\textquotesingle{}s content to provide size hints. 
+
+Reimplemented from \hyperlink{classQCPLayoutElement_a4c540ba5c686a1494c92c466912e5411}{Q\+C\+P\+Layout\+Element}.
+
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!row\+Col\+To\+Index@{row\+Col\+To\+Index}}
+\index{row\+Col\+To\+Index@{row\+Col\+To\+Index}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{row\+Col\+To\+Index(int row, int column) const }{rowColToIndex(int row, int column) const }}]{\setlength{\rightskip}{0pt plus 5cm}int Q\+C\+P\+Layout\+Grid\+::row\+Col\+To\+Index (
+\begin{DoxyParamCaption}
+\item[{int}]{row, }
+\item[{int}]{column}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCPLayoutGrid_a3cefc5fe391722b653958ab6e984c706}{}\label{classQCPLayoutGrid_a3cefc5fe391722b653958ab6e984c706}
+Converts the given {\itshape row} and {\itshape column} to the linear index used by some methods of \hyperlink{classQCPLayoutGrid}{Q\+C\+P\+Layout\+Grid} and \hyperlink{classQCPLayout}{Q\+C\+P\+Layout}.
+
+The way the cells are indexed depends on \hyperlink{classQCPLayoutGrid_affc2f3cfd22f28698c5b29b960d2a391}{set\+Fill\+Order}. If it is \hyperlink{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353ccaa0202730954e26c474cc820164aedce3e}{fo\+Rows\+First}, the indices increase left to right and then top to bottom. If it is \hyperlink{classQCPLayoutGrid_a7d49ee08773de6b2fd246edfed353ccaac4cb4b796ec4822d5894b47b51627fb3}{fo\+Columns\+First}, the indices increase top to bottom and then left to right.
+
+For the returned index to be valid, {\itshape row} and {\itshape column} must be valid indices themselves, i.\+e. greater or equal to zero and smaller than the current \hyperlink{classQCPLayoutGrid_af8e6c7a05864ebe610c87756c7b9079c}{row\+Count}/\hyperlink{classQCPLayoutGrid_ac39074eafd148b82d0762090f258189e}{column\+Count}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_a964d4e6284af1cfc4da0292c2e0b5ac0}{index\+To\+Row\+Col} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!row\+Count@{row\+Count}}
+\index{row\+Count@{row\+Count}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{row\+Count() const }{rowCount() const }}]{\setlength{\rightskip}{0pt plus 5cm}int Q\+C\+P\+Layout\+Grid\+::row\+Count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPLayoutGrid_af8e6c7a05864ebe610c87756c7b9079c}{}\label{classQCPLayoutGrid_af8e6c7a05864ebe610c87756c7b9079c}
+Returns the number of rows in the layout.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_ac39074eafd148b82d0762090f258189e}{column\+Count} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!set\+Column\+Spacing@{set\+Column\+Spacing}}
+\index{set\+Column\+Spacing@{set\+Column\+Spacing}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{set\+Column\+Spacing(int pixels)}{setColumnSpacing(int pixels)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Grid\+::set\+Column\+Spacing (
+\begin{DoxyParamCaption}
+\item[{int}]{pixels}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutGrid_a3a49272aba32bb0fddc3bb2a45a3dba0}{}\label{classQCPLayoutGrid_a3a49272aba32bb0fddc3bb2a45a3dba0}
+Sets the gap that is left blank between columns to {\itshape pixels}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_aaef2cd2d456197ee06a208793678e436}{set\+Row\+Spacing} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!set\+Column\+Stretch\+Factor@{set\+Column\+Stretch\+Factor}}
+\index{set\+Column\+Stretch\+Factor@{set\+Column\+Stretch\+Factor}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{set\+Column\+Stretch\+Factor(int column, double factor)}{setColumnStretchFactor(int column, double factor)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Grid\+::set\+Column\+Stretch\+Factor (
+\begin{DoxyParamCaption}
+\item[{int}]{column, }
+\item[{double}]{factor}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutGrid_ae38f31a71687b9d7ee3104852528fb50}{}\label{classQCPLayoutGrid_ae38f31a71687b9d7ee3104852528fb50}
+Sets the stretch {\itshape factor} of {\itshape column}.
+
+Stretch factors control the relative sizes of rows and columns. Cells will not be resized beyond their minimum and maximum widths/heights, regardless of the stretch factor. (see \hyperlink{classQCPLayoutElement_a5dd29a3c8bc88440c97c06b67be7886b}{Q\+C\+P\+Layout\+Element\+::set\+Minimum\+Size}, \hyperlink{classQCPLayoutElement_a74eb5280a737ab44833d506db65efd95}{Q\+C\+P\+Layout\+Element\+::set\+Maximum\+Size}, \hyperlink{classQCPLayoutElement_a361666cdcc6fbfd37344cc44be746b0f}{Q\+C\+P\+Layout\+Element\+::set\+Size\+Constraint\+Rect}.)
+
+The default stretch factor of newly created rows/columns is 1.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_a6c2591d1a7e2534ce036989543b49e57}{set\+Column\+Stretch\+Factors}, \hyperlink{classQCPLayoutGrid_a7b0273de5369bd93d942edbaf5b166ec}{set\+Row\+Stretch\+Factor} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!set\+Column\+Stretch\+Factors@{set\+Column\+Stretch\+Factors}}
+\index{set\+Column\+Stretch\+Factors@{set\+Column\+Stretch\+Factors}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{set\+Column\+Stretch\+Factors(const Q\+List$<$ double $>$ \&factors)}{setColumnStretchFactors(const QList< double > &factors)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Grid\+::set\+Column\+Stretch\+Factors (
+\begin{DoxyParamCaption}
+\item[{const Q\+List$<$ double $>$ \&}]{factors}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutGrid_a6c2591d1a7e2534ce036989543b49e57}{}\label{classQCPLayoutGrid_a6c2591d1a7e2534ce036989543b49e57}
+Sets the stretch {\itshape factors} of all columns. {\itshape factors} must have the size \hyperlink{classQCPLayoutGrid_ac39074eafd148b82d0762090f258189e}{column\+Count}.
+
+Stretch factors control the relative sizes of rows and columns. Cells will not be resized beyond their minimum and maximum widths/heights, regardless of the stretch factor. (see \hyperlink{classQCPLayoutElement_a5dd29a3c8bc88440c97c06b67be7886b}{Q\+C\+P\+Layout\+Element\+::set\+Minimum\+Size}, \hyperlink{classQCPLayoutElement_a74eb5280a737ab44833d506db65efd95}{Q\+C\+P\+Layout\+Element\+::set\+Maximum\+Size}, \hyperlink{classQCPLayoutElement_a361666cdcc6fbfd37344cc44be746b0f}{Q\+C\+P\+Layout\+Element\+::set\+Size\+Constraint\+Rect}.)
+
+The default stretch factor of newly created rows/columns is 1.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_ae38f31a71687b9d7ee3104852528fb50}{set\+Column\+Stretch\+Factor}, \hyperlink{classQCPLayoutGrid_a200b45f9c908f96ebadaa3c8d87a2782}{set\+Row\+Stretch\+Factors} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!set\+Fill\+Order@{set\+Fill\+Order}}
+\index{set\+Fill\+Order@{set\+Fill\+Order}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{set\+Fill\+Order(\+Fill\+Order order, bool rearrange=true)}{setFillOrder(FillOrder order, bool rearrange=true)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Grid\+::set\+Fill\+Order (
+\begin{DoxyParamCaption}
+\item[{{\bf Fill\+Order}}]{order, }
+\item[{bool}]{rearrange = {\ttfamily true}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutGrid_affc2f3cfd22f28698c5b29b960d2a391}{}\label{classQCPLayoutGrid_affc2f3cfd22f28698c5b29b960d2a391}
+Sets the filling order and wrapping behaviour that is used when adding new elements with the method \hyperlink{classQCPLayoutGrid_a4c44025dd25acd27e053cadfd448ad7b}{add\+Element(\+Q\+C\+P\+Layout\+Element$\ast$)}.
+
+The specified {\itshape order} defines whether rows or columns are filled first. Using \hyperlink{classQCPLayoutGrid_ab36af18d77e4428386d02970382ee598}{set\+Wrap}, you can control at which row/column count wrapping into the next column/row will occur. If you set it to zero, no wrapping will ever occur. Changing the fill order also changes the meaning of the linear index used e.\+g. in \hyperlink{classQCPLayoutGrid_a4288f174082555f6bd92021bdedb75dc}{element\+At} and \hyperlink{classQCPLayoutGrid_a17dd220234d1bbf8835abcc666384d45}{take\+At}.
+
+If you want to have all current elements arranged in the new order, set {\itshape rearrange} to true. The elements will be rearranged in a way that tries to preserve their linear index. However, empty cells are skipped during build-\/up of the new cell order, which shifts the succeeding element\textquotesingle{}s index. The rearranging is performed even if the specified {\itshape order} is already the current fill order. Thus this method can be used to re-\/wrap the current elements.
+
+If {\itshape rearrange} is false, the current element arrangement is not changed, which means the linear indexes change (because the linear index is dependent on the fill order).
+
+Note that the method \hyperlink{classQCPLayoutGrid_adff1a2ca691ed83d2d24a4cd1fe17012}{add\+Element(int row, int column, Q\+C\+P\+Layout\+Element $\ast$element)} with explicitly stated row and column is not subject to wrapping and can place elements even beyond the specified wrapping point.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_ab36af18d77e4428386d02970382ee598}{set\+Wrap}, \hyperlink{classQCPLayoutGrid_a4c44025dd25acd27e053cadfd448ad7b}{add\+Element(\+Q\+C\+P\+Layout\+Element$\ast$)} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!set\+Row\+Spacing@{set\+Row\+Spacing}}
+\index{set\+Row\+Spacing@{set\+Row\+Spacing}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{set\+Row\+Spacing(int pixels)}{setRowSpacing(int pixels)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Grid\+::set\+Row\+Spacing (
+\begin{DoxyParamCaption}
+\item[{int}]{pixels}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutGrid_aaef2cd2d456197ee06a208793678e436}{}\label{classQCPLayoutGrid_aaef2cd2d456197ee06a208793678e436}
+Sets the gap that is left blank between rows to {\itshape pixels}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_a3a49272aba32bb0fddc3bb2a45a3dba0}{set\+Column\+Spacing} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!set\+Row\+Stretch\+Factor@{set\+Row\+Stretch\+Factor}}
+\index{set\+Row\+Stretch\+Factor@{set\+Row\+Stretch\+Factor}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{set\+Row\+Stretch\+Factor(int row, double factor)}{setRowStretchFactor(int row, double factor)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Grid\+::set\+Row\+Stretch\+Factor (
+\begin{DoxyParamCaption}
+\item[{int}]{row, }
+\item[{double}]{factor}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutGrid_a7b0273de5369bd93d942edbaf5b166ec}{}\label{classQCPLayoutGrid_a7b0273de5369bd93d942edbaf5b166ec}
+Sets the stretch {\itshape factor} of {\itshape row}.
+
+Stretch factors control the relative sizes of rows and columns. Cells will not be resized beyond their minimum and maximum widths/heights, regardless of the stretch factor. (see \hyperlink{classQCPLayoutElement_a5dd29a3c8bc88440c97c06b67be7886b}{Q\+C\+P\+Layout\+Element\+::set\+Minimum\+Size}, \hyperlink{classQCPLayoutElement_a74eb5280a737ab44833d506db65efd95}{Q\+C\+P\+Layout\+Element\+::set\+Maximum\+Size}, \hyperlink{classQCPLayoutElement_a361666cdcc6fbfd37344cc44be746b0f}{Q\+C\+P\+Layout\+Element\+::set\+Size\+Constraint\+Rect}.)
+
+The default stretch factor of newly created rows/columns is 1.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_a6c2591d1a7e2534ce036989543b49e57}{set\+Column\+Stretch\+Factors}, \hyperlink{classQCPLayoutGrid_a7b0273de5369bd93d942edbaf5b166ec}{set\+Row\+Stretch\+Factor} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!set\+Row\+Stretch\+Factors@{set\+Row\+Stretch\+Factors}}
+\index{set\+Row\+Stretch\+Factors@{set\+Row\+Stretch\+Factors}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{set\+Row\+Stretch\+Factors(const Q\+List$<$ double $>$ \&factors)}{setRowStretchFactors(const QList< double > &factors)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Grid\+::set\+Row\+Stretch\+Factors (
+\begin{DoxyParamCaption}
+\item[{const Q\+List$<$ double $>$ \&}]{factors}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutGrid_a200b45f9c908f96ebadaa3c8d87a2782}{}\label{classQCPLayoutGrid_a200b45f9c908f96ebadaa3c8d87a2782}
+Sets the stretch {\itshape factors} of all rows. {\itshape factors} must have the size \hyperlink{classQCPLayoutGrid_af8e6c7a05864ebe610c87756c7b9079c}{row\+Count}.
+
+Stretch factors control the relative sizes of rows and columns. Cells will not be resized beyond their minimum and maximum widths/heights, regardless of the stretch factor. (see \hyperlink{classQCPLayoutElement_a5dd29a3c8bc88440c97c06b67be7886b}{Q\+C\+P\+Layout\+Element\+::set\+Minimum\+Size}, \hyperlink{classQCPLayoutElement_a74eb5280a737ab44833d506db65efd95}{Q\+C\+P\+Layout\+Element\+::set\+Maximum\+Size}, \hyperlink{classQCPLayoutElement_a361666cdcc6fbfd37344cc44be746b0f}{Q\+C\+P\+Layout\+Element\+::set\+Size\+Constraint\+Rect}.)
+
+The default stretch factor of newly created rows/columns is 1.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_a7b0273de5369bd93d942edbaf5b166ec}{set\+Row\+Stretch\+Factor}, \hyperlink{classQCPLayoutGrid_a6c2591d1a7e2534ce036989543b49e57}{set\+Column\+Stretch\+Factors} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!set\+Wrap@{set\+Wrap}}
+\index{set\+Wrap@{set\+Wrap}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{set\+Wrap(int count)}{setWrap(int count)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Grid\+::set\+Wrap (
+\begin{DoxyParamCaption}
+\item[{int}]{count}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutGrid_ab36af18d77e4428386d02970382ee598}{}\label{classQCPLayoutGrid_ab36af18d77e4428386d02970382ee598}
+Sets the maximum number of columns or rows that are used, before new elements added with \hyperlink{classQCPLayoutGrid_a4c44025dd25acd27e053cadfd448ad7b}{add\+Element(\+Q\+C\+P\+Layout\+Element$\ast$)} will start to fill the next row or column, respectively. It depends on \hyperlink{classQCPLayoutGrid_affc2f3cfd22f28698c5b29b960d2a391}{set\+Fill\+Order}, whether rows or columns are wrapped.
+
+If {\itshape count} is set to zero, no wrapping will ever occur.
+
+If you wish to re-\/wrap the elements currently in the layout, call \hyperlink{classQCPLayoutGrid_affc2f3cfd22f28698c5b29b960d2a391}{set\+Fill\+Order} with {\itshape rearrange} set to true (the actual fill order doesn\textquotesingle{}t need to be changed for the rearranging to be done).
+
+Note that the method \hyperlink{classQCPLayoutGrid_adff1a2ca691ed83d2d24a4cd1fe17012}{add\+Element(int row, int column, Q\+C\+P\+Layout\+Element $\ast$element)} with explicitly stated row and column is not subject to wrapping and can place elements even beyond the specified wrapping point.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_affc2f3cfd22f28698c5b29b960d2a391}{set\+Fill\+Order} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!simplify@{simplify}}
+\index{simplify@{simplify}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{simplify() Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{simplify() Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Grid\+::simplify (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPLayoutGrid_a38621ca7aa633b6a9a88617df7f08672}{}\label{classQCPLayoutGrid_a38621ca7aa633b6a9a88617df7f08672}
+Simplifies the layout by collapsing rows and columns which only contain empty cells. 
+
+Reimplemented from \hyperlink{classQCPLayout_a41e6ac049143866e8f8b4964efab01b2}{Q\+C\+P\+Layout}.
+
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!take@{take}}
+\index{take@{take}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{take(\+Q\+C\+P\+Layout\+Element $\ast$element) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{take(QCPLayoutElement *element) Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+C\+P\+Layout\+Grid\+::take (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Layout\+Element} $\ast$}]{element}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPLayoutGrid_aee961c2eb6cf8a85dcbc5a7d7b6c1a00}{}\label{classQCPLayoutGrid_aee961c2eb6cf8a85dcbc5a7d7b6c1a00}
+Removes the specified {\itshape element} from the layout and returns true on success.
+
+If the {\itshape element} isn\textquotesingle{}t in this layout, returns false.
+
+Note that some layouts don\textquotesingle{}t remove the respective cell right away but leave an empty cell after successful removal of the layout element. To collapse empty cells, use \hyperlink{classQCPLayoutGrid_a38621ca7aa633b6a9a88617df7f08672}{simplify}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_a17dd220234d1bbf8835abcc666384d45}{take\+At} 
+\end{DoxySeeAlso}
+
+
+Implements \hyperlink{classQCPLayout_ada26cd17e56472b0b4d7fbbc96873e4c}{Q\+C\+P\+Layout}.
+
+\index{Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}!take\+At@{take\+At}}
+\index{take\+At@{take\+At}!Q\+C\+P\+Layout\+Grid@{Q\+C\+P\+Layout\+Grid}}
+\subsubsection[{\texorpdfstring{take\+At(int index) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{takeAt(int index) Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Layout\+Element} $\ast$ Q\+C\+P\+Layout\+Grid\+::take\+At (
+\begin{DoxyParamCaption}
+\item[{int}]{index}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPLayoutGrid_a17dd220234d1bbf8835abcc666384d45}{}\label{classQCPLayoutGrid_a17dd220234d1bbf8835abcc666384d45}
+Note that the association of the linear {\itshape index} to the row/column based cells depends on the current setting of \hyperlink{classQCPLayoutGrid_affc2f3cfd22f28698c5b29b960d2a391}{set\+Fill\+Order}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutGrid_a3cefc5fe391722b653958ab6e984c706}{row\+Col\+To\+Index} 
+\end{DoxySeeAlso}
+
+
+Implements \hyperlink{classQCPLayout_a5a79621fa0a6eabb8b520cfc04fb601a}{Q\+C\+P\+Layout}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/qcustomplot.\+h\item 
+src/qcustomplot.\+cpp\end{DoxyCompactItemize}

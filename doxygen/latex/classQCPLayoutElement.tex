@@ -1,0 +1,486 @@
+\hypertarget{classQCPLayoutElement}{}\section{Q\+C\+P\+Layout\+Element Class Reference}
+\label{classQCPLayoutElement}\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+
+
+The abstract base class for all objects that form the layout system.  
+
+
+
+
+Inheritance diagram for Q\+C\+P\+Layout\+Element\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classQCPLayoutElement__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Q\+C\+P\+Layout\+Element\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classQCPLayoutElement__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374d}{Update\+Phase} \{ \hyperlink{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374dad6119882eba136357c2f627992e527d3}{up\+Preparation}, 
+\hyperlink{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374da288cb59a92280e47261a341f2813e676}{up\+Margins}, 
+\hyperlink{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374da5d1ccf5d79967c232c3c511796860045}{up\+Layout}
+ \}
+\item 
+enum \hyperlink{classQCPLayoutElement_a0afb3e5773529e4bd20e448f81be4d2a}{Size\+Constraint\+Rect} \{ \hyperlink{classQCPLayoutElement_a0afb3e5773529e4bd20e448f81be4d2aa7fa7e25cd23758b9915c64ed9f1be26c}{scr\+Inner\+Rect}, 
+\hyperlink{classQCPLayoutElement_a0afb3e5773529e4bd20e448f81be4d2aabe2745b41a6131ed194e13591b08e04d}{scr\+Outer\+Rect}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPLayoutElement_a8947f0ada17e672aaba3d424cbbb67e3}{Q\+C\+P\+Layout\+Element} (\hyperlink{classQCustomPlot}{Q\+Custom\+Plot} $\ast$parent\+Plot=0)
+\item 
+\hyperlink{classQCPLayout}{Q\+C\+P\+Layout} $\ast$ \hyperlink{classQCPLayoutElement_a6235f5384db871fc6e3387a1bc558b0d}{layout} () const 
+\item 
+Q\+Rect \hyperlink{classQCPLayoutElement_affdfea003469aac3d0fac5f4e06171bc}{rect} () const 
+\item 
+Q\+Rect \hyperlink{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}{outer\+Rect} () const 
+\item 
+Q\+Margins {\bfseries margins} () const \hypertarget{classQCPLayoutElement_a85ff977dfcced84eef32d9f819ec9543}{}\label{classQCPLayoutElement_a85ff977dfcced84eef32d9f819ec9543}
+
+\item 
+Q\+Margins {\bfseries minimum\+Margins} () const \hypertarget{classQCPLayoutElement_a60ec7f377c26726174d536bffb632002}{}\label{classQCPLayoutElement_a60ec7f377c26726174d536bffb632002}
+
+\item 
+Q\+C\+P\+::\+Margin\+Sides {\bfseries auto\+Margins} () const \hypertarget{classQCPLayoutElement_a2f499b1179b3126e22d0d7508124ccb3}{}\label{classQCPLayoutElement_a2f499b1179b3126e22d0d7508124ccb3}
+
+\item 
+Q\+Size {\bfseries minimum\+Size} () const \hypertarget{classQCPLayoutElement_ae71f9230171d2d898e21dc461fc3df03}{}\label{classQCPLayoutElement_ae71f9230171d2d898e21dc461fc3df03}
+
+\item 
+Q\+Size {\bfseries maximum\+Size} () const \hypertarget{classQCPLayoutElement_a1fc85c79e15c2ab8051eccd455fccc4a}{}\label{classQCPLayoutElement_a1fc85c79e15c2ab8051eccd455fccc4a}
+
+\item 
+\hyperlink{classQCPLayoutElement_a0afb3e5773529e4bd20e448f81be4d2a}{Size\+Constraint\+Rect} {\bfseries size\+Constraint\+Rect} () const \hypertarget{classQCPLayoutElement_ad1785b700781fecf99f7b02e77b9ca03}{}\label{classQCPLayoutElement_ad1785b700781fecf99f7b02e77b9ca03}
+
+\item 
+\hyperlink{classQCPMarginGroup}{Q\+C\+P\+Margin\+Group} $\ast$ {\bfseries margin\+Group} (\hyperlink{namespaceQCP_a7e487e3e2ccb62ab7771065bab7cae54}{Q\+C\+P\+::\+Margin\+Side} side) const \hypertarget{classQCPLayoutElement_a22cb1bb62c452fd802e43ca2524660db}{}\label{classQCPLayoutElement_a22cb1bb62c452fd802e43ca2524660db}
+
+\item 
+Q\+Hash$<$ \hyperlink{namespaceQCP_a7e487e3e2ccb62ab7771065bab7cae54}{Q\+C\+P\+::\+Margin\+Side}, \hyperlink{classQCPMarginGroup}{Q\+C\+P\+Margin\+Group} $\ast$ $>$ {\bfseries margin\+Groups} () const \hypertarget{classQCPLayoutElement_ac43921c997570389c14a1671bc3ea499}{}\label{classQCPLayoutElement_ac43921c997570389c14a1671bc3ea499}
+
+\item 
+void \hyperlink{classQCPLayoutElement_a38975ea13e36de8e53391ce41d94bc0f}{set\+Outer\+Rect} (const Q\+Rect \&\hyperlink{classQCPLayoutElement_affdfea003469aac3d0fac5f4e06171bc}{rect})
+\item 
+void \hyperlink{classQCPLayoutElement_a8f450b1f3f992ad576fce2c63d8b79cf}{set\+Margins} (const Q\+Margins \&margins)
+\item 
+void \hyperlink{classQCPLayoutElement_a0a8a17abc16b7923159fcc7608f94673}{set\+Minimum\+Margins} (const Q\+Margins \&margins)
+\item 
+void \hyperlink{classQCPLayoutElement_accfda49994e3e6d51ed14504abf9d27d}{set\+Auto\+Margins} (Q\+C\+P\+::\+Margin\+Sides sides)
+\item 
+void \hyperlink{classQCPLayoutElement_a5dd29a3c8bc88440c97c06b67be7886b}{set\+Minimum\+Size} (const Q\+Size \&size)
+\item 
+void \hyperlink{classQCPLayoutElement_a8e0447614a0bf92de9a7304588c6b96e}{set\+Minimum\+Size} (int width, int height)
+\item 
+void \hyperlink{classQCPLayoutElement_a74eb5280a737ab44833d506db65efd95}{set\+Maximum\+Size} (const Q\+Size \&size)
+\item 
+void \hyperlink{classQCPLayoutElement_a03e0e9c48f230217c529b0819f832d84}{set\+Maximum\+Size} (int width, int height)
+\item 
+void \hyperlink{classQCPLayoutElement_a361666cdcc6fbfd37344cc44be746b0f}{set\+Size\+Constraint\+Rect} (\hyperlink{classQCPLayoutElement_a0afb3e5773529e4bd20e448f81be4d2a}{Size\+Constraint\+Rect} constraint\+Rect)
+\item 
+void \hyperlink{classQCPLayoutElement_a516e56f76b6bc100e8e71d329866847d}{set\+Margin\+Group} (Q\+C\+P\+::\+Margin\+Sides sides, \hyperlink{classQCPMarginGroup}{Q\+C\+P\+Margin\+Group} $\ast$group)
+\item 
+virtual void \hyperlink{classQCPLayoutElement_a929c2ec62e0e0e1d8418eaa802e2af9b}{update} (\hyperlink{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374d}{Update\+Phase} phase)
+\item 
+virtual Q\+Size \hyperlink{classQCPLayoutElement_a4c540ba5c686a1494c92c466912e5411}{minimum\+Outer\+Size\+Hint} () const 
+\item 
+virtual Q\+Size \hyperlink{classQCPLayoutElement_ad60d20664d3950e93c3584e0e7b761bd}{maximum\+Outer\+Size\+Hint} () const 
+\item 
+virtual Q\+List$<$ \hyperlink{classQCPLayoutElement}{Q\+C\+P\+Layout\+Element} $\ast$ $>$ \hyperlink{classQCPLayoutElement_a311d60d78e62ef8eaaedb1b6ceb9e788}{elements} (bool recursive) const 
+\item 
+virtual double \hyperlink{classQCPLayoutElement_ae97f483cccedadbf18ea4525ef240ee4}{select\+Test} (const Q\+PointF \&pos, bool only\+Selectable, Q\+Variant $\ast$details=0) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual int {\bfseries calculate\+Auto\+Margin} (\hyperlink{namespaceQCP_a7e487e3e2ccb62ab7771065bab7cae54}{Q\+C\+P\+::\+Margin\+Side} side)\hypertarget{classQCPLayoutElement_a005c9f0fe84bc1591a2cf2c46fd477b4}{}\label{classQCPLayoutElement_a005c9f0fe84bc1591a2cf2c46fd477b4}
+
+\item 
+virtual void {\bfseries layout\+Changed} ()\hypertarget{classQCPLayoutElement_a765f041a73af0c2de41b41a5a03e31a4}{}\label{classQCPLayoutElement_a765f041a73af0c2de41b41a5a03e31a4}
+
+\item 
+virtual void {\bfseries apply\+Default\+Antialiasing\+Hint} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPLayoutElement_a0a8f18141bcf46cf40ad4c13324ff346}{}\label{classQCPLayoutElement_a0a8f18141bcf46cf40ad4c13324ff346}
+
+\item 
+virtual void {\bfseries draw} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPLayoutElement_ad1c597b1d608cfdd86e7b76819a94cfb}{}\label{classQCPLayoutElement_ad1c597b1d608cfdd86e7b76819a94cfb}
+
+\item 
+virtual void {\bfseries parent\+Plot\+Initialized} (\hyperlink{classQCustomPlot}{Q\+Custom\+Plot} $\ast$parent\+Plot) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPLayoutElement_ab4bb5c5a958451f5f153fdce350f13cf}{}\label{classQCPLayoutElement_ab4bb5c5a958451f5f153fdce350f13cf}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPLayout}{Q\+C\+P\+Layout} $\ast$ {\bfseries m\+Parent\+Layout}\hypertarget{classQCPLayoutElement_ae7c75c25549608bd688bdb65d4c38066}{}\label{classQCPLayoutElement_ae7c75c25549608bd688bdb65d4c38066}
+
+\item 
+Q\+Size {\bfseries m\+Minimum\+Size}\hypertarget{classQCPLayoutElement_affef747c81632de33f08483b7fd10d01}{}\label{classQCPLayoutElement_affef747c81632de33f08483b7fd10d01}
+
+\item 
+Q\+Size {\bfseries m\+Maximum\+Size}\hypertarget{classQCPLayoutElement_a64a387973fd4addac842028c89088998}{}\label{classQCPLayoutElement_a64a387973fd4addac842028c89088998}
+
+\item 
+\hyperlink{classQCPLayoutElement_a0afb3e5773529e4bd20e448f81be4d2a}{Size\+Constraint\+Rect} {\bfseries m\+Size\+Constraint\+Rect}\hypertarget{classQCPLayoutElement_acc012635b1ae178ff3c4da8a3af303a2}{}\label{classQCPLayoutElement_acc012635b1ae178ff3c4da8a3af303a2}
+
+\item 
+Q\+Rect {\bfseries m\+Rect}\hypertarget{classQCPLayoutElement_ad8896f05550389f7b9e92c9e6cdf6e01}{}\label{classQCPLayoutElement_ad8896f05550389f7b9e92c9e6cdf6e01}
+
+\item 
+Q\+Rect {\bfseries m\+Outer\+Rect}\hypertarget{classQCPLayoutElement_a07bb4973379e75cb0fa5b032c1d24afd}{}\label{classQCPLayoutElement_a07bb4973379e75cb0fa5b032c1d24afd}
+
+\item 
+Q\+Margins {\bfseries m\+Margins}\hypertarget{classQCPLayoutElement_ac2a32b99ee527ca5dfff9da03628fe94}{}\label{classQCPLayoutElement_ac2a32b99ee527ca5dfff9da03628fe94}
+
+\item 
+Q\+Margins {\bfseries m\+Minimum\+Margins}\hypertarget{classQCPLayoutElement_a5ba71f25d1af4bb092b28df618538e63}{}\label{classQCPLayoutElement_a5ba71f25d1af4bb092b28df618538e63}
+
+\item 
+Q\+C\+P\+::\+Margin\+Sides {\bfseries m\+Auto\+Margins}\hypertarget{classQCPLayoutElement_af61c70354d1275778d68206b2a1b2d36}{}\label{classQCPLayoutElement_af61c70354d1275778d68206b2a1b2d36}
+
+\item 
+Q\+Hash$<$ \hyperlink{namespaceQCP_a7e487e3e2ccb62ab7771065bab7cae54}{Q\+C\+P\+::\+Margin\+Side}, \hyperlink{classQCPMarginGroup}{Q\+C\+P\+Margin\+Group} $\ast$ $>$ {\bfseries m\+Margin\+Groups}\hypertarget{classQCPLayoutElement_aeafbbc1130e02eee663c5326761fc963}{}\label{classQCPLayoutElement_aeafbbc1130e02eee663c5326761fc963}
+
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class {\bfseries Q\+Custom\+Plot}\hypertarget{classQCPLayoutElement_a1cdf9df76adcfae45261690aa0ca2198}{}\label{classQCPLayoutElement_a1cdf9df76adcfae45261690aa0ca2198}
+
+\item 
+class {\bfseries Q\+C\+P\+Layout}\hypertarget{classQCPLayoutElement_a588aac0a0d721f6c5f10126d8596a20f}{}\label{classQCPLayoutElement_a588aac0a0d721f6c5f10126d8596a20f}
+
+\item 
+class {\bfseries Q\+C\+P\+Margin\+Group}\hypertarget{classQCPLayoutElement_ad077a686e85ab6fa03dcb2fd37fc499a}{}\label{classQCPLayoutElement_ad077a686e85ab6fa03dcb2fd37fc499a}
+
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+The abstract base class for all objects that form the layout system. 
+
+This is an abstract base class. As such, it can\textquotesingle{}t be instantiated directly, rather use one of its subclasses.
+
+A Layout element is a rectangular object which can be placed in layouts. It has an outer rect (\hyperlink{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}{Q\+C\+P\+Layout\+Element\+::outer\+Rect}) and an inner rect (\hyperlink{classQCPLayoutElement_affdfea003469aac3d0fac5f4e06171bc}{Q\+C\+P\+Layout\+Element\+::rect}). The difference between outer and inner rect is called its margin. The margin can either be set to automatic or manual (\hyperlink{classQCPLayoutElement_accfda49994e3e6d51ed14504abf9d27d}{set\+Auto\+Margins}) on a per-\/side basis. If a side is set to manual, that margin can be set explicitly with \hyperlink{classQCPLayoutElement_a8f450b1f3f992ad576fce2c63d8b79cf}{set\+Margins} and will stay fixed at that value. If it\textquotesingle{}s set to automatic, the layout element subclass will control the value itself (via calculate\+Auto\+Margin).
+
+Layout elements can be placed in layouts (base class \hyperlink{classQCPLayout}{Q\+C\+P\+Layout}) like \hyperlink{classQCPLayoutGrid}{Q\+C\+P\+Layout\+Grid}. The top level layout is reachable via \hyperlink{classQCustomPlot_afd280d4d621ae64a106543a545c508d7}{Q\+Custom\+Plot\+::plot\+Layout}, and is a \hyperlink{classQCPLayoutGrid}{Q\+C\+P\+Layout\+Grid}. Since \hyperlink{classQCPLayout}{Q\+C\+P\+Layout} itself derives from \hyperlink{classQCPLayoutElement}{Q\+C\+P\+Layout\+Element}, layouts can be nested.
+
+Thus in \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} one can divide layout elements into two categories\+: The ones that are invisible by themselves, because they don\textquotesingle{}t draw anything. Their only purpose is to manage the position and size of other layout elements. This category of layout elements usually use \hyperlink{classQCPLayout}{Q\+C\+P\+Layout} as base class. Then there is the category of layout elements which actually draw something. For example, \hyperlink{classQCPAxisRect}{Q\+C\+P\+Axis\+Rect}, \hyperlink{classQCPLegend}{Q\+C\+P\+Legend} and \hyperlink{classQCPTextElement}{Q\+C\+P\+Text\+Element} are of this category. This does not necessarily mean that the latter category can\textquotesingle{}t have child layout elements. \hyperlink{classQCPLegend}{Q\+C\+P\+Legend} for instance, actually derives from \hyperlink{classQCPLayoutGrid}{Q\+C\+P\+Layout\+Grid} and the individual legend items are child layout elements in the grid layout. 
+
+\subsection{Member Enumeration Documentation}
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!Size\+Constraint\+Rect@{Size\+Constraint\+Rect}}
+\index{Size\+Constraint\+Rect@{Size\+Constraint\+Rect}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{Size\+Constraint\+Rect}{SizeConstraintRect}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Q\+C\+P\+Layout\+Element\+::\+Size\+Constraint\+Rect}}\hypertarget{classQCPLayoutElement_a0afb3e5773529e4bd20e448f81be4d2a}{}\label{classQCPLayoutElement_a0afb3e5773529e4bd20e448f81be4d2a}
+Defines to which rect of a layout element the size constraints that can be set via \hyperlink{classQCPLayoutElement_a5dd29a3c8bc88440c97c06b67be7886b}{set\+Minimum\+Size} and \hyperlink{classQCPLayoutElement_a74eb5280a737ab44833d506db65efd95}{set\+Maximum\+Size} apply. The outer rect (\hyperlink{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}{outer\+Rect}) includes the margins (e.\+g. in the case of a \hyperlink{classQCPAxisRect}{Q\+C\+P\+Axis\+Rect} the axis labels), whereas the inner rect (\hyperlink{classQCPLayoutElement_affdfea003469aac3d0fac5f4e06171bc}{rect}) does not.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutElement_a361666cdcc6fbfd37344cc44be746b0f}{set\+Size\+Constraint\+Rect} 
+\end{DoxySeeAlso}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{scr\+Inner\+Rect@{scr\+Inner\+Rect}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!scr\+Inner\+Rect@{scr\+Inner\+Rect}}\item[{\em 
+scr\+Inner\+Rect\hypertarget{classQCPLayoutElement_a0afb3e5773529e4bd20e448f81be4d2aa7fa7e25cd23758b9915c64ed9f1be26c}{}\label{classQCPLayoutElement_a0afb3e5773529e4bd20e448f81be4d2aa7fa7e25cd23758b9915c64ed9f1be26c}
+}]Minimum/\+Maximum size constraints apply to inner rect. \index{scr\+Outer\+Rect@{scr\+Outer\+Rect}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!scr\+Outer\+Rect@{scr\+Outer\+Rect}}\item[{\em 
+scr\+Outer\+Rect\hypertarget{classQCPLayoutElement_a0afb3e5773529e4bd20e448f81be4d2aabe2745b41a6131ed194e13591b08e04d}{}\label{classQCPLayoutElement_a0afb3e5773529e4bd20e448f81be4d2aabe2745b41a6131ed194e13591b08e04d}
+}]Minimum/\+Maximum size constraints apply to outer rect, thus include layout element margins. \end{description}
+\end{Desc}
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!Update\+Phase@{Update\+Phase}}
+\index{Update\+Phase@{Update\+Phase}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{Update\+Phase}{UpdatePhase}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Q\+C\+P\+Layout\+Element\+::\+Update\+Phase}}\hypertarget{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374d}{}\label{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374d}
+Defines the phases of the update process, that happens just before a replot. At each phase, \hyperlink{classQCPLayoutElement_a929c2ec62e0e0e1d8418eaa802e2af9b}{update} is called with the according Update\+Phase value. \begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{up\+Preparation@{up\+Preparation}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!up\+Preparation@{up\+Preparation}}\item[{\em 
+up\+Preparation\hypertarget{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374dad6119882eba136357c2f627992e527d3}{}\label{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374dad6119882eba136357c2f627992e527d3}
+}]Phase used for any type of preparation that needs to be done before margin calculation and layout. \index{up\+Margins@{up\+Margins}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!up\+Margins@{up\+Margins}}\item[{\em 
+up\+Margins\hypertarget{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374da288cb59a92280e47261a341f2813e676}{}\label{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374da288cb59a92280e47261a341f2813e676}
+}]Phase in which the margins are calculated and set. \index{up\+Layout@{up\+Layout}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!up\+Layout@{up\+Layout}}\item[{\em 
+up\+Layout\hypertarget{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374da5d1ccf5d79967c232c3c511796860045}{}\label{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374da5d1ccf5d79967c232c3c511796860045}
+}]Final phase in which the layout system places the rects of the elements. \end{description}
+\end{Desc}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Layout\+Element(\+Q\+Custom\+Plot $\ast$parent\+Plot=0)}{QCPLayoutElement(QCustomPlot *parentPlot=0)}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+C\+P\+Layout\+Element\+::\+Q\+C\+P\+Layout\+Element (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+Custom\+Plot} $\ast$}]{parent\+Plot = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [explicit]}}\hypertarget{classQCPLayoutElement_a8947f0ada17e672aaba3d424cbbb67e3}{}\label{classQCPLayoutElement_a8947f0ada17e672aaba3d424cbbb67e3}
+Creates an instance of \hyperlink{classQCPLayoutElement}{Q\+C\+P\+Layout\+Element} and sets default values. 
+
+\subsection{Member Function Documentation}
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!elements@{elements}}
+\index{elements@{elements}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{elements(bool recursive) const }{elements(bool recursive) const }}]{\setlength{\rightskip}{0pt plus 5cm}Q\+List$<$ {\bf Q\+C\+P\+Layout\+Element} $\ast$ $>$ Q\+C\+P\+Layout\+Element\+::elements (
+\begin{DoxyParamCaption}
+\item[{bool}]{recursive}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPLayoutElement_a311d60d78e62ef8eaaedb1b6ceb9e788}{}\label{classQCPLayoutElement_a311d60d78e62ef8eaaedb1b6ceb9e788}
+Returns a list of all child elements in this layout element. If {\itshape recursive} is true, all sub-\/child elements are included in the list, too.
+
+\begin{DoxyWarning}{Warning}
+There may be entries with value 0 in the returned list. (For example, \hyperlink{classQCPLayoutGrid}{Q\+C\+P\+Layout\+Grid} may have empty cells which yield 0 at the respective index.) 
+\end{DoxyWarning}
+
+
+Reimplemented in \hyperlink{classQCPAxisRect_a3aee067fd105f2fa8de9eb8024435ac5}{Q\+C\+P\+Axis\+Rect}, \hyperlink{classQCPLayoutGrid_a7d5b968b4cf57393e9e387976d91f8f7}{Q\+C\+P\+Layout\+Grid}, and \hyperlink{classQCPLayout_aca129722c019f91d3367046f80abfa77}{Q\+C\+P\+Layout}.
+
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!layout@{layout}}
+\index{layout@{layout}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{layout() const }{layout() const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Layout} $\ast$ Q\+C\+P\+Layout\+Element\+::layout (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPLayoutElement_a6235f5384db871fc6e3387a1bc558b0d}{}\label{classQCPLayoutElement_a6235f5384db871fc6e3387a1bc558b0d}
+Returns the parent layout of this layout element. \index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!maximum\+Outer\+Size\+Hint@{maximum\+Outer\+Size\+Hint}}
+\index{maximum\+Outer\+Size\+Hint@{maximum\+Outer\+Size\+Hint}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{maximum\+Outer\+Size\+Hint() const }{maximumOuterSizeHint() const }}]{\setlength{\rightskip}{0pt plus 5cm}Q\+Size Q\+C\+P\+Layout\+Element\+::maximum\+Outer\+Size\+Hint (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPLayoutElement_ad60d20664d3950e93c3584e0e7b761bd}{}\label{classQCPLayoutElement_ad60d20664d3950e93c3584e0e7b761bd}
+Returns the suggested maximum size this layout element (the \hyperlink{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}{outer\+Rect}) may be expanded to, if no manual maximum size is set.
+
+if a maximum size (\hyperlink{classQCPLayoutElement_a74eb5280a737ab44833d506db65efd95}{set\+Maximum\+Size}) was not set manually, parent layouts use the returned size (usually indirectly through Q\+C\+P\+Layout\+::get\+Final\+Maximum\+Outer\+Size) to determine the maximum allowed size of this layout element.
+
+A manual maximum size is considered set if it is smaller than Qt\textquotesingle{}s {\ttfamily Q\+W\+I\+D\+G\+E\+T\+S\+I\+Z\+E\+\_\+\+M\+AX}.
+
+The default implementation simply returns {\ttfamily Q\+W\+I\+D\+G\+E\+T\+S\+I\+Z\+E\+\_\+\+M\+AX} for both width and height, implying no suggested maximum size. Reimplementations may use their detailed knowledge about the layout element\textquotesingle{}s content to provide size hints. 
+
+Reimplemented in \hyperlink{classQCPTextElement_ae82475b50c10a5b3314d996d50ae536b}{Q\+C\+P\+Text\+Element}, and \hyperlink{classQCPLayoutGrid_a41ce0014c220d77b909e2ca937f0e599}{Q\+C\+P\+Layout\+Grid}.
+
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!minimum\+Outer\+Size\+Hint@{minimum\+Outer\+Size\+Hint}}
+\index{minimum\+Outer\+Size\+Hint@{minimum\+Outer\+Size\+Hint}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{minimum\+Outer\+Size\+Hint() const }{minimumOuterSizeHint() const }}]{\setlength{\rightskip}{0pt plus 5cm}Q\+Size Q\+C\+P\+Layout\+Element\+::minimum\+Outer\+Size\+Hint (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPLayoutElement_a4c540ba5c686a1494c92c466912e5411}{}\label{classQCPLayoutElement_a4c540ba5c686a1494c92c466912e5411}
+Returns the suggested minimum size this layout element (the \hyperlink{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}{outer\+Rect}) may be compressed to, if no manual minimum size is set.
+
+if a minimum size (\hyperlink{classQCPLayoutElement_a5dd29a3c8bc88440c97c06b67be7886b}{set\+Minimum\+Size}) was not set manually, parent layouts use the returned size (usually indirectly through Q\+C\+P\+Layout\+::get\+Final\+Minimum\+Outer\+Size) to determine the minimum allowed size of this layout element.
+
+A manual minimum size is considered set if it is non-\/zero.
+
+The default implementation simply returns the sum of the horizontal margins for the width and the sum of the vertical margins for the height. Reimplementations may use their detailed knowledge about the layout element\textquotesingle{}s content to provide size hints. 
+
+Reimplemented in \hyperlink{classQCPTextElement_a47b8541f55ff520c557e0f27461f109e}{Q\+C\+P\+Text\+Element}, \hyperlink{classQCPPlottableLegendItem_a8b543f3ac32b2fe59326e01c1101b3b8}{Q\+C\+P\+Plottable\+Legend\+Item}, and \hyperlink{classQCPLayoutGrid_a0438bc58b4d3894d01db95b08d4268df}{Q\+C\+P\+Layout\+Grid}.
+
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!outer\+Rect@{outer\+Rect}}
+\index{outer\+Rect@{outer\+Rect}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{outer\+Rect() const }{outerRect() const }}]{\setlength{\rightskip}{0pt plus 5cm}Q\+Rect Q\+C\+P\+Layout\+Element\+::outer\+Rect (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}{}\label{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}
+Returns the outer rect of this layout element. The outer rect is the inner rect expanded by the margins (\hyperlink{classQCPLayoutElement_a8f450b1f3f992ad576fce2c63d8b79cf}{set\+Margins}, \hyperlink{classQCPLayoutElement_accfda49994e3e6d51ed14504abf9d27d}{set\+Auto\+Margins}). The outer rect is used (and set via \hyperlink{classQCPLayoutElement_a38975ea13e36de8e53391ce41d94bc0f}{set\+Outer\+Rect}) by the parent \hyperlink{classQCPLayout}{Q\+C\+P\+Layout} to control the size of this layout element.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutElement_affdfea003469aac3d0fac5f4e06171bc}{rect} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!rect@{rect}}
+\index{rect@{rect}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{rect() const }{rect() const }}]{\setlength{\rightskip}{0pt plus 5cm}Q\+Rect Q\+C\+P\+Layout\+Element\+::rect (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPLayoutElement_affdfea003469aac3d0fac5f4e06171bc}{}\label{classQCPLayoutElement_affdfea003469aac3d0fac5f4e06171bc}
+Returns the inner rect of this layout element. The inner rect is the outer rect (\hyperlink{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}{outer\+Rect}, \hyperlink{classQCPLayoutElement_a38975ea13e36de8e53391ce41d94bc0f}{set\+Outer\+Rect}) shrinked by the margins (\hyperlink{classQCPLayoutElement_a8f450b1f3f992ad576fce2c63d8b79cf}{set\+Margins}, \hyperlink{classQCPLayoutElement_accfda49994e3e6d51ed14504abf9d27d}{set\+Auto\+Margins}).
+
+In some cases, the area between outer and inner rect is left blank. In other cases the margin area is used to display peripheral graphics while the main content is in the inner rect. This is where automatic margin calculation becomes interesting because it allows the layout element to adapt the margins to the peripheral graphics it wants to draw. For example, \hyperlink{classQCPAxisRect}{Q\+C\+P\+Axis\+Rect} draws the axis labels and tick labels in the margin area, thus needs to adjust the margins (if \hyperlink{classQCPLayoutElement_accfda49994e3e6d51ed14504abf9d27d}{set\+Auto\+Margins} is enabled) according to the space required by the labels of the axes.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}{outer\+Rect} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!select\+Test@{select\+Test}}
+\index{select\+Test@{select\+Test}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{select\+Test(const Q\+Point\+F \&pos, bool only\+Selectable, Q\+Variant $\ast$details=0) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{selectTest(const QPointF &pos, bool onlySelectable, QVariant *details=0) const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}double Q\+C\+P\+Layout\+Element\+::select\+Test (
+\begin{DoxyParamCaption}
+\item[{const Q\+PointF \&}]{pos, }
+\item[{bool}]{only\+Selectable, }
+\item[{Q\+Variant $\ast$}]{details = {\ttfamily 0}}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPLayoutElement_ae97f483cccedadbf18ea4525ef240ee4}{}\label{classQCPLayoutElement_ae97f483cccedadbf18ea4525ef240ee4}
+Layout elements are sensitive to events inside their outer rect. If {\itshape pos} is within the outer rect, this method returns a value corresponding to 0.\+99 times the parent plot\textquotesingle{}s selection tolerance. However, layout elements are not selectable by default. So if {\itshape only\+Selectable} is true, -\/1.\+0 is returned.
+
+See \hyperlink{classQCPLayerable_a4001c4d0dfec55598efa4d531f2179a9}{Q\+C\+P\+Layerable\+::select\+Test} for a general explanation of this virtual method.
+
+\hyperlink{classQCPLayoutElement}{Q\+C\+P\+Layout\+Element} subclasses may reimplement this method to provide more specific selection test behaviour. 
+
+Reimplemented from \hyperlink{classQCPLayerable_a4001c4d0dfec55598efa4d531f2179a9}{Q\+C\+P\+Layerable}.
+
+
+
+Reimplemented in \hyperlink{classQCPTextElement_a1e721bc2994a127ef5a8f0a514a5dbac}{Q\+C\+P\+Text\+Element}, \hyperlink{classQCPLegend_aa53507624491908fb3d1a514b1fc674e}{Q\+C\+P\+Legend}, \hyperlink{classQCPAbstractLegendItem_a80ec112a6608fc39dbed56239849b187}{Q\+C\+P\+Abstract\+Legend\+Item}, and \hyperlink{classQCPLayoutInset_a2eeef7ea1b8340e7c7c2e2fc229df5ea}{Q\+C\+P\+Layout\+Inset}.
+
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!set\+Auto\+Margins@{set\+Auto\+Margins}}
+\index{set\+Auto\+Margins@{set\+Auto\+Margins}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{set\+Auto\+Margins(\+Q\+C\+P\+::\+Margin\+Sides sides)}{setAutoMargins(QCP::MarginSides sides)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Element\+::set\+Auto\+Margins (
+\begin{DoxyParamCaption}
+\item[{Q\+C\+P\+::\+Margin\+Sides}]{sides}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutElement_accfda49994e3e6d51ed14504abf9d27d}{}\label{classQCPLayoutElement_accfda49994e3e6d51ed14504abf9d27d}
+Sets on which sides the margin shall be calculated automatically. If a side is calculated automatically, a minimum margin value may be provided with \hyperlink{classQCPLayoutElement_a0a8a17abc16b7923159fcc7608f94673}{set\+Minimum\+Margins}. If a side is set to be controlled manually, the value may be specified with \hyperlink{classQCPLayoutElement_a8f450b1f3f992ad576fce2c63d8b79cf}{set\+Margins}.
+
+Margin sides that are under automatic control may participate in a \hyperlink{classQCPMarginGroup}{Q\+C\+P\+Margin\+Group} (see \hyperlink{classQCPLayoutElement_a516e56f76b6bc100e8e71d329866847d}{set\+Margin\+Group}), to synchronize (align) it with other layout elements in the plot.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutElement_a0a8a17abc16b7923159fcc7608f94673}{set\+Minimum\+Margins}, \hyperlink{classQCPLayoutElement_a8f450b1f3f992ad576fce2c63d8b79cf}{set\+Margins}, \hyperlink{namespaceQCP_a7e487e3e2ccb62ab7771065bab7cae54}{Q\+C\+P\+::\+Margin\+Side} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!set\+Margin\+Group@{set\+Margin\+Group}}
+\index{set\+Margin\+Group@{set\+Margin\+Group}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{set\+Margin\+Group(\+Q\+C\+P\+::\+Margin\+Sides sides, Q\+C\+P\+Margin\+Group $\ast$group)}{setMarginGroup(QCP::MarginSides sides, QCPMarginGroup *group)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Element\+::set\+Margin\+Group (
+\begin{DoxyParamCaption}
+\item[{Q\+C\+P\+::\+Margin\+Sides}]{sides, }
+\item[{{\bf Q\+C\+P\+Margin\+Group} $\ast$}]{group}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutElement_a516e56f76b6bc100e8e71d329866847d}{}\label{classQCPLayoutElement_a516e56f76b6bc100e8e71d329866847d}
+Sets the margin {\itshape group} of the specified margin {\itshape sides}.
+
+Margin groups allow synchronizing specified margins across layout elements, see the documentation of \hyperlink{classQCPMarginGroup}{Q\+C\+P\+Margin\+Group}.
+
+To unset the margin group of {\itshape sides}, set {\itshape group} to 0.
+
+Note that margin groups only work for margin sides that are set to automatic (\hyperlink{classQCPLayoutElement_accfda49994e3e6d51ed14504abf9d27d}{set\+Auto\+Margins}).
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{namespaceQCP_a7e487e3e2ccb62ab7771065bab7cae54}{Q\+C\+P\+::\+Margin\+Side} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!set\+Margins@{set\+Margins}}
+\index{set\+Margins@{set\+Margins}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{set\+Margins(const Q\+Margins \&margins)}{setMargins(const QMargins &margins)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Element\+::set\+Margins (
+\begin{DoxyParamCaption}
+\item[{const Q\+Margins \&}]{margins}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutElement_a8f450b1f3f992ad576fce2c63d8b79cf}{}\label{classQCPLayoutElement_a8f450b1f3f992ad576fce2c63d8b79cf}
+Sets the margins of this layout element. If \hyperlink{classQCPLayoutElement_accfda49994e3e6d51ed14504abf9d27d}{set\+Auto\+Margins} is disabled for some or all sides, this function is used to manually set the margin on those sides. Sides that are still set to be handled automatically are ignored and may have any value in {\itshape margins}.
+
+The margin is the distance between the outer rect (controlled by the parent layout via \hyperlink{classQCPLayoutElement_a38975ea13e36de8e53391ce41d94bc0f}{set\+Outer\+Rect}) and the inner \hyperlink{classQCPLayoutElement_affdfea003469aac3d0fac5f4e06171bc}{rect} (which usually contains the main content of this layout element).
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutElement_accfda49994e3e6d51ed14504abf9d27d}{set\+Auto\+Margins} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!set\+Maximum\+Size@{set\+Maximum\+Size}}
+\index{set\+Maximum\+Size@{set\+Maximum\+Size}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{set\+Maximum\+Size(const Q\+Size \&size)}{setMaximumSize(const QSize &size)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Element\+::set\+Maximum\+Size (
+\begin{DoxyParamCaption}
+\item[{const Q\+Size \&}]{size}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutElement_a74eb5280a737ab44833d506db65efd95}{}\label{classQCPLayoutElement_a74eb5280a737ab44833d506db65efd95}
+Sets the maximum size of this layout element. A parent layout tries to respect the {\itshape size} here by changing row/column sizes in the layout accordingly.
+
+Whether this constraint applies to the inner or the outer rect can be specified with \hyperlink{classQCPLayoutElement_a361666cdcc6fbfd37344cc44be746b0f}{set\+Size\+Constraint\+Rect} (see \hyperlink{classQCPLayoutElement_affdfea003469aac3d0fac5f4e06171bc}{rect} and \hyperlink{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}{outer\+Rect}). \index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!set\+Maximum\+Size@{set\+Maximum\+Size}}
+\index{set\+Maximum\+Size@{set\+Maximum\+Size}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{set\+Maximum\+Size(int width, int height)}{setMaximumSize(int width, int height)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Element\+::set\+Maximum\+Size (
+\begin{DoxyParamCaption}
+\item[{int}]{width, }
+\item[{int}]{height}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutElement_a03e0e9c48f230217c529b0819f832d84}{}\label{classQCPLayoutElement_a03e0e9c48f230217c529b0819f832d84}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Sets the maximum size of this layout element.
+
+Whether this constraint applies to the inner or the outer rect can be specified with \hyperlink{classQCPLayoutElement_a361666cdcc6fbfd37344cc44be746b0f}{set\+Size\+Constraint\+Rect} (see \hyperlink{classQCPLayoutElement_affdfea003469aac3d0fac5f4e06171bc}{rect} and \hyperlink{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}{outer\+Rect}). \index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!set\+Minimum\+Margins@{set\+Minimum\+Margins}}
+\index{set\+Minimum\+Margins@{set\+Minimum\+Margins}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{set\+Minimum\+Margins(const Q\+Margins \&margins)}{setMinimumMargins(const QMargins &margins)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Element\+::set\+Minimum\+Margins (
+\begin{DoxyParamCaption}
+\item[{const Q\+Margins \&}]{margins}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutElement_a0a8a17abc16b7923159fcc7608f94673}{}\label{classQCPLayoutElement_a0a8a17abc16b7923159fcc7608f94673}
+If \hyperlink{classQCPLayoutElement_accfda49994e3e6d51ed14504abf9d27d}{set\+Auto\+Margins} is enabled on some or all margins, this function is used to provide minimum values for those margins.
+
+The minimum values are not enforced on margin sides that were set to be under manual control via \hyperlink{classQCPLayoutElement_accfda49994e3e6d51ed14504abf9d27d}{set\+Auto\+Margins}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutElement_accfda49994e3e6d51ed14504abf9d27d}{set\+Auto\+Margins} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!set\+Minimum\+Size@{set\+Minimum\+Size}}
+\index{set\+Minimum\+Size@{set\+Minimum\+Size}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{set\+Minimum\+Size(const Q\+Size \&size)}{setMinimumSize(const QSize &size)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Element\+::set\+Minimum\+Size (
+\begin{DoxyParamCaption}
+\item[{const Q\+Size \&}]{size}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutElement_a5dd29a3c8bc88440c97c06b67be7886b}{}\label{classQCPLayoutElement_a5dd29a3c8bc88440c97c06b67be7886b}
+Sets the minimum size of this layout element. A parent layout tries to respect the {\itshape size} here by changing row/column sizes in the layout accordingly.
+
+If the parent layout size is not sufficient to satisfy all minimum size constraints of its child layout elements, the layout may set a size that is actually smaller than {\itshape size}. \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} propagates the layout\textquotesingle{}s size constraints to the outside by setting its own minimum Q\+Widget size accordingly, so violations of {\itshape size} should be exceptions.
+
+Whether this constraint applies to the inner or the outer rect can be specified with \hyperlink{classQCPLayoutElement_a361666cdcc6fbfd37344cc44be746b0f}{set\+Size\+Constraint\+Rect} (see \hyperlink{classQCPLayoutElement_affdfea003469aac3d0fac5f4e06171bc}{rect} and \hyperlink{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}{outer\+Rect}). \index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!set\+Minimum\+Size@{set\+Minimum\+Size}}
+\index{set\+Minimum\+Size@{set\+Minimum\+Size}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{set\+Minimum\+Size(int width, int height)}{setMinimumSize(int width, int height)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Element\+::set\+Minimum\+Size (
+\begin{DoxyParamCaption}
+\item[{int}]{width, }
+\item[{int}]{height}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutElement_a8e0447614a0bf92de9a7304588c6b96e}{}\label{classQCPLayoutElement_a8e0447614a0bf92de9a7304588c6b96e}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Sets the minimum size of this layout element.
+
+Whether this constraint applies to the inner or the outer rect can be specified with \hyperlink{classQCPLayoutElement_a361666cdcc6fbfd37344cc44be746b0f}{set\+Size\+Constraint\+Rect} (see \hyperlink{classQCPLayoutElement_affdfea003469aac3d0fac5f4e06171bc}{rect} and \hyperlink{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}{outer\+Rect}). \index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!set\+Outer\+Rect@{set\+Outer\+Rect}}
+\index{set\+Outer\+Rect@{set\+Outer\+Rect}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{set\+Outer\+Rect(const Q\+Rect \&rect)}{setOuterRect(const QRect &rect)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Element\+::set\+Outer\+Rect (
+\begin{DoxyParamCaption}
+\item[{const Q\+Rect \&}]{rect}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutElement_a38975ea13e36de8e53391ce41d94bc0f}{}\label{classQCPLayoutElement_a38975ea13e36de8e53391ce41d94bc0f}
+Sets the outer rect of this layout element. If the layout element is inside a layout, the layout sets the position and size of this layout element using this function.
+
+Calling this function externally has no effect, since the layout will overwrite any changes to the outer rect upon the next replot.
+
+The layout element will adapt its inner \hyperlink{classQCPLayoutElement_affdfea003469aac3d0fac5f4e06171bc}{rect} by applying the margins inward to the outer rect.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutElement_affdfea003469aac3d0fac5f4e06171bc}{rect} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!set\+Size\+Constraint\+Rect@{set\+Size\+Constraint\+Rect}}
+\index{set\+Size\+Constraint\+Rect@{set\+Size\+Constraint\+Rect}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{set\+Size\+Constraint\+Rect(\+Size\+Constraint\+Rect constraint\+Rect)}{setSizeConstraintRect(SizeConstraintRect constraintRect)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Element\+::set\+Size\+Constraint\+Rect (
+\begin{DoxyParamCaption}
+\item[{{\bf Size\+Constraint\+Rect}}]{constraint\+Rect}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPLayoutElement_a361666cdcc6fbfd37344cc44be746b0f}{}\label{classQCPLayoutElement_a361666cdcc6fbfd37344cc44be746b0f}
+Sets to which rect of a layout element the size constraints apply. Size constraints can be set via \hyperlink{classQCPLayoutElement_a5dd29a3c8bc88440c97c06b67be7886b}{set\+Minimum\+Size} and \hyperlink{classQCPLayoutElement_a74eb5280a737ab44833d506db65efd95}{set\+Maximum\+Size}.
+
+The outer rect (\hyperlink{classQCPLayoutElement_a60bbddee2d1230c2414bd776f44d17b8}{outer\+Rect}) includes the margins (e.\+g. in the case of a \hyperlink{classQCPAxisRect}{Q\+C\+P\+Axis\+Rect} the axis labels), whereas the inner rect (\hyperlink{classQCPLayoutElement_affdfea003469aac3d0fac5f4e06171bc}{rect}) does not.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPLayoutElement_a5dd29a3c8bc88440c97c06b67be7886b}{set\+Minimum\+Size}, \hyperlink{classQCPLayoutElement_a74eb5280a737ab44833d506db65efd95}{set\+Maximum\+Size} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}!update@{update}}
+\index{update@{update}!Q\+C\+P\+Layout\+Element@{Q\+C\+P\+Layout\+Element}}
+\subsubsection[{\texorpdfstring{update(\+Update\+Phase phase)}{update(UpdatePhase phase)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Layout\+Element\+::update (
+\begin{DoxyParamCaption}
+\item[{{\bf Update\+Phase}}]{phase}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPLayoutElement_a929c2ec62e0e0e1d8418eaa802e2af9b}{}\label{classQCPLayoutElement_a929c2ec62e0e0e1d8418eaa802e2af9b}
+Updates the layout element and sub-\/elements. This function is automatically called before every replot by the parent layout element. It is called multiple times, once for every \hyperlink{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374d}{Update\+Phase}. The phases are run through in the order of the enum values. For details about what happens at the different phases, see the documentation of \hyperlink{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374d}{Update\+Phase}.
+
+Layout elements that have child elements should call the \hyperlink{classQCPLayoutElement_a929c2ec62e0e0e1d8418eaa802e2af9b}{update} method of their child elements, and pass the current {\itshape phase} unchanged.
+
+The default implementation executes the automatic margin mechanism in the \hyperlink{classQCPLayoutElement_a0d83360e05735735aaf6d7983c56374da288cb59a92280e47261a341f2813e676}{up\+Margins} phase. Subclasses should make sure to call the base class implementation. 
+
+Reimplemented in \hyperlink{classQCPColorScale_a259dcb6d3053a2cc3c197e9b1191ddbe}{Q\+C\+P\+Color\+Scale}, \hyperlink{classQCPAxisRect_add049d464b9ef2ccdc638adc4ccb4aca}{Q\+C\+P\+Axis\+Rect}, and \hyperlink{classQCPLayout_a48ecc9c98ea90b547c3e27a931a8f7bd}{Q\+C\+P\+Layout}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/qcustomplot.\+h\item 
+src/qcustomplot.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,132 @@
+\hypertarget{classprim_1_1Ghost}{}\section{prim\+:\+:Ghost Class Reference}
+\label{classprim_1_1Ghost}\index{prim\+::\+Ghost@{prim\+::\+Ghost}}
+
+
+collection of \hyperlink{classprim_1_1GhostDot}{Ghost\+Dot} and \hyperlink{classprim_1_1GhostBox}{Ghost\+Box} objects for moving Items or copy/paste, singleton  
+
+
+
+
+{\ttfamily \#include $<$ghost.\+h$>$}
+
+
+
+Inheritance diagram for prim\+:\+:Ghost\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=163pt]{classprim_1_1Ghost__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for prim\+:\+:Ghost\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=163pt]{classprim_1_1Ghost__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classprim_1_1Ghost_ad2c6d5babda20b32619b8801c1f8d94a}{$\sim$\+Ghost} ()\hypertarget{classprim_1_1Ghost_ad2c6d5babda20b32619b8801c1f8d94a}{}\label{classprim_1_1Ghost_ad2c6d5babda20b32619b8801c1f8d94a}
+
+\begin{DoxyCompactList}\small\item\em destructor, potentially useful later \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1Ghost_a4218723c157248b5d7336c7381110316}{clean\+Ghost} ()\hypertarget{classprim_1_1Ghost_a4218723c157248b5d7336c7381110316}{}\label{classprim_1_1Ghost_a4218723c157248b5d7336c7381110316}
+
+\begin{DoxyCompactList}\small\item\em reset \hyperlink{classprim_1_1Ghost}{Ghost} to its empty state \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1Ghost_ad8b7351f2d73c9793f39571c79e3abcf}{set\+Scene} (Q\+Graphics\+Scene $\ast$sc)\hypertarget{classprim_1_1Ghost_ad8b7351f2d73c9793f39571c79e3abcf}{}\label{classprim_1_1Ghost_ad8b7351f2d73c9793f39571c79e3abcf}
+
+\begin{DoxyCompactList}\small\item\em Add the current \hyperlink{classprim_1_1Ghost}{Ghost} to sc. \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1Ghost_a61f8b226d0feb571f0cba1d27029c231}{prepare} (const Q\+List$<$ \hyperlink{classprim_1_1Item}{prim\+::\+Item} $\ast$ $>$ \&items, Q\+PointF scene\+\_\+pos=Q\+PointF())\hypertarget{classprim_1_1Ghost_a61f8b226d0feb571f0cba1d27029c231}{}\label{classprim_1_1Ghost_a61f8b226d0feb571f0cba1d27029c231}
+
+\begin{DoxyCompactList}\small\item\em create a ghost image from a list of \hyperlink{classprim_1_1Item}{Item} objects if moving, scene\+\_\+pos gives the current mouse location \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1Ghost_a8e92d9b86e2f9ebcdf2849de63fb87f9}{prepare} (\hyperlink{classprim_1_1Item}{Item} $\ast$item, Q\+PointF scene\+\_\+pos=Q\+PointF())\hypertarget{classprim_1_1Ghost_a8e92d9b86e2f9ebcdf2849de63fb87f9}{}\label{classprim_1_1Ghost_a8e92d9b86e2f9ebcdf2849de63fb87f9}
+
+\begin{DoxyCompactList}\small\item\em create a ghost image from a single \hyperlink{classprim_1_1Item}{Item} if moving, scene\+\_\+pos gives the current mouse location \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1Ghost_a1f51f724ed50b9a152ce590e5fc865bd}{move\+To} (Q\+PointF pos)\hypertarget{classprim_1_1Ghost_a1f51f724ed50b9a152ce590e5fc865bd}{}\label{classprim_1_1Ghost_a1f51f724ed50b9a152ce590e5fc865bd}
+
+\begin{DoxyCompactList}\small\item\em move center of \hyperlink{classprim_1_1Ghost}{Ghost} to the given position \end{DoxyCompactList}\item 
+Q\+List$<$ \hyperlink{classprim_1_1Item}{prim\+::\+Item} $\ast$ $>$ \& \hyperlink{classprim_1_1Ghost_ac765bda81aa6c2e1d484cf11b7a53b40}{get\+Sources} ()\hypertarget{classprim_1_1Ghost_ac765bda81aa6c2e1d484cf11b7a53b40}{}\label{classprim_1_1Ghost_ac765bda81aa6c2e1d484cf11b7a53b40}
+
+\begin{DoxyCompactList}\small\item\em get the items associated with the Ghost\+Dots \end{DoxyCompactList}\item 
+Q\+List$<$ \hyperlink{classprim_1_1GhostDot}{prim\+::\+Ghost\+Dot} $\ast$ $>$ \hyperlink{classprim_1_1Ghost_a6046201ee3e54a1ff5f8ce06e4076034}{get\+Dots} ()\hypertarget{classprim_1_1Ghost_a6046201ee3e54a1ff5f8ce06e4076034}{}\label{classprim_1_1Ghost_a6046201ee3e54a1ff5f8ce06e4076034}
+
+\begin{DoxyCompactList}\small\item\em get the Ghost\+Dots \end{DoxyCompactList}\item 
+Q\+List$<$ \hyperlink{classprim_1_1Item}{prim\+::\+Item} $\ast$ $>$ \& \hyperlink{classprim_1_1Ghost_a8588e78ab2471a42cec11ed206f12ba8}{get\+Box\+Sources} ()\hypertarget{classprim_1_1Ghost_a8588e78ab2471a42cec11ed206f12ba8}{}\label{classprim_1_1Ghost_a8588e78ab2471a42cec11ed206f12ba8}
+
+\begin{DoxyCompactList}\small\item\em get the items associated with the Ghost\+Boxes \end{DoxyCompactList}\item 
+Q\+List$<$ \hyperlink{classprim_1_1GhostBox}{prim\+::\+Ghost\+Box} $\ast$ $>$ \hyperlink{classprim_1_1Ghost_a3ab6cb77d198a866c036253278778f49}{get\+Boxes} ()\hypertarget{classprim_1_1Ghost_a3ab6cb77d198a866c036253278778f49}{}\label{classprim_1_1Ghost_a3ab6cb77d198a866c036253278778f49}
+
+\begin{DoxyCompactList}\small\item\em get the Ghost\+Boxes \end{DoxyCompactList}\item 
+Q\+List$<$ \hyperlink{classprim_1_1Item}{prim\+::\+Item} $\ast$ $>$ \hyperlink{classprim_1_1Ghost_a920aa6435950563ae70262dcd69df7d4}{get\+Top\+Items} () const \hypertarget{classprim_1_1Ghost_a920aa6435950563ae70262dcd69df7d4}{}\label{classprim_1_1Ghost_a920aa6435950563ae70262dcd69df7d4}
+
+\begin{DoxyCompactList}\small\item\em get a list of the highest level Items associated with the sources \end{DoxyCompactList}\item 
+\hyperlink{structprim_1_1AggNode}{prim\+::\+Agg\+Node} \& \hyperlink{classprim_1_1Ghost_af75764943e4245ef8c4825bdbfadec7e}{get\+Top\+Indices} ()\hypertarget{classprim_1_1Ghost_af75764943e4245ef8c4825bdbfadec7e}{}\label{classprim_1_1Ghost_af75764943e4245ef8c4825bdbfadec7e}
+
+\begin{DoxyCompactList}\small\item\em get a nested list of the items included in each high level item, must free Index\+List pointer after use \end{DoxyCompactList}\item 
+Q\+List$<$ \hyperlink{classprim_1_1LatticeDot}{prim\+::\+Lattice\+Dot} $\ast$ $>$ \hyperlink{classprim_1_1Ghost_a641a82fd79a022ade58f9a3f392647e2}{get\+Lattice} (const Q\+PointF \&offset=Q\+PointF()) const \hypertarget{classprim_1_1Ghost_a641a82fd79a022ade58f9a3f392647e2}{}\label{classprim_1_1Ghost_a641a82fd79a022ade58f9a3f392647e2}
+
+\begin{DoxyCompactList}\small\item\em get a list corresponding to the \hyperlink{classprim_1_1LatticeDot}{Lattice\+Dot} associated with each \hyperlink{classprim_1_1GhostDot}{Ghost\+Dot}. If the \hyperlink{classprim_1_1Item}{Item} associated with the \hyperlink{classprim_1_1GhostDot}{Ghost\+Dot} is not a dangling bond the list will contain a 0. \end{DoxyCompactList}\item 
+\hyperlink{classprim_1_1LatticeDot}{prim\+::\+Lattice\+Dot} $\ast$ \hyperlink{classprim_1_1Ghost_a3d5a8778efd339414b0d37faba25c1dd}{get\+Lattice\+Dot} (\hyperlink{classprim_1_1DBDot}{prim\+::\+D\+B\+Dot} $\ast$db)\hypertarget{classprim_1_1Ghost_a3d5a8778efd339414b0d37faba25c1dd}{}\label{classprim_1_1Ghost_a3d5a8778efd339414b0d37faba25c1dd}
+
+\begin{DoxyCompactList}\small\item\em attempt to get the lattice dot under the \hyperlink{classprim_1_1GhostDot}{Ghost\+Dot} correponding to the given \hyperlink{classprim_1_1DBDot}{D\+B\+Dot} item. \end{DoxyCompactList}\item 
+\hyperlink{classprim_1_1GhostDot}{prim\+::\+Ghost\+Dot} $\ast$ \hyperlink{classprim_1_1Ghost_a2558b908740d3f990cc7fec51a058802}{snap\+Anchor} ()\hypertarget{classprim_1_1Ghost_a2558b908740d3f990cc7fec51a058802}{}\label{classprim_1_1Ghost_a2558b908740d3f990cc7fec51a058802}
+
+\begin{DoxyCompactList}\small\item\em get the \hyperlink{classprim_1_1GhostDot}{Ghost\+Dot} nearest to the center of the \hyperlink{classprim_1_1Ghost}{Ghost}. If db is set, will return the neatest dangling bond \hyperlink{classprim_1_1GhostDot}{Ghost\+Dot} if any exists else 0. \end{DoxyCompactList}\item 
+Q\+PointF \hyperlink{classprim_1_1Ghost_a070edb8e12dcbca0004419d84a1d6352}{free\+Anchor} (Q\+PointF scene\+\_\+pos)\hypertarget{classprim_1_1Ghost_a070edb8e12dcbca0004419d84a1d6352}{}\label{classprim_1_1Ghost_a070edb8e12dcbca0004419d84a1d6352}
+
+\begin{DoxyCompactList}\small\item\em location of the anchor dot if the \hyperlink{classprim_1_1Ghost}{Ghost} were centered at the given scene position. \end{DoxyCompactList}\item 
+Q\+Color $\ast$ \hyperlink{classprim_1_1Ghost_a5beebb67cf4a0b3f6bfc72af3e13055f}{get\+Col} ()\hypertarget{classprim_1_1Ghost_a5beebb67cf4a0b3f6bfc72af3e13055f}{}\label{classprim_1_1Ghost_a5beebb67cf4a0b3f6bfc72af3e13055f}
+
+\begin{DoxyCompactList}\small\item\em getter for ghost color \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1Ghost_add66c0767f3e9251e3532c07f7357923}{set\+Col} (Q\+Color \&color)\hypertarget{classprim_1_1Ghost_add66c0767f3e9251e3532c07f7357923}{}\label{classprim_1_1Ghost_add66c0767f3e9251e3532c07f7357923}
+
+\begin{DoxyCompactList}\small\item\em setter for ghost color \end{DoxyCompactList}\item 
+void \hyperlink{classprim_1_1Ghost_a9f7ed79e6ea56dacad0f2c4a0f6a503d}{set\+Valid} (bool val)\hypertarget{classprim_1_1Ghost_a9f7ed79e6ea56dacad0f2c4a0f6a503d}{}\label{classprim_1_1Ghost_a9f7ed79e6ea56dacad0f2c4a0f6a503d}
+
+\begin{DoxyCompactList}\small\item\em manual set for the validity of the current position \end{DoxyCompactList}\item 
+bool \hyperlink{classprim_1_1Ghost_a353ab6dfe05cfff99aebab59207cb95d}{check\+Valid} (const Q\+PointF \&offset=Q\+PointF())\hypertarget{classprim_1_1Ghost_a353ab6dfe05cfff99aebab59207cb95d}{}\label{classprim_1_1Ghost_a353ab6dfe05cfff99aebab59207cb95d}
+
+\begin{DoxyCompactList}\small\item\em check if the current position is valid. \end{DoxyCompactList}\item 
+Q\+PointF \hyperlink{classprim_1_1Ghost_aae476432c09d4c3b3a8c8dcdb8a94c94}{move\+Offset} () const \hypertarget{classprim_1_1Ghost_aae476432c09d4c3b3a8c8dcdb8a94c94}{}\label{classprim_1_1Ghost_aae476432c09d4c3b3a8c8dcdb8a94c94}
+
+\begin{DoxyCompactList}\small\item\em change in position between the first source and \hyperlink{classprim_1_1GhostDot}{Ghost\+Dot}, for moving Items \end{DoxyCompactList}\item 
+Q\+RectF {\bfseries bounding\+Rect} () const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classprim_1_1Ghost_a67cf6c0546c09e90f86107f8c9b6c548}{}\label{classprim_1_1Ghost_a67cf6c0546c09e90f86107f8c9b6c548}
+
+\item 
+void {\bfseries paint} (Q\+Painter $\ast$painter, const Q\+Style\+Option\+Graphics\+Item $\ast$, Q\+Widget $\ast$) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classprim_1_1Ghost_ae9a5e4b678c702be051a96060e80082c}{}\label{classprim_1_1Ghost_ae9a5e4b678c702be051a96060e80082c}
+
+\item 
+\hyperlink{classprim_1_1Item}{prim\+::\+Item} $\ast$ \hyperlink{classprim_1_1Ghost_a93ee73c97062828642eafdd64d6211de}{deep\+Copy} () const \hypertarget{classprim_1_1Ghost_a93ee73c97062828642eafdd64d6211de}{}\label{classprim_1_1Ghost_a93ee73c97062828642eafdd64d6211de}
+
+\begin{DoxyCompactList}\small\item\em create a deep copy of the \hyperlink{classprim_1_1Item}{Item} for the clipboard. Deep-\/copied items should have no parent or scene and need only to have the information necessary to create a new copy somewhere in the scene \end{DoxyCompactList}\item 
+void {\bfseries echo\+Top\+Indices} ()\hypertarget{classprim_1_1Ghost_a9df8e28afe11ef1355672ba2c834c267}{}\label{classprim_1_1Ghost_a9df8e28afe11ef1355672ba2c834c267}
+
+\item 
+void {\bfseries echo\+Node} (Q\+String \&s, \hyperlink{structprim_1_1AggNode}{Agg\+Node} $\ast$node)\hypertarget{classprim_1_1Ghost_ac6766dd582591462577331a9b93b60ea}{}\label{classprim_1_1Ghost_ac6766dd582591462577331a9b93b60ea}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \hyperlink{classprim_1_1Ghost}{Ghost} $\ast$ \hyperlink{classprim_1_1Ghost_a16931bddd932d534b0926826d20e1e90}{instance} ()\hypertarget{classprim_1_1Ghost_a16931bddd932d534b0926826d20e1e90}{}\label{classprim_1_1Ghost_a16931bddd932d534b0926826d20e1e90}
+
+\begin{DoxyCompactList}\small\item\em get or create the static \hyperlink{classprim_1_1Ghost}{Ghost} instance \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Q\+Hash$<$ \hyperlink{classprim_1_1LatticeDot}{prim\+::\+Lattice\+Dot} $\ast$, bool $>$ \hyperlink{classprim_1_1Ghost_abdb2bd655baa8cb186477355ff1d7a57}{valid\+\_\+hash}\hypertarget{classprim_1_1Ghost_abdb2bd655baa8cb186477355ff1d7a57}{}\label{classprim_1_1Ghost_abdb2bd655baa8cb186477355ff1d7a57}
+
+\begin{DoxyCompactList}\small\item\em hash table for valid snap points \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+collection of \hyperlink{classprim_1_1GhostDot}{Ghost\+Dot} and \hyperlink{classprim_1_1GhostBox}{Ghost\+Box} objects for moving Items or copy/paste, singleton 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/gui/widgets/primitives/\hyperlink{ghost_8h}{ghost.\+h}\item 
+src/gui/widgets/primitives/ghost.\+cc\end{DoxyCompactItemize}

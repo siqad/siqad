@@ -1734,8 +1734,7 @@ void gui::DesignPanel::CreatePotPlot::destroy()
 {
   prim::PotPlot *pp = static_cast<prim::PotPlot*>(dp->getLayer(layer_index)->getItem(index));
   if(pp != 0){
-    // destroy electrode
-    dp->removeItem(pp, dp->getLayer(pp->layer_id));  // deletes electrode
+    dp->removeItem(pp, dp->getLayer(pp->layer_id));  // deletes PotPlot
     pp = 0;
   }
 }

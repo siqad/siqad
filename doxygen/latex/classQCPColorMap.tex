@@ -1,0 +1,432 @@
+\hypertarget{classQCPColorMap}{}\section{Q\+C\+P\+Color\+Map Class Reference}
+\label{classQCPColorMap}\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+
+
+A plottable representing a two-\/dimensional color map in a plot.  
+
+
+
+
+Inheritance diagram for Q\+C\+P\+Color\+Map\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=193pt]{classQCPColorMap__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Q\+C\+P\+Color\+Map\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classQCPColorMap__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Signals}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classQCPColorMap_a83ae5be3903da493f732e1a5c14fd807}{data\+Range\+Changed} (const \hyperlink{classQCPRange}{Q\+C\+P\+Range} \&new\+Range)
+\item 
+void \hyperlink{classQCPColorMap_a978d5d5c9f68cffef8c902b855c04490}{data\+Scale\+Type\+Changed} (\hyperlink{classQCPAxis_a36d8e8658dbaa179bf2aeb973db2d6f0}{Q\+C\+P\+Axis\+::\+Scale\+Type} scale\+Type)
+\item 
+void \hyperlink{classQCPColorMap_a31a12726736b1ac274e7b1d8dfb67468}{gradient\+Changed} (const \hyperlink{classQCPColorGradient}{Q\+C\+P\+Color\+Gradient} \&new\+Gradient)
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPColorMap_aa37e976d2ee1e2be6c4cd88a64b36215}{Q\+C\+P\+Color\+Map} (\hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$key\+Axis, \hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$value\+Axis)
+\item 
+\hyperlink{classQCPColorMapData}{Q\+C\+P\+Color\+Map\+Data} $\ast$ \hyperlink{classQCPColorMap_a3ae12c9ce842352037cd20ea5267414f}{data} () const 
+\item 
+\hyperlink{classQCPRange}{Q\+C\+P\+Range} {\bfseries data\+Range} () const \hypertarget{classQCPColorMap_a37cc8e821e070697e15652f6419fab48}{}\label{classQCPColorMap_a37cc8e821e070697e15652f6419fab48}
+
+\item 
+\hyperlink{classQCPAxis_a36d8e8658dbaa179bf2aeb973db2d6f0}{Q\+C\+P\+Axis\+::\+Scale\+Type} {\bfseries data\+Scale\+Type} () const \hypertarget{classQCPColorMap_a5ffc703dc603c4fd942f36ea51b8c48d}{}\label{classQCPColorMap_a5ffc703dc603c4fd942f36ea51b8c48d}
+
+\item 
+bool {\bfseries interpolate} () const \hypertarget{classQCPColorMap_a39019675a7ad00efad7212b96c0ccc95}{}\label{classQCPColorMap_a39019675a7ad00efad7212b96c0ccc95}
+
+\item 
+bool {\bfseries tight\+Boundary} () const \hypertarget{classQCPColorMap_aa1d9aa8db73a5942881f6f6c5afdbb0f}{}\label{classQCPColorMap_aa1d9aa8db73a5942881f6f6c5afdbb0f}
+
+\item 
+\hyperlink{classQCPColorGradient}{Q\+C\+P\+Color\+Gradient} {\bfseries gradient} () const \hypertarget{classQCPColorMap_a9f967a971474e32345290b79cf107809}{}\label{classQCPColorMap_a9f967a971474e32345290b79cf107809}
+
+\item 
+\hyperlink{classQCPColorScale}{Q\+C\+P\+Color\+Scale} $\ast$ {\bfseries color\+Scale} () const \hypertarget{classQCPColorMap_a6bd82e0b042a2ec4d64f40853a3b05e3}{}\label{classQCPColorMap_a6bd82e0b042a2ec4d64f40853a3b05e3}
+
+\item 
+void \hyperlink{classQCPColorMap_a5a23e133a20c4ccad35fd32e6c0f9809}{set\+Data} (\hyperlink{classQCPColorMapData}{Q\+C\+P\+Color\+Map\+Data} $\ast$\hyperlink{classQCPColorMap_a3ae12c9ce842352037cd20ea5267414f}{data}, bool copy=false)
+\item 
+Q\+\_\+\+S\+L\+OT void \hyperlink{classQCPColorMap_a980b42837821159786a85b4b7dcb8774}{set\+Data\+Range} (const \hyperlink{classQCPRange}{Q\+C\+P\+Range} \&data\+Range)
+\item 
+Q\+\_\+\+S\+L\+OT void \hyperlink{classQCPColorMap_a9d20aa08e3c1f20f22908c45b9c06511}{set\+Data\+Scale\+Type} (\hyperlink{classQCPAxis_a36d8e8658dbaa179bf2aeb973db2d6f0}{Q\+C\+P\+Axis\+::\+Scale\+Type} scale\+Type)
+\item 
+Q\+\_\+\+S\+L\+OT void \hyperlink{classQCPColorMap_a7313c78360471cead3576341a2c50377}{set\+Gradient} (const \hyperlink{classQCPColorGradient}{Q\+C\+P\+Color\+Gradient} \&gradient)
+\item 
+void \hyperlink{classQCPColorMap_a484eaa8a5065cfc386b15375bf98b964}{set\+Interpolate} (bool enabled)
+\item 
+void \hyperlink{classQCPColorMap_ad03221cc285e5f562a0b13d684b5576d}{set\+Tight\+Boundary} (bool enabled)
+\item 
+void \hyperlink{classQCPColorMap_aa828921db364fe3c6af4619580ab85fd}{set\+Color\+Scale} (\hyperlink{classQCPColorScale}{Q\+C\+P\+Color\+Scale} $\ast$color\+Scale)
+\item 
+void \hyperlink{classQCPColorMap_a856608fa3dd1cc290bcd5f29a5575774}{rescale\+Data\+Range} (bool recalculate\+Data\+Bounds=false)
+\item 
+Q\+\_\+\+S\+L\+OT void \hyperlink{classQCPColorMap_a5d8158b62d55fcfeaabcb68ce0083e87}{update\+Legend\+Icon} (Qt\+::\+Transformation\+Mode transform\+Mode=Qt\+::\+Smooth\+Transformation, const Q\+Size \&thumb\+Size=Q\+Size(32, 18))
+\item 
+virtual double \hyperlink{classQCPColorMap_afb4b843596addf58096082827a9e3450}{select\+Test} (const Q\+PointF \&pos, bool only\+Selectable, Q\+Variant $\ast$details=0) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+virtual \hyperlink{classQCPRange}{Q\+C\+P\+Range} \hyperlink{classQCPColorMap_a985861974560f950af6cb7fae8c46267}{get\+Key\+Range} (bool \&found\+Range, \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9}{Q\+C\+P\+::\+Sign\+Domain} in\+Sign\+Domain=\hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9aa38352ef02d51ddfa4399d9551566e24}{Q\+C\+P\+::sd\+Both}) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\item 
+virtual \hyperlink{classQCPRange}{Q\+C\+P\+Range} \hyperlink{classQCPColorMap_a88134493aaf6b297af34eaab65264fff}{get\+Value\+Range} (bool \&found\+Range, \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9}{Q\+C\+P\+::\+Sign\+Domain} in\+Sign\+Domain=\hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9aa38352ef02d51ddfa4399d9551566e24}{Q\+C\+P\+::sd\+Both}, const \hyperlink{classQCPRange}{Q\+C\+P\+Range} \&in\+Key\+Range=\hyperlink{classQCPRange}{Q\+C\+P\+Range}()) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void {\bfseries update\+Map\+Image} ()\hypertarget{classQCPColorMap_a5efcea591bb5486d968af520a4d43c3a}{}\label{classQCPColorMap_a5efcea591bb5486d968af520a4d43c3a}
+
+\item 
+virtual void {\bfseries draw} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPColorMap_a6b628014d2939368935efd0a788648c8}{}\label{classQCPColorMap_a6b628014d2939368935efd0a788648c8}
+
+\item 
+virtual void {\bfseries draw\+Legend\+Icon} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter, const Q\+RectF \&rect) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPColorMap_adeaa5e262a03b7f021bd1aa6f1e60ce9}{}\label{classQCPColorMap_adeaa5e262a03b7f021bd1aa6f1e60ce9}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPRange}{Q\+C\+P\+Range} {\bfseries m\+Data\+Range}\hypertarget{classQCPColorMap_ab87609621d16cd3e9d52ad070b327b08}{}\label{classQCPColorMap_ab87609621d16cd3e9d52ad070b327b08}
+
+\item 
+\hyperlink{classQCPAxis_a36d8e8658dbaa179bf2aeb973db2d6f0}{Q\+C\+P\+Axis\+::\+Scale\+Type} {\bfseries m\+Data\+Scale\+Type}\hypertarget{classQCPColorMap_ab28a4b2def408f83b9818799d5f18446}{}\label{classQCPColorMap_ab28a4b2def408f83b9818799d5f18446}
+
+\item 
+\hyperlink{classQCPColorMapData}{Q\+C\+P\+Color\+Map\+Data} $\ast$ {\bfseries m\+Map\+Data}\hypertarget{classQCPColorMap_a8709272aa8f0be3ca111bf3866806f8b}{}\label{classQCPColorMap_a8709272aa8f0be3ca111bf3866806f8b}
+
+\item 
+\hyperlink{classQCPColorGradient}{Q\+C\+P\+Color\+Gradient} {\bfseries m\+Gradient}\hypertarget{classQCPColorMap_aab77fe9a8df6f0486ab3507cc5f278fa}{}\label{classQCPColorMap_aab77fe9a8df6f0486ab3507cc5f278fa}
+
+\item 
+bool {\bfseries m\+Interpolate}\hypertarget{classQCPColorMap_af77e5eba9a844592648edeb6fbe834f1}{}\label{classQCPColorMap_af77e5eba9a844592648edeb6fbe834f1}
+
+\item 
+bool {\bfseries m\+Tight\+Boundary}\hypertarget{classQCPColorMap_ac2e9425fe4381b496726e1c09f978302}{}\label{classQCPColorMap_ac2e9425fe4381b496726e1c09f978302}
+
+\item 
+Q\+Pointer$<$ \hyperlink{classQCPColorScale}{Q\+C\+P\+Color\+Scale} $>$ {\bfseries m\+Color\+Scale}\hypertarget{classQCPColorMap_a95b4100bacc3387652c988b071ec9db7}{}\label{classQCPColorMap_a95b4100bacc3387652c988b071ec9db7}
+
+\item 
+Q\+Image {\bfseries m\+Map\+Image}\hypertarget{classQCPColorMap_a66110813b42eca78b64095b2a1f285a0}{}\label{classQCPColorMap_a66110813b42eca78b64095b2a1f285a0}
+
+\item 
+Q\+Image {\bfseries m\+Undersampled\+Map\+Image}\hypertarget{classQCPColorMap_acad3d52f3572436d5f2e4057911ea8d3}{}\label{classQCPColorMap_acad3d52f3572436d5f2e4057911ea8d3}
+
+\item 
+Q\+Pixmap {\bfseries m\+Legend\+Icon}\hypertarget{classQCPColorMap_ada522988db02cb531767d38c5029ef60}{}\label{classQCPColorMap_ada522988db02cb531767d38c5029ef60}
+
+\item 
+bool {\bfseries m\+Map\+Image\+Invalidated}\hypertarget{classQCPColorMap_ac9aea6a5c193d7fa866bc7b26e79ef2c}{}\label{classQCPColorMap_ac9aea6a5c193d7fa866bc7b26e79ef2c}
+
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class {\bfseries Q\+Custom\+Plot}\hypertarget{classQCPColorMap_a1cdf9df76adcfae45261690aa0ca2198}{}\label{classQCPColorMap_a1cdf9df76adcfae45261690aa0ca2198}
+
+\item 
+class {\bfseries Q\+C\+P\+Legend}\hypertarget{classQCPColorMap_a8429035e7adfbd7f05805a6530ad5e3b}{}\label{classQCPColorMap_a8429035e7adfbd7f05805a6530ad5e3b}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A plottable representing a two-\/dimensional color map in a plot. 
+
+
+
+The data is stored in the class \hyperlink{classQCPColorMapData}{Q\+C\+P\+Color\+Map\+Data}, which can be accessed via the \hyperlink{classQCPColorMap_a3ae12c9ce842352037cd20ea5267414f}{data()} method.
+
+A color map has three dimensions to represent a data point\+: The {\itshape key} dimension, the {\itshape value} dimension and the {\itshape data} dimension. As with other plottables such as graphs, {\itshape key} and {\itshape value} correspond to two orthogonal axes on the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} surface that you specify in the \hyperlink{classQCPColorMap}{Q\+C\+P\+Color\+Map} constructor. The {\itshape data} dimension however is encoded as the color of the point at ({\itshape key}, {\itshape value}).
+
+Set the number of points (or {\itshape cells}) in the key/value dimension via \hyperlink{classQCPColorMapData_a0d9ff35c299d0478b682bfbcdd9c097e}{Q\+C\+P\+Color\+Map\+Data\+::set\+Size}. The plot coordinate range over which these points will be displayed is specified via \hyperlink{classQCPColorMapData_aad9c1c7c703c1339489fc730517c83d4}{Q\+C\+P\+Color\+Map\+Data\+::set\+Range}. The first cell will be centered on the lower range boundary and the last cell will be centered on the upper range boundary. The data can be set by either accessing the cells directly with \hyperlink{classQCPColorMapData_a8e75eaf8746596319032a93f3d2d0683}{Q\+C\+P\+Color\+Map\+Data\+::set\+Cell} or by addressing the cells via their plot coordinates with \hyperlink{classQCPColorMapData_afd2083ccfd6987ec94aa7ef8e91ca39a}{Q\+C\+P\+Color\+Map\+Data\+::set\+Data}. If possible, you should prefer set\+Cell, since it doesn\textquotesingle{}t need to do any coordinate transformation and thus performs a bit better.
+
+The cell with index (0, 0) is at the bottom left, if the color map uses normal (i.\+e. not reversed) key and value axes.
+
+To show the user which colors correspond to which {\itshape data} values, a \hyperlink{classQCPColorScale}{Q\+C\+P\+Color\+Scale} is typically placed to the right of the axis rect. See the documentation there for details on how to add and use a color scale.\hypertarget{classQCPColorMap_qcpcolormap-appearance}{}\subsection{Changing the appearance}\label{classQCPColorMap_qcpcolormap-appearance}
+The central part of the appearance is the color gradient, which can be specified via \hyperlink{classQCPColorMap_a7313c78360471cead3576341a2c50377}{set\+Gradient}. See the documentation of \hyperlink{classQCPColorGradient}{Q\+C\+P\+Color\+Gradient} for details on configuring a color gradient.
+
+The {\itshape data} range that is mapped to the colors of the gradient can be specified with \hyperlink{classQCPColorMap_a980b42837821159786a85b4b7dcb8774}{set\+Data\+Range}. To make the data range encompass the whole data set minimum to maximum, call \hyperlink{classQCPColorMap_a856608fa3dd1cc290bcd5f29a5575774}{rescale\+Data\+Range}.\hypertarget{classQCPColorMap_qcpcolormap-transparency}{}\subsection{Transparency}\label{classQCPColorMap_qcpcolormap-transparency}
+Transparency in color maps can be achieved by two mechanisms. On one hand, you can specify alpha values for color stops of the \hyperlink{classQCPColorGradient}{Q\+C\+P\+Color\+Gradient}, via the regular Q\+Color interface. This will cause the color map data which gets mapped to colors around those color stops to appear with the accordingly interpolated transparency.
+
+On the other hand you can also directly apply an alpha value to each cell independent of its data, by using the alpha map feature of \hyperlink{classQCPColorMapData}{Q\+C\+P\+Color\+Map\+Data}. The relevant methods are \hyperlink{classQCPColorMapData_aaf7de5b34c58f38d8f4c1ceb064a876c}{Q\+C\+P\+Color\+Map\+Data\+::set\+Alpha}, \hyperlink{classQCPColorMapData_a93e2a549d7702bc849cd48a585294657}{Q\+C\+P\+Color\+Map\+Data\+::fill\+Alpha} and \hyperlink{classQCPColorMapData_a14d08b9c3720cd719400079b86d3906b}{Q\+C\+P\+Color\+Map\+Data\+::clear\+Alpha()}.
+
+The two transparencies will be joined together in the plot and otherwise not interfere with each other. They are mixed in a multiplicative matter, so an alpha of e.\+g. 50\% (128/255) in both modes simultaneously, will result in a total transparency of 25\% (64/255).\hypertarget{classQCPColorMap_qcpcolormap-usage}{}\subsection{Usage}\label{classQCPColorMap_qcpcolormap-usage}
+Like all data representing objects in \hyperlink{classQCustomPlot}{Q\+Custom\+Plot}, the \hyperlink{classQCPColorMap}{Q\+C\+P\+Color\+Map} is a plottable (\hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable}). So the plottable-\/interface of \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} applies (\hyperlink{classQCustomPlot_a32de81ff53e263e785b83b52ecd99d6f}{Q\+Custom\+Plot\+::plottable}, \hyperlink{classQCustomPlot_af3dafd56884208474f311d6226513ab2}{Q\+Custom\+Plot\+::remove\+Plottable}, etc.)
+
+Usually, you first create an instance\+: 
+\begin{DoxyCodeInclude}
+\end{DoxyCodeInclude}
+which registers it with the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance of the passed axes. Note that this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance takes ownership of the plottable, so do not delete it manually but use \hyperlink{classQCustomPlot_af3dafd56884208474f311d6226513ab2}{Q\+Custom\+Plot\+::remove\+Plottable()} instead. The newly created plottable can be modified, e.\+g.\+: 
+\begin{DoxyCodeInclude}
+\end{DoxyCodeInclude}
+ \begin{DoxyNote}{Note}
+The \hyperlink{classQCPColorMap}{Q\+C\+P\+Color\+Map} always displays the data at equal key/value intervals, even if the key or value axis is set to a logarithmic scaling. If you want to use \hyperlink{classQCPColorMap}{Q\+C\+P\+Color\+Map} with logarithmic axes, you shouldn\textquotesingle{}t use the \hyperlink{classQCPColorMapData_afd2083ccfd6987ec94aa7ef8e91ca39a}{Q\+C\+P\+Color\+Map\+Data\+::set\+Data} method as it uses a linear transformation to determine the cell index. Rather directly access the cell index with \hyperlink{classQCPColorMapData_a8e75eaf8746596319032a93f3d2d0683}{Q\+C\+P\+Color\+Map\+Data\+::set\+Cell}. 
+\end{DoxyNote}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Color\+Map(\+Q\+C\+P\+Axis $\ast$key\+Axis, Q\+C\+P\+Axis $\ast$value\+Axis)}{QCPColorMap(QCPAxis *keyAxis, QCPAxis *valueAxis)}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+C\+P\+Color\+Map\+::\+Q\+C\+P\+Color\+Map (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Axis} $\ast$}]{key\+Axis, }
+\item[{{\bf Q\+C\+P\+Axis} $\ast$}]{value\+Axis}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [explicit]}}\hypertarget{classQCPColorMap_aa37e976d2ee1e2be6c4cd88a64b36215}{}\label{classQCPColorMap_aa37e976d2ee1e2be6c4cd88a64b36215}
+Constructs a color map with the specified {\itshape key\+Axis} and {\itshape value\+Axis}.
+
+The created \hyperlink{classQCPColorMap}{Q\+C\+P\+Color\+Map} is automatically registered with the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance inferred from {\itshape key\+Axis}. This \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance takes ownership of the \hyperlink{classQCPColorMap}{Q\+C\+P\+Color\+Map}, so do not delete it manually but use \hyperlink{classQCustomPlot_af3dafd56884208474f311d6226513ab2}{Q\+Custom\+Plot\+::remove\+Plottable()} instead. 
+
+\subsection{Member Function Documentation}
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!data@{data}}
+\index{data@{data}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{data() const }{data() const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Color\+Map\+Data} $\ast$ Q\+C\+P\+Color\+Map\+::data (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCPColorMap_a3ae12c9ce842352037cd20ea5267414f}{}\label{classQCPColorMap_a3ae12c9ce842352037cd20ea5267414f}
+Returns a pointer to the internal data storage of type \hyperlink{classQCPColorMapData}{Q\+C\+P\+Color\+Map\+Data}. Access this to modify data points (cells) and the color map key/value range.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPColorMap_a5a23e133a20c4ccad35fd32e6c0f9809}{set\+Data} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!data\+Range\+Changed@{data\+Range\+Changed}}
+\index{data\+Range\+Changed@{data\+Range\+Changed}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{data\+Range\+Changed}{dataRangeChanged}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Map\+::data\+Range\+Changed (
+\begin{DoxyParamCaption}
+\item[{const {\bf Q\+C\+P\+Range} \&}]{new\+Range}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCPColorMap_a83ae5be3903da493f732e1a5c14fd807}{}\label{classQCPColorMap_a83ae5be3903da493f732e1a5c14fd807}
+This signal is emitted when the data range changes.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPColorMap_a980b42837821159786a85b4b7dcb8774}{set\+Data\+Range} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!data\+Scale\+Type\+Changed@{data\+Scale\+Type\+Changed}}
+\index{data\+Scale\+Type\+Changed@{data\+Scale\+Type\+Changed}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{data\+Scale\+Type\+Changed}{dataScaleTypeChanged}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Map\+::data\+Scale\+Type\+Changed (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Axis\+::\+Scale\+Type}}]{scale\+Type}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCPColorMap_a978d5d5c9f68cffef8c902b855c04490}{}\label{classQCPColorMap_a978d5d5c9f68cffef8c902b855c04490}
+This signal is emitted when the data scale type changes.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPColorMap_a9d20aa08e3c1f20f22908c45b9c06511}{set\+Data\+Scale\+Type} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!get\+Key\+Range@{get\+Key\+Range}}
+\index{get\+Key\+Range@{get\+Key\+Range}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{get\+Key\+Range(bool \&found\+Range, Q\+C\+P\+::\+Sign\+Domain in\+Sign\+Domain=\+Q\+C\+P\+::sd\+Both) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{getKeyRange(bool &foundRange, QCP::SignDomain inSignDomain=QCP::sdBoth) const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Range} Q\+C\+P\+Color\+Map\+::get\+Key\+Range (
+\begin{DoxyParamCaption}
+\item[{bool \&}]{found\+Range, }
+\item[{{\bf Q\+C\+P\+::\+Sign\+Domain}}]{in\+Sign\+Domain = {\ttfamily {\bf Q\+C\+P\+::sd\+Both}}}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPColorMap_a985861974560f950af6cb7fae8c46267}{}\label{classQCPColorMap_a985861974560f950af6cb7fae8c46267}
+Returns the coordinate range that all data in this plottable span in the key axis dimension. For logarithmic plots, one can set {\itshape in\+Sign\+Domain} to either \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a2d18af0bc58f6528d1e82ce699fe4829}{Q\+C\+P\+::sd\+Negative} or \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a584784b75fb816abcc627cf743bb699f}{Q\+C\+P\+::sd\+Positive} in order to restrict the returned range to that sign domain. E.\+g. when only negative range is wanted, set {\itshape in\+Sign\+Domain} to \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a2d18af0bc58f6528d1e82ce699fe4829}{Q\+C\+P\+::sd\+Negative} and all positive points will be ignored for range calculation. For no restriction, just set {\itshape in\+Sign\+Domain} to \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9aa38352ef02d51ddfa4399d9551566e24}{Q\+C\+P\+::sd\+Both} (default). {\itshape found\+Range} is an output parameter that indicates whether a range could be found or not. If this is false, you shouldn\textquotesingle{}t use the returned range (e.\+g. no points in data).
+
+Note that {\itshape found\+Range} is not the same as \hyperlink{classQCPRange_ab38bd4841c77c7bb86c9eea0f142dcc0}{Q\+C\+P\+Range\+::valid\+Range}, since the range returned by this function may have size zero (e.\+g. when there is only one data point). In this case {\itshape found\+Range} would return true, but the returned range is not a valid range in terms of \hyperlink{classQCPRange_ab38bd4841c77c7bb86c9eea0f142dcc0}{Q\+C\+P\+Range\+::valid\+Range}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPAbstractPlottable_a7e8fc3be43c27ccacd70a7bf9d74a5cd}{rescale\+Axes}, \hyperlink{classQCPColorMap_a88134493aaf6b297af34eaab65264fff}{get\+Value\+Range} 
+\end{DoxySeeAlso}
+
+
+Implements \hyperlink{classQCPAbstractPlottable_a4da16d3cd4b509e1104a9b0275623c96}{Q\+C\+P\+Abstract\+Plottable}.
+
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!get\+Value\+Range@{get\+Value\+Range}}
+\index{get\+Value\+Range@{get\+Value\+Range}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{get\+Value\+Range(bool \&found\+Range, Q\+C\+P\+::\+Sign\+Domain in\+Sign\+Domain=\+Q\+C\+P\+::sd\+Both, const Q\+C\+P\+Range \&in\+Key\+Range=\+Q\+C\+P\+Range()) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{getValueRange(bool &foundRange, QCP::SignDomain inSignDomain=QCP::sdBoth, const QCPRange &inKeyRange=QCPRange()) const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Range} Q\+C\+P\+Color\+Map\+::get\+Value\+Range (
+\begin{DoxyParamCaption}
+\item[{bool \&}]{found\+Range, }
+\item[{{\bf Q\+C\+P\+::\+Sign\+Domain}}]{in\+Sign\+Domain = {\ttfamily {\bf Q\+C\+P\+::sd\+Both}}, }
+\item[{const {\bf Q\+C\+P\+Range} \&}]{in\+Key\+Range = {\ttfamily {\bf Q\+C\+P\+Range}()}}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPColorMap_a88134493aaf6b297af34eaab65264fff}{}\label{classQCPColorMap_a88134493aaf6b297af34eaab65264fff}
+Returns the coordinate range that the data points in the specified key range ({\itshape in\+Key\+Range}) span in the value axis dimension. For logarithmic plots, one can set {\itshape in\+Sign\+Domain} to either \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a2d18af0bc58f6528d1e82ce699fe4829}{Q\+C\+P\+::sd\+Negative} or \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a584784b75fb816abcc627cf743bb699f}{Q\+C\+P\+::sd\+Positive} in order to restrict the returned range to that sign domain. E.\+g. when only negative range is wanted, set {\itshape in\+Sign\+Domain} to \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9a2d18af0bc58f6528d1e82ce699fe4829}{Q\+C\+P\+::sd\+Negative} and all positive points will be ignored for range calculation. For no restriction, just set {\itshape in\+Sign\+Domain} to \hyperlink{namespaceQCP_afd50e7cf431af385614987d8553ff8a9aa38352ef02d51ddfa4399d9551566e24}{Q\+C\+P\+::sd\+Both} (default). {\itshape found\+Range} is an output parameter that indicates whether a range could be found or not. If this is false, you shouldn\textquotesingle{}t use the returned range (e.\+g. no points in data).
+
+If {\itshape in\+Key\+Range} has both lower and upper bound set to zero (is equal to {\ttfamily \hyperlink{classQCPRange}{Q\+C\+P\+Range()}}), all data points are considered, without any restriction on the keys.
+
+Note that {\itshape found\+Range} is not the same as \hyperlink{classQCPRange_ab38bd4841c77c7bb86c9eea0f142dcc0}{Q\+C\+P\+Range\+::valid\+Range}, since the range returned by this function may have size zero (e.\+g. when there is only one data point). In this case {\itshape found\+Range} would return true, but the returned range is not a valid range in terms of \hyperlink{classQCPRange_ab38bd4841c77c7bb86c9eea0f142dcc0}{Q\+C\+P\+Range\+::valid\+Range}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPAbstractPlottable_a7e8fc3be43c27ccacd70a7bf9d74a5cd}{rescale\+Axes}, \hyperlink{classQCPColorMap_a985861974560f950af6cb7fae8c46267}{get\+Key\+Range} 
+\end{DoxySeeAlso}
+
+
+Implements \hyperlink{classQCPAbstractPlottable_a4de773988b21ed090fddd27c6a3a3dcb}{Q\+C\+P\+Abstract\+Plottable}.
+
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!gradient\+Changed@{gradient\+Changed}}
+\index{gradient\+Changed@{gradient\+Changed}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{gradient\+Changed}{gradientChanged}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Map\+::gradient\+Changed (
+\begin{DoxyParamCaption}
+\item[{const {\bf Q\+C\+P\+Color\+Gradient} \&}]{new\+Gradient}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCPColorMap_a31a12726736b1ac274e7b1d8dfb67468}{}\label{classQCPColorMap_a31a12726736b1ac274e7b1d8dfb67468}
+This signal is emitted when the gradient changes.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPColorMap_a7313c78360471cead3576341a2c50377}{set\+Gradient} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!rescale\+Data\+Range@{rescale\+Data\+Range}}
+\index{rescale\+Data\+Range@{rescale\+Data\+Range}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{rescale\+Data\+Range(bool recalculate\+Data\+Bounds=false)}{rescaleDataRange(bool recalculateDataBounds=false)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Map\+::rescale\+Data\+Range (
+\begin{DoxyParamCaption}
+\item[{bool}]{recalculate\+Data\+Bounds = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorMap_a856608fa3dd1cc290bcd5f29a5575774}{}\label{classQCPColorMap_a856608fa3dd1cc290bcd5f29a5575774}
+Sets the data range (\hyperlink{classQCPColorMap_a980b42837821159786a85b4b7dcb8774}{set\+Data\+Range}) to span the minimum and maximum values that occur in the current data set. This corresponds to the \hyperlink{classQCPAbstractPlottable_a1acecfcca3e7fcda00fcbaa3c886386f}{rescale\+Key\+Axis} or \hyperlink{classQCPAbstractPlottable_a4336ede4d4ef615022356316d9e9c362}{rescale\+Value\+Axis} methods, only for the third data dimension of the color map.
+
+The minimum and maximum values of the data set are buffered in the internal \hyperlink{classQCPColorMapData}{Q\+C\+P\+Color\+Map\+Data} instance (\hyperlink{classQCPColorMap_a3ae12c9ce842352037cd20ea5267414f}{data}). As data is updated via its \hyperlink{classQCPColorMapData_a8e75eaf8746596319032a93f3d2d0683}{Q\+C\+P\+Color\+Map\+Data\+::set\+Cell} or \hyperlink{classQCPColorMapData_afd2083ccfd6987ec94aa7ef8e91ca39a}{Q\+C\+P\+Color\+Map\+Data\+::set\+Data}, the buffered minimum and maximum values are updated, too. For performance reasons, however, they are only updated in an expanding fashion. So the buffered maximum can only increase and the buffered minimum can only decrease. In consequence, changes to the data that actually lower the maximum of the data set (by overwriting the cell holding the current maximum with a smaller value), aren\textquotesingle{}t recognized and the buffered maximum overestimates the true maximum of the data set. The same happens for the buffered minimum. To recalculate the true minimum and maximum by explicitly looking at each cell, the method \hyperlink{classQCPColorMapData_ab235ade8a4d64bd3adb26a99b3dd57ee}{Q\+C\+P\+Color\+Map\+Data\+::recalculate\+Data\+Bounds} can be used. For convenience, setting the parameter {\itshape recalculate\+Data\+Bounds} calls this method before setting the data range to the buffered minimum and maximum.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPColorMap_a980b42837821159786a85b4b7dcb8774}{set\+Data\+Range} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!select\+Test@{select\+Test}}
+\index{select\+Test@{select\+Test}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{select\+Test(const Q\+Point\+F \&pos, bool only\+Selectable, Q\+Variant $\ast$details=0) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{selectTest(const QPointF &pos, bool onlySelectable, QVariant *details=0) const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}double Q\+C\+P\+Color\+Map\+::select\+Test (
+\begin{DoxyParamCaption}
+\item[{const Q\+PointF \&}]{pos, }
+\item[{bool}]{only\+Selectable, }
+\item[{Q\+Variant $\ast$}]{details = {\ttfamily 0}}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPColorMap_afb4b843596addf58096082827a9e3450}{}\label{classQCPColorMap_afb4b843596addf58096082827a9e3450}
+This function is used to decide whether a click hits a layerable object or not.
+
+{\itshape pos} is a point in pixel coordinates on the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} surface. This function returns the shortest pixel distance of this point to the object. If the object is either invisible or the distance couldn\textquotesingle{}t be determined, -\/1.\+0 is returned. Further, if {\itshape only\+Selectable} is true and the object is not selectable, -\/1.\+0 is returned, too.
+
+If the object is represented not by single lines but by an area like a \hyperlink{classQCPItemText}{Q\+C\+P\+Item\+Text} or the bars of a \hyperlink{classQCPBars}{Q\+C\+P\+Bars} plottable, a click inside the area should also be considered a hit. In these cases this function thus returns a constant value greater zero but still below the parent plot\textquotesingle{}s selection tolerance. (typically the selection\+Tolerance multiplied by 0.\+99).
+
+Providing a constant value for area objects allows selecting line objects even when they are obscured by such area objects, by clicking close to the lines (i.\+e. closer than 0.\+99$\ast$selection\+Tolerance).
+
+The actual setting of the selection state is not done by this function. This is handled by the parent \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} when the mouse\+Release\+Event occurs, and the finally selected object is notified via the select\+Event/deselect\+Event methods.
+
+{\itshape details} is an optional output parameter. Every layerable subclass may place any information in {\itshape details}. This information will be passed to select\+Event when the parent \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} decides on the basis of this select\+Test call, that the object was successfully selected. The subsequent call to select\+Event will carry the {\itshape details}. This is useful for multi-\/part objects (like \hyperlink{classQCPAxis}{Q\+C\+P\+Axis}). This way, a possibly complex calculation to decide which part was clicked is only done once in \hyperlink{classQCPColorMap_afb4b843596addf58096082827a9e3450}{select\+Test}. The result (i.\+e. the actually clicked part) can then be placed in {\itshape details}. So in the subsequent select\+Event, the decision which part was selected doesn\textquotesingle{}t have to be done a second time for a single selection operation.
+
+You may pass 0 as {\itshape details} to indicate that you are not interested in those selection details.
+
+\begin{DoxySeeAlso}{See also}
+select\+Event, deselect\+Event, \hyperlink{classQCPLayerable_af6567604818db90f4fd52822f8bc8376}{mouse\+Press\+Event}, \hyperlink{classQCPLayerable_a47dfd7b8fd99c08ca54e09c362b6f022}{wheel\+Event}, \hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{Q\+Custom\+Plot\+::set\+Interactions} 
+\end{DoxySeeAlso}
+
+
+Implements \hyperlink{classQCPAbstractPlottable_a38efe9641d972992a3d44204bc80ec1d}{Q\+C\+P\+Abstract\+Plottable}.
+
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!set\+Color\+Scale@{set\+Color\+Scale}}
+\index{set\+Color\+Scale@{set\+Color\+Scale}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{set\+Color\+Scale(\+Q\+C\+P\+Color\+Scale $\ast$color\+Scale)}{setColorScale(QCPColorScale *colorScale)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Map\+::set\+Color\+Scale (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Color\+Scale} $\ast$}]{color\+Scale}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorMap_aa828921db364fe3c6af4619580ab85fd}{}\label{classQCPColorMap_aa828921db364fe3c6af4619580ab85fd}
+Associates the color scale {\itshape color\+Scale} with this color map.
+
+This means that both the color scale and the color map synchronize their gradient, data range and data scale type (\hyperlink{classQCPColorMap_a7313c78360471cead3576341a2c50377}{set\+Gradient}, \hyperlink{classQCPColorMap_a980b42837821159786a85b4b7dcb8774}{set\+Data\+Range}, \hyperlink{classQCPColorMap_a9d20aa08e3c1f20f22908c45b9c06511}{set\+Data\+Scale\+Type}). Multiple color maps can be associated with one single color scale. This causes the color maps to also synchronize those properties, via the mutual color scale.
+
+This function causes the color map to adopt the current color gradient, data range and data scale type of {\itshape color\+Scale}. After this call, you may change these properties at either the color map or the color scale, and the setting will be applied to both.
+
+Pass 0 as {\itshape color\+Scale} to disconnect the color scale from this color map again. \index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!set\+Data@{set\+Data}}
+\index{set\+Data@{set\+Data}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{set\+Data(\+Q\+C\+P\+Color\+Map\+Data $\ast$data, bool copy=false)}{setData(QCPColorMapData *data, bool copy=false)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Map\+::set\+Data (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Color\+Map\+Data} $\ast$}]{data, }
+\item[{bool}]{copy = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorMap_a5a23e133a20c4ccad35fd32e6c0f9809}{}\label{classQCPColorMap_a5a23e133a20c4ccad35fd32e6c0f9809}
+Replaces the current \hyperlink{classQCPColorMap_a3ae12c9ce842352037cd20ea5267414f}{data} with the provided {\itshape data}.
+
+If {\itshape copy} is set to true, the {\itshape data} object will only be copied. if false, the color map takes ownership of the passed data and replaces the internal data pointer with it. This is significantly faster than copying for large datasets. \index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!set\+Data\+Range@{set\+Data\+Range}}
+\index{set\+Data\+Range@{set\+Data\+Range}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{set\+Data\+Range(const Q\+C\+P\+Range \&data\+Range)}{setDataRange(const QCPRange &dataRange)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Map\+::set\+Data\+Range (
+\begin{DoxyParamCaption}
+\item[{const {\bf Q\+C\+P\+Range} \&}]{data\+Range}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorMap_a980b42837821159786a85b4b7dcb8774}{}\label{classQCPColorMap_a980b42837821159786a85b4b7dcb8774}
+Sets the data range of this color map to {\itshape data\+Range}. The data range defines which data values are mapped to the color gradient.
+
+To make the data range span the full range of the data set, use \hyperlink{classQCPColorMap_a856608fa3dd1cc290bcd5f29a5575774}{rescale\+Data\+Range}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPColorScale_abe88633003a26d1e756aa74984587fef}{Q\+C\+P\+Color\+Scale\+::set\+Data\+Range} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!set\+Data\+Scale\+Type@{set\+Data\+Scale\+Type}}
+\index{set\+Data\+Scale\+Type@{set\+Data\+Scale\+Type}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{set\+Data\+Scale\+Type(\+Q\+C\+P\+Axis\+::\+Scale\+Type scale\+Type)}{setDataScaleType(QCPAxis::ScaleType scaleType)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Map\+::set\+Data\+Scale\+Type (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Axis\+::\+Scale\+Type}}]{scale\+Type}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorMap_a9d20aa08e3c1f20f22908c45b9c06511}{}\label{classQCPColorMap_a9d20aa08e3c1f20f22908c45b9c06511}
+Sets whether the data is correlated with the color gradient linearly or logarithmically.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPColorScale_aeb6107d67dd7325145b2498abae67fc3}{Q\+C\+P\+Color\+Scale\+::set\+Data\+Scale\+Type} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!set\+Gradient@{set\+Gradient}}
+\index{set\+Gradient@{set\+Gradient}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{set\+Gradient(const Q\+C\+P\+Color\+Gradient \&gradient)}{setGradient(const QCPColorGradient &gradient)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Map\+::set\+Gradient (
+\begin{DoxyParamCaption}
+\item[{const {\bf Q\+C\+P\+Color\+Gradient} \&}]{gradient}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorMap_a7313c78360471cead3576341a2c50377}{}\label{classQCPColorMap_a7313c78360471cead3576341a2c50377}
+Sets the color gradient that is used to represent the data. For more details on how to create an own gradient or use one of the preset gradients, see \hyperlink{classQCPColorGradient}{Q\+C\+P\+Color\+Gradient}.
+
+The colors defined by the gradient will be used to represent data values in the currently set data range, see \hyperlink{classQCPColorMap_a980b42837821159786a85b4b7dcb8774}{set\+Data\+Range}. Data points that are outside this data range will either be colored uniformly with the respective gradient boundary color, or the gradient will repeat, depending on \hyperlink{classQCPColorGradient_a39d6448155fc00a219f239220d14bb39}{Q\+C\+P\+Color\+Gradient\+::set\+Periodic}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPColorScale_a1f29583bb6f1e7f473b62fb712be3940}{Q\+C\+P\+Color\+Scale\+::set\+Gradient} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!set\+Interpolate@{set\+Interpolate}}
+\index{set\+Interpolate@{set\+Interpolate}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{set\+Interpolate(bool enabled)}{setInterpolate(bool enabled)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Map\+::set\+Interpolate (
+\begin{DoxyParamCaption}
+\item[{bool}]{enabled}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorMap_a484eaa8a5065cfc386b15375bf98b964}{}\label{classQCPColorMap_a484eaa8a5065cfc386b15375bf98b964}
+Sets whether the color map image shall use bicubic interpolation when displaying the color map shrinked or expanded, and not at a 1\+:1 pixel-\/to-\/data scale.
+
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!set\+Tight\+Boundary@{set\+Tight\+Boundary}}
+\index{set\+Tight\+Boundary@{set\+Tight\+Boundary}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{set\+Tight\+Boundary(bool enabled)}{setTightBoundary(bool enabled)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Map\+::set\+Tight\+Boundary (
+\begin{DoxyParamCaption}
+\item[{bool}]{enabled}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorMap_ad03221cc285e5f562a0b13d684b5576d}{}\label{classQCPColorMap_ad03221cc285e5f562a0b13d684b5576d}
+Sets whether the outer most data rows and columns are clipped to the specified key and value range (see \hyperlink{classQCPColorMapData_a0738c485f3c9df9ea1241b7a8bb6a86e}{Q\+C\+P\+Color\+Map\+Data\+::set\+Key\+Range}, \hyperlink{classQCPColorMapData_ada1b2680ba96a5f4175b6d341cf75d23}{Q\+C\+P\+Color\+Map\+Data\+::set\+Value\+Range}).
+
+if {\itshape enabled} is set to false, the data points at the border of the color map are drawn with the same width and height as all other data points. Since the data points are represented by rectangles of one color centered on the data coordinate, this means that the shown color map extends by half a data point over the specified key/value range in each direction.
+
+\index{Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}!update\+Legend\+Icon@{update\+Legend\+Icon}}
+\index{update\+Legend\+Icon@{update\+Legend\+Icon}!Q\+C\+P\+Color\+Map@{Q\+C\+P\+Color\+Map}}
+\subsubsection[{\texorpdfstring{update\+Legend\+Icon(\+Qt\+::\+Transformation\+Mode transform\+Mode=\+Qt\+::\+Smooth\+Transformation, const Q\+Size \&thumb\+Size=\+Q\+Size(32, 18))}{updateLegendIcon(Qt::TransformationMode transformMode=Qt::SmoothTransformation, const QSize &thumbSize=QSize(32, 18))}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Color\+Map\+::update\+Legend\+Icon (
+\begin{DoxyParamCaption}
+\item[{Qt\+::\+Transformation\+Mode}]{transform\+Mode = {\ttfamily Qt\+:\+:SmoothTransformation}, }
+\item[{const Q\+Size \&}]{thumb\+Size = {\ttfamily QSize(32,~18)}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPColorMap_a5d8158b62d55fcfeaabcb68ce0083e87}{}\label{classQCPColorMap_a5d8158b62d55fcfeaabcb68ce0083e87}
+Takes the current appearance of the color map and updates the legend icon, which is used to represent this color map in the legend (see \hyperlink{classQCPLegend}{Q\+C\+P\+Legend}).
+
+The {\itshape transform\+Mode} specifies whether the rescaling is done by a faster, low quality image scaling algorithm (Qt\+::\+Fast\+Transformation) or by a slower, higher quality algorithm (Qt\+::\+Smooth\+Transformation).
+
+The current color map appearance is scaled down to {\itshape thumb\+Size}. Ideally, this should be equal to the size of the legend icon (see \hyperlink{classQCPLegend_a8b0740cce488bf7010da6beda6898984}{Q\+C\+P\+Legend\+::set\+Icon\+Size}). If it isn\textquotesingle{}t exactly the configured legend icon size, the thumb will be rescaled during drawing of the legend item.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPColorMap_a980b42837821159786a85b4b7dcb8774}{set\+Data\+Range} 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/qcustomplot.\+h\item 
+src/qcustomplot.\+cpp\end{DoxyCompactItemize}

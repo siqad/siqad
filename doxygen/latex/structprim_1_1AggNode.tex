@@ -1,0 +1,49 @@
+\hypertarget{structprim_1_1AggNode}{}\section{prim\+:\+:Agg\+Node Struct Reference}
+\label{structprim_1_1AggNode}\index{prim\+::\+Agg\+Node@{prim\+::\+Agg\+Node}}
+
+
+node structure for describing which sources belong to which aggregate  
+
+
+
+
+{\ttfamily \#include $<$ghost.\+h$>$}
+
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum {\bfseries Source\+Type} \{ {\bfseries D\+B\+Dot}, 
+{\bfseries Aggregate}, 
+{\bfseries Electrode}
+ \}\hypertarget{structprim_1_1AggNode_a68cd78338aa8b3429d6c4de1d3834df3}{}\label{structprim_1_1AggNode_a68cd78338aa8b3429d6c4de1d3834df3}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Agg\+Node} (int \hyperlink{structprim_1_1AggNode_a00fb2b61e32519620bb8bd6f30f79d97}{index}=-\/1)\hypertarget{structprim_1_1AggNode_adc15b91fa3513436dbec6763a087c940}{}\label{structprim_1_1AggNode_adc15b91fa3513436dbec6763a087c940}
+
+\item 
+void {\bfseries reset} ()\hypertarget{structprim_1_1AggNode_a0e1ef12a1fed11dee07e2408c9c281d6}{}\label{structprim_1_1AggNode_a0e1ef12a1fed11dee07e2408c9c281d6}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{structprim_1_1AggNode_a00fb2b61e32519620bb8bd6f30f79d97}{index}\hypertarget{structprim_1_1AggNode_a00fb2b61e32519620bb8bd6f30f79d97}{}\label{structprim_1_1AggNode_a00fb2b61e32519620bb8bd6f30f79d97}
+
+\begin{DoxyCompactList}\small\item\em index of source if not an \hyperlink{classprim_1_1Aggregate}{Aggregate} \end{DoxyCompactList}\item 
+Q\+List$<$ \hyperlink{structprim_1_1AggNode}{Agg\+Node} $\ast$ $>$ \hyperlink{structprim_1_1AggNode_a46eb56a15e6a55a9373dbbba5b364771}{nodes}\hypertarget{structprim_1_1AggNode_a46eb56a15e6a55a9373dbbba5b364771}{}\label{structprim_1_1AggNode_a46eb56a15e6a55a9373dbbba5b364771}
+
+\begin{DoxyCompactList}\small\item\em children of the \hyperlink{classprim_1_1Aggregate}{Aggregate} if any \end{DoxyCompactList}\item 
+Source\+Type {\bfseries source\+\_\+type}\hypertarget{structprim_1_1AggNode_a553e1ee04c14c6ec48bdb364d57f03fd}{}\label{structprim_1_1AggNode_a553e1ee04c14c6ec48bdb364d57f03fd}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+node structure for describing which sources belong to which aggregate 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/gui/widgets/primitives/\hyperlink{ghost_8h}{ghost.\+h}\end{DoxyCompactItemize}

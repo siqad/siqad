@@ -1,0 +1,209 @@
+\hypertarget{classQCPItemLine}{}\section{Q\+C\+P\+Item\+Line Class Reference}
+\label{classQCPItemLine}\index{Q\+C\+P\+Item\+Line@{Q\+C\+P\+Item\+Line}}
+
+
+A line from one point to another.  
+
+
+
+
+Inheritance diagram for Q\+C\+P\+Item\+Line\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=175pt]{classQCPItemLine__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Q\+C\+P\+Item\+Line\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classQCPItemLine__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPItemLine_a17804b7f64961c6accf25b61e85142e3}{Q\+C\+P\+Item\+Line} (\hyperlink{classQCustomPlot}{Q\+Custom\+Plot} $\ast$parent\+Plot)
+\item 
+Q\+Pen {\bfseries pen} () const \hypertarget{classQCPItemLine_a235779dd079a263bedb20b3daecc40eb}{}\label{classQCPItemLine_a235779dd079a263bedb20b3daecc40eb}
+
+\item 
+Q\+Pen {\bfseries selected\+Pen} () const \hypertarget{classQCPItemLine_a9fde5e95a1a369008252e18f1925650c}{}\label{classQCPItemLine_a9fde5e95a1a369008252e18f1925650c}
+
+\item 
+\hyperlink{classQCPLineEnding}{Q\+C\+P\+Line\+Ending} {\bfseries head} () const \hypertarget{classQCPItemLine_a5f6cbc5c763feae9dfbce71748fc43f1}{}\label{classQCPItemLine_a5f6cbc5c763feae9dfbce71748fc43f1}
+
+\item 
+\hyperlink{classQCPLineEnding}{Q\+C\+P\+Line\+Ending} {\bfseries tail} () const \hypertarget{classQCPItemLine_a5d2ca0f784933e80f3e6e1d15dceebb3}{}\label{classQCPItemLine_a5d2ca0f784933e80f3e6e1d15dceebb3}
+
+\item 
+void \hyperlink{classQCPItemLine_a572528dab61c1abe205822fbd5db4b27}{set\+Pen} (const Q\+Pen \&pen)
+\item 
+void \hyperlink{classQCPItemLine_a3e2fec44503277e77717e9c24f87f1ea}{set\+Selected\+Pen} (const Q\+Pen \&pen)
+\item 
+void \hyperlink{classQCPItemLine_aebf3d687114d584e0459db6759e2c3c3}{set\+Head} (const \hyperlink{classQCPLineEnding}{Q\+C\+P\+Line\+Ending} \&head)
+\item 
+void \hyperlink{classQCPItemLine_ac264222c3297a7efe33df9345c811a5f}{set\+Tail} (const \hyperlink{classQCPLineEnding}{Q\+C\+P\+Line\+Ending} \&tail)
+\item 
+virtual double \hyperlink{classQCPItemLine_a8e02bfbca04fbcf3dbc375a2bf693229}{select\+Test} (const Q\+PointF \&pos, bool only\+Selectable, Q\+Variant $\ast$details=0) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPItemPosition}{Q\+C\+P\+Item\+Position} $\ast$const {\bfseries start}\hypertarget{classQCPItemLine_a602da607a09498b0f152ada1d6851bc5}{}\label{classQCPItemLine_a602da607a09498b0f152ada1d6851bc5}
+
+\item 
+\hyperlink{classQCPItemPosition}{Q\+C\+P\+Item\+Position} $\ast$const {\bfseries end}\hypertarget{classQCPItemLine_a15598864c1c22a2497a1979c4980c4e1}{}\label{classQCPItemLine_a15598864c1c22a2497a1979c4980c4e1}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void {\bfseries draw} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCPItemLine_ae184140b61b2ef5b8edde76304447200}{}\label{classQCPItemLine_ae184140b61b2ef5b8edde76304447200}
+
+\item 
+Q\+LineF {\bfseries get\+Rect\+Clipped\+Line} (const \hyperlink{classQCPVector2D}{Q\+C\+P\+Vector2D} \&start, const \hyperlink{classQCPVector2D}{Q\+C\+P\+Vector2D} \&end, const Q\+Rect \&rect) const \hypertarget{classQCPItemLine_ad8ea8403df3e11d0beddc44e1227e655}{}\label{classQCPItemLine_ad8ea8403df3e11d0beddc44e1227e655}
+
+\item 
+Q\+Pen {\bfseries main\+Pen} () const \hypertarget{classQCPItemLine_a7b5bc4ebacb55774b87c91b308ca7912}{}\label{classQCPItemLine_a7b5bc4ebacb55774b87c91b308ca7912}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Q\+Pen {\bfseries m\+Pen}\hypertarget{classQCPItemLine_abbb544d5bb927dfe4e81a7f3ca4c65ac}{}\label{classQCPItemLine_abbb544d5bb927dfe4e81a7f3ca4c65ac}
+
+\item 
+Q\+Pen {\bfseries m\+Selected\+Pen}\hypertarget{classQCPItemLine_aff858ad6dde3b90024814ca4b116f278}{}\label{classQCPItemLine_aff858ad6dde3b90024814ca4b116f278}
+
+\item 
+\hyperlink{classQCPLineEnding}{Q\+C\+P\+Line\+Ending} {\bfseries m\+Head}\hypertarget{classQCPItemLine_a51603f28ab7ddb1c1a95ea384791d3ed}{}\label{classQCPItemLine_a51603f28ab7ddb1c1a95ea384791d3ed}
+
+\item 
+\hyperlink{classQCPLineEnding}{Q\+C\+P\+Line\+Ending} {\bfseries m\+Tail}\hypertarget{classQCPItemLine_ab8ed61dfe15bbb1cbf9b95eae95e242f}{}\label{classQCPItemLine_ab8ed61dfe15bbb1cbf9b95eae95e242f}
+
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+A line from one point to another. 
+
+ It has two positions, {\itshape start} and {\itshape end}, which define the end points of the line.
+
+With \hyperlink{classQCPItemLine_aebf3d687114d584e0459db6759e2c3c3}{set\+Head} and \hyperlink{classQCPItemLine_ac264222c3297a7efe33df9345c811a5f}{set\+Tail} you may set different line ending styles, e.\+g. to create an arrow. 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Q\+C\+P\+Item\+Line@{Q\+C\+P\+Item\+Line}!Q\+C\+P\+Item\+Line@{Q\+C\+P\+Item\+Line}}
+\index{Q\+C\+P\+Item\+Line@{Q\+C\+P\+Item\+Line}!Q\+C\+P\+Item\+Line@{Q\+C\+P\+Item\+Line}}
+\subsubsection[{\texorpdfstring{Q\+C\+P\+Item\+Line(\+Q\+Custom\+Plot $\ast$parent\+Plot)}{QCPItemLine(QCustomPlot *parentPlot)}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+C\+P\+Item\+Line\+::\+Q\+C\+P\+Item\+Line (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+Custom\+Plot} $\ast$}]{parent\+Plot}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [explicit]}}\hypertarget{classQCPItemLine_a17804b7f64961c6accf25b61e85142e3}{}\label{classQCPItemLine_a17804b7f64961c6accf25b61e85142e3}
+Creates a line item and sets default values.
+
+The created item is automatically registered with {\itshape parent\+Plot}. This \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance takes ownership of the item, so do not delete it manually but use \hyperlink{classQCustomPlot_ae04446557292551e8fb6e2c106e1848d}{Q\+Custom\+Plot\+::remove\+Item()} instead. 
+
+\subsection{Member Function Documentation}
+\index{Q\+C\+P\+Item\+Line@{Q\+C\+P\+Item\+Line}!select\+Test@{select\+Test}}
+\index{select\+Test@{select\+Test}!Q\+C\+P\+Item\+Line@{Q\+C\+P\+Item\+Line}}
+\subsubsection[{\texorpdfstring{select\+Test(const Q\+Point\+F \&pos, bool only\+Selectable, Q\+Variant $\ast$details=0) const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE}{selectTest(const QPointF &pos, bool onlySelectable, QVariant *details=0) const Q_DECL_OVERRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}double Q\+C\+P\+Item\+Line\+::select\+Test (
+\begin{DoxyParamCaption}
+\item[{const Q\+PointF \&}]{pos, }
+\item[{bool}]{only\+Selectable, }
+\item[{Q\+Variant $\ast$}]{details = {\ttfamily 0}}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{classQCPItemLine_a8e02bfbca04fbcf3dbc375a2bf693229}{}\label{classQCPItemLine_a8e02bfbca04fbcf3dbc375a2bf693229}
+This function is used to decide whether a click hits a layerable object or not.
+
+{\itshape pos} is a point in pixel coordinates on the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} surface. This function returns the shortest pixel distance of this point to the object. If the object is either invisible or the distance couldn\textquotesingle{}t be determined, -\/1.\+0 is returned. Further, if {\itshape only\+Selectable} is true and the object is not selectable, -\/1.\+0 is returned, too.
+
+If the object is represented not by single lines but by an area like a \hyperlink{classQCPItemText}{Q\+C\+P\+Item\+Text} or the bars of a \hyperlink{classQCPBars}{Q\+C\+P\+Bars} plottable, a click inside the area should also be considered a hit. In these cases this function thus returns a constant value greater zero but still below the parent plot\textquotesingle{}s selection tolerance. (typically the selection\+Tolerance multiplied by 0.\+99).
+
+Providing a constant value for area objects allows selecting line objects even when they are obscured by such area objects, by clicking close to the lines (i.\+e. closer than 0.\+99$\ast$selection\+Tolerance).
+
+The actual setting of the selection state is not done by this function. This is handled by the parent \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} when the mouse\+Release\+Event occurs, and the finally selected object is notified via the select\+Event/deselect\+Event methods.
+
+{\itshape details} is an optional output parameter. Every layerable subclass may place any information in {\itshape details}. This information will be passed to select\+Event when the parent \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} decides on the basis of this select\+Test call, that the object was successfully selected. The subsequent call to select\+Event will carry the {\itshape details}. This is useful for multi-\/part objects (like \hyperlink{classQCPAxis}{Q\+C\+P\+Axis}). This way, a possibly complex calculation to decide which part was clicked is only done once in \hyperlink{classQCPItemLine_a8e02bfbca04fbcf3dbc375a2bf693229}{select\+Test}. The result (i.\+e. the actually clicked part) can then be placed in {\itshape details}. So in the subsequent select\+Event, the decision which part was selected doesn\textquotesingle{}t have to be done a second time for a single selection operation.
+
+You may pass 0 as {\itshape details} to indicate that you are not interested in those selection details.
+
+\begin{DoxySeeAlso}{See also}
+select\+Event, deselect\+Event, \hyperlink{classQCPLayerable_af6567604818db90f4fd52822f8bc8376}{mouse\+Press\+Event}, \hyperlink{classQCPLayerable_a47dfd7b8fd99c08ca54e09c362b6f022}{wheel\+Event}, \hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{Q\+Custom\+Plot\+::set\+Interactions} 
+\end{DoxySeeAlso}
+
+
+Implements \hyperlink{classQCPAbstractItem_ae41d0349d68bb802c49104afd100ba2a}{Q\+C\+P\+Abstract\+Item}.
+
+\index{Q\+C\+P\+Item\+Line@{Q\+C\+P\+Item\+Line}!set\+Head@{set\+Head}}
+\index{set\+Head@{set\+Head}!Q\+C\+P\+Item\+Line@{Q\+C\+P\+Item\+Line}}
+\subsubsection[{\texorpdfstring{set\+Head(const Q\+C\+P\+Line\+Ending \&head)}{setHead(const QCPLineEnding &head)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Item\+Line\+::set\+Head (
+\begin{DoxyParamCaption}
+\item[{const {\bf Q\+C\+P\+Line\+Ending} \&}]{head}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPItemLine_aebf3d687114d584e0459db6759e2c3c3}{}\label{classQCPItemLine_aebf3d687114d584e0459db6759e2c3c3}
+Sets the line ending style of the head. The head corresponds to the {\itshape end} position.
+
+Note that due to the overloaded \hyperlink{classQCPLineEnding}{Q\+C\+P\+Line\+Ending} constructor, you may directly specify a \hyperlink{classQCPLineEnding_a5ef16e6876b4b74959c7261d8d4c2cd5}{Q\+C\+P\+Line\+Ending\+::\+Ending\+Style} here, e.\+g.
+\begin{DoxyCode}
+\hyperlink{classQCPItemLine_aebf3d687114d584e0459db6759e2c3c3}{setHead}(\hyperlink{classQCPLineEnding_a5ef16e6876b4b74959c7261d8d4c2cd5ab9964d0d03f812d1e79de15edbeb2cbf}{QCPLineEnding::esSpikeArrow}) 
+\end{DoxyCode}
+
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPItemLine_ac264222c3297a7efe33df9345c811a5f}{set\+Tail} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Item\+Line@{Q\+C\+P\+Item\+Line}!set\+Pen@{set\+Pen}}
+\index{set\+Pen@{set\+Pen}!Q\+C\+P\+Item\+Line@{Q\+C\+P\+Item\+Line}}
+\subsubsection[{\texorpdfstring{set\+Pen(const Q\+Pen \&pen)}{setPen(const QPen &pen)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Item\+Line\+::set\+Pen (
+\begin{DoxyParamCaption}
+\item[{const Q\+Pen \&}]{pen}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPItemLine_a572528dab61c1abe205822fbd5db4b27}{}\label{classQCPItemLine_a572528dab61c1abe205822fbd5db4b27}
+Sets the pen that will be used to draw the line
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPItemLine_a3e2fec44503277e77717e9c24f87f1ea}{set\+Selected\+Pen} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Item\+Line@{Q\+C\+P\+Item\+Line}!set\+Selected\+Pen@{set\+Selected\+Pen}}
+\index{set\+Selected\+Pen@{set\+Selected\+Pen}!Q\+C\+P\+Item\+Line@{Q\+C\+P\+Item\+Line}}
+\subsubsection[{\texorpdfstring{set\+Selected\+Pen(const Q\+Pen \&pen)}{setSelectedPen(const QPen &pen)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Item\+Line\+::set\+Selected\+Pen (
+\begin{DoxyParamCaption}
+\item[{const Q\+Pen \&}]{pen}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPItemLine_a3e2fec44503277e77717e9c24f87f1ea}{}\label{classQCPItemLine_a3e2fec44503277e77717e9c24f87f1ea}
+Sets the pen that will be used to draw the line when selected
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPItemLine_a572528dab61c1abe205822fbd5db4b27}{set\+Pen}, \hyperlink{classQCPAbstractItem_a203de94ad586cc44d16c9565f49d3378}{set\+Selected} 
+\end{DoxySeeAlso}
+\index{Q\+C\+P\+Item\+Line@{Q\+C\+P\+Item\+Line}!set\+Tail@{set\+Tail}}
+\index{set\+Tail@{set\+Tail}!Q\+C\+P\+Item\+Line@{Q\+C\+P\+Item\+Line}}
+\subsubsection[{\texorpdfstring{set\+Tail(const Q\+C\+P\+Line\+Ending \&tail)}{setTail(const QCPLineEnding &tail)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+C\+P\+Item\+Line\+::set\+Tail (
+\begin{DoxyParamCaption}
+\item[{const {\bf Q\+C\+P\+Line\+Ending} \&}]{tail}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCPItemLine_ac264222c3297a7efe33df9345c811a5f}{}\label{classQCPItemLine_ac264222c3297a7efe33df9345c811a5f}
+Sets the line ending style of the tail. The tail corresponds to the {\itshape start} position.
+
+Note that due to the overloaded \hyperlink{classQCPLineEnding}{Q\+C\+P\+Line\+Ending} constructor, you may directly specify a \hyperlink{classQCPLineEnding_a5ef16e6876b4b74959c7261d8d4c2cd5}{Q\+C\+P\+Line\+Ending\+::\+Ending\+Style} here, e.\+g.
+\begin{DoxyCode}
+\hyperlink{classQCPItemLine_ac264222c3297a7efe33df9345c811a5f}{setTail}(\hyperlink{classQCPLineEnding_a5ef16e6876b4b74959c7261d8d4c2cd5ab9964d0d03f812d1e79de15edbeb2cbf}{QCPLineEnding::esSpikeArrow}) 
+\end{DoxyCode}
+
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPItemLine_aebf3d687114d584e0459db6759e2c3c3}{set\+Head} 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/qcustomplot.\+h\item 
+src/qcustomplot.\+cpp\end{DoxyCompactItemize}

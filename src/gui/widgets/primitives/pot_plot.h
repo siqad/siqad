@@ -46,7 +46,6 @@ namespace prim{
     // VARIABLES
     QPixmap potential_plot;
     QRectF graph_container;
-
     static qreal edge_width;  // proportional width of dot boundary edge
     static QColor fill_col;   // dot fill color (same for all lattice dots)
     static QColor edge_col;     // edge colour, unselected

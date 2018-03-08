@@ -33,7 +33,7 @@ void prim::PotPlot::initPotPlot(int lay_id, QPixmap potential_plot_in, QRectF gr
   graph_container = graph_container_in;
   constructStatics();
   setZValue(-1);
-  setPos(mapToScene(graph_container.topLeft()).toPoint());
+  setPos(graph_container.topLeft());
   // flags
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
@@ -56,7 +56,9 @@ void prim::PotPlot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
   // painter->setPen(QPen(edge_col, edge_width));
   // painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
   // painter->drawRect(rect);
-  painter->drawPixmap(graph_container, potential_plot.scaled(graph_container.width(), graph_container.height()), graph_container);
+  QRectF graph_container_draw = QRectF(0,0,graph_container.width(), graph_container.height());
+  QRectF crop_rect = QRectF(qreal(0), qreal(0), graph_container.width(), graph_container.height());
+  painter->drawPixmap(graph_container_draw, potential_plot.scaled(graph_container.width(), graph_container.height()), crop_rect);
   painter->setOpacity(1);
 }
 

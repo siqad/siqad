@@ -1,0 +1,50 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classQCPPlottableInterface1D.html" title="Defines an abstract interface for one&#45;dimensional plottables. " alt="" coords="297,781,468,808"/>
+<area shape="rect" id="node2" href="$classQCPAbstractPlottable1D.html" title="A template base class for plottables with one&#45;dimensional data. " alt="" coords="524,513,692,554"/>
+<area shape="rect" id="node3" href="$classQCPAbstractPlottable1D.html" title="QCPAbstractPlottable1D\l\&lt; QCPBarsData \&gt;" alt="" coords="524,643,692,685"/>
+<area shape="rect" id="node5" href="$classQCPAbstractPlottable1D.html" title="QCPAbstractPlottable1D\l\&lt; QCPCurveData \&gt;" alt="" coords="524,709,692,750"/>
+<area shape="rect" id="node7" href="$classQCPAbstractPlottable1D.html" title="QCPAbstractPlottable1D\l\&lt; QCPFinancialData \&gt;" alt="" coords="524,774,692,815"/>
+<area shape="rect" id="node9" href="$classQCPAbstractPlottable1D.html" title="QCPAbstractPlottable1D\l\&lt; QCPGraphData \&gt;" alt="" coords="524,839,692,881"/>
+<area shape="rect" id="node11" href="$classQCPAbstractPlottable1D.html" title="QCPAbstractPlottable1D\l\&lt; QCPStatisticalBoxData \&gt;" alt="" coords="516,578,700,619"/>
+<area shape="rect" id="node13" href="$classQCPErrorBars.html" title="A plottable that adds a set of error bars to other plottables. " alt="" coords="555,905,661,932"/>
+<area shape="rect" id="node4" href="$classQCPBars.html" title="A plottable representing a bar chart in a plot. " alt="" coords="814,651,893,677"/>
+<area shape="rect" id="node6" href="$classQCPCurve.html" title="A plottable representing a parametric curve in a plot. " alt="" coords="810,716,897,743"/>
+<area shape="rect" id="node8" href="$classQCPFinancial.html" title="A plottable representing a financial stock chart. " alt="" coords="802,781,905,808"/>
+<area shape="rect" id="node10" href="$classQCPGraph.html" title="A plottable representing a graph in a plot. " alt="" coords="810,847,897,873"/>
+<area shape="rect" id="node12" href="$classQCPStatisticalBox.html" title="A plottable representing a single statistical box in a plot. " alt="" coords="787,585,919,612"/>
+<area shape="rect" id="node15" href="$classprim_1_1Emitter.html" title="prim::Emitter" alt="" coords="138,1057,235,1084"/>
+<area shape="rect" id="node16" href="$classprim_1_1Layer.html" title="prim::Layer" alt="" coords="143,1108,230,1135"/>
+<area shape="rect" id="node18" href="$classprim_1_1SimEngine.html" title="prim::SimEngine" alt="" coords="127,1159,246,1185"/>
+<area shape="rect" id="node19" href="$classprim_1_1SimJob.html" title="prim::SimJob" alt="" coords="137,1209,236,1236"/>
+<area shape="rect" id="node20" href="$classQCPBarsGroup.html" title="Groups multiple QCPBars together so they appear side by side. " alt="" coords="130,1260,243,1287"/>
+<area shape="rect" id="node21" href="$classQCPLayer.html" title="A layer that may contain objects, to control the rendering order. " alt="" coords="145,1311,228,1337"/>
+<area shape="rect" id="node22" href="$classQCPLayerable.html" title="Base class for all drawable objects. " alt="" coords="133,981,240,1008"/>
+<area shape="rect" id="node49" href="$classQCPMarginGroup.html" title="A margin group allows synchronization of margin sides if working with multiple layout elements..." alt="" coords="124,1361,249,1388"/>
+<area shape="rect" id="node17" href="$classprim_1_1Lattice.html" title="prim::Lattice" alt="" coords="335,1133,430,1160"/>
+<area shape="rect" id="node23" href="$classQCPAbstractItem.html" title="The abstract base class for all items in a plot. " alt="" coords="319,233,446,260"/>
+<area shape="rect" id="node33" href="$classQCPAbstractPlottable.html" title="The abstract base class for all data representing objects in a plot. " alt="" coords="307,680,458,707"/>
+<area shape="rect" id="node35" href="$classQCPAxis.html" title="Manages a single axis inside a QCustomPlot. " alt="" coords="344,731,421,757"/>
+<area shape="rect" id="node36" href="$classQCPGrid.html" title="Responsible for drawing the grid of a QCPAxis. " alt="" coords="345,1032,420,1059"/>
+<area shape="rect" id="node37" href="$classQCPLayoutElement.html" title="The abstract base class for all objects that form the layout system. " alt="" coords="313,981,452,1008"/>
+<area shape="rect" id="node48" href="$classQCPSelectionRect.html" title="Provides rect/rubber&#45;band data selection and range zoom interaction. " alt="" coords="316,1083,449,1109"/>
+<area shape="rect" id="node24" href="$classQCPItemBracket.html" title="A bracket for referencing/highlighting certain parts in the plot. " alt="" coords="547,360,669,387"/>
+<area shape="rect" id="node25" href="$classQCPItemCurve.html" title="A curved line from one point to another. " alt="" coords="552,411,664,437"/>
+<area shape="rect" id="node26" href="$classQCPItemEllipse.html" title="An ellipse. " alt="" coords="550,5,666,32"/>
+<area shape="rect" id="node27" href="$classQCPItemLine.html" title="A line from one point to another. " alt="" coords="557,56,659,83"/>
+<area shape="rect" id="node28" href="$classQCPItemPixmap.html" title="An arbitrary pixmap. " alt="" coords="547,107,669,133"/>
+<area shape="rect" id="node29" href="$classQCPItemRect.html" title="A rectangle. " alt="" coords="555,157,661,184"/>
+<area shape="rect" id="node30" href="$classQCPItemStraightLine.html" title="A straight line that spans infinitely in both directions. " alt="" coords="535,208,681,235"/>
+<area shape="rect" id="node31" href="$classQCPItemText.html" title="A text label. " alt="" coords="557,259,659,285"/>
+<area shape="rect" id="node32" href="$classQCPItemTracer.html" title="Item that sticks to QCPGraph data points. " alt="" coords="551,309,665,336"/>
+<area shape="rect" id="node34" href="$classQCPColorMap.html" title="A plottable representing a two&#45;dimensional color map in a plot. " alt="" coords="555,461,661,488"/>
+<area shape="rect" id="node38" href="$classQCPAbstractLegendItem.html" title="The abstract base class for all entries in a QCPLegend. " alt="" coords="524,956,692,983"/>
+<area shape="rect" id="node40" href="$classQCPAxisRect.html" title="Holds multiple axes and arranges them in a rectangular shape. " alt="" coords="555,1007,661,1033"/>
+<area shape="rect" id="node42" href="$classQCPColorScale.html" title="A color scale for use with color coding data such as QCPColorMap. " alt="" coords="551,1057,665,1084"/>
+<area shape="rect" id="node43" href="$classQCPLayout.html" title="The abstract base class for layouts. " alt="" coords="563,1108,653,1135"/>
+<area shape="rect" id="node47" href="$classQCPTextElement.html" title="A layout element displaying a text. " alt="" coords="545,1159,671,1185"/>
+<area shape="rect" id="node39" href="$classQCPPlottableLegendItem.html" title="A legend item representing a plottable with an icon and the plottable name. " alt="" coords="768,956,939,983"/>
+<area shape="rect" id="node41" href="$classQCPColorScaleAxisRectPrivate.html" title="QCPColorScaleAxisRectPrivate" alt="" coords="748,1007,959,1033"/>
+<area shape="rect" id="node44" href="$classQCPLayoutGrid.html" title="A layout that arranges child elements in a grid. " alt="" coords="796,1108,911,1135"/>
+<area shape="rect" id="node46" href="$classQCPLayoutInset.html" title="A layout that places child elements aligned to the border or arbitrarily positioned. " alt="" coords="794,1057,913,1084"/>
+<area shape="rect" id="node45" href="$classQCPLegend.html" title="Manages a legend inside a QCustomPlot. " alt="" coords="1007,1108,1100,1135"/>
+</map>

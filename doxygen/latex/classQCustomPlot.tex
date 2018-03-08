@@ -1,0 +1,2009 @@
+\hypertarget{classQCustomPlot}{}\section{Q\+Custom\+Plot Class Reference}
+\label{classQCustomPlot}\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+
+
+The central class of the library. This is the Q\+Widget which displays the plot and interacts with the user.  
+
+
+
+
+Inheritance diagram for Q\+Custom\+Plot\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=156pt]{classQCustomPlot__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Q\+Custom\+Plot\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classQCustomPlot__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classQCustomPlot_a75a8afbe6ef333b1f3d47abb25b9add7}{Layer\+Insert\+Mode} \{ \hyperlink{classQCustomPlot_a75a8afbe6ef333b1f3d47abb25b9add7aee39cf650cd24e68552da0b697ce4a93}{lim\+Below}, 
+\hyperlink{classQCustomPlot_a75a8afbe6ef333b1f3d47abb25b9add7a062b0b7825650b432a713c0df6742d41}{lim\+Above}
+ \}
+\item 
+enum \hyperlink{classQCustomPlot_a45d61392d13042e712a956d27762aa39}{Refresh\+Priority} \{ \hyperlink{classQCustomPlot_a45d61392d13042e712a956d27762aa39aa6eda645ccf1a60635df3e8b71ea6ae2}{rp\+Immediate\+Refresh}, 
+\hyperlink{classQCustomPlot_a45d61392d13042e712a956d27762aa39acd6f1e590ea775d1ddee666428077f3e}{rp\+Queued\+Refresh}, 
+\hyperlink{classQCustomPlot_a45d61392d13042e712a956d27762aa39a49666a5854a68dbcca8b277b03331260}{rp\+Refresh\+Hint}, 
+\hyperlink{classQCustomPlot_a45d61392d13042e712a956d27762aa39a019650c6ddf308f97e811fbfff207a8f}{rp\+Queued\+Replot}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Signals}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classQCustomPlot_a9b232142c64fcf273a953ee08e5b90e9}{mouse\+Double\+Click} (Q\+Mouse\+Event $\ast$event)
+\item 
+void \hyperlink{classQCustomPlot_aca75bf9afb5dd19349c375de2a87a051}{mouse\+Press} (Q\+Mouse\+Event $\ast$event)
+\item 
+void \hyperlink{classQCustomPlot_a742ca4f94688bed2a685fd8a56ce5704}{mouse\+Move} (Q\+Mouse\+Event $\ast$event)
+\item 
+void \hyperlink{classQCustomPlot_ac8dc0ee6bb98e923c00b4ebafbe6134d}{mouse\+Release} (Q\+Mouse\+Event $\ast$event)
+\item 
+void \hyperlink{classQCustomPlot_ac80a14206f99304a91d2aa55775ec3ff}{mouse\+Wheel} (Q\+Wheel\+Event $\ast$event)
+\item 
+void \hyperlink{classQCustomPlot_af5fe78b8bc9e4e96df921612837fd4fd}{plottable\+Click} (\hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable} $\ast$\hyperlink{classQCustomPlot_a32de81ff53e263e785b83b52ecd99d6f}{plottable}, int data\+Index, Q\+Mouse\+Event $\ast$event)
+\item 
+void \hyperlink{classQCustomPlot_a86a3ab7263c9c4e008e70d6c5fce9fbd}{plottable\+Double\+Click} (\hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable} $\ast$\hyperlink{classQCustomPlot_a32de81ff53e263e785b83b52ecd99d6f}{plottable}, int data\+Index, Q\+Mouse\+Event $\ast$event)
+\item 
+void \hyperlink{classQCustomPlot_ae16b51f52d2b7aebbc7e3e74e6ff2e4b}{item\+Click} (\hyperlink{classQCPAbstractItem}{Q\+C\+P\+Abstract\+Item} $\ast$\hyperlink{classQCustomPlot_a3e842b5a65b1d17fbb96cfb1fa1314d1}{item}, Q\+Mouse\+Event $\ast$event)
+\item 
+void \hyperlink{classQCustomPlot_ac83aa9f5a3e9bb3efc9cdc763dcd42a6}{item\+Double\+Click} (\hyperlink{classQCPAbstractItem}{Q\+C\+P\+Abstract\+Item} $\ast$\hyperlink{classQCustomPlot_a3e842b5a65b1d17fbb96cfb1fa1314d1}{item}, Q\+Mouse\+Event $\ast$event)
+\item 
+void \hyperlink{classQCustomPlot_abf635f8b56ab5c16d5de9f358543e82b}{axis\+Click} (\hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$axis, \hyperlink{classQCPAxis_abee4c7a54c468b1385dfce2c898b115f}{Q\+C\+P\+Axis\+::\+Selectable\+Part} part, Q\+Mouse\+Event $\ast$event)
+\item 
+void \hyperlink{classQCustomPlot_a6df35357460181a72da3e93d600f5256}{axis\+Double\+Click} (\hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$axis, \hyperlink{classQCPAxis_abee4c7a54c468b1385dfce2c898b115f}{Q\+C\+P\+Axis\+::\+Selectable\+Part} part, Q\+Mouse\+Event $\ast$event)
+\item 
+void \hyperlink{classQCustomPlot_a79cff0baafbca10a3aaf694d2d3b9ab3}{legend\+Click} (\hyperlink{classQCPLegend}{Q\+C\+P\+Legend} $\ast$\hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{legend}, \hyperlink{classQCPAbstractLegendItem}{Q\+C\+P\+Abstract\+Legend\+Item} $\ast$\hyperlink{classQCustomPlot_a3e842b5a65b1d17fbb96cfb1fa1314d1}{item}, Q\+Mouse\+Event $\ast$event)
+\item 
+void \hyperlink{classQCustomPlot_a0250f835c044521df1619b132288bca7}{legend\+Double\+Click} (\hyperlink{classQCPLegend}{Q\+C\+P\+Legend} $\ast$\hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{legend}, \hyperlink{classQCPAbstractLegendItem}{Q\+C\+P\+Abstract\+Legend\+Item} $\ast$\hyperlink{classQCustomPlot_a3e842b5a65b1d17fbb96cfb1fa1314d1}{item}, Q\+Mouse\+Event $\ast$event)
+\item 
+void \hyperlink{classQCustomPlot_a500c64a109bc773c973ad274f2fa4190}{selection\+Changed\+By\+User} ()
+\item 
+void \hyperlink{classQCustomPlot_a0cd30e29b73efd6afe096e44bc5956f5}{before\+Replot} ()
+\item 
+void \hyperlink{classQCustomPlot_a6f4fa624af060bc5919c5f266cf426a0}{after\+Replot} ()
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCustomPlot_a45b99626558651a6428b83972b0b34b8}{Q\+Custom\+Plot} (Q\+Widget $\ast$parent=0)
+\item 
+Q\+Rect {\bfseries viewport} () const \hypertarget{classQCustomPlot_a953ecdbc28018e7e84cb6213ad3d88c2}{}\label{classQCustomPlot_a953ecdbc28018e7e84cb6213ad3d88c2}
+
+\item 
+double {\bfseries buffer\+Device\+Pixel\+Ratio} () const \hypertarget{classQCustomPlot_a82ba278c2465520017ff269d713dd1bb}{}\label{classQCustomPlot_a82ba278c2465520017ff269d713dd1bb}
+
+\item 
+Q\+Pixmap {\bfseries background} () const \hypertarget{classQCustomPlot_a4643ddc8249cc4f51725650677c2b779}{}\label{classQCustomPlot_a4643ddc8249cc4f51725650677c2b779}
+
+\item 
+bool {\bfseries background\+Scaled} () const \hypertarget{classQCustomPlot_af9a6e0fe88e4b8ae5504ee9646abb121}{}\label{classQCustomPlot_af9a6e0fe88e4b8ae5504ee9646abb121}
+
+\item 
+Qt\+::\+Aspect\+Ratio\+Mode {\bfseries background\+Scaled\+Mode} () const \hypertarget{classQCustomPlot_a3394512baf54fbcdc7613ac44a07c3b6}{}\label{classQCustomPlot_a3394512baf54fbcdc7613ac44a07c3b6}
+
+\item 
+\hyperlink{classQCPLayoutGrid}{Q\+C\+P\+Layout\+Grid} $\ast$ \hyperlink{classQCustomPlot_afd280d4d621ae64a106543a545c508d7}{plot\+Layout} () const 
+\item 
+Q\+C\+P\+::\+Antialiased\+Elements {\bfseries antialiased\+Elements} () const \hypertarget{classQCustomPlot_a81e954fbb485bb44c609e5707f0067b3}{}\label{classQCustomPlot_a81e954fbb485bb44c609e5707f0067b3}
+
+\item 
+Q\+C\+P\+::\+Antialiased\+Elements {\bfseries not\+Antialiased\+Elements} () const \hypertarget{classQCustomPlot_a8060cee59757213764382a78d3196189}{}\label{classQCustomPlot_a8060cee59757213764382a78d3196189}
+
+\item 
+bool {\bfseries auto\+Add\+Plottable\+To\+Legend} () const \hypertarget{classQCustomPlot_ad1599fc3fd1833b5988f6b89c1f616ca}{}\label{classQCustomPlot_ad1599fc3fd1833b5988f6b89c1f616ca}
+
+\item 
+const Q\+C\+P\+::\+Interactions {\bfseries interactions} () const \hypertarget{classQCustomPlot_a12401c02b6949a717f5749bb28c62983}{}\label{classQCustomPlot_a12401c02b6949a717f5749bb28c62983}
+
+\item 
+int {\bfseries selection\+Tolerance} () const \hypertarget{classQCustomPlot_a7b738074c75e80070ef6a10263c6cd69}{}\label{classQCustomPlot_a7b738074c75e80070ef6a10263c6cd69}
+
+\item 
+bool {\bfseries no\+Antialiasing\+On\+Drag} () const \hypertarget{classQCustomPlot_ae07f2895a34d13a97a10cae4d8e17a36}{}\label{classQCustomPlot_ae07f2895a34d13a97a10cae4d8e17a36}
+
+\item 
+Q\+C\+P\+::\+Plotting\+Hints {\bfseries plotting\+Hints} () const \hypertarget{classQCustomPlot_a130b55e205697a5288081e9fc11e443e}{}\label{classQCustomPlot_a130b55e205697a5288081e9fc11e443e}
+
+\item 
+Qt\+::\+Keyboard\+Modifier {\bfseries multi\+Select\+Modifier} () const \hypertarget{classQCustomPlot_a9b6b1a0fea8da3fda6d5e3d687202877}{}\label{classQCustomPlot_a9b6b1a0fea8da3fda6d5e3d687202877}
+
+\item 
+\hyperlink{namespaceQCP_ac9aa4d6d81ac76b094f9af9ad2d3aacf}{Q\+C\+P\+::\+Selection\+Rect\+Mode} {\bfseries selection\+Rect\+Mode} () const \hypertarget{classQCustomPlot_afae2023152cd30e7052b536148226a04}{}\label{classQCustomPlot_afae2023152cd30e7052b536148226a04}
+
+\item 
+\hyperlink{classQCPSelectionRect}{Q\+C\+P\+Selection\+Rect} $\ast$ \hyperlink{classQCustomPlot_ae64a3994735d8f592a60d9430526a163}{selection\+Rect} () const 
+\item 
+bool {\bfseries open\+Gl} () const \hypertarget{classQCustomPlot_ab81fd5b380574c6dee92b6d8c8fd1b18}{}\label{classQCustomPlot_ab81fd5b380574c6dee92b6d8c8fd1b18}
+
+\item 
+void \hyperlink{classQCustomPlot_a3f9bc4b939dd8aaba9339fd09f273fc4}{set\+Viewport} (const Q\+Rect \&rect)
+\item 
+void \hyperlink{classQCustomPlot_a159162653ad6f8b8bf21263ba5787215}{set\+Buffer\+Device\+Pixel\+Ratio} (double ratio)
+\item 
+void \hyperlink{classQCustomPlot_a130358592cfca353ff3cf5571b49fb00}{set\+Background} (const Q\+Pixmap \&pm)
+\item 
+void \hyperlink{classQCustomPlot_a8513971d6aa24d8b0d6a68d45b542130}{set\+Background} (const Q\+Pixmap \&pm, bool scaled, Qt\+::\+Aspect\+Ratio\+Mode mode=Qt\+::\+Keep\+Aspect\+Ratio\+By\+Expanding)
+\item 
+void \hyperlink{classQCustomPlot_a8ed256cf467bfa7ba1f9feaae62c3bd0}{set\+Background} (const Q\+Brush \&brush)
+\item 
+void \hyperlink{classQCustomPlot_a36f0fa1317325dc7b7efea615ee2de1f}{set\+Background\+Scaled} (bool scaled)
+\item 
+void \hyperlink{classQCustomPlot_a4c0eb4865b7949f62e1cb97db04a3de0}{set\+Background\+Scaled\+Mode} (Qt\+::\+Aspect\+Ratio\+Mode mode)
+\item 
+void \hyperlink{classQCustomPlot_af6f91e5eab1be85f67c556e98c3745e8}{set\+Antialiased\+Elements} (const Q\+C\+P\+::\+Antialiased\+Elements \&antialiased\+Elements)
+\item 
+void \hyperlink{classQCustomPlot_aeef813bcf7efab8e765f9f87ec454691}{set\+Antialiased\+Element} (\hyperlink{namespaceQCP_ae55dbe315d41fe80f29ba88100843a0c}{Q\+C\+P\+::\+Antialiased\+Element} antialiased\+Element, bool enabled=true)
+\item 
+void \hyperlink{classQCustomPlot_ae10d685b5eabea2999fb8775ca173c24}{set\+Not\+Antialiased\+Elements} (const Q\+C\+P\+::\+Antialiased\+Elements \&not\+Antialiased\+Elements)
+\item 
+void \hyperlink{classQCustomPlot_afc657938a707c890e449ae89203a076d}{set\+Not\+Antialiased\+Element} (\hyperlink{namespaceQCP_ae55dbe315d41fe80f29ba88100843a0c}{Q\+C\+P\+::\+Antialiased\+Element} not\+Antialiased\+Element, bool enabled=true)
+\item 
+void \hyperlink{classQCustomPlot_ad8858410c2db47b7104040a3aa61c3fc}{set\+Auto\+Add\+Plottable\+To\+Legend} (bool on)
+\item 
+void \hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{set\+Interactions} (const Q\+C\+P\+::\+Interactions \&interactions)
+\item 
+void \hyperlink{classQCustomPlot_a422bf1bc6d56dac75a3d805d9a65902c}{set\+Interaction} (const \hyperlink{namespaceQCP_a2ad6bb6281c7c2d593d4277b44c2b037}{Q\+C\+P\+::\+Interaction} \&interaction, bool enabled=true)
+\item 
+void \hyperlink{classQCustomPlot_a4dc31241d7b09680950e19e5f971ed93}{set\+Selection\+Tolerance} (int pixels)
+\item 
+void \hyperlink{classQCustomPlot_a775bdcb6329d44701aeaa6135b0e5265}{set\+No\+Antialiasing\+On\+Drag} (bool enabled)
+\item 
+void \hyperlink{classQCustomPlot_a94a33cbdadbbac5934843508bcfc210d}{set\+Plotting\+Hints} (const Q\+C\+P\+::\+Plotting\+Hints \&hints)
+\item 
+void \hyperlink{classQCustomPlot_a3b7c97bb6c16464e9e15190c07abe9a9}{set\+Plotting\+Hint} (\hyperlink{namespaceQCP_a5400e5fcb9528d92002ddb938c1f4ef4}{Q\+C\+P\+::\+Plotting\+Hint} hint, bool enabled=true)
+\item 
+void \hyperlink{classQCustomPlot_a8fc96e3b5138a06759a2a90c166df516}{set\+Multi\+Select\+Modifier} (Qt\+::\+Keyboard\+Modifier modifier)
+\item 
+void \hyperlink{classQCustomPlot_a810ef958ebe84db661c7288b526c0deb}{set\+Selection\+Rect\+Mode} (\hyperlink{namespaceQCP_ac9aa4d6d81ac76b094f9af9ad2d3aacf}{Q\+C\+P\+::\+Selection\+Rect\+Mode} mode)
+\item 
+void \hyperlink{classQCustomPlot_a0c09f96df15faa4799ad7051bb16cf33}{set\+Selection\+Rect} (\hyperlink{classQCPSelectionRect}{Q\+C\+P\+Selection\+Rect} $\ast$\hyperlink{classQCustomPlot_ae64a3994735d8f592a60d9430526a163}{selection\+Rect})
+\item 
+void \hyperlink{classQCustomPlot_a7db1adc09016329f3aef7c60da935789}{set\+Open\+Gl} (bool enabled, int multisampling=16)
+\item 
+\hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable} $\ast$ \hyperlink{classQCustomPlot_a32de81ff53e263e785b83b52ecd99d6f}{plottable} (int index)
+\item 
+\hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable} $\ast$ \hyperlink{classQCustomPlot_adea38bdc660da9412ba69fb939031567}{plottable} ()
+\item 
+bool \hyperlink{classQCustomPlot_af3dafd56884208474f311d6226513ab2}{remove\+Plottable} (\hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable} $\ast$\hyperlink{classQCustomPlot_a32de81ff53e263e785b83b52ecd99d6f}{plottable})
+\item 
+bool \hyperlink{classQCustomPlot_afc210e0021480f8119bccf37839dbcc8}{remove\+Plottable} (int index)
+\item 
+int \hyperlink{classQCustomPlot_a9a409bb3201878adb7ffba1c89c4e004}{clear\+Plottables} ()
+\item 
+int \hyperlink{classQCustomPlot_a2dbfbf15dc38713f9a1c445a3dd2e989}{plottable\+Count} () const 
+\item 
+Q\+List$<$ \hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable} $\ast$ $>$ \hyperlink{classQCustomPlot_a6721b8c689bb7f2f400987e580508fe8}{selected\+Plottables} () const 
+\item 
+\hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable} $\ast$ \hyperlink{classQCustomPlot_ac1d1bc6ae4e13616fb02cef6d9e2188e}{plottable\+At} (const Q\+PointF \&pos, bool only\+Selectable=false) const 
+\item 
+bool \hyperlink{classQCustomPlot_a4fc28914e2ee91aab424b7ce46b6bdf1}{has\+Plottable} (\hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable} $\ast$\hyperlink{classQCustomPlot_a32de81ff53e263e785b83b52ecd99d6f}{plottable}) const 
+\item 
+\hyperlink{classQCPGraph}{Q\+C\+P\+Graph} $\ast$ \hyperlink{classQCustomPlot_a6d3ed93c2bf46ab7fa670d66be4cddaf}{graph} (int index) const 
+\item 
+\hyperlink{classQCPGraph}{Q\+C\+P\+Graph} $\ast$ \hyperlink{classQCustomPlot_a80c40ced2a74eefe9e92de1e82ba2274}{graph} () const 
+\item 
+\hyperlink{classQCPGraph}{Q\+C\+P\+Graph} $\ast$ \hyperlink{classQCustomPlot_a6fb2873d35a8a8089842d81a70a54167}{add\+Graph} (\hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$key\+Axis=0, \hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$value\+Axis=0)
+\item 
+bool \hyperlink{classQCustomPlot_a903561be895fb6528a770d66ac5e6713}{remove\+Graph} (\hyperlink{classQCPGraph}{Q\+C\+P\+Graph} $\ast$\hyperlink{classQCustomPlot_a6d3ed93c2bf46ab7fa670d66be4cddaf}{graph})
+\item 
+bool \hyperlink{classQCustomPlot_a9554b3d2d5b10c0f884bd4010b6c192c}{remove\+Graph} (int index)
+\item 
+int \hyperlink{classQCustomPlot_ab0f3abff2d2f7df3668b5836f39207fa}{clear\+Graphs} ()
+\item 
+int \hyperlink{classQCustomPlot_a7d9b4d19114b2fde60f0233eeb0aa682}{graph\+Count} () const 
+\item 
+Q\+List$<$ \hyperlink{classQCPGraph}{Q\+C\+P\+Graph} $\ast$ $>$ \hyperlink{classQCustomPlot_ad2a0493bdd01e7aa99a4209ae3a5b67b}{selected\+Graphs} () const 
+\item 
+\hyperlink{classQCPAbstractItem}{Q\+C\+P\+Abstract\+Item} $\ast$ \hyperlink{classQCustomPlot_a3e842b5a65b1d17fbb96cfb1fa1314d1}{item} (int index) const 
+\item 
+\hyperlink{classQCPAbstractItem}{Q\+C\+P\+Abstract\+Item} $\ast$ \hyperlink{classQCustomPlot_a700399eae539798c5baf64a37c7f2135}{item} () const 
+\item 
+bool \hyperlink{classQCustomPlot_ae04446557292551e8fb6e2c106e1848d}{remove\+Item} (\hyperlink{classQCPAbstractItem}{Q\+C\+P\+Abstract\+Item} $\ast$\hyperlink{classQCustomPlot_a3e842b5a65b1d17fbb96cfb1fa1314d1}{item})
+\item 
+bool \hyperlink{classQCustomPlot_abcfdda3d601c0441cab136137d715dea}{remove\+Item} (int index)
+\item 
+int \hyperlink{classQCustomPlot_abdfd07d4f0591d0cf967f85013fd3645}{clear\+Items} ()
+\item 
+int \hyperlink{classQCustomPlot_a6fc860e30df17fd5c46056bf6fe29390}{item\+Count} () const 
+\item 
+Q\+List$<$ \hyperlink{classQCPAbstractItem}{Q\+C\+P\+Abstract\+Item} $\ast$ $>$ \hyperlink{classQCustomPlot_a1a48b13547e2d9ac5cd6927516f47a2e}{selected\+Items} () const 
+\item 
+\hyperlink{classQCPAbstractItem}{Q\+C\+P\+Abstract\+Item} $\ast$ \hyperlink{classQCustomPlot_a793e4b04e0ede11a733021907368fa83}{item\+At} (const Q\+PointF \&pos, bool only\+Selectable=false) const 
+\item 
+bool \hyperlink{classQCustomPlot_ab4199c38b03e63a2623c82453fe8add5}{has\+Item} (\hyperlink{classQCPAbstractItem}{Q\+C\+P\+Abstract\+Item} $\ast$\hyperlink{classQCustomPlot_a3e842b5a65b1d17fbb96cfb1fa1314d1}{item}) const 
+\item 
+\hyperlink{classQCPLayer}{Q\+C\+P\+Layer} $\ast$ \hyperlink{classQCustomPlot_aac492da01782820454e9136a8db28182}{layer} (const Q\+String \&name) const 
+\item 
+\hyperlink{classQCPLayer}{Q\+C\+P\+Layer} $\ast$ \hyperlink{classQCustomPlot_a1e73051e371f1815b48d8b355be0d2ab}{layer} (int index) const 
+\item 
+\hyperlink{classQCPLayer}{Q\+C\+P\+Layer} $\ast$ \hyperlink{classQCustomPlot_af73057345656cbd1463454982d808b00}{current\+Layer} () const 
+\item 
+bool \hyperlink{classQCustomPlot_a73a6dc47c653bb6f8f030abca5a11852}{set\+Current\+Layer} (const Q\+String \&name)
+\item 
+bool \hyperlink{classQCustomPlot_a23a4d3cadad1a0063c5fe19aac5659e6}{set\+Current\+Layer} (\hyperlink{classQCPLayer}{Q\+C\+P\+Layer} $\ast$\hyperlink{classQCustomPlot_aac492da01782820454e9136a8db28182}{layer})
+\item 
+int \hyperlink{classQCustomPlot_a1b3926884f5bd4bdda1495d8b3c891d0}{layer\+Count} () const 
+\item 
+bool \hyperlink{classQCustomPlot_ad5255393df078448bb6ac83fa5db5f52}{add\+Layer} (const Q\+String \&name, \hyperlink{classQCPLayer}{Q\+C\+P\+Layer} $\ast$other\+Layer=0, \hyperlink{classQCustomPlot_a75a8afbe6ef333b1f3d47abb25b9add7}{Layer\+Insert\+Mode} insert\+Mode=\hyperlink{classQCustomPlot_a75a8afbe6ef333b1f3d47abb25b9add7a062b0b7825650b432a713c0df6742d41}{lim\+Above})
+\item 
+bool \hyperlink{classQCustomPlot_a40f75e342c5eaab6a86066a42a0e2a94}{remove\+Layer} (\hyperlink{classQCPLayer}{Q\+C\+P\+Layer} $\ast$\hyperlink{classQCustomPlot_aac492da01782820454e9136a8db28182}{layer})
+\item 
+bool \hyperlink{classQCustomPlot_ae896140beff19424e9e9e02d6e331104}{move\+Layer} (\hyperlink{classQCPLayer}{Q\+C\+P\+Layer} $\ast$\hyperlink{classQCustomPlot_aac492da01782820454e9136a8db28182}{layer}, \hyperlink{classQCPLayer}{Q\+C\+P\+Layer} $\ast$other\+Layer, \hyperlink{classQCustomPlot_a75a8afbe6ef333b1f3d47abb25b9add7}{Layer\+Insert\+Mode} insert\+Mode=\hyperlink{classQCustomPlot_a75a8afbe6ef333b1f3d47abb25b9add7a062b0b7825650b432a713c0df6742d41}{lim\+Above})
+\item 
+int \hyperlink{classQCustomPlot_a340fa24b1607e445cedda9685670ead3}{axis\+Rect\+Count} () const 
+\item 
+\hyperlink{classQCPAxisRect}{Q\+C\+P\+Axis\+Rect} $\ast$ \hyperlink{classQCustomPlot_a4a37a1add5fe63060ac518cf0a4c4050}{axis\+Rect} (int index=0) const 
+\item 
+Q\+List$<$ \hyperlink{classQCPAxisRect}{Q\+C\+P\+Axis\+Rect} $\ast$ $>$ \hyperlink{classQCustomPlot_afd67094aaeccbc5719761348b2d8c891}{axis\+Rects} () const 
+\item 
+\hyperlink{classQCPLayoutElement}{Q\+C\+P\+Layout\+Element} $\ast$ \hyperlink{classQCustomPlot_a840458186d4483c8a42d6a399448d38f}{layout\+Element\+At} (const Q\+PointF \&pos) const 
+\item 
+\hyperlink{classQCPAxisRect}{Q\+C\+P\+Axis\+Rect} $\ast$ \hyperlink{classQCustomPlot_af903c081aaf7201631d3607905cc9afc}{axis\+Rect\+At} (const Q\+PointF \&pos) const 
+\item 
+Q\+\_\+\+S\+L\+OT void \hyperlink{classQCustomPlot_ad86528f2cee6c7e446dea4a6e8839935}{rescale\+Axes} (bool only\+Visible\+Plottables=false)
+\item 
+Q\+List$<$ \hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$ $>$ \hyperlink{classQCustomPlot_aa6baf867e8beb96ed5bd471f83ece903}{selected\+Axes} () const 
+\item 
+Q\+List$<$ \hyperlink{classQCPLegend}{Q\+C\+P\+Legend} $\ast$ $>$ \hyperlink{classQCustomPlot_a1ea6297300c3e2770e65f95836411755}{selected\+Legends} () const 
+\item 
+Q\+\_\+\+S\+L\+OT void \hyperlink{classQCustomPlot_a9d4808ab925b003054085246c92a257c}{deselect\+All} ()
+\item 
+bool \hyperlink{classQCustomPlot_ad5acd34f6b39c3516887d7e54fec2412}{save\+Pdf} (const Q\+String \&file\+Name, int width=0, int height=0, \hyperlink{namespaceQCP_a17844f19e1019693a953e1eb93536d2f}{Q\+C\+P\+::\+Export\+Pen} export\+Pen=\hyperlink{namespaceQCP_a17844f19e1019693a953e1eb93536d2fa50d3657dba3fb90560b93a823cb0a6e8}{Q\+C\+P\+::ep\+Allow\+Cosmetic}, const Q\+String \&pdf\+Creator=Q\+String(), const Q\+String \&pdf\+Title=Q\+String())
+\item 
+bool \hyperlink{classQCustomPlot_ac92cc9256d12f354b40a4be4600b5fb9}{save\+Png} (const Q\+String \&file\+Name, int width=0, int height=0, double scale=1.\+0, int quality=-\/1, int resolution=96, \hyperlink{namespaceQCP_a715d46153da230990aa887d0f0602452}{Q\+C\+P\+::\+Resolution\+Unit} resolution\+Unit=\hyperlink{namespaceQCP_a715d46153da230990aa887d0f0602452affb887d8efe79c39a1aca2acd7002afc}{Q\+C\+P\+::ru\+Dots\+Per\+Inch})
+\item 
+bool \hyperlink{classQCustomPlot_a76f0d278e630a711fa6f48048cfd83e4}{save\+Jpg} (const Q\+String \&file\+Name, int width=0, int height=0, double scale=1.\+0, int quality=-\/1, int resolution=96, \hyperlink{namespaceQCP_a715d46153da230990aa887d0f0602452}{Q\+C\+P\+::\+Resolution\+Unit} resolution\+Unit=\hyperlink{namespaceQCP_a715d46153da230990aa887d0f0602452affb887d8efe79c39a1aca2acd7002afc}{Q\+C\+P\+::ru\+Dots\+Per\+Inch})
+\item 
+bool \hyperlink{classQCustomPlot_ae3a86ed0795670e50afa21759d4fa13d}{save\+Bmp} (const Q\+String \&file\+Name, int width=0, int height=0, double scale=1.\+0, int resolution=96, \hyperlink{namespaceQCP_a715d46153da230990aa887d0f0602452}{Q\+C\+P\+::\+Resolution\+Unit} resolution\+Unit=\hyperlink{namespaceQCP_a715d46153da230990aa887d0f0602452affb887d8efe79c39a1aca2acd7002afc}{Q\+C\+P\+::ru\+Dots\+Per\+Inch})
+\item 
+bool \hyperlink{classQCustomPlot_ad7723ce2edfa270632ef42b03a444352}{save\+Rastered} (const Q\+String \&file\+Name, int width, int height, double scale, const char $\ast$format, int quality=-\/1, int resolution=96, \hyperlink{namespaceQCP_a715d46153da230990aa887d0f0602452}{Q\+C\+P\+::\+Resolution\+Unit} resolution\+Unit=\hyperlink{namespaceQCP_a715d46153da230990aa887d0f0602452affb887d8efe79c39a1aca2acd7002afc}{Q\+C\+P\+::ru\+Dots\+Per\+Inch})
+\item 
+Q\+Pixmap \hyperlink{classQCustomPlot_aabb974d71ce96c137dc04eb6eab844fe}{to\+Pixmap} (int width=0, int height=0, double scale=1.\+0)
+\item 
+void \hyperlink{classQCustomPlot_a1be68d5c0f1e086d6374d1340a193fb9}{to\+Painter} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter, int width=0, int height=0)
+\item 
+Q\+\_\+\+S\+L\+OT void \hyperlink{classQCustomPlot_aa4bfe7d70dbe67e81d877819b75ab9af}{replot} (\hyperlink{classQCustomPlot_a45d61392d13042e712a956d27762aa39}{Q\+Custom\+Plot\+::\+Refresh\+Priority} refresh\+Priority=\hyperlink{classQCustomPlot_a45d61392d13042e712a956d27762aa39a49666a5854a68dbcca8b277b03331260}{Q\+Custom\+Plot\+::rp\+Refresh\+Hint})
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$ \hyperlink{classQCustomPlot_a9a79cd0158a4c7f30cbc702f0fd800e4}{x\+Axis}
+\item 
+\hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$ \hyperlink{classQCustomPlot_af6fea5679725b152c14facd920b19367}{y\+Axis}
+\item 
+\hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$ \hyperlink{classQCustomPlot_ada41599f22cad901c030f3dcbdd82fd9}{x\+Axis2}
+\item 
+\hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$ \hyperlink{classQCustomPlot_af13fdc5bce7d0fabd640f13ba805c0b7}{y\+Axis2}
+\item 
+\hyperlink{classQCPLegend}{Q\+C\+P\+Legend} $\ast$ \hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{legend}
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual Q\+Size {\bfseries minimum\+Size\+Hint} () const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCustomPlot_a968a01cd4077d63aecde1aef1db057fc}{}\label{classQCustomPlot_a968a01cd4077d63aecde1aef1db057fc}
+
+\item 
+virtual Q\+Size {\bfseries size\+Hint} () const Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCustomPlot_ac9d6fe101e082daf756903b11f6e6213}{}\label{classQCustomPlot_ac9d6fe101e082daf756903b11f6e6213}
+
+\item 
+virtual void {\bfseries paint\+Event} (Q\+Paint\+Event $\ast$event) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCustomPlot_a8068b368e5813065ee0f4cf7c6d21330}{}\label{classQCustomPlot_a8068b368e5813065ee0f4cf7c6d21330}
+
+\item 
+virtual void {\bfseries resize\+Event} (Q\+Resize\+Event $\ast$event) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCustomPlot_af5b69dc6a431562ecdd1d0718bcbdf70}{}\label{classQCustomPlot_af5b69dc6a431562ecdd1d0718bcbdf70}
+
+\item 
+virtual void {\bfseries mouse\+Double\+Click\+Event} (Q\+Mouse\+Event $\ast$event) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCustomPlot_a344075e6e80ed6d575c79b81694abb8a}{}\label{classQCustomPlot_a344075e6e80ed6d575c79b81694abb8a}
+
+\item 
+virtual void {\bfseries mouse\+Press\+Event} (Q\+Mouse\+Event $\ast$event) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCustomPlot_aac0a7296a6031dc667c01c1abd4ecc6b}{}\label{classQCustomPlot_aac0a7296a6031dc667c01c1abd4ecc6b}
+
+\item 
+virtual void {\bfseries mouse\+Move\+Event} (Q\+Mouse\+Event $\ast$event) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCustomPlot_ae7abdc93b26d2ad4632c1ab75ae5b46f}{}\label{classQCustomPlot_ae7abdc93b26d2ad4632c1ab75ae5b46f}
+
+\item 
+virtual void {\bfseries mouse\+Release\+Event} (Q\+Mouse\+Event $\ast$event) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCustomPlot_adc24846f52199e5a9bc35c387a6ce68d}{}\label{classQCustomPlot_adc24846f52199e5a9bc35c387a6ce68d}
+
+\item 
+virtual void {\bfseries wheel\+Event} (Q\+Wheel\+Event $\ast$event) Q\+\_\+\+D\+E\+C\+L\+\_\+\+O\+V\+E\+R\+R\+I\+DE\hypertarget{classQCustomPlot_a7848c9ac8be60bbd8fcea9b53be543c5}{}\label{classQCustomPlot_a7848c9ac8be60bbd8fcea9b53be543c5}
+
+\item 
+virtual void {\bfseries draw} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter)\hypertarget{classQCustomPlot_ad7a7d878bf050f101a43008e7d8fdb52}{}\label{classQCustomPlot_ad7a7d878bf050f101a43008e7d8fdb52}
+
+\item 
+virtual void {\bfseries update\+Layout} ()\hypertarget{classQCustomPlot_a6e6693e2c249f65437382ffd93405e04}{}\label{classQCustomPlot_a6e6693e2c249f65437382ffd93405e04}
+
+\item 
+virtual void {\bfseries axis\+Removed} (\hyperlink{classQCPAxis}{Q\+C\+P\+Axis} $\ast$axis)\hypertarget{classQCustomPlot_a8b46607021c463c94709d3504951cb47}{}\label{classQCustomPlot_a8b46607021c463c94709d3504951cb47}
+
+\item 
+virtual void {\bfseries legend\+Removed} (\hyperlink{classQCPLegend}{Q\+C\+P\+Legend} $\ast$\hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{legend})\hypertarget{classQCustomPlot_a9d173454555021c9ffd4f675c4d9037a}{}\label{classQCustomPlot_a9d173454555021c9ffd4f675c4d9037a}
+
+\item 
+virtual Q\+\_\+\+S\+L\+OT void {\bfseries process\+Rect\+Selection} (Q\+Rect rect, Q\+Mouse\+Event $\ast$event)\hypertarget{classQCustomPlot_ac10849411e1d0e858ea7f29c8ade364c}{}\label{classQCustomPlot_ac10849411e1d0e858ea7f29c8ade364c}
+
+\item 
+virtual Q\+\_\+\+S\+L\+OT void {\bfseries process\+Rect\+Zoom} (Q\+Rect rect, Q\+Mouse\+Event $\ast$event)\hypertarget{classQCustomPlot_a5508a207dcc279f316142f96d984bba3}{}\label{classQCustomPlot_a5508a207dcc279f316142f96d984bba3}
+
+\item 
+virtual Q\+\_\+\+S\+L\+OT void {\bfseries process\+Point\+Selection} (Q\+Mouse\+Event $\ast$event)\hypertarget{classQCustomPlot_ac13c10fff6613e3e80e13c787b010838}{}\label{classQCustomPlot_ac13c10fff6613e3e80e13c787b010838}
+
+\item 
+bool {\bfseries register\+Plottable} (\hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable} $\ast$\hyperlink{classQCustomPlot_a32de81ff53e263e785b83b52ecd99d6f}{plottable})\hypertarget{classQCustomPlot_aeba7733bb9fadfb5a375b3f40de9e58a}{}\label{classQCustomPlot_aeba7733bb9fadfb5a375b3f40de9e58a}
+
+\item 
+bool {\bfseries register\+Graph} (\hyperlink{classQCPGraph}{Q\+C\+P\+Graph} $\ast$\hyperlink{classQCustomPlot_a6d3ed93c2bf46ab7fa670d66be4cddaf}{graph})\hypertarget{classQCustomPlot_acfc01230bddaea4f1782e4aa7d130af6}{}\label{classQCustomPlot_acfc01230bddaea4f1782e4aa7d130af6}
+
+\item 
+bool {\bfseries register\+Item} (\hyperlink{classQCPAbstractItem}{Q\+C\+P\+Abstract\+Item} $\ast$\hyperlink{classQCustomPlot_a3e842b5a65b1d17fbb96cfb1fa1314d1}{item})\hypertarget{classQCustomPlot_afbd4010b2e3f364c8d512691b2a1640a}{}\label{classQCustomPlot_afbd4010b2e3f364c8d512691b2a1640a}
+
+\item 
+void {\bfseries update\+Layer\+Indices} () const \hypertarget{classQCustomPlot_a3117754df3a5638787a6223c7147970f}{}\label{classQCustomPlot_a3117754df3a5638787a6223c7147970f}
+
+\item 
+\hyperlink{classQCPLayerable}{Q\+C\+P\+Layerable} $\ast$ {\bfseries layerable\+At} (const Q\+PointF \&pos, bool only\+Selectable, Q\+Variant $\ast$selection\+Details=0) const \hypertarget{classQCustomPlot_a3fffd1d8364f657482ae985e0b5aa028}{}\label{classQCustomPlot_a3fffd1d8364f657482ae985e0b5aa028}
+
+\item 
+Q\+List$<$ \hyperlink{classQCPLayerable}{Q\+C\+P\+Layerable} $\ast$ $>$ {\bfseries layerable\+List\+At} (const Q\+PointF \&pos, bool only\+Selectable, Q\+List$<$ Q\+Variant $>$ $\ast$selection\+Details=0) const \hypertarget{classQCustomPlot_af80753be504e55fdcc366845c021d7cb}{}\label{classQCustomPlot_af80753be504e55fdcc366845c021d7cb}
+
+\item 
+void {\bfseries draw\+Background} (\hyperlink{classQCPPainter}{Q\+C\+P\+Painter} $\ast$painter)\hypertarget{classQCustomPlot_a05dd52438cee4353b18c1e53a439008d}{}\label{classQCustomPlot_a05dd52438cee4353b18c1e53a439008d}
+
+\item 
+void {\bfseries setup\+Paint\+Buffers} ()\hypertarget{classQCustomPlot_a2685341f7242c3882f4cc5e379308d71}{}\label{classQCustomPlot_a2685341f7242c3882f4cc5e379308d71}
+
+\item 
+\hyperlink{classQCPAbstractPaintBuffer}{Q\+C\+P\+Abstract\+Paint\+Buffer} $\ast$ {\bfseries create\+Paint\+Buffer} ()\hypertarget{classQCustomPlot_a943b57596a1adf7f0e75c3b50e407ae6}{}\label{classQCustomPlot_a943b57596a1adf7f0e75c3b50e407ae6}
+
+\item 
+bool \hyperlink{classQCustomPlot_ad452b582348c8e99462d83fe1cd0279b}{has\+Invalidated\+Paint\+Buffers} ()
+\item 
+bool {\bfseries setup\+Open\+Gl} ()\hypertarget{classQCustomPlot_a8954c4667c51070ff4e9b02d858fd190}{}\label{classQCustomPlot_a8954c4667c51070ff4e9b02d858fd190}
+
+\item 
+void {\bfseries free\+Open\+Gl} ()\hypertarget{classQCustomPlot_aaa3073362074581a7b5905726b4a0067}{}\label{classQCustomPlot_aaa3073362074581a7b5905726b4a0067}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Q\+Rect {\bfseries m\+Viewport}\hypertarget{classQCustomPlot_ac0a7c38a715526c257cff95774f83ab6}{}\label{classQCustomPlot_ac0a7c38a715526c257cff95774f83ab6}
+
+\item 
+double {\bfseries m\+Buffer\+Device\+Pixel\+Ratio}\hypertarget{classQCustomPlot_a63a40c57a2d89eea27b90b62cc4eee1f}{}\label{classQCustomPlot_a63a40c57a2d89eea27b90b62cc4eee1f}
+
+\item 
+\hyperlink{classQCPLayoutGrid}{Q\+C\+P\+Layout\+Grid} $\ast$ {\bfseries m\+Plot\+Layout}\hypertarget{classQCustomPlot_ac97298756882a0eecd98151679850ac1}{}\label{classQCustomPlot_ac97298756882a0eecd98151679850ac1}
+
+\item 
+bool {\bfseries m\+Auto\+Add\+Plottable\+To\+Legend}\hypertarget{classQCustomPlot_aaf3ea6a4cb04d35a149cc9a0cdac3394}{}\label{classQCustomPlot_aaf3ea6a4cb04d35a149cc9a0cdac3394}
+
+\item 
+Q\+List$<$ \hyperlink{classQCPAbstractPlottable}{Q\+C\+P\+Abstract\+Plottable} $\ast$ $>$ {\bfseries m\+Plottables}\hypertarget{classQCustomPlot_a62bf8e4e7f8d23fc1e9301ba0148269f}{}\label{classQCustomPlot_a62bf8e4e7f8d23fc1e9301ba0148269f}
+
+\item 
+Q\+List$<$ \hyperlink{classQCPGraph}{Q\+C\+P\+Graph} $\ast$ $>$ {\bfseries m\+Graphs}\hypertarget{classQCustomPlot_adaf8d407d72a725169d7dbed2ee386bb}{}\label{classQCustomPlot_adaf8d407d72a725169d7dbed2ee386bb}
+
+\item 
+Q\+List$<$ \hyperlink{classQCPAbstractItem}{Q\+C\+P\+Abstract\+Item} $\ast$ $>$ {\bfseries m\+Items}\hypertarget{classQCustomPlot_a6a93905372326e31e98d6c3bc8953ec8}{}\label{classQCustomPlot_a6a93905372326e31e98d6c3bc8953ec8}
+
+\item 
+Q\+List$<$ \hyperlink{classQCPLayer}{Q\+C\+P\+Layer} $\ast$ $>$ {\bfseries m\+Layers}\hypertarget{classQCustomPlot_a72ee313041b873d76c198793ce7e6c37}{}\label{classQCustomPlot_a72ee313041b873d76c198793ce7e6c37}
+
+\item 
+Q\+C\+P\+::\+Antialiased\+Elements {\bfseries m\+Antialiased\+Elements}\hypertarget{classQCustomPlot_aa333200629256830e273873b582a5524}{}\label{classQCustomPlot_aa333200629256830e273873b582a5524}
+
+\item 
+Q\+C\+P\+::\+Antialiased\+Elements {\bfseries m\+Not\+Antialiased\+Elements}\hypertarget{classQCustomPlot_a2b6ebcad00a90ba07f146cefcd4293da}{}\label{classQCustomPlot_a2b6ebcad00a90ba07f146cefcd4293da}
+
+\item 
+Q\+C\+P\+::\+Interactions {\bfseries m\+Interactions}\hypertarget{classQCustomPlot_ad717377ceba7493b4b32f0bcbbdf1895}{}\label{classQCustomPlot_ad717377ceba7493b4b32f0bcbbdf1895}
+
+\item 
+int {\bfseries m\+Selection\+Tolerance}\hypertarget{classQCustomPlot_abc36e12dd0482117ad810a800c847722}{}\label{classQCustomPlot_abc36e12dd0482117ad810a800c847722}
+
+\item 
+bool {\bfseries m\+No\+Antialiasing\+On\+Drag}\hypertarget{classQCustomPlot_ac83df968435f6b8ec79f2993ab9124e8}{}\label{classQCustomPlot_ac83df968435f6b8ec79f2993ab9124e8}
+
+\item 
+Q\+Brush {\bfseries m\+Background\+Brush}\hypertarget{classQCustomPlot_a3aef5de4ac012178e3293248e9c63737}{}\label{classQCustomPlot_a3aef5de4ac012178e3293248e9c63737}
+
+\item 
+Q\+Pixmap {\bfseries m\+Background\+Pixmap}\hypertarget{classQCustomPlot_ae8f4677399324a78c5f8dbfb95a34f90}{}\label{classQCustomPlot_ae8f4677399324a78c5f8dbfb95a34f90}
+
+\item 
+Q\+Pixmap {\bfseries m\+Scaled\+Background\+Pixmap}\hypertarget{classQCustomPlot_a081bf046501d52642dc6d7e3bdb97d57}{}\label{classQCustomPlot_a081bf046501d52642dc6d7e3bdb97d57}
+
+\item 
+bool {\bfseries m\+Background\+Scaled}\hypertarget{classQCustomPlot_a62fe584b20680b1b2e1c7efb5c5416a5}{}\label{classQCustomPlot_a62fe584b20680b1b2e1c7efb5c5416a5}
+
+\item 
+Qt\+::\+Aspect\+Ratio\+Mode {\bfseries m\+Background\+Scaled\+Mode}\hypertarget{classQCustomPlot_ab82e8a5e3ad6b486f95d6da8bf49e9aa}{}\label{classQCustomPlot_ab82e8a5e3ad6b486f95d6da8bf49e9aa}
+
+\item 
+\hyperlink{classQCPLayer}{Q\+C\+P\+Layer} $\ast$ {\bfseries m\+Current\+Layer}\hypertarget{classQCustomPlot_aa27569c92e74395af10151357d268628}{}\label{classQCustomPlot_aa27569c92e74395af10151357d268628}
+
+\item 
+Q\+C\+P\+::\+Plotting\+Hints {\bfseries m\+Plotting\+Hints}\hypertarget{classQCustomPlot_aa184197a6101a9cc5807469e1d006c9e}{}\label{classQCustomPlot_aa184197a6101a9cc5807469e1d006c9e}
+
+\item 
+Qt\+::\+Keyboard\+Modifier {\bfseries m\+Multi\+Select\+Modifier}\hypertarget{classQCustomPlot_a0e97e701c5671e7e463d2ce0211d0f8a}{}\label{classQCustomPlot_a0e97e701c5671e7e463d2ce0211d0f8a}
+
+\item 
+\hyperlink{namespaceQCP_ac9aa4d6d81ac76b094f9af9ad2d3aacf}{Q\+C\+P\+::\+Selection\+Rect\+Mode} {\bfseries m\+Selection\+Rect\+Mode}\hypertarget{classQCustomPlot_abe04c5def373cc4fede8de20542ca3f2}{}\label{classQCustomPlot_abe04c5def373cc4fede8de20542ca3f2}
+
+\item 
+\hyperlink{classQCPSelectionRect}{Q\+C\+P\+Selection\+Rect} $\ast$ {\bfseries m\+Selection\+Rect}\hypertarget{classQCustomPlot_a4827bc84ef5ce52dfbf9ff630ed1b276}{}\label{classQCustomPlot_a4827bc84ef5ce52dfbf9ff630ed1b276}
+
+\item 
+bool {\bfseries m\+Open\+Gl}\hypertarget{classQCustomPlot_a0841dbea13bd120d20e3f0cc36767ff9}{}\label{classQCustomPlot_a0841dbea13bd120d20e3f0cc36767ff9}
+
+\item 
+Q\+List$<$ Q\+Shared\+Pointer$<$ \hyperlink{classQCPAbstractPaintBuffer}{Q\+C\+P\+Abstract\+Paint\+Buffer} $>$ $>$ {\bfseries m\+Paint\+Buffers}\hypertarget{classQCustomPlot_a57b270b1e3990e0d1b9fb39b137d5a5d}{}\label{classQCustomPlot_a57b270b1e3990e0d1b9fb39b137d5a5d}
+
+\item 
+Q\+Point {\bfseries m\+Mouse\+Press\+Pos}\hypertarget{classQCustomPlot_ac57090da95056ae4dd67be67adfa85bd}{}\label{classQCustomPlot_ac57090da95056ae4dd67be67adfa85bd}
+
+\item 
+bool {\bfseries m\+Mouse\+Has\+Moved}\hypertarget{classQCustomPlot_ad2108936f001a8be5974b0b6ff13dae3}{}\label{classQCustomPlot_ad2108936f001a8be5974b0b6ff13dae3}
+
+\item 
+Q\+Pointer$<$ \hyperlink{classQCPLayerable}{Q\+C\+P\+Layerable} $>$ {\bfseries m\+Mouse\+Event\+Layerable}\hypertarget{classQCustomPlot_a243867f445d2f4e35e00add2f589e1da}{}\label{classQCustomPlot_a243867f445d2f4e35e00add2f589e1da}
+
+\item 
+Q\+Pointer$<$ \hyperlink{classQCPLayerable}{Q\+C\+P\+Layerable} $>$ {\bfseries m\+Mouse\+Signal\+Layerable}\hypertarget{classQCustomPlot_adf81640dbf365bd4fa22494e3e504e70}{}\label{classQCustomPlot_adf81640dbf365bd4fa22494e3e504e70}
+
+\item 
+Q\+Variant {\bfseries m\+Mouse\+Event\+Layerable\+Details}\hypertarget{classQCustomPlot_ad604958ef16fc022c474521a08d88a2d}{}\label{classQCustomPlot_ad604958ef16fc022c474521a08d88a2d}
+
+\item 
+Q\+Variant {\bfseries m\+Mouse\+Signal\+Layerable\+Details}\hypertarget{classQCustomPlot_a2f313604bb22781633137915f3c100e6}{}\label{classQCustomPlot_a2f313604bb22781633137915f3c100e6}
+
+\item 
+bool {\bfseries m\+Replotting}\hypertarget{classQCustomPlot_ab30daeca6612c3948afd368dce5f1c39}{}\label{classQCustomPlot_ab30daeca6612c3948afd368dce5f1c39}
+
+\item 
+bool {\bfseries m\+Replot\+Queued}\hypertarget{classQCustomPlot_acedeef316dfcde835b8ea0112cec2a77}{}\label{classQCustomPlot_acedeef316dfcde835b8ea0112cec2a77}
+
+\item 
+int {\bfseries m\+Open\+Gl\+Multisamples}\hypertarget{classQCustomPlot_aacafac2b2280b6a868a4b734273a394c}{}\label{classQCustomPlot_aacafac2b2280b6a868a4b734273a394c}
+
+\item 
+Q\+C\+P\+::\+Antialiased\+Elements {\bfseries m\+Open\+Gl\+Antialiased\+Elements\+Backup}\hypertarget{classQCustomPlot_adbf005715d5f8550511819a4baf841fb}{}\label{classQCustomPlot_adbf005715d5f8550511819a4baf841fb}
+
+\item 
+bool {\bfseries m\+Open\+Gl\+Cache\+Labels\+Backup}\hypertarget{classQCustomPlot_ab1692469dde841080fa33719533bf2b7}{}\label{classQCustomPlot_ab1692469dde841080fa33719533bf2b7}
+
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class {\bfseries Q\+C\+P\+Legend}\hypertarget{classQCustomPlot_a8429035e7adfbd7f05805a6530ad5e3b}{}\label{classQCustomPlot_a8429035e7adfbd7f05805a6530ad5e3b}
+
+\item 
+class {\bfseries Q\+C\+P\+Axis}\hypertarget{classQCustomPlot_af123edeca169ec7a31958a1d714e1a8a}{}\label{classQCustomPlot_af123edeca169ec7a31958a1d714e1a8a}
+
+\item 
+class {\bfseries Q\+C\+P\+Layer}\hypertarget{classQCustomPlot_a5dbf96bf7664c1b6fce49063eeea6eef}{}\label{classQCustomPlot_a5dbf96bf7664c1b6fce49063eeea6eef}
+
+\item 
+class {\bfseries Q\+C\+P\+Axis\+Rect}\hypertarget{classQCustomPlot_acbf20ecb140f66c5fd1bc64ae0762990}{}\label{classQCustomPlot_acbf20ecb140f66c5fd1bc64ae0762990}
+
+\item 
+class {\bfseries Q\+C\+P\+Abstract\+Plottable}\hypertarget{classQCustomPlot_a53cf0e76aca814550c796fed79e345d6}{}\label{classQCustomPlot_a53cf0e76aca814550c796fed79e345d6}
+
+\item 
+class {\bfseries Q\+C\+P\+Graph}\hypertarget{classQCustomPlot_ad0c52e327d94c699d415fd61f930700a}{}\label{classQCustomPlot_ad0c52e327d94c699d415fd61f930700a}
+
+\item 
+class {\bfseries Q\+C\+P\+Abstract\+Item}\hypertarget{classQCustomPlot_a93e962f2e677e31ecc575bb884e46adf}{}\label{classQCustomPlot_a93e962f2e677e31ecc575bb884e46adf}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The central class of the library. This is the Q\+Widget which displays the plot and interacts with the user. 
+
+For tutorials on how to use \hyperlink{classQCustomPlot}{Q\+Custom\+Plot}, see the website~\newline
+\href{http://www.qcustomplot.com/}{\tt http\+://www.\+qcustomplot.\+com/} 
+
+\subsection{Member Enumeration Documentation}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!Layer\+Insert\+Mode@{Layer\+Insert\+Mode}}
+\index{Layer\+Insert\+Mode@{Layer\+Insert\+Mode}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{Layer\+Insert\+Mode}{LayerInsertMode}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Q\+Custom\+Plot\+::\+Layer\+Insert\+Mode}}\hypertarget{classQCustomPlot_a75a8afbe6ef333b1f3d47abb25b9add7}{}\label{classQCustomPlot_a75a8afbe6ef333b1f3d47abb25b9add7}
+Defines how a layer should be inserted relative to an other layer.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ad5255393df078448bb6ac83fa5db5f52}{add\+Layer}, \hyperlink{classQCustomPlot_ae896140beff19424e9e9e02d6e331104}{move\+Layer} 
+\end{DoxySeeAlso}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{lim\+Below@{lim\+Below}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!lim\+Below@{lim\+Below}}\item[{\em 
+lim\+Below\hypertarget{classQCustomPlot_a75a8afbe6ef333b1f3d47abb25b9add7aee39cf650cd24e68552da0b697ce4a93}{}\label{classQCustomPlot_a75a8afbe6ef333b1f3d47abb25b9add7aee39cf650cd24e68552da0b697ce4a93}
+}]Layer is inserted below other layer. \index{lim\+Above@{lim\+Above}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!lim\+Above@{lim\+Above}}\item[{\em 
+lim\+Above\hypertarget{classQCustomPlot_a75a8afbe6ef333b1f3d47abb25b9add7a062b0b7825650b432a713c0df6742d41}{}\label{classQCustomPlot_a75a8afbe6ef333b1f3d47abb25b9add7a062b0b7825650b432a713c0df6742d41}
+}]Layer is inserted above other layer. \end{description}
+\end{Desc}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!Refresh\+Priority@{Refresh\+Priority}}
+\index{Refresh\+Priority@{Refresh\+Priority}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{Refresh\+Priority}{RefreshPriority}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Q\+Custom\+Plot\+::\+Refresh\+Priority}}\hypertarget{classQCustomPlot_a45d61392d13042e712a956d27762aa39}{}\label{classQCustomPlot_a45d61392d13042e712a956d27762aa39}
+Defines with what timing the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} surface is refreshed after a replot.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_aa4bfe7d70dbe67e81d877819b75ab9af}{replot} 
+\end{DoxySeeAlso}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{rp\+Immediate\+Refresh@{rp\+Immediate\+Refresh}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!rp\+Immediate\+Refresh@{rp\+Immediate\+Refresh}}\item[{\em 
+rp\+Immediate\+Refresh\hypertarget{classQCustomPlot_a45d61392d13042e712a956d27762aa39aa6eda645ccf1a60635df3e8b71ea6ae2}{}\label{classQCustomPlot_a45d61392d13042e712a956d27762aa39aa6eda645ccf1a60635df3e8b71ea6ae2}
+}]Replots immediately and repaints the widget immediately by calling Q\+Widget\+::repaint() after the replot. \index{rp\+Queued\+Refresh@{rp\+Queued\+Refresh}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!rp\+Queued\+Refresh@{rp\+Queued\+Refresh}}\item[{\em 
+rp\+Queued\+Refresh\hypertarget{classQCustomPlot_a45d61392d13042e712a956d27762aa39acd6f1e590ea775d1ddee666428077f3e}{}\label{classQCustomPlot_a45d61392d13042e712a956d27762aa39acd6f1e590ea775d1ddee666428077f3e}
+}]Replots immediately, but queues the widget repaint, by calling Q\+Widget\+::update() after the replot. This way multiple redundant widget repaints can be avoided. \index{rp\+Refresh\+Hint@{rp\+Refresh\+Hint}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!rp\+Refresh\+Hint@{rp\+Refresh\+Hint}}\item[{\em 
+rp\+Refresh\+Hint\hypertarget{classQCustomPlot_a45d61392d13042e712a956d27762aa39a49666a5854a68dbcca8b277b03331260}{}\label{classQCustomPlot_a45d61392d13042e712a956d27762aa39a49666a5854a68dbcca8b277b03331260}
+}]Whether to use immediate or queued refresh depends on whether the plotting hint \hyperlink{namespaceQCP_a5400e5fcb9528d92002ddb938c1f4ef4a30840fba10eebfa519a92cf5c3d32870}{Q\+C\+P\+::ph\+Immediate\+Refresh} is set, see \hyperlink{classQCustomPlot_a94a33cbdadbbac5934843508bcfc210d}{set\+Plotting\+Hints}. \index{rp\+Queued\+Replot@{rp\+Queued\+Replot}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!rp\+Queued\+Replot@{rp\+Queued\+Replot}}\item[{\em 
+rp\+Queued\+Replot\hypertarget{classQCustomPlot_a45d61392d13042e712a956d27762aa39a019650c6ddf308f97e811fbfff207a8f}{}\label{classQCustomPlot_a45d61392d13042e712a956d27762aa39a019650c6ddf308f97e811fbfff207a8f}
+}]Queues the entire replot for the next event loop iteration. This way multiple redundant replots can be avoided. The actual replot is then done with \hyperlink{classQCustomPlot_a45d61392d13042e712a956d27762aa39a49666a5854a68dbcca8b277b03331260}{rp\+Refresh\+Hint} priority. \end{description}
+\end{Desc}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{Q\+Custom\+Plot(\+Q\+Widget $\ast$parent=0)}{QCustomPlot(QWidget *parent=0)}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+Custom\+Plot\+::\+Q\+Custom\+Plot (
+\begin{DoxyParamCaption}
+\item[{Q\+Widget $\ast$}]{parent = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [explicit]}}\hypertarget{classQCustomPlot_a45b99626558651a6428b83972b0b34b8}{}\label{classQCustomPlot_a45b99626558651a6428b83972b0b34b8}
+Constructs a \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} and sets reasonable default values. 
+
+\subsection{Member Function Documentation}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!add\+Graph@{add\+Graph}}
+\index{add\+Graph@{add\+Graph}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{add\+Graph(\+Q\+C\+P\+Axis $\ast$key\+Axis=0, Q\+C\+P\+Axis $\ast$value\+Axis=0)}{addGraph(QCPAxis *keyAxis=0, QCPAxis *valueAxis=0)}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Graph} $\ast$ Q\+Custom\+Plot\+::add\+Graph (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Axis} $\ast$}]{key\+Axis = {\ttfamily 0}, }
+\item[{{\bf Q\+C\+P\+Axis} $\ast$}]{value\+Axis = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a6fb2873d35a8a8089842d81a70a54167}{}\label{classQCustomPlot_a6fb2873d35a8a8089842d81a70a54167}
+Creates a new graph inside the plot. If {\itshape key\+Axis} and {\itshape value\+Axis} are left unspecified (0), the bottom (x\+Axis) is used as key and the left (y\+Axis) is used as value axis. If specified, {\itshape key\+Axis} and {\itshape value\+Axis} must reside in this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot}.
+
+{\itshape key\+Axis} will be used as key axis (typically \char`\"{}x\char`\"{}) and {\itshape value\+Axis} as value axis (typically \char`\"{}y\char`\"{}) for the graph.
+
+Returns a pointer to the newly created graph, or 0 if adding the graph failed.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a6d3ed93c2bf46ab7fa670d66be4cddaf}{graph}, \hyperlink{classQCustomPlot_a7d9b4d19114b2fde60f0233eeb0aa682}{graph\+Count}, \hyperlink{classQCustomPlot_a903561be895fb6528a770d66ac5e6713}{remove\+Graph}, \hyperlink{classQCustomPlot_ab0f3abff2d2f7df3668b5836f39207fa}{clear\+Graphs} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!add\+Layer@{add\+Layer}}
+\index{add\+Layer@{add\+Layer}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{add\+Layer(const Q\+String \&name, Q\+C\+P\+Layer $\ast$other\+Layer=0, Layer\+Insert\+Mode insert\+Mode=lim\+Above)}{addLayer(const QString &name, QCPLayer *otherLayer=0, LayerInsertMode insertMode=limAbove)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::add\+Layer (
+\begin{DoxyParamCaption}
+\item[{const Q\+String \&}]{name, }
+\item[{{\bf Q\+C\+P\+Layer} $\ast$}]{other\+Layer = {\ttfamily 0}, }
+\item[{{\bf Q\+Custom\+Plot\+::\+Layer\+Insert\+Mode}}]{insert\+Mode = {\ttfamily {\bf lim\+Above}}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_ad5255393df078448bb6ac83fa5db5f52}{}\label{classQCustomPlot_ad5255393df078448bb6ac83fa5db5f52}
+Adds a new layer to this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance. The new layer will have the name {\itshape name}, which must be unique. Depending on {\itshape insert\+Mode}, it is positioned either below or above {\itshape other\+Layer}.
+
+Returns true on success, i.\+e. if there is no other layer named {\itshape name} and {\itshape other\+Layer} is a valid layer inside this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot}.
+
+If {\itshape other\+Layer} is 0, the highest layer in the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} will be used.
+
+For an explanation of what layers are in \hyperlink{classQCustomPlot}{Q\+Custom\+Plot}, see the documentation of \hyperlink{classQCPLayer}{Q\+C\+P\+Layer}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_aac492da01782820454e9136a8db28182}{layer}, \hyperlink{classQCustomPlot_ae896140beff19424e9e9e02d6e331104}{move\+Layer}, \hyperlink{classQCustomPlot_a40f75e342c5eaab6a86066a42a0e2a94}{remove\+Layer} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!after\+Replot@{after\+Replot}}
+\index{after\+Replot@{after\+Replot}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{after\+Replot}{afterReplot}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::after\+Replot (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_a6f4fa624af060bc5919c5f266cf426a0}{}\label{classQCustomPlot_a6f4fa624af060bc5919c5f266cf426a0}
+This signal is emitted immediately after a replot has taken place (caused by a call to the slot \hyperlink{classQCustomPlot_aa4bfe7d70dbe67e81d877819b75ab9af}{replot}).
+
+It is safe to mutually connect the replot slot with this signal on two Q\+Custom\+Plots to make them replot synchronously, it won\textquotesingle{}t cause an infinite recursion.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_aa4bfe7d70dbe67e81d877819b75ab9af}{replot}, \hyperlink{classQCustomPlot_a0cd30e29b73efd6afe096e44bc5956f5}{before\+Replot} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!axis\+Click@{axis\+Click}}
+\index{axis\+Click@{axis\+Click}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{axis\+Click}{axisClick}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::axis\+Click (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Axis} $\ast$}]{axis, }
+\item[{{\bf Q\+C\+P\+Axis\+::\+Selectable\+Part}}]{part, }
+\item[{Q\+Mouse\+Event $\ast$}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_abf635f8b56ab5c16d5de9f358543e82b}{}\label{classQCustomPlot_abf635f8b56ab5c16d5de9f358543e82b}
+This signal is emitted when an axis is clicked.
+
+{\itshape event} is the mouse event that caused the click, {\itshape axis} is the axis that received the click and {\itshape part} indicates the part of the axis that was clicked.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a6df35357460181a72da3e93d600f5256}{axis\+Double\+Click} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!axis\+Double\+Click@{axis\+Double\+Click}}
+\index{axis\+Double\+Click@{axis\+Double\+Click}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{axis\+Double\+Click}{axisDoubleClick}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::axis\+Double\+Click (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Axis} $\ast$}]{axis, }
+\item[{{\bf Q\+C\+P\+Axis\+::\+Selectable\+Part}}]{part, }
+\item[{Q\+Mouse\+Event $\ast$}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_a6df35357460181a72da3e93d600f5256}{}\label{classQCustomPlot_a6df35357460181a72da3e93d600f5256}
+This signal is emitted when an axis is double clicked.
+
+{\itshape event} is the mouse event that caused the click, {\itshape axis} is the axis that received the click and {\itshape part} indicates the part of the axis that was clicked.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_abf635f8b56ab5c16d5de9f358543e82b}{axis\+Click} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!axis\+Rect@{axis\+Rect}}
+\index{axis\+Rect@{axis\+Rect}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{axis\+Rect(int index=0) const }{axisRect(int index=0) const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Axis\+Rect} $\ast$ Q\+Custom\+Plot\+::axis\+Rect (
+\begin{DoxyParamCaption}
+\item[{int}]{index = {\ttfamily 0}}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a4a37a1add5fe63060ac518cf0a4c4050}{}\label{classQCustomPlot_a4a37a1add5fe63060ac518cf0a4c4050}
+Returns the axis rect with {\itshape index}.
+
+Initially, only one axis rect (with index 0) exists in the plot. If multiple axis rects were added, all of them may be accessed with this function in a linear fashion (even when they are nested in a layout hierarchy or inside other axis rects via \hyperlink{classQCPAxisRect_a4114887c7141b59650b7488f930993e5}{Q\+C\+P\+Axis\+Rect\+::inset\+Layout}).
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a340fa24b1607e445cedda9685670ead3}{axis\+Rect\+Count}, \hyperlink{classQCustomPlot_afd67094aaeccbc5719761348b2d8c891}{axis\+Rects} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!axis\+Rect\+At@{axis\+Rect\+At}}
+\index{axis\+Rect\+At@{axis\+Rect\+At}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{axis\+Rect\+At(const Q\+Point\+F \&pos) const }{axisRectAt(const QPointF &pos) const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Axis\+Rect} $\ast$ Q\+Custom\+Plot\+::axis\+Rect\+At (
+\begin{DoxyParamCaption}
+\item[{const Q\+PointF \&}]{pos}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_af903c081aaf7201631d3607905cc9afc}{}\label{classQCustomPlot_af903c081aaf7201631d3607905cc9afc}
+Returns the layout element of type \hyperlink{classQCPAxisRect}{Q\+C\+P\+Axis\+Rect} at pixel position {\itshape pos}. This method ignores other layout elements even if they are visually in front of the axis rect (e.\+g. a \hyperlink{classQCPLegend}{Q\+C\+P\+Legend}). If there is no axis rect at that position, returns 0.
+
+Only visible axis rects are used. If \hyperlink{classQCPLayerable_a3bed99ddc396b48ce3ebfdc0418744f8}{Q\+C\+P\+Layout\+Element\+::set\+Visible} on the axis rect itself or on any of its parent elements is set to false, it will not be considered.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a840458186d4483c8a42d6a399448d38f}{layout\+Element\+At} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!axis\+Rect\+Count@{axis\+Rect\+Count}}
+\index{axis\+Rect\+Count@{axis\+Rect\+Count}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{axis\+Rect\+Count() const }{axisRectCount() const }}]{\setlength{\rightskip}{0pt plus 5cm}int Q\+Custom\+Plot\+::axis\+Rect\+Count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a340fa24b1607e445cedda9685670ead3}{}\label{classQCustomPlot_a340fa24b1607e445cedda9685670ead3}
+Returns the number of axis rects in the plot.
+
+All axis rects can be accessed via \hyperlink{classQCustomPlot_a4a37a1add5fe63060ac518cf0a4c4050}{Q\+Custom\+Plot\+::axis\+Rect()}.
+
+Initially, only one axis rect exists in the plot.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a4a37a1add5fe63060ac518cf0a4c4050}{axis\+Rect}, \hyperlink{classQCustomPlot_afd67094aaeccbc5719761348b2d8c891}{axis\+Rects} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!axis\+Rects@{axis\+Rects}}
+\index{axis\+Rects@{axis\+Rects}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{axis\+Rects() const }{axisRects() const }}]{\setlength{\rightskip}{0pt plus 5cm}Q\+List$<$ {\bf Q\+C\+P\+Axis\+Rect} $\ast$ $>$ Q\+Custom\+Plot\+::axis\+Rects (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_afd67094aaeccbc5719761348b2d8c891}{}\label{classQCustomPlot_afd67094aaeccbc5719761348b2d8c891}
+Returns all axis rects in the plot.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a340fa24b1607e445cedda9685670ead3}{axis\+Rect\+Count}, \hyperlink{classQCustomPlot_a4a37a1add5fe63060ac518cf0a4c4050}{axis\+Rect} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!before\+Replot@{before\+Replot}}
+\index{before\+Replot@{before\+Replot}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{before\+Replot}{beforeReplot}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::before\+Replot (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_a0cd30e29b73efd6afe096e44bc5956f5}{}\label{classQCustomPlot_a0cd30e29b73efd6afe096e44bc5956f5}
+This signal is emitted immediately before a replot takes place (caused by a call to the slot \hyperlink{classQCustomPlot_aa4bfe7d70dbe67e81d877819b75ab9af}{replot}).
+
+It is safe to mutually connect the replot slot with this signal on two Q\+Custom\+Plots to make them replot synchronously, it won\textquotesingle{}t cause an infinite recursion.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_aa4bfe7d70dbe67e81d877819b75ab9af}{replot}, \hyperlink{classQCustomPlot_a6f4fa624af060bc5919c5f266cf426a0}{after\+Replot} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!clear\+Graphs@{clear\+Graphs}}
+\index{clear\+Graphs@{clear\+Graphs}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{clear\+Graphs()}{clearGraphs()}}]{\setlength{\rightskip}{0pt plus 5cm}int Q\+Custom\+Plot\+::clear\+Graphs (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_ab0f3abff2d2f7df3668b5836f39207fa}{}\label{classQCustomPlot_ab0f3abff2d2f7df3668b5836f39207fa}
+Removes all graphs from the plot and deletes them. Corresponding legend items are also removed from the default legend (\hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{Q\+Custom\+Plot\+::legend}).
+
+Returns the number of graphs removed.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a903561be895fb6528a770d66ac5e6713}{remove\+Graph} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!clear\+Items@{clear\+Items}}
+\index{clear\+Items@{clear\+Items}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{clear\+Items()}{clearItems()}}]{\setlength{\rightskip}{0pt plus 5cm}int Q\+Custom\+Plot\+::clear\+Items (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_abdfd07d4f0591d0cf967f85013fd3645}{}\label{classQCustomPlot_abdfd07d4f0591d0cf967f85013fd3645}
+Removes all items from the plot and deletes them.
+
+Returns the number of items removed.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ae04446557292551e8fb6e2c106e1848d}{remove\+Item} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!clear\+Plottables@{clear\+Plottables}}
+\index{clear\+Plottables@{clear\+Plottables}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{clear\+Plottables()}{clearPlottables()}}]{\setlength{\rightskip}{0pt plus 5cm}int Q\+Custom\+Plot\+::clear\+Plottables (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a9a409bb3201878adb7ffba1c89c4e004}{}\label{classQCustomPlot_a9a409bb3201878adb7ffba1c89c4e004}
+Removes all plottables from the plot and deletes them. Corresponding legend items are also removed from the default legend (\hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{Q\+Custom\+Plot\+::legend}).
+
+Returns the number of plottables removed.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_af3dafd56884208474f311d6226513ab2}{remove\+Plottable} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!current\+Layer@{current\+Layer}}
+\index{current\+Layer@{current\+Layer}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{current\+Layer() const }{currentLayer() const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Layer} $\ast$ Q\+Custom\+Plot\+::current\+Layer (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_af73057345656cbd1463454982d808b00}{}\label{classQCustomPlot_af73057345656cbd1463454982d808b00}
+Returns the layer that is set as current layer (see \hyperlink{classQCustomPlot_a73a6dc47c653bb6f8f030abca5a11852}{set\+Current\+Layer}). \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!deselect\+All@{deselect\+All}}
+\index{deselect\+All@{deselect\+All}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{deselect\+All()}{deselectAll()}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::deselect\+All (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a9d4808ab925b003054085246c92a257c}{}\label{classQCustomPlot_a9d4808ab925b003054085246c92a257c}
+Deselects all layerables (plottables, items, axes, legends,...) of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot}.
+
+Since calling this function is not a user interaction, this does not emit the \hyperlink{classQCustomPlot_a500c64a109bc773c973ad274f2fa4190}{selection\+Changed\+By\+User} signal. The individual selection\+Changed signals are emitted though, if the objects were previously selected.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{set\+Interactions}, \hyperlink{classQCustomPlot_a6721b8c689bb7f2f400987e580508fe8}{selected\+Plottables}, \hyperlink{classQCustomPlot_a1a48b13547e2d9ac5cd6927516f47a2e}{selected\+Items}, \hyperlink{classQCustomPlot_aa6baf867e8beb96ed5bd471f83ece903}{selected\+Axes}, \hyperlink{classQCustomPlot_a1ea6297300c3e2770e65f95836411755}{selected\+Legends} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!graph@{graph}}
+\index{graph@{graph}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{graph(int index) const }{graph(int index) const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Graph} $\ast$ Q\+Custom\+Plot\+::graph (
+\begin{DoxyParamCaption}
+\item[{int}]{index}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a6d3ed93c2bf46ab7fa670d66be4cddaf}{}\label{classQCustomPlot_a6d3ed93c2bf46ab7fa670d66be4cddaf}
+Returns the graph with {\itshape index}. If the index is invalid, returns 0.
+
+There is an overloaded version of this function with no parameter which returns the last created graph, see \hyperlink{classQCustomPlot_a6d3ed93c2bf46ab7fa670d66be4cddaf}{Q\+Custom\+Plot\+::graph()}
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a7d9b4d19114b2fde60f0233eeb0aa682}{graph\+Count}, \hyperlink{classQCustomPlot_a6fb2873d35a8a8089842d81a70a54167}{add\+Graph} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!graph@{graph}}
+\index{graph@{graph}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{graph() const }{graph() const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Graph} $\ast$ Q\+Custom\+Plot\+::graph (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a80c40ced2a74eefe9e92de1e82ba2274}{}\label{classQCustomPlot_a80c40ced2a74eefe9e92de1e82ba2274}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Returns the last graph, that was created with \hyperlink{classQCustomPlot_a6fb2873d35a8a8089842d81a70a54167}{add\+Graph}. If there are no graphs in the plot, returns 0.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a7d9b4d19114b2fde60f0233eeb0aa682}{graph\+Count}, \hyperlink{classQCustomPlot_a6fb2873d35a8a8089842d81a70a54167}{add\+Graph} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!graph\+Count@{graph\+Count}}
+\index{graph\+Count@{graph\+Count}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{graph\+Count() const }{graphCount() const }}]{\setlength{\rightskip}{0pt plus 5cm}int Q\+Custom\+Plot\+::graph\+Count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a7d9b4d19114b2fde60f0233eeb0aa682}{}\label{classQCustomPlot_a7d9b4d19114b2fde60f0233eeb0aa682}
+Returns the number of currently existing graphs in the plot
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a6d3ed93c2bf46ab7fa670d66be4cddaf}{graph}, \hyperlink{classQCustomPlot_a6fb2873d35a8a8089842d81a70a54167}{add\+Graph} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!has\+Invalidated\+Paint\+Buffers@{has\+Invalidated\+Paint\+Buffers}}
+\index{has\+Invalidated\+Paint\+Buffers@{has\+Invalidated\+Paint\+Buffers}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{has\+Invalidated\+Paint\+Buffers()}{hasInvalidatedPaintBuffers()}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::has\+Invalidated\+Paint\+Buffers (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classQCustomPlot_ad452b582348c8e99462d83fe1cd0279b}{}\label{classQCustomPlot_ad452b582348c8e99462d83fe1cd0279b}
+This method returns whether any of the paint buffers held by this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance are invalidated.
+
+If any buffer is invalidated, a partial replot (\hyperlink{classQCPLayer_adefd53b6db02f470151c416f42e37180}{Q\+C\+P\+Layer\+::replot}) is not allowed and always causes a full replot (\hyperlink{classQCustomPlot_aa4bfe7d70dbe67e81d877819b75ab9af}{Q\+Custom\+Plot\+::replot}) of all layers. This is the case when for example the layer order has changed, new layers were added, layers were removed, or layer modes were changed (\hyperlink{classQCPLayer_a938d57b04f4e4c23cedf1711f983919b}{Q\+C\+P\+Layer\+::set\+Mode}).
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPAbstractPaintBuffer_ae4c7dc70dfc66be2879ce297b2b3d67f}{Q\+C\+P\+Abstract\+Paint\+Buffer\+::set\+Invalidated} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!has\+Item@{has\+Item}}
+\index{has\+Item@{has\+Item}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{has\+Item(\+Q\+C\+P\+Abstract\+Item $\ast$item) const }{hasItem(QCPAbstractItem *item) const }}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::has\+Item (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Abstract\+Item} $\ast$}]{item}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_ab4199c38b03e63a2623c82453fe8add5}{}\label{classQCustomPlot_ab4199c38b03e63a2623c82453fe8add5}
+Returns whether this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} contains the {\itshape item}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a3e842b5a65b1d17fbb96cfb1fa1314d1}{item} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!has\+Plottable@{has\+Plottable}}
+\index{has\+Plottable@{has\+Plottable}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{has\+Plottable(\+Q\+C\+P\+Abstract\+Plottable $\ast$plottable) const }{hasPlottable(QCPAbstractPlottable *plottable) const }}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::has\+Plottable (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Abstract\+Plottable} $\ast$}]{plottable}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a4fc28914e2ee91aab424b7ce46b6bdf1}{}\label{classQCustomPlot_a4fc28914e2ee91aab424b7ce46b6bdf1}
+Returns whether this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance contains the {\itshape plottable}. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!item@{item}}
+\index{item@{item}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{item(int index) const }{item(int index) const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Abstract\+Item} $\ast$ Q\+Custom\+Plot\+::item (
+\begin{DoxyParamCaption}
+\item[{int}]{index}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a3e842b5a65b1d17fbb96cfb1fa1314d1}{}\label{classQCustomPlot_a3e842b5a65b1d17fbb96cfb1fa1314d1}
+Returns the item with {\itshape index}. If the index is invalid, returns 0.
+
+There is an overloaded version of this function with no parameter which returns the last added item, see \hyperlink{classQCustomPlot_a3e842b5a65b1d17fbb96cfb1fa1314d1}{Q\+Custom\+Plot\+::item()}
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a6fc860e30df17fd5c46056bf6fe29390}{item\+Count} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!item@{item}}
+\index{item@{item}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{item() const }{item() const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Abstract\+Item} $\ast$ Q\+Custom\+Plot\+::item (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a700399eae539798c5baf64a37c7f2135}{}\label{classQCustomPlot_a700399eae539798c5baf64a37c7f2135}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Returns the last item that was added to this plot. If there are no items in the plot, returns 0.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a6fc860e30df17fd5c46056bf6fe29390}{item\+Count} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!item\+At@{item\+At}}
+\index{item\+At@{item\+At}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{item\+At(const Q\+Point\+F \&pos, bool only\+Selectable=false) const }{itemAt(const QPointF &pos, bool onlySelectable=false) const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Abstract\+Item} $\ast$ Q\+Custom\+Plot\+::item\+At (
+\begin{DoxyParamCaption}
+\item[{const Q\+PointF \&}]{pos, }
+\item[{bool}]{only\+Selectable = {\ttfamily false}}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a793e4b04e0ede11a733021907368fa83}{}\label{classQCustomPlot_a793e4b04e0ede11a733021907368fa83}
+Returns the item at the pixel position {\itshape pos}. Items that only consist of single lines (e.\+g. \hyperlink{classQCPItemLine}{Q\+C\+P\+Item\+Line} or \hyperlink{classQCPItemCurve}{Q\+C\+P\+Item\+Curve}) have a tolerance band around them, see \hyperlink{classQCustomPlot_a4dc31241d7b09680950e19e5f971ed93}{set\+Selection\+Tolerance}. If multiple items come into consideration, the one closest to {\itshape pos} is returned.
+
+If {\itshape only\+Selectable} is true, only items that are selectable (\hyperlink{classQCPAbstractItem_a8a8e32a55bc478b849756a78c2d87fd2}{Q\+C\+P\+Abstract\+Item\+::set\+Selectable}) are considered.
+
+If there is no item at {\itshape pos}, the return value is 0.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ac1d1bc6ae4e13616fb02cef6d9e2188e}{plottable\+At}, \hyperlink{classQCustomPlot_a840458186d4483c8a42d6a399448d38f}{layout\+Element\+At} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!item\+Click@{item\+Click}}
+\index{item\+Click@{item\+Click}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{item\+Click}{itemClick}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::item\+Click (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Abstract\+Item} $\ast$}]{item, }
+\item[{Q\+Mouse\+Event $\ast$}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_ae16b51f52d2b7aebbc7e3e74e6ff2e4b}{}\label{classQCustomPlot_ae16b51f52d2b7aebbc7e3e74e6ff2e4b}
+This signal is emitted when an item is clicked.
+
+{\itshape event} is the mouse event that caused the click and {\itshape item} is the item that received the click.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ac83aa9f5a3e9bb3efc9cdc763dcd42a6}{item\+Double\+Click} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!item\+Count@{item\+Count}}
+\index{item\+Count@{item\+Count}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{item\+Count() const }{itemCount() const }}]{\setlength{\rightskip}{0pt plus 5cm}int Q\+Custom\+Plot\+::item\+Count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a6fc860e30df17fd5c46056bf6fe29390}{}\label{classQCustomPlot_a6fc860e30df17fd5c46056bf6fe29390}
+Returns the number of currently existing items in the plot
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a3e842b5a65b1d17fbb96cfb1fa1314d1}{item} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!item\+Double\+Click@{item\+Double\+Click}}
+\index{item\+Double\+Click@{item\+Double\+Click}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{item\+Double\+Click}{itemDoubleClick}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::item\+Double\+Click (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Abstract\+Item} $\ast$}]{item, }
+\item[{Q\+Mouse\+Event $\ast$}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_ac83aa9f5a3e9bb3efc9cdc763dcd42a6}{}\label{classQCustomPlot_ac83aa9f5a3e9bb3efc9cdc763dcd42a6}
+This signal is emitted when an item is double clicked.
+
+{\itshape event} is the mouse event that caused the click and {\itshape item} is the item that received the click.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ae16b51f52d2b7aebbc7e3e74e6ff2e4b}{item\+Click} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!layer@{layer}}
+\index{layer@{layer}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{layer(const Q\+String \&name) const }{layer(const QString &name) const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Layer} $\ast$ Q\+Custom\+Plot\+::layer (
+\begin{DoxyParamCaption}
+\item[{const Q\+String \&}]{name}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_aac492da01782820454e9136a8db28182}{}\label{classQCustomPlot_aac492da01782820454e9136a8db28182}
+Returns the layer with the specified {\itshape name}. If there is no layer with the specified name, 0 is returned.
+
+Layer names are case-\/sensitive.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ad5255393df078448bb6ac83fa5db5f52}{add\+Layer}, \hyperlink{classQCustomPlot_ae896140beff19424e9e9e02d6e331104}{move\+Layer}, \hyperlink{classQCustomPlot_a40f75e342c5eaab6a86066a42a0e2a94}{remove\+Layer} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!layer@{layer}}
+\index{layer@{layer}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{layer(int index) const }{layer(int index) const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Layer} $\ast$ Q\+Custom\+Plot\+::layer (
+\begin{DoxyParamCaption}
+\item[{int}]{index}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a1e73051e371f1815b48d8b355be0d2ab}{}\label{classQCustomPlot_a1e73051e371f1815b48d8b355be0d2ab}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Returns the layer by {\itshape index}. If the index is invalid, 0 is returned.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ad5255393df078448bb6ac83fa5db5f52}{add\+Layer}, \hyperlink{classQCustomPlot_ae896140beff19424e9e9e02d6e331104}{move\+Layer}, \hyperlink{classQCustomPlot_a40f75e342c5eaab6a86066a42a0e2a94}{remove\+Layer} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!layer\+Count@{layer\+Count}}
+\index{layer\+Count@{layer\+Count}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{layer\+Count() const }{layerCount() const }}]{\setlength{\rightskip}{0pt plus 5cm}int Q\+Custom\+Plot\+::layer\+Count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a1b3926884f5bd4bdda1495d8b3c891d0}{}\label{classQCustomPlot_a1b3926884f5bd4bdda1495d8b3c891d0}
+Returns the number of currently existing layers in the plot
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_aac492da01782820454e9136a8db28182}{layer}, \hyperlink{classQCustomPlot_ad5255393df078448bb6ac83fa5db5f52}{add\+Layer} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!layout\+Element\+At@{layout\+Element\+At}}
+\index{layout\+Element\+At@{layout\+Element\+At}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{layout\+Element\+At(const Q\+Point\+F \&pos) const }{layoutElementAt(const QPointF &pos) const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Layout\+Element} $\ast$ Q\+Custom\+Plot\+::layout\+Element\+At (
+\begin{DoxyParamCaption}
+\item[{const Q\+PointF \&}]{pos}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a840458186d4483c8a42d6a399448d38f}{}\label{classQCustomPlot_a840458186d4483c8a42d6a399448d38f}
+Returns the layout element at pixel position {\itshape pos}. If there is no element at that position, returns 0.
+
+Only visible elements are used. If \hyperlink{classQCPLayerable_a3bed99ddc396b48ce3ebfdc0418744f8}{Q\+C\+P\+Layout\+Element\+::set\+Visible} on the element itself or on any of its parent elements is set to false, it will not be considered.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a793e4b04e0ede11a733021907368fa83}{item\+At}, \hyperlink{classQCustomPlot_ac1d1bc6ae4e13616fb02cef6d9e2188e}{plottable\+At} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!legend\+Click@{legend\+Click}}
+\index{legend\+Click@{legend\+Click}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{legend\+Click}{legendClick}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::legend\+Click (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Legend} $\ast$}]{legend, }
+\item[{{\bf Q\+C\+P\+Abstract\+Legend\+Item} $\ast$}]{item, }
+\item[{Q\+Mouse\+Event $\ast$}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_a79cff0baafbca10a3aaf694d2d3b9ab3}{}\label{classQCustomPlot_a79cff0baafbca10a3aaf694d2d3b9ab3}
+This signal is emitted when a legend (item) is clicked.
+
+{\itshape event} is the mouse event that caused the click, {\itshape legend} is the legend that received the click and {\itshape item} is the legend item that received the click. If only the legend and no item is clicked, {\itshape item} is 0. This happens for a click inside the legend padding or the space between two items.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a0250f835c044521df1619b132288bca7}{legend\+Double\+Click} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!legend\+Double\+Click@{legend\+Double\+Click}}
+\index{legend\+Double\+Click@{legend\+Double\+Click}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{legend\+Double\+Click}{legendDoubleClick}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::legend\+Double\+Click (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Legend} $\ast$}]{legend, }
+\item[{{\bf Q\+C\+P\+Abstract\+Legend\+Item} $\ast$}]{item, }
+\item[{Q\+Mouse\+Event $\ast$}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_a0250f835c044521df1619b132288bca7}{}\label{classQCustomPlot_a0250f835c044521df1619b132288bca7}
+This signal is emitted when a legend (item) is double clicked.
+
+{\itshape event} is the mouse event that caused the click, {\itshape legend} is the legend that received the click and {\itshape item} is the legend item that received the click. If only the legend and no item is clicked, {\itshape item} is 0. This happens for a click inside the legend padding or the space between two items.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a79cff0baafbca10a3aaf694d2d3b9ab3}{legend\+Click} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!mouse\+Double\+Click@{mouse\+Double\+Click}}
+\index{mouse\+Double\+Click@{mouse\+Double\+Click}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{mouse\+Double\+Click}{mouseDoubleClick}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::mouse\+Double\+Click (
+\begin{DoxyParamCaption}
+\item[{Q\+Mouse\+Event $\ast$}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_a9b232142c64fcf273a953ee08e5b90e9}{}\label{classQCustomPlot_a9b232142c64fcf273a953ee08e5b90e9}
+This signal is emitted when the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} receives a mouse double click event. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!mouse\+Move@{mouse\+Move}}
+\index{mouse\+Move@{mouse\+Move}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{mouse\+Move}{mouseMove}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::mouse\+Move (
+\begin{DoxyParamCaption}
+\item[{Q\+Mouse\+Event $\ast$}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_a742ca4f94688bed2a685fd8a56ce5704}{}\label{classQCustomPlot_a742ca4f94688bed2a685fd8a56ce5704}
+This signal is emitted when the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} receives a mouse move event.
+
+It is emitted before \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} handles any other mechanism like range dragging. So a slot connected to this signal can still influence the behaviour e.\+g. with \hyperlink{classQCPAxisRect_ae6aef2f7211ba6097c925dcd26008418}{Q\+C\+P\+Axis\+Rect\+::set\+Range\+Drag} or \hyperlink{classQCPAxisRect_a648cce336bd99daac4a5ca3e5743775d}{Q\+C\+P\+Axis\+Rect\+::set\+Range\+Drag\+Axes}.
+
+\begin{DoxyWarning}{Warning}
+It is discouraged to change the drag-\/axes with \hyperlink{classQCPAxisRect_a648cce336bd99daac4a5ca3e5743775d}{Q\+C\+P\+Axis\+Rect\+::set\+Range\+Drag\+Axes} here, because the dragging starting point was saved the moment the mouse was pressed. Thus it only has a meaning for the range drag axes that were set at that moment. If you want to change the drag axes, consider doing this in the \hyperlink{classQCustomPlot_aca75bf9afb5dd19349c375de2a87a051}{mouse\+Press} signal instead. 
+\end{DoxyWarning}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!mouse\+Press@{mouse\+Press}}
+\index{mouse\+Press@{mouse\+Press}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{mouse\+Press}{mousePress}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::mouse\+Press (
+\begin{DoxyParamCaption}
+\item[{Q\+Mouse\+Event $\ast$}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_aca75bf9afb5dd19349c375de2a87a051}{}\label{classQCustomPlot_aca75bf9afb5dd19349c375de2a87a051}
+This signal is emitted when the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} receives a mouse press event.
+
+It is emitted before \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} handles any other mechanism like range dragging. So a slot connected to this signal can still influence the behaviour e.\+g. with \hyperlink{classQCPAxisRect_ae6aef2f7211ba6097c925dcd26008418}{Q\+C\+P\+Axis\+Rect\+::set\+Range\+Drag} or \hyperlink{classQCPAxisRect_a648cce336bd99daac4a5ca3e5743775d}{Q\+C\+P\+Axis\+Rect\+::set\+Range\+Drag\+Axes}. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!mouse\+Release@{mouse\+Release}}
+\index{mouse\+Release@{mouse\+Release}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{mouse\+Release}{mouseRelease}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::mouse\+Release (
+\begin{DoxyParamCaption}
+\item[{Q\+Mouse\+Event $\ast$}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_ac8dc0ee6bb98e923c00b4ebafbe6134d}{}\label{classQCustomPlot_ac8dc0ee6bb98e923c00b4ebafbe6134d}
+This signal is emitted when the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} receives a mouse release event.
+
+It is emitted before \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} handles any other mechanisms like object selection. So a slot connected to this signal can still influence the behaviour e.\+g. with \hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{set\+Interactions} or \hyperlink{classQCPAbstractPlottable_ac238d6e910f976f1f30d41c2bca44ac3}{Q\+C\+P\+Abstract\+Plottable\+::set\+Selectable}. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!mouse\+Wheel@{mouse\+Wheel}}
+\index{mouse\+Wheel@{mouse\+Wheel}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{mouse\+Wheel}{mouseWheel}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::mouse\+Wheel (
+\begin{DoxyParamCaption}
+\item[{Q\+Wheel\+Event $\ast$}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_ac80a14206f99304a91d2aa55775ec3ff}{}\label{classQCustomPlot_ac80a14206f99304a91d2aa55775ec3ff}
+This signal is emitted when the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} receives a mouse wheel event.
+
+It is emitted before \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} handles any other mechanisms like range zooming. So a slot connected to this signal can still influence the behaviour e.\+g. with \hyperlink{classQCPAxisRect_a7960a9d222f1c31d558b064b60f86a31}{Q\+C\+P\+Axis\+Rect\+::set\+Range\+Zoom}, \hyperlink{classQCPAxisRect_a9442cca2aa358405f39a64d51eca13d2}{Q\+C\+P\+Axis\+Rect\+::set\+Range\+Zoom\+Axes} or \hyperlink{classQCPAxisRect_a895d7ac745ea614e04056244b3c138ac}{Q\+C\+P\+Axis\+Rect\+::set\+Range\+Zoom\+Factor}. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!move\+Layer@{move\+Layer}}
+\index{move\+Layer@{move\+Layer}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{move\+Layer(\+Q\+C\+P\+Layer $\ast$layer, Q\+C\+P\+Layer $\ast$other\+Layer, Layer\+Insert\+Mode insert\+Mode=lim\+Above)}{moveLayer(QCPLayer *layer, QCPLayer *otherLayer, LayerInsertMode insertMode=limAbove)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::move\+Layer (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Layer} $\ast$}]{layer, }
+\item[{{\bf Q\+C\+P\+Layer} $\ast$}]{other\+Layer, }
+\item[{{\bf Q\+Custom\+Plot\+::\+Layer\+Insert\+Mode}}]{insert\+Mode = {\ttfamily {\bf lim\+Above}}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_ae896140beff19424e9e9e02d6e331104}{}\label{classQCustomPlot_ae896140beff19424e9e9e02d6e331104}
+Moves the specified {\itshape layer} either above or below {\itshape other\+Layer}. Whether it\textquotesingle{}s placed above or below is controlled with {\itshape insert\+Mode}.
+
+Returns true on success, i.\+e. when both {\itshape layer} and {\itshape other\+Layer} are valid layers in the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_aac492da01782820454e9136a8db28182}{layer}, \hyperlink{classQCustomPlot_ad5255393df078448bb6ac83fa5db5f52}{add\+Layer}, \hyperlink{classQCustomPlot_ae896140beff19424e9e9e02d6e331104}{move\+Layer} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!plot\+Layout@{plot\+Layout}}
+\index{plot\+Layout@{plot\+Layout}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{plot\+Layout() const }{plotLayout() const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Layout\+Grid} $\ast$ Q\+Custom\+Plot\+::plot\+Layout (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCustomPlot_afd280d4d621ae64a106543a545c508d7}{}\label{classQCustomPlot_afd280d4d621ae64a106543a545c508d7}
+Returns the top level layout of this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance. It is a \hyperlink{classQCPLayoutGrid}{Q\+C\+P\+Layout\+Grid}, initially containing just one cell with the main \hyperlink{classQCPAxisRect}{Q\+C\+P\+Axis\+Rect} inside. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!plottable@{plottable}}
+\index{plottable@{plottable}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{plottable(int index)}{plottable(int index)}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Abstract\+Plottable} $\ast$ Q\+Custom\+Plot\+::plottable (
+\begin{DoxyParamCaption}
+\item[{int}]{index}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a32de81ff53e263e785b83b52ecd99d6f}{}\label{classQCustomPlot_a32de81ff53e263e785b83b52ecd99d6f}
+Returns the plottable with {\itshape index}. If the index is invalid, returns 0.
+
+There is an overloaded version of this function with no parameter which returns the last added plottable, see \hyperlink{classQCustomPlot_adea38bdc660da9412ba69fb939031567}{Q\+Custom\+Plot\+::plottable()}
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a2dbfbf15dc38713f9a1c445a3dd2e989}{plottable\+Count} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!plottable@{plottable}}
+\index{plottable@{plottable}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{plottable()}{plottable()}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Abstract\+Plottable} $\ast$ Q\+Custom\+Plot\+::plottable (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_adea38bdc660da9412ba69fb939031567}{}\label{classQCustomPlot_adea38bdc660da9412ba69fb939031567}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Returns the last plottable that was added to the plot. If there are no plottables in the plot, returns 0.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a2dbfbf15dc38713f9a1c445a3dd2e989}{plottable\+Count} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!plottable\+At@{plottable\+At}}
+\index{plottable\+At@{plottable\+At}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{plottable\+At(const Q\+Point\+F \&pos, bool only\+Selectable=false) const }{plottableAt(const QPointF &pos, bool onlySelectable=false) const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Abstract\+Plottable} $\ast$ Q\+Custom\+Plot\+::plottable\+At (
+\begin{DoxyParamCaption}
+\item[{const Q\+PointF \&}]{pos, }
+\item[{bool}]{only\+Selectable = {\ttfamily false}}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_ac1d1bc6ae4e13616fb02cef6d9e2188e}{}\label{classQCustomPlot_ac1d1bc6ae4e13616fb02cef6d9e2188e}
+Returns the plottable at the pixel position {\itshape pos}. Plottables that only consist of single lines (like graphs) have a tolerance band around them, see \hyperlink{classQCustomPlot_a4dc31241d7b09680950e19e5f971ed93}{set\+Selection\+Tolerance}. If multiple plottables come into consideration, the one closest to {\itshape pos} is returned.
+
+If {\itshape only\+Selectable} is true, only plottables that are selectable (\hyperlink{classQCPAbstractPlottable_ac238d6e910f976f1f30d41c2bca44ac3}{Q\+C\+P\+Abstract\+Plottable\+::set\+Selectable}) are considered.
+
+If there is no plottable at {\itshape pos}, the return value is 0.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a793e4b04e0ede11a733021907368fa83}{item\+At}, \hyperlink{classQCustomPlot_a840458186d4483c8a42d6a399448d38f}{layout\+Element\+At} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!plottable\+Click@{plottable\+Click}}
+\index{plottable\+Click@{plottable\+Click}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{plottable\+Click}{plottableClick}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::plottable\+Click (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Abstract\+Plottable} $\ast$}]{plottable, }
+\item[{int}]{data\+Index, }
+\item[{Q\+Mouse\+Event $\ast$}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_af5fe78b8bc9e4e96df921612837fd4fd}{}\label{classQCustomPlot_af5fe78b8bc9e4e96df921612837fd4fd}
+This signal is emitted when a plottable is clicked.
+
+{\itshape event} is the mouse event that caused the click and {\itshape plottable} is the plottable that received the click. The parameter {\itshape data\+Index} indicates the data point that was closest to the click position.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a86a3ab7263c9c4e008e70d6c5fce9fbd}{plottable\+Double\+Click} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!plottable\+Count@{plottable\+Count}}
+\index{plottable\+Count@{plottable\+Count}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{plottable\+Count() const }{plottableCount() const }}]{\setlength{\rightskip}{0pt plus 5cm}int Q\+Custom\+Plot\+::plottable\+Count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a2dbfbf15dc38713f9a1c445a3dd2e989}{}\label{classQCustomPlot_a2dbfbf15dc38713f9a1c445a3dd2e989}
+Returns the number of currently existing plottables in the plot
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a32de81ff53e263e785b83b52ecd99d6f}{plottable} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!plottable\+Double\+Click@{plottable\+Double\+Click}}
+\index{plottable\+Double\+Click@{plottable\+Double\+Click}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{plottable\+Double\+Click}{plottableDoubleClick}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::plottable\+Double\+Click (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Abstract\+Plottable} $\ast$}]{plottable, }
+\item[{int}]{data\+Index, }
+\item[{Q\+Mouse\+Event $\ast$}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_a86a3ab7263c9c4e008e70d6c5fce9fbd}{}\label{classQCustomPlot_a86a3ab7263c9c4e008e70d6c5fce9fbd}
+This signal is emitted when a plottable is double clicked.
+
+{\itshape event} is the mouse event that caused the click and {\itshape plottable} is the plottable that received the click. The parameter {\itshape data\+Index} indicates the data point that was closest to the click position.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_af5fe78b8bc9e4e96df921612837fd4fd}{plottable\+Click} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!remove\+Graph@{remove\+Graph}}
+\index{remove\+Graph@{remove\+Graph}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{remove\+Graph(\+Q\+C\+P\+Graph $\ast$graph)}{removeGraph(QCPGraph *graph)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::remove\+Graph (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Graph} $\ast$}]{graph}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a903561be895fb6528a770d66ac5e6713}{}\label{classQCustomPlot_a903561be895fb6528a770d66ac5e6713}
+Removes the specified {\itshape graph} from the plot and deletes it. If necessary, the corresponding legend item is also removed from the default legend (\hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{Q\+Custom\+Plot\+::legend}). If any other graphs in the plot have a channel fill set towards the removed graph, the channel fill property of those graphs is reset to zero (no channel fill).
+
+Returns true on success.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ab0f3abff2d2f7df3668b5836f39207fa}{clear\+Graphs} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!remove\+Graph@{remove\+Graph}}
+\index{remove\+Graph@{remove\+Graph}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{remove\+Graph(int index)}{removeGraph(int index)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::remove\+Graph (
+\begin{DoxyParamCaption}
+\item[{int}]{index}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a9554b3d2d5b10c0f884bd4010b6c192c}{}\label{classQCustomPlot_a9554b3d2d5b10c0f884bd4010b6c192c}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Removes and deletes the graph by its {\itshape index}. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!remove\+Item@{remove\+Item}}
+\index{remove\+Item@{remove\+Item}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{remove\+Item(\+Q\+C\+P\+Abstract\+Item $\ast$item)}{removeItem(QCPAbstractItem *item)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::remove\+Item (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Abstract\+Item} $\ast$}]{item}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_ae04446557292551e8fb6e2c106e1848d}{}\label{classQCustomPlot_ae04446557292551e8fb6e2c106e1848d}
+Removes the specified item from the plot and deletes it.
+
+Returns true on success.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_abdfd07d4f0591d0cf967f85013fd3645}{clear\+Items} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!remove\+Item@{remove\+Item}}
+\index{remove\+Item@{remove\+Item}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{remove\+Item(int index)}{removeItem(int index)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::remove\+Item (
+\begin{DoxyParamCaption}
+\item[{int}]{index}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_abcfdda3d601c0441cab136137d715dea}{}\label{classQCustomPlot_abcfdda3d601c0441cab136137d715dea}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Removes and deletes the item by its {\itshape index}. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!remove\+Layer@{remove\+Layer}}
+\index{remove\+Layer@{remove\+Layer}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{remove\+Layer(\+Q\+C\+P\+Layer $\ast$layer)}{removeLayer(QCPLayer *layer)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::remove\+Layer (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Layer} $\ast$}]{layer}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a40f75e342c5eaab6a86066a42a0e2a94}{}\label{classQCustomPlot_a40f75e342c5eaab6a86066a42a0e2a94}
+Removes the specified {\itshape layer} and returns true on success.
+
+All layerables (e.\+g. plottables and items) on the removed layer will be moved to the layer below {\itshape layer}. If {\itshape layer} is the bottom layer, the layerables are moved to the layer above. In both cases, the total rendering order of all layerables in the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} is preserved.
+
+If {\itshape layer} is the current layer (\hyperlink{classQCustomPlot_a73a6dc47c653bb6f8f030abca5a11852}{set\+Current\+Layer}), the layer below (or above, if bottom layer) becomes the new current layer.
+
+It is not possible to remove the last layer of the plot.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_aac492da01782820454e9136a8db28182}{layer}, \hyperlink{classQCustomPlot_ad5255393df078448bb6ac83fa5db5f52}{add\+Layer}, \hyperlink{classQCustomPlot_ae896140beff19424e9e9e02d6e331104}{move\+Layer} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!remove\+Plottable@{remove\+Plottable}}
+\index{remove\+Plottable@{remove\+Plottable}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{remove\+Plottable(\+Q\+C\+P\+Abstract\+Plottable $\ast$plottable)}{removePlottable(QCPAbstractPlottable *plottable)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::remove\+Plottable (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Abstract\+Plottable} $\ast$}]{plottable}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_af3dafd56884208474f311d6226513ab2}{}\label{classQCustomPlot_af3dafd56884208474f311d6226513ab2}
+Removes the specified plottable from the plot and deletes it. If necessary, the corresponding legend item is also removed from the default legend (\hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{Q\+Custom\+Plot\+::legend}).
+
+Returns true on success.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a9a409bb3201878adb7ffba1c89c4e004}{clear\+Plottables} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!remove\+Plottable@{remove\+Plottable}}
+\index{remove\+Plottable@{remove\+Plottable}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{remove\+Plottable(int index)}{removePlottable(int index)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::remove\+Plottable (
+\begin{DoxyParamCaption}
+\item[{int}]{index}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_afc210e0021480f8119bccf37839dbcc8}{}\label{classQCustomPlot_afc210e0021480f8119bccf37839dbcc8}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Removes and deletes the plottable by its {\itshape index}. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!replot@{replot}}
+\index{replot@{replot}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{replot(\+Q\+Custom\+Plot\+::\+Refresh\+Priority refresh\+Priority=\+Q\+Custom\+Plot\+::rp\+Refresh\+Hint)}{replot(QCustomPlot::RefreshPriority refreshPriority=QCustomPlot::rpRefreshHint)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::replot (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+Custom\+Plot\+::\+Refresh\+Priority}}]{refresh\+Priority = {\ttfamily {\bf Q\+Custom\+Plot\+::rp\+Refresh\+Hint}}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_aa4bfe7d70dbe67e81d877819b75ab9af}{}\label{classQCustomPlot_aa4bfe7d70dbe67e81d877819b75ab9af}
+Causes a complete replot into the internal paint buffer(s). Finally, the widget surface is refreshed with the new buffer contents. This is the method that must be called to make changes to the plot, e.\+g. on the axis ranges or data points of graphs, visible.
+
+The parameter {\itshape refresh\+Priority} can be used to fine-\/tune the timing of the replot. For example if your application calls \hyperlink{classQCustomPlot_aa4bfe7d70dbe67e81d877819b75ab9af}{replot} very quickly in succession (e.\+g. multiple independent functions change some aspects of the plot and each wants to make sure the change gets replotted), it is advisable to set {\itshape refresh\+Priority} to \hyperlink{classQCustomPlot_a45d61392d13042e712a956d27762aa39a019650c6ddf308f97e811fbfff207a8f}{Q\+Custom\+Plot\+::rp\+Queued\+Replot}. This way, the actual replotting is deferred to the next event loop iteration. Multiple successive calls of \hyperlink{classQCustomPlot_aa4bfe7d70dbe67e81d877819b75ab9af}{replot} with this priority will only cause a single replot, avoiding redundant replots and improving performance.
+
+Under a few circumstances, \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} causes a replot by itself. Those are resize events of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget and user interactions (object selection and range dragging/zooming).
+
+Before the replot happens, the signal \hyperlink{classQCustomPlot_a0cd30e29b73efd6afe096e44bc5956f5}{before\+Replot} is emitted. After the replot, \hyperlink{classQCustomPlot_a6f4fa624af060bc5919c5f266cf426a0}{after\+Replot} is emitted. It is safe to mutually connect the replot slot with any of those two signals on two Q\+Custom\+Plots to make them replot synchronously, it won\textquotesingle{}t cause an infinite recursion.
+
+If a layer is in mode \hyperlink{classQCPLayer_a67dcfc1590be2a1f2227c5a39bb59c7cab581b9fab3007c4c65f057f4185d7538}{Q\+C\+P\+Layer\+::lm\+Buffered} (\hyperlink{classQCPLayer_a938d57b04f4e4c23cedf1711f983919b}{Q\+C\+P\+Layer\+::set\+Mode}), it is also possible to replot only that specific layer via \hyperlink{classQCPLayer_adefd53b6db02f470151c416f42e37180}{Q\+C\+P\+Layer\+::replot}. See the documentation there for details. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!rescale\+Axes@{rescale\+Axes}}
+\index{rescale\+Axes@{rescale\+Axes}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{rescale\+Axes(bool only\+Visible\+Plottables=false)}{rescaleAxes(bool onlyVisiblePlottables=false)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::rescale\+Axes (
+\begin{DoxyParamCaption}
+\item[{bool}]{only\+Visible\+Plottables = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_ad86528f2cee6c7e446dea4a6e8839935}{}\label{classQCustomPlot_ad86528f2cee6c7e446dea4a6e8839935}
+Rescales the axes such that all plottables (like graphs) in the plot are fully visible.
+
+if {\itshape only\+Visible\+Plottables} is set to true, only the plottables that have their visibility set to true (\hyperlink{classQCPLayerable_a3bed99ddc396b48ce3ebfdc0418744f8}{Q\+C\+P\+Layerable\+::set\+Visible}), will be used to rescale the axes.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCPAbstractPlottable_a7e8fc3be43c27ccacd70a7bf9d74a5cd}{Q\+C\+P\+Abstract\+Plottable\+::rescale\+Axes}, \hyperlink{classQCPAxis_a499345f02ebce4b23d8ccec96e58daa9}{Q\+C\+P\+Axis\+::rescale} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!save\+Bmp@{save\+Bmp}}
+\index{save\+Bmp@{save\+Bmp}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{save\+Bmp(const Q\+String \&file\+Name, int width=0, int height=0, double scale=1.\+0, int resolution=96, Q\+C\+P\+::\+Resolution\+Unit resolution\+Unit=\+Q\+C\+P\+::ru\+Dots\+Per\+Inch)}{saveBmp(const QString &fileName, int width=0, int height=0, double scale=1.0, int resolution=96, QCP::ResolutionUnit resolutionUnit=QCP::ruDotsPerInch)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::save\+Bmp (
+\begin{DoxyParamCaption}
+\item[{const Q\+String \&}]{file\+Name, }
+\item[{int}]{width = {\ttfamily 0}, }
+\item[{int}]{height = {\ttfamily 0}, }
+\item[{double}]{scale = {\ttfamily 1.0}, }
+\item[{int}]{resolution = {\ttfamily 96}, }
+\item[{{\bf Q\+C\+P\+::\+Resolution\+Unit}}]{resolution\+Unit = {\ttfamily {\bf Q\+C\+P\+::ru\+Dots\+Per\+Inch}}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_ae3a86ed0795670e50afa21759d4fa13d}{}\label{classQCustomPlot_ae3a86ed0795670e50afa21759d4fa13d}
+Saves a B\+MP image file to {\itshape file\+Name} on disc. The output plot will have the dimensions {\itshape width} and {\itshape height} in pixels, multiplied by {\itshape scale}. If either {\itshape width} or {\itshape height} is zero, the current width and height of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget is used instead. Line widths and texts etc. are not scaled up when larger widths/heights are used. If you want that effect, use the {\itshape scale} parameter.
+
+For example, if you set both {\itshape width} and {\itshape height} to 100 and {\itshape scale} to 2, you will end up with an image file of size 200$\ast$200 in which all graphical elements are scaled up by factor 2 (line widths, texts, etc.). This scaling is not done by stretching a 100$\ast$100 image, the result will have full 200$\ast$200 pixel resolution.
+
+If you use a high scaling factor, it is recommended to enable antialiasing for all elements by temporarily setting \hyperlink{classQCustomPlot_af6f91e5eab1be85f67c556e98c3745e8}{Q\+Custom\+Plot\+::set\+Antialiased\+Elements} to \hyperlink{namespaceQCP_ae55dbe315d41fe80f29ba88100843a0caa897c232a0ffc8368e7c100ffc59ef31}{Q\+C\+P\+::ae\+All} as this allows \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} to place objects with sub-\/pixel accuracy.
+
+The {\itshape resolution} will be written to the image file header and has no direct consequence for the quality or the pixel size. However, if opening the image with a tool which respects the metadata, it will be able to scale the image to match either a given size in real units of length (inch, centimeters, etc.), or the target display D\+PI. You can specify in which units {\itshape resolution} is given, by setting {\itshape resolution\+Unit}. The {\itshape resolution} is converted to the format\textquotesingle{}s expected resolution unit internally.
+
+Returns true on success. If this function fails, most likely the B\+MP format isn\textquotesingle{}t supported by the system, see Qt docs about Q\+Image\+Writer\+::supported\+Image\+Formats().
+
+The objects of the plot will appear in the current selection state. If you don\textquotesingle{}t want any selected objects to be painted in their selected look, deselect everything with \hyperlink{classQCustomPlot_a9d4808ab925b003054085246c92a257c}{deselect\+All} before calling this function.
+
+\begin{DoxyWarning}{Warning}
+If calling this function inside the constructor of the parent of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget (i.\+e. the Main\+Window constructor, if \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} is inside the Main\+Window), always provide explicit non-\/zero widths and heights. If you leave {\itshape width} or {\itshape height} as 0 (default), this function uses the current width and height of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget. However, in Qt, these aren\textquotesingle{}t defined yet inside the constructor, so you would get an image that has strange widths/heights.
+\end{DoxyWarning}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ad5acd34f6b39c3516887d7e54fec2412}{save\+Pdf}, \hyperlink{classQCustomPlot_ac92cc9256d12f354b40a4be4600b5fb9}{save\+Png}, \hyperlink{classQCustomPlot_a76f0d278e630a711fa6f48048cfd83e4}{save\+Jpg}, \hyperlink{classQCustomPlot_ad7723ce2edfa270632ef42b03a444352}{save\+Rastered} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!save\+Jpg@{save\+Jpg}}
+\index{save\+Jpg@{save\+Jpg}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{save\+Jpg(const Q\+String \&file\+Name, int width=0, int height=0, double scale=1.\+0, int quality=-\/1, int resolution=96, Q\+C\+P\+::\+Resolution\+Unit resolution\+Unit=\+Q\+C\+P\+::ru\+Dots\+Per\+Inch)}{saveJpg(const QString &fileName, int width=0, int height=0, double scale=1.0, int quality=-1, int resolution=96, QCP::ResolutionUnit resolutionUnit=QCP::ruDotsPerInch)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::save\+Jpg (
+\begin{DoxyParamCaption}
+\item[{const Q\+String \&}]{file\+Name, }
+\item[{int}]{width = {\ttfamily 0}, }
+\item[{int}]{height = {\ttfamily 0}, }
+\item[{double}]{scale = {\ttfamily 1.0}, }
+\item[{int}]{quality = {\ttfamily -\/1}, }
+\item[{int}]{resolution = {\ttfamily 96}, }
+\item[{{\bf Q\+C\+P\+::\+Resolution\+Unit}}]{resolution\+Unit = {\ttfamily {\bf Q\+C\+P\+::ru\+Dots\+Per\+Inch}}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a76f0d278e630a711fa6f48048cfd83e4}{}\label{classQCustomPlot_a76f0d278e630a711fa6f48048cfd83e4}
+Saves a J\+P\+EG image file to {\itshape file\+Name} on disc. The output plot will have the dimensions {\itshape width} and {\itshape height} in pixels, multiplied by {\itshape scale}. If either {\itshape width} or {\itshape height} is zero, the current width and height of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget is used instead. Line widths and texts etc. are not scaled up when larger widths/heights are used. If you want that effect, use the {\itshape scale} parameter.
+
+For example, if you set both {\itshape width} and {\itshape height} to 100 and {\itshape scale} to 2, you will end up with an image file of size 200$\ast$200 in which all graphical elements are scaled up by factor 2 (line widths, texts, etc.). This scaling is not done by stretching a 100$\ast$100 image, the result will have full 200$\ast$200 pixel resolution.
+
+If you use a high scaling factor, it is recommended to enable antialiasing for all elements by temporarily setting \hyperlink{classQCustomPlot_af6f91e5eab1be85f67c556e98c3745e8}{Q\+Custom\+Plot\+::set\+Antialiased\+Elements} to \hyperlink{namespaceQCP_ae55dbe315d41fe80f29ba88100843a0caa897c232a0ffc8368e7c100ffc59ef31}{Q\+C\+P\+::ae\+All} as this allows \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} to place objects with sub-\/pixel accuracy.
+
+image compression can be controlled with the {\itshape quality} parameter which must be between 0 and 100 or -\/1 to use the default setting.
+
+The {\itshape resolution} will be written to the image file header and has no direct consequence for the quality or the pixel size. However, if opening the image with a tool which respects the metadata, it will be able to scale the image to match either a given size in real units of length (inch, centimeters, etc.), or the target display D\+PI. You can specify in which units {\itshape resolution} is given, by setting {\itshape resolution\+Unit}. The {\itshape resolution} is converted to the format\textquotesingle{}s expected resolution unit internally.
+
+Returns true on success. If this function fails, most likely the J\+P\+EG format isn\textquotesingle{}t supported by the system, see Qt docs about Q\+Image\+Writer\+::supported\+Image\+Formats().
+
+The objects of the plot will appear in the current selection state. If you don\textquotesingle{}t want any selected objects to be painted in their selected look, deselect everything with \hyperlink{classQCustomPlot_a9d4808ab925b003054085246c92a257c}{deselect\+All} before calling this function.
+
+\begin{DoxyWarning}{Warning}
+If calling this function inside the constructor of the parent of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget (i.\+e. the Main\+Window constructor, if \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} is inside the Main\+Window), always provide explicit non-\/zero widths and heights. If you leave {\itshape width} or {\itshape height} as 0 (default), this function uses the current width and height of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget. However, in Qt, these aren\textquotesingle{}t defined yet inside the constructor, so you would get an image that has strange widths/heights.
+\end{DoxyWarning}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ad5acd34f6b39c3516887d7e54fec2412}{save\+Pdf}, \hyperlink{classQCustomPlot_ac92cc9256d12f354b40a4be4600b5fb9}{save\+Png}, \hyperlink{classQCustomPlot_ae3a86ed0795670e50afa21759d4fa13d}{save\+Bmp}, \hyperlink{classQCustomPlot_ad7723ce2edfa270632ef42b03a444352}{save\+Rastered} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!save\+Pdf@{save\+Pdf}}
+\index{save\+Pdf@{save\+Pdf}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{save\+Pdf(const Q\+String \&file\+Name, int width=0, int height=0, Q\+C\+P\+::\+Export\+Pen export\+Pen=\+Q\+C\+P\+::ep\+Allow\+Cosmetic, const Q\+String \&pdf\+Creator=\+Q\+String(), const Q\+String \&pdf\+Title=\+Q\+String())}{savePdf(const QString &fileName, int width=0, int height=0, QCP::ExportPen exportPen=QCP::epAllowCosmetic, const QString &pdfCreator=QString(), const QString &pdfTitle=QString())}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::save\+Pdf (
+\begin{DoxyParamCaption}
+\item[{const Q\+String \&}]{file\+Name, }
+\item[{int}]{width = {\ttfamily 0}, }
+\item[{int}]{height = {\ttfamily 0}, }
+\item[{{\bf Q\+C\+P\+::\+Export\+Pen}}]{export\+Pen = {\ttfamily {\bf Q\+C\+P\+::ep\+Allow\+Cosmetic}}, }
+\item[{const Q\+String \&}]{pdf\+Creator = {\ttfamily QString()}, }
+\item[{const Q\+String \&}]{pdf\+Title = {\ttfamily QString()}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_ad5acd34f6b39c3516887d7e54fec2412}{}\label{classQCustomPlot_ad5acd34f6b39c3516887d7e54fec2412}
+Saves a P\+DF with the vectorized plot to the file {\itshape file\+Name}. The axis ratio as well as the scale of texts and lines will be derived from the specified {\itshape width} and {\itshape height}. This means, the output will look like the normal on-\/screen output of a \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget with the corresponding pixel width and height. If either {\itshape width} or {\itshape height} is zero, the exported image will have the same dimensions as the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget currently has.
+
+Setting {\itshape export\+Pen} to \hyperlink{namespaceQCP_a17844f19e1019693a953e1eb93536d2faae8fcfaafee234ce18558afef83f6a78}{Q\+C\+P\+::ep\+No\+Cosmetic} allows to disable the use of cosmetic pens when drawing to the P\+DF file. Cosmetic pens are pens with numerical width 0, which are always drawn as a one pixel wide line, no matter what zoom factor is set in the P\+D\+F-\/\+Viewer. For more information about cosmetic pens, see the Q\+Painter and Q\+Pen documentation.
+
+The objects of the plot will appear in the current selection state. If you don\textquotesingle{}t want any selected objects to be painted in their selected look, deselect everything with \hyperlink{classQCustomPlot_a9d4808ab925b003054085246c92a257c}{deselect\+All} before calling this function.
+
+Returns true on success.
+
+\begin{DoxyWarning}{Warning}
+\begin{DoxyItemize}
+\item If you plan on editing the exported P\+DF file with a vector graphics editor like Inkscape, it is advised to set {\itshape export\+Pen} to \hyperlink{namespaceQCP_a17844f19e1019693a953e1eb93536d2faae8fcfaafee234ce18558afef83f6a78}{Q\+C\+P\+::ep\+No\+Cosmetic} to avoid losing those cosmetic lines (which might be quite many, because cosmetic pens are the default for e.\+g. axes and tick marks). \item If calling this function inside the constructor of the parent of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget (i.\+e. the Main\+Window constructor, if \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} is inside the Main\+Window), always provide explicit non-\/zero widths and heights. If you leave {\itshape width} or {\itshape height} as 0 (default), this function uses the current width and height of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget. However, in Qt, these aren\textquotesingle{}t defined yet inside the constructor, so you would get an image that has strange widths/heights.\end{DoxyItemize}
+{\itshape pdf\+Creator} and {\itshape pdf\+Title} may be used to set the according metadata fields in the resulting P\+DF file.
+\end{DoxyWarning}
+\begin{DoxyNote}{Note}
+On Android systems, this method does nothing and issues an according q\+Debug warning message. This is also the case if for other reasons the define flag {\ttfamily Q\+T\+\_\+\+N\+O\+\_\+\+P\+R\+I\+N\+T\+ER} is set.
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ac92cc9256d12f354b40a4be4600b5fb9}{save\+Png}, \hyperlink{classQCustomPlot_ae3a86ed0795670e50afa21759d4fa13d}{save\+Bmp}, \hyperlink{classQCustomPlot_a76f0d278e630a711fa6f48048cfd83e4}{save\+Jpg}, \hyperlink{classQCustomPlot_ad7723ce2edfa270632ef42b03a444352}{save\+Rastered} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!save\+Png@{save\+Png}}
+\index{save\+Png@{save\+Png}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{save\+Png(const Q\+String \&file\+Name, int width=0, int height=0, double scale=1.\+0, int quality=-\/1, int resolution=96, Q\+C\+P\+::\+Resolution\+Unit resolution\+Unit=\+Q\+C\+P\+::ru\+Dots\+Per\+Inch)}{savePng(const QString &fileName, int width=0, int height=0, double scale=1.0, int quality=-1, int resolution=96, QCP::ResolutionUnit resolutionUnit=QCP::ruDotsPerInch)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::save\+Png (
+\begin{DoxyParamCaption}
+\item[{const Q\+String \&}]{file\+Name, }
+\item[{int}]{width = {\ttfamily 0}, }
+\item[{int}]{height = {\ttfamily 0}, }
+\item[{double}]{scale = {\ttfamily 1.0}, }
+\item[{int}]{quality = {\ttfamily -\/1}, }
+\item[{int}]{resolution = {\ttfamily 96}, }
+\item[{{\bf Q\+C\+P\+::\+Resolution\+Unit}}]{resolution\+Unit = {\ttfamily {\bf Q\+C\+P\+::ru\+Dots\+Per\+Inch}}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_ac92cc9256d12f354b40a4be4600b5fb9}{}\label{classQCustomPlot_ac92cc9256d12f354b40a4be4600b5fb9}
+Saves a P\+NG image file to {\itshape file\+Name} on disc. The output plot will have the dimensions {\itshape width} and {\itshape height} in pixels, multiplied by {\itshape scale}. If either {\itshape width} or {\itshape height} is zero, the current width and height of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget is used instead. Line widths and texts etc. are not scaled up when larger widths/heights are used. If you want that effect, use the {\itshape scale} parameter.
+
+For example, if you set both {\itshape width} and {\itshape height} to 100 and {\itshape scale} to 2, you will end up with an image file of size 200$\ast$200 in which all graphical elements are scaled up by factor 2 (line widths, texts, etc.). This scaling is not done by stretching a 100$\ast$100 image, the result will have full 200$\ast$200 pixel resolution.
+
+If you use a high scaling factor, it is recommended to enable antialiasing for all elements by temporarily setting \hyperlink{classQCustomPlot_af6f91e5eab1be85f67c556e98c3745e8}{Q\+Custom\+Plot\+::set\+Antialiased\+Elements} to \hyperlink{namespaceQCP_ae55dbe315d41fe80f29ba88100843a0caa897c232a0ffc8368e7c100ffc59ef31}{Q\+C\+P\+::ae\+All} as this allows \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} to place objects with sub-\/pixel accuracy.
+
+image compression can be controlled with the {\itshape quality} parameter which must be between 0 and 100 or -\/1 to use the default setting.
+
+The {\itshape resolution} will be written to the image file header and has no direct consequence for the quality or the pixel size. However, if opening the image with a tool which respects the metadata, it will be able to scale the image to match either a given size in real units of length (inch, centimeters, etc.), or the target display D\+PI. You can specify in which units {\itshape resolution} is given, by setting {\itshape resolution\+Unit}. The {\itshape resolution} is converted to the format\textquotesingle{}s expected resolution unit internally.
+
+Returns true on success. If this function fails, most likely the P\+NG format isn\textquotesingle{}t supported by the system, see Qt docs about Q\+Image\+Writer\+::supported\+Image\+Formats().
+
+The objects of the plot will appear in the current selection state. If you don\textquotesingle{}t want any selected objects to be painted in their selected look, deselect everything with \hyperlink{classQCustomPlot_a9d4808ab925b003054085246c92a257c}{deselect\+All} before calling this function.
+
+If you want the P\+NG to have a transparent background, call \hyperlink{classQCustomPlot_a8ed256cf467bfa7ba1f9feaae62c3bd0}{set\+Background(const Q\+Brush \&brush)} with no brush (Qt\+::\+No\+Brush) or a transparent color (Qt\+::transparent), before saving.
+
+\begin{DoxyWarning}{Warning}
+If calling this function inside the constructor of the parent of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget (i.\+e. the Main\+Window constructor, if \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} is inside the Main\+Window), always provide explicit non-\/zero widths and heights. If you leave {\itshape width} or {\itshape height} as 0 (default), this function uses the current width and height of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget. However, in Qt, these aren\textquotesingle{}t defined yet inside the constructor, so you would get an image that has strange widths/heights.
+\end{DoxyWarning}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ad5acd34f6b39c3516887d7e54fec2412}{save\+Pdf}, \hyperlink{classQCustomPlot_ae3a86ed0795670e50afa21759d4fa13d}{save\+Bmp}, \hyperlink{classQCustomPlot_a76f0d278e630a711fa6f48048cfd83e4}{save\+Jpg}, \hyperlink{classQCustomPlot_ad7723ce2edfa270632ef42b03a444352}{save\+Rastered} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!save\+Rastered@{save\+Rastered}}
+\index{save\+Rastered@{save\+Rastered}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{save\+Rastered(const Q\+String \&file\+Name, int width, int height, double scale, const char $\ast$format, int quality=-\/1, int resolution=96, Q\+C\+P\+::\+Resolution\+Unit resolution\+Unit=\+Q\+C\+P\+::ru\+Dots\+Per\+Inch)}{saveRastered(const QString &fileName, int width, int height, double scale, const char *format, int quality=-1, int resolution=96, QCP::ResolutionUnit resolutionUnit=QCP::ruDotsPerInch)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::save\+Rastered (
+\begin{DoxyParamCaption}
+\item[{const Q\+String \&}]{file\+Name, }
+\item[{int}]{width, }
+\item[{int}]{height, }
+\item[{double}]{scale, }
+\item[{const char $\ast$}]{format, }
+\item[{int}]{quality = {\ttfamily -\/1}, }
+\item[{int}]{resolution = {\ttfamily 96}, }
+\item[{{\bf Q\+C\+P\+::\+Resolution\+Unit}}]{resolution\+Unit = {\ttfamily {\bf Q\+C\+P\+::ru\+Dots\+Per\+Inch}}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_ad7723ce2edfa270632ef42b03a444352}{}\label{classQCustomPlot_ad7723ce2edfa270632ef42b03a444352}
+Saves the plot to a rastered image file {\itshape file\+Name} in the image format {\itshape format}. The plot is sized to {\itshape width} and {\itshape height} in pixels and scaled with {\itshape scale}. (width 100 and scale 2.\+0 lead to a full resolution file with width 200.) If the {\itshape format} supports compression, {\itshape quality} may be between 0 and 100 to control it.
+
+Returns true on success. If this function fails, most likely the given {\itshape format} isn\textquotesingle{}t supported by the system, see Qt docs about Q\+Image\+Writer\+::supported\+Image\+Formats().
+
+The {\itshape resolution} will be written to the image file header (if the file format supports this) and has no direct consequence for the quality or the pixel size. However, if opening the image with a tool which respects the metadata, it will be able to scale the image to match either a given size in real units of length (inch, centimeters, etc.), or the target display D\+PI. You can specify in which units {\itshape resolution} is given, by setting {\itshape resolution\+Unit}. The {\itshape resolution} is converted to the format\textquotesingle{}s expected resolution unit internally.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ae3a86ed0795670e50afa21759d4fa13d}{save\+Bmp}, \hyperlink{classQCustomPlot_a76f0d278e630a711fa6f48048cfd83e4}{save\+Jpg}, \hyperlink{classQCustomPlot_ac92cc9256d12f354b40a4be4600b5fb9}{save\+Png}, \hyperlink{classQCustomPlot_ad5acd34f6b39c3516887d7e54fec2412}{save\+Pdf} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!selected\+Axes@{selected\+Axes}}
+\index{selected\+Axes@{selected\+Axes}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{selected\+Axes() const }{selectedAxes() const }}]{\setlength{\rightskip}{0pt plus 5cm}Q\+List$<$ {\bf Q\+C\+P\+Axis} $\ast$ $>$ Q\+Custom\+Plot\+::selected\+Axes (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_aa6baf867e8beb96ed5bd471f83ece903}{}\label{classQCustomPlot_aa6baf867e8beb96ed5bd471f83ece903}
+Returns the axes that currently have selected parts, i.\+e. whose selection state is not \hyperlink{classQCPAxis_abee4c7a54c468b1385dfce2c898b115fae0df8123a5528d5ccf87cb7794f971ea}{Q\+C\+P\+Axis\+::sp\+None}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a6721b8c689bb7f2f400987e580508fe8}{selected\+Plottables}, \hyperlink{classQCustomPlot_a1ea6297300c3e2770e65f95836411755}{selected\+Legends}, \hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{set\+Interactions}, \hyperlink{classQCPAxis_ab9d7a69277dcbed9119b3c1f25ca19c3}{Q\+C\+P\+Axis\+::set\+Selected\+Parts}, \hyperlink{classQCPAxis_a513f9b9e326c505d9bec54880031b085}{Q\+C\+P\+Axis\+::set\+Selectable\+Parts} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!selected\+Graphs@{selected\+Graphs}}
+\index{selected\+Graphs@{selected\+Graphs}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{selected\+Graphs() const }{selectedGraphs() const }}]{\setlength{\rightskip}{0pt plus 5cm}Q\+List$<$ {\bf Q\+C\+P\+Graph} $\ast$ $>$ Q\+Custom\+Plot\+::selected\+Graphs (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_ad2a0493bdd01e7aa99a4209ae3a5b67b}{}\label{classQCustomPlot_ad2a0493bdd01e7aa99a4209ae3a5b67b}
+Returns a list of the selected graphs. If no graphs are currently selected, the list is empty.
+
+If you are not only interested in selected graphs but other plottables like \hyperlink{classQCPCurve}{Q\+C\+P\+Curve}, \hyperlink{classQCPBars}{Q\+C\+P\+Bars}, etc., use \hyperlink{classQCustomPlot_a6721b8c689bb7f2f400987e580508fe8}{selected\+Plottables}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{set\+Interactions}, \hyperlink{classQCustomPlot_a6721b8c689bb7f2f400987e580508fe8}{selected\+Plottables}, \hyperlink{classQCPAbstractPlottable_ac238d6e910f976f1f30d41c2bca44ac3}{Q\+C\+P\+Abstract\+Plottable\+::set\+Selectable}, \hyperlink{classQCPAbstractPlottable_a219bc5403a9d85d3129165ec3f5ae436}{Q\+C\+P\+Abstract\+Plottable\+::set\+Selection} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!selected\+Items@{selected\+Items}}
+\index{selected\+Items@{selected\+Items}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{selected\+Items() const }{selectedItems() const }}]{\setlength{\rightskip}{0pt plus 5cm}Q\+List$<$ {\bf Q\+C\+P\+Abstract\+Item} $\ast$ $>$ Q\+Custom\+Plot\+::selected\+Items (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a1a48b13547e2d9ac5cd6927516f47a2e}{}\label{classQCustomPlot_a1a48b13547e2d9ac5cd6927516f47a2e}
+Returns a list of the selected items. If no items are currently selected, the list is empty.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{set\+Interactions}, \hyperlink{classQCPAbstractItem_a8a8e32a55bc478b849756a78c2d87fd2}{Q\+C\+P\+Abstract\+Item\+::set\+Selectable}, \hyperlink{classQCPAbstractItem_a203de94ad586cc44d16c9565f49d3378}{Q\+C\+P\+Abstract\+Item\+::set\+Selected} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!selected\+Legends@{selected\+Legends}}
+\index{selected\+Legends@{selected\+Legends}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{selected\+Legends() const }{selectedLegends() const }}]{\setlength{\rightskip}{0pt plus 5cm}Q\+List$<$ {\bf Q\+C\+P\+Legend} $\ast$ $>$ Q\+Custom\+Plot\+::selected\+Legends (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a1ea6297300c3e2770e65f95836411755}{}\label{classQCustomPlot_a1ea6297300c3e2770e65f95836411755}
+Returns the legends that currently have selected parts, i.\+e. whose selection state is not \hyperlink{classQCPLegend_a5404de8bc1e4a994ca4ae69e2c7072f1a378201c07d500af7126e3ec91652eed7}{Q\+C\+P\+Legend\+::sp\+None}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a6721b8c689bb7f2f400987e580508fe8}{selected\+Plottables}, \hyperlink{classQCustomPlot_aa6baf867e8beb96ed5bd471f83ece903}{selected\+Axes}, \hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{set\+Interactions}, \hyperlink{classQCPLegend_a2aee309bb5c2a794b1987f3fc97f8ad8}{Q\+C\+P\+Legend\+::set\+Selected\+Parts}, \hyperlink{classQCPLegend_a9ce60aa8bbd89f62ae4fa83ac6c60110}{Q\+C\+P\+Legend\+::set\+Selectable\+Parts}, \hyperlink{classQCPLegend_ac93eaf236e911d67aa8b88942ef45c5e}{Q\+C\+P\+Legend\+::selected\+Items} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!selected\+Plottables@{selected\+Plottables}}
+\index{selected\+Plottables@{selected\+Plottables}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{selected\+Plottables() const }{selectedPlottables() const }}]{\setlength{\rightskip}{0pt plus 5cm}Q\+List$<$ {\bf Q\+C\+P\+Abstract\+Plottable} $\ast$ $>$ Q\+Custom\+Plot\+::selected\+Plottables (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classQCustomPlot_a6721b8c689bb7f2f400987e580508fe8}{}\label{classQCustomPlot_a6721b8c689bb7f2f400987e580508fe8}
+Returns a list of the selected plottables. If no plottables are currently selected, the list is empty.
+
+There is a convenience function if you\textquotesingle{}re only interested in selected graphs, see \hyperlink{classQCustomPlot_ad2a0493bdd01e7aa99a4209ae3a5b67b}{selected\+Graphs}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{set\+Interactions}, \hyperlink{classQCPAbstractPlottable_ac238d6e910f976f1f30d41c2bca44ac3}{Q\+C\+P\+Abstract\+Plottable\+::set\+Selectable}, \hyperlink{classQCPAbstractPlottable_a219bc5403a9d85d3129165ec3f5ae436}{Q\+C\+P\+Abstract\+Plottable\+::set\+Selection} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!selection\+Changed\+By\+User@{selection\+Changed\+By\+User}}
+\index{selection\+Changed\+By\+User@{selection\+Changed\+By\+User}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{selection\+Changed\+By\+User}{selectionChangedByUser}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::selection\+Changed\+By\+User (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [signal]}}\hypertarget{classQCustomPlot_a500c64a109bc773c973ad274f2fa4190}{}\label{classQCustomPlot_a500c64a109bc773c973ad274f2fa4190}
+This signal is emitted after the user has changed the selection in the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot}, e.\+g. by clicking. It is not emitted when the selection state of an object has changed programmatically by a direct call to {\ttfamily set\+Selected()}/{\ttfamily set\+Selection()} on an object or by calling \hyperlink{classQCustomPlot_a9d4808ab925b003054085246c92a257c}{deselect\+All}.
+
+In addition to this signal, selectable objects also provide individual signals, for example \hyperlink{classQCPAxis_a62b598abeee7174a05f9d542cc85b1f5}{Q\+C\+P\+Axis\+::selection\+Changed} or \hyperlink{classQCPAbstractPlottable_a3af66432b1dca93b28e00e78a8c7c1d9}{Q\+C\+P\+Abstract\+Plottable\+::selection\+Changed}. Note that those signals are emitted even if the selection state is changed programmatically.
+
+See the documentation of \hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{set\+Interactions} for details about the selection mechanism.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a6721b8c689bb7f2f400987e580508fe8}{selected\+Plottables}, \hyperlink{classQCustomPlot_ad2a0493bdd01e7aa99a4209ae3a5b67b}{selected\+Graphs}, \hyperlink{classQCustomPlot_a1a48b13547e2d9ac5cd6927516f47a2e}{selected\+Items}, \hyperlink{classQCustomPlot_aa6baf867e8beb96ed5bd471f83ece903}{selected\+Axes}, \hyperlink{classQCustomPlot_a1ea6297300c3e2770e65f95836411755}{selected\+Legends} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!selection\+Rect@{selection\+Rect}}
+\index{selection\+Rect@{selection\+Rect}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{selection\+Rect() const }{selectionRect() const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Selection\+Rect} $\ast$ Q\+Custom\+Plot\+::selection\+Rect (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classQCustomPlot_ae64a3994735d8f592a60d9430526a163}{}\label{classQCustomPlot_ae64a3994735d8f592a60d9430526a163}
+Allows access to the currently used \hyperlink{classQCPSelectionRect}{Q\+C\+P\+Selection\+Rect} instance (or subclass thereof), that is used to handle and draw selection rect interactions (see \hyperlink{classQCustomPlot_a810ef958ebe84db661c7288b526c0deb}{set\+Selection\+Rect\+Mode}).
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a0c09f96df15faa4799ad7051bb16cf33}{set\+Selection\+Rect} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Antialiased\+Element@{set\+Antialiased\+Element}}
+\index{set\+Antialiased\+Element@{set\+Antialiased\+Element}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Antialiased\+Element(\+Q\+C\+P\+::\+Antialiased\+Element antialiased\+Element, bool enabled=true)}{setAntialiasedElement(QCP::AntialiasedElement antialiasedElement, bool enabled=true)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Antialiased\+Element (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+::\+Antialiased\+Element}}]{antialiased\+Element, }
+\item[{bool}]{enabled = {\ttfamily true}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_aeef813bcf7efab8e765f9f87ec454691}{}\label{classQCustomPlot_aeef813bcf7efab8e765f9f87ec454691}
+Sets whether the specified {\itshape antialiased\+Element} is forcibly drawn antialiased.
+
+See \hyperlink{classQCustomPlot_af6f91e5eab1be85f67c556e98c3745e8}{set\+Antialiased\+Elements} for details.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_afc657938a707c890e449ae89203a076d}{set\+Not\+Antialiased\+Element} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Antialiased\+Elements@{set\+Antialiased\+Elements}}
+\index{set\+Antialiased\+Elements@{set\+Antialiased\+Elements}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Antialiased\+Elements(const Q\+C\+P\+::\+Antialiased\+Elements \&antialiased\+Elements)}{setAntialiasedElements(const QCP::AntialiasedElements &antialiasedElements)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Antialiased\+Elements (
+\begin{DoxyParamCaption}
+\item[{const Q\+C\+P\+::\+Antialiased\+Elements \&}]{antialiased\+Elements}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_af6f91e5eab1be85f67c556e98c3745e8}{}\label{classQCustomPlot_af6f91e5eab1be85f67c556e98c3745e8}
+Sets which elements are forcibly drawn antialiased as an {\itshape or} combination of \hyperlink{namespaceQCP_ae55dbe315d41fe80f29ba88100843a0c}{Q\+C\+P\+::\+Antialiased\+Element}.
+
+This overrides the antialiasing settings for whole element groups, normally controlled with the {\itshape set\+Antialiasing} function on the individual elements. If an element is neither specified in \hyperlink{classQCustomPlot_af6f91e5eab1be85f67c556e98c3745e8}{set\+Antialiased\+Elements} nor in \hyperlink{classQCustomPlot_ae10d685b5eabea2999fb8775ca173c24}{set\+Not\+Antialiased\+Elements}, the antialiasing setting on each individual element instance is used.
+
+For example, if {\itshape antialiased\+Elements} contains \hyperlink{namespaceQCP_ae55dbe315d41fe80f29ba88100843a0ca4145e4251b0cf2dbedabeea0a38f84f6}{Q\+C\+P\+::ae\+Plottables}, all plottables will be drawn antialiased, no matter what the specific \hyperlink{classQCPLayerable_a4fd43e89be4a553ead41652565ff0581}{Q\+C\+P\+Abstract\+Plottable\+::set\+Antialiased} value was set to.
+
+if an element in {\itshape antialiased\+Elements} is already set in \hyperlink{classQCustomPlot_ae10d685b5eabea2999fb8775ca173c24}{set\+Not\+Antialiased\+Elements}, it is removed from there.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ae10d685b5eabea2999fb8775ca173c24}{set\+Not\+Antialiased\+Elements} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Auto\+Add\+Plottable\+To\+Legend@{set\+Auto\+Add\+Plottable\+To\+Legend}}
+\index{set\+Auto\+Add\+Plottable\+To\+Legend@{set\+Auto\+Add\+Plottable\+To\+Legend}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Auto\+Add\+Plottable\+To\+Legend(bool on)}{setAutoAddPlottableToLegend(bool on)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Auto\+Add\+Plottable\+To\+Legend (
+\begin{DoxyParamCaption}
+\item[{bool}]{on}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_ad8858410c2db47b7104040a3aa61c3fc}{}\label{classQCustomPlot_ad8858410c2db47b7104040a3aa61c3fc}
+If set to true, adding a plottable (e.\+g. a graph) to the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} automatically also adds the plottable to the legend (\hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{Q\+Custom\+Plot\+::legend}).
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a6fb2873d35a8a8089842d81a70a54167}{add\+Graph}, \hyperlink{classQCPLegend_a3ab274de52d2951faea45a6d975e6b3f}{Q\+C\+P\+Legend\+::add\+Item} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Background@{set\+Background}}
+\index{set\+Background@{set\+Background}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Background(const Q\+Pixmap \&pm)}{setBackground(const QPixmap &pm)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Background (
+\begin{DoxyParamCaption}
+\item[{const Q\+Pixmap \&}]{pm}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a130358592cfca353ff3cf5571b49fb00}{}\label{classQCustomPlot_a130358592cfca353ff3cf5571b49fb00}
+Sets {\itshape pm} as the viewport background pixmap (see \hyperlink{classQCustomPlot_a3f9bc4b939dd8aaba9339fd09f273fc4}{set\+Viewport}). The pixmap is always drawn below all other objects in the plot.
+
+For cases where the provided pixmap doesn\textquotesingle{}t have the same size as the viewport, scaling can be enabled with \hyperlink{classQCustomPlot_a36f0fa1317325dc7b7efea615ee2de1f}{set\+Background\+Scaled} and the scaling mode (whether and how the aspect ratio is preserved) can be set with \hyperlink{classQCustomPlot_a4c0eb4865b7949f62e1cb97db04a3de0}{set\+Background\+Scaled\+Mode}. To set all these options in one call, consider using the overloaded version of this function.
+
+If a background brush was set with \hyperlink{classQCustomPlot_a8ed256cf467bfa7ba1f9feaae62c3bd0}{set\+Background(const Q\+Brush \&brush)}, the viewport will first be filled with that brush, before drawing the background pixmap. This can be useful for background pixmaps with translucent areas.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a36f0fa1317325dc7b7efea615ee2de1f}{set\+Background\+Scaled}, \hyperlink{classQCustomPlot_a4c0eb4865b7949f62e1cb97db04a3de0}{set\+Background\+Scaled\+Mode} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Background@{set\+Background}}
+\index{set\+Background@{set\+Background}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Background(const Q\+Pixmap \&pm, bool scaled, Qt\+::\+Aspect\+Ratio\+Mode mode=\+Qt\+::\+Keep\+Aspect\+Ratio\+By\+Expanding)}{setBackground(const QPixmap &pm, bool scaled, Qt::AspectRatioMode mode=Qt::KeepAspectRatioByExpanding)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Background (
+\begin{DoxyParamCaption}
+\item[{const Q\+Pixmap \&}]{pm, }
+\item[{bool}]{scaled, }
+\item[{Qt\+::\+Aspect\+Ratio\+Mode}]{mode = {\ttfamily Qt\+:\+:KeepAspectRatioByExpanding}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a8513971d6aa24d8b0d6a68d45b542130}{}\label{classQCustomPlot_a8513971d6aa24d8b0d6a68d45b542130}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Allows setting the background pixmap of the viewport, whether it shall be scaled and how it shall be scaled in one call.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a130358592cfca353ff3cf5571b49fb00}{set\+Background(const Q\+Pixmap \&pm)}, \hyperlink{classQCustomPlot_a36f0fa1317325dc7b7efea615ee2de1f}{set\+Background\+Scaled}, \hyperlink{classQCustomPlot_a4c0eb4865b7949f62e1cb97db04a3de0}{set\+Background\+Scaled\+Mode} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Background@{set\+Background}}
+\index{set\+Background@{set\+Background}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Background(const Q\+Brush \&brush)}{setBackground(const QBrush &brush)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Background (
+\begin{DoxyParamCaption}
+\item[{const Q\+Brush \&}]{brush}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a8ed256cf467bfa7ba1f9feaae62c3bd0}{}\label{classQCustomPlot_a8ed256cf467bfa7ba1f9feaae62c3bd0}
+Sets the background brush of the viewport (see \hyperlink{classQCustomPlot_a3f9bc4b939dd8aaba9339fd09f273fc4}{set\+Viewport}).
+
+Before drawing everything else, the background is filled with {\itshape brush}. If a background pixmap was set with \hyperlink{classQCustomPlot_a130358592cfca353ff3cf5571b49fb00}{set\+Background(const Q\+Pixmap \&pm)}, this brush will be used to fill the viewport before the background pixmap is drawn. This can be useful for background pixmaps with translucent areas.
+
+Set {\itshape brush} to Qt\+::\+No\+Brush or Qt\+::\+Transparent to leave background transparent. This can be useful for exporting to image formats which support transparency, e.\+g. \hyperlink{classQCustomPlot_ac92cc9256d12f354b40a4be4600b5fb9}{save\+Png}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a36f0fa1317325dc7b7efea615ee2de1f}{set\+Background\+Scaled}, \hyperlink{classQCustomPlot_a4c0eb4865b7949f62e1cb97db04a3de0}{set\+Background\+Scaled\+Mode} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Background\+Scaled@{set\+Background\+Scaled}}
+\index{set\+Background\+Scaled@{set\+Background\+Scaled}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Background\+Scaled(bool scaled)}{setBackgroundScaled(bool scaled)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Background\+Scaled (
+\begin{DoxyParamCaption}
+\item[{bool}]{scaled}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a36f0fa1317325dc7b7efea615ee2de1f}{}\label{classQCustomPlot_a36f0fa1317325dc7b7efea615ee2de1f}
+Sets whether the viewport background pixmap shall be scaled to fit the viewport. If {\itshape scaled} is set to true, control whether and how the aspect ratio of the original pixmap is preserved with \hyperlink{classQCustomPlot_a4c0eb4865b7949f62e1cb97db04a3de0}{set\+Background\+Scaled\+Mode}.
+
+Note that the scaled version of the original pixmap is buffered, so there is no performance penalty on replots. (Except when the viewport dimensions are changed continuously.)
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a130358592cfca353ff3cf5571b49fb00}{set\+Background}, \hyperlink{classQCustomPlot_a4c0eb4865b7949f62e1cb97db04a3de0}{set\+Background\+Scaled\+Mode} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Background\+Scaled\+Mode@{set\+Background\+Scaled\+Mode}}
+\index{set\+Background\+Scaled\+Mode@{set\+Background\+Scaled\+Mode}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Background\+Scaled\+Mode(\+Qt\+::\+Aspect\+Ratio\+Mode mode)}{setBackgroundScaledMode(Qt::AspectRatioMode mode)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Background\+Scaled\+Mode (
+\begin{DoxyParamCaption}
+\item[{Qt\+::\+Aspect\+Ratio\+Mode}]{mode}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a4c0eb4865b7949f62e1cb97db04a3de0}{}\label{classQCustomPlot_a4c0eb4865b7949f62e1cb97db04a3de0}
+If scaling of the viewport background pixmap is enabled (\hyperlink{classQCustomPlot_a36f0fa1317325dc7b7efea615ee2de1f}{set\+Background\+Scaled}), use this function to define whether and how the aspect ratio of the original pixmap is preserved.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a130358592cfca353ff3cf5571b49fb00}{set\+Background}, \hyperlink{classQCustomPlot_a36f0fa1317325dc7b7efea615ee2de1f}{set\+Background\+Scaled} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Buffer\+Device\+Pixel\+Ratio@{set\+Buffer\+Device\+Pixel\+Ratio}}
+\index{set\+Buffer\+Device\+Pixel\+Ratio@{set\+Buffer\+Device\+Pixel\+Ratio}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Buffer\+Device\+Pixel\+Ratio(double ratio)}{setBufferDevicePixelRatio(double ratio)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Buffer\+Device\+Pixel\+Ratio (
+\begin{DoxyParamCaption}
+\item[{double}]{ratio}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a159162653ad6f8b8bf21263ba5787215}{}\label{classQCustomPlot_a159162653ad6f8b8bf21263ba5787215}
+Sets the device pixel ratio used by the paint buffers of this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance.
+
+Normally, this doesn\textquotesingle{}t need to be set manually, because it is initialized with the regular {\itshape Q\+Widget\+::device\+Pixel\+Ratio} which is configured by Qt to fit the display device (e.\+g. 1 for normal displays, 2 for High-\/\+D\+PI displays).
+
+Device pixel ratios are supported by Qt only for Qt versions since 5.\+4. If this method is called when \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} is being used with older Qt versions, outputs an according q\+Debug message and leaves the internal buffer device pixel ratio at 1.\+0. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Current\+Layer@{set\+Current\+Layer}}
+\index{set\+Current\+Layer@{set\+Current\+Layer}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Current\+Layer(const Q\+String \&name)}{setCurrentLayer(const QString &name)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::set\+Current\+Layer (
+\begin{DoxyParamCaption}
+\item[{const Q\+String \&}]{name}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a73a6dc47c653bb6f8f030abca5a11852}{}\label{classQCustomPlot_a73a6dc47c653bb6f8f030abca5a11852}
+Sets the layer with the specified {\itshape name} to be the current layer. All layerables (\hyperlink{classQCPLayerable}{Q\+C\+P\+Layerable}), e.\+g. plottables and items, are created on the current layer.
+
+Returns true on success, i.\+e. if there is a layer with the specified {\itshape name} in the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot}.
+
+Layer names are case-\/sensitive.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ad5255393df078448bb6ac83fa5db5f52}{add\+Layer}, \hyperlink{classQCustomPlot_ae896140beff19424e9e9e02d6e331104}{move\+Layer}, \hyperlink{classQCustomPlot_a40f75e342c5eaab6a86066a42a0e2a94}{remove\+Layer}, \hyperlink{classQCPLayerable_ab0d0da6d2de45a118886d2c8e16d5a54}{Q\+C\+P\+Layerable\+::set\+Layer} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Current\+Layer@{set\+Current\+Layer}}
+\index{set\+Current\+Layer@{set\+Current\+Layer}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Current\+Layer(\+Q\+C\+P\+Layer $\ast$layer)}{setCurrentLayer(QCPLayer *layer)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Q\+Custom\+Plot\+::set\+Current\+Layer (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Layer} $\ast$}]{layer}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a23a4d3cadad1a0063c5fe19aac5659e6}{}\label{classQCustomPlot_a23a4d3cadad1a0063c5fe19aac5659e6}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
+
+Sets the provided {\itshape layer} to be the current layer.
+
+Returns true on success, i.\+e. when {\itshape layer} is a valid layer in the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_ad5255393df078448bb6ac83fa5db5f52}{add\+Layer}, \hyperlink{classQCustomPlot_ae896140beff19424e9e9e02d6e331104}{move\+Layer}, \hyperlink{classQCustomPlot_a40f75e342c5eaab6a86066a42a0e2a94}{remove\+Layer} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Interaction@{set\+Interaction}}
+\index{set\+Interaction@{set\+Interaction}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Interaction(const Q\+C\+P\+::\+Interaction \&interaction, bool enabled=true)}{setInteraction(const QCP::Interaction &interaction, bool enabled=true)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Interaction (
+\begin{DoxyParamCaption}
+\item[{const {\bf Q\+C\+P\+::\+Interaction} \&}]{interaction, }
+\item[{bool}]{enabled = {\ttfamily true}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a422bf1bc6d56dac75a3d805d9a65902c}{}\label{classQCustomPlot_a422bf1bc6d56dac75a3d805d9a65902c}
+Sets the single {\itshape interaction} of this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} to {\itshape enabled}.
+
+For details about the interaction system, see \hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{set\+Interactions}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{set\+Interactions} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Interactions@{set\+Interactions}}
+\index{set\+Interactions@{set\+Interactions}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Interactions(const Q\+C\+P\+::\+Interactions \&interactions)}{setInteractions(const QCP::Interactions &interactions)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Interactions (
+\begin{DoxyParamCaption}
+\item[{const Q\+C\+P\+::\+Interactions \&}]{interactions}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{}\label{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}
+Sets the possible interactions of this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} as an or-\/combination of \hyperlink{namespaceQCP_a2ad6bb6281c7c2d593d4277b44c2b037}{Q\+C\+P\+::\+Interaction} enums. There are the following types of interactions\+:
+
+{\bfseries Axis range manipulation} is controlled via \hyperlink{namespaceQCP_a2ad6bb6281c7c2d593d4277b44c2b037a2c4432b9aceafb94000be8d1b589ef18}{Q\+C\+P\+::i\+Range\+Drag} and \hyperlink{namespaceQCP_a2ad6bb6281c7c2d593d4277b44c2b037abee1e94353525a636aeaf0ba32b72e14}{Q\+C\+P\+::i\+Range\+Zoom}. When the respective interaction is enabled, the user may drag axes ranges and zoom with the mouse wheel. For details how to control which axes the user may drag/zoom and in what orientations, see \hyperlink{classQCPAxisRect_ae6aef2f7211ba6097c925dcd26008418}{Q\+C\+P\+Axis\+Rect\+::set\+Range\+Drag}, \hyperlink{classQCPAxisRect_a7960a9d222f1c31d558b064b60f86a31}{Q\+C\+P\+Axis\+Rect\+::set\+Range\+Zoom}, \hyperlink{classQCPAxisRect_a648cce336bd99daac4a5ca3e5743775d}{Q\+C\+P\+Axis\+Rect\+::set\+Range\+Drag\+Axes}, \hyperlink{classQCPAxisRect_a9442cca2aa358405f39a64d51eca13d2}{Q\+C\+P\+Axis\+Rect\+::set\+Range\+Zoom\+Axes}.
+
+{\bfseries Plottable data selection} is controlled by \hyperlink{namespaceQCP_a2ad6bb6281c7c2d593d4277b44c2b037a67148c8227b4155eca49135fc274c7ec}{Q\+C\+P\+::i\+Select\+Plottables}. If \hyperlink{namespaceQCP_a2ad6bb6281c7c2d593d4277b44c2b037a67148c8227b4155eca49135fc274c7ec}{Q\+C\+P\+::i\+Select\+Plottables} is set, the user may select plottables (graphs, curves, bars,...) and their data by clicking on them or in their vicinity (\hyperlink{classQCustomPlot_a4dc31241d7b09680950e19e5f971ed93}{set\+Selection\+Tolerance}). Whether the user can actually select a plottable and its data can further be restricted with the \hyperlink{classQCPAbstractPlottable_ac238d6e910f976f1f30d41c2bca44ac3}{Q\+C\+P\+Abstract\+Plottable\+::set\+Selectable} method on the specific plottable. For details, see the special page about the data selection mechanism. To retrieve a list of all currently selected plottables, call \hyperlink{classQCustomPlot_a6721b8c689bb7f2f400987e580508fe8}{selected\+Plottables}. If you\textquotesingle{}re only interested in Q\+C\+P\+Graphs, you may use the convenience function \hyperlink{classQCustomPlot_ad2a0493bdd01e7aa99a4209ae3a5b67b}{selected\+Graphs}.
+
+{\bfseries Item selection} is controlled by \hyperlink{namespaceQCP_a2ad6bb6281c7c2d593d4277b44c2b037aea2f7c105d674e76d9b187b02ef29260}{Q\+C\+P\+::i\+Select\+Items}. If \hyperlink{namespaceQCP_a2ad6bb6281c7c2d593d4277b44c2b037aea2f7c105d674e76d9b187b02ef29260}{Q\+C\+P\+::i\+Select\+Items} is set, the user may select items (\hyperlink{classQCPItemLine}{Q\+C\+P\+Item\+Line}, \hyperlink{classQCPItemText}{Q\+C\+P\+Item\+Text},...) by clicking on them or in their vicinity. To find out whether a specific item is selected, call Q\+C\+P\+Abstract\+Item\+::selected(). To retrieve a list of all currently selected items, call \hyperlink{classQCustomPlot_a1a48b13547e2d9ac5cd6927516f47a2e}{selected\+Items}.
+
+{\bfseries Axis selection} is controlled with \hyperlink{namespaceQCP_a2ad6bb6281c7c2d593d4277b44c2b037ad6644ac55bef621645326e9dd7469caa}{Q\+C\+P\+::i\+Select\+Axes}. If \hyperlink{namespaceQCP_a2ad6bb6281c7c2d593d4277b44c2b037ad6644ac55bef621645326e9dd7469caa}{Q\+C\+P\+::i\+Select\+Axes} is set, the user may select parts of the axes by clicking on them. What parts exactly (e.\+g. Axis base line, tick labels, axis label) are selectable can be controlled via \hyperlink{classQCPAxis_a513f9b9e326c505d9bec54880031b085}{Q\+C\+P\+Axis\+::set\+Selectable\+Parts} for each axis. To retrieve a list of all axes that currently contain selected parts, call \hyperlink{classQCustomPlot_aa6baf867e8beb96ed5bd471f83ece903}{selected\+Axes}. Which parts of an axis are selected, can be retrieved with Q\+C\+P\+Axis\+::selected\+Parts().
+
+{\bfseries Legend selection} is controlled with \hyperlink{namespaceQCP_a2ad6bb6281c7c2d593d4277b44c2b037a269c9af298e257d1108edec0432b5513}{Q\+C\+P\+::i\+Select\+Legend}. If this is set, the user may select the legend itself or individual items by clicking on them. What parts exactly are selectable can be controlled via \hyperlink{classQCPLegend_a9ce60aa8bbd89f62ae4fa83ac6c60110}{Q\+C\+P\+Legend\+::set\+Selectable\+Parts}. To find out whether the legend or any of its child items are selected, check the value of Q\+C\+P\+Legend\+::selected\+Parts. To find out which child items are selected, call \hyperlink{classQCPLegend_ac93eaf236e911d67aa8b88942ef45c5e}{Q\+C\+P\+Legend\+::selected\+Items}.
+
+{\bfseries All other selectable elements} The selection of all other selectable objects (e.\+g. \hyperlink{classQCPTextElement}{Q\+C\+P\+Text\+Element}, or your own layerable subclasses) is controlled with \hyperlink{namespaceQCP_a2ad6bb6281c7c2d593d4277b44c2b037af67a50bc26147a13b551b3a625374949}{Q\+C\+P\+::i\+Select\+Other}. If set, the user may select those objects by clicking on them. To find out which are currently selected, you need to check their selected state explicitly.
+
+If the selection state has changed by user interaction, the \hyperlink{classQCustomPlot_a500c64a109bc773c973ad274f2fa4190}{selection\+Changed\+By\+User} signal is emitted. Each selectable object additionally emits an individual selection\+Changed signal whenever their selection state has changed, i.\+e. not only by user interaction.
+
+To allow multiple objects to be selected by holding the selection modifier (\hyperlink{classQCustomPlot_a8fc96e3b5138a06759a2a90c166df516}{set\+Multi\+Select\+Modifier}), set the flag \hyperlink{namespaceQCP_a2ad6bb6281c7c2d593d4277b44c2b037aef673112c5067c3cf4cfddb62da7265d}{Q\+C\+P\+::i\+Multi\+Select}.
+
+\begin{DoxyNote}{Note}
+In addition to the selection mechanism presented here, \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} always emits corresponding signals, when an object is clicked or double clicked. see \hyperlink{classQCustomPlot_af5fe78b8bc9e4e96df921612837fd4fd}{plottable\+Click} and \hyperlink{classQCustomPlot_a86a3ab7263c9c4e008e70d6c5fce9fbd}{plottable\+Double\+Click} for example.
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a422bf1bc6d56dac75a3d805d9a65902c}{set\+Interaction}, \hyperlink{classQCustomPlot_a4dc31241d7b09680950e19e5f971ed93}{set\+Selection\+Tolerance} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Multi\+Select\+Modifier@{set\+Multi\+Select\+Modifier}}
+\index{set\+Multi\+Select\+Modifier@{set\+Multi\+Select\+Modifier}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Multi\+Select\+Modifier(\+Qt\+::\+Keyboard\+Modifier modifier)}{setMultiSelectModifier(Qt::KeyboardModifier modifier)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Multi\+Select\+Modifier (
+\begin{DoxyParamCaption}
+\item[{Qt\+::\+Keyboard\+Modifier}]{modifier}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a8fc96e3b5138a06759a2a90c166df516}{}\label{classQCustomPlot_a8fc96e3b5138a06759a2a90c166df516}
+Sets the keyboard modifier that will be recognized as multi-\/select-\/modifier.
+
+If \hyperlink{namespaceQCP_a2ad6bb6281c7c2d593d4277b44c2b037aef673112c5067c3cf4cfddb62da7265d}{Q\+C\+P\+::i\+Multi\+Select} is specified in \hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{set\+Interactions}, the user may select multiple objects (or data points) by clicking on them one after the other while holding down {\itshape modifier}.
+
+By default the multi-\/select-\/modifier is set to Qt\+::\+Control\+Modifier.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{set\+Interactions} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+No\+Antialiasing\+On\+Drag@{set\+No\+Antialiasing\+On\+Drag}}
+\index{set\+No\+Antialiasing\+On\+Drag@{set\+No\+Antialiasing\+On\+Drag}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+No\+Antialiasing\+On\+Drag(bool enabled)}{setNoAntialiasingOnDrag(bool enabled)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+No\+Antialiasing\+On\+Drag (
+\begin{DoxyParamCaption}
+\item[{bool}]{enabled}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a775bdcb6329d44701aeaa6135b0e5265}{}\label{classQCustomPlot_a775bdcb6329d44701aeaa6135b0e5265}
+Sets whether antialiasing is disabled for this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} while the user is dragging axes ranges. If many objects, especially plottables, are drawn antialiased, this greatly improves performance during dragging. Thus it creates a more responsive user experience. As soon as the user stops dragging, the last replot is done with normal antialiasing, to restore high image quality.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_af6f91e5eab1be85f67c556e98c3745e8}{set\+Antialiased\+Elements}, \hyperlink{classQCustomPlot_ae10d685b5eabea2999fb8775ca173c24}{set\+Not\+Antialiased\+Elements} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Not\+Antialiased\+Element@{set\+Not\+Antialiased\+Element}}
+\index{set\+Not\+Antialiased\+Element@{set\+Not\+Antialiased\+Element}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Not\+Antialiased\+Element(\+Q\+C\+P\+::\+Antialiased\+Element not\+Antialiased\+Element, bool enabled=true)}{setNotAntialiasedElement(QCP::AntialiasedElement notAntialiasedElement, bool enabled=true)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Not\+Antialiased\+Element (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+::\+Antialiased\+Element}}]{not\+Antialiased\+Element, }
+\item[{bool}]{enabled = {\ttfamily true}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_afc657938a707c890e449ae89203a076d}{}\label{classQCustomPlot_afc657938a707c890e449ae89203a076d}
+Sets whether the specified {\itshape not\+Antialiased\+Element} is forcibly drawn not antialiased.
+
+See \hyperlink{classQCustomPlot_ae10d685b5eabea2999fb8775ca173c24}{set\+Not\+Antialiased\+Elements} for details.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_aeef813bcf7efab8e765f9f87ec454691}{set\+Antialiased\+Element} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Not\+Antialiased\+Elements@{set\+Not\+Antialiased\+Elements}}
+\index{set\+Not\+Antialiased\+Elements@{set\+Not\+Antialiased\+Elements}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Not\+Antialiased\+Elements(const Q\+C\+P\+::\+Antialiased\+Elements \&not\+Antialiased\+Elements)}{setNotAntialiasedElements(const QCP::AntialiasedElements &notAntialiasedElements)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Not\+Antialiased\+Elements (
+\begin{DoxyParamCaption}
+\item[{const Q\+C\+P\+::\+Antialiased\+Elements \&}]{not\+Antialiased\+Elements}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_ae10d685b5eabea2999fb8775ca173c24}{}\label{classQCustomPlot_ae10d685b5eabea2999fb8775ca173c24}
+Sets which elements are forcibly drawn not antialiased as an {\itshape or} combination of \hyperlink{namespaceQCP_ae55dbe315d41fe80f29ba88100843a0c}{Q\+C\+P\+::\+Antialiased\+Element}.
+
+This overrides the antialiasing settings for whole element groups, normally controlled with the {\itshape set\+Antialiasing} function on the individual elements. If an element is neither specified in \hyperlink{classQCustomPlot_af6f91e5eab1be85f67c556e98c3745e8}{set\+Antialiased\+Elements} nor in \hyperlink{classQCustomPlot_ae10d685b5eabea2999fb8775ca173c24}{set\+Not\+Antialiased\+Elements}, the antialiasing setting on each individual element instance is used.
+
+For example, if {\itshape not\+Antialiased\+Elements} contains \hyperlink{namespaceQCP_ae55dbe315d41fe80f29ba88100843a0ca4145e4251b0cf2dbedabeea0a38f84f6}{Q\+C\+P\+::ae\+Plottables}, no plottables will be drawn antialiased, no matter what the specific \hyperlink{classQCPLayerable_a4fd43e89be4a553ead41652565ff0581}{Q\+C\+P\+Abstract\+Plottable\+::set\+Antialiased} value was set to.
+
+if an element in {\itshape not\+Antialiased\+Elements} is already set in \hyperlink{classQCustomPlot_af6f91e5eab1be85f67c556e98c3745e8}{set\+Antialiased\+Elements}, it is removed from there.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_af6f91e5eab1be85f67c556e98c3745e8}{set\+Antialiased\+Elements} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Open\+Gl@{set\+Open\+Gl}}
+\index{set\+Open\+Gl@{set\+Open\+Gl}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Open\+Gl(bool enabled, int multisampling=16)}{setOpenGl(bool enabled, int multisampling=16)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Open\+Gl (
+\begin{DoxyParamCaption}
+\item[{bool}]{enabled, }
+\item[{int}]{multisampling = {\ttfamily 16}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a7db1adc09016329f3aef7c60da935789}{}\label{classQCustomPlot_a7db1adc09016329f3aef7c60da935789}
+\begin{DoxyWarning}{Warning}
+This is still an experimental feature and its performance depends on the system that it runs on. Having multiple \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widgets in one application with enabled Open\+GL rendering might cause context conflicts on some systems.
+\end{DoxyWarning}
+This method allows to enable Open\+GL plot rendering, for increased plotting performance of graphically demanding plots (thick lines, translucent fills, etc.).
+
+If {\itshape enabled} is set to true, \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} will try to initialize Open\+GL and, if successful, continue plotting with hardware acceleration. The parameter {\itshape multisampling} controls how many samples will be used per pixel, it essentially controls the antialiasing quality. If {\itshape multisampling} is set too high for the current graphics hardware, the maximum allowed value will be used.
+
+You can test whether switching to Open\+GL rendering was successful by checking whether the according getter {\itshape Q\+Custom\+Plot\+::open\+Gl()} returns true. If the Open\+GL initialization fails, rendering continues with the regular software rasterizer, and an according q\+Debug output is generated.
+
+If switching to Open\+GL was successful, this method disables label caching (\hyperlink{classQCustomPlot_a3b7c97bb6c16464e9e15190c07abe9a9}{set\+Plotting\+Hint(Q\+CP\+:\+:ph\+Cache\+Labels, false)}) and turns on \hyperlink{classQCustomPlot}{Q\+Custom\+Plot}\textquotesingle{}s antialiasing override for all elements (\hyperlink{classQCustomPlot_af6f91e5eab1be85f67c556e98c3745e8}{set\+Antialiased\+Elements(Q\+CP\+:\+:ae\+All)}), leading to a higher quality output. The antialiasing override allows for pixel-\/grid aligned drawing in the Open\+GL paint device. As stated before, in Open\+GL rendering the actual antialiasing of the plot is controlled with {\itshape multisampling}. If {\itshape enabled} is set to false, the antialiasing/label caching settings are restored to what they were before Open\+GL was enabled, if they weren\textquotesingle{}t altered in the meantime.
+
+\begin{DoxyNote}{Note}
+Open\+GL support is only enabled if \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} is compiled with the macro {\ttfamily Q\+C\+U\+S\+T\+O\+M\+P\+L\+O\+T\+\_\+\+U\+S\+E\+\_\+\+O\+P\+E\+N\+GL} defined. This define must be set before including the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} header both during compilation of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} library as well as when compiling your application. It is best to just include the line {\ttfamily D\+E\+F\+I\+N\+ES += Q\+C\+U\+S\+T\+O\+M\+P\+L\+O\+T\+\_\+\+U\+S\+E\+\_\+\+O\+P\+E\+N\+GL} in the respective qmake project files. 
+
+If you are using a Qt version before 5.\+0, you must also add the module \char`\"{}opengl\char`\"{} to your {\ttfamily QT} variable in the qmake project files. For Qt versions 5.\+0 and higher, \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} switches to a newer Open\+GL interface which is already in the \char`\"{}gui\char`\"{} module. 
+\end{DoxyNote}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Plotting\+Hint@{set\+Plotting\+Hint}}
+\index{set\+Plotting\+Hint@{set\+Plotting\+Hint}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Plotting\+Hint(\+Q\+C\+P\+::\+Plotting\+Hint hint, bool enabled=true)}{setPlottingHint(QCP::PlottingHint hint, bool enabled=true)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Plotting\+Hint (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+::\+Plotting\+Hint}}]{hint, }
+\item[{bool}]{enabled = {\ttfamily true}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a3b7c97bb6c16464e9e15190c07abe9a9}{}\label{classQCustomPlot_a3b7c97bb6c16464e9e15190c07abe9a9}
+Sets the specified plotting {\itshape hint} to {\itshape enabled}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a94a33cbdadbbac5934843508bcfc210d}{set\+Plotting\+Hints} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Plotting\+Hints@{set\+Plotting\+Hints}}
+\index{set\+Plotting\+Hints@{set\+Plotting\+Hints}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Plotting\+Hints(const Q\+C\+P\+::\+Plotting\+Hints \&hints)}{setPlottingHints(const QCP::PlottingHints &hints)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Plotting\+Hints (
+\begin{DoxyParamCaption}
+\item[{const Q\+C\+P\+::\+Plotting\+Hints \&}]{hints}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a94a33cbdadbbac5934843508bcfc210d}{}\label{classQCustomPlot_a94a33cbdadbbac5934843508bcfc210d}
+Sets the plotting hints for this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} instance as an {\itshape or} combination of \hyperlink{namespaceQCP_a5400e5fcb9528d92002ddb938c1f4ef4}{Q\+C\+P\+::\+Plotting\+Hint}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a3b7c97bb6c16464e9e15190c07abe9a9}{set\+Plotting\+Hint} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Selection\+Rect@{set\+Selection\+Rect}}
+\index{set\+Selection\+Rect@{set\+Selection\+Rect}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Selection\+Rect(\+Q\+C\+P\+Selection\+Rect $\ast$selection\+Rect)}{setSelectionRect(QCPSelectionRect *selectionRect)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Selection\+Rect (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Selection\+Rect} $\ast$}]{selection\+Rect}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a0c09f96df15faa4799ad7051bb16cf33}{}\label{classQCustomPlot_a0c09f96df15faa4799ad7051bb16cf33}
+Sets the \hyperlink{classQCPSelectionRect}{Q\+C\+P\+Selection\+Rect} instance that \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} will use if {\itshape mode} is not \hyperlink{namespaceQCP_ac9aa4d6d81ac76b094f9af9ad2d3aacfa9032f170490d67240a6c68c2638ffab1}{Q\+C\+P\+::srm\+None} and the user performs a click-\/and-\/drag interaction. \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} takes ownership of the passed {\itshape selection\+Rect}. It can be accessed later via \hyperlink{classQCustomPlot_ae64a3994735d8f592a60d9430526a163}{selection\+Rect}.
+
+This method is useful if you wish to replace the default \hyperlink{classQCPSelectionRect}{Q\+C\+P\+Selection\+Rect} instance with an instance of a \hyperlink{classQCPSelectionRect}{Q\+C\+P\+Selection\+Rect} subclass, to introduce custom behaviour of the selection rect.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a810ef958ebe84db661c7288b526c0deb}{set\+Selection\+Rect\+Mode} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Selection\+Rect\+Mode@{set\+Selection\+Rect\+Mode}}
+\index{set\+Selection\+Rect\+Mode@{set\+Selection\+Rect\+Mode}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Selection\+Rect\+Mode(\+Q\+C\+P\+::\+Selection\+Rect\+Mode mode)}{setSelectionRectMode(QCP::SelectionRectMode mode)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Selection\+Rect\+Mode (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+::\+Selection\+Rect\+Mode}}]{mode}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a810ef958ebe84db661c7288b526c0deb}{}\label{classQCustomPlot_a810ef958ebe84db661c7288b526c0deb}
+Sets how \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} processes mouse click-\/and-\/drag interactions by the user.
+
+If {\itshape mode} is \hyperlink{namespaceQCP_ac9aa4d6d81ac76b094f9af9ad2d3aacfa9032f170490d67240a6c68c2638ffab1}{Q\+C\+P\+::srm\+None}, the mouse drag is forwarded to the underlying objects. For example, \hyperlink{classQCPAxisRect}{Q\+C\+P\+Axis\+Rect} may process a mouse drag by dragging axis ranges, see \hyperlink{classQCPAxisRect_ae6aef2f7211ba6097c925dcd26008418}{Q\+C\+P\+Axis\+Rect\+::set\+Range\+Drag}. If {\itshape mode} is not \hyperlink{namespaceQCP_ac9aa4d6d81ac76b094f9af9ad2d3aacfa9032f170490d67240a6c68c2638ffab1}{Q\+C\+P\+::srm\+None}, the current selection rect (\hyperlink{classQCustomPlot_ae64a3994735d8f592a60d9430526a163}{selection\+Rect}) becomes activated and allows e.\+g. rect zooming and data point selection.
+
+If you wish to provide your user both with axis range dragging and data selection/range zooming, use this method to switch between the modes just before the interaction is processed, e.\+g. in reaction to the \hyperlink{classQCustomPlot_aca75bf9afb5dd19349c375de2a87a051}{mouse\+Press} or \hyperlink{classQCustomPlot_a742ca4f94688bed2a685fd8a56ce5704}{mouse\+Move} signals. For example you could check whether the user is holding a certain keyboard modifier, and then decide which {\itshape mode} shall be set.
+
+If a selection rect interaction is currently active, and {\itshape mode} is set to \hyperlink{namespaceQCP_ac9aa4d6d81ac76b094f9af9ad2d3aacfa9032f170490d67240a6c68c2638ffab1}{Q\+C\+P\+::srm\+None}, the interaction is canceled (\hyperlink{classQCPSelectionRect_af67bc58f4f5ce9a4dc420b9c42de235a}{Q\+C\+P\+Selection\+Rect\+::cancel}). Switching between any of the other modes will keep the selection rect active. Upon completion of the interaction, the behaviour is as defined by the currently set {\itshape mode}, not the mode that was set when the interaction started.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{set\+Interactions}, \hyperlink{classQCustomPlot_a0c09f96df15faa4799ad7051bb16cf33}{set\+Selection\+Rect}, \hyperlink{classQCPSelectionRect}{Q\+C\+P\+Selection\+Rect} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Selection\+Tolerance@{set\+Selection\+Tolerance}}
+\index{set\+Selection\+Tolerance@{set\+Selection\+Tolerance}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Selection\+Tolerance(int pixels)}{setSelectionTolerance(int pixels)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Selection\+Tolerance (
+\begin{DoxyParamCaption}
+\item[{int}]{pixels}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a4dc31241d7b09680950e19e5f971ed93}{}\label{classQCustomPlot_a4dc31241d7b09680950e19e5f971ed93}
+Sets the tolerance that is used to decide whether a click selects an object (e.\+g. a plottable) or not.
+
+If the user clicks in the vicinity of the line of e.\+g. a \hyperlink{classQCPGraph}{Q\+C\+P\+Graph}, it\textquotesingle{}s only regarded as a potential selection when the minimum distance between the click position and the graph line is smaller than {\itshape pixels}. Objects that are defined by an area (e.\+g. \hyperlink{classQCPBars}{Q\+C\+P\+Bars}) only react to clicks directly inside the area and ignore this selection tolerance. In other words, it only has meaning for parts of objects that are too thin to exactly hit with a click and thus need such a tolerance.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a5ee1e2f6ae27419deca53e75907c27e5}{set\+Interactions}, \hyperlink{classQCPLayerable_a4001c4d0dfec55598efa4d531f2179a9}{Q\+C\+P\+Layerable\+::select\+Test} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!set\+Viewport@{set\+Viewport}}
+\index{set\+Viewport@{set\+Viewport}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{set\+Viewport(const Q\+Rect \&rect)}{setViewport(const QRect &rect)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::set\+Viewport (
+\begin{DoxyParamCaption}
+\item[{const Q\+Rect \&}]{rect}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a3f9bc4b939dd8aaba9339fd09f273fc4}{}\label{classQCustomPlot_a3f9bc4b939dd8aaba9339fd09f273fc4}
+Sets the viewport of this \hyperlink{classQCustomPlot}{Q\+Custom\+Plot}. Usually users of \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} don\textquotesingle{}t need to change the viewport manually.
+
+The viewport is the area in which the plot is drawn. All mechanisms, e.\+g. margin caluclation take the viewport to be the outer border of the plot. The viewport normally is the rect() of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget, i.\+e. a rect with top left (0, 0) and size of the \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} widget.
+
+Don\textquotesingle{}t confuse the viewport with the axis rect (\hyperlink{classQCustomPlot_a4a37a1add5fe63060ac518cf0a4c4050}{Q\+Custom\+Plot\+::axis\+Rect}). An axis rect is typically an area enclosed by four axes, where the graphs/plottables are drawn in. The viewport is larger and contains also the axes themselves, their tick numbers, their labels, or even additional axis rects, color scales and other layout elements.
+
+This function is used to allow arbitrary size exports with \hyperlink{classQCustomPlot_aabb974d71ce96c137dc04eb6eab844fe}{to\+Pixmap}, \hyperlink{classQCustomPlot_ac92cc9256d12f354b40a4be4600b5fb9}{save\+Png}, \hyperlink{classQCustomPlot_ad5acd34f6b39c3516887d7e54fec2412}{save\+Pdf}, etc. by temporarily changing the viewport size. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!to\+Painter@{to\+Painter}}
+\index{to\+Painter@{to\+Painter}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{to\+Painter(\+Q\+C\+P\+Painter $\ast$painter, int width=0, int height=0)}{toPainter(QCPPainter *painter, int width=0, int height=0)}}]{\setlength{\rightskip}{0pt plus 5cm}void Q\+Custom\+Plot\+::to\+Painter (
+\begin{DoxyParamCaption}
+\item[{{\bf Q\+C\+P\+Painter} $\ast$}]{painter, }
+\item[{int}]{width = {\ttfamily 0}, }
+\item[{int}]{height = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_a1be68d5c0f1e086d6374d1340a193fb9}{}\label{classQCustomPlot_a1be68d5c0f1e086d6374d1340a193fb9}
+Renders the plot using the passed {\itshape painter}.
+
+The plot is sized to {\itshape width} and {\itshape height} in pixels. If the {\itshape painter\textquotesingle{}s} scale is not 1.\+0, the resulting plot will appear scaled accordingly.
+
+\begin{DoxyNote}{Note}
+If you are restricted to using a Q\+Painter (instead of \hyperlink{classQCPPainter}{Q\+C\+P\+Painter}), create a temporary Q\+Picture and open a \hyperlink{classQCPPainter}{Q\+C\+P\+Painter} on it. Then call \hyperlink{classQCustomPlot_a1be68d5c0f1e086d6374d1340a193fb9}{to\+Painter} with this \hyperlink{classQCPPainter}{Q\+C\+P\+Painter}. After ending the paint operation on the picture, draw it with the Q\+Painter. This will reproduce the painter actions the \hyperlink{classQCPPainter}{Q\+C\+P\+Painter} took, with a Q\+Painter.
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_aabb974d71ce96c137dc04eb6eab844fe}{to\+Pixmap} 
+\end{DoxySeeAlso}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!to\+Pixmap@{to\+Pixmap}}
+\index{to\+Pixmap@{to\+Pixmap}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{to\+Pixmap(int width=0, int height=0, double scale=1.\+0)}{toPixmap(int width=0, int height=0, double scale=1.0)}}]{\setlength{\rightskip}{0pt plus 5cm}Q\+Pixmap Q\+Custom\+Plot\+::to\+Pixmap (
+\begin{DoxyParamCaption}
+\item[{int}]{width = {\ttfamily 0}, }
+\item[{int}]{height = {\ttfamily 0}, }
+\item[{double}]{scale = {\ttfamily 1.0}}
+\end{DoxyParamCaption}
+)}\hypertarget{classQCustomPlot_aabb974d71ce96c137dc04eb6eab844fe}{}\label{classQCustomPlot_aabb974d71ce96c137dc04eb6eab844fe}
+Renders the plot to a pixmap and returns it.
+
+The plot is sized to {\itshape width} and {\itshape height} in pixels and scaled with {\itshape scale}. (width 100 and scale 2.\+0 lead to a full resolution pixmap with width 200.)
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classQCustomPlot_a1be68d5c0f1e086d6374d1340a193fb9}{to\+Painter}, \hyperlink{classQCustomPlot_ad7723ce2edfa270632ef42b03a444352}{save\+Rastered}, \hyperlink{classQCustomPlot_ae3a86ed0795670e50afa21759d4fa13d}{save\+Bmp}, \hyperlink{classQCustomPlot_ac92cc9256d12f354b40a4be4600b5fb9}{save\+Png}, \hyperlink{classQCustomPlot_a76f0d278e630a711fa6f48048cfd83e4}{save\+Jpg}, \hyperlink{classQCustomPlot_ad5acd34f6b39c3516887d7e54fec2412}{save\+Pdf} 
+\end{DoxySeeAlso}
+
+
+\subsection{Member Data Documentation}
+\index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!legend@{legend}}
+\index{legend@{legend}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{legend}{legend}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Legend} $\ast$ Q\+Custom\+Plot\+::legend}\hypertarget{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{}\label{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}
+A pointer to the default legend of the main axis rect. The legend is invisible by default. Use \hyperlink{classQCPLayerable_a3bed99ddc396b48ce3ebfdc0418744f8}{Q\+C\+P\+Legend\+::set\+Visible} to change this.
+
+\hyperlink{classQCustomPlot}{Q\+Custom\+Plot} offers convenient pointers to the axes (\hyperlink{classQCustomPlot_a9a79cd0158a4c7f30cbc702f0fd800e4}{x\+Axis}, \hyperlink{classQCustomPlot_af6fea5679725b152c14facd920b19367}{y\+Axis}, \hyperlink{classQCustomPlot_ada41599f22cad901c030f3dcbdd82fd9}{x\+Axis2}, \hyperlink{classQCustomPlot_af13fdc5bce7d0fabd640f13ba805c0b7}{y\+Axis2}) and the \hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{legend}. They make it very easy working with plots that only have a single axis rect and at most one axis at each axis rect side. If you use \hyperlink{}{the layout system} to add multiple legends to the plot, use the layout system interface to access the new legend. For example, legends can be placed inside an axis rect\textquotesingle{}s \hyperlink{classQCPAxisRect_a4114887c7141b59650b7488f930993e5}{inset layout}, and must then also be accessed via the inset layout. If the default legend is removed due to manipulation of the layout system (e.\+g. by removing the main axis rect), the corresponding pointer becomes 0.
+
+If an axis convenience pointer is currently zero and a new axis rect or a corresponding axis is added in the place of the main axis rect, \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} resets the convenience pointers to the according new axes. Similarly the \hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{legend} convenience pointer will be reset if a legend is added after the main legend was removed before. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!x\+Axis@{x\+Axis}}
+\index{x\+Axis@{x\+Axis}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{x\+Axis}{xAxis}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Axis} $\ast$ Q\+Custom\+Plot\+::x\+Axis}\hypertarget{classQCustomPlot_a9a79cd0158a4c7f30cbc702f0fd800e4}{}\label{classQCustomPlot_a9a79cd0158a4c7f30cbc702f0fd800e4}
+A pointer to the primary x Axis (bottom) of the main axis rect of the plot.
+
+\hyperlink{classQCustomPlot}{Q\+Custom\+Plot} offers convenient pointers to the axes (\hyperlink{classQCustomPlot_a9a79cd0158a4c7f30cbc702f0fd800e4}{x\+Axis}, \hyperlink{classQCustomPlot_af6fea5679725b152c14facd920b19367}{y\+Axis}, \hyperlink{classQCustomPlot_ada41599f22cad901c030f3dcbdd82fd9}{x\+Axis2}, \hyperlink{classQCustomPlot_af13fdc5bce7d0fabd640f13ba805c0b7}{y\+Axis2}) and the \hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{legend}. They make it very easy working with plots that only have a single axis rect and at most one axis at each axis rect side. If you use \hyperlink{}{the layout system} to add multiple axis rects or multiple axes to one side, use the \hyperlink{classQCPAxisRect_a560de44e47a4af0f86c59102a094b1e4}{Q\+C\+P\+Axis\+Rect\+::axis} interface to access the new axes. If one of the four default axes or the default legend is removed due to manipulation of the layout system (e.\+g. by removing the main axis rect), the corresponding pointers become 0.
+
+If an axis convenience pointer is currently zero and a new axis rect or a corresponding axis is added in the place of the main axis rect, \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} resets the convenience pointers to the according new axes. Similarly the \hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{legend} convenience pointer will be reset if a legend is added after the main legend was removed before. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!x\+Axis2@{x\+Axis2}}
+\index{x\+Axis2@{x\+Axis2}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{x\+Axis2}{xAxis2}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Axis} $\ast$ Q\+Custom\+Plot\+::x\+Axis2}\hypertarget{classQCustomPlot_ada41599f22cad901c030f3dcbdd82fd9}{}\label{classQCustomPlot_ada41599f22cad901c030f3dcbdd82fd9}
+A pointer to the secondary x Axis (top) of the main axis rect of the plot. Secondary axes are invisible by default. Use \hyperlink{classQCPLayerable_a3bed99ddc396b48ce3ebfdc0418744f8}{Q\+C\+P\+Axis\+::set\+Visible} to change this (or use \hyperlink{classQCPAxisRect_a5fa906175447b14206954f77fc7f1ef4}{Q\+C\+P\+Axis\+Rect\+::setup\+Full\+Axes\+Box}).
+
+\hyperlink{classQCustomPlot}{Q\+Custom\+Plot} offers convenient pointers to the axes (\hyperlink{classQCustomPlot_a9a79cd0158a4c7f30cbc702f0fd800e4}{x\+Axis}, \hyperlink{classQCustomPlot_af6fea5679725b152c14facd920b19367}{y\+Axis}, \hyperlink{classQCustomPlot_ada41599f22cad901c030f3dcbdd82fd9}{x\+Axis2}, \hyperlink{classQCustomPlot_af13fdc5bce7d0fabd640f13ba805c0b7}{y\+Axis2}) and the \hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{legend}. They make it very easy working with plots that only have a single axis rect and at most one axis at each axis rect side. If you use \hyperlink{}{the layout system} to add multiple axis rects or multiple axes to one side, use the \hyperlink{classQCPAxisRect_a560de44e47a4af0f86c59102a094b1e4}{Q\+C\+P\+Axis\+Rect\+::axis} interface to access the new axes. If one of the four default axes or the default legend is removed due to manipulation of the layout system (e.\+g. by removing the main axis rect), the corresponding pointers become 0.
+
+If an axis convenience pointer is currently zero and a new axis rect or a corresponding axis is added in the place of the main axis rect, \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} resets the convenience pointers to the according new axes. Similarly the \hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{legend} convenience pointer will be reset if a legend is added after the main legend was removed before. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!y\+Axis@{y\+Axis}}
+\index{y\+Axis@{y\+Axis}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{y\+Axis}{yAxis}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Axis} $\ast$ Q\+Custom\+Plot\+::y\+Axis}\hypertarget{classQCustomPlot_af6fea5679725b152c14facd920b19367}{}\label{classQCustomPlot_af6fea5679725b152c14facd920b19367}
+A pointer to the primary y Axis (left) of the main axis rect of the plot.
+
+\hyperlink{classQCustomPlot}{Q\+Custom\+Plot} offers convenient pointers to the axes (\hyperlink{classQCustomPlot_a9a79cd0158a4c7f30cbc702f0fd800e4}{x\+Axis}, \hyperlink{classQCustomPlot_af6fea5679725b152c14facd920b19367}{y\+Axis}, \hyperlink{classQCustomPlot_ada41599f22cad901c030f3dcbdd82fd9}{x\+Axis2}, \hyperlink{classQCustomPlot_af13fdc5bce7d0fabd640f13ba805c0b7}{y\+Axis2}) and the \hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{legend}. They make it very easy working with plots that only have a single axis rect and at most one axis at each axis rect side. If you use \hyperlink{}{the layout system} to add multiple axis rects or multiple axes to one side, use the \hyperlink{classQCPAxisRect_a560de44e47a4af0f86c59102a094b1e4}{Q\+C\+P\+Axis\+Rect\+::axis} interface to access the new axes. If one of the four default axes or the default legend is removed due to manipulation of the layout system (e.\+g. by removing the main axis rect), the corresponding pointers become 0.
+
+If an axis convenience pointer is currently zero and a new axis rect or a corresponding axis is added in the place of the main axis rect, \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} resets the convenience pointers to the according new axes. Similarly the \hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{legend} convenience pointer will be reset if a legend is added after the main legend was removed before. \index{Q\+Custom\+Plot@{Q\+Custom\+Plot}!y\+Axis2@{y\+Axis2}}
+\index{y\+Axis2@{y\+Axis2}!Q\+Custom\+Plot@{Q\+Custom\+Plot}}
+\subsubsection[{\texorpdfstring{y\+Axis2}{yAxis2}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Q\+C\+P\+Axis} $\ast$ Q\+Custom\+Plot\+::y\+Axis2}\hypertarget{classQCustomPlot_af13fdc5bce7d0fabd640f13ba805c0b7}{}\label{classQCustomPlot_af13fdc5bce7d0fabd640f13ba805c0b7}
+A pointer to the secondary y Axis (right) of the main axis rect of the plot. Secondary axes are invisible by default. Use \hyperlink{classQCPLayerable_a3bed99ddc396b48ce3ebfdc0418744f8}{Q\+C\+P\+Axis\+::set\+Visible} to change this (or use \hyperlink{classQCPAxisRect_a5fa906175447b14206954f77fc7f1ef4}{Q\+C\+P\+Axis\+Rect\+::setup\+Full\+Axes\+Box}).
+
+\hyperlink{classQCustomPlot}{Q\+Custom\+Plot} offers convenient pointers to the axes (\hyperlink{classQCustomPlot_a9a79cd0158a4c7f30cbc702f0fd800e4}{x\+Axis}, \hyperlink{classQCustomPlot_af6fea5679725b152c14facd920b19367}{y\+Axis}, \hyperlink{classQCustomPlot_ada41599f22cad901c030f3dcbdd82fd9}{x\+Axis2}, \hyperlink{classQCustomPlot_af13fdc5bce7d0fabd640f13ba805c0b7}{y\+Axis2}) and the \hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{legend}. They make it very easy working with plots that only have a single axis rect and at most one axis at each axis rect side. If you use \hyperlink{}{the layout system} to add multiple axis rects or multiple axes to one side, use the \hyperlink{classQCPAxisRect_a560de44e47a4af0f86c59102a094b1e4}{Q\+C\+P\+Axis\+Rect\+::axis} interface to access the new axes. If one of the four default axes or the default legend is removed due to manipulation of the layout system (e.\+g. by removing the main axis rect), the corresponding pointers become 0.
+
+If an axis convenience pointer is currently zero and a new axis rect or a corresponding axis is added in the place of the main axis rect, \hyperlink{classQCustomPlot}{Q\+Custom\+Plot} resets the convenience pointers to the according new axes. Similarly the \hyperlink{classQCustomPlot_a4eadcd237dc6a09938b68b16877fa6af}{legend} convenience pointer will be reset if a legend is added after the main legend was removed before. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/qcustomplot.\+h\item 
+src/qcustomplot.\+cpp\end{DoxyCompactItemize}

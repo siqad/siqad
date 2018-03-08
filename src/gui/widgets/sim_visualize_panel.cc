@@ -90,21 +90,10 @@ void SimVisualize::showJobTerminalOutput()
 
 void SimVisualize::showPotPlot()
 {
-  // QWidget *window = new QWidget;
-  // window->resize(750, 750);
-  // QHBoxLayout *layout = new QHBoxLayout;
   QCustomPlot *customPlot = new QCustomPlot();
-
-  // set up the QCPColorMap:
-  // number of points in x and y direction
-  // int nx = 50;
-  // int ny = 50;
-  // coordinate range for x and y
-
   QVector<qreal> x_vec;
   QVector<qreal> y_vec;
   QVector<qreal> val_vec;
-
 
   qDebug() << tr("fill QVectors");
   QList<QVector<float>>::iterator iter;
@@ -115,7 +104,6 @@ void SimVisualize::showPotPlot()
     // qDebug() << tr("x: %1, y: %2, val: %3").arg((*iter)[0]).arg((*iter)[1]).arg((*iter)[2]);
   }
   qDebug() << tr("QVectors filled. Size of vectors: %1").arg(x_vec.size());
-
 
   QCPColorMap *colorMap = new QCPColorMap(customPlot->xAxis, customPlot->yAxis);
   int nx = qSqrt(x_vec.size());
@@ -166,7 +154,6 @@ void SimVisualize::showPotPlot()
 
   // rescale the key (x) and value (y) axes so the whole color map is visible:
 
-
   customPlot->xAxis->setVisible(false);
   customPlot->yAxis->setVisible(false);
   customPlot->setContentsMargins(0,0,0,0);
@@ -177,9 +164,6 @@ void SimVisualize::showPotPlot()
   QPixmap potential_plot = customPlot->toPixmap();
   QRectF graph_container(QPointF(x_vec.first(),y_vec.first()), QPointF(x_vec.last(),y_vec.last()));
   emit showPotPlotOnScene(potential_plot, graph_container);
-  // layout->addWidget(customPlot); //customPlot doubles as a widget
-  // window->setLayout(layout);
-  // window->show();
 
 }
 
