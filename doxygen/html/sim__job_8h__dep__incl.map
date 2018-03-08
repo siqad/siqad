@@ -1,7 +1,0 @@
-<map id="src/gui/widgets/primitives/sim_job.h" name="src/gui/widgets/primitives/sim_job.h">
-<area shape="rect" id="node2" href="$design__panel_8h.html" title=": Top level widget for the design panel. Contains all layers and functionality for reating..." alt="" coords="16,95,168,136"/>
-<area shape="rect" id="node3" href="$application_8h_source.html" title="src/gui/application.h" alt="" coords="136,273,275,300"/>
-<area shape="rect" id="node5" href="$sim__manager_8h_source.html" title="src/gui/widgets/sim\l_manager.h" alt="" coords="244,95,378,136"/>
-<area shape="rect" id="node6" href="$sim__visualize__panel_8h_source.html" title="src/gui/widgets/sim\l_visualize_panel.h" alt="" coords="294,184,429,225"/>
-<area shape="rect" id="node4" href="$layer__editor_8h_source.html" title="src/gui/widgets/layer\l_editor.h" alt="" coords="25,184,168,225"/>
-</map>

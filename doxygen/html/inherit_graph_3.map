@@ -1,9 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node2" href="$classgui_1_1DesignPanel_1_1CreateAFMNode.html" title="gui::DesignPanel::Create\lAFMNode" alt="" coords="201,5,369,47"/>
-<area shape="rect" id="node3" href="$classgui_1_1DesignPanel_1_1CreateAFMPath.html" title="gui::DesignPanel::Create\lAFMPath" alt="" coords="201,71,369,112"/>
-<area shape="rect" id="node4" href="$classgui_1_1DesignPanel_1_1CreateDB.html" title="gui::DesignPanel::CreateDB" alt="" coords="192,137,379,163"/>
-<area shape="rect" id="node5" href="$classgui_1_1DesignPanel_1_1CreateElectrode.html" title="gui::DesignPanel::Create\lElectrode" alt="" coords="201,188,369,229"/>
-<area shape="rect" id="node6" href="$classgui_1_1DesignPanel_1_1CreatePotPlot.html" title="gui::DesignPanel::Create\lPotPlot" alt="" coords="201,253,369,295"/>
-<area shape="rect" id="node7" href="$classgui_1_1DesignPanel_1_1FormAggregate.html" title="gui::DesignPanel::FormAggregate" alt="" coords="176,319,395,346"/>
-<area shape="rect" id="node8" href="$classgui_1_1DesignPanel_1_1MoveItem.html" title="gui::DesignPanel::MoveItem" alt="" coords="192,370,379,397"/>
-</map>

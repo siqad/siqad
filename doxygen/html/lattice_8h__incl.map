@@ -1,7 +1,0 @@
-<map id="src/gui/widgets/primitives/lattice.h" name="src/gui/widgets/primitives/lattice.h">
-<area shape="rect" id="node2" href="$layer_8h.html" title="layer.h" alt="" coords="222,95,283,121"/>
-<area shape="rect" id="node12" href="$latdot_8h.html" title="latdot.h" alt="" coords="308,95,373,121"/>
-<area shape="rect" id="node6" href="$item_8h.html" title=": Base classes for all graphical items with custom signals " alt="" coords="311,169,370,196"/>
-<area shape="rect" id="node7" href="$emitter_8h.html" title=": Assistance class Emitter which allows non QWidget object to trigger an interrupt to the DesignWidet..." alt="" coords="363,244,436,271"/>
-<area shape="rect" id="node10" href="$settings_8h_source.html" title="src/settings/settings.h" alt="" coords="85,244,236,271"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classQCPAbstractPaintBuffer.html" title="The abstract base class for paint buffers, which define the rendering backend. " alt="" coords="5,5,171,32"/>
-<area shape="rect" id="node2" href="$classQCPPaintBufferPixmap.html" title="A paint buffer based on QPixmap, using software raster rendering. " alt="" coords="219,5,379,32"/>
-</map>
