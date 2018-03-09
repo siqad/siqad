@@ -198,6 +198,12 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("electrode/fill_col", QColor(100,100,100));     // fill color
   S->setValue("electrode/selected_col", QColor(0, 100, 255)); // edge color, selected
 
+  // potplot parameters
+  S->setValue("potplot/edge_width", .05);                   // edge width of box lines
+  S->setValue("potplot/edge_col", QColor(60,60,60));        // edge color
+  S->setValue("potplot/fill_col", QColor(100,100,100));     // fill color
+  S->setValue("potplot/selected_col", QColor(0, 100, 255)); // edge color, selected
+
   // afm parameters
   S->setValue("afmnode/fill_col_default", QColor(0, 90, 255, 200));   // default fill color
   S->setValue("afmnode/fill_col_hovered", QColor(0, 170, 255, 200));  // hovered fill color
