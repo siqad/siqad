@@ -277,7 +277,7 @@ void SimManager::initEngines()
     QDir eng_dir(engine_lib_dir.filePath(engine_dir_path));
     QStringList matched_eng_files = eng_dir.entryList(engine_filter, QDir::Files);
 
-    qDebug() << tr("Found %1 engine files").arg(matched_eng_files.length());
+    //qDebug() << tr("Found %1 engine files").arg(matched_eng_files.length());
 
     // add engine declaration files to a list
     for (QString matched_eng_file : matched_eng_files) {
@@ -292,7 +292,7 @@ void SimManager::initEngines()
     sim_engines.append(new prim::SimEngine(eng_dec_file));
   }
 
-  qDebug() << tr("Successfully read physics engine library");
+  qDebug() << tr("Successfully read physics engine files");
 }
 
 bool SimManager::exportSimProblem()

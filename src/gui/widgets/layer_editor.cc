@@ -129,7 +129,7 @@ void LayerEditor::updateLayerPropFromTable(int row, int column)
 {
   // TODO really need to not hard code layer ID and column position, need some sort of table that translates between readable name and row/col number
   QString layer_name = layer_table->item(row, static_cast<int>(Name))->text();
-  qDebug() << QObject::tr("Row=%1, Col=%2, Layer name=%3").arg(row).arg(column).arg(layer_name);
+  //qDebug() << QObject::tr("Row=%1, Col=%2, Layer name=%3").arg(row).arg(column).arg(layer_name);
   prim::Layer* layer = dp->getLayer(layer_name); // get layer according to Layer Name
 
   switch(column) {

@@ -90,10 +90,16 @@ void gui::ApplicationGUI::initGUI()
   initSideBar();
 
   // inter-widget signals
-  connect(sim_manager, &gui::SimManager::emitSimJob, this, &gui::ApplicationGUI::runSimulation);
-  connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene, design_pan, &gui::DesignPanel::displaySimResults);
-  connect(design_pan, &gui::DesignPanel::sig_resetDesignPanel, this, &gui::ApplicationGUI::designPanelReset);
-  connect(sim_visualize, &gui::SimVisualize::showPotPlotOnScene, design_pan, &gui::DesignPanel::displayPotentialPlot);
+  connect(sim_manager, &gui::SimManager::emitSimJob,
+          this, &gui::ApplicationGUI::runSimulation);
+  connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene,
+          design_pan, &gui::DesignPanel::displaySimResults);
+  connect(design_pan, &gui::DesignPanel::sig_resetDesignPanel,
+          this, &gui::ApplicationGUI::designPanelReset);
+  connect(design_pan, &gui::DesignPanel::sig_undoStackCleanChanged,
+          this, &gui::ApplicationGUI::updateWindowTitle);
+  connect(sim_visualize, &gui::SimVisualize::showPotPlotOnScene,
+          design_pan, &gui::DesignPanel::displayPotentialPlot);
 
   // layout management
   QWidget *main_widget = new QWidget(this); // main widget for mainwindow
@@ -390,7 +396,7 @@ void gui::ApplicationGUI::initState()
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 
   setTool(gui::ToolType::SelectTool);
-  working_path.clear();
+  updateWindowTitle();
   autosave_timer.start(1000*app_settings->get<int>("save/autosaveinterval"));
 
   save_dir = QDir::homePath();
@@ -458,6 +464,26 @@ void gui::ApplicationGUI::saveSettings()
 
 
 // PUBLIC SLOTS
+
+void gui::ApplicationGUI::updateWindowTitle()
+{
+  QString title_name;
+  if (working_path.isEmpty()) {
+    title_name = "Untitled";
+  } else {
+    QFileInfo working_path_info(working_path);
+    title_name = working_path_info.fileName();
+  }
+
+  // add an asterisk to the name if the file has been edited since last save
+  if (design_pan->stateChanged())
+    title_name += "*";
+
+  setWindowTitle(tr("%1 - %2")
+    .arg(title_name)
+    .arg(QCoreApplication::applicationName())
+  );
+}
 
 void gui::ApplicationGUI::setTool(gui::ToolType tool)
 {
@@ -733,6 +759,7 @@ void gui::ApplicationGUI::newFile()
       return;
 
   // reset widgets and reinitialize GUI state
+  working_path.clear();
   design_pan->resetDesignPanel();
   initState();
 }
@@ -744,16 +771,16 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   QString write_path;
 
   // determine target file
-  if(!path.isEmpty())
+  if (!path.isEmpty()) {
     write_path = path;
-  else if(working_path.isEmpty() || flag==SaveAs){
+  } else if (working_path.isEmpty() || flag==SaveAs) {
     write_path = QFileDialog::getSaveFileName(this, tr("Save File"),
-                  save_dir.filePath("cooldbdesign.xml"), tr("XML files (*.xml)"));
-    if(write_path.isEmpty())
+                  save_dir.filePath("New DB Layout.xml"), tr("XML files (*.xml)"));
+    if (write_path.isEmpty())
       return false;
-  }
-  else
+  } else {
     write_path = working_path;
+  }
 
   // add .xml extension if there isn't
   if(!write_path.endsWith(".xml", Qt::CaseInsensitive))
@@ -814,6 +841,7 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   if(flag == Save || flag == SaveAs){
     save_dir.setPath(write_path);
     working_path = write_path;
+    updateWindowTitle();
   }
 
   return true;
@@ -868,6 +896,7 @@ void gui::ApplicationGUI::openFromFile()
     return;
 
   working_path = prompt_path;
+  updateWindowTitle();
   QFile file(working_path);
 
   if(!file.open(QFile::ReadOnly | QFile::Text)){

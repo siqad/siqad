@@ -37,6 +37,8 @@ gui::DesignPanel::~DesignPanel()
 // initialise design panel on first init or after reset
 void gui::DesignPanel::initDesignPanel() {
   undo_stack = new QUndoStack();
+  connect(undo_stack, SIGNAL(cleanChanged(bool)),
+          this, SLOT(emitUndoStackCleanChanged(bool)));
 
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   settings::AppSettings *app_settings = settings::AppSettings::instance();

@@ -28,7 +28,7 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
   }
 
   QXmlStreamReader rs(&eng_f);
-  qDebug() << tr("Reading engine library from %1").arg(eng_f.fileName());
+  qDebug() << tr("Reading engine file from %1").arg(eng_f.fileName());
 
   QString read_eng_nm, read_eng_ver;
   QString read_interpreter, read_bin_path, read_linked_script_path;
@@ -70,7 +70,7 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
                 }
                 param_nm = rs.readElementText();
                 addExpectedSimParam(param_nm, gui_obj_nm, gui_obj_type, gui_def_txt);
-                qDebug() << QObject::tr("addExpectedSimParam(%1, %2, %3, %4)").arg(param_nm).arg(gui_obj_nm).arg(gui_obj_type).arg(gui_def_txt);
+                //qDebug() << QObject::tr("addExpectedSimParam(%1, %2, %3, %4)").arg(param_nm).arg(gui_obj_nm).arg(gui_obj_type).arg(gui_def_txt);
               }
             } // end of sim_params
           }

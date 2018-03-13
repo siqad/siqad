@@ -158,10 +158,13 @@ namespace gui{
     void rotateCw();
     void rotateCcw();
 
+    void emitUndoStackCleanChanged(bool c) {emit sig_undoStackCleanChanged(c);}
+
   signals:
     void sig_toolChangeRequest(gui::ToolType tool);  // request ApplicationGUI to change tool
     void sig_toolChanged(gui::ToolType tool);  // request ApplicationGUI to change tool
     void sig_resetDesignPanel();
+    void sig_undoStackCleanChanged(bool); // emitted when undo_stack emits cleanChanged(bool)
 
   protected:
 

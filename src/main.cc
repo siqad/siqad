@@ -83,12 +83,11 @@ int main(int argc, char **argv){
 
   // initialise QApplication
   QApplication app(argc, argv);
+  app.setApplicationName(APPLICATION_NAME);
   app.setApplicationVersion(APP_VERSION);
 
   // Main Window
   gui::ApplicationGUI w;
-
-  w.setWindowTitle("Dangling Bond Simulator");
   w.show();
 
   return app.exec();
