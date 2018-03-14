@@ -365,8 +365,8 @@ void SimVisualize::jobSelUpdate()
 
 void SimVisualize::distSelUpdate()
 {
-  qDebug() << tr("distSelUpdate()");
-  text_dist_selected->setText(tr("%1/%2").arg(slider_dist_sel->value()).arg(show_job->elec_dists.size()));
+  text_dist_selected->setText(tr("%1/%2").arg(
+      slider_dist_sel->value()).arg(show_job->elec_dists.size()));
   showElecDist(slider_dist_sel->sliderPosition());
 }
 

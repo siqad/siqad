@@ -24,8 +24,11 @@ INCLUDEPATH += .
 
 VERSION = 0.0.1
 DEFINES += APP_VERSION=\\\"0.0.1\\\"
+DEFINES += APPLICATION_NAME=\\\"Quasics\\\"
+DEFINES += ORGANIZATION_NAME=\\\"WalusLab\\\"
+
 QMAKE_TARGET_COMPANY = "WalusLab"
-QMAKE_TARGET_PRODUCT = "DBDesigner"
+QMAKE_TARGET_PRODUCT = "Quasics"
 QMAKE_TARGET_DESCRIPTION = "A CAD tool that enables the creation and simulation of quantum dot networks"
 QMAKE_TARGET_COPYRIGHT = "GPLv3"
 
@@ -135,7 +138,7 @@ UI_DIR		= $$DESTDIR/.ui
 
 # official physics engines
 
-# directory holding the binary, $$OUT_PWD makes it relative to the 
+# directory holding the binary, $$OUT_PWD makes it relative to the
 # directory containing the Makefile
 EXEC_DIR = $$OUT_PWD/$$DESTDIR
 # directory holding the physics engines, relative to db-sim.pro

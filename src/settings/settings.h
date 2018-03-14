@@ -73,7 +73,8 @@ public:
 
   static QString pathReplacement(QString path)
   {
-    constructPathMap();
+    if (!path_map.contains("<BINPATH>"))
+      constructPathMap();
 
     // perform replacement
     QRegExp regex("<(.*)?>");
@@ -97,7 +98,11 @@ protected:
 private:
   static void constructPathMap()
   {
-    path_map["<BINPATH>"] = QCoreApplication::applicationDirPath();
+    if (!QCoreApplication::startingUp()){
+      // WARNING <BINPATH> can only be accessed after the core application has
+      // been instantiated in main!
+      path_map["<BINPATH>"] = QCoreApplication::applicationDirPath();
+    }
     path_map["<HOME>"] = QDir::homePath();
     path_map["<ROOT>"] = QDir::rootPath();
     path_map["<SYSTMP>"] = QDir::tempPath() + "/db-sim";

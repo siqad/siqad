@@ -21,11 +21,29 @@ namespace settings{
     Q_OBJECT
 
   public:
+
+    enum SettingsCategory{App, GUI, Lattice};
+
     SettingsDialog(QWidget *parent=0);
     ~SettingsDialog() {};
 
+    //! A struct that holds pending changes to one setting
+    struct PendingChange {
+      PendingChange(const SettingsCategory &category, const QString &name,
+          const QVariant &value)
+        : category(category), name(name), value(value)
+      {}
+      SettingsCategory category;
+      QString name;
+      QVariant value;
+    };
+
   public slots:
-    void boolUpdate(bool new_state);
+    void addPendingBoolUpdate(bool new_state);
+
+    void applyPendingChanges();
+    void applyAndClose();
+    void discardAndClose();
 
   private:
     // initialise the dialog and panes
@@ -33,6 +51,9 @@ namespace settings{
     QWidget *appSettingsPane();
     QWidget *guiSettingsPane();
     QWidget *latticeSettingsPane();
+
+    // Return the Settings class pointer to the specified category
+    settings::Settings *settingsCategoryPointer(SettingsCategory);
 
     // VARS
     AppSettings *app_settings=0;
@@ -42,6 +63,8 @@ namespace settings{
     QWidget *app_settings_pane=0;
     QWidget *gui_settings_pane=0;
     QWidget *lattice_settings_pane=0;
+
+    QList<PendingChange> pending_changes;
   };
 
 } // end of settings namespace

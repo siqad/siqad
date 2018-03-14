@@ -56,6 +56,9 @@ namespace gui{
 
   public slots:
 
+    // update the window title
+    void updateWindowTitle();
+
     // cursor tool updating
     void setTool(gui::ToolType tool);
     void setToolSelect();
