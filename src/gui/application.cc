@@ -468,16 +468,13 @@ void gui::ApplicationGUI::saveSettings()
 void gui::ApplicationGUI::updateWindowTitle()
 {
   QString title_name;
-  if (working_path.isEmpty()) {
-    title_name = "Untitled";
-  } else {
-    QFileInfo working_path_info(working_path);
-    title_name = working_path_info.fileName();
-  }
 
-  // add an asterisk to the name if the file has been edited since last save
+  // prefix the title by an asterisk to the name if the file has been edited
   if (design_pan->stateChanged())
     title_name += "*";
+
+  QFileInfo w_path_info(working_path);
+  title_name += (working_path.isEmpty()) ? "Untitled" : w_path_info.fileName();
 
   setWindowTitle(tr("%1 - %2")
     .arg(title_name)
