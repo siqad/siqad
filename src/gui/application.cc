@@ -271,17 +271,26 @@ void gui::ApplicationGUI::initSideBar()
   // actions
   QActionGroup *action_group = new QActionGroup(side_bar);
 
-  action_select_tool = side_bar->addAction(QIcon(":/ico/select.svg"), tr("Select tool"));
-  action_drag_tool = side_bar->addAction(QIcon(":/ico/drag.svg"), tr("Drag tool"));
-  action_dbgen_tool = side_bar->addAction(QIcon(":/ico/dbgen.svg"), tr("DB tool"));
-  action_electrode_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"), tr("Electrode tool"));
-  action_afmpath_tool = side_bar->addAction(QIcon(":/ico/drawafmpath.svg"), tr("AFM Path tool"));
-  //TODO action_label_tool = side_bar->addAction(QIcon(":/ico/drawlabel.svg"), tr("Label tool"));
+  action_select_tool = side_bar->addAction(QIcon(":/ico/select.svg"),
+      tr("Select tool"));
+  action_drag_tool = side_bar->addAction(QIcon(":/ico/drag.svg"),
+      tr("Drag tool"));
+  action_dbgen_tool = side_bar->addAction(QIcon(":/ico/dbgen.svg"),
+      tr("DB tool"));
+  action_electrode_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"),
+      tr("Electrode tool"));
+  action_afmarea_tool = side_bar->addAction(QIcon(":/ico/drawafmarea.svg"),
+      tr("AFM Area tool"));
+  action_afmpath_tool = side_bar->addAction(QIcon(":/ico/drawafmpath.svg"),
+      tr("AFM Path tool"));
+  //TODO action_label_tool = side_bar->addAction(QIcon(":/ico/drawlabel.svg"),
+  //    tr("Label tool"));
 
   action_group->addAction(action_select_tool);
   action_group->addAction(action_drag_tool);
   action_group->addAction(action_dbgen_tool);
   action_group->addAction(action_electrode_tool);
+  action_group->addAction(action_afmarea_tool);
   action_group->addAction(action_afmpath_tool);
   //action_group->addAction(action_label_tool);
 
@@ -289,17 +298,26 @@ void gui::ApplicationGUI::initSideBar()
   action_drag_tool->setCheckable(true);
   action_dbgen_tool->setCheckable(true);
   action_electrode_tool->setCheckable(true);
+  action_afmarea_tool->setCheckable(true);
   action_afmpath_tool->setCheckable(true);
   //action_label_tool->setCheckable(true);
 
   action_select_tool->setChecked(true);
 
-  connect(action_select_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolSelect);
-  connect(action_drag_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolDrag);
-  connect(action_dbgen_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolDBGen);
-  connect(action_electrode_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolElectrode);
-  connect(action_afmpath_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolAFMPath);
-  //connect(action_label_tool, &QAction::triggered, this, &gui::ApplicationGUI::setToolLabel);
+  connect(action_select_tool, &QAction::triggered,
+          this, &gui::ApplicationGUI::setToolSelect);
+  connect(action_drag_tool, &QAction::triggered,
+          this, &gui::ApplicationGUI::setToolDrag);
+  connect(action_dbgen_tool, &QAction::triggered,
+          this, &gui::ApplicationGUI::setToolDBGen);
+  connect(action_electrode_tool, &QAction::triggered,
+          this, &gui::ApplicationGUI::setToolElectrode);
+  connect(action_afmarea_tool, &QAction::triggered,
+          this, &gui::ApplicationGUI::setToolAFMArea);
+  connect(action_afmpath_tool, &QAction::triggered,
+          this, &gui::ApplicationGUI::setToolAFMPath);
+  //connect(action_label_tool, &QAction::triggered,
+  //        this, &gui::ApplicationGUI::setToolLabel);
 
   addToolBar(area, side_bar);
 }
@@ -501,6 +519,10 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
       action_electrode_tool->setChecked(true);
       setToolElectrode();
       break;
+    case gui::ToolType::AFMAreaTool:
+      action_afmarea_tool->setChecked(true);
+      setToolAFMArea();
+      break;
     case gui::ToolType::AFMPathTool:
       action_afmpath_tool->setChecked(true);
       setToolAFMPath();
@@ -536,6 +558,12 @@ void gui::ApplicationGUI::setToolElectrode()
 {
   qDebug() << tr("selecting electrode tool");
   design_pan->setTool(gui::ToolType::ElectrodeTool);
+}
+
+void gui::ApplicationGUI::setToolAFMArea()
+{
+  qDebug() << tr("selecting afmarea tool");
+  design_pan->setTool(gui::ToolType::AFMAreaTool);
 }
 
 void gui::ApplicationGUI::setToolAFMPath()

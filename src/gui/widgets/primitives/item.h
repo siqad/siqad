@@ -31,7 +31,7 @@ namespace prim{
     //! to distinguish them in functions which accept Item objects. Derived
     //! classes can be declared and implemented elsewhere as long as they are
     //! defined before use
-    enum ItemType{Aggregate, DBDot, LatticeDot, Ghost, GhostDot, Text, Electrode, GhostBox, AFMPath, AFMNode, AFMSeg, PotPlot};
+    enum ItemType{Aggregate, DBDot, LatticeDot, Ghost, GhostDot, Text, Electrode, GhostBox, AFMArea, AFMPath, AFMNode, AFMSeg, PotPlot};
 
     //! constructor, layer = 0 should indicate temporary objects that do not
     //! belong to any particular layer
@@ -83,6 +83,17 @@ namespace prim{
     // SAVE LOAD
     virtual void saveItems(QXmlStreamWriter *) const {}
     virtual void loadFromFile(QXmlStreamReader *) {} // TODO instead of using this function, switch to using constructor
+
+    //! Handy struct for storing various color variables for items when under
+    //! different states.
+    struct StateColors {
+      QColor normal;
+      QColor hovered;
+      QColor selected;
+    };
+
+    //! Get the color corresponding to the current state of the item.
+    QColor getCurrentStateColor(const StateColors &state_colors);
 
   protected:
 

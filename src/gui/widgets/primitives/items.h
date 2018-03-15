@@ -15,6 +15,7 @@
 #include "latdot.h"
 #include "ghost.h"
 #include "electrode.h"
+#include "afmarea.h"
 #include "afmpath.h"
 #include "pot_plot.h"
 

@@ -205,6 +205,17 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("potplot/selected_col", QColor(0, 100, 255)); // edge color, selected
 
   // afm parameters
+  S->setValue("afmarea/area_border_width", 5);
+  S->setValue("afmarea/afm_border_normal", QColor(0,0,0,255));
+  S->setValue("afmarea/afm_border_hovered", QColor(0,0,0,255));
+  S->setValue("afmarea/afm_border_selected", QColor(0,0,0,255));
+  S->setValue("afmarea/area_fill_normal", QColor(50,50,50,255));
+  S->setValue("afmarea/area_fill_hovered", QColor(80,80,80,255));
+  S->setValue("afmarea/area_fill_selected", QColor(150,150,150,255));
+  S->setValue("afmarea/scan_path_width", 1);
+  S->setValue("afmarea/scan_path_fill_normal", QColor(50,50,50,255));
+  S->setValue("afmarea/scan_path_fill_hovered", QColor(80,80,80,255));
+  S->setValue("afmarea/scan_path_fill_selected", QColor(150,150,150,255));
   S->setValue("afmnode/fill_col_default", QColor(0, 90, 255, 200));   // default fill color
   S->setValue("afmnode/fill_col_hovered", QColor(0, 170, 255, 200));  // hovered fill color
   S->setValue("afmnode/fill_col_sel", QColor(130, 90, 255, 200));     // selected fill color

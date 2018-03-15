@@ -315,6 +315,8 @@ namespace gui{
 
     class CreatePotPlot;  // create an electrode at the given points
 
+    class CreateAFMArea;    // create an AFM area
+
     class CreateAFMPath;    // create an empty AFMPath that should later contain AFMNodes
     class CreateAFMNode;    // create AFMNodes that should be children of AFMPath
 
@@ -327,6 +329,9 @@ namespace gui{
 
     //create potential plot on panel
     void createPotPlot(QPixmap potential_plot, QRectF graph_container);
+
+    // create AFM area with rubberband selected area
+    void createAFMArea(QPoint point1);
 
     // create AFM node in focused path after focused node
     void createAFMNode();
@@ -526,6 +531,35 @@ namespace gui{
 
     // internals
     int index;              // index of electrode item in the layer item stack
+  };
+
+
+  class DesignPanel::CreateAFMArea : public QUndoCommand
+  {
+  public:
+    //! Create an AFMArea at the given points
+    CreateAFMArea(int layer_index, gui::DesignPanel *dp, QPointF point1,
+        QPointF point2, prim::AFMArea *afm_area=0, bool invert=false,
+        QUndoCommand *parent=0);
+
+  private:
+    //! Destroy the AFMArea
+    virtual void undo();
+    //! Re-create the AFMArea
+    virtual void redo();
+
+    void create();    //! Create the AFMArea.
+    void destroy();   //! Destroy the AFMArea.
+
+    DesignPanel *dp;  //! Pointer to the DesignPanel
+    int layer_index;  //! Index of layer in dp->layers stack
+
+    QPointF point1;
+    QPointF point2;
+
+    bool invert;
+
+    int index;        //! Index of this item in the layer item stack.
   };
 
 

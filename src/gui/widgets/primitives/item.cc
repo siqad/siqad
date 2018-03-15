@@ -47,6 +47,34 @@ bool prim::Item::upHovered()
 }
 
 
+
+QColor prim::Item::getCurrentStateColor(const prim::Item::StateColors &state_colors)
+{
+  if (select_mode && upSelected()) {
+    qDebug() << "Selected";
+    qDebug() << QObject::tr("%1, %2, %3")
+        .arg(state_colors.selected.red())
+        .arg(state_colors.selected.green())
+        .arg(state_colors.selected.blue());
+    return state_colors.selected;
+  } else if (upHovered()) {
+    qDebug() << "hovered";
+    qDebug() << QObject::tr("%1, %2, %3")
+        .arg(state_colors.hovered.red())
+        .arg(state_colors.hovered.green())
+        .arg(state_colors.hovered.blue());
+    return state_colors.hovered;
+  } else {
+    qDebug() << "normal";
+    qDebug() << QObject::tr("%1, %2, %3")
+        .arg(state_colors.normal.red())
+        .arg(state_colors.normal.green())
+        .arg(state_colors.normal.blue());
+    return state_colors.normal;
+  }
+}
+
+
 // current functionality:
 // items that are selected emit a signal when left clicked if control not pressed
 void prim::Item::mousePressEvent(QGraphicsSceneMouseEvent *e)

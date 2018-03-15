@@ -414,6 +414,9 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
       setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
       break;
+    case gui::ToolType::AFMAreaTool:
+      setInteractive(true);
+      break;
     case gui::ToolType::AFMPathTool:
       setInteractive(true); // TODO check back later that this is the right mode
       break;
@@ -748,12 +751,13 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   clicked = true;
   switch(e->button()){
     case Qt::LeftButton:
-      if (tool_type == SelectTool || tool_type == ElectrodeTool) {
+      if (tool_type == SelectTool || tool_type == ElectrodeTool ||
+          tool_type == AFMAreaTool) {
         // rubber band variables
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
 
-        if(keymods & Qt::ShiftModifier) {
+        if (keymods & Qt::ShiftModifier) {
           // save current selection if Shift is pressed
           rb_shift_selected = scene->selectedItems();
         } else {
@@ -825,7 +829,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     switch(e->buttons()){
       case Qt::LeftButton:
         if (tool_type == SelectTool || tool_type == DBGenTool
-              || tool_type == ElectrodeTool) {
+              || tool_type == ElectrodeTool || tool_type == AFMAreaTool) {
           rubberBandUpdate(e->pos());
         }
         // use default behaviour for left mouse button
@@ -892,6 +896,10 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             // get start and end locations, and create the electrode.
             filterSelection(false);
             createElectrodes(e->pos());
+            break;
+          case gui::ToolType::AFMAreaTool:
+            filterSelection(false);
+            createAFMArea(e->pos());
             break;
           case gui::ToolType::AFMPathTool:
             // Make node at the ghost position
@@ -1742,6 +1750,44 @@ void gui::DesignPanel::CreatePotPlot::destroy()
 }
 
 
+// CreateAFMArea class
+
+gui::DesignPanel::CreateAFMArea::CreateAFMArea(int layer_index,
+    gui::DesignPanel *dp, QPointF point1, QPointF point2,
+    prim::AFMArea *afm_area, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index),
+    point1(point1), point2(point2)
+{
+  prim::Layer *layer = dp->getLayer(layer_index);
+  index = invert ? layer->getItems().indexOf(afm_area) : layer->getItems().size();
+}
+
+void gui::DesignPanel::CreateAFMArea::undo()
+{
+  invert ? create() : destroy();
+}
+
+void gui::DesignPanel::CreateAFMArea::redo()
+{
+  invert ? destroy() : create();
+}
+
+void gui::DesignPanel::CreateAFMArea::create()
+{
+  dp->addItem(new prim::AFMArea(layer_index, point1, point2), layer_index, index);
+}
+
+void gui::DesignPanel::CreateAFMArea::destroy()
+{
+  prim::AFMArea *afmarea = static_cast<prim::AFMArea*>(
+      dp->getLayer(layer_index)->getItem(index));
+  if (afmarea != 0) {
+    // destroy AFMArea
+    dp->removeItem(afmarea, dp->getLayer(afmarea->layer_id));
+  }
+}
+
+
 // CreateAFMPath class
 
 gui::DesignPanel::CreateAFMPath::CreateAFMPath(int layer_index, gui::DesignPanel *dp,
@@ -2083,6 +2129,18 @@ void gui::DesignPanel::createPotPlot(QPixmap potential_plot, QRectF graph_contai
   //only ever create one electrode at a time
   undo_stack->beginMacro(tr("create electrode with given corners"));
   undo_stack->push(new CreatePotPlot(layer_index, this, potential_plot, graph_container));
+  undo_stack->endMacro();
+}
+
+void gui::DesignPanel::createAFMArea(QPoint point1)
+{
+  point1 = mapToScene(point1).toPoint();
+  QPoint point2 = mapToScene(mouse_pos_cached).toPoint();
+  int layer_index = getLayerIndex(afm_layer);
+
+  // create the AFM area
+  undo_stack->beginMacro(tr("create AFM area with given corners"));
+  undo_stack->push(new CreateAFMArea(layer_index, this, point1, point2));
   undo_stack->endMacro();
 }
 
