@@ -22,7 +22,14 @@ gui::DialogPanel::DialogPanel(QWidget *parent)
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   setReadOnly(true);
-  setLineWrapMode(QPlainTextEdit::NoWrap);
+  setLineWrapMode(QPlainTextEdit::WidgetWidth);
+
+  // show message if this dialog isn't set to capture debug outputs
+  if (!app_settings->get<bool>("log/override")) {
+    appendPlainText("This dialog is currently inactive. If you would like "
+                    "debugging messages to be shown, go to Tools -> Settings "
+                    "and enable \"Show debug messages\".");
+  }
 
   // set up file if active
   file=0;
