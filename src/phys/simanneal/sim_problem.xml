@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dbdesigner>
+    <!--Program Flags-->
+    <program>
+        <file_purpose>simulation</file_purpose>
+        <version>TBD</version>
+        <date>2018-03-15 12:02:41</date>
+    </program>
+    <sim_params>
+        <result_queue_size>1000</result_queue_size>
+        <preanneal_cycles>1000</preanneal_cycles>
+        <anneal_cycles>10000</anneal_cycles>
+        <global_v0>1.5</global_v0>
+        <debye_length>5E-9</debye_length>
+    </sim_params>
+    <!--GUI Flags-->
+    <gui>
+        <zoom>1</zoom>
+        <scroll x="-121" y="-121"/>
+    </gui>
+    <!--Layer Properties-->
+    <!--Layer ID is intrinsic to the layer order-->
+    <layer_prop>
+        <name>Lattice</name>
+        <type>Lattice</type>
+        <zoffset>0</zoffset>
+        <zheight>0</zheight>
+        <visible>1</visible>
+        <active>0</active>
+    </layer_prop>
+    <layer_prop>
+        <name>Surface</name>
+        <type>DB</type>
+        <zoffset>0</zoffset>
+        <zheight>0</zheight>
+        <visible>1</visible>
+        <active>0</active>
+    </layer_prop>
+    <layer_prop>
+        <name>Metal</name>
+        <type>Electrode</type>
+        <zoffset>-1e-7</zoffset>
+        <zheight>0</zheight>
+        <visible>1</visible>
+        <active>0</active>
+    </layer_prop>
+    <layer_prop>
+        <name>AFM</name>
+        <type>AFMTip</type>
+        <zoffset>5e-10</zoffset>
+        <zheight>5e-11</zheight>
+        <visible>1</visible>
+        <active>0</active>
+    </layer_prop>
+    <layer_prop>
+        <name>Plot</name>
+        <type>Plot</type>
+        <zoffset>-5e-8</zoffset>
+        <zheight>0</zheight>
+        <visible>1</visible>
+        <active>0</active>
+    </layer_prop>
+    <!--Item Hierarchy-->
+    <design>
+        <!--Lattice-->
+        <layer type="Lattice"/>
+        <!--Surface-->
+        <layer type="DB">
+            <dbdot>
+                <layer_id>1</layer_id>
+                <elec>0</elec>
+                <physloc x="15.36" y="0"/>
+            </dbdot>
+            <dbdot>
+                <layer_id>1</layer_id>
+                <elec>0</elec>
+                <physloc x="11.52" y="7.68"/>
+            </dbdot>
+        </layer>
+        <!--Metal-->
+        <layer type="Electrode"/>
+        <!--AFM-->
+        <layer type="AFMTip"/>
+        <!--Plot-->
+        <layer type="Plot"/>
+    </design>
+</dbdesigner>

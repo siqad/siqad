@@ -14,7 +14,47 @@ using namespace phys;
 SimAnneal::SimAnneal(const std::string& i_path, const std::string& o_path)
   : PhysicsEngine("SimAnneal", i_path, o_path)
 {
+  phys_con = new PhysicsConnector(std::string("SimAnneal"), i_path, o_path);
   rng.seed(std::time(NULL));
+  initExpectedParams();
+}
+
+
+void SimAnneal::initExpectedParams()
+{
+  std::cout << "SimAnneal instantiated." << std::endl;
+  phys_con->setRequiredSimParam("preanneal_cycles");
+  phys_con->setRequiredSimParam("anneal_cycles");
+  phys_con->setRequiredSimParam("global_v0");
+  phys_con->setRequiredSimParam("debye_length");
+  phys_con->setRequiredSimParam("result_queue_size");
+  phys_con->setExpectDB(true);
+  phys_con->readProblem();
+  for (auto& iter : phys_con->getRequiredSimParam()) {
+    if(!phys_con->parameterExists(iter)){
+      std::cout << "Parameter " << iter << " not found." << std::endl;
+    }
+  }
+}
+
+
+void SimAnneal::exportData()
+{
+  //create the vector of strings for the db locationss
+  std::vector<std::vector<std::string>> dbl_data(db_locs.size());
+  for (unsigned int i = 0; i < db_locs.size(); i++) { //need the index
+    dbl_data[i].resize(2);
+    dbl_data[i][0] = std::to_string(db_locs[i].first);
+    dbl_data[i][1] = std::to_string(db_locs[i].second);
+    std::cout << std::to_string(db_locs[i].first) << std::endl;
+    std::cout << std::to_string(db_locs[i].second) << std::endl;
+    // bpt::ptree node_dbdot;
+    // node_dbdot.put("<xmlattr>.x", std::to_string(dbl.first).c_str());
+    // node_dbdot.put("<xmlattr>.y", std::to_string(dbl.second).c_str());
+    // node_physloc.add_child("dbdot", node_dbdot);
+  }
+  phys_con->setExportDBLoc(true);
+  phys_con->setDBLocData(dbl_data);
 }
 
 
@@ -24,7 +64,9 @@ bool SimAnneal::runSim()
   // TODO move to phys_engine
   std::cout << "Grab all physical locations..." << std::endl;
   n_dbs = 0;
-  for(auto db : problem) {
+  phys_con->initCollections();
+  // for(auto db : problem) {
+  for(auto db : *(phys_con->db_col)) {
     if(db->elec != 1){
       db_locs.push_back(std::make_pair(db->x, db->y));
       n_dbs++;
@@ -49,7 +91,6 @@ bool SimAnneal::runSim()
 
   // SIM ANNEAL
   simAnneal();
-
 
   return true;
 }

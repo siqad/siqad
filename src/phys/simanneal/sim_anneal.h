@@ -7,6 +7,7 @@
 // @desc:     Simulated annealing physics engine
 
 #include "phys_engine.h"
+#include "phys_connector.h"
 #include <vector>
 #include <deque>
 #include <tuple>
@@ -28,24 +29,24 @@ namespace phys {
 
     // run simulation
     bool runSim();
-
+    void exportData();
 
   private:
     // simulation components
     void initVars();
+    void initExpectedParams();
     void precalc();
     void simAnneal();     // perform simulated annealing
     void dbHop(int from_ind, int to_ind);
     void timeStep();      // advance time-step
     void printCharges();
-
     // physical calculations
     float systemEnergy();
     float distance(float x1, float y1, float x2, float y2);
     float interElecPotential(float r);
 
     // acceptance functions
-    bool acceptPop(int db_ind); 
+    bool acceptPop(int db_ind);
     bool acceptHop(float v_diff); // acceptance function for hopping
     bool evalProb(float prob); // generate true or false based on given probaility
 
@@ -81,5 +82,7 @@ namespace phys {
     int result_queue_size;
     //std::deque<std::vector<int>> db_charges;
     std::vector<int> curr_charges;
+
+    PhysicsConnector* phys_con;
   };
 }
