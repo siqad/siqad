@@ -34,17 +34,26 @@ namespace prim{
 
     // Accessors
 
+    //! Return the top left point of the AFM area.
+    QPointF topLeft() {return point_top_left;}
+    //! Return the bottom right point of the AFM area.
+    QPointF bottomRight() {return point_bot_right;}
+
     //! Set the z-axis (out-of-plane) tip movement speed.
     void setZSpeed(float speed) {z_speed = speed;}
+    float zSpeed() {return z_speed;}
 
     //! Set the horizontal (in-plane) tip movement speed.
     void setHorizontalSpeed(float speed) {h_speed = speed;}
+    float horizontalSpeed() {return h_speed;}
 
     //! Set the vertical (in-plane) tip movement speed.
     void setVerticalSpeed(float speed) {v_speed = speed;}
+    float verticalSpeed() {return v_speed;}
 
     //! Set the vertical (in-plane) displacement after each horizontal scan.
-    void setVerticalDisplacementBetweenScan(float d) {v_displacement = d;}
+    void setVerticalDisplacementBetweenScans(float d) {v_displacement = d;}
+    float verticalDisplacementBetweenScans() {return v_displacement;}
 
     //! Generate the path used for simulation and return a QList containing
     //! locations and timestamps.

@@ -2222,25 +2222,33 @@ void gui::DesignPanel::deleteSelection()
                         item->y() + static_cast<prim::Electrode*>(item)->getHeight()),
                         static_cast<prim::Electrode*>(item), true));
         break;
+      case prim::Item::AFMArea:
+        {
+        prim::AFMArea *afm_area = static_cast<prim::AFMArea*>(item);
+        undo_stack->push(new CreateAFMArea(afm_area->layer_id, this,
+            afm_area->topLeft(), afm_area->bottomRight(), afm_area, true));
+        break;
+        }
       case prim::Item::AFMPath:
         destroyAFMPath(static_cast<prim::AFMPath*>(item));
         break;
       case prim::Item::AFMNode:
         {
-          prim::AFMNode *afm_node = static_cast<prim::AFMNode*>(item);
-          prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(afm_node->parentItem());
-          int afm_index = getLayer(afm_node->layer_id)->getItemIndex(afm_path);
-          int node_index = afm_path->getNodeIndex(afm_node);
-          undo_stack->push(new CreateAFMNode(afm_node->layer_id, this, afm_node->scenePos(),
-                            afm_node->zOffset(), afm_index, node_index, true));
-          qDebug() << "shouldn't be here yet";
-          break;
+        prim::AFMNode *afm_node = static_cast<prim::AFMNode*>(item);
+        prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(afm_node->parentItem());
+        int afm_index = getLayer(afm_node->layer_id)->getItemIndex(afm_path);
+        int node_index = afm_path->getNodeIndex(afm_node);
+        undo_stack->push(new CreateAFMNode(afm_node->layer_id, this,
+            afm_node->scenePos(), afm_node->zOffset(), afm_index, node_index, true));
+        qDebug() << "shouldn't be here yet";
+        break;
         }
       case prim::Item::PotPlot:
         {
         prim::PotPlot *pp = static_cast<prim::PotPlot*>(item);
-        undo_stack->push(new CreatePotPlot( pp->layer_id, this, pp->getPotentialPlot(),
-          pp->getGraphContainer(), static_cast<prim::PotPlot*>(item), true));
+        undo_stack->push(new CreatePotPlot( pp->layer_id, this,
+            pp->getPotentialPlot(), pp->getGraphContainer(),
+            static_cast<prim::PotPlot*>(item), true));
         break;
         }
       default:

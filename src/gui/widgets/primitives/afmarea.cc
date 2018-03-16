@@ -88,10 +88,6 @@ void AFMArea::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget
   QRectF rect = boundingRect();
   qreal dxy = .5*area_border_width;
   rect.adjust(dxy, dxy, -dxy, -dxy);  // trim off the border from bounding rect
-  qDebug() << QObject::tr("Current area fill color: %1, %2, %3")
-      .arg(getCurrentStateColor(area_fill_col).red())
-      .arg(getCurrentStateColor(area_fill_col).green())
-      .arg(getCurrentStateColor(area_fill_col).blue());
   painter->setPen(QPen(getCurrentStateColor(area_border_col), area_border_width));
   painter->setBrush(getCurrentStateColor(area_fill_col));
   painter->drawRect(rect);
@@ -115,16 +111,14 @@ void AFMArea::mousePressEvent(QGraphicsSceneMouseEvent *e)
   }
 }
 
-void AFMArea::hoverEnterEvent(QGraphicsSceneHoverEvent *e)
+void AFMArea::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
-  qDebug() << "AFMArea has seen the hoverEnterEvent";
   setHovered(true);
   update();
 }
 
 void AFMArea::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
-  qDebug() << "AFMArea has seen the hoverLeaveEvent";
   setHovered(false);
   update();
 }
