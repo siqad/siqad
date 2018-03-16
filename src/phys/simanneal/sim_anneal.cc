@@ -12,7 +12,6 @@
 using namespace phys;
 
 SimAnneal::SimAnneal(const std::string& i_path, const std::string& o_path)
-  : PhysicsEngine("SimAnneal", i_path, o_path)
 {
   phys_con = new PhysicsConnector(std::string("SimAnneal"), i_path, o_path);
   rng.seed(std::time(NULL));
@@ -46,15 +45,27 @@ void SimAnneal::exportData()
     dbl_data[i].resize(2);
     dbl_data[i][0] = std::to_string(db_locs[i].first);
     dbl_data[i][1] = std::to_string(db_locs[i].second);
-    std::cout << std::to_string(db_locs[i].first) << std::endl;
-    std::cout << std::to_string(db_locs[i].second) << std::endl;
-    // bpt::ptree node_dbdot;
-    // node_dbdot.put("<xmlattr>.x", std::to_string(dbl.first).c_str());
-    // node_dbdot.put("<xmlattr>.y", std::to_string(dbl.second).c_str());
-    // node_physloc.add_child("dbdot", node_dbdot);
   }
   phys_con->setExportDBLoc(true);
   phys_con->setDBLocData(dbl_data);
+
+  std::vector<std::vector<std::string>> db_dist_data(db_charges.size());
+  unsigned int i = 0;
+  for (auto db_charge : db_charges) {
+    db_dist_data[i].resize(1);
+    std::string dbc_link;
+    for(auto chg : db_charge){
+      dbc_link.append(std::to_string(chg));
+    }
+    db_dist_data[i][0] = dbc_link;
+    // std::cout << db_dist_data[i][0] << std::endl;
+    i++;
+  }
+
+  phys_con->setExportDBElecConfig(true);
+  phys_con->setDBElecData(db_dist_data);
+
+  phys_con->writeResultsXml();
 }
 
 
@@ -65,7 +76,6 @@ bool SimAnneal::runSim()
   std::cout << "Grab all physical locations..." << std::endl;
   n_dbs = 0;
   phys_con->initCollections();
-  // for(auto db : problem) {
   for(auto db : *(phys_con->db_col)) {
     if(db->elec != 1){
       db_locs.push_back(std::make_pair(db->x, db->y));
@@ -105,17 +115,17 @@ void SimAnneal::initVars()
     std::cout << "There are no dbs in the problem!" << std::endl;
     return;
   }
-  t_preanneal = problem.parameterExists("preanneal_cycles") ?
-                  std::stoi(problem.getParameter("preanneal_cycles")) : 1000;
-  t_max = problem.parameterExists("anneal_cycles") ?
-                  std::stoi(problem.getParameter("anneal_cycles")) : 10000;
-  v_0 = problem.parameterExists("global_v0") ?
-                  std::stof(problem.getParameter("global_v0")) : 1; // TODO this should be fixed
-  debye_length = problem.parameterExists("debye_length") ?
-                  std::stof(problem.getParameter("debye_length")) : 5E-9; // ~10s of dimer rows
+  t_preanneal = phys_con->parameterExists("preanneal_cycles") ?
+                  std::stoi(phys_con->getParameter("preanneal_cycles")) : 1000;
+  t_max = phys_con->parameterExists("anneal_cycles") ?
+                  std::stoi(phys_con->getParameter("anneal_cycles")) : 10000;
+  v_0 = phys_con->parameterExists("global_v0") ?
+                  std::stof(phys_con->getParameter("global_v0")) : 1; // TODO this should be fixed
+  debye_length = phys_con->parameterExists("debye_length") ?
+                  std::stof(phys_con->getParameter("debye_length")) : 5E-9; // ~10s of dimer rows
 
-  result_queue_size = problem.parameterExists("result_queue_size") ?
-                  std::stoi(problem.getParameter("result_queue_size")) : 1000;
+  result_queue_size = phys_con->parameterExists("result_queue_size") ?
+                  std::stoi(phys_con->getParameter("result_queue_size")) : 1000;
   result_queue_size = t_max < result_queue_size ? t_max : result_queue_size;
 
   kT = 2.568E-2; kT_step = 0.999999;    // kT = Boltzmann constant (eV/K) * 298 K, NOTE kT_step arbitrary

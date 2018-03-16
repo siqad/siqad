@@ -73,6 +73,8 @@ namespace phys{
     void setElectrodeData(std::vector<std::vector<std::string>> &data_in){elec_data = data_in;}
     //set vector of strings as db data
     void setDBLocData(std::vector<std::vector<std::string>> &data_in){dbl_data = data_in;}
+    //set vector of strings as db data
+    void setDBElecData(std::vector<std::vector<std::string>> &data_in){db_elec_data = data_in;}
 
     //get the required simulation parameter vector.
     std::vector<std::string> getRequiredSimParam(void){return req_params;}
@@ -88,6 +90,8 @@ namespace phys{
     std::vector<std::vector<std::string>> pot_data;
     std::vector<std::vector<std::string>> elec_data;
     std::vector<std::vector<std::string>> dbl_data;
+    std::vector<std::vector<std::string>> db_elec_data;
+
 
     std::vector<std::pair<float,float>> db_locs;
     boost::circular_buffer<std::vector<int>> db_charges;

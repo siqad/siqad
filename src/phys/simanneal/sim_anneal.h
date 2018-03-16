@@ -6,7 +6,7 @@
 //
 // @desc:     Simulated annealing physics engine
 
-#include "phys_engine.h"
+// #include "phys_engine.h"
 #include "phys_connector.h"
 #include <vector>
 #include <deque>
@@ -18,7 +18,7 @@
 
 namespace phys {
 
-  class SimAnneal: public PhysicsEngine
+  class SimAnneal
   {
   public:
     // constructor
@@ -30,6 +30,10 @@ namespace phys {
     // run simulation
     bool runSim();
     void exportData();
+
+
+    std::vector<std::pair<float,float>> db_locs; // location of free dbs
+    boost::circular_buffer<std::vector<int>> db_charges;
 
   private:
     // simulation components

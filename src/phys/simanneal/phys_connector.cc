@@ -43,6 +43,10 @@ void PhysicsConnector::initProblem(void)
   expect_electrode = false;
   expect_db = false;
   expect_afm_path = false;
+  setExportElecPotential(false);
+  setExportDBElecConfig(false);
+  setExportElectrode(false);
+  setExportDBLoc(false);
 }
 
 // aggregate
@@ -296,7 +300,7 @@ bool PhysicsConnector::readDBDot(const bpt::ptree &subtree, const std::shared_pt
 
 void PhysicsConnector::writeResultsXml()
 {
-  std::cout << "PhysicsConnector::writeResultsXML()" << std::endl;
+  std::cout << "PhysicsConnector::writeResultsXml()" << std::endl;
   // define major XML nodes
   boost::property_tree::ptree tree;
   boost::property_tree::ptree node_root;       // <sim_out>
@@ -304,6 +308,8 @@ void PhysicsConnector::writeResultsXml()
   boost::property_tree::ptree node_sim_params; // <sim_params>
   boost::property_tree::ptree node_electrode;  // <electrode>
   boost::property_tree::ptree node_potential_map;  // <potential>
+  boost::property_tree::ptree node_physloc;    // <physloc>
+  boost::property_tree::ptree node_elec_dist;  // <elec_dist>
 
   std::cout << "Write results to XML..." << std::endl;
   // NOTE in the future, there's probably a range of stuff that can be exported.
@@ -316,6 +322,28 @@ void PhysicsConnector::writeResultsXml()
   // sim_params
   // TODO
 
+  // DB locations
+  if (export_db_loc){
+    std::cout << "Exporting DB locations..." << std::endl;
+    for (unsigned int i = 0; i < dbl_data.size(); i++){
+      bpt::ptree node_dbdot;
+      node_dbdot.put("<xmlattr>.x", dbl_data[i][0].c_str());
+      node_dbdot.put("<xmlattr>.y", dbl_data[i][1].c_str());
+      node_physloc.add_child("dbdot", node_dbdot);
+    }
+    node_root.add_child("physloc", node_physloc);
+  }
+
+  //DB elec distributions
+  if(export_db_elec_config){
+    std::cout << "Exporting DB electron distrbutions..." << std::endl;
+    for (unsigned int i = 0; i < db_elec_data.size(); i++){
+      bpt::ptree node_dist;
+      node_dist.put("", db_elec_data[i][0]);
+      node_elec_dist.add_child("dist", node_dist);
+    }
+    node_root.add_child("elec_dist", node_elec_dist);
+  }
   // electrode
   if (export_electrode){
     std::cout << "Exporting electrode data..." << std::endl;
@@ -334,8 +362,8 @@ void PhysicsConnector::writeResultsXml()
   }
 
   //electric potentials
-  int resolution = std::stoi(getParameter("resolution"));
   if (export_elec_potential){
+    int resolution = std::stoi(getParameter("resolution"));
     std::cout << "Exporting electric potential data..." << std::endl;
     for (int i = 0; i < resolution; i++){
       for (int j = 0; j < resolution; j++){
