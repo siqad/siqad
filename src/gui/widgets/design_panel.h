@@ -359,6 +359,7 @@ namespace gui{
     void pasteDBDot(prim::Ghost *ghost, prim::DBDot *db);
     void pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg);
     void pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec);
+    void pasteAFMArea(prim::Ghost *ghost, prim::AFMArea *afm_area);
 
     // move the selected items to the current Ghost, returns True if successful
     bool moveToGhost(bool kill=false);
@@ -466,6 +467,7 @@ namespace gui{
     // move an Aggregate by the given amount
     void moveAggregate(prim::Aggregate *agg, const QPointF &delta);
     void moveElectrode(prim::Electrode *electrode, const QPointF &delta);
+    void moveAFMArea(prim::AFMArea *afm_area, const QPointF &delta);
 
     DesignPanel *dp;
 

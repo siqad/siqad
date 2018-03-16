@@ -1302,7 +1302,10 @@ void gui::DesignPanel::createActions()
 void gui::DesignPanel::filterSelection(bool select_flag)
 {
   // should only be here if tool type is either select or dbgen
-  if(tool_type != gui::ToolType::SelectTool && tool_type != gui::ToolType::DBGenTool && tool_type != gui::ToolType::ElectrodeTool){
+  if (tool_type != gui::ToolType::SelectTool &&
+      tool_type != gui::ToolType::DBGenTool &&
+      tool_type != gui::ToolType::ElectrodeTool &&
+      tool_type != gui::ToolType::AFMAreaTool){
     qCritical() << tr("Filtering selection with invalid tool type...");
     return;
   }
@@ -1403,19 +1406,18 @@ void gui::DesignPanel::clearGhost()
 
 bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
 {
-  bool is_all_electrodes = true;
+  bool is_all_floating = true;
 
-  //check if holding any non-electrodes
+  // check if holding any non-floating objects
   for (prim::Item *item : pasting ? clipboard : selectedItems()) {
-    if (item->item_type != prim::Item::Electrode) {
-      is_all_electrodes = false;
+    if (item->item_type != prim::Item::Electrode &&
+        item->item_type != prim::Item::AFMArea) {
+      is_all_floating = false;
       break;
     }
   }
 
-  // if holding any non-electrodes (for now just db dots or lat dots)
-  // don't need to recheck snap target unless the cursor has moved significantly
-  if (is_all_electrodes) {
+  if (is_all_floating) {
     prim::Ghost *ghost = prim::Ghost::instance();
     if (pasting) { //offset is in the first electrode item
       ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos()))
@@ -1428,6 +1430,8 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
     }
     return false;
   } else {
+    // if holding any non-floating (for now just db dots or lat dots)
+    // don't need to recheck snap target unless the cursor has moved significantly
     if ((scene_pos-snap_cache).manhattanLength()<.3*snap_diameter)
       return false;
     snap_cache = scene_pos;
@@ -2045,6 +2049,9 @@ void gui::DesignPanel::MoveItem::moveItem(prim::Item *item, const QPointF &delta
     case prim::Item::Electrode:
       moveElectrode(static_cast<prim::Electrode*>(item), delta);
       break;
+    case prim::Item::AFMArea:
+      moveAFMArea(static_cast<prim::AFMArea*>(item), delta);
+      break;
     default:
       item->moveBy(delta.x(), delta.y());
       break;
@@ -2085,6 +2092,13 @@ void gui::DesignPanel::MoveItem::moveElectrode(prim::Electrode *electrode, const
 {
   electrode->setPos( electrode->pos() + delta );
   electrode->updatePoints(delta);
+}
+
+void gui::DesignPanel::MoveItem::moveAFMArea(prim::AFMArea *afm_area,
+    const QPointF &delta)
+{
+  afm_area->setPos(afm_area->pos() + delta);
+  afm_area->updatePoints(delta);
 }
 
 // Undo/Redo Methods
@@ -2344,19 +2358,21 @@ void gui::DesignPanel::destroyAggregate(prim::Aggregate *agg)
 bool gui::DesignPanel::pasteAtGhost()
 {
   prim::Ghost *ghost = prim::Ghost::instance();
-  bool is_all_electrodes = true;
+  bool is_all_floating = true;
   for(QGraphicsItem *gitem : clipboard){
-    if(static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode){
-      is_all_electrodes = false;
+    if (static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode &&
+        static_cast<prim::Item*>(gitem)->item_type != prim::Item::AFMArea){
+      is_all_floating = false;
       break;
     }
   }
   // do nothing if clipboard empty
-  if(clipboard.isEmpty())
+  if (clipboard.isEmpty()) {
     return false;
-  else{
-    if( !is_all_electrodes && !ghost->valid_hash[snap_target])
+  } else {
+    if (!is_all_floating && !ghost->valid_hash[snap_target]) {
       return false;
+    }
   }
   undo_stack->beginMacro(tr("Paste %1 items").arg(clipboard.count()));
   // paste each item in the clipboard, same as ghost top items (preferred order)
@@ -2380,7 +2396,9 @@ void gui::DesignPanel::pasteItem(prim::Ghost *ghost, prim::Item *item)
     case prim::Item::Electrode:
       pasteElectrode(ghost, static_cast<prim::Electrode*>(item));
       break;
-
+    case prim::Item::AFMArea:
+      pasteAFMArea(ghost, static_cast<prim::AFMArea*>(item));
+      break;
     default:
       qCritical() << tr("No functionality for pasting given item... update pasteItem");
       break;
@@ -2424,30 +2442,41 @@ void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec)
   undo_stack->endMacro();
 }
 
+void gui::DesignPanel::pasteAFMArea(prim::Ghost *ghost, prim::AFMArea *afm_area)
+{
+  undo_stack->beginMacro(tr("create AFMArea with given afm_area params"));
+  // TODO copy AFM tip attributes
+  undo_stack->push(new CreateAFMArea(afm_area->layer_id, this,
+      ghost->pos()+afm_area->topLeft(), ghost->pos()+afm_area->bottomRight()));
+  undo_stack->endMacro();
+}
+
 // NOTE: currently item move relies on there being a snap target (i.e. at least
 //       one dangling bond is being moved). Should modify in future to be more
 //       general. If no move is made, need to make originial lattice dots
 //       unselectable again.
 bool gui::DesignPanel::moveToGhost(bool kill)
 {
-  bool is_all_electrodes = true;
+  bool is_all_floating = true;
   prim::Ghost *ghost = prim::Ghost::instance();
   moving = false;
   // get the move offset
   QPointF offset = (!kill && ghost->valid_hash[snap_target]) ? ghost->moveOffset() : QPointF();
 
-  if(offset.isNull()){
+  if (offset.isNull()) {
     // There is no offset for dbs. Check if selection is all electrodes, and if it is, move them.
     // reset the original lattice dot selectability and return false
-    for(prim::Item *item : selectedItems())
-    {
-      if(item->item_type != prim::Item::Electrode)
-        is_all_electrodes = false;
+    for (prim::Item *item : selectedItems()) {
+      if (item->item_type != prim::Item::Electrode &&
+          item->item_type!= prim::Item::AFMArea) {
+        is_all_floating = false;
+      }
       setLatticeDotSelectability(item, false);
     }
-    if(is_all_electrodes == true) //selection is all electrodes. try to move them without snapping.
-    { //offset is kept inside ghost->pos()
-      for(prim::Item *item : ghost->getTopItems())
+
+    if (is_all_floating) {//selection is all electrodes. try to move them without snapping.
+      //offset is kept inside ghost->pos()
+      for (prim::Item *item : ghost->getTopItems())
         undo_stack->push(new MoveItem(item, ghost->pos(), this));
       return true; //things were moved.
     }

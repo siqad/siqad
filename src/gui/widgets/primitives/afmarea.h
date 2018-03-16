@@ -19,7 +19,7 @@ namespace prim{
 
     //! Constructor that takes the top left and bottom right points of the area.
     //! The order of points 1 and 2 doesn't matter.
-    AFMArea(int lay_id, QPointF point1, QPointF point2, bool h_orientation=true,
+    AFMArea(int lay_id, QPointF point1, QPointF point2, bool orientation=true,
         float z_spd=-1, float h_spd=-1, float v_spd=-1, float v_disp=-1);
 
     //! Constructor that creates an AFMArea from a loaded design file.
@@ -35,25 +35,30 @@ namespace prim{
     // Accessors
 
     //! Return the top left point of the AFM area.
-    QPointF topLeft() {return point_top_left;}
+    QPointF topLeft() const {return point_top_left;}
     //! Return the bottom right point of the AFM area.
-    QPointF bottomRight() {return point_bot_right;}
+    QPointF bottomRight() const {return point_bot_right;}
+
+    //! Set the orientation of the scan. "Horizontal" refers to the x-axis if
+    //! orientation is set to true, y-axis if false.
+    void setOrientation(bool x_oriented) {h_orientation = x_oriented;}
+    bool horizontalOrientation() const {return h_orientation;}
 
     //! Set the z-axis (out-of-plane) tip movement speed.
     void setZSpeed(float speed) {z_speed = speed;}
-    float zSpeed() {return z_speed;}
+    float zSpeed() const {return z_speed;}
 
     //! Set the horizontal (in-plane) tip movement speed.
     void setHorizontalSpeed(float speed) {h_speed = speed;}
-    float horizontalSpeed() {return h_speed;}
+    float horizontalSpeed() const {return h_speed;}
 
     //! Set the vertical (in-plane) tip movement speed.
     void setVerticalSpeed(float speed) {v_speed = speed;}
-    float verticalSpeed() {return v_speed;}
+    float verticalSpeed() const {return v_speed;}
 
     //! Set the vertical (in-plane) displacement after each horizontal scan.
     void setVerticalDisplacementBetweenScans(float d) {v_displacement = d;}
-    float verticalDisplacementBetweenScans() {return v_displacement;}
+    float verticalDisplacementBetweenScans() const {return v_displacement;}
 
     //! Generate the path used for simulation and return a QList containing
     //! locations and timestamps.
@@ -61,6 +66,9 @@ namespace prim{
 
 
     // Graphics
+
+    //! Move the AFM area by the given delta.
+    void updatePoints(const QPointF &offset);
 
     //! Bounding rect for graphics calculations.
     virtual QRectF boundingRect() const;
@@ -86,7 +94,7 @@ namespace prim{
     //! Initialize AFMArea, commonly called by all constructors. Point order
     //! doesn't matter.
     void initAFMArea(int lay_id, QPointF point1, QPointF point2,
-        bool h_orientation, float z_spd, float h_spd, float v_spd, float v_disp);
+        bool orientation, float z_spd, float h_spd, float v_spd, float v_disp);
 
     //! Initialize static class variables.
     void prepareStatics();
@@ -96,7 +104,7 @@ namespace prim{
     QPointF point_bot_right;  //! Bottom right point.
 
     // AFM tip movement parameters
-    bool orientation; //! "horizontal" direction = orientation ? x, y
+    bool h_orientation; //! "horizontal" direction = orientation ? x, y
     float z_speed;    //! Z-axis movement speed of the tip (out-of-plane).
     float h_speed;    //! Horizontal movement speed of the tip (in-plane).
     float v_speed;    //! Vertical movement speed of the tip (in-plane).

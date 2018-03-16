@@ -10,6 +10,7 @@
 #include "aggregate.h"
 #include "dbdot.h"
 #include "electrode.h"
+#include "afmarea.h"
 #include "afmpath.h"
 
 
@@ -182,6 +183,9 @@ void prim::Layer::loadItems(QXmlStreamReader *stream, QGraphicsScene *scene)
       } else if (stream->name() == "electrode") {
         stream->readNext();
         addItem(new prim::Electrode(stream, scene));
+      } else if (stream->name() == "afmarea") {
+        stream->readNext();
+        addItem(new prim::AFMArea(stream, scene));
       } else if (stream->name() == "afmpath") {
         stream->readNext();
         addItem(new prim::AFMPath(stream, scene));
