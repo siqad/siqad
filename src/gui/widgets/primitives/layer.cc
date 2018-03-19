@@ -158,6 +158,10 @@ void prim::Layer::saveLayer(QXmlStreamWriter *stream) const
 
 void prim::Layer::saveItems(QXmlStreamWriter *stream) const
 {
+  // Control layer type content not saved
+  if (getContentType() == Control)
+    return;
+
   stream->writeStartElement("layer");
   stream->writeAttribute("type", getContentTypeString());
 

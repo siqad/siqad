@@ -31,7 +31,9 @@ namespace prim{
     //! to distinguish them in functions which accept Item objects. Derived
     //! classes can be declared and implemented elsewhere as long as they are
     //! defined before use
-    enum ItemType{Aggregate, DBDot, LatticeDot, Ghost, GhostDot, Text, Electrode, GhostBox, AFMArea, AFMPath, AFMNode, AFMSeg, PotPlot};
+    enum ItemType{Aggregate, DBDot, LatticeDot, Ghost, GhostDot, Text,
+        Electrode, GhostBox, AFMArea, AFMPath, AFMNode, AFMSeg, PotPlot,
+        ResizeFrame, ResizeHandle};
 
     //! constructor, layer = 0 should indicate temporary objects that do not
     //! belong to any particular layer
@@ -54,6 +56,10 @@ namespace prim{
 
     //! true if the item or its parent has been seleted, recursive to highest level parent
     bool upSelected();
+
+    //! set whether the item is resizable
+    void setResizable(bool flag) {resizable = flag;}
+    bool isResizable() {return resizable;}
 
     //! set hovered state
     void setHovered(bool flag) {hovered = flag;}
@@ -107,6 +113,8 @@ namespace prim{
   private:
 
     bool design_mode;
+
+    bool resizable=false;
 
   };
 

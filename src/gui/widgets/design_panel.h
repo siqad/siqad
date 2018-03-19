@@ -211,6 +211,7 @@ namespace gui{
     prim::Layer *electrode_layer; // add electrodes to this layer
     prim::Layer *afm_layer;       // add afm paths to this layer TODO request layers from Layer Manager instead of keeping pointers like these
     prim::Layer *plot_layer;      // add potential plots to this layer
+    prim::Layer *control_layer;   // layer for control items, not saved
 
     // flags, change later to bit flags
     bool clicked;   // mouse left button is clicked
@@ -253,6 +254,10 @@ namespace gui{
 
     // filter selected items
     void filterSelection(bool select_flag);
+
+    // apply a resize frame to the selected item if there's only one selected
+    // item, and if the item is resizable.
+    void applyResizeFrame();
 
     // RUBBER BAND
 

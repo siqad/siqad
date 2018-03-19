@@ -86,9 +86,6 @@ void gui::DesignPanel::initDesignPanel() {
   buildLattice();
   setScenePadding();
 
-  // surface layer active on init
-  top_layer = layers.at(1);
-  electrode_layer = layers.at(2);
   // initialise the Ghost and set the scene
   prim::Ghost::instance()->setScene(scene);
 
@@ -364,6 +361,9 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   addLayer(tr("Plot"), prim::Layer::Plot,-50E-9,0);
   plot_layer = layers.at(4);
 
+  // add the control layer for control indication items
+  addLayer(tr("Control"), prim::Layer::Control,0,0);
+  control_layer = layers.at(5);
 }
 
 
@@ -886,6 +886,8 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
           case gui::ToolType::SelectTool:
             // filter out items in the lattice
             filterSelection(true);
+            // add a resize frame when appropriate
+            applyResizeFrame();
             break;
           case gui::ToolType::DBGenTool:
             // identify free lattice sites and create dangling bonds
@@ -1317,6 +1319,15 @@ void gui::DesignPanel::filterSelection(bool select_flag)
     if( (item->layer_id == 0) == select_flag)
       item->setSelected(false);
   }
+}
+
+
+void gui::DesignPanel::applyResizeFrame()
+{
+  int control_layer_id = getLayerIndex(control_layer);
+
+  if (selectedItems().size() == 1 && selectedItems().back()->isResizable())
+    addItem(new prim::ResizeFrame(control_layer_id, selectedItems().back()));
 }
 
 
