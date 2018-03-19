@@ -192,6 +192,12 @@ void AFMArea::mousePressEvent(QGraphicsSceneMouseEvent *e)
   }
 }
 
+void AFMArea::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
+{
+  setCursor(Qt::SizeHorCursor);
+  qDebug() << "ping";
+}
+
 void AFMArea::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
   setHovered(true);
