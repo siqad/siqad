@@ -112,6 +112,7 @@ void AFMArea::initAFMArea(int lay_id, QPointF point1, QPointF point2,
   // GUI
   setPos(mapToScene(top_left).toPoint());
   setFlag(QGraphicsItem::ItemIsSelectable, true);
+  setFlag(QGraphicsItem::ItemIsFocusable, true);
   setAcceptHoverEvents(true);
   setResizable(true);
 }
@@ -191,6 +192,16 @@ void AFMArea::mousePressEvent(QGraphicsSceneMouseEvent *e)
       prim::Item::mousePressEvent(e);
       break;
   }
+}
+
+void AFMArea::focusInEvent(QFocusEvent *)
+{
+  qDebug() << "Focus in";
+}
+
+void AFMArea::focusOutEvent(QFocusEvent *)
+{
+  qDebug() << "Focus out";
 }
 
 void AFMArea::hoverEnterEvent(QGraphicsSceneHoverEvent *)
