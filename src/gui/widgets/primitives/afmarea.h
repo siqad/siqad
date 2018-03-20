@@ -35,6 +35,8 @@ namespace prim{
 
     // Accessors
 
+    //! Set the top left point to a new position.
+    void moveTopLeft(QPointF new_top_left) {point_top_left = new_top_left;}
     //! Return the top left point of the AFM area.
     QPointF topLeft() const {return point_top_left;}
     //! Return the bottom right point of the AFM area.

@@ -41,6 +41,13 @@ namespace prim{
     //! Retrieve the handle at the indicated location
     prim::ResizeHandle *handle(HandlePosition pos) {return resize_handles.at(pos);}
 
+    //! Update the resize target with the resize handle's new position, and
+    //! update the positions of the rest of the handles.
+    void resizeTargetToHandle(HandlePosition pos);
+
+    //! Update the position of all handles.
+    void updateHandlePositions();
+
     // Graphics
 
     //! Bounding rect for graphics calculations, just takes the resize_target's.
@@ -102,6 +109,7 @@ namespace prim{
 
   protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
 
   private:
     //! Initialize static class variables.

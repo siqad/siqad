@@ -7,6 +7,7 @@
 // @desc:     Resize handles for resizable objects
 
 #include "resize_frame.h"
+#include "afmarea.h"
 
 namespace prim{
 
@@ -41,14 +42,24 @@ ResizeFrame::ResizeFrame(prim::Item *resize_target)
 void ResizeFrame::setResizeTarget(prim::Item *new_target)
 {
   resize_target = new_target;
-
-  if (!resize_target)
-    return;
-
   setParentItem(resize_target);
 
-  // each handle will determine its new position using the bounding rect of the
-  // new target
+  if (resize_target)
+    updateHandlePositions();
+}
+
+
+void ResizeFrame::resizeTargetToHandle(HandlePosition pos)
+{
+  if (pos == TopLeft) {
+    static_cast<prim::AFMArea*>(resizeTarget())->moveTopLeft(handle(pos)->pos());
+    updateHandlePositions();
+  }
+}
+
+
+void ResizeFrame::updateHandlePositions()
+{
   for (prim::ResizeHandle *handle : resize_handles)
     handle->updatePosition();
 }
@@ -119,6 +130,7 @@ ResizeHandle::ResizeHandle(prim::ResizeFrame::HandlePosition handle_pos,
   // Graphics
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemIsFocusable, true);
+  setFlag(QGraphicsItem::ItemIsMovable, true);
 }
 
 void ResizeHandle::updatePosition()
@@ -178,6 +190,12 @@ void ResizeHandle::mousePressEvent(QGraphicsSceneMouseEvent *e)
       prim::Item::mousePressEvent(e);
       break;
   }
+}
+
+void ResizeHandle::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
+{
+  setPos(e->pos());
+  static_cast<prim::ResizeFrame*>(parentItem())->resizeTargetToHandle(handle_position);
 }
 
 void ResizeHandle::prepareStatics()
