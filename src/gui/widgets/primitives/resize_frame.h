@@ -17,8 +17,7 @@ namespace prim{
   class ResizeHandle;
 
   //! A rectangular frame containing a few square handles for users to drag to
-  //! resize graphics items. Always created in the "Control" layer which
-  //! displays items intended purely for user control, never exported nor saved.
+  //! resize graphics items. The frame sees the target item as its parent item.
   class ResizeFrame : public Item
   {
   public:
@@ -28,9 +27,9 @@ namespace prim{
     enum HandlePosition{TopLeft, Top, TopRight, Right, BottomRight, Bottom,
         BottomLeft, Left};
 
-    //! Constructor which takes the "Control" layer id and a pointer to the
-    //! target item that this frame will resize.
-    ResizeFrame(int lay_id, prim::Item *resize_target=0);
+    //! Constructor which takes the pointer to the target item that this frame
+    //! will resize.
+    ResizeFrame(prim::Item *resize_target=0);
 
     //! Empty destructor.
     ~ResizeFrame() {};
@@ -50,8 +49,9 @@ namespace prim{
     //! Paint function.
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem*, QWidget*);
 
-    //! This object is never copied.
-    virtual Item *deepCopy() const {};
+    //! This object is never copied, so the function is just implemented to shut
+    //! up compiler warnings.
+    virtual Item *deepCopy() const {return new ResizeFrame();}
 
   protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
@@ -83,7 +83,7 @@ namespace prim{
   {
   public:
     //! Initialize the handle with the given handle position.
-    ResizeHandle(int lay_id, prim::ResizeFrame::HandlePosition handle_pos,
+    ResizeHandle(prim::ResizeFrame::HandlePosition handle_pos,
         QGraphicsItem *parent);
 
     //! Update the position of this handle when a new target has been set or
@@ -96,8 +96,9 @@ namespace prim{
     //! Paint a square indicating where users should grab for resize.
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem*, QWidget*);
 
-    //! This object is never copied.
-    virtual Item *deepCopy() const {};
+    //! This object is never copied, so the function is just implemented to shut
+    //! up compiler warnings.
+    virtual Item *deepCopy() const {return new ResizeHandle(handle_position,0);}
 
   protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
@@ -105,7 +106,7 @@ namespace prim{
   private:
     //! Initialize static class variables.
     void prepareStatics();
-    
+
     prim::ResizeFrame::HandlePosition handle_position; //! The position of this handle.
 
     static qreal handle_dim;

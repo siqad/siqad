@@ -17,18 +17,18 @@ qreal ResizeHandle::handle_dim = -1;
 prim::Item::StateColors handle_col;
 
 // Constructor
-ResizeFrame::ResizeFrame(int lay_id, prim::Item *resize_target)
-  : Item(prim::Item::ResizeFrame, lay_id), resize_target(resize_target)
+ResizeFrame::ResizeFrame(prim::Item *resize_target)
+  : Item(prim::Item::ResizeFrame), resize_target(resize_target)
 {
   if (border_width == -1)
     prepareStatics();
 
-  //setPos(resize_target->pos());
+  if (resize_target)
+    setParentItem(resize_target);
 
   // create a set of handles
   for (HandlePosition handle_pos : handle_positions) {
-    prim::ResizeHandle *handle = new prim::ResizeHandle(lay_id, handle_pos,
-        this);
+    prim::ResizeHandle *handle = new prim::ResizeHandle(handle_pos, this);
     resize_handles.append(handle);
   }
 
@@ -42,7 +42,10 @@ void ResizeFrame::setResizeTarget(prim::Item *new_target)
 {
   resize_target = new_target;
 
-  setPos(new_target->pos());
+  if (!resize_target)
+    return;
+
+  setParentItem(resize_target);
 
   // each handle will determine its new position using the bounding rect of the
   // new target
@@ -82,9 +85,9 @@ void ResizeFrame::prepareStatics()
 
 // ResizeHandle class
 
-ResizeHandle::ResizeHandle(int lay_id,
-    prim::ResizeFrame::HandlePosition handle_pos, QGraphicsItem *parent)
-  : Item(prim::Item::ResizeHandle, lay_id, parent), handle_position(handle_pos)
+ResizeHandle::ResizeHandle(prim::ResizeFrame::HandlePosition handle_pos,
+    QGraphicsItem *parent)
+  : Item(prim::Item::ResizeHandle, -1, parent), handle_position(handle_pos)
 {
   if (handle_dim == -1)
     prepareStatics();
@@ -120,33 +123,31 @@ ResizeHandle::ResizeHandle(int lay_id,
 
 void ResizeHandle::updatePosition()
 {
-  QPointF f_pos = mapFromScene(static_cast<prim::ResizeFrame*>(parentItem())->
-      resizeTarget()->pos());
   QRectF p_rect = parentItem()->boundingRect();
   switch (handle_position) {
     case prim::ResizeFrame::TopLeft:
-      setPos(f_pos+p_rect.topLeft());
+      setPos(p_rect.topLeft());
       break;
     case prim::ResizeFrame::Top:
-      setPos(f_pos+QPointF((p_rect.left()+p_rect.right())/2, p_rect.top()));
+      setPos(QPointF((p_rect.left()+p_rect.right())/2, p_rect.top()));
       break;
     case prim::ResizeFrame::TopRight:
-      setPos(f_pos+p_rect.topRight());
+      setPos(p_rect.topRight());
       break;
     case prim::ResizeFrame::Right:
-      setPos(f_pos+QPointF(p_rect.right(), (p_rect.top()+p_rect.bottom())/2));
+      setPos(QPointF(p_rect.right(), (p_rect.top()+p_rect.bottom())/2));
       break;
     case prim::ResizeFrame::BottomRight:
-      setPos(f_pos+p_rect.bottomRight());
+      setPos(p_rect.bottomRight());
       break;
     case prim::ResizeFrame::Bottom:
-      setPos(f_pos+QPointF((p_rect.left()+p_rect.right())/2, p_rect.bottom()));
+      setPos(QPointF((p_rect.left()+p_rect.right())/2, p_rect.bottom()));
       break;
     case prim::ResizeFrame::BottomLeft:
-      setPos(f_pos+p_rect.bottomLeft());
+      setPos(p_rect.bottomLeft());
       break;
     case prim::ResizeFrame::Left:
-      setPos(f_pos+QPointF(p_rect.left(), (p_rect.top()+p_rect.bottom())/2));
+      setPos(QPointF(p_rect.left(), (p_rect.top()+p_rect.bottom())/2));
       break;
     default:
       qCritical() << "Trying to access a non-existent resize handle position";

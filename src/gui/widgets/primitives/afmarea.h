@@ -10,6 +10,7 @@
 #define _PRIM_AFMAREA_H_
 
 #include "item.h"
+#include "resize_frame.h"
 
 namespace prim{
 
@@ -119,6 +120,9 @@ namespace prim{
     static prim::Item::StateColors area_fill_col; //! Background fill color of the area.
     static qreal scan_path_width;       //! AFM scan path preview width.
     static prim::Item::StateColors scan_path_fill_col; //! AFM scan path preview fill color.
+
+    // Resize box
+    prim::ResizeFrame *resize_frame=0;
   };
 }
 

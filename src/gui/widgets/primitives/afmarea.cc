@@ -196,12 +196,18 @@ void AFMArea::mousePressEvent(QGraphicsSceneMouseEvent *e)
 
 void AFMArea::focusInEvent(QFocusEvent *)
 {
-  qDebug() << "Focus in";
+  if (!resize_frame)
+    resize_frame = new prim::ResizeFrame(this);
+  else
+    resize_frame->setVisible(true);
 }
 
 void AFMArea::focusOutEvent(QFocusEvent *)
 {
-  qDebug() << "Focus out";
+  if (!resize_frame)
+    return;
+
+  resize_frame->setVisible(false);
 }
 
 void AFMArea::hoverEnterEvent(QGraphicsSceneHoverEvent *)
