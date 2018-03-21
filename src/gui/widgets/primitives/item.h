@@ -57,10 +57,6 @@ namespace prim{
     //! true if the item or its parent has been seleted, recursive to highest level parent
     bool upSelected();
 
-    //! set whether the item is resizable
-    void setResizable(bool flag) {resizable = flag;}
-    bool isResizable() {return resizable;}
-
     //! set hovered state
     void setHovered(bool flag) {hovered = flag;}
     //! get hovered state
@@ -72,6 +68,16 @@ namespace prim{
     void setDesignMode(bool mode) {design_mode = mode;}
     //! get design mode
     bool designMode() {return design_mode;}
+
+    //! set whether the item is resizable
+    void setResizable(bool flag) {resizable = flag;}
+    bool isResizable() {return resizable;}
+
+    //! If the item is resizable, implement the resize function. (dx1, dy1)
+    //! corresponds to the delta for the top left corner, (dx2, dy2) corresponds
+    //! to the bottom right. Don't forget update the item position with setPos.
+    void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2);
+
 
     // securing the item type and layer as private isn't worth the copy
     // constructor calls for accessors, make public

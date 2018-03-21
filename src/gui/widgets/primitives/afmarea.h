@@ -35,21 +35,15 @@ namespace prim{
 
     // Accessors
 
-    //! Move the top left point by a specified delta.
-    void resizeTopLeft(const QPointF &delta) {setPos(scenePos()+delta); point_bot_right-=delta; update();}
-
-    //! Move the top by a specified delta.
-    void resizeTop(const qreal &dy) {setPos(scenePos().x(), scenePos().y()+dy); point_bot_right.setY(point_bot_right.y()-dy); update();}
-
-    //! Move the top right by a specified delta.
-    void resizeTopRight(const QPointF &delta) {point_top_left.setY(point_top_left.y()+delta.y()); point_bot_right.setX(point_bot_right.x()+delta.x()); update();}
-
-
+    //! Resize according to given coordinates.
+    void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2);
 
     //! Return the top left point of the AFM area.
     QPointF topLeft() const {return point_top_left;}
     //! Return the bottom right point of the AFM area.
     QPointF bottomRight() const {return point_bot_right;}
+    //! Return the center point of the AFM area
+    QPointF center() const;
 
     //! Set the orientation of the scan. "Horizontal" refers to the x-axis if
     //! orientation is set to true, y-axis if false.

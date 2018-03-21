@@ -55,29 +55,29 @@ void ResizeFrame::resizeTargetToHandle(const HandlePosition &pos, const QPointF 
   prim::AFMArea *target = static_cast<prim::AFMArea*>(resizeTarget());
   switch (pos) {
     case TopLeft:
-      target->resizeTopLeft(delta);
+      target->resize(delta.x(), delta.y(), 0, 0);
       break;
     case Top:
-      target->resizeTop(delta.y());
+      target->resize(0, delta.y(), 0, 0);
       break;
     case TopRight:
-      target->resizeTopRight(delta);
+      target->resize(0, delta.y(), delta.x(), 0);
       break;
-    /*case Right:
-      target->resizeRight(delta.x());
+    case Right:
+      target->resize(0, 0, delta.x(), 0);
       break;
     case BottomRight:
-      target->resizeBottomRight(delta);
+      target->resize(0, 0, delta.x(), delta.y());
       break;
     case Bottom:
-      target->resizeBottom(delta.y());
+      target->resize(0, 0, 0, delta.y());
       break;
     case BottomLeft:
-      target->resizeBottomLeft(delta);
+      target->resize(delta.x(), 0, 0, delta.y());
       break;
     case Left:
-      target->resizeLeft(delta.x());
-      break;*/
+      target->resize(delta.x(), 0, 0, 0);
+      break;
     default:
       qCritical() << "Trying to access a non-existent resize handle position";
       break;

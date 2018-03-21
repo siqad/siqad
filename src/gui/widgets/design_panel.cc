@@ -1873,6 +1873,50 @@ void gui::DesignPanel::CreateAFMNode::destroy()
 }
 
 
+// ResizeAFMArea class
+gui::DesignPanel::ResizeAFMArea::ResizeAFMArea(int layer_index, DesignPanel *dp,
+    const QPointF &orig_top_left, const QPointF &orig_bot_right,
+    const QPointF &new_top_left, const QPointF &new_bot_right,
+    int afm_area_index, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), layer_index(layer_index), dp(dp),
+        orig_top_left(orig_top_left), orig_bot_right(orig_bot_right),
+        new_top_left(new_top_left), new_bot_right(new_bot_right),
+        afm_area_index(afm_area_index), invert(invert)
+{
+  top_left_delta = new_top_left - orig_top_left;
+  bot_right_delta = new_bot_right - orig_bot_right;
+}
+
+void gui::DesignPanel::ResizeAFMArea::undo()
+{
+  prim::AFMArea *afm_area = static_cast<prim::AFMArea*>(
+      dp->getLayer(layer_index)->getItem(afm_area_index));
+
+  if (afm_area->topLeft() == orig_top_left &&
+      afm_area->bottomRight() == orig_bot_right)
+    return;
+
+  afm_area->resize(-top_left_delta.x(), -top_left_delta.y(),
+      -bot_right_delta.x(), -bot_right_delta.y());
+}
+
+void gui::DesignPanel::ResizeAFMArea::redo()
+{
+  prim::AFMArea *afm_area = static_cast<prim::AFMArea*>(
+      dp->getLayer(layer_index)->getItem(afm_area_index));
+
+  // if the user resized the afm area with the cursor, then the area might
+  // already be the right size, in which case do nothing
+  if (afm_area->topLeft() == new_top_left &&
+      afm_area->bottomRight() == new_bot_right)
+    return;
+
+  afm_area->resize(top_left_delta.x(), top_left_delta.y(),
+      bot_right_delta.x(), bot_right_delta.y());
+}
+
+
+
 // FromAggregate class
 gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
                                             DesignPanel *dp, QUndoCommand *parent)
@@ -2178,6 +2222,17 @@ void gui::DesignPanel::createAFMNode()
   //qDebug() << tr("About to push new AFMNode to undo stack, afm_path_index=%1").arg(afm_path_index);
   undo_stack->push(new CreateAFMNode(layer_index, this, scene_pos, afm_layer->zOffset(),
                                         afm_path_index));
+  undo_stack->endMacro();
+}
+
+void gui::DesignPanel::resizeAFMArea(prim::AFMArea *afm_area,
+    const QPointF &orig_top_left, const QPointF &orig_bot_right,
+    const QPointF &new_top_left, const QPointF &new_bot_right)
+{
+  undo_stack->beginMacro(tr("Resize AFM Area"));
+  int ind_in_layer = getLayer(afm_area->layer_id)->getItemIndex(afm_area);
+  undo_stack->push(new ResizeAFMArea(afm_area->layer_id, this, orig_top_left,
+      orig_bot_right, new_top_left, new_bot_right, ind_in_layer));
   undo_stack->endMacro();
 }
 

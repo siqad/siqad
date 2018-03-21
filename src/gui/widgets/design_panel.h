@@ -320,6 +320,8 @@ namespace gui{
     class CreateAFMPath;    // create an empty AFMPath that should later contain AFMNodes
     class CreateAFMNode;    // create AFMNodes that should be children of AFMPath
 
+    class ResizeAFMArea;    // resize an AFM Area
+
     // functions including undo/redo behaviour
 
     // create dangling bonds in the surface at all selected lattice dots
@@ -335,6 +337,11 @@ namespace gui{
 
     // create AFM node in focused path after focused node
     void createAFMNode();
+
+    // resize AFM Area
+    void resizeAFMArea(prim::AFMArea *afm_area, const QPointF &orig_top_left,
+        const QPointF &orig_bot_right, const QPointF &new_top_left,
+        const QPointF &new_bot_right);
 
     // destroy AFM path and included nodes
     void destroyAFMPath(prim::AFMPath *afm_path);
@@ -617,6 +624,35 @@ namespace gui{
     int node_index;   // the Node's index in the path
     QPointF scenepos;
     float z_offset;
+  };
+
+  class DesignPanel::ResizeAFMArea : public QUndoCommand
+  {
+  public:
+    // resize the AFM area from the original positions to the new positions
+    ResizeAFMArea(int layer_index, DesignPanel *dp,
+        const QPointF &orig_top_left, const QPointF &orig_bot_right,
+        const QPointF &new_top_left, const QPointF &new_bot_right,
+        int afm_area_index, bool invert=false, QUndoCommand *parent=0);
+
+    // resize from new to original positions
+    virtual void undo();
+
+    // resize from original to new positions
+    virtual void redo();
+
+  private:
+    bool invert;
+
+    int layer_index;
+    DesignPanel *dp;
+    int afm_area_index; // the AFM Area's index in its layer
+    QPointF top_left_delta;
+    QPointF bot_right_delta;
+    QPointF orig_top_left;
+    QPointF orig_bot_right;
+    QPointF new_top_left;
+    QPointF new_bot_right;
   };
 
 

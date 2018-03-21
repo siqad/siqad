@@ -143,6 +143,26 @@ void AFMArea::saveItems(QXmlStreamWriter *ws) const
   ws->writeEndElement();
 }
 
+// Resize according to given coordinates
+void AFMArea::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2)
+{
+  //setPos(scenePos() + QPointF(dx1, dy1));
+  prepareGeometryChange();
+  point_top_left += QPointF(dx1, dy1);
+  point_bot_right += QPointF(dx2, dy2);
+  setPos(topLeft());
+  update();
+}
+
+// Center point of the AFM Area
+QPointF AFMArea::center() const
+{
+  QPointF center_point;
+  center_point.setX(.5*(topLeft().x()+bottomRight().x()));
+  center_point.setY(.5*(topLeft().y()+bottomRight().y()));
+  return center_point;
+}
+
 // Generate path used for simulation
 /*QList<global::AFMPathTimed> AFMArea::generateSimulationPath()
 {
