@@ -152,6 +152,8 @@ namespace gui{
     void selectClicked(prim::Item *item);
     void simVisualizeDockVisibilityChanged(bool visible);
 
+    void resizeBegin();
+
     void addItemToSceneRequest(prim::Item *item) {addItemToScene(item);}
     void removeItemFromSceneRequest(prim::Item *item) {removeItemFromScene(item);}
 
@@ -217,6 +219,7 @@ namespace gui{
     bool ghosting;  // currently dragging a ghost
     bool moving;    // moving an existing group
     bool pasting;   // evoked some kind of pasting
+    bool resizing;  // currently resizing an item
 
     // snapping
     qreal snap_diameter;            // size of region to search for snap points
@@ -338,7 +341,7 @@ namespace gui{
     // create AFM node in focused path after focused node
     void createAFMNode();
 
-    void finalizeResize(prim::Item *item, const QRectF &orig_rect,
+    void resizeItem(prim::Item *item, const QRectF &orig_rect,
         const QRectF &new_rect);
 
     // resize AFM Area

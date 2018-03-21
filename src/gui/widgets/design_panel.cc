@@ -26,8 +26,10 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
             this, &gui::DesignPanel::addItemToSceneRequest);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_removeItemFromScene,
             this, &gui::DesignPanel::removeItemFromScene);
-  connect(prim::Emitter::instance(), &prim::Emitter::sig_finalizeResize,
-            this, &gui::DesignPanel::finalizeResize);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeBegin,
+            this, &gui::DesignPanel::resizeBegin);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeFinalize,
+            this, &gui::DesignPanel::resizeItem);
 }
 
 // destructor
@@ -57,7 +59,7 @@ void gui::DesignPanel::initDesignPanel() {
             afm_panel, &gui::AFMPanel::toolChangeResponse);
 
   // setup flags
-  clicked = ghosting = moving = false;
+  clicked = ghosting = moving = pasting = resizing = false;
 
   // initialising parameters
   snap_diameter = app_settings->get<qreal>("snap/diameter")*prim::Item::scale_factor;
@@ -709,6 +711,11 @@ void gui::DesignPanel::simVisualizeDockVisibilityChanged(bool visible)
     clearSimResults();
 }
 
+void gui::DesignPanel::resizeBegin()
+{
+  resizing = true;
+}
+
 void gui::DesignPanel::rotateCw()
 {
   QPointF old_center = mapToScene(viewport()->rect().center());
@@ -1320,7 +1327,7 @@ void gui::DesignPanel::filterSelection(bool select_flag)
 
 void gui::DesignPanel::rubberBandUpdate(QPoint pos){
   // stop rubber band if moving item
-  if(moving){
+  if(moving || resizing){
     rubberBandEnd();
     return;
   }
@@ -2225,9 +2232,10 @@ void gui::DesignPanel::createAFMNode()
   undo_stack->endMacro();
 }
 
-void gui::DesignPanel::finalizeResize(prim::Item *item,
+void gui::DesignPanel::resizeItem(prim::Item *item,
     const QRectF &orig_rect, const QRectF &new_rect)
 {
+  resizing = false;
   switch (item->item_type) {
     case prim::Item::AFMArea:
       resizeAFMArea(static_cast<prim::AFMArea*>(item), orig_rect, new_rect);

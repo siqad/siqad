@@ -73,10 +73,6 @@ namespace prim{
     void setResizable(bool flag) {resizable = flag;}
     bool isResizable() {return resizable;}
 
-    //! If the item is resizable, begin the resize by storing the original
-    //! dimensions of the item.
-    virtual void beginResize() {};
-
     //! If the item is resizable, implement the resize function. The first two
     //! parameters (dx1, dy1) correspond to the delta for the top left corner,
     //! the next two parameters (dx2, dy2) correspond to the bottom right.
@@ -85,25 +81,29 @@ namespace prim{
     //! set to true if calling from QUndoStack.
     virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
         bool update_handles=false)
-    {Q_UNUSED(dx1); Q_UNUSED(dy1); Q_UNUSED(dx2); Q_UNUSED(dy2);
-      Q_UNUSED(update_handles);}
+      {Q_UNUSED(dx1); Q_UNUSED(dy1); Q_UNUSED(dx2); Q_UNUSED(dy2);
+        Q_UNUSED(update_handles);}
 
-    //! If the item is resizable, this function finalizes the resize by pushing
-    //! it to the undo stack.
-    virtual void finalizeResize() {};
+    //! Note down the bounding rect of the item before resize.
+    void setBoundingRectPreResize(const QRectF &rect)
+      {bounding_rect_pre_resize = rect;}
+
+    //! The bounding rect of the item before the resize.
+    QRectF boundingRectPreResize() {return bounding_rect_pre_resize;}
 
 
     // securing the item type and layer as private isn't worth the copy
     // constructor calls for accessors, make public
 
-    ItemType item_type;   // the ItemType of the Item
-    int layer_id;            // the layer id of the Item
+    ItemType item_type;       // the ItemType of the Item
+    int layer_id;             // the layer id of the Item
 
     // static class variables
     static qreal scale_factor;  // pixels/angstrom scaling factor
     static bool select_mode;    // Application is in select mode
     static bool db_gen_mode;
     static bool electrode_mode;
+    static int selected_item_count;  // number of items currently selected
     static void init();
 
     // SAVE LOAD
@@ -135,6 +135,7 @@ namespace prim{
     bool design_mode;
 
     bool resizable=false;
+    QRectF bounding_rect_pre_resize;  // used for resizable items
 
   };
 

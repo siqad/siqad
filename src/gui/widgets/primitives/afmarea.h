@@ -35,16 +35,9 @@ namespace prim{
 
     // Accessors
 
-    //! Begin resizing, store the original dimensions.
-    virtual void beginResize();
-
     //! Resize according to given coordinates.
     virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
         bool update_handles=false);
-
-    //! Finalize the resize, emit a signal notifying the design panel of the
-    //! resize event.
-    virtual void finalizeResize();
 
 
     //! Return the top left point of the AFM area.
@@ -100,8 +93,8 @@ namespace prim{
     //! Show AFM area config dialog when selected.
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
 
-    virtual void focusInEvent(QFocusEvent *) Q_DECL_OVERRIDE;
-    virtual void focusOutEvent(QFocusEvent *) Q_DECL_OVERRIDE;
+    virtual QVariant itemChange(GraphicsItemChange change,
+        const QVariant &value) Q_DECL_OVERRIDE;
 
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *) Q_DECL_OVERRIDE;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *) Q_DECL_OVERRIDE;

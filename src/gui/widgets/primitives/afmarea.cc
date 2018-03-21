@@ -112,7 +112,6 @@ void AFMArea::initAFMArea(int lay_id, QPointF point1, QPointF point2,
   // GUI
   setPos(mapToScene(top_left).toPoint());
   setFlag(QGraphicsItem::ItemIsSelectable, true);
-  setFlag(QGraphicsItem::ItemIsFocusable, true);
   setAcceptHoverEvents(true);
   setResizable(true);
 }
@@ -143,12 +142,6 @@ void AFMArea::saveItems(QXmlStreamWriter *ws) const
   ws->writeEndElement();
 }
 
-// Begin resizing
-void AFMArea::beginResize()
-{
-  orig_rect = boundingRect();
-}
-
 // Resize according to given coordinates
 void AFMArea::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
     bool update_handles)
@@ -157,18 +150,19 @@ void AFMArea::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
   prepareGeometryChange();
   point_top_left += QPointF(dx1, dy1);
   point_bot_right += QPointF(dx2, dy2);
+
+  // reverse change if user resizes past the other edge
+  if (point_top_left.x() > point_bot_right.x() ||
+      point_top_left.y() > point_bot_right.y()) {
+    point_top_left -= QPointF(dx1, dy1);
+    point_bot_right -= QPointF(dx2, dy2);
+  }
+
   setPos(topLeft());
   update();
 
   if (update_handles && resize_frame)
     resize_frame->updateHandlePositions();
-}
-
-// Finalize the resize
-void AFMArea::finalizeResize()
-{
-  emit prim::Emitter::instance()->sig_finalizeResize(this, orig_rect,
-      boundingRect());
 }
 
 // Center point of the AFM Area
@@ -231,17 +225,27 @@ void AFMArea::mousePressEvent(QGraphicsSceneMouseEvent *e)
   }
 }
 
-void AFMArea::focusInEvent(QFocusEvent *)
+QVariant AFMArea::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-  if (!resize_frame)
-    resize_frame = new prim::ResizeFrame(this);
-  resize_frame->setVisible(true);
-}
+  bool resize_frame_visible = false;
 
-void AFMArea::focusOutEvent(QFocusEvent *)
-{
-  /*if (resize_frame)
-    resize_frame->setVisible(false);*/
+  if (change == QGraphicsItem::ItemSelectedChange && value == true)
+    resize_frame_visible = true;
+
+  if (resize_frame_visible) {
+    // create resize frame if one doesn't already exist
+    if (!resize_frame) {
+      resize_frame = new prim::ResizeFrame(this);
+    }
+    resize_frame->setVisible(true);
+  } else {
+    if (resize_frame) {
+      // hide resize frame if item is not focused
+      resize_frame->setVisible(false);
+    }
+  }
+
+  return prim::Item::itemChange(change, value);
 }
 
 void AFMArea::hoverEnterEvent(QGraphicsSceneHoverEvent *)

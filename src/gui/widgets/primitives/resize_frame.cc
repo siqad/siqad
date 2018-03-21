@@ -35,7 +35,6 @@ ResizeFrame::ResizeFrame(prim::Item *resize_target)
 
   // Graphics
   setFlag(QGraphicsItem::ItemIsSelectable, false);
-  setFlag(QGraphicsItem::ItemIsFocusable, false);
 }
 
 
@@ -51,32 +50,30 @@ void ResizeFrame::setResizeTarget(prim::Item *new_target)
 
 void ResizeFrame::resizeTargetToHandle(const HandlePosition &pos, const QPointF &delta)
 {
-  // TODO change AFMArea to generic rect item
-  prim::AFMArea *target = static_cast<prim::AFMArea*>(resizeTarget());
   switch (pos) {
     case TopLeft:
-      target->resize(delta.x(), delta.y(), 0, 0);
+      resizeTarget()->resize(delta.x(), delta.y(), 0, 0);
       break;
     case Top:
-      target->resize(0, delta.y(), 0, 0);
+      resizeTarget()->resize(0, delta.y(), 0, 0);
       break;
     case TopRight:
-      target->resize(0, delta.y(), delta.x(), 0);
+      resizeTarget()->resize(0, delta.y(), delta.x(), 0);
       break;
     case Right:
-      target->resize(0, 0, delta.x(), 0);
+      resizeTarget()->resize(0, 0, delta.x(), 0);
       break;
     case BottomRight:
-      target->resize(0, 0, delta.x(), delta.y());
+      resizeTarget()->resize(0, 0, delta.x(), delta.y());
       break;
     case Bottom:
-      target->resize(0, 0, 0, delta.y());
+      resizeTarget()->resize(0, 0, 0, delta.y());
       break;
     case BottomLeft:
-      target->resize(delta.x(), 0, 0, delta.y());
+      resizeTarget()->resize(delta.x(), 0, 0, delta.y());
       break;
     case Left:
-      target->resize(delta.x(), 0, 0, 0);
+      resizeTarget()->resize(delta.x(), 0, 0, 0);
       break;
     default:
       qCritical() << "Trying to access a non-existent resize handle position";
@@ -157,7 +154,6 @@ ResizeHandle::ResizeHandle(prim::ResizeFrame::HandlePosition handle_pos,
 
   // Graphics
   setFlag(QGraphicsItem::ItemIsSelectable, true);
-  setFlag(QGraphicsItem::ItemIsFocusable, true);
   setFlag(QGraphicsItem::ItemIsMovable, true);
 }
 
@@ -216,10 +212,16 @@ void ResizeHandle::mousePressEvent(QGraphicsSceneMouseEvent *e)
   switch(e->buttons()) {
     case Qt::LeftButton:
     {
-      clicked = true;
-      step_pos = e->scenePos();
-      static_cast<prim::ResizeFrame*>(parentItem())->resizeTarget()->beginResize();
-      e->accept();
+      prim::Item *target = static_cast<prim::ResizeFrame*>(parentItem())->
+          resizeTarget();
+      if (target) {
+        target->setBoundingRectPreResize(target->boundingRect());
+
+        clicked = true;
+        step_pos = e->scenePos();
+        emit prim::Emitter::instance()->sig_resizeBegin();
+        e->accept();
+      }
       break;
     }
     default:
@@ -243,8 +245,11 @@ void ResizeHandle::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
 
 void ResizeHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
 {
-  if (clicked)
-    static_cast<prim::ResizeFrame*>(parentItem())->resizeTarget()->finalizeResize();
+  if (clicked) {
+    prim::Item *target = static_cast<prim::ResizeFrame*>(parentItem())->resizeTarget();
+    emit prim::Emitter::instance()->sig_resizeFinalize(target,
+        target->boundingRectPreResize(), target->boundingRect());
+  }
   clicked = false;
 }
 
