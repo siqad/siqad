@@ -15,7 +15,6 @@ qreal prim::Item::scale_factor = -1;
 bool prim::Item::select_mode = false;
 bool prim::Item::db_gen_mode = false;
 bool prim::Item::electrode_mode = false;
-int prim::Item::selected_item_count = 0;
 
 
 // CLASS::Item

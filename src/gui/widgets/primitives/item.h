@@ -103,7 +103,6 @@ namespace prim{
     static bool select_mode;    // Application is in select mode
     static bool db_gen_mode;
     static bool electrode_mode;
-    static int selected_item_count;  // number of items currently selected
     static void init();
 
     // SAVE LOAD
