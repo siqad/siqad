@@ -73,10 +73,24 @@ namespace prim{
     void setResizable(bool flag) {resizable = flag;}
     bool isResizable() {return resizable;}
 
-    //! If the item is resizable, implement the resize function. (dx1, dy1)
-    //! corresponds to the delta for the top left corner, (dx2, dy2) corresponds
-    //! to the bottom right. Don't forget update the item position with setPos.
-    void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2);
+    //! If the item is resizable, begin the resize by storing the original
+    //! dimensions of the item.
+    virtual void beginResize() {};
+
+    //! If the item is resizable, implement the resize function. The first two
+    //! parameters (dx1, dy1) correspond to the delta for the top left corner,
+    //! the next two parameters (dx2, dy2) correspond to the bottom right.
+    //! Don't forget update the item position with setPos. update_handles
+    //! indicate whether the resize frame handle positions should be updated,
+    //! set to true if calling from QUndoStack.
+    virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
+        bool update_handles=false)
+    {Q_UNUSED(dx1); Q_UNUSED(dy1); Q_UNUSED(dx2); Q_UNUSED(dy2);
+      Q_UNUSED(update_handles);}
+
+    //! If the item is resizable, this function finalizes the resize by pushing
+    //! it to the undo stack.
+    virtual void finalizeResize() {};
 
 
     // securing the item type and layer as private isn't worth the copy

@@ -35,8 +35,17 @@ namespace prim{
 
     // Accessors
 
+    //! Begin resizing, store the original dimensions.
+    virtual void beginResize();
+
     //! Resize according to given coordinates.
-    void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2);
+    virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
+        bool update_handles=false);
+
+    //! Finalize the resize, emit a signal notifying the design panel of the
+    //! resize event.
+    virtual void finalizeResize();
+
 
     //! Return the top left point of the AFM area.
     QPointF topLeft() const {return point_top_left;}
@@ -126,8 +135,9 @@ namespace prim{
     static qreal scan_path_width;       //! AFM scan path preview width.
     static prim::Item::StateColors scan_path_fill_col; //! AFM scan path preview fill color.
 
-    // Resize box
+    // Resize
     prim::ResizeFrame *resize_frame=0;
+    QRectF orig_rect;
   };
 }
 

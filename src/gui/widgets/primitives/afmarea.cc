@@ -143,8 +143,15 @@ void AFMArea::saveItems(QXmlStreamWriter *ws) const
   ws->writeEndElement();
 }
 
+// Begin resizing
+void AFMArea::beginResize()
+{
+  orig_rect = boundingRect();
+}
+
 // Resize according to given coordinates
-void AFMArea::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2)
+void AFMArea::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
+    bool update_handles)
 {
   //setPos(scenePos() + QPointF(dx1, dy1));
   prepareGeometryChange();
@@ -152,6 +159,16 @@ void AFMArea::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2)
   point_bot_right += QPointF(dx2, dy2);
   setPos(topLeft());
   update();
+
+  if (update_handles && resize_frame)
+    resize_frame->updateHandlePositions();
+}
+
+// Finalize the resize
+void AFMArea::finalizeResize()
+{
+  emit prim::Emitter::instance()->sig_finalizeResize(this, orig_rect,
+      boundingRect());
 }
 
 // Center point of the AFM Area

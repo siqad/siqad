@@ -217,7 +217,8 @@ void ResizeHandle::mousePressEvent(QGraphicsSceneMouseEvent *e)
     case Qt::LeftButton:
     {
       clicked = true;
-      click_pos = step_pos = e->scenePos();
+      step_pos = e->scenePos();
+      static_cast<prim::ResizeFrame*>(parentItem())->resizeTarget()->beginResize();
       e->accept();
       break;
     }
@@ -242,9 +243,8 @@ void ResizeHandle::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
 
 void ResizeHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
 {
-  if (clicked) {
-    // TODO finalize resize to undo stack
-  }
+  if (clicked)
+    static_cast<prim::ResizeFrame*>(parentItem())->resizeTarget()->finalizeResize();
   clicked = false;
 }
 

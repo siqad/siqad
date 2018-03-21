@@ -122,7 +122,6 @@ namespace prim{
     static prim::Item::StateColors handle_col;
 
     bool clicked;
-    QPointF click_pos;  // cursor location when mouse press event was registered
     QPointF step_pos;   // cursor location at the last mouse move event
   }; // end of ResizeHandle class
 

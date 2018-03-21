@@ -26,6 +26,8 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
             this, &gui::DesignPanel::addItemToSceneRequest);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_removeItemFromScene,
             this, &gui::DesignPanel::removeItemFromScene);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_finalizeResize,
+            this, &gui::DesignPanel::finalizeResize);
 }
 
 // destructor
@@ -1875,16 +1877,14 @@ void gui::DesignPanel::CreateAFMNode::destroy()
 
 // ResizeAFMArea class
 gui::DesignPanel::ResizeAFMArea::ResizeAFMArea(int layer_index, DesignPanel *dp,
-    const QPointF &orig_top_left, const QPointF &orig_bot_right,
-    const QPointF &new_top_left, const QPointF &new_bot_right,
-    int afm_area_index, bool invert, QUndoCommand *parent)
+    const QRectF &orig_rect, const QRectF &new_rect, int afm_area_index,
+    bool invert, QUndoCommand *parent)
   : QUndoCommand(parent), layer_index(layer_index), dp(dp),
-        orig_top_left(orig_top_left), orig_bot_right(orig_bot_right),
-        new_top_left(new_top_left), new_bot_right(new_bot_right),
+        orig_rect(orig_rect), new_rect(new_rect),
         afm_area_index(afm_area_index), invert(invert)
 {
-  top_left_delta = new_top_left - orig_top_left;
-  bot_right_delta = new_bot_right - orig_bot_right;
+  top_left_delta = new_rect.topLeft() - orig_rect.topLeft();
+  bot_right_delta = new_rect.bottomRight() - orig_rect.bottomRight();
 }
 
 void gui::DesignPanel::ResizeAFMArea::undo()
@@ -1892,12 +1892,12 @@ void gui::DesignPanel::ResizeAFMArea::undo()
   prim::AFMArea *afm_area = static_cast<prim::AFMArea*>(
       dp->getLayer(layer_index)->getItem(afm_area_index));
 
-  if (afm_area->topLeft() == orig_top_left &&
-      afm_area->bottomRight() == orig_bot_right)
+  if (afm_area->boundingRect().topLeft() == orig_rect.topLeft() &&
+      afm_area->boundingRect().bottomRight() == orig_rect.bottomRight())
     return;
 
   afm_area->resize(-top_left_delta.x(), -top_left_delta.y(),
-      -bot_right_delta.x(), -bot_right_delta.y());
+      -bot_right_delta.x(), -bot_right_delta.y(), true);
 }
 
 void gui::DesignPanel::ResizeAFMArea::redo()
@@ -1907,12 +1907,12 @@ void gui::DesignPanel::ResizeAFMArea::redo()
 
   // if the user resized the afm area with the cursor, then the area might
   // already be the right size, in which case do nothing
-  if (afm_area->topLeft() == new_top_left &&
-      afm_area->bottomRight() == new_bot_right)
+  if (afm_area->boundingRect().topLeft() == new_rect.topLeft() &&
+      afm_area->boundingRect().bottomRight() == new_rect.bottomRight())
     return;
 
   afm_area->resize(top_left_delta.x(), top_left_delta.y(),
-      bot_right_delta.x(), bot_right_delta.y());
+      bot_right_delta.x(), bot_right_delta.y(), true);
 }
 
 
@@ -2225,14 +2225,25 @@ void gui::DesignPanel::createAFMNode()
   undo_stack->endMacro();
 }
 
+void gui::DesignPanel::finalizeResize(prim::Item *item,
+    const QRectF &orig_rect, const QRectF &new_rect)
+{
+  switch (item->item_type) {
+    case prim::Item::AFMArea:
+      resizeAFMArea(static_cast<prim::AFMArea*>(item), orig_rect, new_rect);
+      break;
+    default:
+      break;
+  }
+}
+
 void gui::DesignPanel::resizeAFMArea(prim::AFMArea *afm_area,
-    const QPointF &orig_top_left, const QPointF &orig_bot_right,
-    const QPointF &new_top_left, const QPointF &new_bot_right)
+    const QRectF &orig_rect, const QRectF &new_rect)
 {
   undo_stack->beginMacro(tr("Resize AFM Area"));
   int ind_in_layer = getLayer(afm_area->layer_id)->getItemIndex(afm_area);
-  undo_stack->push(new ResizeAFMArea(afm_area->layer_id, this, orig_top_left,
-      orig_bot_right, new_top_left, new_bot_right, ind_in_layer));
+  undo_stack->push(new ResizeAFMArea(afm_area->layer_id, this, orig_rect,
+      new_rect, ind_in_layer));
   undo_stack->endMacro();
 }
 
