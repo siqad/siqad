@@ -35,8 +35,17 @@ namespace prim{
 
     // Accessors
 
-    //! Set the top left point to a new position.
-    void moveTopLeft(QPointF new_top_left) {point_top_left = new_top_left;}
+    //! Move the top left point by a specified delta.
+    void resizeTopLeft(const QPointF &delta) {setPos(scenePos()+delta); point_bot_right-=delta; update();}
+
+    //! Move the top by a specified delta.
+    void resizeTop(const qreal &dy) {setPos(scenePos().x(), scenePos().y()+dy); point_bot_right.setY(point_bot_right.y()-dy); update();}
+
+    //! Move the top right by a specified delta.
+    void resizeTopRight(const QPointF &delta) {point_top_left.setY(point_top_left.y()+delta.y()); point_bot_right.setX(point_bot_right.x()+delta.x()); update();}
+
+
+
     //! Return the top left point of the AFM area.
     QPointF topLeft() const {return point_top_left;}
     //! Return the bottom right point of the AFM area.

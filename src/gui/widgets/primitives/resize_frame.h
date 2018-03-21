@@ -43,7 +43,7 @@ namespace prim{
 
     //! Update the resize target with the resize handle's new position, and
     //! update the positions of the rest of the handles.
-    void resizeTargetToHandle(HandlePosition pos);
+    void resizeTargetToHandle(const HandlePosition &pos, const QPointF &delta);
 
     //! Update the position of all handles.
     void updateHandlePositions();
@@ -110,6 +110,7 @@ namespace prim{
   protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
 
   private:
     //! Initialize static class variables.
@@ -119,6 +120,10 @@ namespace prim{
 
     static qreal handle_dim;
     static prim::Item::StateColors handle_col;
+
+    bool clicked;
+    QPointF click_pos;  // cursor location when mouse press event was registered
+    QPointF step_pos;   // cursor location at the last mouse move event
   }; // end of ResizeHandle class
 
 } // end of prim namespace

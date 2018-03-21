@@ -49,12 +49,40 @@ void ResizeFrame::setResizeTarget(prim::Item *new_target)
 }
 
 
-void ResizeFrame::resizeTargetToHandle(HandlePosition pos)
+void ResizeFrame::resizeTargetToHandle(const HandlePosition &pos, const QPointF &delta)
 {
-  if (pos == TopLeft) {
-    static_cast<prim::AFMArea*>(resizeTarget())->moveTopLeft(handle(pos)->pos());
-    updateHandlePositions();
+  // TODO change AFMArea to generic rect item
+  prim::AFMArea *target = static_cast<prim::AFMArea*>(resizeTarget());
+  switch (pos) {
+    case TopLeft:
+      target->resizeTopLeft(delta);
+      break;
+    case Top:
+      target->resizeTop(delta.y());
+      break;
+    case TopRight:
+      target->resizeTopRight(delta);
+      break;
+    /*case Right:
+      target->resizeRight(delta.x());
+      break;
+    case BottomRight:
+      target->resizeBottomRight(delta);
+      break;
+    case Bottom:
+      target->resizeBottom(delta.y());
+      break;
+    case BottomLeft:
+      target->resizeBottomLeft(delta);
+      break;
+    case Left:
+      target->resizeLeft(delta.x());
+      break;*/
+    default:
+      qCritical() << "Trying to access a non-existent resize handle position";
+      break;
   }
+  updateHandlePositions();
 }
 
 
@@ -186,16 +214,38 @@ void ResizeHandle::paint(QPainter *painter,
 void ResizeHandle::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
   switch(e->buttons()) {
+    case Qt::LeftButton:
+    {
+      clicked = true;
+      click_pos = step_pos = e->scenePos();
+      e->accept();
+      break;
+    }
     default:
+    {
       prim::Item::mousePressEvent(e);
       break;
+    }
   }
 }
 
 void ResizeHandle::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
 {
-  setPos(e->pos());
-  static_cast<prim::ResizeFrame*>(parentItem())->resizeTargetToHandle(handle_position);
+  if (clicked) {
+    QPointF step_delta = e->scenePos() - step_pos;
+    setPos(pos()+step_delta);
+    static_cast<prim::ResizeFrame*>(parentItem())->resizeTargetToHandle(handle_position, step_delta);
+    step_pos = e->scenePos();
+    e->accept();
+  }
+}
+
+void ResizeHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
+{
+  if (clicked) {
+    // TODO finalize resize to undo stack
+  }
+  clicked = false;
 }
 
 void ResizeHandle::prepareStatics()
