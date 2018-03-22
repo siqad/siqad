@@ -227,25 +227,22 @@ void AFMArea::mousePressEvent(QGraphicsSceneMouseEvent *e)
 
 QVariant AFMArea::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-  bool resize_frame_visible = false;
-
-  if (change == QGraphicsItem::ItemSelectedChange && value == true)
-    resize_frame_visible = true;
-
-  if (resize_frame_visible) {
-    // create resize frame if one doesn't already exist
-    if (!resize_frame) {
-      resize_frame = new prim::ResizeFrame(this);
-    }
-    resize_frame->setVisible(true);
-  } else {
-    if (resize_frame) {
-      // hide resize frame if item is not focused
-      resize_frame->setVisible(false);
+  if (change == QGraphicsItem::ItemSelectedChange) {
+    if (value == true) {
+      if (!resize_frame) {
+        resize_frame = new prim::ResizeFrame(this);
+      }
+      resize_frame->setVisible(true);
+    } else {
+      if (resize_frame) {
+        resize_frame->setVisible(false);
+      }
     }
   }
 
-  return prim::Item::itemChange(change, value);
+  return QGraphicsItem::itemChange(change, value);
+
+  bool resize_frame_visible = false;
 }
 
 void AFMArea::hoverEnterEvent(QGraphicsSceneHoverEvent *)
