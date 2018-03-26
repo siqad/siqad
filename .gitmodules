@@ -4,3 +4,6 @@
 [submodule "src/phys/poissolver"]
 	path = src/phys/poissolver
 	url = https://github.com/NathanChiu/PoisSolvers.git
+[submodule "src/phys/simanneal"]
+	path = src/phys/simanneal
+	url = https://github.com/samuelngsh/simanneal-sidb.git
