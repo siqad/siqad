@@ -48,7 +48,8 @@ void ResizeFrame::setResizeTarget(prim::Item *new_target)
 }
 
 
-void ResizeFrame::resizeTargetToHandle(const HandlePosition &pos, const QPointF &delta)
+void ResizeFrame::resizeTargetToHandle(const HandlePosition &pos,
+    const QPointF &delta)
 {
   switch (pos) {
     case TopLeft:
@@ -219,6 +220,8 @@ void ResizeHandle::mousePressEvent(QGraphicsSceneMouseEvent *e)
 
         clicked = true;
         step_pos = e->scenePos();
+
+        // emit a signal informing design panel of the new mode
         emit prim::Emitter::instance()->sig_resizeBegin();
         e->accept();
       }
@@ -237,7 +240,8 @@ void ResizeHandle::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
   if (clicked) {
     QPointF step_delta = e->scenePos() - step_pos;
     setPos(pos()+step_delta);
-    static_cast<prim::ResizeFrame*>(parentItem())->resizeTargetToHandle(handle_position, step_delta);
+    static_cast<prim::ResizeFrame*>(parentItem())->
+        resizeTargetToHandle(handle_position, step_delta);
     step_pos = e->scenePos();
     e->accept();
   }
@@ -246,7 +250,8 @@ void ResizeHandle::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
 void ResizeHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
 {
   if (clicked) {
-    prim::Item *target = static_cast<prim::ResizeFrame*>(parentItem())->resizeTarget();
+    prim::Item *target = static_cast<prim::ResizeFrame*>(parentItem())->
+        resizeTarget();
     emit prim::Emitter::instance()->sig_resizeFinalize(target,
         target->boundingRectPreResize(), target->boundingRect());
   }
