@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>460</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="simulation_type_hl">
+     <item>
+      <widget class="QLabel" name="label_simulation_type">
+       <property name="text">
+        <string>Simulation Type</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="le_simulation_type">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>line_scan</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="scan_type_hl">
+     <item>
+      <widget class="QLabel" name="label_scan_type">
+       <property name="text">
+        <string>Scan type (-1,0,1)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="le_scan_type">
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="hopping_model_hl">
+     <item>
+      <widget class="QLabel" name="label_hopping_model">
+       <property name="text">
+        <string>Hopping Model</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="le_hopping_model">
+       <property name="text">
+        <string>marcus</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="write_strength_hl">
+     <item>
+      <widget class="QLabel" name="label_write_strength">
+       <property name="text">
+        <string>Write strength (eV)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="le_write_strength">
+       <property name="text">
+        <string>0.01</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="bias_hl">
+     <item>
+      <widget class="QLabel" name="label_bias">
+       <property name="text">
+        <string>Bias (eV)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="le_bias">
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="num_electrons_hl">
+     <item>
+      <widget class="QLabel" name="label_num_electrons">
+       <property name="text">
+        <string>Number of electrons</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="le_num_electrons">
+       <property name="text">
+        <string>-1</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cb_num_electrons_ratio">
+       <property name="text">
+        <string>Ratio</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="num_scans_hl">
+     <item>
+      <widget class="QLabel" name="label_num_scans">
+       <property name="text">
+        <string>Number of line scans</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="le_num_scans">
+       <property name="text">
+        <string>200</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="padding_hl">
+     <item>
+      <widget class="QLabel" name="label_padding">
+       <property name="text">
+        <string>Padding (left,right)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="le_lattice_padding_l">
+       <property name="text">
+        <string>3</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_padding_split">
+       <property name="text">
+        <string>,</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="le_lattice_padding_r">
+       <property name="text">
+        <string>3</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="tip_speed_hl">
+     <item>
+      <widget class="QLabel" name="label_tip_speed">
+       <property name="text">
+        <string>Tip speed (angstroms/second)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="le_tip_speed">
+       <property name="text">
+        <string>82</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

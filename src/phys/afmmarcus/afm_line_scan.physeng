@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<physeng>
+    <name>AFM Line Scan</name>
+    <version>0.1</version>
+    <interpreter></interpreter> <!-- used for calling a script with python, java, etc. Leave blank otherwise -->
+    <bin_path>afmmarcus</bin_path> <!-- path to binary (standalone) or script (read by interpreter), relative to the folder containing engine_description.xml -->
+    <linked_script_path>db-sim-connector.py</linked_script_path> <!-- if the binary is a connector that calls another script, indicate the script path here, relative to the folder containing engine_description.xml -->
+    <gui_dialog_path>afm_line_scan.ui</gui_dialog_path>
+    <sim_params>
+        <param gui_object_type="QLineEdit" gui_object_name="le_simulation_type">simulation_type</param>
+        <param gui_object_type="QLineEdit" gui_object_name="le_scan_type">scan_type</param>
+        <param gui_object_type="QLineEdit" gui_object_name="le_hopping_model">hopping_model</param>
+        <param gui_object_type="QLineEdit" gui_object_name="le_write_strength">write_strength</param>
+        <param gui_object_type="QLineEdit" gui_object_name="le_bias">bias</param>
+        <param gui_object_type="QLineEdit" gui_object_name="le_num_electrons">num_electrons</param>
+        <param gui_object_type="QLineEdit" gui_object_name="le_num_scans">num_scans</param>
+        <param gui_object_type="QLineEdit" gui_object_name="le_lattice_padding_l">lattice_padding_l</param>
+        <param gui_object_type="QLineEdit" gui_object_name="le_lattice_padding_r">lattice_padding_r</param>
+        <param gui_object_type="QLineEdit" gui_object_name="le_tip_speed">tip_speed</param>
+    </sim_params>
+</physeng>

@@ -1,0 +1,5 @@
+*.pyc
+*.pdf
+.*.swp
+results.xml
+test.xml
