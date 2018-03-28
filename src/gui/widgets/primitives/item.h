@@ -14,6 +14,7 @@
 #include <QtCore>
 #include "emitter.h"
 #include "src/settings/settings.h"
+#include "src/gui/property_map.h"
 
 namespace prim{
 

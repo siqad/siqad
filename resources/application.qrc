@@ -1,19 +1,20 @@
 <RCC>
 <qresource>
+	<file>properties/afmarea.xml</file>
 	<file>ico/select.svg</file>
 	<file>ico/drag.svg</file>
 	<file>ico/dbgen.svg</file>
-    <file>ico/drawelectrode.svg</file>
-    <file>ico/drawafmarea.svg</file>
-    <file>ico/drawafmpath.svg</file>
-    <file>ico/drawlabel.svg</file>
+  <file>ico/drawelectrode.svg</file>
+  <file>ico/drawafmarea.svg</file>
+  <file>ico/drawafmpath.svg</file>
+  <file>ico/drawlabel.svg</file>
 	<file>ico/runsim.svg</file>
 	<file>ico/simvisual.svg</file>
-    <file>ico/layer.svg</file>
-    <file>ico/term.svg</file>
-    <file>ico/visible.svg</file>
-    <file>ico/editable.svg</file>
-    <file>ico/lattice.svg</file>
-    <file>ico/unknown.svg</file>
+  <file>ico/layer.svg</file>
+  <file>ico/term.svg</file>
+  <file>ico/visible.svg</file>
+  <file>ico/editable.svg</file>
+  <file>ico/lattice.svg</file>
+  <file>ico/unknown.svg</file>
 </qresource>
 </RCC>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties>
+  <zspeed>
+    <T>float</T>
+    <val>42</val>
+    <label>Z-axis tip speed</label>
+    <tip>Z-axis (out-of-plane) movement speed for AFM tip in angstroms per second.</tip>
+  </zspeed>
+  <hspeed>
+    <T>float</T>
+    <val>42</val>
+    <label>Horizonal tip speed</label>
+    <tip>Horizontal (in-plane) movement speed for AFM tip in angstroms per second.</tip>
+  </hspeed>
+  <vspeed>
+    <T>float</T>
+    <val>42</val>
+    <label>Vertical tip speed</label>
+    <tip>Vertical (in-plane) movement speed for AFM tip in angstroms per second.</tip>
+  </vspeed>
+  <v_displacement>
+    <T>float</T>
+    <val>42</val>
+    <label>Vertical displacement between scans</label>
+    <tip>Vertical (in-plane) displacement of the tip after each horizontal scan.</tip>
+  </v_displacement>
+</properties>

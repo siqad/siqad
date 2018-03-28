@@ -100,6 +100,7 @@ SOURCES += \
 
 HEADERS += \
 	src/gui/application.h \
+	src/gui/property_map.h \
 	src/gui/widgets/design_panel.h \
 	src/gui/widgets/dialog_panel.h \
 	src/gui/widgets/input_field.h \
@@ -113,6 +114,7 @@ HEADERS += \
 
 SOURCES += \
 	src/gui/application.cc \
+	src/gui/property_map.cc \
 	src/gui/widgets/design_panel.cc \
 	src/gui/widgets/dialog_panel.cc \
 	src/gui/widgets/input_field.cc \

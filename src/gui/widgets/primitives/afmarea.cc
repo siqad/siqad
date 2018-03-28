@@ -11,11 +11,13 @@
 namespace prim {
 
 // Initialise statics
+gui::PropertyMap AFMArea::default_props;
 qreal AFMArea::area_border_width=-1;
 prim::Item::StateColors AFMArea::area_border_col;
 prim::Item::StateColors AFMArea::area_fill_col;
 qreal AFMArea::scan_path_width;
 prim::Item::StateColors AFMArea::scan_path_fill_col;
+
 
 // Normal constructor
 AFMArea::AFMArea(int lay_id, QPointF point1, QPointF point2, bool orientation,
@@ -259,6 +261,9 @@ void AFMArea::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 
 void AFMArea::prepareStatics()
 {
+  // Read properties
+  default_props.readPropertiesFromXML(":/properties/afmarea.xml");
+
   // Initialize static variables
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 

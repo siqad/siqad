@@ -114,6 +114,9 @@ namespace prim{
     QPointF point_top_left;   //! Top left point.
     QPointF point_bot_right;  //! Bottom right point.
 
+    // properties of this item class
+    static gui::PropertyMap default_props;
+
     // AFM tip movement parameters
     bool h_orientation; //! "horizontal" direction = orientation ? x, y
     float z_speed;    //! Z-axis movement speed of the tip (out-of-plane).
