@@ -33,7 +33,9 @@ void PropertyMap::readPropertiesFromXML(const QString &fname)
 {
   xml_path = fname;
 
-  qDebug() << QObject::tr("int=%1, float=%2, double=%3, string=%4").arg(string2type["int"]).arg(string2type["float"]).arg(string2type["double"]).arg(string2type["string"]);
+  qDebug() << QObject::tr("int=%1, float=%2, double=%3, string=%4")
+      .arg(string2type["int"]).arg(string2type["float"])
+      .arg(string2type["double"]).arg(string2type["string"]);
 
   QFile file(xml_path);
 
@@ -111,7 +113,8 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
 
   prop.value = string2Type2QVariant(p_val, p_type_id);
 
-  qDebug() << QObject::tr("Got value of %1 with type %2").arg(prop.value.toString()).arg(p_type_id);
+  qDebug() << QObject::tr("Got value of %1 with type %2")
+      .arg(prop.value.toString()).arg(p_type_id);
 
   // add this property to the map
   insert(node_name, prop);

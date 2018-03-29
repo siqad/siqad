@@ -7,8 +7,8 @@
 // @desc:     Reads properties from XML resources, parses them and makes them
 //            available as a map
 
-#ifndef _GUI_PROPERTIES_H_
-#define _GUI_PROPERTIES_H_
+#ifndef _GUI_PROPERTY_MAP_H_
+#define _GUI_PROPERTY_MAP_H_
 
 // Qt includes
 #include <QtWidgets>
@@ -61,7 +61,7 @@ namespace gui{
 
 
   private:
-    
+
     QString xml_path;
 
     static QMap<QString, int> string2type;
