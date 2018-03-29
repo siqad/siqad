@@ -33,6 +33,8 @@ void PropertyMap::readPropertiesFromXML(const QString &fname)
 {
   xml_path = fname;
 
+  qDebug() << QObject::tr("int=%1, float=%2, double=%3, string=%4").arg(string2type["int"]).arg(string2type["float"]).arg(string2type["double"]).arg(string2type["string"]);
+
   QFile file(xml_path);
 
   // test whether file can be opened to read
@@ -76,25 +78,26 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
 
   Property prop;
   int p_type_id=-1;
+  QString p_val;
   qDebug() << QObject::tr("Reading content of property %1").arg(node_name);
 
   // keep reading until the end of this property node
-  while ( !(rs->name() == node_name && rs->isEndElement()) &&
-      rs->readNextStartElement()) {
+  while ( !(rs->name() == node_name && rs->isEndElement())
+        && rs->readNextStartElement()) {
     if (rs->name() == "T") {
-      qDebug() << QObject::tr("%1 type=%2").arg(node_name).arg(rs->readElementText());
       p_type_id = string2type[rs->readElementText()];
+      qDebug() << QObject::tr("%1 type=%2").arg(node_name).arg(p_type_id);
     } else if (rs->name() == "val") {
-      qDebug() << QObject::tr("%1 val=%2").arg(node_name).arg(rs->readElementText());
-      prop.value = rs->readElementText();
+      p_val = rs->readElementText();
+      qDebug() << QObject::tr("%1 val=%2").arg(node_name).arg(p_val);
       //rs->skipCurrentElement();
     } else if (rs->name() == "label") {
-      qDebug() << QObject::tr("%1 label=%2").arg(node_name).arg(rs->readElementText());
       prop.form_label = rs->readElementText();
+      qDebug() << QObject::tr("%1 label=%2").arg(node_name).arg(prop.form_label);
       //rs->skipCurrentElement();
     } else if (rs->name() == "tip") {
-      qDebug() << QObject::tr("%1 tip=%2").arg(node_name).arg(rs->readElementText());
       prop.form_tip = rs->readElementText();
+      qDebug() << QObject::tr("%1 tip=%2").arg(node_name).arg(prop.form_tip);
       //rs->skipCurrentElement();
     } else {
       qDebug() << "else";
@@ -106,23 +109,34 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
   if (p_type_id == -1)
     qFatal("Unable to read type id of a property");
 
-  if (prop.value.canConvert(p_type_id))
-    prop.value.convert(p_type_id);
-  else
-    qFatal("Unable to convert QVariant to desired type");
+  prop.value = string2Type2QVariant(p_val, p_type_id);
+
+  qDebug() << QObject::tr("Got value of %1 with type %2").arg(prop.value.toString()).arg(p_type_id);
 
   // add this property to the map
   insert(node_name, prop);
 }
 
-void PropertyMap::prepareStatics()
+QVariant PropertyMap::string2Type2QVariant(const QString &val, int type_id)
 {
-  qDebug() << "2";
-  string2type.insert("int", QMetaType::Int);
-  string2type.insert("float", QMetaType::Float);
-  string2type.insert("double", QMetaType::Double);
-  string2type.insert("string", QMetaType::QString);
-  qDebug() << "3";
+  switch (type_id) {
+    case QMetaType::Int:
+      return QVariant(val.toInt());
+      break;
+    case QMetaType::Float:
+      return QVariant(val.toFloat());
+      break;
+    case QMetaType::Double:
+      return QVariant(val.toDouble());
+      break;
+    case QMetaType::QString:
+      return QVariant(val);
+      break;
+    default:
+      qFatal("Trying to convert string to an unsupported type");
+      return QVariant(0);
+      break;
+  }
 }
 
 

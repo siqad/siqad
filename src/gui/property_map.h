@@ -55,10 +55,13 @@ namespace gui{
     //! Read one property node from XML file.
     void readProperty(const QString &node_name, QXmlStreamReader *rs);
 
+    //! Convert value to specified type and return a QVariant containing that
+    //! converted value. Give the type_id in terms of QMetaType's enum.
+    QVariant string2Type2QVariant(const QString &val, int type_id);
+
 
   private:
-    static void prepareStatics();
-
+    
     QString xml_path;
 
     static QMap<QString, int> string2type;
