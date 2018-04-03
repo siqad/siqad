@@ -47,7 +47,7 @@ PropertyForm::PropertyForm(gui::PropertyMap *map, prim::Item *target_item,
 
 
 // Return a list of properties that have been changed
-gui::PropertyMap PropertyForm::pushPropertyChanges()
+void PropertyForm::pushPropertyChanges()
 {
   QMapIterator<QString, gui::Property> prop_it(*target_map);
   while (prop_it.hasNext()) {
@@ -56,9 +56,13 @@ gui::PropertyMap PropertyForm::pushPropertyChanges()
 
     QLineEdit *prop_field = QObject::findChild<QLineEdit *>(prop_it.key());
     // update the item's property value if changes have been made
-    if (prop.value<QString>() != prop_field->text()) {
+    if (prop.value.value<QString>() != prop_field->text()) {
       target_item->setProperty(prop_it.key(),
-          gui::PropertyMap::string2Type2QVariant(prop_field->text()));
+          gui::PropertyMap::string2Type2QVariant(
+              prop_field->text(),
+              prop.value.type()
+          )
+      );
     }
   }
 }
@@ -69,13 +73,13 @@ gui::PropertyMap PropertyForm::pushPropertyChanges()
 void PropertyForm::initForm()
 {
   QMapIterator<QString, gui::Property> prop_it(*target_map);
-  QVBoxLayout vl_props = new QVBoxLayout;
+  QVBoxLayout *vl_props = new QVBoxLayout;
   while (prop_it.hasNext()) {
     prop_it.next();
     gui::Property prop = prop_it.value();
 
     QLabel *label_prop = new QLabel(prop.form_label);
-    QLineEdit *le_prop = new QLineEdit(prop.value<QString>());
+    QLineEdit *le_prop = new QLineEdit(prop.value.value<QString>());
     le_prop->setObjectName(prop_it.key());
 
     QHBoxLayout *hl_prop = new QHBoxLayout;

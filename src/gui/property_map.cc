@@ -120,7 +120,7 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
   insert(node_name, prop);
 }
 
-QVariant PropertyMap::string2Type2QVariant(const QString &val, int type_id) const
+QVariant PropertyMap::string2Type2QVariant(const QString &val, int type_id)
 {
   switch (type_id) {
     case QMetaType::Int:

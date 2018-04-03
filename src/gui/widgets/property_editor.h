@@ -13,13 +13,14 @@
 #include <QtWidgets>
 #include <QtCore>
 
+#include "primitives/item.h"
 #include "../../global.h"
 #include "../property_map.h"
 
 namespace gui{
 
   // Forward declaration of property form
-  class PropertyForm : public QWidget;
+  class PropertyForm;
 
   //! The property editor generates forms from provided PropertyMaps which
   //! allows users to edit properties of supported sub-classes of prim::Item.
@@ -53,21 +54,21 @@ namespace gui{
 
 
   //! A user-editable form for editing item properties.
-  class PropertyForm : public QtWidget
+  class PropertyForm : public QWidget
   {
     Q_OBJECT
 
   public:
 
     //! Constructor
-    PropertyForm(gui::PropertyMap *map, prim::Item *target_item, QWidget *parent)
+    PropertyForm(gui::PropertyMap *map, prim::Item *target_item, QWidget *parent);
 
     //! Destructor
     ~PropertyForm() {}
 
     //! Return a list of properties that have been changed. Compares the content
     //! in the form with the target_item's own property map.
-    gui::PropertyMap pushPropertyChanges();
+    void pushPropertyChanges();
 
   private:
     //! Initialize the form
@@ -76,7 +77,7 @@ namespace gui{
     gui::PropertyMap *target_map; //! Property map of the target item, should
                                   //! already have merged default and changed.
     prim::Item *target_item;      //! Item currently being edited.
-  }
+  };
 
 } // end of gui namespace
 
