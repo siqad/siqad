@@ -93,6 +93,10 @@ namespace prim{
     QRectF boundingRectPreResize() {return bounding_rect_pre_resize;}
 
 
+    //! Set a property in this item's property map
+    void setProperty(const QString &key, QVariant var) {local_props[key]=var};
+
+
     // securing the item type and layer as private isn't worth the copy
     // constructor calls for accessors, make public
 
@@ -136,6 +140,10 @@ namespace prim{
 
     bool resizable=false;
     QRectF bounding_rect_pre_resize;  // used for resizable items
+
+    // properties of this item
+    // Default properties of each class are static variables of each class
+    gui::PropertyMap local_props;           //! Properties altered from default
 
   };
 

@@ -116,7 +116,7 @@ namespace prim{
 
     // properties of this item class
     static gui::PropertyMap default_props;  //! Default properties for this class
-    gui::PropertyMap local_props;           //! Properties altered from default
+    //gui::PropertyMap local_props;           //! Properties altered from default
 
     // AFM tip movement parameters
     bool h_orientation; //! "horizontal" direction = orientation ? x, y

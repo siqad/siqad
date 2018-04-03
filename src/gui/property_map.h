@@ -57,7 +57,7 @@ namespace gui{
 
     //! Convert value to specified type and return a QVariant containing that
     //! converted value. Give the type_id in terms of QMetaType's enum.
-    QVariant string2Type2QVariant(const QString &val, int type_id);
+    static QVariant string2Type2QVariant(const QString &val, int type_id) const;
 
 
   private:

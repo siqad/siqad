@@ -101,11 +101,12 @@ SOURCES += \
 HEADERS += \
 	src/gui/application.h \
 	src/gui/property_map.h \
+	src/gui/widgets/property_editor.h \
 	src/gui/widgets/design_panel.h \
 	src/gui/widgets/dialog_panel.h \
 	src/gui/widgets/input_field.h \
 	src/gui/widgets/info_panel.h \
-	src/qcustomplot.h\
+	src/qcustomplot.h \
   src/gui/widgets/layer_editor.h \
   src/gui/widgets/sim_manager.h \
   src/gui/widgets/sim_visualize_panel.h \
@@ -115,11 +116,12 @@ HEADERS += \
 SOURCES += \
 	src/gui/application.cc \
 	src/gui/property_map.cc \
+	src/gui/widgets/property_editor.cc \
 	src/gui/widgets/design_panel.cc \
 	src/gui/widgets/dialog_panel.cc \
 	src/gui/widgets/input_field.cc \
 	src/gui/widgets/info_panel.cc \
-	src/qcustomplot.cpp\
+	src/qcustomplot.cpp \
   src/gui/widgets/layer_editor.cc \
   src/gui/widgets/sim_manager.cc \
   src/gui/widgets/sim_visualize_panel.cc \
