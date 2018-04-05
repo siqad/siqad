@@ -50,6 +50,10 @@ namespace prim{
 
     void sig_removeItemFromScene(Item *);
 
+    void sig_resizeBegin();
+
+    void sig_resizeFinalize(Item *, QRectF orig_rect, QRectF final_rect);
+
   private:
 
     // private constructor, singleton

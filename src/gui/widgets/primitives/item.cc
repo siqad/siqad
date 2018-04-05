@@ -47,6 +47,18 @@ bool prim::Item::upHovered()
 }
 
 
+
+QColor prim::Item::getCurrentStateColor(const prim::Item::StateColors &state_colors)
+{
+  if (select_mode && upSelected())
+    return state_colors.selected;
+  else if (upHovered())
+    return state_colors.hovered;
+  else
+    return state_colors.normal;
+}
+
+
 // current functionality:
 // items that are selected emit a signal when left clicked if control not pressed
 void prim::Item::mousePressEvent(QGraphicsSceneMouseEvent *e)

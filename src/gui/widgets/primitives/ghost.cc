@@ -50,8 +50,18 @@ prim::GhostBox::GhostBox(prim::Item *item, prim::Item *parent)
   : Item(prim::Item::GhostBox, 0, parent)
 {
   constructStatics();
-  width = static_cast<prim::Electrode*>(item)->getWidth();
-  height = static_cast<prim::Electrode*>(item)->getHeight();
+
+  if (item->item_type == prim::Item::Electrode) {
+    width = static_cast<prim::Electrode*>(item)->getWidth();
+    height = static_cast<prim::Electrode*>(item)->getHeight();
+  } else if (item->item_type == prim::Item::AFMArea) {
+    prim::AFMArea *afm_area = static_cast<prim::AFMArea*>(item);
+    width = afm_area->bottomRight().x()-afm_area->topLeft().x();
+    height = afm_area->bottomRight().y()-afm_area->topLeft().y();
+  } else {
+    qFatal("Trying to make a GhostBox out of unsupported item type");
+  }
+
   setZValue(-1);
   setPos(item->pos());
 }
@@ -292,7 +302,7 @@ void prim::Ghost::createGhostDot(prim::Item *item)
 
 void prim::Ghost::createGhostBox(prim::Item *item)
 {
-  // qDebug() << QObject::tr("Creating Ghost Box");
+  qDebug() << QObject::tr("Creating Ghost Box");
   // prim::GhostDot *dot = new prim::GhostDot(item, this, &col);
   prim::GhostBox *box = new prim::GhostBox(item, this);
   //
@@ -304,7 +314,7 @@ void prim::Ghost::createGhostBox(prim::Item *item)
 void prim::Ghost::prepareItem(prim::Item *item, prim::AggNode *node)
 {
   prim::AggNode *new_node;
-  if(item->item_type == prim::Item::Aggregate){
+  if (item->item_type == prim::Item::Aggregate) {
     // add a new list-type IndexList
     new_node = new prim::AggNode();
     new_node->source_type = prim::AggNode::Aggregate;
@@ -313,21 +323,24 @@ void prim::Ghost::prepareItem(prim::Item *item, prim::AggNode *node)
     prim::Aggregate *agg = static_cast<prim::Aggregate*>(item);
     for(prim::Item *it : agg->getChildren())
       prepareItem(it, new_node);
-  }
-  else if(item->item_type == prim::Item::DBDot){
+  } else if (item->item_type == prim::Item::DBDot) {
     // add a new index-type IndexList
     new_node = new prim::AggNode(sources.count());
     new_node->source_type = prim::AggNode::DBDot;
     node->nodes.append(new_node);
     // create a GhostDot for the Item
     createGhostDot(item);
-  }
-  else if(item->item_type == prim::Item::Electrode){
+  } else if (item->item_type == prim::Item::Electrode) {
     // add a new index-type IndexList
     new_node = new prim::AggNode(box_sources.count());
     new_node->source_type = prim::AggNode::Electrode;
     node->nodes.append(new_node);
     // create a GhostBox for the Item
+    createGhostBox(item);
+  } else if (item->item_type == prim::Item::AFMArea) {
+    new_node = new prim::AggNode(box_sources.count());
+    new_node->source_type = prim::AggNode::AFMArea;
+    node->nodes.append(new_node);
     createGhostBox(item);
   }
 }
@@ -400,7 +413,8 @@ prim::Item *prim::Ghost::getNodeItem(prim::AggNode *node) const
   }
   else if(node->source_type == prim::AggNode::DBDot)
     return sources.at(node->index);
-  else if(node->source_type == prim::AggNode::Electrode)
+  else if(node->source_type == prim::AggNode::Electrode ||
+          node->source_type == prim::AggNode::AFMArea)
     return box_sources.at(node->index);
   else
     return 0;

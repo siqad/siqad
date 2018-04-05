@@ -10,6 +10,7 @@
 #include "aggregate.h"
 #include "dbdot.h"
 #include "electrode.h"
+#include "afmarea.h"
 #include "afmpath.h"
 
 
@@ -157,6 +158,10 @@ void prim::Layer::saveLayer(QXmlStreamWriter *stream) const
 
 void prim::Layer::saveItems(QXmlStreamWriter *stream) const
 {
+  // Control layer type content not saved
+  if (getContentType() == Control)
+    return;
+
   stream->writeStartElement("layer");
   stream->writeAttribute("type", getContentTypeString());
 
@@ -182,6 +187,9 @@ void prim::Layer::loadItems(QXmlStreamReader *stream, QGraphicsScene *scene)
       } else if (stream->name() == "electrode") {
         stream->readNext();
         addItem(new prim::Electrode(stream, scene));
+      } else if (stream->name() == "afmarea") {
+        stream->readNext();
+        addItem(new prim::AFMArea(stream, scene));
       } else if (stream->name() == "afmpath") {
         stream->readNext();
         addItem(new prim::AFMPath(stream, scene));

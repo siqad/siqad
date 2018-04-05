@@ -1,6 +1,9 @@
 [submodule "src/phys/afmmarcus"]
 	path = src/phys/afmmarcus
-	url = https://github.com/retallickj/afm-sim
+	url = https://github.com/retallickj/afm-sim.git
 [submodule "src/phys/poissolver"]
 	path = src/phys/poissolver
 	url = https://github.com/NathanChiu/PoisSolvers.git
+[submodule "src/phys/simanneal"]
+	path = src/phys/simanneal
+	url = https://github.com/samuelngsh/simanneal-sidb.git

@@ -152,6 +152,8 @@ namespace gui{
     void selectClicked(prim::Item *item);
     void simVisualizeDockVisibilityChanged(bool visible);
 
+    void resizeBegin();
+
     void addItemToSceneRequest(prim::Item *item) {addItemToScene(item);}
     void removeItemFromSceneRequest(prim::Item *item) {removeItemFromScene(item);}
 
@@ -217,6 +219,7 @@ namespace gui{
     bool ghosting;  // currently dragging a ghost
     bool moving;    // moving an existing group
     bool pasting;   // evoked some kind of pasting
+    bool resizing;  // currently resizing an item
 
     // snapping
     qreal snap_diameter;            // size of region to search for snap points
@@ -315,8 +318,12 @@ namespace gui{
 
     class CreatePotPlot;  // create an electrode at the given points
 
+    class CreateAFMArea;    // create an AFM area
+
     class CreateAFMPath;    // create an empty AFMPath that should later contain AFMNodes
     class CreateAFMNode;    // create AFMNodes that should be children of AFMPath
+
+    class ResizeAFMArea;    // resize an AFM Area
 
     // functions including undo/redo behaviour
 
@@ -328,8 +335,18 @@ namespace gui{
     //create potential plot on panel
     void createPotPlot(QPixmap potential_plot, QRectF graph_container);
 
+    // create AFM area with rubberband selected area
+    void createAFMArea(QPoint point1);
+
     // create AFM node in focused path after focused node
     void createAFMNode();
+
+    void resizeItem(prim::Item *item, const QRectF &orig_rect,
+        const QRectF &new_rect);
+
+    // resize AFM Area
+    void resizeAFMArea(prim::AFMArea *afm_area, const QRectF &orig_rect,
+        const QRectF &new_rect);
 
     // destroy AFM path and included nodes
     void destroyAFMPath(prim::AFMPath *afm_path);
@@ -354,6 +371,7 @@ namespace gui{
     void pasteDBDot(prim::Ghost *ghost, prim::DBDot *db);
     void pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg);
     void pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec);
+    void pasteAFMArea(prim::Ghost *ghost, prim::AFMArea *afm_area);
 
     // move the selected items to the current Ghost, returns True if successful
     bool moveToGhost(bool kill=false);
@@ -461,6 +479,7 @@ namespace gui{
     // move an Aggregate by the given amount
     void moveAggregate(prim::Aggregate *agg, const QPointF &delta);
     void moveElectrode(prim::Electrode *electrode, const QPointF &delta);
+    void moveAFMArea(prim::AFMArea *afm_area, const QPointF &delta);
 
     DesignPanel *dp;
 
@@ -529,6 +548,35 @@ namespace gui{
   };
 
 
+  class DesignPanel::CreateAFMArea : public QUndoCommand
+  {
+  public:
+    //! Create an AFMArea at the given points
+    CreateAFMArea(int layer_index, gui::DesignPanel *dp, QPointF point1,
+        QPointF point2, prim::AFMArea *afm_area=0, bool invert=false,
+        QUndoCommand *parent=0);
+
+  private:
+    //! Destroy the AFMArea
+    virtual void undo();
+    //! Re-create the AFMArea
+    virtual void redo();
+
+    void create();    //! Create the AFMArea.
+    void destroy();   //! Destroy the AFMArea.
+
+    DesignPanel *dp;  //! Pointer to the DesignPanel
+    int layer_index;  //! Index of layer in dp->layers stack
+
+    QPointF point1;
+    QPointF point2;
+
+    bool invert;
+
+    int index;        //! Index of this item in the layer item stack.
+  };
+
+
   class DesignPanel::CreateAFMPath : public QUndoCommand
   {
   public:
@@ -581,6 +629,32 @@ namespace gui{
     int node_index;   // the Node's index in the path
     QPointF scenepos;
     float z_offset;
+  };
+
+  class DesignPanel::ResizeAFMArea : public QUndoCommand
+  {
+  public:
+    // resize the AFM area from the original positions to the new positions
+    ResizeAFMArea(int layer_index, DesignPanel *dp,
+        const QRectF &orig_rect, const QRectF &new_rect,
+        int afm_area_index, bool invert=false, QUndoCommand *parent=0);
+
+    // resize from new to original positions
+    virtual void undo();
+
+    // resize from original to new positions
+    virtual void redo();
+
+  private:
+    bool invert;
+
+    int layer_index;
+    DesignPanel *dp;
+    int afm_area_index; // the AFM Area's index in its layer
+    QPointF top_left_delta;
+    QPointF bot_right_delta;
+    QRectF orig_rect;
+    QRectF new_rect;
   };
 
 

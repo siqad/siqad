@@ -31,7 +31,7 @@ namespace prim{
   public:
 
     //! enum type for different layer contents
-    enum LayerType{Lattice, DB, Electrode, AFMTip, Plot};
+    enum LayerType{Lattice, DB, Electrode, AFMTip, Plot, Control};
     Q_ENUM(LayerType)
 
 
@@ -94,7 +94,7 @@ namespace prim{
     void setContentType(LayerType type) {content_type = type;}
 
     //! get the Layer content type, like "electrode", "dbdots", etc.
-    LayerType getContentType() {return content_type;}
+    LayerType getContentType() const {return content_type;}
     const QString getContentTypeString() const {return QString(QMetaEnum::fromType<LayerType>().valueToKey(content_type));}
 
     //! if i is within bounds, return a pointer to the indexed item in the Layer

@@ -65,6 +65,7 @@ namespace gui{
     void setToolDrag();
     void setToolDBGen();
     void setToolElectrode();
+    void setToolAFMArea();
     void setToolAFMPath();
 
     // change lattice
@@ -166,6 +167,7 @@ namespace gui{
     QAction *action_drag_tool;    // change cursor tool to drag
     QAction *action_dbgen_tool;   // change cursor tool to gen
     QAction *action_electrode_tool;   // change cursor tool to electrode
+    QAction *action_afmarea_tool; // change cursor tool to AFM Area tool
     QAction *action_afmpath_tool; // change cursor tool to AFM Path tool
     QAction *action_label_tool;   // change cursor tool to label
     QAction *action_run_sim;      // run the current simulation method

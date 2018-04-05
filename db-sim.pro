@@ -68,10 +68,12 @@ HEADERS += \
 	src/gui/widgets/primitives/sim_engine.h \
 	src/gui/widgets/primitives/sim_job.h \
 	src/gui/widgets/primitives/electrode.h \
+  src/gui/widgets/primitives/afmarea.h \
   src/gui/widgets/primitives/afmpath.h \
   src/gui/widgets/primitives/afmnode.h \
   src/gui/widgets/primitives/afmseg.h \
-  src/gui/widgets/primitives/pot_plot.h
+  src/gui/widgets/primitives/pot_plot.h \
+	src/gui/widgets/primitives/resize_frame.h
 
 
 SOURCES += \
@@ -86,10 +88,12 @@ SOURCES += \
 	src/gui/widgets/primitives/sim_engine.cc \
 	src/gui/widgets/primitives/sim_job.cc \
 	src/gui/widgets/primitives/electrode.cc \
+	src/gui/widgets/primitives/afmarea.cc \
 	src/gui/widgets/primitives/afmpath.cc \
 	src/gui/widgets/primitives/afmnode.cc \
 	src/gui/widgets/primitives/afmseg.cc \
-  src/gui/widgets/primitives/pot_plot.cc
+  src/gui/widgets/primitives/pot_plot.cc \
+	src/gui/widgets/primitives/resize_frame.cc
 
 
 # widgets
@@ -101,10 +105,10 @@ HEADERS += \
 	src/gui/widgets/input_field.h \
 	src/gui/widgets/info_panel.h \
 	src/qcustomplot.h\
-    src/gui/widgets/layer_editor.h \
-    src/gui/widgets/sim_manager.h \
-    src/gui/widgets/sim_visualize_panel.h \
-    src/gui/widgets/afm_panel.h
+  src/gui/widgets/layer_editor.h \
+  src/gui/widgets/sim_manager.h \
+  src/gui/widgets/sim_visualize_panel.h \
+  src/gui/widgets/afm_panel.h
 
 
 SOURCES += \
@@ -114,10 +118,10 @@ SOURCES += \
 	src/gui/widgets/input_field.cc \
 	src/gui/widgets/info_panel.cc \
 	src/qcustomplot.cpp\
-    src/gui/widgets/layer_editor.cc \
-    src/gui/widgets/sim_manager.cc \
-    src/gui/widgets/sim_visualize_panel.cc \
-    src/gui/widgets/afm_panel.cc
+  src/gui/widgets/layer_editor.cc \
+  src/gui/widgets/sim_manager.cc \
+  src/gui/widgets/sim_visualize_panel.cc \
+  src/gui/widgets/afm_panel.cc
 
 
 #####################
