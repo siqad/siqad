@@ -353,7 +353,7 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   top_layer = layers.at(1);
 
   // add in the metal layer for electrodes
-  addLayer(tr("Metal"),prim::Layer::Electrode,-100E-9,0);
+  addLayer(tr("Metal"),prim::Layer::Electrode,-100E-9,100E-9);
   electrode_layer = layers.at(2);
 
   // add in the AFM layer for AFM tip travel paths
