@@ -354,7 +354,7 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   top_layer = layers.at(1);
 
   // add in the metal layer for electrodes
-  addLayer(tr("Metal"),prim::Layer::Electrode,-100E-9,100E-9);
+  addLayer(tr("Metal"),prim::Layer::Electrode,-100E-9,10E-9);
   electrode_layer = layers.at(2);
 
   // add in the AFM layer for AFM tip travel paths
@@ -1244,11 +1244,11 @@ void gui::DesignPanel::electrodeSetPotentialAction()
     if(selection.count() == 1){
       potential = QInputDialog::getDouble(this, tr("Set Potential"),
                   tr("Set electrode potential(s) to:"), static_cast<prim::Electrode*>(selection.at(0))->getPotential(),
-                  -2147483647, 2147483647, 1, &ok);
+                  -2147483647, 2147483647, 3, &ok);
     } else {
       potential = QInputDialog::getDouble(this, tr("Set Potential"),
                   tr("WARNING: Multiple electrodes selected.\nSet electrode potential(s) to:"), 0.0,
-                  -2147483647, 2147483647, 1, &ok);
+                  -2147483647, 2147483647, 3, &ok);
     }
     if(ok){
       for(prim::Item *item : selection){
