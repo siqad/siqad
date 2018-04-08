@@ -15,8 +15,8 @@
 namespace gui{
 
   enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool, ElectrodeTool,
-      AFMAreaTool, AFMPathTool};
-  enum DisplayMode{DesignMode, SimDisplayMode};
+      AFMAreaTool, AFMPathTool, ScreenshotAreaTool};
+  enum DisplayMode{DesignMode, SimDisplayMode, ScreenshotMode};
 
 } // end global namespace
 

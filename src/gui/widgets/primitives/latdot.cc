@@ -68,7 +68,7 @@ void prim::LatticeDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->drawEllipse(rect);
 
     // draw inner circle
-    if(db_gen_mode && isSelected()){
+    if(tool_type == gui::ToolType::DBGenTool && isSelected()){
         QPointF center = rect.center();
         QSizeF size(diameter, diameter);
         rect.setSize(size*in_fill);

@@ -122,8 +122,13 @@ namespace gui{
     //! check if the contents of the DesignPanel have changed
     bool stateChanged() const {return !undo_stack->isClean();}
 
-    //! return the current display mode
+    //! Take an SVG screenshot bounded by the given QRect
+    void screenshot(QRect rect);
+
+    //! Return the current display mode.
     DisplayMode displayMode() {return display_mode;}
+
+    //! Set the current display mode. DisplayMode is defined in global.h.
     void setDisplayMode(DisplayMode mode);
 
     //! get afm_panel pointer
@@ -164,7 +169,8 @@ namespace gui{
 
   signals:
     void sig_toolChangeRequest(gui::ToolType tool);  // request ApplicationGUI to change tool
-    void sig_toolChanged(gui::ToolType tool);  // request ApplicationGUI to change tool
+    void sig_toolChanged(gui::ToolType tool); // notify other components of the
+                                              // change in tool
     void sig_resetDesignPanel();
     void sig_undoStackCleanChanged(bool); // emitted when undo_stack emits cleanChanged(bool)
 
@@ -231,6 +237,7 @@ namespace gui{
     prim::AFMSeg *ghost_afm_seg=0;
 
     // mouse functionality
+    QPoint press_scene_pos;   // the scene position at the last mouse press event
     QPoint mouse_pos_old;     // old mouse position in pixels on click
     QPoint mouse_pos_cached;  // parameter for caching relevant mouse positions on click, in pixels
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
@@ -270,6 +277,9 @@ namespace gui{
     // hide rubberband and reset flags
     void rubberBandEnd();
 
+    // SCREENSHOT
+
+    QRect screenshot_rect;
 
 
     // GHOSTclass UndoCommand;e a Ghost for the current selection or clipboard

@@ -12,9 +12,9 @@
 
 
 qreal prim::Item::scale_factor = -1;
-bool prim::Item::select_mode = false;
-bool prim::Item::db_gen_mode = false;
-bool prim::Item::electrode_mode = false;
+
+gui::DisplayMode prim::Item::display_mode;
+gui::ToolType prim::Item::tool_type;
 
 
 // CLASS::Item
@@ -50,7 +50,7 @@ bool prim::Item::upHovered()
 
 QColor prim::Item::getCurrentStateColor(const prim::Item::StateColors &state_colors)
 {
-  if (select_mode && upSelected())
+  if (tool_type == gui::SelectTool && upSelected())
     return state_colors.selected;
   else if (upHovered())
     return state_colors.hovered;

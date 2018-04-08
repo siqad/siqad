@@ -205,12 +205,12 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
     rect.moveCenter(center);
 
     painter->setPen(Qt::NoPen);
-    painter->setBrush((select_mode && upSelected()) ? fill_col_sel : fill_col);
+    painter->setBrush((tool_type == gui::SelectTool && upSelected()) ? fill_col_sel : fill_col);
     painter->drawEllipse(rect);
   }
 
   // draw outer circle
-  painter->setPen(QPen((select_mode && upSelected()) ? selected_col : edge_col, edge_width));
+  painter->setPen(QPen((tool_type == gui::SelectTool && upSelected()) ? selected_col : edge_col, edge_width));
   painter->drawEllipse(rect);
 
 }

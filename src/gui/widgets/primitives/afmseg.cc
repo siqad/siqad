@@ -102,7 +102,7 @@ void AFMSeg::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget 
   if (!segmentIsValid())
     return;
 
-  if (select_mode && upSelected()) {
+  if (tool_type == gui::SelectTool && upSelected()) {
     line_col = line_col_sel;
   } else if (isHovered()) {
     line_col = line_col_hovered;

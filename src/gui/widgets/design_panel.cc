@@ -389,10 +389,7 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
   scene->clearSelection();
 
   // inform all items of select mode
-  // TODO replace with signal based notification
-  prim::Item::select_mode = tool==gui::ToolType::SelectTool;
-  prim::Item::db_gen_mode = tool==gui::ToolType::DBGenTool;
-  prim::Item::electrode_mode = tool==gui::ToolType::ElectrodeTool;
+  prim::Item::tool_type = tool;
 
   switch(tool){
     case gui::ToolType::SelectTool:
@@ -441,13 +438,16 @@ void gui::DesignPanel::setFills(float *fills)
 }
 
 
+void gui::DesignPanel::screenshot(QRect rect)
+{
+
+}
+
+
 void gui::DesignPanel::setDisplayMode(DisplayMode mode)
 {
   display_mode = mode;
-
-  for(prim::Layer* layer : layers)
-    for(prim::Item* item : layer->getItems())
-      item->setDesignMode(mode == DesignMode);
+  prim::Item::display_mode = mode;
 }
 
 
@@ -748,6 +748,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   // set clicked flag and store current mouse position for move behaviour
   mouse_pos_old = e->pos();
   mouse_pos_cached = e->pos(); // this might be a referencing clash, check.
+  press_scene_pos = mapToScene(e->pos()); // the scene position of the click event
 
   // if other buttons are clicked during rubber band selection, end selection
   if(rb)
@@ -756,7 +757,12 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   clicked = true;
   switch(e->button()){
     case Qt::LeftButton:
-      if (tool_type == SelectTool || tool_type == ElectrodeTool ||
+      if (tool_type == ScreenshotAreaTool) {
+        // use rubberband to select screenshot area
+        rb_start = mapToScene(e->pos()).toPoint();
+        rb_cache = e->pos();
+
+      } else if (tool_type == SelectTool || tool_type == ElectrodeTool ||
           tool_type == AFMAreaTool) {
         // rubber band variables
         rb_start = mapToScene(e->pos()).toPoint();
@@ -833,8 +839,9 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
       case Qt::LeftButton:
-        if (tool_type == SelectTool || tool_type == DBGenTool
-              || tool_type == ElectrodeTool || tool_type == AFMAreaTool) {
+        if (tool_type == SelectTool || tool_type == DBGenTool ||
+            tool_type == ElectrodeTool || tool_type == AFMAreaTool ||
+            tool_type == ScreenshotAreaTool) {
           rubberBandUpdate(e->pos());
         }
         // use default behaviour for left mouse button
@@ -888,6 +895,11 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
       case Qt::LeftButton:
         // action based on chosen tool
         switch(tool_type){
+          case gui::ToolType::ScreenshotAreaTool:
+            // take a screenshot of the rubberband area
+            filterSelection(false);
+            screenshot(QRect(press_scene_pos, mapToScene(e->pos())));
+            break;
           case gui::ToolType::SelectTool:
             // filter out items in the lattice
             filterSelection(true);
@@ -1306,11 +1318,12 @@ void gui::DesignPanel::createActions()
 
 void gui::DesignPanel::filterSelection(bool select_flag)
 {
-  // should only be here if tool type is either select or dbgen
+  // should only be here if tool type is one of the following
   if (tool_type != gui::ToolType::SelectTool &&
       tool_type != gui::ToolType::DBGenTool &&
       tool_type != gui::ToolType::ElectrodeTool &&
-      tool_type != gui::ToolType::AFMAreaTool){
+      tool_type != gui::ToolType::AFMAreaTool &&
+      tool_type != gui::ToolType::ScreenshotAreaTool){
     qCritical() << tr("Filtering selection with invalid tool type...");
     return;
   }

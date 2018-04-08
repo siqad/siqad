@@ -176,12 +176,14 @@ void gui::ApplicationGUI::initMenuBar()
   // tools menu actions
   QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
   QAction *select_color = new QAction(tr("Select Color..."), this);
+  QAction *area_screenshot = new QAction(tr("Area Screenshot..."), this);
   QAction *screenshot = new QAction(tr("Full Screenshot..."), this);
   QAction *design_screenshot = new QAction(tr("Design Screenshot..."), this);
   QAction *action_settings_dialog = new QAction(tr("Settings"), this);
 
   tools->addAction(change_lattice);
   tools->addAction(select_color);
+  tools->addAction(area_screenshot);
   tools->addAction(screenshot);
   tools->addAction(design_screenshot);
   tools->addSeparator();
@@ -202,6 +204,7 @@ void gui::ApplicationGUI::initMenuBar()
   connect(rotate_view_ccw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCcw);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
+  connect(area_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::areaScreenshot);
   connect(screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
   connect(design_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::designScreenshot);
   connect(action_settings_dialog, &QAction::triggered, this, &gui::ApplicationGUI::showSettingsDialog);
@@ -271,6 +274,8 @@ void gui::ApplicationGUI::initSideBar()
   // actions
   QActionGroup *action_group = new QActionGroup(side_bar);
 
+  action_screenshot_tool = side_bar->addAction(QIcon(":/ico/screenshotarea.svg"),
+      tr("Screenshot Area tool"));
   action_select_tool = side_bar->addAction(QIcon(":/ico/select.svg"),
       tr("Select tool"));
   action_drag_tool = side_bar->addAction(QIcon(":/ico/drag.svg"),
@@ -286,6 +291,7 @@ void gui::ApplicationGUI::initSideBar()
   //TODO action_label_tool = side_bar->addAction(QIcon(":/ico/drawlabel.svg"),
   //    tr("Label tool"));
 
+  action_group->addAction(action_screenshot_tool);
   action_group->addAction(action_select_tool);
   action_group->addAction(action_drag_tool);
   action_group->addAction(action_dbgen_tool);
@@ -294,6 +300,9 @@ void gui::ApplicationGUI::initSideBar()
   action_group->addAction(action_afmpath_tool);
   //action_group->addAction(action_label_tool);
 
+  action_screenshot_tool->setVisible(false);  // only shown in ScreenshotMode
+
+  action_screenshot_tool->setCheckable(true);
   action_select_tool->setCheckable(true);
   action_drag_tool->setCheckable(true);
   action_dbgen_tool->setCheckable(true);
@@ -304,6 +313,8 @@ void gui::ApplicationGUI::initSideBar()
 
   action_select_tool->setChecked(true);
 
+  connect(action_screenshot_tool, &QAction::triggered,
+          this, &gui::ApplicationGUI::setToolScreenshotArea);
   connect(action_select_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolSelect);
   connect(action_drag_tool, &QAction::triggered,
@@ -527,6 +538,9 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
       action_afmpath_tool->setChecked(true);
       setToolAFMPath();
       break;
+    case gui::ToolType::ScreenshotAreaTool:
+      action_screenshot_tool->setChecked(true);
+      setToolScreenshotArea();
     default:
       break;
   }
@@ -570,6 +584,12 @@ void gui::ApplicationGUI::setToolAFMPath()
 {
   qDebug() << tr("selecting afmpath tool");
   design_pan->setTool(gui::ToolType::AFMPathTool);
+}
+
+void gui::ApplicationGUI::setToolScreenshotArea()
+{
+  qDebug() << tr("selecting screenshot area tool");
+  design_pan->setTool(gui::ToolType::ScreenshotAreaTool);
 }
 
 
@@ -692,6 +712,23 @@ void gui::ApplicationGUI::selectColor()
     tr("Select a color"), QColorDialog::ShowAlphaChannel);
 }
 
+
+void gui::ApplicationGUI::areaScreenshot()
+{
+  design_pan->setDisplayMode(ScreenshotMode);
+  action_screenshot_tool->setVisible(true);
+  setTool(ScreenshotAreaTool);
+
+  // TODO allow user to draw a rectangle
+  // TODO or let user use the previous rectangle if they want
+    // like show a faint box showing the previously captured area and say press
+    // a certain hotkey to reuse the area or click anywhere to select a new area,
+    // this box will disappear
+
+  // call screenshot() with the rectangle
+
+  // update prev_screenshot_area
+}
 
 void gui::ApplicationGUI::screenshot()
 {
