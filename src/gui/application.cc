@@ -100,6 +100,8 @@ void gui::ApplicationGUI::initGUI()
           this, &gui::ApplicationGUI::updateWindowTitle);
   connect(sim_visualize, &gui::SimVisualize::showPotPlotOnScene,
           design_pan, &gui::DesignPanel::displayPotentialPlot);
+  connect(design_pan, SIGNAL(sig_screenshot(QRect)),
+          this, SLOT(designScreenshot(QRect)));
 
   // layout management
   QWidget *main_widget = new QWidget(this); // main widget for mainwindow
@@ -183,7 +185,7 @@ void gui::ApplicationGUI::initMenuBar()
 
   tools->addAction(change_lattice);
   tools->addAction(select_color);
-  tools->addAction(area_screenshot);
+  // tools->addAction(area_screenshot); // taken out for now until proper implementation
   tools->addAction(screenshot);
   tools->addAction(design_screenshot);
   tools->addSeparator();
@@ -204,9 +206,10 @@ void gui::ApplicationGUI::initMenuBar()
   connect(rotate_view_ccw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCcw);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
-  connect(area_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::areaScreenshot);
+  connect(area_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::beginScreenshotMode);
   connect(screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
-  connect(design_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::designScreenshot);
+  connect(design_screenshot, SIGNAL(triggered()),
+          this, SLOT(designScreenshot()));
   connect(action_settings_dialog, &QAction::triggered, this, &gui::ApplicationGUI::showSettingsDialog);
   connect(about_version, &QAction::triggered, this, &gui::ApplicationGUI::aboutVersion);
 
@@ -713,21 +716,18 @@ void gui::ApplicationGUI::selectColor()
 }
 
 
-void gui::ApplicationGUI::areaScreenshot()
+void gui::ApplicationGUI::beginScreenshotMode()
 {
   design_pan->setDisplayMode(ScreenshotMode);
   action_screenshot_tool->setVisible(true);
   setTool(ScreenshotAreaTool);
+}
 
-  // TODO allow user to draw a rectangle
-  // TODO or let user use the previous rectangle if they want
-    // like show a faint box showing the previously captured area and say press
-    // a certain hotkey to reuse the area or click anywhere to select a new area,
-    // this box will disappear
-
-  // call screenshot() with the rectangle
-
-  // update prev_screenshot_area
+void gui::ApplicationGUI::endScreenshotMode()
+{
+  design_pan->setDisplayMode(DesignMode);
+  action_screenshot_tool->setVisible(false);
+  setTool(SelectTool);
 }
 
 void gui::ApplicationGUI::screenshot()
@@ -769,6 +769,24 @@ void gui::ApplicationGUI::screenshot()
 
 void gui::ApplicationGUI::designScreenshot()
 {
+  beginScreenshotMode();
+
+  gui::DesignPanel *widget = this->design_pan;
+  QRect rect = widget->rect();
+  rect.setHeight(rect.height() - widget->horizontalScrollBar()->height());
+  rect.setWidth(rect.width() - widget->verticalScrollBar()->width());
+
+  designScreenshot(rect);
+}
+
+
+void gui::ApplicationGUI::designScreenshot(QRect rect)
+{
+  // TODO turns out Qt's SVG doesn't support clipping. I'll not remove the code
+  // but return to this in the future for another implementation.
+
+  qDebug() << tr("taking screenshot for rect (%1, %2) (%3, %4)")
+      .arg(rect.left()).arg(rect.top()).arg(rect.right()).arg(rect.bottom());
   // get save path
   QString fname = QFileDialog::getSaveFileName(this, tr("Save File"), img_dir.path(),
                       tr("SVG files (*.svg)"));
@@ -777,11 +795,6 @@ void gui::ApplicationGUI::designScreenshot()
     return;
   img_dir = QDir(fname);
 
-  gui::DesignPanel *widget = this->design_pan;
-  QRect rect = widget->rect();
-  rect.setHeight(rect.height() - widget->horizontalScrollBar()->height());
-  rect.setWidth(rect.width() - widget->verticalScrollBar()->width());
-
   QSvgGenerator gen;
   gen.setFileName(fname);
   gen.setSize(rect.size());
@@ -789,10 +802,11 @@ void gui::ApplicationGUI::designScreenshot()
 
   QPainter painter;
   painter.begin(&gen);
-  widget->render(&painter);
+  design_pan->render(&painter);
   painter.end();
-}
 
+  endScreenshotMode();
+}
 
 // FILE HANDLING
 

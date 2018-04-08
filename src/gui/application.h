@@ -92,16 +92,21 @@ namespace gui{
 
     // Screenshots
 
-    //! Take an svg capture of a selected area
-    void areaScreenshot();
+    //! Initiate Screenshot Mode which allows the user to pick an area to
+    //! screenshot.
+    void beginScreenshotMode();
 
-    //! Take an svg capture of the selected area, or the entire GUI if no rect
-    //! is given.
-    //void screenshot(QRect rect=QRect());
+    //! End Screenshot mode.
+    void endScreenshotMode();
+
+    //! Take an svg capture of the entire GUI.
     void screenshot();
 
     //! Take an svg capture of the design window.
     void designScreenshot();
+
+    //! Take an svg capture of the design window in the given area.
+    void designScreenshot(QRect rect);
 
     // show pop-up dialogs
     void showSettingsDialog() {settings_dialog->show();}

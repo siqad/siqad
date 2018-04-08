@@ -415,7 +415,10 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
       setInteractive(true);
       break;
     case gui::ToolType::AFMPathTool:
-      setInteractive(true); // TODO check back later that this is the right mode
+      setInteractive(true);
+      break;
+    case gui::ToolType::ScreenshotAreaTool:
+      setInteractive(true);
       break;
     default:
       qCritical() << tr("Invalid ToolType... should not have happened");
@@ -435,12 +438,6 @@ void gui::DesignPanel::setFills(float *fills)
     else
       dbs.at(i)->setFill(fills[i]);
   }
-}
-
-
-void gui::DesignPanel::screenshot(QRect rect)
-{
-
 }
 
 
@@ -895,11 +892,6 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
       case Qt::LeftButton:
         // action based on chosen tool
         switch(tool_type){
-          case gui::ToolType::ScreenshotAreaTool:
-            // take a screenshot of the rubberband area
-            filterSelection(false);
-            screenshot(QRect(press_scene_pos, mapToScene(e->pos())));
-            break;
           case gui::ToolType::SelectTool:
             // filter out items in the lattice
             filterSelection(true);
@@ -921,6 +913,11 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
           case gui::ToolType::AFMPathTool:
             // Make node at the ghost position
             createAFMNode();
+            break;
+          case gui::ToolType::ScreenshotAreaTool:
+            // take a screenshot of the rubberband area
+            filterSelection(false);
+            sig_screenshot(QRect(press_scene_pos.toPoint(), mapToScene(e->pos()).toPoint()));
             break;
           case gui::ToolType::DragTool:
             // pan ends

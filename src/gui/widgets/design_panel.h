@@ -122,9 +122,6 @@ namespace gui{
     //! check if the contents of the DesignPanel have changed
     bool stateChanged() const {return !undo_stack->isClean();}
 
-    //! Take an SVG screenshot bounded by the given QRect
-    void screenshot(QRect rect);
-
     //! Return the current display mode.
     DisplayMode displayMode() {return display_mode;}
 
@@ -173,6 +170,10 @@ namespace gui{
                                               // change in tool
     void sig_resetDesignPanel();
     void sig_undoStackCleanChanged(bool); // emitted when undo_stack emits cleanChanged(bool)
+
+    //! Request ApplicationGUI to take a screenshot of the design panel bounded
+    //! by the given QRect.
+    void sig_screenshot(QRect);
 
   protected:
 
@@ -237,7 +238,7 @@ namespace gui{
     prim::AFMSeg *ghost_afm_seg=0;
 
     // mouse functionality
-    QPoint press_scene_pos;   // the scene position at the last mouse press event
+    QPointF press_scene_pos;   // the scene position at the last mouse press event
     QPoint mouse_pos_old;     // old mouse position in pixels on click
     QPoint mouse_pos_cached;  // parameter for caching relevant mouse positions on click, in pixels
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
