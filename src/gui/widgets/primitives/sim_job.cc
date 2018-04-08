@@ -9,6 +9,7 @@
 
 #include <QProcess>
 #include <iostream>
+#include <algorithm>
 #include "sim_job.h"
 
 namespace prim{
@@ -112,6 +113,9 @@ bool SimJob::readResults()
 
   // TODO flag that indicates what type of data these results contain, might be useful for sim_manager
 
+  // store electron distributions to a map first for deduplication
+  QMap<QString, elecDist> elec_dists_map;
+
   while(!rs.atEnd()){
     if(rs.isStartElement()){
       if(rs.name() == "sim_out"){
@@ -156,16 +160,28 @@ bool SimJob::readResults()
           if(!rs.readNextStartElement())
             continue; // skip until a start element is encountered
           if(rs.name() == "dist"){
-            // read dist, convert each character to bool (or raise error if not 0/1) and push_back the list to elec_dists
-            elec_dists.append(QList<int>());
+            // read dist, convert each character to bool and store to a temp map
+            float energy = -1;
+            for (QXmlStreamAttribute &attr : rs.attributes()) {
+              if (attr.name().toString() == QLatin1String("energy")) {
+                energy = attr.value().toFloat();
+              }
+            }
+
             QString dist = rs.readElementText();
-            for(QString chg : dist)
-              elec_dists.last().append(chg.toInt());
-            // print dist for verification TODO remove later
-            QString this_dist;
-            for(int this_chg : elec_dists.last())
-              this_dist.append(QString::number(this_chg));
-            //qDebug() << tr("This distribution: %1").arg(this_dist);
+            if (elec_dists_map.contains(dist)) {
+              elec_dists_map[dist].count++;
+              continue;
+            }
+
+            elecDist read_dist;
+            read_dist.energy = energy;
+
+            for (QString charge : dist)
+              read_dist.dist.append(charge.toInt());
+
+            elec_dists_map[dist] = read_dist;
+            qDebug() << tr("Distribution: %1, Energy: %2").arg(dist).arg(read_dist.energy);
           }
         }
         rs.readNext();
@@ -247,6 +263,9 @@ bool SimJob::readResults()
   qDebug() << tr("SimJob: Successfully read simulation result.");
   result_file.close();
 
+  // sort and store the deduplicated electron distributions into the class
+  sortStoreElecDists(elec_dists_map);
+
   return true;
 }
 
@@ -256,6 +275,13 @@ bool SimJob::processResults()
   // TODO sort results?
   // TODO deduplicate results, keep count of how many times it was duplicated
   return true;
+}
+
+
+void SimJob::sortStoreElecDists(QMap<QString, elecDist> elec_dists_map)
+{
+  elec_dists.append(elec_dists_map.values());
+  std::sort(elec_dists.begin(), elec_dists.end());
 }
 
 

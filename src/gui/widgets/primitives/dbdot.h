@@ -92,6 +92,10 @@ namespace prim{
     static QColor fill_col_elec;
     static QColor fill_col_elec_sel;
 
+    static prim::Item::StateColors fill_col;            // normal dbdot
+    static prim::Item::StaticColors fill_col_driver;    // driver (forced polarization)
+    static prim::Item::StaticColors fill_col_electron;  // contains electron
+
     // static class parameters for painting
 
     qreal diameter;      // dot diameter in angstroms

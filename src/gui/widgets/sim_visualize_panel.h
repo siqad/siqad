@@ -69,6 +69,7 @@ namespace gui{
 
     QSlider *slider_dist_sel;
     QLabel *text_dist_selected;
+    QLabel *text_dist_energy;
   };
 
 } // end of gui namespace

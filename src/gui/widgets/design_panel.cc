@@ -667,7 +667,7 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
   // set their show_elec to the set specified by job->elec_dists
   for(int i=0; i<db_dots_result.size(); i++){
     if(db_dots_result[i])
-      db_dots_result[i]->setShowElec(job->elec_dists[dist_ind][i]);
+      db_dots_result[i]->setShowElec(job->elec_dists[dist_ind].dist[i]);
   }
 }
 

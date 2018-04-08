@@ -318,6 +318,8 @@ void SimVisualize::initSimVisualize()
   QPushButton *button_dist_prev = new QPushButton(tr("<"));
   QPushButton *button_dist_next = new QPushButton(tr(">"));
   text_dist_selected = new QLabel("0/0");
+  QLabel *label_dist_energy = new QLabel("Energy:");
+  text_dist_energy = new QLabel("0");
 
   button_dist_prev->setShortcut(tr("CTRL+H"));
   button_dist_next->setShortcut(tr("CTRL+L"));
@@ -334,9 +336,14 @@ void SimVisualize::initSimVisualize()
   dist_sel_buttons_hl->addWidget(text_dist_selected);
   dist_sel_buttons_hl->addWidget(button_dist_next);
 
+  QHBoxLayout *dist_energy_hl = new QHBoxLayout;
+  dist_energy_hl->addWidget(label_dist_energy);
+  dist_energy_hl->addWidget(text_dist_energy);
+
   QVBoxLayout *dist_vl = new QVBoxLayout;
   dist_vl->addLayout(dist_sel_hl);
   dist_vl->addLayout(dist_sel_buttons_hl);
+  dist_vl->addLayout(dist_energy_hl);
 
   dist_group->setLayout(dist_vl);
 
@@ -365,9 +372,12 @@ void SimVisualize::jobSelUpdate()
 
 void SimVisualize::distSelUpdate()
 {
+  int elec_ind = slider_dist_sel->sliderPosition() - 1;
   text_dist_selected->setText(tr("%1/%2").arg(
       slider_dist_sel->value()).arg(show_job->elec_dists.size()));
-  showElecDist(slider_dist_sel->sliderPosition());
+  showElecDist(elec_ind);
+
+  text_dist_energy->setText(QString::number(show_job->elec_dists[elec_ind].energy));
 }
 
 void SimVisualize::distPrev()
