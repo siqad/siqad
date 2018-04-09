@@ -791,8 +791,10 @@ void gui::ApplicationGUI::designScreenshot(QRect rect)
   QString fname = QFileDialog::getSaveFileName(this, tr("Save File"), img_dir.path(),
                       tr("SVG files (*.svg)"));
 
-  if(fname.isEmpty())
+  if(fname.isEmpty()) {
+    endScreenshotMode();
     return;
+  }
   img_dir = QDir(fname);
 
   QSvgGenerator gen;

@@ -50,12 +50,16 @@ bool prim::Item::upHovered()
 
 QColor prim::Item::getCurrentStateColor(const prim::Item::StateColors &state_colors)
 {
+  if (display_mode == gui::ScreenshotMode)
+    return state_colors.high_contrast; // high contrast when taking a screenshot
+
   if (tool_type == gui::SelectTool && upSelected())
     return state_colors.selected;
-  else if (upHovered())
+
+  if (upHovered())
     return state_colors.hovered;
-  else
-    return state_colors.normal;
+
+  return state_colors.normal;
 }
 
 
