@@ -443,8 +443,8 @@ void gui::DesignPanel::setFills(float *fills)
 
 void gui::DesignPanel::screenshot(QPainter *painter, const QRect &region)
 {
+  prev_screenshot_area = region;
   scene->render(painter, region, region);
-  //design_pan->render(&painter, QRectF(), rect);
 }
 
 
@@ -1081,8 +1081,8 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
           deleteSelection();
         break;
       case Qt::Key_S:
-        if(keymods == Qt::ControlModifier){
-          //gui::ApplicationGUI::saveToFile();
+        if (display_mode == ScreenshotMode) {
+          sig_screenshot(prev_screenshot_area);
         }
         break;
       default:

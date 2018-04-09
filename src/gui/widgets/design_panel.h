@@ -246,6 +246,9 @@ namespace gui{
     QPoint mouse_pos_cached;  // parameter for caching relevant mouse positions on click, in pixels
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
 
+    // screenshot
+    QRect prev_screenshot_area; // store the previous screenshot area for reuse
+
     // sim visualization
     QList<prim::DBDot*> db_dots_result;
 
