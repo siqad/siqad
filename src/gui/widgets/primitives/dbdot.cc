@@ -219,7 +219,6 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
   // draw outer circle
   painter->setPen(QPen(getCurrentStateColor(edge_col), edge_width));
   painter->drawEllipse(rect);
-
 }
 
 

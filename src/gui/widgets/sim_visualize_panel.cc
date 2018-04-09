@@ -320,6 +320,7 @@ void SimVisualize::initSimVisualize()
   text_dist_selected = new QLabel("0/0");
   QLabel *label_dist_energy = new QLabel("Energy:");
   text_dist_energy = new QLabel("0");
+  QLabel *label_dist_energy_unit = new QLabel("eV");
 
   button_dist_prev->setShortcut(tr("CTRL+H"));
   button_dist_next->setShortcut(tr("CTRL+L"));
@@ -339,6 +340,7 @@ void SimVisualize::initSimVisualize()
   QHBoxLayout *dist_energy_hl = new QHBoxLayout;
   dist_energy_hl->addWidget(label_dist_energy);
   dist_energy_hl->addWidget(text_dist_energy);
+  dist_energy_hl->addWidget(label_dist_energy_unit);
 
   QVBoxLayout *dist_vl = new QVBoxLayout;
   dist_vl->addLayout(dist_sel_hl);

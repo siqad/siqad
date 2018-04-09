@@ -122,6 +122,9 @@ namespace gui{
     //! check if the contents of the DesignPanel have changed
     bool stateChanged() const {return !undo_stack->isClean();}
 
+    //! take a screenshot of the design at the specified QRect in scene coord
+    void screenshot(QPainter *painter, const QRect &region=QRect());
+
     //! Return the current display mode.
     DisplayMode displayMode() {return display_mode;}
 

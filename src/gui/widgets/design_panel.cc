@@ -441,6 +441,13 @@ void gui::DesignPanel::setFills(float *fills)
 }
 
 
+void gui::DesignPanel::screenshot(QPainter *painter, const QRect &region)
+{
+  scene->render(painter, region, region);
+  //design_pan->render(&painter, QRectF(), rect);
+}
+
+
 void gui::DesignPanel::setDisplayMode(DisplayMode mode)
 {
   display_mode = mode;

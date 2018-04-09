@@ -185,7 +185,7 @@ void gui::ApplicationGUI::initMenuBar()
 
   tools->addAction(change_lattice);
   tools->addAction(select_color);
-  // tools->addAction(area_screenshot); // taken out for now until proper implementation
+   tools->addAction(area_screenshot); // taken out for now until proper implementation
   tools->addAction(screenshot);
   tools->addAction(design_screenshot);
   tools->addSeparator();
@@ -805,7 +805,8 @@ void gui::ApplicationGUI::designScreenshot(QRect rect)
 
   QPainter painter;
   painter.begin(&gen);
-  design_pan->render(&painter);
+  //design_pan->render(&painter, QRectF(), rect);
+  design_pan->screenshot(&painter, rect);
   painter.end();
 
   endScreenshotMode();
