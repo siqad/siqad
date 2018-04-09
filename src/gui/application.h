@@ -153,15 +153,15 @@ namespace gui{
 
     // VARIABLES
 
+    // display mode cache for returning to previous mode
+    DisplayMode display_mode_cache;
+
     // save start time for instance recognition
     QDateTime start_time;
 
     // directory path persistence
     QDir img_dir;
     QDir save_dir;
-
-    // previous screenshot area
-    QRect prev_screenshot_area;
 
     // purely graphics widgets
     QToolBar *top_bar;

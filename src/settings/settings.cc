@@ -151,6 +151,7 @@ QSettings* settings::GUISettings::m_defs()
   // QGraphicsView
   S->setValue("view/scale_fact", 10);           // pixels/angstrom in the main view
   S->setValue("view/bg_col", QColor(40,50,60)); // background color
+  S->setValue("view/bg_col_hc", QColor(255,255,255)); // background color
   S->setValue("view/zoom_factor", 0.1);         // scaling factor for zoom operations
   S->setValue("view/zoom_boost", 2);            // must have factor*boost < 1
   S->setValue("view/zoom_min", .1);             // minimum zoom factor
@@ -176,17 +177,20 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("dbdot/fill_col_drv_hovered", QColor(0,180,0));  // dot fill color for driver dot (forced electron=1)
   S->setValue("dbdot/fill_col_drv_hc", QColor(0,255,0));  // dot fill color for driver dot (forced electron=1)
   S->setValue("dbdot/fill_col_elec", QColor(255,90,90));   // dot fill color for dot showing electron
-  S->setValue("dbdot/fill_col_elec_sel", QColor(128,95,173));  // dot fill color for dot showing electron
-  S->setValue("dbdot/fill_col_elec_hovered", QColor(128,95,173));  // dot fill color for dot showing electron
-  S->setValue("dbdot/fill_col_elec_hc", QColor(128,95,173));  // dot fill color for dot showing electron
+  S->setValue("dbdot/fill_col_elec_sel", QColor(255,90,90));  // dot fill color for dot showing electron
+  S->setValue("dbdot/fill_col_elec_hovered", QColor(255,90,90));  // dot fill color for dot showing electron
+  S->setValue("dbdot/fill_col_elec_hc", QColor(255,90,90));  // dot fill color for dot showing electron
 
   // lattice dot parameters
   S->setValue("latdot/diameter", 1.0);                    // dot diameter
-  S->setValue("latdot/edge_width", .05);                  // edge width rel. to diameter
+  S->setValue("latdot/edge_width", .08);                  // edge width rel. to diameter
   S->setValue("latdot/edge_col", QColor(255,255,255,70)); // edge color
+  S->setValue("latdot/edge_col_hc", QColor(0,0,0,100)); // edge color (high contrast)
   S->setValue("latdot/fill_col", QColor(0,0,0,0));        // fill color
+  S->setValue("latdot/fill_col_hc", QColor(0,0,0,0));     // fill color (high contrast)
   S->setValue("latdot/inner_fill", .5);                   // inner fill factor
   S->setValue("latdot/inner_fill_col", QColor(255, 255, 0));  // inner colour
+  S->setValue("latdot/inner_fill_col_hc", QColor(255, 255, 0));  // inner colour (high contrast)
 
   // ghost parameters
   S->setValue("ghost/dot_diameter", .6);                    // ghost dot diameter

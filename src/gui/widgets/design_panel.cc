@@ -445,6 +445,12 @@ void gui::DesignPanel::setDisplayMode(DisplayMode mode)
 {
   display_mode = mode;
   prim::Item::display_mode = mode;
+
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  if (mode == gui::ScreenshotMode)
+    setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col_hc")));
+  else
+    setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col")));
 }
 
 

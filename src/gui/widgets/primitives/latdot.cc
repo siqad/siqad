@@ -17,11 +17,11 @@
 qreal prim::LatticeDot::diameter = -1;
 qreal prim::LatticeDot::edge_width = -1;
 
-QColor prim::LatticeDot::edge_col;
-QColor prim::LatticeDot::fill_col;
+prim::Item::StateColors prim::LatticeDot::edge_col;
+prim::Item::StateColors prim::LatticeDot::fill_col;
 
 qreal prim::LatticeDot::in_fill;
-QColor prim::LatticeDot::in_fill_col;
+prim::Item::StateColors prim::LatticeDot::in_fill_col;
 
 
 // the surface lattice will always be layer 0
@@ -63,8 +63,8 @@ void prim::LatticeDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     rect.adjust(dxy,dxy,-dxy,-dxy);
 
     // draw outer circle
-    painter->setPen(QPen(edge_col, edge_width));
-    painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
+    painter->setPen(QPen(getCurrentStateColor(edge_col), edge_width));
+    painter->setBrush(getCurrentStateColor(fill_col));
     painter->drawEllipse(rect);
 
     // draw inner circle
@@ -75,7 +75,7 @@ void prim::LatticeDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         rect.moveCenter(center);
 
         painter->setPen(Qt::NoPen);
-        painter->setBrush(in_fill_col);
+        painter->setBrush(getCurrentStateColor(in_fill_col));
         painter->drawEllipse(rect);
     }
   }
@@ -93,8 +93,20 @@ void prim::LatticeDot::constructStatics()
 
   diameter = gui_settings->get<qreal>("latdot/diameter")*scale_factor;
   edge_width = gui_settings->get<qreal>("latdot/edge_width")*diameter;
-  edge_col= gui_settings->get<QColor>("latdot/edge_col");
-  fill_col= gui_settings->get<QColor>("latdot/fill_col");
+
+  edge_col.normal = gui_settings->get<QColor>("latdot/edge_col");
+  edge_col.selected = gui_settings->get<QColor>("latdot/edge_col");
+  edge_col.hovered = gui_settings->get<QColor>("latdot/edge_col");
+  edge_col.high_contrast = gui_settings->get<QColor>("latdot/edge_col_hc");
+
+  fill_col.normal = gui_settings->get<QColor>("latdot/fill_col");
+  fill_col.selected = gui_settings->get<QColor>("latdot/fill_col");
+  fill_col.hovered = gui_settings->get<QColor>("latdot/fill_col");
+  fill_col.high_contrast = gui_settings->get<QColor>("latdot/fill_col_hc");
+
   in_fill = gui_settings->get<qreal>("latdot/inner_fill");
-  in_fill_col = gui_settings->get<QColor>("latdot/inner_fill_col");
+  in_fill_col.normal = gui_settings->get<QColor>("latdot/inner_fill_col");
+  in_fill_col.selected = gui_settings->get<QColor>("latdot/inner_fill_col");
+  in_fill_col.hovered = gui_settings->get<QColor>("latdot/inner_fill_col");
+  in_fill_col.high_contrast = gui_settings->get<QColor>("latdot/inner_fill_col_hc");
 }

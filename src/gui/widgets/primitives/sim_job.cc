@@ -168,6 +168,7 @@ bool SimJob::readResults()
               }
             }
 
+            // convert distribution to array of int
             QString dist = rs.readElementText();
             if (elec_dists_map.contains(dist)) {
               elec_dists_map[dist].count++;
@@ -177,11 +178,11 @@ bool SimJob::readResults()
             elecDist read_dist;
             read_dist.energy = energy;
 
-            for (QString charge : dist)
-              read_dist.dist.append(charge.toInt());
+            for (QString charge_str : dist)
+              read_dist.dist.append(charge_str.toInt());
 
             elec_dists_map[dist] = read_dist;
-            qDebug() << tr("Distribution: %1, Energy: %2").arg(dist).arg(read_dist.energy);
+            //qDebug() << tr("Distribution: %1, Energy: %2").arg(dist).arg(read_dist.energy);
           }
         }
         rs.readNext();

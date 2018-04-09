@@ -718,6 +718,7 @@ void gui::ApplicationGUI::selectColor()
 
 void gui::ApplicationGUI::beginScreenshotMode()
 {
+  display_mode_cache = design_pan->displayMode();
   design_pan->setDisplayMode(ScreenshotMode);
   action_screenshot_tool->setVisible(true);
   setTool(ScreenshotAreaTool);
@@ -725,7 +726,7 @@ void gui::ApplicationGUI::beginScreenshotMode()
 
 void gui::ApplicationGUI::endScreenshotMode()
 {
-  design_pan->setDisplayMode(DesignMode);
+  design_pan->setDisplayMode(display_mode_cache);
   action_screenshot_tool->setVisible(false);
   setTool(SelectTool);
 }

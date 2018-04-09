@@ -72,8 +72,8 @@ namespace prim{
       float energy;     // energy of this distribution
       int count;        // how many times does this distribution occur
 
-      bool operator<(elecDist other) const {
-        return count > other.count;
+      bool operator < (const elecDist &other) const {
+        return (energy < other.energy);
       }
     };
 
