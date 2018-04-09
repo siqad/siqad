@@ -178,16 +178,17 @@ void gui::ApplicationGUI::initMenuBar()
   // tools menu actions
   QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
   QAction *select_color = new QAction(tr("Select Color..."), this);
-  QAction *area_screenshot = new QAction(tr("Area Screenshot..."), this);
-  QAction *screenshot = new QAction(tr("Full Screenshot..."), this);
+  QAction *area_screenshot = new QAction(tr("Region Screenshot..."), this);
   QAction *design_screenshot = new QAction(tr("Design Screenshot..."), this);
+  QAction *screenshot = new QAction(tr("Window Screenshot..."), this);
   QAction *action_settings_dialog = new QAction(tr("Settings"), this);
 
   tools->addAction(change_lattice);
   tools->addAction(select_color);
-   tools->addAction(area_screenshot); // taken out for now until proper implementation
-  tools->addAction(screenshot);
+  view->addSeparator();
+  tools->addAction(area_screenshot);
   tools->addAction(design_screenshot);
+  tools->addAction(screenshot);
   tools->addSeparator();
   tools->addAction(action_settings_dialog);
 
@@ -776,6 +777,11 @@ void gui::ApplicationGUI::designScreenshot()
   QRect rect = widget->rect();
   rect.setHeight(rect.height() - widget->horizontalScrollBar()->height());
   rect.setWidth(rect.width() - widget->verticalScrollBar()->width());
+  // translate the rect from view coord to scene coord, there might be a simpler
+  // solution but this works...
+  rect.translate(design_pan->mapToScene(
+                    design_pan->mapFromParent(rect.topLeft())).toPoint()
+                - rect.topLeft());
 
   designScreenshot(rect);
 }

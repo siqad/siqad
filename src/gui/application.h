@@ -102,10 +102,10 @@ namespace gui{
     //! Take an svg capture of the entire GUI.
     void screenshot();
 
-    //! Take an svg capture of the design window.
+    //! Take an svg capture of the design window currently shown.
     void designScreenshot();
 
-    //! Take an svg capture of the design window in the given area.
+    //! Take an svg capture of the design window in the given QRect (scene coord).
     void designScreenshot(QRect rect);
 
     // show pop-up dialogs
