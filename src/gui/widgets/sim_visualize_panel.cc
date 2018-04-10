@@ -201,6 +201,12 @@ bool SimVisualize::showElecDist(int dist_ind)
 }
 
 
+void SimVisualize::showAverageElecDist()
+{
+  emit showElecDistOnScene(show_job, -1);
+}
+
+
 void SimVisualize::updateElecDistOptions()
 {
   // slider
@@ -318,6 +324,7 @@ void SimVisualize::initSimVisualize()
   QPushButton *button_dist_prev = new QPushButton(tr("<"));
   QPushButton *button_dist_next = new QPushButton(tr(">"));
   text_dist_selected = new QLabel("0/0");
+  QPushButton *button_average_elec_dist = new QPushButton(tr("Show Average"));
   QLabel *label_dist_energy = new QLabel("Energy:");
   text_dist_energy = new QLabel("0");
   QLabel *label_dist_energy_unit = new QLabel("eV");
@@ -345,16 +352,25 @@ void SimVisualize::initSimVisualize()
   QVBoxLayout *dist_vl = new QVBoxLayout;
   dist_vl->addLayout(dist_sel_hl);
   dist_vl->addLayout(dist_sel_buttons_hl);
+  dist_vl->addWidget(button_average_elec_dist);
   dist_vl->addLayout(dist_energy_hl);
 
   dist_group->setLayout(dist_vl);
 
   // signal connection
-  connect(button_show_term_out, &QAbstractButton::clicked, this, &gui::SimVisualize::showJobTerminalOutput);
-  connect(combo_job_sel, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &gui::SimVisualize::jobSelUpdate);
-  connect(slider_dist_sel, static_cast<void(QSlider::*)(int)>(&QSlider::valueChanged), this, &gui::SimVisualize::distSelUpdate);
-  connect(button_dist_prev, &QAbstractButton::clicked, this, &gui::SimVisualize::distPrev);
-  connect(button_dist_next, &QAbstractButton::clicked, this, &gui::SimVisualize::distNext);
+  connect(button_show_term_out, &QAbstractButton::clicked,
+          this, &gui::SimVisualize::showJobTerminalOutput);
+  connect(combo_job_sel, static_cast<void(QComboBox::*)(int)>(
+                                              &QComboBox::currentIndexChanged),
+          this, &gui::SimVisualize::jobSelUpdate);
+  connect(slider_dist_sel, static_cast<void(QSlider::*)(int)>(&QSlider::valueChanged),
+          this, &gui::SimVisualize::distSelUpdate);
+  connect(button_dist_prev, &QAbstractButton::clicked,
+          this, &gui::SimVisualize::distPrev);
+  connect(button_dist_next, &QAbstractButton::clicked,
+          this, &gui::SimVisualize::distNext);
+  connect(button_average_elec_dist, &QAbstractButton::clicked,
+          this, &gui::SimVisualize::showAverageElecDist);
 
   // TODO show energy level, and maybe sorting feature
 

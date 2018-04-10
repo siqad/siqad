@@ -39,7 +39,8 @@ namespace gui{
     void showPotPlot();
 
     void updateJobSelCombo();
-    bool showElecDist(int dist_ind);
+    bool showElecDist(int dist_ind);  // show elec charges on design panel
+    void showAverageElecDist();       // average the elec charges when showing
     void updateElecDistOptions();
     void updateOptions();
 

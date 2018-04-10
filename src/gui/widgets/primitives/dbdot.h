@@ -47,7 +47,7 @@ namespace prim{
     int getElec() {return elec;}
 
     //! Set electron occupant visibility
-    void setShowElec(int se_in);
+    void setShowElec(float se_in);
 
     //! Set the DBDot source as src, and update phys_loc to that of src.
     void setSource(prim::LatticeDot *src);

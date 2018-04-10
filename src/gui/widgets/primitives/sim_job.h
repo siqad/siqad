@@ -77,7 +77,7 @@ namespace prim{
       }
     };
 
-    void sortStoreElecDists(QMap<QString, elecDist> elec_dists_map);
+    void processElecDists(QMap<QString, elecDist> elec_dists_map);
 
     int distCount() {return dist_count;}  //!< return the number of charge distributions this has
 
@@ -113,8 +113,12 @@ namespace prim{
     // variables TODO put them back to private later, with proper accessors
     QList<QVector<float>> potentials; //!< potentials[result_ind][0] is x, ...[1] is y, ...[2] is potential value
     QList<QPair<float,float>> physlocs;   //!< physlocs[dot_ind].first or .second
-    //QList<QList<int>> elec_dists;         //!< elec_dists[result_ind][dot_ind]
-    QList<elecDist> elec_dists;
+
+    // electron distribution
+    QList<elecDist> elec_dists;           //! electron distributions
+    QList<float> elec_dists_avg;            //! the average charge across all dots
+    int dist_count; // number of distributions
+
     QList<LineScanPath> line_scan_paths;  //!< line scan path props and results
   private:
 
@@ -140,7 +144,6 @@ namespace prim{
 
     // results
     // TODO flag storing what types of results are available
-    int dist_count; // number of distributions
   };
 
 } // end of prim namespace

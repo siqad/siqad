@@ -182,6 +182,7 @@ bool SimJob::readResults()
               read_dist.dist.append(charge_str.toInt());
 
             elec_dists_map[dist] = read_dist;
+            dist_count++;
             //qDebug() << tr("Distribution: %1, Energy: %2").arg(dist).arg(read_dist.energy);
           }
         }
@@ -265,7 +266,7 @@ bool SimJob::readResults()
   result_file.close();
 
   // sort and store the deduplicated electron distributions into the class
-  sortStoreElecDists(elec_dists_map);
+  processElecDists(elec_dists_map);
 
   return true;
 }
@@ -279,10 +280,21 @@ bool SimJob::processResults()
 }
 
 
-void SimJob::sortStoreElecDists(QMap<QString, elecDist> elec_dists_map)
+void SimJob::processElecDists(QMap<QString, elecDist> elec_dists_map)
 {
+  // sort
   elec_dists.append(elec_dists_map.values());
   std::sort(elec_dists.begin(), elec_dists.end());
+
+  // find average
+  int result_count = elec_dists.size();
+  int db_count = elec_dists[0].dist.size();
+  for (int db_ind=0; db_ind<db_count; db_ind++) {
+    for (int result_ind=0; result_ind<result_count; result_ind++) {
+      elec_dists_avg[db_ind] += elec_dists[result_ind].dist[db_ind] * elec_dists[result_ind].count;
+    }
+    elec_dists_avg[db_ind] /= dist_count;
+  }
 }
 
 

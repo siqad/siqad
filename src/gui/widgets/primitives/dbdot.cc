@@ -143,13 +143,13 @@ void prim::DBDot::setElec(int e_in)
 }
 
 
-void prim::DBDot::setShowElec(int se_in)
+void prim::DBDot::setShowElec(float se_in)
 {
   // TODO move the color logic to paint
   show_elec = se_in;
-  if(show_elec){
+  if(show_elec > 0){
     // set to 1
-    setFill(1);
+    setFill(se_in);
     //setFillCol(fill_col_elec, fill_col_elec_sel);
     diameter = diameter_l; // TODO change this to paint
   }

@@ -648,12 +648,12 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
     return;
   }
   // TODO perform this check in job's accessor rather than here
-  else if(dist_ind < 0 || dist_ind > job->elec_dists.size()){
+  else if(dist_ind > job->elec_dists.size()){
     qDebug() << tr("DesignPanel: dist_ind out of range when attempting to display sim results: %1").arg(dist_ind);
     return;
   }
 
-  // grab a list of DBDots in the order of job->physlocs
+  // grab the list of DBDots in the order of job->physlocs
   db_dots_result.clear();
   qreal scale_factor = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
   for(auto job_pl : job->physlocs){
@@ -679,8 +679,13 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
 
   // set their show_elec to the set specified by job->elec_dists
   for(int i=0; i<db_dots_result.size(); i++){
-    if(db_dots_result[i])
+    if (dist_ind == -1) {
+      // show average distribution if distribution index is -1
+      db_dots_result[i]->setShowElec(job->elec_dists_avg[i]);
+    } else if(db_dots_result[i]) {
+      // show the distribution of the selected index
       db_dots_result[i]->setShowElec(job->elec_dists[dist_ind].dist[i]);
+    }
   }
 }
 
