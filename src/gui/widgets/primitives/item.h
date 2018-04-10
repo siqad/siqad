@@ -98,7 +98,7 @@ namespace prim{
     static qreal scale_factor;            // pixels/angstrom scaling factor
     static gui::ToolType tool_type;       // current tool type of the GUI
     static gui::DisplayMode display_mode; // current display mode of the GUI
-    
+
     static void init();
 
     // SAVE LOAD
@@ -111,7 +111,7 @@ namespace prim{
       QColor normal;
       QColor hovered;
       QColor selected;
-      QColor high_contrast;
+      QColor publish;
     };
 
     //! Get the color corresponding to the current state of the item.

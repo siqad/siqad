@@ -68,6 +68,7 @@ namespace prim{
 
     static qreal diameter;    // dot diameter in angstroms
     static qreal edge_width;  // proportional width of dot boundary edge
+    static qreal publish_scale;
 
     static prim::Item::StateColors edge_col;   // boundary edge color
     static prim::Item::StateColors fill_col;   // dot fill color (same for all lattice dots)

@@ -15,7 +15,8 @@
 // Initialize statics
 
 qreal prim::LatticeDot::diameter = -1;
-qreal prim::LatticeDot::edge_width = -1;
+qreal prim::LatticeDot::edge_width;
+qreal prim::LatticeDot::publish_scale;
 
 prim::Item::StateColors prim::LatticeDot::edge_col;
 prim::Item::StateColors prim::LatticeDot::fill_col;
@@ -49,6 +50,7 @@ void prim::LatticeDot::setDBDot(prim::DBDot *dot)
 QRectF prim::LatticeDot::boundingRect() const
 {
   qreal width = diameter+edge_width;
+  if (display_mode == gui::ScreenshotMode) width *= publish_scale;
   return QRectF(-.5*width, -.5*width, width, width);
 }
 
@@ -57,27 +59,35 @@ QRectF prim::LatticeDot::boundingRect() const
 // pre-rendered bitma for speed.
 void prim::LatticeDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-  if(dbdot==0){
-    QRectF rect = boundingRect();
-    qreal dxy = .5*edge_width;
-    rect.adjust(dxy,dxy,-dxy,-dxy);
+  if (dbdot != 0)
+    return;
 
-    // draw outer circle
-    painter->setPen(QPen(getCurrentStateColor(edge_col), edge_width));
-    painter->setBrush(getCurrentStateColor(fill_col));
+  QRectF rect = boundingRect();
+  qreal dxy = .5*edge_width;
+  rect.adjust(dxy,dxy,-dxy,-dxy);
+
+  qreal edge_width_paint = edge_width;
+  qreal diameter_paint = diameter;
+  if (display_mode == gui::ScreenshotMode) {
+    edge_width_paint *= publish_scale;
+    diameter_paint *= publish_scale;
+  }
+
+  // draw outer circle
+  painter->setPen(QPen(getCurrentStateColor(edge_col), edge_width_paint));
+  painter->setBrush(getCurrentStateColor(fill_col));
+  painter->drawEllipse(rect);
+
+  // draw inner circle
+  if(tool_type == gui::ToolType::DBGenTool && isSelected()){
+    QPointF center = rect.center();
+    QSizeF size(diameter_paint, diameter_paint);
+    rect.setSize(size*in_fill);
+    rect.moveCenter(center);
+
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(getCurrentStateColor(in_fill_col));
     painter->drawEllipse(rect);
-
-    // draw inner circle
-    if(tool_type == gui::ToolType::DBGenTool && isSelected()){
-        QPointF center = rect.center();
-        QSizeF size(diameter, diameter);
-        rect.setSize(size*in_fill);
-        rect.moveCenter(center);
-
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(getCurrentStateColor(in_fill_col));
-        painter->drawEllipse(rect);
-    }
   }
 }
 
@@ -93,20 +103,21 @@ void prim::LatticeDot::constructStatics()
 
   diameter = gui_settings->get<qreal>("latdot/diameter")*scale_factor;
   edge_width = gui_settings->get<qreal>("latdot/edge_width")*diameter;
+  publish_scale = gui_settings->get<qreal>("latdot/publish_scale");
 
   edge_col.normal = gui_settings->get<QColor>("latdot/edge_col");
   edge_col.selected = gui_settings->get<QColor>("latdot/edge_col");
   edge_col.hovered = gui_settings->get<QColor>("latdot/edge_col");
-  edge_col.high_contrast = gui_settings->get<QColor>("latdot/edge_col_hc");
+  edge_col.publish = gui_settings->get<QColor>("latdot/edge_col_pb");
 
   fill_col.normal = gui_settings->get<QColor>("latdot/fill_col");
   fill_col.selected = gui_settings->get<QColor>("latdot/fill_col");
   fill_col.hovered = gui_settings->get<QColor>("latdot/fill_col");
-  fill_col.high_contrast = gui_settings->get<QColor>("latdot/fill_col_hc");
+  fill_col.publish = gui_settings->get<QColor>("latdot/fill_col_pb");
 
   in_fill = gui_settings->get<qreal>("latdot/inner_fill");
   in_fill_col.normal = gui_settings->get<QColor>("latdot/inner_fill_col");
   in_fill_col.selected = gui_settings->get<QColor>("latdot/inner_fill_col");
   in_fill_col.hovered = gui_settings->get<QColor>("latdot/inner_fill_col");
-  in_fill_col.high_contrast = gui_settings->get<QColor>("latdot/inner_fill_col_hc");
+  in_fill_col.publish = gui_settings->get<QColor>("latdot/inner_fill_col_pb");
 }

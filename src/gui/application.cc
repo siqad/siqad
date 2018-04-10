@@ -789,9 +789,6 @@ void gui::ApplicationGUI::designScreenshot()
 
 void gui::ApplicationGUI::designScreenshot(QRect rect)
 {
-  // TODO turns out Qt's SVG doesn't support clipping. I'll not remove the code
-  // but return to this in the future for another implementation.
-
   qDebug() << tr("taking screenshot for rect (%1, %2) (%3, %4)")
       .arg(rect.left()).arg(rect.top()).arg(rect.right()).arg(rect.bottom());
   // get save path
@@ -806,12 +803,11 @@ void gui::ApplicationGUI::designScreenshot(QRect rect)
 
   QSvgGenerator gen;
   gen.setFileName(fname);
-  gen.setSize(rect.size());
+  //gen.setSize(rect.size());
   gen.setViewBox(rect);
 
   QPainter painter;
   painter.begin(&gen);
-  //design_pan->render(&painter, QRectF(), rect);
   design_pan->screenshot(&painter, rect);
   painter.end();
 
