@@ -1110,6 +1110,20 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
           sig_screenshot(prev_screenshot_area);
         }
         break;
+      case Qt::Key_R:{
+        if (keymods == (Qt::ControlModifier | Qt::ShiftModifier)) {
+          QMessageBox::StandardButton reply;
+          reply = QMessageBox::question(this, "Quick run simulation",
+              "Are you sure you want to run a simulation with previous settings?",
+              QMessageBox::Yes | QMessageBox::No);
+          if (reply == QMessageBox::Yes) {
+            emit sig_quickRunSimulation();
+          }
+        } else if (keymods == Qt::ControlModifier) {
+          emit sig_showSimulationSetup();
+        }
+        break;
+      }
       default:
         QGraphicsView::keyReleaseEvent(e);
         break;

@@ -32,6 +32,9 @@ gui::ApplicationGUI::ApplicationGUI(QWidget *parent)
   // save start time for instance recognition
   start_time = QDateTime::currentDateTime();
 
+  // initialize default save_dir
+  save_dir = QDir::homePath();
+
   // initialise GUI
   initGUI();
 
@@ -102,6 +105,10 @@ void gui::ApplicationGUI::initGUI()
           design_pan, &gui::DesignPanel::displayPotentialPlot);
   connect(design_pan, SIGNAL(sig_screenshot(QRect)),
           this, SLOT(designScreenshot(QRect)));
+  connect(design_pan, SIGNAL(sig_showSimulationSetup()),
+          this, SLOT(simulationSetup()));
+  connect(design_pan, SIGNAL(sig_quickRunSimulation()),
+          sim_manager, SLOT(quickRun()));
 
   // layout management
   QWidget *main_widget = new QWidget(this); // main widget for mainwindow
@@ -431,8 +438,6 @@ void gui::ApplicationGUI::initState()
   setTool(gui::ToolType::SelectTool);
   updateWindowTitle();
   autosave_timer.start(1000*app_settings->get<int>("save/autosaveinterval"));
-
-  save_dir = QDir::homePath();
 }
 
 
@@ -972,12 +977,14 @@ void gui::ApplicationGUI::openFromFile()
       return;
 
   // file dialog
-  QString prompt_path = QFileDialog::getOpenFileName(this, tr("Open File"), ".", tr("XML files (*.xml)"));
+  QString prompt_path = QFileDialog::getOpenFileName(this, tr("Open File"),
+      save_dir.absolutePath(), tr("XML files (*.xml)"));
 
   if(prompt_path.isEmpty())
     return;
 
   working_path = prompt_path;
+  save_dir.setPath(QFileInfo(prompt_path).absolutePath());
   updateWindowTitle();
   QFile file(working_path);
 

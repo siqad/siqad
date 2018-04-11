@@ -174,6 +174,12 @@ namespace gui{
     void sig_resetDesignPanel();
     void sig_undoStackCleanChanged(bool); // emitted when undo_stack emits cleanChanged(bool)
 
+    //! Request ApplicationGUI to show simulation setup dialog
+    void sig_showSimulationSetup();
+
+    //! Request SimManager to quickly run a simulation without showing the dialog.
+    void sig_quickRunSimulation();
+
     //! Request ApplicationGUI to take a screenshot of the design panel bounded
     //! by the given QRect.
     void sig_screenshot(QRect);
