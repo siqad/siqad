@@ -148,15 +148,9 @@ void prim::DBDot::setShowElec(float se_in)
   // TODO move the color logic to paint
   show_elec = se_in;
   if(show_elec > 0){
-    // set to 1
-    setFill(se_in);
-    //setFillCol(fill_col_elec, fill_col_elec_sel);
     diameter = diameter_l; // TODO change this to paint
   }
   else{
-    // set to 0
-    setFill(1);
-    //setFillCol(fill_col_default, fill_col_default_sel);
     diameter = diameter_m;
   }
   update();
@@ -189,6 +183,20 @@ QRectF prim::DBDot::boundingRect() const
 
 void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+  QColor fill_col_state;
+  if ( (display_mode == gui::SimDisplayMode ||
+        display_mode == gui::ScreenshotMode) &&
+        show_elec > 0) {
+    setFill(show_elec);
+    fill_col_state = getCurrentStateColor(fill_col_electron);
+  } else if (elec > 0) {
+    setFill(1);
+    fill_col_state = getCurrentStateColor(fill_col_driver);
+  } else {
+    setFill(1);
+    fill_col_state = getCurrentStateColor(fill_col);
+  }
+
   qreal edge_width_paint = edge_width;
   qreal diameter_paint = diameter;
   if (display_mode == gui::ScreenshotMode) {
@@ -209,19 +217,6 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
     rect.moveCenter(center);
 
     painter->setPen(Qt::NoPen);
-    QColor fill_col_state;
-    if ( (display_mode == gui::SimDisplayMode ||
-          display_mode == gui::ScreenshotMode) &&
-          show_elec > 0) {
-      setFill(1);
-      fill_col_state = getCurrentStateColor(fill_col_electron);
-    } else if (elec > 0) {
-      setFill(1);
-      fill_col_state = getCurrentStateColor(fill_col_driver);
-    } else {
-      setFill(1);
-      fill_col_state = getCurrentStateColor(fill_col);
-    }
     painter->setBrush(fill_col_state);
     painter->drawEllipse(rect);
   }

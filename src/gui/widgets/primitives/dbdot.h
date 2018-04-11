@@ -78,7 +78,7 @@ namespace prim{
     // VARIABLES
     QPointF phys_loc;         // physical location of dot in angstroms
     int elec;                 // 1=forced electron on this db
-    int show_elec;            // simulation result visualization electron, 1=has electron
+    float show_elec;            // simulation result visualization electron, 1=has electron
 
     prim::LatticeDot *source=0; // lattice site beneath dot
 

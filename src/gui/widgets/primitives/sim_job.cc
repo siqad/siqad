@@ -182,7 +182,6 @@ bool SimJob::readResults()
               read_dist.dist.append(charge_str.toInt());
 
             elec_dists_map[dist] = read_dist;
-            dist_count++;
             //qDebug() << tr("Distribution: %1, Energy: %2").arg(dist).arg(read_dist.energy);
           }
         }
@@ -271,14 +270,6 @@ bool SimJob::readResults()
   return true;
 }
 
-bool SimJob::processResults()
-{
-  // TODO check that results have already been read
-  // TODO sort results?
-  // TODO deduplicate results, keep count of how many times it was duplicated
-  return true;
-}
-
 
 void SimJob::processElecDists(QMap<QString, elecDist> elec_dists_map)
 {
@@ -289,12 +280,33 @@ void SimJob::processElecDists(QMap<QString, elecDist> elec_dists_map)
   // find average
   int result_count = elec_dists.size();
   int db_count = elec_dists[0].dist.size();
+  int dist_count=0;
   for (int db_ind=0; db_ind<db_count; db_ind++) {
+    elec_dists_avg.push_back(0);
     for (int result_ind=0; result_ind<result_count; result_ind++) {
       elec_dists_avg[db_ind] += elec_dists[result_ind].dist[db_ind] * elec_dists[result_ind].count;
+      if (db_ind == 0) dist_count += elec_dists[result_ind].count;
     }
     elec_dists_avg[db_ind] /= dist_count;
   }
+}
+
+
+float SimJob::elecDistAvgDegenOfDB(int dist_ind, int db_ind)
+{
+  float target_energy = elec_dists[dist_ind].energy;
+  int degen_count = 0;
+  float degen_db_accum = 0;
+  for (elecDist dist : elec_dists) {
+    if (dist.energy < target_energy)
+      continue;
+    else if (dist.energy > target_energy)
+      break;
+
+    degen_db_accum += dist.dist[db_ind];
+    degen_count++;
+  }
+  return degen_db_accum / degen_count;
 }
 
 

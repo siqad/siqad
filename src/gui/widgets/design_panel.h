@@ -146,7 +146,7 @@ namespace gui{
 
     // SIMULATION RESULT DISPLAY
     //! Display the simulation result from SimAnneal
-    void displaySimResults(prim::SimJob *job, int dist_int);
+    void displaySimResults(prim::SimJob *job, int dist_int, bool avg_degen);
     //! Clear the simulation result from SimAnneal
     void clearSimResults();
     //! Display the simulation result from PoisSolver

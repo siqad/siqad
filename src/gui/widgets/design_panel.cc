@@ -638,7 +638,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
 
 
 // SIMULATION RESULT DISPLAY
-void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
+void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind, bool avg_degen)
 {
   // TODO in the future, show results in a pop up windows instead of the result screen itself
   setDisplayMode(SimDisplayMode);
@@ -672,7 +672,8 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
     }
 
     if(!db_exists){
-      qDebug() << tr("DesignPanel: unable to show result, no DBDot is present at location x=%1, y=%2").arg(scene_loc.x()).arg(scene_loc.y());
+      qDebug() << tr("DesignPanel: unable to show result, no DBDot is present "
+                     "at location x=%1, y=%2").arg(scene_loc.x()).arg(scene_loc.y());
       return;
     }
   }
@@ -682,9 +683,15 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
     if (dist_ind == -1) {
       // show average distribution if distribution index is -1
       db_dots_result[i]->setShowElec(job->elec_dists_avg[i]);
+      qDebug() << tr("Setting electron %1 to %2").arg(i).arg(job->elec_dists_avg[i]);
     } else if(db_dots_result[i]) {
       // show the distribution of the selected index
-      db_dots_result[i]->setShowElec(job->elec_dists[dist_ind].dist[i]);
+      if (avg_degen) {
+        db_dots_result[i]->setShowElec(job->elecDistAvgDegenOfDB(dist_ind, i));
+        qDebug() << tr("Setting electron %1 to %2, averaged").arg(i).arg(job->elecDistAvgDegenOfDB(dist_ind,i));
+      } else {
+        db_dots_result[i]->setShowElec(job->elec_dists[dist_ind].dist[i]);
+      }
     }
   }
 }

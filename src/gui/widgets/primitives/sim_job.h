@@ -63,14 +63,13 @@ namespace prim{
     // JOB RESULT
 
     bool readResults();     //!< read result XML
-    bool processResults();  //!< process results
 
     // result storage and access
     //! elec_dists struct for showing where electrons are
     struct elecDist{
       QList<int> dist;
       float energy;     // energy of this distribution
-      int count;        // how many times does this distribution occur
+      int count=0;        // how many times does this distribution occur
 
       bool operator < (const elecDist &other) const {
         return (energy < other.energy);
@@ -78,8 +77,8 @@ namespace prim{
     };
 
     void processElecDists(QMap<QString, elecDist> elec_dists_map);
+    float elecDistAvgDegenOfDB(int dist_ind, int db_ind);
 
-    int distCount() {return dist_count;}  //!< return the number of charge distributions this has
 
     struct LineScanPath {
       QList<QPair<float,float>> afm_nodes;    //!< afm nodes in angstrom
@@ -117,7 +116,6 @@ namespace prim{
     // electron distribution
     QList<elecDist> elec_dists;           //! electron distributions
     QList<float> elec_dists_avg;            //! the average charge across all dots
-    int dist_count; // number of distributions
 
     QList<LineScanPath> line_scan_paths;  //!< line scan path props and results
   private:
