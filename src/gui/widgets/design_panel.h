@@ -211,6 +211,10 @@ namespace gui{
     gui::DisplayMode display_mode; // current display mode
     QUndoStack *undo_stack;   // undo stack
 
+    // background color presets
+    static QColor background_col;         // normal background color
+    static QColor background_col_publish; // background color in publishing mode
+
     // children panels
     AFMPanel *afm_panel;
     // TODO layer manager
@@ -253,6 +257,9 @@ namespace gui{
     QList<prim::DBDot*> db_dots_result;
 
     // INTERNAL METHODS
+
+    // construct static variables on first init
+    void constructStatics();
 
     // perform scene zoom based on wheel rotation
     void wheelZoom(QWheelEvent *e, bool boost);

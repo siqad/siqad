@@ -11,6 +11,9 @@
 
 #include <algorithm>
 
+QColor gui::DesignPanel::background_col;
+QColor gui::DesignPanel::background_col_publish;
+
 // constructor
 gui::DesignPanel::DesignPanel(QWidget *parent)
   : QGraphicsView(parent)
@@ -18,6 +21,11 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   // set-up scale_factor in prim::Item
   prim::Item::init();
 
+  // construct static variables at first launch
+  if (!background_col.isValid())
+    constructStatics();
+
+  // initialize design panel
   initDesignPanel();
 
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
@@ -35,6 +43,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 // destructor
 gui::DesignPanel::~DesignPanel()
 {
+  clearSimResults();        // clear simulation results first if they're being shown
   clearDesignPanel(false);
 }
 
@@ -453,11 +462,15 @@ void gui::DesignPanel::setDisplayMode(DisplayMode mode)
   display_mode = mode;
   prim::Item::display_mode = mode;
 
-  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  /*settings::GUISettings *gui_settings = settings::GUISettings::instance();
   if (mode == gui::ScreenshotMode)
     setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col_hc")));
   else
-    setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col")));
+    setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col")));*/
+  if (mode == gui::ScreenshotMode)
+    setBackgroundBrush(QBrush(background_col_publish));
+  else
+    setBackgroundBrush(QBrush(background_col));
 }
 
 
@@ -729,7 +742,7 @@ void gui::DesignPanel::selectClicked(prim::Item *)
 
 void gui::DesignPanel::simVisualizeDockVisibilityChanged(bool visible)
 {
-  if(!visible)
+  if(!visible && display_mode == SimDisplayMode)
     clearSimResults();
 }
 
@@ -1106,6 +1119,12 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
 
 // INTERNAL METHODS
 
+void gui::DesignPanel::constructStatics()
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  background_col = gui_settings->get<QColor>("view/bg_col");
+  background_col_publish = gui_settings->get<QColor>("view/bg_col_hc");
+}
 
 void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
 {

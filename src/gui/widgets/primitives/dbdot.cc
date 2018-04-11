@@ -213,7 +213,7 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
   if(fill_fact>0){
     QPointF center = rect.center();
     QSizeF size(diameter_paint, diameter_paint);
-    rect.setSize(size*fill_fact);
+    rect.setSize(size*qSqrt(fill_fact));
     rect.moveCenter(center);
 
     painter->setPen(Qt::NoPen);
