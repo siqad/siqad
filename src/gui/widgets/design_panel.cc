@@ -1123,7 +1123,7 @@ void gui::DesignPanel::constructStatics()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   background_col = gui_settings->get<QColor>("view/bg_col");
-  background_col_publish = gui_settings->get<QColor>("view/bg_col_hc");
+  background_col_publish = gui_settings->get<QColor>("view/bg_col_pb");
 }
 
 void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
