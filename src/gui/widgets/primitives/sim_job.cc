@@ -265,7 +265,8 @@ bool SimJob::readResults()
   result_file.close();
 
   // sort and store the deduplicated electron distributions into the class
-  processElecDists(elec_dists_map);
+  if (elec_dists_map.size() > 0)
+    processElecDists(elec_dists_map);
 
   return true;
 }
