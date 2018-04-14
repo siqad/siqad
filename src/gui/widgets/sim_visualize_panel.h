@@ -39,14 +39,16 @@ namespace gui{
     void showPotPlot();
 
     void updateJobSelCombo();
-    bool showElecDist(int dist_ind);
+    bool showElecDist(int dist_ind);  // show elec charges on design panel
+    void showAverageElecDist();       // average the elec charges when showing
+    void showAverageElecDistDegen();  // average the elec charges of degenerate states
     void updateElecDistOptions();
     void updateOptions();
 
     // TODO generate a list of DBDot* with the same order as physlocs in show_job
 
   signals:
-    void showElecDistOnScene(prim::SimJob *job, int dist_ind);
+    void showElecDistOnScene(prim::SimJob *job, int dist_ind, bool avg_degen=false);
     void showPotPlotOnScene(QPixmap potential_plot, QRectF graph_container);
 
   private:
@@ -69,6 +71,7 @@ namespace gui{
 
     QSlider *slider_dist_sel;
     QLabel *text_dist_selected;
+    QLabel *text_dist_energy;
   };
 
 } // end of gui namespace

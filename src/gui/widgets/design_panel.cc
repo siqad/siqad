@@ -11,6 +11,9 @@
 
 #include <algorithm>
 
+QColor gui::DesignPanel::background_col;
+QColor gui::DesignPanel::background_col_publish;
+
 // constructor
 gui::DesignPanel::DesignPanel(QWidget *parent)
   : QGraphicsView(parent)
@@ -18,6 +21,11 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   // set-up scale_factor in prim::Item
   prim::Item::init();
 
+  // construct static variables at first launch
+  if (!background_col.isValid())
+    constructStatics();
+
+  // initialize design panel
   initDesignPanel();
 
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
@@ -35,6 +43,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 // destructor
 gui::DesignPanel::~DesignPanel()
 {
+  clearSimResults();        // clear simulation results first if they're being shown
   clearDesignPanel(false);
 }
 
@@ -389,10 +398,7 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
   scene->clearSelection();
 
   // inform all items of select mode
-  // TODO replace with signal based notification
-  prim::Item::select_mode = tool==gui::ToolType::SelectTool;
-  prim::Item::db_gen_mode = tool==gui::ToolType::DBGenTool;
-  prim::Item::electrode_mode = tool==gui::ToolType::ElectrodeTool;
+  prim::Item::tool_type = tool;
 
   switch(tool){
     case gui::ToolType::SelectTool:
@@ -418,7 +424,10 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
       setInteractive(true);
       break;
     case gui::ToolType::AFMPathTool:
-      setInteractive(true); // TODO check back later that this is the right mode
+      setInteractive(true);
+      break;
+    case gui::ToolType::ScreenshotAreaTool:
+      setInteractive(true);
       break;
     default:
       qCritical() << tr("Invalid ToolType... should not have happened");
@@ -441,13 +450,27 @@ void gui::DesignPanel::setFills(float *fills)
 }
 
 
+void gui::DesignPanel::screenshot(QPainter *painter, const QRect &region)
+{
+  prev_screenshot_area = region;
+  scene->render(painter, region, region);
+}
+
+
 void gui::DesignPanel::setDisplayMode(DisplayMode mode)
 {
   display_mode = mode;
+  prim::Item::display_mode = mode;
 
-  for(prim::Layer* layer : layers)
-    for(prim::Item* item : layer->getItems())
-      item->setDesignMode(mode == DesignMode);
+  /*settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  if (mode == gui::ScreenshotMode)
+    setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col_hc")));
+  else
+    setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col")));*/
+  if (mode == gui::ScreenshotMode)
+    setBackgroundBrush(QBrush(background_col_publish));
+  else
+    setBackgroundBrush(QBrush(background_col));
 }
 
 
@@ -628,7 +651,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
 
 
 // SIMULATION RESULT DISPLAY
-void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
+void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind, bool avg_degen)
 {
   // TODO in the future, show results in a pop up windows instead of the result screen itself
   setDisplayMode(SimDisplayMode);
@@ -638,12 +661,12 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
     return;
   }
   // TODO perform this check in job's accessor rather than here
-  else if(dist_ind < 0 || dist_ind > job->elec_dists.size()){
+  else if(dist_ind > job->elec_dists.size()){
     qDebug() << tr("DesignPanel: dist_ind out of range when attempting to display sim results: %1").arg(dist_ind);
     return;
   }
 
-  // grab a list of DBDots in the order of job->physlocs
+  // grab the list of DBDots in the order of job->physlocs
   db_dots_result.clear();
   qreal scale_factor = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
   for(auto job_pl : job->physlocs){
@@ -662,15 +685,27 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
     }
 
     if(!db_exists){
-      qDebug() << tr("DesignPanel: unable to show result, no DBDot is present at location x=%1, y=%2").arg(scene_loc.x()).arg(scene_loc.y());
+      qDebug() << tr("DesignPanel: unable to show result, no DBDot is present "
+                     "at location x=%1, y=%2").arg(scene_loc.x()).arg(scene_loc.y());
       return;
     }
   }
 
   // set their show_elec to the set specified by job->elec_dists
   for(int i=0; i<db_dots_result.size(); i++){
-    if(db_dots_result[i])
-      db_dots_result[i]->setShowElec(job->elec_dists[dist_ind][i]);
+    if (dist_ind == -1) {
+      // show average distribution if distribution index is -1
+      db_dots_result[i]->setShowElec(job->elec_dists_avg[i]);
+      qDebug() << tr("Setting electron %1 to %2").arg(i).arg(job->elec_dists_avg[i]);
+    } else if(db_dots_result[i]) {
+      // show the distribution of the selected index
+      if (avg_degen) {
+        db_dots_result[i]->setShowElec(job->elecDistAvgDegenOfDB(dist_ind, i));
+        qDebug() << tr("Setting electron %1 to %2, averaged").arg(i).arg(job->elecDistAvgDegenOfDB(dist_ind,i));
+      } else {
+        db_dots_result[i]->setShowElec(job->elec_dists[dist_ind].dist[i]);
+      }
+    }
   }
 }
 
@@ -707,7 +742,7 @@ void gui::DesignPanel::selectClicked(prim::Item *)
 
 void gui::DesignPanel::simVisualizeDockVisibilityChanged(bool visible)
 {
-  if(!visible)
+  if(!visible && display_mode == SimDisplayMode)
     clearSimResults();
 }
 
@@ -748,6 +783,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   // set clicked flag and store current mouse position for move behaviour
   mouse_pos_old = e->pos();
   mouse_pos_cached = e->pos(); // this might be a referencing clash, check.
+  press_scene_pos = mapToScene(e->pos()); // the scene position of the click event
 
   // if other buttons are clicked during rubber band selection, end selection
   if(rb)
@@ -756,7 +792,12 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   clicked = true;
   switch(e->button()){
     case Qt::LeftButton:
-      if (tool_type == SelectTool || tool_type == ElectrodeTool ||
+      if (tool_type == ScreenshotAreaTool) {
+        // use rubberband to select screenshot area
+        rb_start = mapToScene(e->pos()).toPoint();
+        rb_cache = e->pos();
+
+      } else if (tool_type == SelectTool || tool_type == ElectrodeTool ||
           tool_type == AFMAreaTool) {
         // rubber band variables
         rb_start = mapToScene(e->pos()).toPoint();
@@ -833,8 +874,9 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
       case Qt::LeftButton:
-        if (tool_type == SelectTool || tool_type == DBGenTool
-              || tool_type == ElectrodeTool || tool_type == AFMAreaTool) {
+        if (tool_type == SelectTool || tool_type == DBGenTool ||
+            tool_type == ElectrodeTool || tool_type == AFMAreaTool ||
+            tool_type == ScreenshotAreaTool) {
           rubberBandUpdate(e->pos());
         }
         // use default behaviour for left mouse button
@@ -909,6 +951,11 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
           case gui::ToolType::AFMPathTool:
             // Make node at the ghost position
             createAFMNode();
+            break;
+          case gui::ToolType::ScreenshotAreaTool:
+            // take a screenshot of the rubberband area
+            filterSelection(false);
+            sig_screenshot(QRect(press_scene_pos.toPoint(), mapToScene(e->pos()).toPoint()));
             break;
           case gui::ToolType::DragTool:
             // pan ends
@@ -1059,10 +1106,24 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
           deleteSelection();
         break;
       case Qt::Key_S:
-        if(keymods == Qt::ControlModifier){
-          //gui::ApplicationGUI::saveToFile();
+        if (display_mode == ScreenshotMode) {
+          sig_screenshot(prev_screenshot_area);
         }
         break;
+      case Qt::Key_R:{
+        if (keymods == (Qt::ControlModifier | Qt::ShiftModifier)) {
+          QMessageBox::StandardButton reply;
+          reply = QMessageBox::question(this, "Quick run simulation",
+              "Are you sure you want to run a simulation with previous settings?",
+              QMessageBox::Yes | QMessageBox::No);
+          if (reply == QMessageBox::Yes) {
+            emit sig_quickRunSimulation();
+          }
+        } else if (keymods == Qt::ControlModifier) {
+          emit sig_showSimulationSetup();
+        }
+        break;
+      }
       default:
         QGraphicsView::keyReleaseEvent(e);
         break;
@@ -1072,6 +1133,12 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
 
 // INTERNAL METHODS
 
+void gui::DesignPanel::constructStatics()
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  background_col = gui_settings->get<QColor>("view/bg_col");
+  background_col_publish = gui_settings->get<QColor>("view/bg_col_pb");
+}
 
 void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
 {
@@ -1306,11 +1373,12 @@ void gui::DesignPanel::createActions()
 
 void gui::DesignPanel::filterSelection(bool select_flag)
 {
-  // should only be here if tool type is either select or dbgen
+  // should only be here if tool type is one of the following
   if (tool_type != gui::ToolType::SelectTool &&
       tool_type != gui::ToolType::DBGenTool &&
       tool_type != gui::ToolType::ElectrodeTool &&
-      tool_type != gui::ToolType::AFMAreaTool){
+      tool_type != gui::ToolType::AFMAreaTool &&
+      tool_type != gui::ToolType::ScreenshotAreaTool){
     qCritical() << tr("Filtering selection with invalid tool type...");
     return;
   }

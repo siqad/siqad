@@ -122,8 +122,13 @@ namespace gui{
     //! check if the contents of the DesignPanel have changed
     bool stateChanged() const {return !undo_stack->isClean();}
 
-    //! return the current display mode
+    //! take a screenshot of the design at the specified QRect in scene coord
+    void screenshot(QPainter *painter, const QRect &region=QRect());
+
+    //! Return the current display mode.
     DisplayMode displayMode() {return display_mode;}
+
+    //! Set the current display mode. DisplayMode is defined in global.h.
     void setDisplayMode(DisplayMode mode);
 
     //! get afm_panel pointer
@@ -141,7 +146,7 @@ namespace gui{
 
     // SIMULATION RESULT DISPLAY
     //! Display the simulation result from SimAnneal
-    void displaySimResults(prim::SimJob *job, int dist_int);
+    void displaySimResults(prim::SimJob *job, int dist_int, bool avg_degen);
     //! Clear the simulation result from SimAnneal
     void clearSimResults();
     //! Display the simulation result from PoisSolver
@@ -164,9 +169,20 @@ namespace gui{
 
   signals:
     void sig_toolChangeRequest(gui::ToolType tool);  // request ApplicationGUI to change tool
-    void sig_toolChanged(gui::ToolType tool);  // request ApplicationGUI to change tool
+    void sig_toolChanged(gui::ToolType tool); // notify other components of the
+                                              // change in tool
     void sig_resetDesignPanel();
     void sig_undoStackCleanChanged(bool); // emitted when undo_stack emits cleanChanged(bool)
+
+    //! Request ApplicationGUI to show simulation setup dialog
+    void sig_showSimulationSetup();
+
+    //! Request SimManager to quickly run a simulation without showing the dialog.
+    void sig_quickRunSimulation();
+
+    //! Request ApplicationGUI to take a screenshot of the design panel bounded
+    //! by the given QRect.
+    void sig_screenshot(QRect);
 
   protected:
 
@@ -201,6 +217,10 @@ namespace gui{
     gui::DisplayMode display_mode; // current display mode
     QUndoStack *undo_stack;   // undo stack
 
+    // background color presets
+    static QColor background_col;         // normal background color
+    static QColor background_col_publish; // background color in publishing mode
+
     // children panels
     AFMPanel *afm_panel;
     // TODO layer manager
@@ -231,14 +251,21 @@ namespace gui{
     prim::AFMSeg *ghost_afm_seg=0;
 
     // mouse functionality
+    QPointF press_scene_pos;   // the scene position at the last mouse press event
     QPoint mouse_pos_old;     // old mouse position in pixels on click
     QPoint mouse_pos_cached;  // parameter for caching relevant mouse positions on click, in pixels
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
+
+    // screenshot
+    QRect prev_screenshot_area; // store the previous screenshot area for reuse
 
     // sim visualization
     QList<prim::DBDot*> db_dots_result;
 
     // INTERNAL METHODS
+
+    // construct static variables on first init
+    void constructStatics();
 
     // perform scene zoom based on wheel rotation
     void wheelZoom(QWheelEvent *e, bool boost);
@@ -270,6 +297,9 @@ namespace gui{
     // hide rubberband and reset flags
     void rubberBandEnd();
 
+    // SCREENSHOT
+
+    QRect screenshot_rect;
 
 
     // GHOSTclass UndoCommand;e a Ghost for the current selection or clipboard

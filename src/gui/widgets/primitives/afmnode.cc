@@ -133,7 +133,7 @@ QRectF AFMNode::boundingRect() const
 
 void AFMNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-  if (select_mode && upSelected()) {
+  if (tool_type == gui::SelectTool && upSelected()) {
     fill_col = fill_col_sel;
     bd_col = bd_col_sel;
   } else if (isHovered()) {
@@ -147,7 +147,7 @@ void AFMNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget
   QRectF rect = boundingRect();
   qreal dxy = .5*edge_width;
   rect.adjust(dxy,dxy,-dxy,-dxy);
-  
+
   painter->setPen(Qt::NoPen);
   painter->setBrush(fill_col);
   painter->drawEllipse(rect);

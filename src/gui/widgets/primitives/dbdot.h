@@ -47,7 +47,7 @@ namespace prim{
     int getElec() {return elec;}
 
     //! Set electron occupant visibility
-    void setShowElec(int se_in);
+    void setShowElec(float se_in);
 
     //! Set the DBDot source as src, and update phys_loc to that of src.
     void setSource(prim::LatticeDot *src);
@@ -55,7 +55,7 @@ namespace prim{
     prim::LatticeDot *getSource() const {return source;}
 
     void setFill(float fill){fill_fact = fill;}
-    void setFillCol(QColor col, QColor col_sel){fill_col = col; fill_col_sel = col_sel;}
+    //void setFillCol(QColor col, QColor col_sel){fill_col = col; fill_col_sel = col_sel;}
 
     // inherited abstract method implementations
 
@@ -77,30 +77,27 @@ namespace prim{
 
     // VARIABLES
     QPointF phys_loc;         // physical location of dot in angstroms
-    int elec;                 // 1=forced electron on this db
-    int show_elec;            // simulation result visualization electron, 1=has electron
+    int elec=0;                 // 1=forced electron on this db
+    float show_elec=0;            // simulation result visualization electron, 1=has electron
 
     prim::LatticeDot *source=0; // lattice site beneath dot
 
     qreal fill_fact;          // area proportional of dot filled
-    QColor fill_col;          // color of fill that is drawn
-    QColor fill_col_sel;      // color of fill when selected that is drawn
-    static QColor fill_col_default;  // default fill color
-    static QColor fill_col_default_sel;  // default fill color (selected)
-    static QColor fill_col_drv;      // driver fill color
-    static QColor fill_col_drv_sel;  // driver fill color (selected)
-    static QColor fill_col_elec;
-    static QColor fill_col_elec_sel;
 
     // static class parameters for painting
+
+    static prim::Item::StateColors fill_col;            // normal dbdot
+    static prim::Item::StateColors fill_col_driver;    // driver (forced polarization)
+    static prim::Item::StateColors fill_col_electron;  // contains electron
+    static prim::Item::StateColors edge_col;           // edge of the dbdot
+
 
     qreal diameter;      // dot diameter in angstroms
     static qreal diameter_m;    // medium sized dot
     static qreal diameter_l;    // large sized dot
     static qreal edge_width;    // proportional width of dot boundary edge
+    static qreal publish_scale; // size scaling factor when in publish screenshot mode
 
-    static QColor edge_col;     // edge colour, unselected
-    static QColor selected_col; // edge colour, selected
   };
 
 } // end prim namespace

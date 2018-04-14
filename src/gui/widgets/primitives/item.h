@@ -13,6 +13,7 @@
 #include <QtWidgets>
 #include <QtCore>
 #include "emitter.h"
+#include "src/global.h"
 #include "src/settings/settings.h"
 
 namespace prim{
@@ -64,11 +65,6 @@ namespace prim{
     //! true if the item or its parent has been hovered, recursive to highest level parent
     bool upHovered();
 
-    //! set design mode
-    void setDesignMode(bool mode) {design_mode = mode;}
-    //! get design mode
-    bool designMode() {return design_mode;}
-
     //! set whether the item is resizable
     void setResizable(bool flag) {resizable = flag;}
     bool isResizable() {return resizable;}
@@ -99,10 +95,10 @@ namespace prim{
     int layer_id;             // the layer id of the Item
 
     // static class variables
-    static qreal scale_factor;  // pixels/angstrom scaling factor
-    static bool select_mode;    // Application is in select mode
-    static bool db_gen_mode;
-    static bool electrode_mode;
+    static qreal scale_factor;            // pixels/angstrom scaling factor
+    static gui::ToolType tool_type;       // current tool type of the GUI
+    static gui::DisplayMode display_mode; // current display mode of the GUI
+
     static void init();
 
     // SAVE LOAD
@@ -115,6 +111,7 @@ namespace prim{
       QColor normal;
       QColor hovered;
       QColor selected;
+      QColor publish;
     };
 
     //! Get the color corresponding to the current state of the item.
@@ -131,7 +128,6 @@ namespace prim{
 
   private:
 
-    bool design_mode;
 
     bool resizable=false;
     QRectF bounding_rect_pre_resize;  // used for resizable items

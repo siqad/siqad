@@ -195,9 +195,20 @@ bool SimVisualize::showElecDist(int dist_ind)
 {
   if(!show_job || dist_ind < 0 || dist_ind >= show_job->elec_dists.size())
     return false;
-  // TODO emit signal telling design_panel to show dist_ind of show_job->elec_dists
   emit showElecDistOnScene(show_job, dist_ind);
   return true;
+}
+
+
+void SimVisualize::showAverageElecDist()
+{
+  emit showElecDistOnScene(show_job, -1);
+}
+
+
+void SimVisualize::showAverageElecDistDegen()
+{
+  emit showElecDistOnScene(show_job, combo_job_sel->currentIndex(), true);
 }
 
 
@@ -314,10 +325,22 @@ void SimVisualize::initSimVisualize()
 
   // Elec Distribution Group
   QGroupBox *dist_group = new QGroupBox(tr("Electron Distribution"));
+
+  // choose the elec distribution ind
   QLabel *label_dist_sel = new QLabel(tr("Dist:"));
   QPushButton *button_dist_prev = new QPushButton(tr("<"));
   QPushButton *button_dist_next = new QPushButton(tr(">"));
   text_dist_selected = new QLabel("0/0");
+
+  // show the energy of the configuration being viewed
+  QLabel *label_dist_energy = new QLabel("Energy:");
+  text_dist_energy = new QLabel("0");
+  QLabel *label_dist_energy_unit = new QLabel("eV");
+
+  // show the average distribution for one of the few presets
+  QLabel *label_average_elec_dist = new QLabel("Show average for:");
+  QPushButton *button_average_elec_dist_all = new QPushButton(tr("All distributions"));
+  QPushButton *button_average_elec_dist_degen = new QPushButton(tr("Degenerate states"));
 
   button_dist_prev->setShortcut(tr("CTRL+H"));
   button_dist_next->setShortcut(tr("CTRL+L"));
@@ -325,27 +348,54 @@ void SimVisualize::initSimVisualize()
   slider_dist_sel = new QSlider(Qt::Horizontal);
   updateElecDistOptions();
 
+  // choose distribution
   QHBoxLayout *dist_sel_hl = new QHBoxLayout;
   dist_sel_hl->addWidget(label_dist_sel);
   dist_sel_hl->addWidget(slider_dist_sel);
 
+  // buttons for distribution choosing
   QHBoxLayout *dist_sel_buttons_hl = new QHBoxLayout;
   dist_sel_buttons_hl->addWidget(button_dist_prev);
   dist_sel_buttons_hl->addWidget(text_dist_selected);
   dist_sel_buttons_hl->addWidget(button_dist_next);
 
+  // energy
+  QHBoxLayout *dist_energy_hl = new QHBoxLayout;
+  dist_energy_hl->addWidget(label_dist_energy);
+  dist_energy_hl->addWidget(text_dist_energy);
+  dist_energy_hl->addWidget(label_dist_energy_unit);
+
+  // average
+  QHBoxLayout *dist_average_hl = new QHBoxLayout;
+  dist_average_hl->addWidget(label_average_elec_dist);
+  dist_average_hl->addWidget(button_average_elec_dist_all);
+  dist_average_hl->addWidget(button_average_elec_dist_degen);
+
+  // entire elec distribution group
   QVBoxLayout *dist_vl = new QVBoxLayout;
   dist_vl->addLayout(dist_sel_hl);
   dist_vl->addLayout(dist_sel_buttons_hl);
+  dist_vl->addLayout(dist_energy_hl);
+  dist_vl->addLayout(dist_average_hl);
 
   dist_group->setLayout(dist_vl);
 
   // signal connection
-  connect(button_show_term_out, &QAbstractButton::clicked, this, &gui::SimVisualize::showJobTerminalOutput);
-  connect(combo_job_sel, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &gui::SimVisualize::jobSelUpdate);
-  connect(slider_dist_sel, static_cast<void(QSlider::*)(int)>(&QSlider::valueChanged), this, &gui::SimVisualize::distSelUpdate);
-  connect(button_dist_prev, &QAbstractButton::clicked, this, &gui::SimVisualize::distPrev);
-  connect(button_dist_next, &QAbstractButton::clicked, this, &gui::SimVisualize::distNext);
+  connect(button_show_term_out, &QAbstractButton::clicked,
+          this, &gui::SimVisualize::showJobTerminalOutput);
+  connect(combo_job_sel, static_cast<void(QComboBox::*)(int)>(
+                                              &QComboBox::currentIndexChanged),
+          this, &gui::SimVisualize::jobSelUpdate);
+  connect(slider_dist_sel, static_cast<void(QSlider::*)(int)>(&QSlider::valueChanged),
+          this, &gui::SimVisualize::distSelUpdate);
+  connect(button_dist_prev, &QAbstractButton::clicked,
+          this, &gui::SimVisualize::distPrev);
+  connect(button_dist_next, &QAbstractButton::clicked,
+          this, &gui::SimVisualize::distNext);
+  connect(button_average_elec_dist_all, &QAbstractButton::clicked,
+          this, &gui::SimVisualize::showAverageElecDist);
+  connect(button_average_elec_dist_degen, &QAbstractButton::clicked,
+          this, &gui::SimVisualize::showAverageElecDistDegen);
 
   // TODO show energy level, and maybe sorting feature
 
@@ -365,9 +415,12 @@ void SimVisualize::jobSelUpdate()
 
 void SimVisualize::distSelUpdate()
 {
+  int elec_ind = slider_dist_sel->sliderPosition() - 1;
   text_dist_selected->setText(tr("%1/%2").arg(
       slider_dist_sel->value()).arg(show_job->elec_dists.size()));
-  showElecDist(slider_dist_sel->sliderPosition());
+  showElecDist(elec_ind);
+
+  text_dist_energy->setText(QString::number(show_job->elec_dists[elec_ind].energy));
 }
 
 void SimVisualize::distPrev()

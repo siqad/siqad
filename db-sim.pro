@@ -180,10 +180,13 @@ sim_afmmarcus.files = \
     $$PHYS_DIR/afmmarcus/src/python/afm.py \
     $$PHYS_DIR/afmmarcus/src/python/animator.py \
     $$PHYS_DIR/afmmarcus/src/python/channel.py \
+    $$PHYS_DIR/afmmarcus/src/python/clocking.py \
     $$PHYS_DIR/afmmarcus/src/python/db-sim-connector.py \
     $$PHYS_DIR/afmmarcus/src/python/hopper.py \
+    $$PHYS_DIR/afmmarcus/src/python/lineview.py \
     $$PHYS_DIR/afmmarcus/src/python/marcus.py \
-    $$PHYS_DIR/afmmarcus/src/python/model.py
+    $$PHYS_DIR/afmmarcus/src/python/model.py \
+    $$PHYS_DIR/afmmarcus/src/python/tip_model.py
 INSTALLS += sim_afmmarcus
 
 # PoisSolver
