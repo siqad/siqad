@@ -270,8 +270,8 @@ namespace gui{
     // perform scene zoom based on wheel rotation
     void wheelZoom(QWheelEvent *e, bool boost);
 
-    // perform scene pan based on wheel rotation
-    void wheelPan(bool boost);
+    // perform scene pan based on wheel rotation, swap x and y if shift is pressed
+    void wheelPan(bool shift_scroll, bool boost);
 
     // assert bounds on zooming
     void boundZoom(qreal &ds);

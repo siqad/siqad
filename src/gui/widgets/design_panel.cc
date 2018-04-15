@@ -1001,9 +1001,9 @@ void gui::DesignPanel::wheelEvent(QWheelEvent *e)
   if(qMax(qAbs(wheel_deg.x()),qAbs(wheel_deg.y())) >= 15) {
     Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
     if(keymods & Qt::ControlModifier)
-      wheelZoom(e, keymods & Qt::ShiftModifier);
+      wheelZoom(e, keymods & Qt::AltModifier);
     else
-      wheelPan(keymods & Qt::ShiftModifier);
+      wheelPan(keymods & Qt::ShiftModifier, keymods & Qt::AltModifier);
   }
 }
 
@@ -1168,7 +1168,7 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
 }
 
 
-void gui::DesignPanel::wheelPan(bool boost)
+void gui::DesignPanel::wheelPan(bool shift_scroll, bool boost)
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
@@ -1195,8 +1195,8 @@ void gui::DesignPanel::wheelPan(bool boost)
     dy *= boost_fact;
   }
 
-  verticalScrollBar()->setValue(verticalScrollBar()->value()+dy);
-  horizontalScrollBar()->setValue(horizontalScrollBar()->value()+dx);
+  verticalScrollBar()->setValue(verticalScrollBar()->value() + ((shift_scroll) ? dx : dy));
+  horizontalScrollBar()->setValue(horizontalScrollBar()->value()+ ((shift_scroll) ? dy: dx));
 }
 
 

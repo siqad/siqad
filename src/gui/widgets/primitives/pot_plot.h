@@ -35,9 +35,9 @@ namespace prim{
     QPixmap getPotentialPlot(void){return potential_plot;}
     QRectF getGraphContainer(void){return graph_container;}
     // inherited abstract method implementations
-    QRectF boundingRect() const Q_DECL_OVERRIDE;
-    void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
-    Item *deepCopy() const;
+    QRectF boundingRect() const override;
+    void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
+    Item *deepCopy() const override;
 
   // protected:
   //   virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;

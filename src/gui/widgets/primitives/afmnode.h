@@ -40,7 +40,7 @@ namespace prim{
     virtual QRectF boundingRect() const override;
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget*) override;
 
-    virtual Item *deepCopy() const;
+    virtual Item *deepCopy() const override;
 
     // params
     QColor fill_col;

@@ -170,7 +170,7 @@ namespace prim{
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*) Q_DECL_OVERRIDE;
 
-    prim::Item *deepCopy() const {return 0;}
+    prim::Item *deepCopy() const override {return 0;}
 
 
     // testing
@@ -226,7 +226,5 @@ namespace prim{
   };
 
 } // end prim namespace
-
-
 
 #endif
