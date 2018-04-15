@@ -28,16 +28,21 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   // initialize design panel
   initDesignPanel();
 
+  // initialize contained widgets
+  property_editor = new PropertyEditor(this);
+
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
-            this, &gui::DesignPanel::selectClicked);
+          this, &gui::DesignPanel::selectClicked);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_showProperty,
+          this, &gui::DesignPanel::showItemProperty);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_addItemToScene,
-            this, &gui::DesignPanel::addItemToSceneRequest);
+          this, &gui::DesignPanel::addItemToSceneRequest);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_removeItemFromScene,
-            this, &gui::DesignPanel::removeItemFromScene);
+          this, &gui::DesignPanel::removeItemFromScene);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeBegin,
-            this, &gui::DesignPanel::resizeBegin);
+          this, &gui::DesignPanel::resizeBegin);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeFinalize,
-            this, &gui::DesignPanel::resizeItem);
+          this, &gui::DesignPanel::resizeItem);
 }
 
 // destructor

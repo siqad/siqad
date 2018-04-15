@@ -25,6 +25,13 @@ namespace gui{
 
   //! A struct that stores all information relevant to a property
   struct Property {
+    Property(QVariant val, QString f_label, QString f_tip)
+      : value(val), form_label(f_label), form_tip(f_tip) {};
+    Property(QVariant val, Property p)
+      : value(val), form_label(p.form_label), form_tip(p.form_tip) {};
+    Property(QVariant val)
+      : value(val) {};
+    Property() {};
     QVariant value;
     QString form_label; // descriptive label when showing this in a form
     QString form_tip;   // tooltip when showing this in a form

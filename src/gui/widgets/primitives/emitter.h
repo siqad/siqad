@@ -46,6 +46,8 @@ namespace prim{
 
     void sig_selectClicked(Item *);
 
+    void sig_showProperty(Item *);
+
     void sig_addItemToScene(Item *);
 
     void sig_removeItemFromScene(Item *);

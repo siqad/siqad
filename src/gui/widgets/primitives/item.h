@@ -89,6 +89,12 @@ namespace prim{
     QRectF boundingRectPreResize() {return bounding_rect_pre_resize;}
 
 
+    //! Retreve the class default property map of this item
+    virtual gui::PropertyMap *classPropertyMap() {return 0;};
+
+    //! Get property from the property map
+    gui::Property getProperty(const QString &key);
+
     //! Set a property in this item's property map
     void setProperty(const QString &key, QVariant var) {local_props[key]=var;}
 

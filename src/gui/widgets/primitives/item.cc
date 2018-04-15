@@ -46,6 +46,25 @@ bool prim::Item::upHovered()
   return parent==0 ? isHovered() : parent->upHovered();
 }
 
+gui::Property prim::Item::getProperty(const QString &key)
+{
+  if (local_props.contains(key)) {
+    if (classPropertyMap()) {
+      return gui::Property(local_props.value(key), classPropertyMap()->value(key));
+    } else {
+      return gui::Property(local_props.value(key));
+    }
+  }
+
+  if (classPropertyMap() && classPropertyMap()->contains(key))
+    return classPropertyMap()->value(key);
+
+  // property not found
+  qCritical() << QObject::tr("Can't find property with key %1 in item type %2")
+      .arg(key).arg(item_type);
+  return gui::Property();
+}
+
 
 
 QColor prim::Item::getCurrentStateColor(const prim::Item::StateColors &state_colors)

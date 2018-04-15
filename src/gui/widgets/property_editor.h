@@ -42,13 +42,36 @@ namespace gui{
 
     //! Generate a user-editable form with the provided property map. Upon
     //! submission of changes, the target item will be updated.
-    QWidget *generateForm(gui::PropertyMap *map, prim::Item *target_item);
+    void showForms(QList<prim::Item*> target_items);
+
+    //! Apply updated settings to items currently being edited.
+    void applyForms();
+
+    //! Discard a form without applying settings.
+    void discardForms();
+
 
   public slots:
+
+    //! Form cancellation
+    void cancel() {discardForms(); hide();}
+
+    //! Form OK
+    void okay() {applyForms(); discardForms(); hide();}
 
   signals:
 
   private:
+
+    //! Initialize property editor
+    void initPropertyEditor();
+
+    // VARS
+
+    QList<PropertyForm*> current_forms;   //! Forms that are currently in use.
+
+    QTabWidget *form_tab_widget=0;        //! a tab widget showing all current forms
+
 
   };  // end of PropertyEditor class
 
@@ -61,7 +84,7 @@ namespace gui{
   public:
 
     //! Constructor
-    PropertyForm(gui::PropertyMap *map, prim::Item *target_item, QWidget *parent);
+    PropertyForm(prim::Item *target_item, QWidget *parent);
 
     //! Destructor
     ~PropertyForm() {}
@@ -74,8 +97,6 @@ namespace gui{
     //! Initialize the form
     void initForm();
 
-    gui::PropertyMap *target_map; //! Property map of the target item, should
-                                  //! already have merged default and changed.
     prim::Item *target_item;      //! Item currently being edited.
   };
 

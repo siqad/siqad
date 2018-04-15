@@ -13,24 +13,71 @@ namespace gui{
 
 // Constructor
 PropertyEditor::PropertyEditor(QWidget *parent)
-  : QWidget(parent)
+  : QWidget(parent, Qt::Dialog)
 {
-
+  initPropertyEditor();
 }
 
 // Generate a user-editable form for the provided property map, and connect
 // appropriate signals to update the target item.
-QWidget *PropertyEditor::generateForm(gui::PropertyMap *map,
-    prim::Item *target_item)
+void PropertyEditor::showForms(QList<prim::Item*> target_items)
 {
-  // TODO set the new form's parent as PropertyEditor
-
-  // TODO generate form from map
-
-  // TODO connect signals to parse form submission (generate a list of changed items)
-
-  // TODO connect signals to push the changed stuff to the item
+  for (prim::Item *item : target_items) {
+    if (!item || !item->classPropertyMap()) {
+      continue;
+    }
+    current_forms.append(new PropertyForm(item, this));
+    form_tab_widget->addTab(current_forms.back(), "TODO item class name");
+  }
+  show();
 }
+
+
+void PropertyEditor::applyForms()
+{
+  for (PropertyForm *form : current_forms)
+    form->pushPropertyChanges();
+}
+
+
+void PropertyEditor::discardForms()
+{
+  form_tab_widget->clear();
+  while (!current_forms.isEmpty())
+    delete current_forms.takeLast();
+}
+
+
+void PropertyEditor::initPropertyEditor()
+{
+  // tab for showing forms
+  form_tab_widget = new QTabWidget(this);
+
+  // editor buttons
+  QHBoxLayout *buttons_hl = new QHBoxLayout;
+  QPushButton *pb_apply = new QPushButton("Apply");
+  QPushButton *pb_ok = new QPushButton("OK");
+  QPushButton *pb_cancel = new QPushButton("Cancel");
+  buttons_hl->addWidget(pb_apply);
+  buttons_hl->addWidget(pb_ok);
+  buttons_hl->addWidget(pb_cancel);
+
+  // full form structure
+  QVBoxLayout *editor_container = new QVBoxLayout;
+  editor_container->addWidget(form_tab_widget);
+  editor_container->addLayout(buttons_hl);
+  setLayout(editor_container);
+
+  // connect signals to parse form submission (generate a list of changed items)
+  connect(pb_apply, &QAbstractButton::clicked,
+          this, &PropertyEditor::applyForms);
+  connect(pb_ok, &QAbstractButton::clicked,
+          this, &PropertyEditor::okay);
+  connect(pb_cancel, &QAbstractButton::clicked,
+          this, &PropertyEditor::cancel);
+}
+
+
 
 
 
@@ -38,9 +85,9 @@ QWidget *PropertyEditor::generateForm(gui::PropertyMap *map,
 // PropertyForm class
 
 // Constructor
-PropertyForm::PropertyForm(gui::PropertyMap *map, prim::Item *target_item,
+PropertyForm::PropertyForm(prim::Item *target_item,
     QWidget *parent)
-  : QWidget(parent), target_map(map), target_item(target_item)
+  : QWidget(parent), target_item(target_item)
 {
   initForm();
 }
@@ -49,20 +96,14 @@ PropertyForm::PropertyForm(gui::PropertyMap *map, prim::Item *target_item,
 // Return a list of properties that have been changed
 void PropertyForm::pushPropertyChanges()
 {
-  QMapIterator<QString, gui::Property> prop_it(*target_map);
-  while (prop_it.hasNext()) {
-    prop_it.next();
-    gui::Property prop = prop_it.value();
-
-    QLineEdit *prop_field = QObject::findChild<QLineEdit *>(prop_it.key());
-    // update the item's property value if changes have been made
+  for (const QString &key : target_item->classPropertyMap()->keys()) {
+    Property prop = target_item->getProperty(key);
+    QLineEdit *prop_field = QObject::findChild<QLineEdit*>(key);
     if (prop.value.value<QString>() != prop_field->text()) {
-      target_item->setProperty(prop_it.key(),
-          gui::PropertyMap::string2Type2QVariant(
-              prop_field->text(),
-              prop.value.type()
-          )
-      );
+      target_item->setProperty(key,
+          PropertyMap::string2Type2QVariant(prop_field->text(), prop.value.type())
+          );
+      qDebug() << tr("Changed prop %1 from %2 to %3").arg(key).arg(prop.value.toString()).arg(prop_field->text());
     }
   }
 }
@@ -72,27 +113,24 @@ void PropertyForm::pushPropertyChanges()
 // Initialize the form
 void PropertyForm::initForm()
 {
-  QMapIterator<QString, gui::Property> prop_it(*target_map);
-  QVBoxLayout *vl_props = new QVBoxLayout;
-  while (prop_it.hasNext()) {
-    prop_it.next();
-    gui::Property prop = prop_it.value();
+  PropertyMap *map = target_item->classPropertyMap();
+  setWindowTitle("Property Editor");
+
+  // generate form from map
+  QFormLayout *prop_fl = new QFormLayout;
+  for (const QString &key : map->keys()) {
+    // get the property from the item so the local properties would be shown instead if available
+    gui::Property prop = target_item->getProperty(key);
 
     QLabel *label_prop = new QLabel(prop.form_label);
     QLineEdit *le_prop = new QLineEdit(prop.value.value<QString>());
-    le_prop->setObjectName(prop_it.key());
+    le_prop->setObjectName(key);
+    le_prop->setToolTip(prop.form_tip);
 
-    QHBoxLayout *hl_prop = new QHBoxLayout;
-    hl_prop->addWidget(label_prop);
-    hl_prop->addWidget(le_prop);
-
-    vl_props->addLayout(hl_prop);
+    prop_fl->addRow(label_prop, le_prop);
   }
-  // TODO apply / revert / cancel buttons
 
-  // TODO signals
-
-  setLayout(vl_props);
+  setLayout(prop_fl);
 }
 
 

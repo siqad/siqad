@@ -72,6 +72,9 @@ namespace prim{
     //! locations and timestamps.
     //QList<global::AFMPathTimed> generateSimulationPath();
 
+    //! Return the class default property map
+    virtual gui::PropertyMap *classPropertyMap() override {return &default_class_properties;}
+
 
     // Graphics
 
@@ -115,8 +118,7 @@ namespace prim{
     QPointF point_bot_right;  //! Bottom right point.
 
     // properties of this item class
-    static gui::PropertyMap default_props;  //! Default properties for this class
-    //gui::PropertyMap local_props;           //! Properties altered from default
+    static gui::PropertyMap default_class_properties; //! Default properties for this class
 
     // AFM tip movement parameters
     bool h_orientation; //! "horizontal" direction = orientation ? x, y

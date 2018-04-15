@@ -19,6 +19,7 @@
 #include "../../global.h"
 
 #include "afm_panel.h"
+#include "property_editor.h"
 
 #include "primitives/layer.h"
 #include "primitives/lattice.h"
@@ -154,17 +155,31 @@ namespace gui{
 
 
   public slots:
+    // items
+
+    //! A selected item has been clicked on.
     void selectClicked(prim::Item *item);
-    void simVisualizeDockVisibilityChanged(bool visible);
 
-    void resizeBegin();
+    //! Show the property of an item.
+    void showItemProperty(prim::Item *item) {property_editor->showForms(QList<prim::Item*>({item}));}
 
+    //! Add the given item to scene.
     void addItemToSceneRequest(prim::Item *item) {addItemToScene(item);}
+
+    //! Remove the given item from scene.
     void removeItemFromSceneRequest(prim::Item *item) {removeItemFromScene(item);}
 
+    //! Begin resizing an item.
+    void resizeBegin();
+
+    // simulation
+    void simVisualizeDockVisibilityChanged(bool visible);
+
+    // gui
     void rotateCw();
     void rotateCcw();
 
+    //! Emitted when the undo stack clean stage has changed.
     void emitUndoStackCleanChanged(bool c) {emit sig_undoStackCleanChanged(c);}
 
   signals:
@@ -216,6 +231,9 @@ namespace gui{
     gui::ToolType tool_type;       // current cursor tool type
     gui::DisplayMode display_mode; // current display mode
     QUndoStack *undo_stack;   // undo stack
+
+    // contained widgets
+    gui::PropertyEditor *property_editor;
 
     // background color presets
     static QColor background_col;         // normal background color
@@ -415,6 +433,7 @@ namespace gui{
     QAction *action_delete;
     QAction *action_set_potential;
     QAction *action_toggle_db_elec;
+    QAction *action_afmarea_properties;
   };
 
 

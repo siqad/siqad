@@ -24,6 +24,7 @@
 #include "widgets/input_field.h"
 #include "widgets/info_panel.h"
 #include "widgets/layer_editor.h"
+#include "widgets/property_editor.h"
 #include "widgets/sim_manager.h"
 #include "widgets/sim_visualize_panel.h"
 #include "widgets/primitives/sim_job.h" // TODO move these stuff to SimManager later

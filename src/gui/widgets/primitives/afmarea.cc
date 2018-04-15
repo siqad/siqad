@@ -11,7 +11,7 @@
 namespace prim {
 
 // Initialise statics
-gui::PropertyMap AFMArea::default_props;
+gui::PropertyMap AFMArea::default_class_properties;
 qreal AFMArea::area_border_width=-1;
 prim::Item::StateColors AFMArea::area_border_col;
 prim::Item::StateColors AFMArea::area_fill_col;
@@ -221,9 +221,12 @@ Item *AFMArea::deepCopy() const
 void AFMArea::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
   switch(e->buttons()) {
-    default:
+    default: {
+      qDebug() << "should be showing property form.";
+      prim::Emitter::instance()->sig_showProperty(this);
       prim::Item::mousePressEvent(e);
       break;
+    }
   }
 }
 
@@ -260,7 +263,7 @@ void AFMArea::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 void AFMArea::prepareStatics()
 {
   // Read properties
-  default_props.readPropertiesFromXML(":/properties/afmarea.xml");
+  default_class_properties.readPropertiesFromXML(":/properties/afmarea.xml");
 
   // Initialize static variables
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
