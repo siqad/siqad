@@ -27,7 +27,6 @@ prim::DBDot::DBDot(int lay_id, prim::LatticeDot *src, int elec_in)
   : prim::Item(prim::Item::DBDot), show_elec(0)
 {
   initDBDot(lay_id, src, elec_in);
-  // TODO might want to add a struct or something that stores all properties of the db, this way copies can be much easier
 }
 
 

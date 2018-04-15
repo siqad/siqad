@@ -1,4 +1,4 @@
-// @file:     property_map.h
+// @file:     property_editor.h
 // @author:   Samuel
 // @created:  2018.03.28
 // @editted:  2018.03.28  - Samuel

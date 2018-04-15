@@ -1,4 +1,4 @@
-// @file:     property_map.cc
+// @file:     property_editor.cc
 // @author:   Samuel
 // @created:  2018.03.29
 // @editted:  2018.03.29  - Samuel

@@ -433,7 +433,6 @@ namespace gui{
     QAction *action_delete;
     QAction *action_set_potential;
     QAction *action_toggle_db_elec;
-    QAction *action_afmarea_properties;
   };
 
 
