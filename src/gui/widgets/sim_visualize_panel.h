@@ -69,6 +69,8 @@ namespace gui{
     QLabel *text_job_end_time;
     QPushButton *button_show_term_out;
 
+    // electron distribution
+    QGroupBox *dist_group;
     QSlider *slider_dist_sel;
     QLabel *text_dist_selected;
     QLabel *text_dist_energy;

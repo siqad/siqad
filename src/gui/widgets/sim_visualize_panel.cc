@@ -218,12 +218,14 @@ void SimVisualize::updateElecDistOptions()
   if(!text_dist_selected || !slider_dist_sel || !show_job)
     return;
 
-  if(!show_job->isComplete() || show_job->elec_dists.isEmpty()){
+  if (!show_job->isComplete() || show_job->elec_dists.isEmpty()) {
+    dist_group->setVisible(false);
     slider_dist_sel->setMinimum(0);
     slider_dist_sel->setMaximum(0);
+    slider_dist_sel->setValue(0);
     text_dist_selected->setText("0/0");
-  }
-  else{
+  } else {
+    dist_group->setVisible(true);
     int dist_count = show_job->elec_dists.size();
     int min_sel = dist_count > 0;
     slider_dist_sel->setMinimum(min_sel);
@@ -253,11 +255,8 @@ void SimVisualize::updateOptions()
       // name - button for rename
 
     // TODO result type selector (not needed for now)
-    if(show_job->engineName() == "SimAnneal"){
-      // elec dist selection
-      updateElecDistOptions();
-    }
-    else if(show_job->engineName() == "PoisSolver"){
+    updateElecDistOptions();
+    if(show_job->engineName() == "PoisSolver"){
       showPotPlot();
     }
 
@@ -324,7 +323,7 @@ void SimVisualize::initSimVisualize()
   job_info_group->setLayout(job_info_layout);
 
   // Elec Distribution Group
-  QGroupBox *dist_group = new QGroupBox(tr("Electron Distribution"));
+  dist_group = new QGroupBox(tr("Electron Distribution"));
 
   // choose the elec distribution ind
   QLabel *label_dist_sel = new QLabel(tr("Dist:"));
@@ -367,9 +366,11 @@ void SimVisualize::initSimVisualize()
 
   // average
   QHBoxLayout *dist_average_hl = new QHBoxLayout;
+  QVBoxLayout *dist_average_buttons_hl = new QVBoxLayout;
   dist_average_hl->addWidget(label_average_elec_dist);
-  dist_average_hl->addWidget(button_average_elec_dist_all);
-  dist_average_hl->addWidget(button_average_elec_dist_degen);
+  dist_average_buttons_hl->addWidget(button_average_elec_dist_all);
+  dist_average_buttons_hl->addWidget(button_average_elec_dist_degen);
+  dist_average_hl->addLayout(dist_average_buttons_hl);
 
   // entire elec distribution group
   QVBoxLayout *dist_vl = new QVBoxLayout;
@@ -434,10 +435,10 @@ void SimVisualize::distPrev()
 
 void SimVisualize::distNext()
 {
-  if(!slider_dist_sel)
+  if (!slider_dist_sel)
     return;
 
-  if(slider_dist_sel->value() != slider_dist_sel->maximum())
+  if (!(slider_dist_sel->value() + 1 > slider_dist_sel->maximum()))
     slider_dist_sel->setValue(slider_dist_sel->value() + 1);
 }
 
