@@ -47,8 +47,8 @@ namespace prim{
     void setLayerIndex(int lay_id) {layer_id = lay_id;}
 
     // abstract member functions for derived classes
-    virtual QRectF boundingRect() const = 0;
-    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) = 0;
+    virtual QRectF boundingRect() const override = 0;
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override = 0;
 
     //! create a deep copy of the Item for the clipboard. Deep-copied items should
     //! have no parent or scene and need only to have the information necessary
@@ -122,9 +122,9 @@ namespace prim{
     bool hovered; //!< manipulated through setHovered(bool) and hovered()
 
     // optional overridable mousePressEvent interrupt
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
-    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *) Q_DECL_OVERRIDE {}
-    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *) Q_DECL_OVERRIDE {}
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *) override {}
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *) override {}
 
   private:
 

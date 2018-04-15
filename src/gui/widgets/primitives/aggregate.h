@@ -35,16 +35,16 @@ namespace prim{
     QStack<prim::Item*> &getChildren() {return items;}
 
     // necessary derived class member functions
-    virtual QRectF boundingRect() const;
-    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
+    virtual QRectF boundingRect() const override;
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
 
-    virtual Item *deepCopy() const;
+    virtual Item *deepCopy() const override;
 
     static QColor edge_col;
     static QColor edge_col_hovered;
 
     // save to file
-    virtual void saveItems(QXmlStreamWriter *) const;
+    virtual void saveItems(QXmlStreamWriter *) const override;
 
   private:
 
@@ -57,11 +57,11 @@ namespace prim{
 
     // aggregates should have no inherrent click behaviour. Rather, child Items
     // should inform the aggregate that they have been clicked.
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) override;
 
     // handle hover events for highlighing aggregate boundary
-    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *e) Q_DECL_OVERRIDE;
-    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *e) Q_DECL_OVERRIDE;
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *e) override;
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *e) override;
   };
 
 } // end prim namespace
