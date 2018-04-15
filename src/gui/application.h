@@ -67,6 +67,7 @@ namespace gui{
     void setToolElectrode();
     void setToolAFMArea();
     void setToolAFMPath();
+    void setToolScreenshotArea();
 
     // change lattice
     void changeLattice();
@@ -89,8 +90,23 @@ namespace gui{
 
     void selectColor(); // tool for converting colors into QVariant strings
 
-    void screenshot();  // take an svg capture of the GUI
-    void designScreenshot();         // take an svg capture ofthe design window
+    // Screenshots
+
+    //! Initiate Screenshot Mode which allows the user to pick an area to
+    //! screenshot.
+    void beginScreenshotMode();
+
+    //! End Screenshot mode.
+    void endScreenshotMode();
+
+    //! Take an svg capture of the entire GUI.
+    void screenshot();
+
+    //! Take an svg capture of the design window currently shown.
+    void designScreenshot();
+
+    //! Take an svg capture of the design window in the given QRect (scene coord).
+    void designScreenshot(QRect rect);
 
     // show pop-up dialogs
     void showSettingsDialog() {settings_dialog->show();}
@@ -137,6 +153,9 @@ namespace gui{
 
     // VARIABLES
 
+    // display mode cache for returning to previous mode
+    DisplayMode display_mode_cache;
+
     // save start time for instance recognition
     QDateTime start_time;
 
@@ -163,6 +182,7 @@ namespace gui{
     QDockWidget *layer_dock;  // right side panel for showing layers
 
     // action pointers
+    QAction *action_screenshot_tool;
     QAction *action_select_tool;  // change cursor tool to select
     QAction *action_drag_tool;    // change cursor tool to drag
     QAction *action_dbgen_tool;   // change cursor tool to gen

@@ -13,6 +13,7 @@
 #include <QtWidgets>
 #include <QtCore>
 #include "emitter.h"
+#include "src/global.h"
 #include "src/settings/settings.h"
 #include "src/gui/property_map.h"
 
@@ -47,13 +48,13 @@ namespace prim{
     void setLayerIndex(int lay_id) {layer_id = lay_id;}
 
     // abstract member functions for derived classes
-    virtual QRectF boundingRect() const = 0;
-    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) = 0;
+    virtual QRectF boundingRect() const override = 0;
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override = 0;
 
     //! create a deep copy of the Item for the clipboard. Deep-copied items should
     //! have no parent or scene and need only to have the information necessary
     //! to create a new copy somewhere in the scene
-    virtual Item *deepCopy() const = 0;
+    virtual Item *deepCopy() const {return 0;}
 
     //! true if the item or its parent has been seleted, recursive to highest level parent
     bool upSelected();
@@ -64,11 +65,6 @@ namespace prim{
     bool isHovered() {return hovered;}
     //! true if the item or its parent has been hovered, recursive to highest level parent
     bool upHovered();
-
-    //! set design mode
-    void setDesignMode(bool mode) {design_mode = mode;}
-    //! get design mode
-    bool designMode() {return design_mode;}
 
     //! set whether the item is resizable
     void setResizable(bool flag) {resizable = flag;}
@@ -104,10 +100,10 @@ namespace prim{
     int layer_id;             // the layer id of the Item
 
     // static class variables
-    static qreal scale_factor;  // pixels/angstrom scaling factor
-    static bool select_mode;    // Application is in select mode
-    static bool db_gen_mode;
-    static bool electrode_mode;
+    static qreal scale_factor;            // pixels/angstrom scaling factor
+    static gui::ToolType tool_type;       // current tool type of the GUI
+    static gui::DisplayMode display_mode; // current display mode of the GUI
+
     static void init();
 
     // SAVE LOAD
@@ -120,6 +116,7 @@ namespace prim{
       QColor normal;
       QColor hovered;
       QColor selected;
+      QColor publish;
     };
 
     //! Get the color corresponding to the current state of the item.
@@ -130,13 +127,12 @@ namespace prim{
     bool hovered; //!< manipulated through setHovered(bool) and hovered()
 
     // optional overridable mousePressEvent interrupt
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
-    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *) Q_DECL_OVERRIDE {}
-    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *) Q_DECL_OVERRIDE {}
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *) override {}
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *) override {}
 
   private:
 
-    bool design_mode;
 
     bool resizable=false;
     QRectF bounding_rect_pre_resize;  // used for resizable items

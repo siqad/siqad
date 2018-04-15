@@ -19,15 +19,16 @@ uint prim::Layer::layer_count = 0;
 
 
 prim::Layer::Layer(const QString &nm, LayerType cnt_type, const float z_offset, const float z_height, int lay_id, QObject *parent)
-  : QObject(parent), visible(true), active(false), zoffset(z_offset), zheight(z_height)
+  : QObject(parent), layer_id(lay_id), zoffset(z_offset), zheight(z_height),
+        visible(true), active(false)
 {
-  layer_id = lay_id;
   name = nm.isEmpty() ? QString("Layer %1").arg(layer_count++) : nm;
   content_type = cnt_type;
 }
 
 
 prim::Layer::Layer(QXmlStreamReader *stream)
+  : visible(true), active(false)
 {
   int lay_id;
   QString name_ld;

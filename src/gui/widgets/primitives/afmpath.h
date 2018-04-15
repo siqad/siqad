@@ -30,7 +30,7 @@ namespace prim{
     ~AFMPath() {}; // AFMNode and AFMSeg pointers are deleted by DesignPanel on scene clear
 
     // Save to XML
-    virtual void saveItems(QXmlStreamWriter *) const;
+    virtual void saveItems(QXmlStreamWriter *) const override;
 
     // Nodes
 
@@ -58,7 +58,7 @@ namespace prim{
     // segment count
     int segmentCount() const {return path_segs.length();}
 
-    // insert segment to index position with path_node[index] as origin and 
+    // insert segment to index position with path_node[index] as origin and
     // path_node[index+1] as destination
     void insertSegment(int index);
 
@@ -81,10 +81,10 @@ namespace prim{
     QList<QPointF> unfoldedPath();
 
     // Graphics
-    virtual QRectF boundingRect() const; // conform to segment shapes
-    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
+    virtual QRectF boundingRect() const override; // conform to segment shapes
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
 
-    virtual Item *deepCopy() const;
+    virtual Item *deepCopy() const override;
 
   /* TODO remove
   signals:
@@ -97,7 +97,7 @@ namespace prim{
     void prepareStatics();
 
     // show path config dialog when selected
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) override;
 
 
     // VARS

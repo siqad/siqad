@@ -32,6 +32,9 @@ gui::ApplicationGUI::ApplicationGUI(QWidget *parent)
   // save start time for instance recognition
   start_time = QDateTime::currentDateTime();
 
+  // initialize default save_dir
+  save_dir = QDir::homePath();
+
   // initialise GUI
   initGUI();
 
@@ -100,6 +103,12 @@ void gui::ApplicationGUI::initGUI()
           this, &gui::ApplicationGUI::updateWindowTitle);
   connect(sim_visualize, &gui::SimVisualize::showPotPlotOnScene,
           design_pan, &gui::DesignPanel::displayPotentialPlot);
+  connect(design_pan, SIGNAL(sig_screenshot(QRect)),
+          this, SLOT(designScreenshot(QRect)));
+  connect(design_pan, SIGNAL(sig_showSimulationSetup()),
+          this, SLOT(simulationSetup()));
+  connect(design_pan, SIGNAL(sig_quickRunSimulation()),
+          sim_manager, SLOT(quickRun()));
 
   // layout management
   QWidget *main_widget = new QWidget(this); // main widget for mainwindow
@@ -176,14 +185,17 @@ void gui::ApplicationGUI::initMenuBar()
   // tools menu actions
   QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
   QAction *select_color = new QAction(tr("Select Color..."), this);
-  QAction *screenshot = new QAction(tr("Full Screenshot..."), this);
+  QAction *area_screenshot = new QAction(tr("Region Screenshot..."), this);
   QAction *design_screenshot = new QAction(tr("Design Screenshot..."), this);
+  QAction *screenshot = new QAction(tr("Window Screenshot..."), this);
   QAction *action_settings_dialog = new QAction(tr("Settings"), this);
 
   tools->addAction(change_lattice);
   tools->addAction(select_color);
-  tools->addAction(screenshot);
+  view->addSeparator();
+  tools->addAction(area_screenshot);
   tools->addAction(design_screenshot);
+  tools->addAction(screenshot);
   tools->addSeparator();
   tools->addAction(action_settings_dialog);
 
@@ -202,8 +214,10 @@ void gui::ApplicationGUI::initMenuBar()
   connect(rotate_view_ccw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCcw);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
+  connect(area_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::beginScreenshotMode);
   connect(screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
-  connect(design_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::designScreenshot);
+  connect(design_screenshot, SIGNAL(triggered()),
+          this, SLOT(designScreenshot()));
   connect(action_settings_dialog, &QAction::triggered, this, &gui::ApplicationGUI::showSettingsDialog);
   connect(about_version, &QAction::triggered, this, &gui::ApplicationGUI::aboutVersion);
 
@@ -271,6 +285,8 @@ void gui::ApplicationGUI::initSideBar()
   // actions
   QActionGroup *action_group = new QActionGroup(side_bar);
 
+  action_screenshot_tool = side_bar->addAction(QIcon(":/ico/screenshotarea.svg"),
+      tr("Screenshot Area tool"));
   action_select_tool = side_bar->addAction(QIcon(":/ico/select.svg"),
       tr("Select tool"));
   action_drag_tool = side_bar->addAction(QIcon(":/ico/drag.svg"),
@@ -286,6 +302,7 @@ void gui::ApplicationGUI::initSideBar()
   //TODO action_label_tool = side_bar->addAction(QIcon(":/ico/drawlabel.svg"),
   //    tr("Label tool"));
 
+  action_group->addAction(action_screenshot_tool);
   action_group->addAction(action_select_tool);
   action_group->addAction(action_drag_tool);
   action_group->addAction(action_dbgen_tool);
@@ -294,6 +311,9 @@ void gui::ApplicationGUI::initSideBar()
   action_group->addAction(action_afmpath_tool);
   //action_group->addAction(action_label_tool);
 
+  action_screenshot_tool->setVisible(false);  // only shown in ScreenshotMode
+
+  action_screenshot_tool->setCheckable(true);
   action_select_tool->setCheckable(true);
   action_drag_tool->setCheckable(true);
   action_dbgen_tool->setCheckable(true);
@@ -304,6 +324,8 @@ void gui::ApplicationGUI::initSideBar()
 
   action_select_tool->setChecked(true);
 
+  connect(action_screenshot_tool, &QAction::triggered,
+          this, &gui::ApplicationGUI::setToolScreenshotArea);
   connect(action_select_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolSelect);
   connect(action_drag_tool, &QAction::triggered,
@@ -416,8 +438,6 @@ void gui::ApplicationGUI::initState()
   setTool(gui::ToolType::SelectTool);
   updateWindowTitle();
   autosave_timer.start(1000*app_settings->get<int>("save/autosaveinterval"));
-
-  save_dir = QDir::homePath();
 }
 
 
@@ -527,6 +547,9 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
       action_afmpath_tool->setChecked(true);
       setToolAFMPath();
       break;
+    case gui::ToolType::ScreenshotAreaTool:
+      action_screenshot_tool->setChecked(true);
+      setToolScreenshotArea();
     default:
       break;
   }
@@ -570,6 +593,12 @@ void gui::ApplicationGUI::setToolAFMPath()
 {
   qDebug() << tr("selecting afmpath tool");
   design_pan->setTool(gui::ToolType::AFMPathTool);
+}
+
+void gui::ApplicationGUI::setToolScreenshotArea()
+{
+  qDebug() << tr("selecting screenshot area tool");
+  design_pan->setTool(gui::ToolType::ScreenshotAreaTool);
 }
 
 
@@ -693,6 +722,21 @@ void gui::ApplicationGUI::selectColor()
 }
 
 
+void gui::ApplicationGUI::beginScreenshotMode()
+{
+  display_mode_cache = design_pan->displayMode();
+  design_pan->setDisplayMode(ScreenshotMode);
+  action_screenshot_tool->setVisible(true);
+  setTool(ScreenshotAreaTool);
+}
+
+void gui::ApplicationGUI::endScreenshotMode()
+{
+  design_pan->setDisplayMode(display_mode_cache);
+  action_screenshot_tool->setVisible(false);
+  setTool(SelectTool);
+}
+
 void gui::ApplicationGUI::screenshot()
 {
   // get save path
@@ -732,30 +776,48 @@ void gui::ApplicationGUI::screenshot()
 
 void gui::ApplicationGUI::designScreenshot()
 {
-  // get save path
-  QString fname = QFileDialog::getSaveFileName(this, tr("Save File"), img_dir.path(),
-                      tr("SVG files (*.svg)"));
-
-  if(fname.isEmpty())
-    return;
-  img_dir = QDir(fname);
+  beginScreenshotMode();
 
   gui::DesignPanel *widget = this->design_pan;
   QRect rect = widget->rect();
   rect.setHeight(rect.height() - widget->horizontalScrollBar()->height());
   rect.setWidth(rect.width() - widget->verticalScrollBar()->width());
+  // translate the rect from view coord to scene coord, there might be a simpler
+  // solution but this works...
+  rect.translate(design_pan->mapToScene(
+                    design_pan->mapFromParent(rect.topLeft())).toPoint()
+                - rect.topLeft());
+
+  designScreenshot(rect);
+}
+
+
+void gui::ApplicationGUI::designScreenshot(QRect rect)
+{
+  qDebug() << tr("taking screenshot for rect (%1, %2) (%3, %4)")
+      .arg(rect.left()).arg(rect.top()).arg(rect.right()).arg(rect.bottom());
+  // get save path
+  QString fname = QFileDialog::getSaveFileName(this, tr("Save File"), img_dir.path(),
+                      tr("SVG files (*.svg)"));
+
+  if(fname.isEmpty()) {
+    endScreenshotMode();
+    return;
+  }
+  img_dir = QDir(fname);
 
   QSvgGenerator gen;
   gen.setFileName(fname);
-  gen.setSize(rect.size());
+  //gen.setSize(rect.size());
   gen.setViewBox(rect);
 
   QPainter painter;
   painter.begin(&gen);
-  widget->render(&painter);
+  design_pan->screenshot(&painter, rect);
   painter.end();
-}
 
+  endScreenshotMode();
+}
 
 // FILE HANDLING
 
@@ -915,12 +977,14 @@ void gui::ApplicationGUI::openFromFile()
       return;
 
   // file dialog
-  QString prompt_path = QFileDialog::getOpenFileName(this, tr("Open File"), ".", tr("XML files (*.xml)"));
+  QString prompt_path = QFileDialog::getOpenFileName(this, tr("Open File"),
+      save_dir.absolutePath(), tr("XML files (*.xml)"));
 
   if(prompt_path.isEmpty())
     return;
 
   working_path = prompt_path;
+  save_dir.setPath(QFileInfo(prompt_path).absolutePath());
   updateWindowTitle();
   QFile file(working_path);
 

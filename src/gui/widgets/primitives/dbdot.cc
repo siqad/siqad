@@ -13,18 +13,14 @@
 // Initialize statics
 
 qreal prim::DBDot::diameter_m = -1;
-qreal prim::DBDot::diameter_l = -1;
-qreal prim::DBDot::edge_width = -1;
+qreal prim::DBDot::diameter_l;
+qreal prim::DBDot::edge_width;
+qreal prim::DBDot::publish_scale;
 
-QColor prim::DBDot::edge_col;
-QColor prim::DBDot::selected_col;
-
-QColor prim::DBDot::fill_col_default;
-QColor prim::DBDot::fill_col_default_sel;
-QColor prim::DBDot::fill_col_drv;
-QColor prim::DBDot::fill_col_drv_sel;
-QColor prim::DBDot::fill_col_elec;
-QColor prim::DBDot::fill_col_elec_sel;
+prim::Item::StateColors prim::DBDot::fill_col;           // normal dbdot
+prim::Item::StateColors prim::DBDot::fill_col_driver;    // driver (forced polarization)
+prim::Item::StateColors prim::DBDot::fill_col_electron;  // contains electron
+prim::Item::StateColors prim::DBDot::edge_col;           // edge of the dbdot
 
 
 prim::DBDot::DBDot(int lay_id, prim::LatticeDot *src, int elec_in)
@@ -130,38 +126,31 @@ void prim::DBDot::toggleElec()
 
 void prim::DBDot::setElec(int e_in)
 {
-  // TODO move the color logic to paint
   elec = e_in;
   if(elec){
     // set to 1
     setFill(1);
-    setFillCol(fill_col_drv, fill_col_drv_sel);
+    //setFillCol(fill_col_drv, fill_col_drv_sel);
     diameter = diameter_m;
   }
   else{
     // set to 0
     setFill(1);
-    setFillCol(fill_col_default, fill_col_default_sel);
+    //setFillCol(fill_col_default, fill_col_default_sel);
     diameter = diameter_m;
   }
   update();
 }
 
 
-void prim::DBDot::setShowElec(int se_in)
+void prim::DBDot::setShowElec(float se_in)
 {
   // TODO move the color logic to paint
   show_elec = se_in;
-  if(show_elec){
-    // set to 1
-    setFill(1);
-    setFillCol(fill_col_elec, fill_col_elec_sel);
+  if(show_elec > 0){
     diameter = diameter_l; // TODO change this to paint
   }
   else{
-    // set to 0
-    setFill(1);
-    setFillCol(fill_col_default, fill_col_default_sel);
     diameter = diameter_m;
   }
   update();
@@ -187,32 +176,54 @@ void prim::DBDot::setSource(prim::LatticeDot *src)
 QRectF prim::DBDot::boundingRect() const
 {
   qreal width = diameter_l+edge_width;
+  if (display_mode == gui::ScreenshotMode) width *= publish_scale;
   return QRectF(-.5*width, -.5*width, width, width);
 }
 
 
 void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+  QColor fill_col_state;
+  if ( (display_mode == gui::SimDisplayMode ||
+        display_mode == gui::ScreenshotMode) &&
+        show_elec > 0) {
+    setFill(show_elec);
+    fill_col_state = getCurrentStateColor(fill_col_electron);
+  } else if (elec > 0) {
+    setFill(1);
+    fill_col_state = getCurrentStateColor(fill_col_driver);
+  } else {
+    setFill(1);
+    fill_col_state = getCurrentStateColor(fill_col);
+  }
+
+  qreal edge_width_paint = edge_width;
+  qreal diameter_paint = diameter;
+  if (display_mode == gui::ScreenshotMode) {
+    edge_width_paint *= publish_scale;
+    diameter_paint *= publish_scale;
+  }
+
+
   QRectF rect = boundingRect();
-  qreal dxy = .5*edge_width;
+  qreal dxy = .5*edge_width_paint;
   rect.adjust(dxy,dxy,-dxy,-dxy);
 
   // draw inner fill
   if(fill_fact>0){
     QPointF center = rect.center();
-    QSizeF size(diameter, diameter);
-    rect.setSize(size*fill_fact);
+    QSizeF size(diameter_paint, diameter_paint);
+    rect.setSize(size*qSqrt(fill_fact));
     rect.moveCenter(center);
 
     painter->setPen(Qt::NoPen);
-    painter->setBrush((select_mode && upSelected()) ? fill_col_sel : fill_col);
+    painter->setBrush(fill_col_state);
     painter->drawEllipse(rect);
   }
 
   // draw outer circle
-  painter->setPen(QPen((select_mode && upSelected()) ? selected_col : edge_col, edge_width));
+  painter->setPen(QPen(getCurrentStateColor(edge_col), edge_width));
   painter->drawEllipse(rect);
-
 }
 
 
@@ -226,11 +237,6 @@ prim::Item *prim::DBDot::deepCopy() const
 
 void prim::DBDot::saveItems(QXmlStreamWriter *stream) const
 {
-  /*stream->writeEmptyElement("dbdot");
-  stream->writeAttribute("x", QString::number(getPhysLoc().x()));
-  stream->writeAttribute("y", QString::number(getPhysLoc().y()));
-  stream->writeAttribute("layer_id", QString::number(layer_id));
-  stream->writeAttribute("elec", QString::number(elec));*/
   stream->writeStartElement("dbdot");
 
   // layer id
@@ -255,14 +261,27 @@ void prim::DBDot::constructStatics()
   diameter_m = gui_settings->get<qreal>("dbdot/diameter_m")*scale_factor;
   diameter_l = gui_settings->get<qreal>("dbdot/diameter_l")*scale_factor;
   edge_width = gui_settings->get<qreal>("dbdot/edge_width")*diameter;
-  edge_col= gui_settings->get<QColor>("dbdot/edge_col");
-  selected_col= gui_settings->get<QColor>("dbdot/selected_col");
-  fill_col_default = gui_settings->get<QColor>("dbdot/fill_col");
-  fill_col_default_sel = gui_settings->get<QColor>("dbdot/fill_col_sel");
-  fill_col_drv = gui_settings->get<QColor>("dbdot/fill_col_drv");
-  fill_col_drv_sel = gui_settings->get<QColor>("dbdot/fill_col_drv_sel");
-  fill_col_elec = gui_settings->get<QColor>("dbdot/fill_col_elec");
-  fill_col_elec_sel = gui_settings->get<QColor>("dbdot/fill_col_elec_sel");
+  publish_scale = gui_settings->get<qreal>("dbdot/publish_scale");
+
+  edge_col.normal = gui_settings->get<QColor>("dbdot/edge_col");
+  edge_col.selected = gui_settings->get<QColor>("dbdot/edge_col_sel");
+  edge_col.hovered = gui_settings->get<QColor>("dbdot/edge_col_hovered");
+  edge_col.publish = gui_settings->get<QColor>("dbdot/edge_col_pb");
+
+  fill_col.normal = gui_settings->get<QColor>("dbdot/fill_col");
+  fill_col.selected = gui_settings->get<QColor>("dbdot/fill_col_sel");
+  fill_col.hovered = gui_settings->get<QColor>("dbdot/fill_col_hovered");
+  fill_col.publish = gui_settings->get<QColor>("dbdot/fill_col_pb");
+
+  fill_col_driver.normal = gui_settings->get<QColor>("dbdot/fill_col_drv");
+  fill_col_driver.selected = gui_settings->get<QColor>("dbdot/fill_col_drv_sel");
+  fill_col_driver.hovered = gui_settings->get<QColor>("dbdot/fill_col_drv_hovered");
+  fill_col_driver.publish = gui_settings->get<QColor>("dbdot/fill_col_drv_pb");
+
+  fill_col_electron.normal = gui_settings->get<QColor>("dbdot/fill_col_elec");
+  fill_col_electron.selected = gui_settings->get<QColor>("dbdot/fill_col_elec_sel");
+  fill_col_electron.hovered = gui_settings->get<QColor>("dbdot/fill_col_elec_hovered");
+  fill_col_electron.publish = gui_settings->get<QColor>("dbdot/fill_col_elec_pb");
 }
 
 void prim::DBDot::mousePressEvent(QGraphicsSceneMouseEvent *e)

@@ -142,7 +142,7 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
   painter->drawRect(rect);
 
   // draw inner circle
-  if(select_mode && isSelected()){
+  if(tool_type == gui::SelectTool && isSelected()){
 
       // qDebug() << QObject::tr("Electrode selected");
     setPos(pos());
@@ -194,7 +194,7 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
   }
 }
 
-void prim::Electrode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e)
+void prim::Electrode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
 {
   // qDebug() << QObject::tr("Electrode has seen the mouseDoubleClickEvent");
   //do something here to manipulate potential. Maybe dialog box?

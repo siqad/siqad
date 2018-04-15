@@ -23,11 +23,11 @@ prim::Aggregate::Aggregate(QXmlStreamReader *stream, QGraphicsScene *scene)
 {
   //qDebug() << QObject::tr("Aggregate: constructing aggregate from XML");
   QStack<Item*> ld_children;
-  
-  // NOTE for now, all aggregates are in DB layer. 
+
+  // NOTE for now, all aggregates are in DB layer.
   // More sophisticated method of determination needed in the future.
-  int lay_id=1; 
-  
+  int lay_id=1;
+
   // read from XML stream (children will be created recursively, add those children to stack)
   while(!stream->atEnd()){
     if(stream->isStartElement()){
@@ -138,7 +138,7 @@ QRectF prim::Aggregate::boundingRect() const
 void prim::Aggregate::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
   // Scene will handle drawing the children, just draw the bounding box
-  if(select_mode && upSelected()){
+  if(tool_type == gui::SelectTool && upSelected()){
     QRectF rect = boundingRect();
 
     painter->setPen(QPen(edge_col));

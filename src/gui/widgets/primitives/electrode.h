@@ -53,10 +53,10 @@ namespace prim{
     // inherited abstract method implementations
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
-    Item *deepCopy() const;
+    Item *deepCopy() const override;
 
     // saving to design
-    virtual void saveItems(QXmlStreamWriter *) const;
+    virtual void saveItems(QXmlStreamWriter *) const override;
 
   protected:
 

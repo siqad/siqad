@@ -30,14 +30,14 @@ namespace prim{
     ~AFMArea() {}
 
     //! Save to XML.
-    virtual void saveItems(QXmlStreamWriter *) const;
+    virtual void saveItems(QXmlStreamWriter *) const override;
 
 
     // Accessors
 
     //! Resize according to given coordinates.
     virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
-        bool update_handles=false);
+        bool update_handles=false) override;
 
 
     //! Return the top left point of the AFM area.
@@ -79,13 +79,13 @@ namespace prim{
     void updatePoints(const QPointF &offset);
 
     //! Bounding rect for graphics calculations.
-    virtual QRectF boundingRect() const;
+    virtual QRectF boundingRect() const override;
 
     //! Paint function.
-    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
 
     //! Behavior when this object is copied.
-    virtual Item *deepCopy() const;
+    virtual Item *deepCopy() const override;
 
 
   protected:

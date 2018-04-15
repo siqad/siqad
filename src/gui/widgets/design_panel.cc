@@ -11,6 +11,9 @@
 
 #include <algorithm>
 
+QColor gui::DesignPanel::background_col;
+QColor gui::DesignPanel::background_col_publish;
+
 // constructor
 gui::DesignPanel::DesignPanel(QWidget *parent)
   : QGraphicsView(parent)
@@ -18,6 +21,11 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   // set-up scale_factor in prim::Item
   prim::Item::init();
 
+  // construct static variables at first launch
+  if (!background_col.isValid())
+    constructStatics();
+
+  // initialize design panel
   initDesignPanel();
 
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
@@ -35,6 +43,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 // destructor
 gui::DesignPanel::~DesignPanel()
 {
+  clearSimResults();        // clear simulation results first if they're being shown
   clearDesignPanel(false);
 }
 
@@ -354,7 +363,7 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   top_layer = layers.at(1);
 
   // add in the metal layer for electrodes
-  addLayer(tr("Metal"),prim::Layer::Electrode,-100E-9,0);
+  addLayer(tr("Metal"),prim::Layer::Electrode,-100E-9,10E-9);
   electrode_layer = layers.at(2);
 
   // add in the AFM layer for AFM tip travel paths
@@ -389,10 +398,7 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
   scene->clearSelection();
 
   // inform all items of select mode
-  // TODO replace with signal based notification
-  prim::Item::select_mode = tool==gui::ToolType::SelectTool;
-  prim::Item::db_gen_mode = tool==gui::ToolType::DBGenTool;
-  prim::Item::electrode_mode = tool==gui::ToolType::ElectrodeTool;
+  prim::Item::tool_type = tool;
 
   switch(tool){
     case gui::ToolType::SelectTool:
@@ -418,7 +424,10 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
       setInteractive(true);
       break;
     case gui::ToolType::AFMPathTool:
-      setInteractive(true); // TODO check back later that this is the right mode
+      setInteractive(true);
+      break;
+    case gui::ToolType::ScreenshotAreaTool:
+      setInteractive(true);
       break;
     default:
       qCritical() << tr("Invalid ToolType... should not have happened");
@@ -441,13 +450,27 @@ void gui::DesignPanel::setFills(float *fills)
 }
 
 
+void gui::DesignPanel::screenshot(QPainter *painter, const QRect &region)
+{
+  prev_screenshot_area = region;
+  scene->render(painter, region, region);
+}
+
+
 void gui::DesignPanel::setDisplayMode(DisplayMode mode)
 {
   display_mode = mode;
+  prim::Item::display_mode = mode;
 
-  for(prim::Layer* layer : layers)
-    for(prim::Item* item : layer->getItems())
-      item->setDesignMode(mode == DesignMode);
+  /*settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  if (mode == gui::ScreenshotMode)
+    setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col_hc")));
+  else
+    setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col")));*/
+  if (mode == gui::ScreenshotMode)
+    setBackgroundBrush(QBrush(background_col_publish));
+  else
+    setBackgroundBrush(QBrush(background_col));
 }
 
 
@@ -628,7 +651,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
 
 
 // SIMULATION RESULT DISPLAY
-void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
+void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind, bool avg_degen)
 {
   // TODO in the future, show results in a pop up windows instead of the result screen itself
   setDisplayMode(SimDisplayMode);
@@ -636,14 +659,12 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
   if(!job){
     qDebug() << tr("DisplayPanel: Job pointer invalid");
     return;
-  }
-  // TODO perform this check in job's accessor rather than here
-  else if(dist_ind < 0 || dist_ind > job->elec_dists.size()){
+  } else if (dist_ind > job->elec_dists.size() || job->elec_dists.size() == 0) {
     qDebug() << tr("DesignPanel: dist_ind out of range when attempting to display sim results: %1").arg(dist_ind);
     return;
   }
 
-  // grab a list of DBDots in the order of job->physlocs
+  // grab the list of DBDots in the order of job->physlocs
   db_dots_result.clear();
   qreal scale_factor = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
   for(auto job_pl : job->physlocs){
@@ -662,15 +683,27 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind)
     }
 
     if(!db_exists){
-      qDebug() << tr("DesignPanel: unable to show result, no DBDot is present at location x=%1, y=%2").arg(scene_loc.x()).arg(scene_loc.y());
+      qDebug() << tr("DesignPanel: unable to show result, no DBDot is present "
+                     "at location x=%1, y=%2").arg(scene_loc.x()).arg(scene_loc.y());
       return;
     }
   }
 
   // set their show_elec to the set specified by job->elec_dists
   for(int i=0; i<db_dots_result.size(); i++){
-    if(db_dots_result[i])
-      db_dots_result[i]->setShowElec(job->elec_dists[dist_ind][i]);
+    if (dist_ind == -1) {
+      // show average distribution if distribution index is -1
+      db_dots_result[i]->setShowElec(job->elec_dists_avg[i]);
+      qDebug() << tr("Setting electron %1 to %2").arg(i).arg(job->elec_dists_avg[i]);
+    } else if(db_dots_result[i]) {
+      // show the distribution of the selected index
+      if (avg_degen) {
+        db_dots_result[i]->setShowElec(job->elecDistAvgDegenOfDB(dist_ind, i));
+        qDebug() << tr("Setting electron %1 to %2, averaged").arg(i).arg(job->elecDistAvgDegenOfDB(dist_ind,i));
+      } else {
+        db_dots_result[i]->setShowElec(job->elec_dists[dist_ind].dist[i]);
+      }
+    }
   }
 }
 
@@ -707,7 +740,7 @@ void gui::DesignPanel::selectClicked(prim::Item *)
 
 void gui::DesignPanel::simVisualizeDockVisibilityChanged(bool visible)
 {
-  if(!visible)
+  if(!visible && display_mode == SimDisplayMode)
     clearSimResults();
 }
 
@@ -748,6 +781,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   // set clicked flag and store current mouse position for move behaviour
   mouse_pos_old = e->pos();
   mouse_pos_cached = e->pos(); // this might be a referencing clash, check.
+  press_scene_pos = mapToScene(e->pos()); // the scene position of the click event
 
   // if other buttons are clicked during rubber band selection, end selection
   if(rb)
@@ -756,7 +790,12 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   clicked = true;
   switch(e->button()){
     case Qt::LeftButton:
-      if (tool_type == SelectTool || tool_type == ElectrodeTool ||
+      if (tool_type == ScreenshotAreaTool) {
+        // use rubberband to select screenshot area
+        rb_start = mapToScene(e->pos()).toPoint();
+        rb_cache = e->pos();
+
+      } else if (tool_type == SelectTool || tool_type == ElectrodeTool ||
           tool_type == AFMAreaTool) {
         // rubber band variables
         rb_start = mapToScene(e->pos()).toPoint();
@@ -799,7 +838,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 // the middle mouse button to always pan and right click for context menus.
 void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
-  Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
+  // Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers(); // uncomment if keymods are needed
 
   QPoint mouse_pos_del;
   qreal dx, dy;
@@ -814,7 +853,6 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
   } else if (tool_type == AFMPathTool) {
     // update ghost node and ghost segment if there is a focused node, only update
     // ghost node if there's none.
-    //afm_panel->ghostNode()->setPos(mapToScene(e->pos()));
     QList<prim::Item::ItemType> target_types;
     target_types.append(prim::Item::LatticeDot);
     target_types.append(prim::Item::DBDot);
@@ -833,8 +871,9 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
       case Qt::LeftButton:
-        if (tool_type == SelectTool || tool_type == DBGenTool
-              || tool_type == ElectrodeTool || tool_type == AFMAreaTool) {
+        if (tool_type == SelectTool || tool_type == DBGenTool ||
+            tool_type == ElectrodeTool || tool_type == AFMAreaTool ||
+            tool_type == ScreenshotAreaTool) {
           rubberBandUpdate(e->pos());
         }
         // use default behaviour for left mouse button
@@ -910,6 +949,11 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             // Make node at the ghost position
             createAFMNode();
             break;
+          case gui::ToolType::ScreenshotAreaTool:
+            // take a screenshot of the rubberband area
+            filterSelection(false);
+            sig_screenshot(QRect(press_scene_pos.toPoint(), mapToScene(e->pos()).toPoint()));
+            break;
           case gui::ToolType::DragTool:
             // pan ends
             break;
@@ -955,9 +999,9 @@ void gui::DesignPanel::wheelEvent(QWheelEvent *e)
   if(qMax(qAbs(wheel_deg.x()),qAbs(wheel_deg.y())) >= 15) {
     Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
     if(keymods & Qt::ControlModifier)
-      wheelZoom(e, keymods & Qt::ShiftModifier);
+      wheelZoom(e, keymods & Qt::AltModifier);
     else
-      wheelPan(keymods & Qt::ShiftModifier);
+      wheelPan(keymods & Qt::ShiftModifier, keymods & Qt::AltModifier);
   }
 }
 
@@ -1059,10 +1103,24 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
           deleteSelection();
         break;
       case Qt::Key_S:
-        if(keymods == Qt::ControlModifier){
-          //gui::ApplicationGUI::saveToFile();
+        if (display_mode == ScreenshotMode) {
+          sig_screenshot(prev_screenshot_area);
         }
         break;
+      case Qt::Key_R:{
+        if (keymods == (Qt::ControlModifier | Qt::ShiftModifier)) {
+          QMessageBox::StandardButton reply;
+          reply = QMessageBox::question(this, "Quick run simulation",
+              "Are you sure you want to run a simulation with previous settings?",
+              QMessageBox::Yes | QMessageBox::No);
+          if (reply == QMessageBox::Yes) {
+            emit sig_quickRunSimulation();
+          }
+        } else if (keymods == Qt::ControlModifier) {
+          emit sig_showSimulationSetup();
+        }
+        break;
+      }
       default:
         QGraphicsView::keyReleaseEvent(e);
         break;
@@ -1072,6 +1130,12 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
 
 // INTERNAL METHODS
 
+void gui::DesignPanel::constructStatics()
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  background_col = gui_settings->get<QColor>("view/bg_col");
+  background_col_publish = gui_settings->get<QColor>("view/bg_col_pb");
+}
 
 void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
 {
@@ -1102,7 +1166,7 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
 }
 
 
-void gui::DesignPanel::wheelPan(bool boost)
+void gui::DesignPanel::wheelPan(bool shift_scroll, bool boost)
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
@@ -1129,8 +1193,8 @@ void gui::DesignPanel::wheelPan(bool boost)
     dy *= boost_fact;
   }
 
-  verticalScrollBar()->setValue(verticalScrollBar()->value()+dy);
-  horizontalScrollBar()->setValue(horizontalScrollBar()->value()+dx);
+  verticalScrollBar()->setValue(verticalScrollBar()->value() + ((shift_scroll) ? dx : dy));
+  horizontalScrollBar()->setValue(horizontalScrollBar()->value()+ ((shift_scroll) ? dy: dx));
 }
 
 
@@ -1244,11 +1308,11 @@ void gui::DesignPanel::electrodeSetPotentialAction()
     if(selection.count() == 1){
       potential = QInputDialog::getDouble(this, tr("Set Potential"),
                   tr("Set electrode potential(s) to:"), static_cast<prim::Electrode*>(selection.at(0))->getPotential(),
-                  -2147483647, 2147483647, 1, &ok);
+                  -2147483647, 2147483647, 3, &ok);
     } else {
       potential = QInputDialog::getDouble(this, tr("Set Potential"),
                   tr("WARNING: Multiple electrodes selected.\nSet electrode potential(s) to:"), 0.0,
-                  -2147483647, 2147483647, 1, &ok);
+                  -2147483647, 2147483647, 3, &ok);
     }
     if(ok){
       for(prim::Item *item : selection){
@@ -1306,11 +1370,12 @@ void gui::DesignPanel::createActions()
 
 void gui::DesignPanel::filterSelection(bool select_flag)
 {
-  // should only be here if tool type is either select or dbgen
+  // should only be here if tool type is one of the following
   if (tool_type != gui::ToolType::SelectTool &&
       tool_type != gui::ToolType::DBGenTool &&
       tool_type != gui::ToolType::ElectrodeTool &&
-      tool_type != gui::ToolType::AFMAreaTool){
+      tool_type != gui::ToolType::AFMAreaTool &&
+      tool_type != gui::ToolType::ScreenshotAreaTool){
     qCritical() << tr("Filtering selection with invalid tool type...");
     return;
   }
@@ -1602,7 +1667,7 @@ prim::Item *gui::DesignPanel::filteredSnapTarget(QPointF scene_pos, QList<prim::
 
   // set search boundary
   QRectF search_bound;
-  search_bound.setSize(QSizeF(snap_diameter, snap_diameter)); // use the same snap range as other snap functions
+  search_bound.setSize(QSizeF(search_box_width, search_box_width)); // use the same snap range as other snap functions
   search_bound.moveCenter(scene_pos);
   QList<QGraphicsItem*> near_items = scene->items(search_bound);
 
@@ -1764,8 +1829,8 @@ void gui::DesignPanel::CreatePotPlot::destroy()
 gui::DesignPanel::CreateAFMArea::CreateAFMArea(int layer_index,
     gui::DesignPanel *dp, QPointF point1, QPointF point2,
     prim::AFMArea *afm_area, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index),
-    point1(point1), point2(point2)
+  : QUndoCommand(parent), dp(dp), layer_index(layer_index),
+    point1(point1), point2(point2), invert(invert)
 {
   prim::Layer *layer = dp->getLayer(layer_index);
   index = invert ? layer->getItems().indexOf(afm_area) : layer->getItems().size();
@@ -1845,8 +1910,8 @@ void gui::DesignPanel::CreateAFMPath::destroy()
 gui::DesignPanel::CreateAFMNode::CreateAFMNode(int layer_index, gui::DesignPanel *dp,
                         QPointF scenepos, float z_offset, int afm_index,
                         int index_in_path, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index),
-          scenepos(scenepos), z_offset(z_offset), afm_index(afm_index)
+  : QUndoCommand(parent), invert(invert), layer_index(layer_index), dp(dp),
+      afm_index(afm_index), scenepos(scenepos), z_offset(z_offset)
 {
   prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
   node_index = (index_in_path == -1) ? afm_path->nodeCount() : index_in_path;
@@ -1886,9 +1951,8 @@ void gui::DesignPanel::CreateAFMNode::destroy()
 gui::DesignPanel::ResizeAFMArea::ResizeAFMArea(int layer_index, DesignPanel *dp,
     const QRectF &orig_rect, const QRectF &new_rect, int afm_area_index,
     bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), layer_index(layer_index), dp(dp),
-        orig_rect(orig_rect), new_rect(new_rect),
-        afm_area_index(afm_area_index), invert(invert)
+  : QUndoCommand(parent), invert(invert), layer_index(layer_index), dp(dp),
+        afm_area_index(afm_area_index), orig_rect(orig_rect), new_rect(new_rect)
 {
   top_left_delta = new_rect.topLeft() - orig_rect.topLeft();
   bot_right_delta = new_rect.bottomRight() - orig_rect.bottomRight();

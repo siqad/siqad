@@ -209,6 +209,12 @@ void SimManager::updateSimParams()
 }
 
 
+void SimManager::quickRun()
+{
+  submitSimSetup();
+}
+
+
 void SimManager::updateEngineSelectionList()
 {
   if(!combo_eng_sel)

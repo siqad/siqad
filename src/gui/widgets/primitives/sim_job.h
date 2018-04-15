@@ -63,17 +63,22 @@ namespace prim{
     // JOB RESULT
 
     bool readResults();     //!< read result XML
-    bool processResults();  //!< process results
 
     // result storage and access
     //! elec_dists struct for showing where electrons are
     struct elecDist{
-      QString dist_str;
-      QList<int> dist_ls; // TODO might not be necessary
-      float energy;
+      QList<int> dist;
+      float energy;     // energy of this distribution
+      int count=0;        // how many times does this distribution occur
+
+      bool operator < (const elecDist &other) const {
+        return (energy < other.energy);
+      }
     };
 
-    int distCount() {return dist_count;}  //!< return the number of charge distributions this has
+    void processElecDists(QMap<QString, elecDist> elec_dists_map);
+    float elecDistAvgDegenOfDB(int dist_ind, int db_ind);
+
 
     struct LineScanPath {
       QList<QPair<float,float>> afm_nodes;    //!< afm nodes in angstrom
@@ -107,7 +112,11 @@ namespace prim{
     // variables TODO put them back to private later, with proper accessors
     QList<QVector<float>> potentials; //!< potentials[result_ind][0] is x, ...[1] is y, ...[2] is potential value
     QList<QPair<float,float>> physlocs;   //!< physlocs[dot_ind].first or .second
-    QList<QList<int>> elec_dists;         //!< elec_dists[result_ind][dot_ind] TODO change this to QList of QVectors
+
+    // electron distribution
+    QList<elecDist> elec_dists;           //! electron distributions
+    QList<float> elec_dists_avg;            //! the average charge across all dots
+
     QList<LineScanPath> line_scan_paths;  //!< line scan path props and results
   private:
 
@@ -133,7 +142,6 @@ namespace prim{
 
     // results
     // TODO flag storing what types of results are available
-    int dist_count; // number of distributions
   };
 
 } // end of prim namespace

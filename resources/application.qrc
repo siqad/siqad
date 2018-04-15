@@ -16,5 +16,6 @@
   <file>ico/editable.svg</file>
   <file>ico/lattice.svg</file>
   <file>ico/unknown.svg</file>
+  <file>ico/screenshotarea.svg</file>
 </qresource>
 </RCC>

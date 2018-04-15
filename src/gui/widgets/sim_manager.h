@@ -58,6 +58,10 @@ signals:
 private slots:
   void updateSimParams();
 
+  //! Without showing the dialog, just activate "Run" and start a job with
+  //! whatever settings are on the dialog.
+  void quickRun();
+
 private:
   // sim manager related (like showing all jobs, all engines, etc.)
   void initSimManager();

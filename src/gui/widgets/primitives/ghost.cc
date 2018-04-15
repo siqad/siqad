@@ -134,7 +134,7 @@ void prim::Ghost::prepare(const QList<prim::Item*> &items, QPointF scene_pos)
 
 
 
-void prim::Ghost::prepare(prim::Item *item, QPointF scene_pos)
+void prim::Ghost::prepare(prim::Item *item, QPointF)
 {
   QList<prim::Item*> items;
   items.append(item);

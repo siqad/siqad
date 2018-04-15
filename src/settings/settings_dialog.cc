@@ -88,9 +88,14 @@ void SettingsDialog::initSettingsDialog()
 {
   // all settings panes in a stacked widget, only one is shown at a time
   QStackedWidget *stacked_settings_panes = new QStackedWidget(this);
-  stacked_settings_panes->addWidget(appSettingsPane());
-  //stacked_settings_panes->addWidget(guiSettingsPane());
-  //stacked_settings_panes->addWidget(latticeSettingsPane());
+  if (appSettingsPane())
+    stacked_settings_panes->addWidget(appSettingsPane());
+
+  if (guiSettingsPane())
+    stacked_settings_panes->addWidget(guiSettingsPane());
+
+  if (latticeSettingsPane())
+    stacked_settings_panes->addWidget(latticeSettingsPane());
 
   // list of all categories
   QListWidget *settings_category_list = new QListWidget(this);
@@ -178,6 +183,7 @@ QWidget *SettingsDialog::guiSettingsPane()
     return gui_settings_pane;
 
   // TODO implement
+  return 0;
 }
 
 QWidget *SettingsDialog::latticeSettingsPane()
@@ -186,6 +192,7 @@ QWidget *SettingsDialog::latticeSettingsPane()
     return lattice_settings_pane;
 
   // TODO implement
+  return 0;
 }
 
 

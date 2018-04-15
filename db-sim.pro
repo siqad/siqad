@@ -177,17 +177,22 @@ sim_afmmarcus.path = $$EXEC_DIR/src/phys/afmmarcus
 sim_afmmarcus.files = \
     $$PHYS_DIR/afmmarcus/afm_line_scan.physeng \
     $$PHYS_DIR/afmmarcus/hopping_animator.physeng \
+    $$PHYS_DIR/afmmarcus/marcus_and_pois.physeng \
     $$PHYS_DIR/afmmarcus/afm_line_scan.ui \
-    $$PHYS_DIR/afmmarcus/hopping_animator.ui
+    $$PHYS_DIR/afmmarcus/hopping_animator.ui \
+    $$PHYS_DIR/afmmarcus/marcus_and_pois.ui
 !win32: sim_afmmarcus.files += \
     $$PHYS_DIR/afmmarcus/src/afmmarcus \
     $$PHYS_DIR/afmmarcus/src/python/afm.py \
     $$PHYS_DIR/afmmarcus/src/python/animator.py \
     $$PHYS_DIR/afmmarcus/src/python/channel.py \
+    $$PHYS_DIR/afmmarcus/src/python/clocking.py \
     $$PHYS_DIR/afmmarcus/src/python/db-sim-connector.py \
     $$PHYS_DIR/afmmarcus/src/python/hopper.py \
+    $$PHYS_DIR/afmmarcus/src/python/lineview.py \
     $$PHYS_DIR/afmmarcus/src/python/marcus.py \
-    $$PHYS_DIR/afmmarcus/src/python/model.py
+    $$PHYS_DIR/afmmarcus/src/python/model.py \
+    $$PHYS_DIR/afmmarcus/src/python/tip_model.py
 INSTALLS += sim_afmmarcus
 
 # PoisSolver

@@ -91,7 +91,7 @@ void ResizeFrame::updateHandlePositions()
 }
 
 
-void ResizeFrame::paint(QPainter *painter, const QStyleOptionGraphicsItem*,
+void ResizeFrame::paint(QPainter *, const QStyleOptionGraphicsItem*,
     QWidget*)
 {
   // TODO draw a rectangular border
@@ -247,7 +247,7 @@ void ResizeHandle::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
   }
 }
 
-void ResizeHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
+void ResizeHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent *)
 {
   if (clicked) {
     prim::Item *target = static_cast<prim::ResizeFrame*>(parentItem())->

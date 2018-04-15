@@ -46,7 +46,7 @@ namespace prim{
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
 
-    Item *deepCopy() const;
+    Item *deepCopy() const override;
 
   protected:
 
@@ -68,12 +68,13 @@ namespace prim{
 
     static qreal diameter;    // dot diameter in angstroms
     static qreal edge_width;  // proportional width of dot boundary edge
+    static qreal publish_scale;
 
-    static QColor edge_col;   // boundary edge color
-    static QColor fill_col;   // dot fill color (same for all lattice dots)
+    static prim::Item::StateColors edge_col;   // boundary edge color
+    static prim::Item::StateColors fill_col;   // dot fill color (same for all lattice dots)
 
-    static qreal in_fill;       // fil factor for inner circle
-    static QColor in_fill_col;  // colour of inner circle
+    static qreal in_fill;                       // fill factor for inner circle
+    static prim::Item::StateColors in_fill_col; // colour of inner circle
   };
 
 } // end prim namespace
