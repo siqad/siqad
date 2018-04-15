@@ -24,7 +24,7 @@ AFMSeg::AFMSeg(int lay_id, prim::AFMNode *orig_node, prim::AFMNode *dest_node)
   initAFMSeg(lay_id, orig_node, dest_node);
 }
 
-AFMSeg::AFMSeg(QXmlStreamReader *rs, QGraphicsScene *scene)
+AFMSeg::AFMSeg(QXmlStreamReader *, QGraphicsScene *)
   : prim::Item(prim::Item::AFMSeg)
 {
   // TODO call initAFMSeg from loaded values
@@ -46,7 +46,7 @@ void AFMSeg::initAFMSeg(int lay_id, prim::AFMNode *orig_node, prim::AFMNode *des
 
 
 // Save to XML
-void AFMSeg::saveItems(QXmlStreamWriter *ws) const
+void AFMSeg::saveItems(QXmlStreamWriter *) const
 {
 
 }
@@ -122,11 +122,6 @@ void AFMSeg::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget 
   painter->drawLine(QLineF(originNode()->scenePos(), destinationNode()->scenePos()));
 }
 
-Item *AFMSeg::deepCopy() const
-{
-
-}
-
 
 // PRIVATE
 
@@ -142,7 +137,7 @@ void AFMSeg::prepareStatics()
 }
 
 
-void AFMSeg::mousePressEvent(QGraphicsSceneMouseEvent *e)
+void AFMSeg::mousePressEvent(QGraphicsSceneMouseEvent *)
 {
   // Show path config dialog when selected, with the two connected nodes highlighted
   // TODO

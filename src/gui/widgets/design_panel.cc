@@ -840,7 +840,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 // the middle mouse button to always pan and right click for context menus.
 void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
-  Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
+  // Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers(); // uncomment if keymods are needed
 
   QPoint mouse_pos_del;
   qreal dx, dy;
@@ -855,7 +855,6 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
   } else if (tool_type == AFMPathTool) {
     // update ghost node and ghost segment if there is a focused node, only update
     // ghost node if there's none.
-    //afm_panel->ghostNode()->setPos(mapToScene(e->pos()));
     QList<prim::Item::ItemType> target_types;
     target_types.append(prim::Item::LatticeDot);
     target_types.append(prim::Item::DBDot);
@@ -1670,7 +1669,7 @@ prim::Item *gui::DesignPanel::filteredSnapTarget(QPointF scene_pos, QList<prim::
 
   // set search boundary
   QRectF search_bound;
-  search_bound.setSize(QSizeF(snap_diameter, snap_diameter)); // use the same snap range as other snap functions
+  search_bound.setSize(QSizeF(search_box_width, search_box_width)); // use the same snap range as other snap functions
   search_bound.moveCenter(scene_pos);
   QList<QGraphicsItem*> near_items = scene->items(search_bound);
 
@@ -1832,8 +1831,8 @@ void gui::DesignPanel::CreatePotPlot::destroy()
 gui::DesignPanel::CreateAFMArea::CreateAFMArea(int layer_index,
     gui::DesignPanel *dp, QPointF point1, QPointF point2,
     prim::AFMArea *afm_area, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index),
-    point1(point1), point2(point2)
+  : QUndoCommand(parent), dp(dp), layer_index(layer_index),
+    point1(point1), point2(point2), invert(invert)
 {
   prim::Layer *layer = dp->getLayer(layer_index);
   index = invert ? layer->getItems().indexOf(afm_area) : layer->getItems().size();
@@ -1913,8 +1912,8 @@ void gui::DesignPanel::CreateAFMPath::destroy()
 gui::DesignPanel::CreateAFMNode::CreateAFMNode(int layer_index, gui::DesignPanel *dp,
                         QPointF scenepos, float z_offset, int afm_index,
                         int index_in_path, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index),
-          scenepos(scenepos), z_offset(z_offset), afm_index(afm_index)
+  : QUndoCommand(parent), invert(invert), layer_index(layer_index), dp(dp),
+      afm_index(afm_index), scenepos(scenepos), z_offset(z_offset)
 {
   prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
   node_index = (index_in_path == -1) ? afm_path->nodeCount() : index_in_path;
@@ -1954,9 +1953,8 @@ void gui::DesignPanel::CreateAFMNode::destroy()
 gui::DesignPanel::ResizeAFMArea::ResizeAFMArea(int layer_index, DesignPanel *dp,
     const QRectF &orig_rect, const QRectF &new_rect, int afm_area_index,
     bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), layer_index(layer_index), dp(dp),
-        orig_rect(orig_rect), new_rect(new_rect),
-        afm_area_index(afm_area_index), invert(invert)
+  : QUndoCommand(parent), invert(invert), layer_index(layer_index), dp(dp),
+        afm_area_index(afm_area_index), orig_rect(orig_rect), new_rect(new_rect)
 {
   top_left_delta = new_rect.topLeft() - orig_rect.topLeft();
   bot_right_delta = new_rect.bottomRight() - orig_rect.bottomRight();

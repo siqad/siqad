@@ -28,7 +28,7 @@ AFMNode::AFMNode(int lay_id, QPointF scenepos, float z_offset)
   initAFMNode(lay_id, scenepos, z_offset);
 }
 
-AFMNode::AFMNode(QXmlStreamReader *rs, QGraphicsScene *scene)
+AFMNode::AFMNode(QXmlStreamReader *rs, QGraphicsScene *)
   : prim::Item(prim::Item::AFMNode)
 {
   int lay_id = -1;

@@ -51,17 +51,13 @@ namespace prim{
     // Graphics
 
     //! Bounding rect for graphics calculations, just takes the resize_target's.
-    virtual QRectF boundingRect() const {return resize_target->boundingRect();}
+    virtual QRectF boundingRect() const override {return resize_target->boundingRect();}
 
     //! Paint function.
-    virtual void paint(QPainter *, const QStyleOptionGraphicsItem*, QWidget*);
-
-    //! This object is never copied, so the function is just implemented to shut
-    //! up compiler warnings.
-    virtual Item *deepCopy() const {return new ResizeFrame();}
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem*, QWidget*) override;
 
   protected:
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
 
   private:
 
@@ -98,19 +94,15 @@ namespace prim{
     void updatePosition();
 
     //! Bounding rect of the handle for users to grab.
-    virtual QRectF boundingRect() const;
+    virtual QRectF boundingRect() const override;
 
     //! Paint a square indicating where users should grab for resize.
-    virtual void paint(QPainter *, const QStyleOptionGraphicsItem*, QWidget*);
-
-    //! This object is never copied, so the function is just implemented to shut
-    //! up compiler warnings.
-    virtual Item *deepCopy() const {return new ResizeHandle(handle_position,0);}
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem*, QWidget*) override;
 
   protected:
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
-    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *) override;
 
   private:
     //! Initialize static class variables.

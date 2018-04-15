@@ -52,7 +52,7 @@ namespace prim{
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*) Q_DECL_OVERRIDE;
 
-    Item* deepCopy() const {return 0;}
+    Item* deepCopy() const override {return 0;}
 
   private:
 
@@ -77,7 +77,7 @@ namespace prim{
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*) Q_DECL_OVERRIDE;
 
-    Item* deepCopy() const {return 0;}
+    Item* deepCopy() const override {return 0;}
 
   private:
 

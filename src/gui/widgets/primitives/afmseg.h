@@ -27,7 +27,7 @@ namespace prim{
     ~AFMSeg() {};
 
     // Save to XML
-    virtual void saveItems(QXmlStreamWriter *) const;
+    virtual void saveItems(QXmlStreamWriter *) const override;
 
     // Segment status
     bool segmentIsValid() const {return (origin_node && destination_node) ? true : false;}
@@ -44,10 +44,8 @@ namespace prim{
     // Graphics
     void updatePoints();
 
-    virtual QRectF boundingRect() const;
-    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget*);
-
-    virtual Item *deepCopy() const;
+    virtual QRectF boundingRect() const override;
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget*) override;
 
     // params
     QColor fill_col;
@@ -69,11 +67,11 @@ namespace prim{
     void prepareStatics();
 
     // show path config dialog when selected
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) override;
 
     // change visuals when hovered
-    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *e) Q_DECL_OVERRIDE;
-    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *e) Q_DECL_OVERRIDE;
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *e) override;
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *e) override;
 
 
     // VARS

@@ -208,7 +208,7 @@ QList<prim::AFMSeg*> AFMPath::getConnectedSegments(int node_ind)
 }
 
 
-void AFMPath::setLoop(bool loop_state)
+void AFMPath::setLoop(bool)
 {
   // Check if the first node and the end node are at the same location. If yes,
   // create the loop. If not, prompt the user whether they want a node to be
@@ -248,11 +248,12 @@ QRectF AFMPath::boundingRect() const
 
 QList<QPointF> AFMPath::unfoldedPath()
 {
-
+  // TODO implement
+  return QList<QPointF>();
 }
 
 
-void AFMPath::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+void AFMPath::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *)
 {
   /* draw line
   if (select_mode && upSelected()) {

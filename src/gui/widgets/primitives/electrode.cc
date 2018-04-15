@@ -194,7 +194,7 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
   }
 }
 
-void prim::Electrode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e)
+void prim::Electrode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
 {
   // qDebug() << QObject::tr("Electrode has seen the mouseDoubleClickEvent");
   //do something here to manipulate potential. Maybe dialog box?

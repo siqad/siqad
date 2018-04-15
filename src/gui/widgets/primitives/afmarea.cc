@@ -241,8 +241,6 @@ QVariant AFMArea::itemChange(GraphicsItemChange change, const QVariant &value)
   }
 
   return QGraphicsItem::itemChange(change, value);
-
-  bool resize_frame_visible = false;
 }
 
 void AFMArea::hoverEnterEvent(QGraphicsSceneHoverEvent *)

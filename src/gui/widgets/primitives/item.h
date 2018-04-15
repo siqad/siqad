@@ -53,7 +53,7 @@ namespace prim{
     //! create a deep copy of the Item for the clipboard. Deep-copied items should
     //! have no parent or scene and need only to have the information necessary
     //! to create a new copy somewhere in the scene
-    virtual Item *deepCopy() const = 0;
+    virtual Item *deepCopy() const {return 0;}
 
     //! true if the item or its parent has been seleted, recursive to highest level parent
     bool upSelected();
