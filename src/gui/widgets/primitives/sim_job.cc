@@ -115,7 +115,7 @@ bool SimJob::readResults()
 
   // store electron distributions to a map first for deduplication
   QMap<QString, elecDist> elec_dists_map;
-
+  QString engine_name = "";
   while(!rs.atEnd()){
     if(rs.isStartElement()){
       if(rs.name() == "sim_out"){
@@ -126,7 +126,8 @@ bool SimJob::readResults()
           if(!rs.readNextStartElement())
             continue; // skip until a start element is encountered
           if(rs.name() == "engine"){
-            // TODO
+            qDebug() << tr("Engine name: %1").arg(rs.readElementText());
+            engine_name = rs.readElementText();
           }
           else if(rs.name() == "version"){
             // TODO
