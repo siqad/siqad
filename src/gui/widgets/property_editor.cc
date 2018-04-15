@@ -26,8 +26,8 @@ void PropertyEditor::showForms(QList<prim::Item*> target_items)
     if (!item || !item->classPropertyMap()) {
       continue;
     }
-    current_forms.append(new PropertyForm(item, this));
-    form_tab_widget->addTab(current_forms.back(), "TODO item class name");
+    form_item_pair.append(qMakePair(new PropertyForm(item->properties(), this), item));
+    form_tab_widget->addTab(form_item_pair.back().first, "TODO item class name");
   }
   show();
 }
@@ -35,16 +35,26 @@ void PropertyEditor::showForms(QList<prim::Item*> target_items)
 
 void PropertyEditor::applyForms()
 {
-  for (PropertyForm *form : current_forms)
-    form->pushPropertyChanges();
+  /*for (PropertyForm *form : form_item_pair)
+    form->pushPropertyChanges();*/
+  for (QPair<PropertyForm*, prim::Item*> p : form_item_pair) {
+    PropertyMap final_map = p.first->finalProperties();
+    prim::Item *item = p.second;
+
+    for (const QString &key : item->properties().keys()) {
+      if (item->getProperty(key).value != final_map.value(key).value) {
+        item->setProperty(key, final_map.value(key).value);
+      }
+    }
+  }
 }
 
 
 void PropertyEditor::discardForms()
 {
   form_tab_widget->clear();
-  while (!current_forms.isEmpty())
-    delete current_forms.takeLast();
+  while (!form_item_pair.isEmpty())
+    delete form_item_pair.takeLast().first;
 }
 
 
@@ -85,18 +95,17 @@ void PropertyEditor::initPropertyEditor()
 // PropertyForm class
 
 // Constructor
-PropertyForm::PropertyForm(prim::Item *target_item,
-    QWidget *parent)
-  : QWidget(parent), target_item(target_item)
+PropertyForm::PropertyForm(PropertyMap map, QWidget *parent)
+  : QWidget(parent), map(map)
 {
   initForm();
 }
 
 
 // Return a list of properties that have been changed
-void PropertyForm::pushPropertyChanges()
+/*void PropertyForm::pushPropertyChanges()
 {
-  for (const QString &key : target_item->classPropertyMap()->keys()) {
+  for (const QString &key : default_map->keys()) {
     Property prop = target_item->getProperty(key);
     QLineEdit *prop_field = QObject::findChild<QLineEdit*>(key);
     if (prop.value.value<QString>() != prop_field->text()) {
@@ -106,6 +115,36 @@ void PropertyForm::pushPropertyChanges()
       qDebug() << tr("Changed prop %1 from %2 to %3").arg(key).arg(prop.value.toString()).arg(prop_field->text());
     }
   }
+}*/
+
+
+// Return a list of properties that have been changed
+/*PropertyMap PropertyForm::changedProperties()
+{
+  PropertyMap changed_props;
+  for (const QString &key : target_item->classPropertyMap()->keys()) {
+    Property prop = target_item->getProperty(key);
+    QLineEdit *prop_field = QObject::findChild<QLineEdit*>(key);
+    if (prop.value.value<QString>() != prop_field->text()) {
+      // save the property with the correct type and the rest of the attributes
+      // taken from the original prop
+      changed_props[key] = Property(PropertyMap::string2Type2QVariant(
+          prop_field->text(), prop.value.type()), prop);
+    }
+  }
+  return changed_props;
+}*/
+
+
+// Return a map of properties containing everything, changed or not
+PropertyMap PropertyForm::finalProperties()
+{
+  for (const QString &key : map.keys()) {
+    // save the property with the correct type
+    QLineEdit *prop_field = QObject::findChild<QLineEdit*>(key);
+    map[key].value = PropertyMap::string2Type2QVariant(prop_field->text(), map[key].value.type());
+  }
+  return map;
 }
 
 
@@ -113,18 +152,16 @@ void PropertyForm::pushPropertyChanges()
 // Initialize the form
 void PropertyForm::initForm()
 {
-  PropertyMap *map = target_item->classPropertyMap();
   setWindowTitle("Property Editor");
 
   // generate form from map
   QFormLayout *prop_fl = new QFormLayout;
-  for (const QString &key : map->keys()) {
-    // get the property from the item so the local properties would be shown instead if available
-    gui::Property prop = target_item->getProperty(key);
+  for (PropertyMap::const_iterator it = map.cbegin(), end = map.cend(); it != end; ++it) {
+    Property prop = it.value();
 
     QLabel *label_prop = new QLabel(prop.form_label);
     QLineEdit *le_prop = new QLineEdit(prop.value.value<QString>());
-    le_prop->setObjectName(key);
+    le_prop->setObjectName(it.key());
     le_prop->setToolTip(prop.form_tip);
 
     prop_fl->addRow(label_prop, le_prop);

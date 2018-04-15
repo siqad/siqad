@@ -73,6 +73,11 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
                 //qDebug() << QObject::tr("addExpectedSimParam(%1, %2, %3, %4)").arg(param_nm).arg(gui_obj_nm).arg(gui_obj_type).arg(gui_def_txt);
               }
             } // end of sim_params
+          } else if (rs.name() == "sim_params_new") {
+            sim_params_map.readPropertiesFromXMLStream(&rs, "sim_params_new");
+            // TODO remove
+            for (const QString &key : sim_params_map.keys())
+              qDebug() << QObject::tr("sim_params_map[%1] = %2").arg(key).arg(sim_params_map[key].value.toString());
           }
         } // end of physeng
         rs.readNext();

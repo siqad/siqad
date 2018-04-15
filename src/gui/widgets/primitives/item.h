@@ -92,6 +92,9 @@ namespace prim{
     //! Retreve the class default property map of this item
     virtual gui::PropertyMap *classPropertyMap() {return 0;};
 
+    //! Get a PropertyMap with the default and local properties combined
+    gui::PropertyMap properties();
+
     //! Get property from the property map
     gui::Property getProperty(const QString &key);
 

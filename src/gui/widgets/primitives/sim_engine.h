@@ -12,11 +12,13 @@
 #include <QtWidgets>
 #include <QtCore>
 #include <QXmlStreamReader>
-#include "src/settings/settings.h" // TODO probably need this later
+
+#include "src/settings/settings.h"
+#include "src/gui/property_map.h"
 
 namespace prim{
 
-  //! A simulation engine that can be used with the design tool. 
+  //! A simulation engine that can be used with the design tool.
   class SimEngine : public QObject
   {
     Q_OBJECT
@@ -90,6 +92,7 @@ namespace prim{
     // GUI
     QWidget *sim_param_dialog=0;// gui for setting sim params for this engine, loaded from *.ui
     QList<ExpectedSimParam> expected_sim_params;
+    gui::PropertyMap sim_params_map;  // a property map containing all of the simulation parameters
 
 
     // TODO some stack/dictionary/etc with simulator info, for showing up in manager

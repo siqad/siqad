@@ -68,7 +68,7 @@ namespace gui{
 
     // VARS
 
-    QList<PropertyForm*> current_forms;   //! Forms that are currently in use.
+    QList<QPair<PropertyForm*, prim::Item*>> form_item_pair; //! Forms that are currently in use.
 
     QTabWidget *form_tab_widget=0;        //! a tab widget showing all current forms
 
@@ -84,20 +84,23 @@ namespace gui{
   public:
 
     //! Constructor
-    PropertyForm(prim::Item *target_item, QWidget *parent);
+    PropertyForm(PropertyMap map, QWidget *parent);
+    //PropertyForm(prim::Item *target_item, QWidget *parent);
 
     //! Destructor
     ~PropertyForm() {}
 
-    //! Return a list of properties that have been changed. Compares the content
-    //! in the form with the target_item's own property map.
-    void pushPropertyChanges();
+    //! Return a map of properties that have bene changed.
+    //PropertyMap changedProperties();
+
+    //! Return a map of properties containing everything, changed or not.
+    PropertyMap finalProperties();
 
   private:
     //! Initialize the form
     void initForm();
 
-    prim::Item *target_item;      //! Item currently being edited.
+    PropertyMap map;  //! the map where changes will be written to
   };
 
 } // end of gui namespace

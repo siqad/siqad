@@ -46,6 +46,27 @@ bool prim::Item::upHovered()
   return parent==0 ? isHovered() : parent->upHovered();
 }
 
+gui::PropertyMap prim::Item::properties()
+{
+  gui::PropertyMap all_props;
+
+  // assume that there aren't local properties if there's no class property
+  if (!classPropertyMap())
+    return gui::PropertyMap();
+
+  for (const QString &key : classPropertyMap()->keys()) {
+    if (local_props.contains(key)) {
+      // use the local value + default attributes
+      all_props[key] = gui::Property(local_props.value(key), classPropertyMap()->value(key));
+    } else {
+      // use the default value + attributes
+      all_props[key] = classPropertyMap()->value(key);
+    }
+  }
+
+  return all_props;
+}
+
 gui::Property prim::Item::getProperty(const QString &key)
 {
   if (local_props.contains(key)) {

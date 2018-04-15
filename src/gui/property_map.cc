@@ -33,10 +33,6 @@ void PropertyMap::readPropertiesFromXML(const QString &fname)
 {
   xml_path = fname;
 
-  qDebug() << QObject::tr("int=%1, float=%2, double=%3, string=%4")
-      .arg(string2type["int"]).arg(string2type["float"])
-      .arg(string2type["double"]).arg(string2type["string"]);
-
   QFile file(xml_path);
 
   // test whether file can be opened to read
@@ -50,24 +46,30 @@ void PropertyMap::readPropertiesFromXML(const QString &fname)
   QXmlStreamReader rs(&file);
   qDebug() << QObject::tr("Beginning load from %1").arg(file.fileName());
 
-  while (!rs.atEnd()) {
-    // skip until the next start element
-    if (!rs.readNextStartElement())
-      continue;
-
-    // root node
-    if (rs.name() == "properties")
-      continue;
-
-    // read new property
-    readProperty(rs.name().toString(), &rs);
-  }
-
-  if (rs.hasError())
-    qCritical() << QObject::tr("XML error: ") << rs.errorString().data();
+  readPropertiesFromXMLStream(&rs, "properties");
 
   file.close();
   qDebug() << QObject::tr("Finished loading from %1").arg(file.fileName());
+}
+
+
+// read properties from XML stream until the end of the indicated tag
+void PropertyMap::readPropertiesFromXMLStream(QXmlStreamReader *rs, const QString &enclosed_tag)
+{
+  while ( !rs->atEnd() && !(rs->name() == enclosed_tag && rs->isEndElement()) ) {
+    if (!rs->readNextStartElement())
+      continue;
+
+    // root node
+    if (rs->name() == enclosed_tag)
+      continue;
+
+    // read new property
+    readProperty(rs->name().toString(), rs);
+  }
+
+  if (rs->hasError())
+    qCritical() << QObject::tr("XML error: ") << rs->errorString().data();
 }
 
 

@@ -59,6 +59,9 @@ namespace gui{
     //! Read properties from XML file at provided path.
     void readPropertiesFromXML(const QString &fname);
 
+    //! Read properties from XML stream until the end of the indicated tag.
+    void readPropertiesFromXMLStream(QXmlStreamReader *rs, const QString &enclosed_tag);
+
     //! Read one property node from XML file.
     void readProperty(const QString &node_name, QXmlStreamReader *rs);
 
