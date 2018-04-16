@@ -59,8 +59,8 @@ namespace prim{
 
     // inherited abstract method implementations
 
-    QRectF boundingRect() const override;
-    void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
+    virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
 
     prim::Item *deepCopy() const override;
 

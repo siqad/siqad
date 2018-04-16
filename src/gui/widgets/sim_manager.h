@@ -12,6 +12,8 @@
 
 #include <QtWidgets>
 #include <QDialog>
+
+#include "property_form.h"
 #include "primitives/sim_engine.h"
 #include "primitives/sim_job.h"
 
@@ -80,8 +82,8 @@ private:
 
   // dialogs
   QWidget *sim_manager_dialog;
-  QWidget *sim_setup_dialog;        // TODO maybe make a subclass for this
-  bool using_engine_sim_param_dialog=false;
+  QWidget *sim_setup_dialog;
+  PropertyForm *curr_sim_params_form=0;
 
   // manager panes
   QListWidget *sim_list_pan;

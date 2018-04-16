@@ -54,6 +54,7 @@ namespace prim{
     void addExpectedSimParam(const QString &param_nm, const QString &g_obj_nm, const QString &g_obj_type, const QString &g_def_txt) {expected_sim_params.append(ExpectedSimParam(param_nm, g_obj_nm, g_obj_type, g_def_txt));}
     //! Get a list of the expected simulation parameters.
     QList<ExpectedSimParam> *expectedSimParams() {return &expected_sim_params;}
+    gui::PropertyMap sim_params_map;  // a property map containing all of the simulation parameters
 
     // ACCESSORS
     QString name() {return eng_name;}
@@ -92,7 +93,6 @@ namespace prim{
     // GUI
     QWidget *sim_param_dialog=0;// gui for setting sim params for this engine, loaded from *.ui
     QList<ExpectedSimParam> expected_sim_params;
-    gui::PropertyMap sim_params_map;  // a property map containing all of the simulation parameters
 
 
     // TODO some stack/dictionary/etc with simulator info, for showing up in manager

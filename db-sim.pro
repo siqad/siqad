@@ -102,6 +102,7 @@ HEADERS += \
 	src/gui/application.h \
 	src/gui/property_map.h \
 	src/gui/widgets/property_editor.h \
+	src/gui/widgets/property_form.h \
 	src/gui/widgets/design_panel.h \
 	src/gui/widgets/dialog_panel.h \
 	src/gui/widgets/input_field.h \
@@ -117,6 +118,7 @@ SOURCES += \
 	src/gui/application.cc \
 	src/gui/property_map.cc \
 	src/gui/widgets/property_editor.cc \
+	src/gui/widgets/property_form.cc \
 	src/gui/widgets/design_panel.cc \
 	src/gui/widgets/dialog_panel.cc \
 	src/gui/widgets/input_field.cc \

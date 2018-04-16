@@ -21,6 +21,15 @@ SimJob::SimJob(const QString &nm, SimEngine *eng, QWidget *parent)
 }
 
 
+// append all entries in the provided PropertyMap to the list of simulation parameters
+void SimJob::addSimParams(const gui::PropertyMap &sim_params_map)
+{
+  qDebug() << "alive1";
+  for (const QString &key : sim_params_map.keys())
+    addSimParam(key, sim_params_map[key].value.toString());
+  qDebug() << "alive2";
+}
+
 // load simulation parameters from engine sim params dialog
 void SimJob::loadSimParamsFromEngineDialog()
 {

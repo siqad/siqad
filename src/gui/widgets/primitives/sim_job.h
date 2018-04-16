@@ -43,13 +43,19 @@ namespace prim{
     bool loadJob(const QString &) {return false;}
 
     // simulation parameters
+
     //! Returns a list key-value pairs representing simulation parameters.
     QList<QPair<QString, QString>> simParams() const {return sim_params;}
+
     //! Appends two strings to the list of simulation parametres as a key-value pair
     void addSimParam(const QString &field, const QString &value) {sim_params.append(qMakePair(field, value));}
-    //! Appends a key-value pair to the list of simulation parameters
+
+    //! Appends a list of key-value pairs to the list of simulation parameters
     void addSimParams(const QList<QPair<QString, QString>> &add_params) {sim_params.append(add_params);}
-    QList<QPair<QString, QString>> loadSimParamsFromDialog();
+
+    //! Appends all entries in the provided PropertyMap to the list of simulation parameters
+    void addSimParams(const gui::PropertyMap &sim_param_map);
+
     //! Loads simulation parameters from the SimManager dialog.
     void loadSimParamsFromEngineDialog();
 
