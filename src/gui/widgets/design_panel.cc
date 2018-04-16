@@ -65,13 +65,6 @@ void gui::DesignPanel::initDesignPanel() {
   setScene(scene);
   setMouseTracking(true);
 
-  // construct widgets
-  afm_panel = new AFMPanel(getLayerIndex(afm_layer), this);
-  scene->addItem(afm_panel->ghostNode());
-  scene->addItem(afm_panel->ghostSegment());
-  connect(this, &gui::DesignPanel::sig_toolChanged,
-            afm_panel, &gui::AFMPanel::toolChangeResponse);
-
   // setup flags
   clicked = ghosting = moving = pasting = resizing = false;
 
@@ -113,6 +106,14 @@ void gui::DesignPanel::initDesignPanel() {
 
   // set display mode
   setDisplayMode(DesignMode);
+
+
+  // construct widgets
+  afm_panel = new AFMPanel(getLayerIndex(afm_layer), this);
+  scene->addItem(afm_panel->ghostNode());
+  scene->addItem(afm_panel->ghostSegment());
+  connect(this, &gui::DesignPanel::sig_toolChanged,
+            afm_panel, &gui::AFMPanel::toolChangeResponse);
 }
 
 // clear design panel
