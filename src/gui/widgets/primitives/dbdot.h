@@ -55,7 +55,6 @@ namespace prim{
     prim::LatticeDot *getSource() const {return source;}
 
     void setFill(float fill){fill_fact = fill;}
-    //void setFillCol(QColor col, QColor col_sel){fill_col = col; fill_col_sel = col_sel;}
 
     // inherited abstract method implementations
 
@@ -86,7 +85,7 @@ namespace prim{
 
     // static class parameters for painting
 
-    static prim::Item::StateColors fill_col;            // normal dbdot
+    static prim::Item::StateColors fill_col;           // normal dbdot
     static prim::Item::StateColors fill_col_driver;    // driver (forced polarization)
     static prim::Item::StateColors fill_col_electron;  // contains electron
     static prim::Item::StateColors edge_col;           // edge of the dbdot

@@ -1711,21 +1711,19 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
 {
   prim::DBDot *dbdot = ldot->getDBDot();
   // dbdot should be 0 if invert is false else non-zero
-  //if( !(invert ^ (dbdot==0)) )
-    //qFatal("Either trying to delete a non-existing DB or overwrite an existing one");
   if (!invert && dbdot!=0) {
+    qDebug() << tr("latdot loc: (%1, %2)").arg(ldot->x()).arg(ldot->y());
     qFatal("Trying to make a new db at a location that already has one");
   }
   if (invert && dbdot==0) {
-    //qDebug() << "******Trying to delete a non-existing DB******";
-    //qDebug() << tr("latdot loc: (%1, %2)").arg(ldot->x()).arg(ldot->y());
+    qDebug() << tr("latdot loc: (%1, %2)").arg(ldot->x()).arg(ldot->y());
     qFatal("Trying to delete a non-existing DB");
   }
 
   // dbdot index in layer
   prim::Layer *layer = dp->getLayer(layer_index);
   index = invert ? layer->getItems().indexOf(dbdot) : layer->getItems().size();
-  elec = src_db ? src_db->getElec() : 0; // TODO in the future, instead of copying properties 1 by 1, probably want to make something that copies all properties
+  elec = src_db ? src_db->getElec() : 0;
 }
 
 void gui::DesignPanel::CreateDB::undo()

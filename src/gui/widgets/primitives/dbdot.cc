@@ -101,8 +101,6 @@ void prim::DBDot::initDBDot(int lay_id, prim::LatticeDot *src, int elec_in)
   if(diameter_m<0)
     constructStatics();
 
-  diameter = diameter_m;
-
   // set dot location in pixels
   setSource(src);
 
@@ -126,32 +124,13 @@ void prim::DBDot::toggleElec()
 void prim::DBDot::setElec(int e_in)
 {
   elec = e_in;
-  if(elec){
-    // set to 1
-    setFill(1);
-    //setFillCol(fill_col_drv, fill_col_drv_sel);
-    diameter = diameter_m;
-  }
-  else{
-    // set to 0
-    setFill(1);
-    //setFillCol(fill_col_default, fill_col_default_sel);
-    diameter = diameter_m;
-  }
   update();
 }
 
 
 void prim::DBDot::setShowElec(float se_in)
 {
-  // TODO move the color logic to paint
   show_elec = se_in;
-  if(show_elec > 0){
-    diameter = diameter_l; // TODO change this to paint
-  }
-  else{
-    diameter = diameter_m;
-  }
   update();
 }
 
@@ -175,7 +154,8 @@ void prim::DBDot::setSource(prim::LatticeDot *src)
 QRectF prim::DBDot::boundingRect() const
 {
   qreal width = diameter_l+edge_width;
-  if (display_mode == gui::ScreenshotMode) width *= publish_scale;
+  if (display_mode == gui::ScreenshotMode)
+    width *= publish_scale;
   return QRectF(-.5*width, -.5*width, width, width);
 }
 
@@ -187,12 +167,15 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
         display_mode == gui::ScreenshotMode) &&
         show_elec > 0) {
     setFill(show_elec);
+    diameter = diameter_l;
     fill_col_state = getCurrentStateColor(fill_col_electron);
   } else if (elec > 0) {
     setFill(1);
+    diameter = diameter_m;
     fill_col_state = getCurrentStateColor(fill_col_driver);
   } else {
     setFill(1);
+    diameter = diameter_m;
     fill_col_state = getCurrentStateColor(fill_col);
   }
 
