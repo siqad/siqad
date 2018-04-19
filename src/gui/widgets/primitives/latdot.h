@@ -43,15 +43,15 @@ namespace prim{
 
     // inherited abstract method implementations
 
-    QRectF boundingRect() const Q_DECL_OVERRIDE;
-    void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
+    QRectF boundingRect() const override;
+    void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
 
     Item *deepCopy() const override;
 
   protected:
 
     // double click event is added to fix the bug where latdot becomes unselectable
-    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE {e->ignore();}
+    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e) override {e->ignore();}
 
   private:
 

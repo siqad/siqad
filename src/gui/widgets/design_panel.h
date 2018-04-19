@@ -199,6 +199,9 @@ namespace gui{
     //! by the given QRect.
     void sig_screenshot(QRect);
 
+    //! Tell ApplicationGUI to cancel the current screenshot.
+    void sig_cancelScreenshot();
+
   protected:
 
     void contextMenuEvent(QContextMenuEvent *e) override;
