@@ -166,8 +166,7 @@ INSTALLS += sim_common
 
 sim_simanneal.path = $$EXEC_DIR/src/phys/simanneal
 sim_simanneal.files = \
-    $$PHYS_DIR/simanneal/engine_description.xml \
-    $$PHYS_DIR/simanneal/option_dialog.ui
+    $$PHYS_DIR/simanneal/sim_anneal.physeng
 linux: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal
 macx:  sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal
 win32: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal.exe
@@ -179,10 +178,7 @@ sim_afmmarcus.path = $$EXEC_DIR/src/phys/afmmarcus
 sim_afmmarcus.files = \
     $$PHYS_DIR/afmmarcus/afm_line_scan.physeng \
     $$PHYS_DIR/afmmarcus/hopping_animator.physeng \
-    $$PHYS_DIR/afmmarcus/marcus_and_pois.physeng \
-    $$PHYS_DIR/afmmarcus/afm_line_scan.ui \
-    $$PHYS_DIR/afmmarcus/hopping_animator.ui \
-    $$PHYS_DIR/afmmarcus/marcus_and_pois.ui
+    $$PHYS_DIR/afmmarcus/marcus_and_pois.physeng
 !win32: sim_afmmarcus.files += \
     $$PHYS_DIR/afmmarcus/src/afmmarcus \
     $$PHYS_DIR/afmmarcus/src/python/afm.py \
@@ -201,6 +197,5 @@ INSTALLS += sim_afmmarcus
 
 sim_poissolver.path = $$EXEC_DIR/src/phys/poissolver
 sim_poissolver.files = $$PHYS_DIR/poissolver/engine_description.xml
-sim_poissolver.files += $$PHYS_DIR/poissolver/option_dialog.ui
 linux: sim_poissolver.files += $$PHYS_DIR/poissolver/PoisFFT/bin/objs/poissolver
 INSTALLS += sim_poissolver

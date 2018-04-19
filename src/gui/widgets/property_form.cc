@@ -24,8 +24,14 @@ PropertyMap PropertyForm::finalProperties()
 {
   for (const QString &key : map.keys()) {
     // save the property with the correct type
-    QLineEdit *prop_field = QObject::findChild<QLineEdit*>(key);
-    map[key].value = PropertyMap::string2Type2QVariant(prop_field->text(), map[key].value.type());
+    if (map[key].value_selection.type == Combo) {
+      QComboBox *prop_combo = QObject::findChild<QComboBox*>(key);
+      map[key].value = prop_combo->currentData();
+    } else {
+      // the field is a line edit if no value selection has been set
+      QLineEdit *prop_field = QObject::findChild<QLineEdit*>(key);
+      map[key].value = PropertyMap::string2Type2QVariant(prop_field->text(), map[key].value.type());
+    }
   }
   return map;
 }
@@ -42,11 +48,20 @@ void PropertyForm::initForm()
     Property prop = it.value();
 
     QLabel *label_prop = new QLabel(prop.form_label);
-    QLineEdit *le_prop = new QLineEdit(prop.value.value<QString>());
-    le_prop->setObjectName(it.key());
-    le_prop->setToolTip(prop.form_tip);
 
-    prop_fl->addRow(label_prop, le_prop);
+    QWidget *prop_val_widget;
+    if (prop.value_selection.type == Combo) {
+      // if there are combo options, treat this as a combo box
+      prop_val_widget = new QComboBox;
+      for (ComboOption combo_option : prop.value_selection.combo_options) {
+        static_cast<QComboBox*>(prop_val_widget)->addItem(combo_option.label, combo_option.val);
+      }
+    } else {
+      prop_val_widget = new QLineEdit(prop.value.value<QString>());
+    }
+    prop_val_widget->setObjectName(it.key());
+    prop_val_widget->setToolTip(prop.form_tip);
+    prop_fl->addRow(label_prop, prop_val_widget);
   }
 
   setLayout(prop_fl);

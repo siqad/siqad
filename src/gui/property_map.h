@@ -23,19 +23,44 @@
 
 namespace gui{
 
+  enum ValueSelectionType{LineEdit, Combo};
+
+  //! A struct that stores a ComboOption
+  struct ComboOption {
+    ComboOption(const QVariant &val, const QString &label) : val(val), label(label) {};
+    ComboOption() {};
+    QVariant val;
+    QString label;
+  };
+
+  //! A struct that stores the value selection type and values. If no type is
+  //! specified then it's a line edit by default.
+  struct ValueSelection {
+    ValueSelection(const ValueSelectionType type,
+      QList<ComboOption> combo_options=QList<ComboOption>())
+      : type(type), combo_options(combo_options) {};
+    ValueSelection() : type(LineEdit) {};
+    ValueSelectionType type;
+    QList<ComboOption> combo_options;
+  };
+
   //! A struct that stores all information relevant to a property
   struct Property {
-    Property(QVariant val, QString f_label, QString f_tip)
-      : value(val), form_label(f_label), form_tip(f_tip) {};
-    Property(QVariant val, Property p)
-      : value(val), form_label(p.form_label), form_tip(p.form_tip) {};
-    Property(QVariant val)
+    Property(const QVariant &val, const QString &f_label, const QString &f_tip,
+      const ValueSelection &v_sel)
+      : value(val), form_label(f_label), form_tip(f_tip), value_selection(v_sel) {};
+    Property(const QVariant &val, const Property &p)
+      : value(val), form_label(p.form_label), form_tip(p.form_tip),
+        value_selection(p.value_selection) {};
+    Property(const QVariant &val)
       : value(val) {};
     Property() {};
     QVariant value;
     QString form_label; // descriptive label when showing this in a form
     QString form_tip;   // tooltip when showing this in a form
+    ValueSelection value_selection;
   };
+
 
   //! Read properties from XML resources, parses them and makes them accessible
   //! as a map. Kind of similar to QSettings in principle, just made to serve
@@ -64,6 +89,9 @@ namespace gui{
 
     //! Read one property node from XML file.
     void readProperty(const QString &node_name, QXmlStreamReader *rs);
+
+    //! Read combo_options for a combo box
+    void readComboOptions(Property *prop, int type_id, QXmlStreamReader *rs);
 
     //! Convert value to specified type and return a QVariant containing that
     //! converted value. Give the type_id in terms of QMetaType's enum.

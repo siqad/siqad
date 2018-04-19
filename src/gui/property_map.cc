@@ -87,7 +87,7 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
 
   // keep reading until the end of this property node
   while ( !(rs->name() == node_name && rs->isEndElement())
-        && rs->readNextStartElement()) {
+          && rs->readNextStartElement()) {
     if (rs->name() == "T") {
       p_type_id = string2type[rs->readElementText()];
       qDebug() << QObject::tr("%1 type=%2").arg(node_name).arg(p_type_id);
@@ -103,6 +103,13 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
       prop.form_tip = rs->readElementText();
       qDebug() << QObject::tr("%1 tip=%2").arg(node_name).arg(prop.form_tip);
       //rs->skipCurrentElement();
+    } else if (rs->name() == "value_selection") {
+      if (rs->attributes().value("type") == "ComboBox") {
+        readComboOptions(&prop, p_type_id, rs);
+      }
+      for (ComboOption combo_option : prop.value_selection.combo_options) {
+        qDebug() << QObject::tr("Combo val is %1").arg(combo_option.val.toString());
+      }
     } else {
       qDebug() << "else";
       rs->readNext();
@@ -120,6 +127,18 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
 
   // add this property to the map
   insert(node_name, prop);
+}
+
+// read combo options
+void PropertyMap::readComboOptions(Property *prop, int type_id, QXmlStreamReader *rs)
+{
+  prop->value_selection = Combo;
+  while ( !(rs->name() == "value_selection" && rs->isEndElement())
+          && rs->readNextStartElement()) {
+    prop->value_selection.combo_options.append(
+        ComboOption(string2Type2QVariant(rs->name().toString(), type_id),
+                    rs->readElementText()));
+  }
 }
 
 QVariant PropertyMap::string2Type2QVariant(const QString &val, int type_id)

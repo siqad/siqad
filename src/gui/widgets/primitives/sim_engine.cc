@@ -51,6 +51,8 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
             setLinkedScriptPath(eng_dir.absoluteFilePath(rs.readElementText()));
           } else if (rs.name() == "gui_dialog_path") {
             setParamDialogPath(eng_dir.absoluteFilePath(rs.readElementText()));
+          /* TODO remove this section along with relevant class variables when
+                  the property map version of sim_params have been finalized.
           } else if (rs.name() == "sim_params") {
             while (!(rs.isEndElement() && rs.name() == "sim_params")) {
               if (!rs.readNextStartElement())
@@ -72,9 +74,9 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
                 addExpectedSimParam(param_nm, gui_obj_nm, gui_obj_type, gui_def_txt);
                 //qDebug() << QObject::tr("addExpectedSimParam(%1, %2, %3, %4)").arg(param_nm).arg(gui_obj_nm).arg(gui_obj_type).arg(gui_def_txt);
               }
-            } // end of sim_params
-          } else if (rs.name() == "sim_params_new") {
-            sim_params_map.readPropertiesFromXMLStream(&rs, "sim_params_new");
+            } // end of sim_params*/
+          } else if (rs.name() == "sim_params") {
+            sim_params_map.readPropertiesFromXMLStream(&rs, "sim_params");
             // TODO remove
             for (const QString &key : sim_params_map.keys())
               qDebug() << QObject::tr("sim_params_map[%1] = %2").arg(key).arg(sim_params_map[key].value.toString());
