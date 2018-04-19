@@ -1049,8 +1049,12 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
   else{
     switch(e->key()){
       case Qt::Key_Escape:
+        // quit screenshot mode if currently in it
+        if (display_mode == ScreenshotMode)
+          emit sig_cancelScreenshot();
+
         // deactivate current tool
-        if(tool_type != gui::ToolType::SelectTool){
+        if (tool_type != gui::ToolType::SelectTool) {
           //qDebug() << tr("Esc pressed, drop back to select tool");
           // emit signal to be picked up by application.cc
           emit sig_toolChangeRequest(gui::ToolType::SelectTool);
