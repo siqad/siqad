@@ -43,8 +43,8 @@ namespace prim{
     QPointF getPoint2(void){return point2;}
     QPointF getTopLeft(void){return top_left;}
     qreal getTopDepth(void){return top_depth;}
-    qreal getWidth(void){return elec_width;}
-    qreal getHeight(void){return elec_height;}
+    qreal getWidth(void) const {return std::max(point1.x(), point2.x()) - std::min(point1.x(), point2.x());}
+    qreal getHeight(void) const {return std::max(point1.y(), point2.y()) - std::min(point1.y(), point2.y());}
     qreal getDepth(void){return elec_depth;}
 
     //! Updates the electrode with its new location. Call this after moving the electrode.
@@ -73,8 +73,6 @@ namespace prim{
     QPointF point2;
     QPointF top_left; //top left point, since the two points given could be any two opposite points
     double potential = 0;
-    qreal elec_width;
-    qreal elec_height;
     qreal elec_depth;
     qreal top_depth;
 

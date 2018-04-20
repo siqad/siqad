@@ -112,8 +112,8 @@ void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point
   potential = potential_in;
   electrode_type = static_cast<prim::Electrode::ElectrodeType>(electrode_type_in);
   constructStatics();
-  elec_width = (std::max(point1.x(), point2.x()) - std::min(point1.x(), point2.x()));
-  elec_height = (std::max(point1.y(), point2.y()) - std::min(point1.y(), point2.y()));
+  qDebug() << QObject::tr("%1 %2").arg(getWidth()).arg(getHeight());
+
   top_left.setX(std::min(point1.x(), point2.x()));
   top_left.setY(std::min(point1.y(), point2.y()));
   setZValue(-1);
@@ -125,8 +125,8 @@ void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point
 
 QRectF prim::Electrode::boundingRect() const
 {
-  qreal width = elec_width+edge_width;
-  qreal height = elec_height+edge_width;
+  qreal width = getWidth()+edge_width;
+  qreal height = getHeight()+edge_width;
   return QRectF(0, 0, width, height);
 }
 
@@ -147,7 +147,7 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
       // qDebug() << QObject::tr("Electrode selected");
     setPos(pos());
     QPointF center = rect.center();
-    QSizeF size(elec_width+edge_width, elec_height+edge_width);
+    QSizeF size(getWidth()+edge_width, getHeight()+edge_width);
     rect.setSize(size);
     rect.moveCenter(center);
 
