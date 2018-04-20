@@ -1049,8 +1049,12 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
   else{
     switch(e->key()){
       case Qt::Key_Escape:
+        // quit screenshot mode if currently in it
+        if (display_mode == ScreenshotMode)
+          emit sig_cancelScreenshot();
+
         // deactivate current tool
-        if(tool_type != gui::ToolType::SelectTool){
+        if (tool_type != gui::ToolType::SelectTool) {
           //qDebug() << tr("Esc pressed, drop back to select tool");
           // emit signal to be picked up by application.cc
           emit sig_toolChangeRequest(gui::ToolType::SelectTool);
@@ -2255,8 +2259,7 @@ void gui::DesignPanel::createElectrodes(QPoint point1)
 void gui::DesignPanel::createPotPlot(QPixmap potential_plot, QRectF graph_container)
 {
   int layer_index = layers.indexOf(plot_layer);
-  //only ever create one electrode at a time
-  undo_stack->beginMacro(tr("create electrode with given corners"));
+  undo_stack->beginMacro(tr("create potential plot with given corners"));
   undo_stack->push(new CreatePotPlot(layer_index, this, potential_plot, graph_container));
   undo_stack->endMacro();
 }

@@ -109,6 +109,8 @@ void gui::ApplicationGUI::initGUI()
           this, SLOT(simulationSetup()));
   connect(design_pan, SIGNAL(sig_quickRunSimulation()),
           sim_manager, SLOT(quickRun()));
+  connect(design_pan, SIGNAL(sig_cancelScreenshot()),
+          this, SLOT(endScreenshotMode()));
 
   // layout management
   QWidget *main_widget = new QWidget(this); // main widget for mainwindow
@@ -192,7 +194,7 @@ void gui::ApplicationGUI::initMenuBar()
 
   tools->addAction(change_lattice);
   tools->addAction(select_color);
-  view->addSeparator();
+  tools->addSeparator();
   tools->addAction(area_screenshot);
   tools->addAction(design_screenshot);
   tools->addAction(screenshot);

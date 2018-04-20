@@ -242,7 +242,7 @@ void prim::DBDot::constructStatics()
 
   diameter_m = gui_settings->get<qreal>("dbdot/diameter_m")*scale_factor;
   diameter_l = gui_settings->get<qreal>("dbdot/diameter_l")*scale_factor;
-  edge_width = gui_settings->get<qreal>("dbdot/edge_width")*diameter;
+  edge_width = gui_settings->get<qreal>("dbdot/edge_width")*diameter_l;
   publish_scale = gui_settings->get<qreal>("dbdot/publish_scale");
 
   edge_col.normal = gui_settings->get<QColor>("dbdot/edge_col");
