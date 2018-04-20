@@ -46,8 +46,12 @@ void PropertyMap::readPropertiesFromXML(const QString &fname)
   QXmlStreamReader rs(&file);
   qDebug() << QObject::tr("Beginning load from %1").arg(file.fileName());
 
-  // enter the root node and start reading properties inside that node
+  // enter the root node and read relevant attributes
   rs.readNextStartElement();
+  if (rs.attributes().value("preserve_order") == "true")
+    preserve_order = true;
+
+  // start reading properties
   if (rs.name() == "properties")
     readPropertiesFromXMLStream(&rs);
 
@@ -75,6 +79,7 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
     qCritical() << QObject::tr("Property %1 has been repeated").arg(node_name);
 
   Property prop;
+  prop.index = size();
   int p_type_id=-1;
   QString p_val;
   qDebug() << QObject::tr("Reading content of property %1").arg(node_name);

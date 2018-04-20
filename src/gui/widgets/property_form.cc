@@ -42,8 +42,12 @@ void PropertyForm::initForm()
 {
   setWindowTitle("Property Editor");
 
-  // generate form from map
+  // populate a form with the desired number of null widgets first
   QFormLayout *prop_fl = new QFormLayout;
+  for (int i=0; i<map.size(); i++)
+    prop_fl->addRow(new QWidget, new QWidget);
+
+  // generate form from map
   for (PropertyMap::const_iterator it = map.cbegin(), end = map.cend(); it != end; ++it) {
     Property prop = it.value();
 
@@ -61,7 +65,10 @@ void PropertyForm::initForm()
     }
     prop_val_widget->setObjectName(it.key());
     prop_val_widget->setToolTip(prop.form_tip);
-    prop_fl->addRow(label_prop, prop_val_widget);
+
+    // delete the null widget at the target row and insert the new row
+    prop_fl->removeRow(prop.index);
+    prop_fl->insertRow(prop.index, label_prop, prop_val_widget);
   }
 
   setLayout(prop_fl);

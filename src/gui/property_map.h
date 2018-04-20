@@ -29,6 +29,7 @@ namespace gui{
   struct ComboOption {
     ComboOption(const QVariant &val, const QString &label) : val(val), label(label) {};
     ComboOption() {};
+
     QVariant val;
     QString label;
   };
@@ -40,25 +41,29 @@ namespace gui{
       QList<ComboOption> combo_options=QList<ComboOption>())
       : type(type), combo_options(combo_options) {};
     ValueSelection() : type(LineEdit) {};
+
     ValueSelectionType type;
     QList<ComboOption> combo_options;
   };
 
   //! A struct that stores all information relevant to a property
   struct Property {
-    Property(const QVariant &val, const QString &f_label, const QString &f_tip,
-      const ValueSelection &v_sel)
-      : value(val), form_label(f_label), form_tip(f_tip), value_selection(v_sel) {};
+    Property(int index, const QVariant &val, const QString &f_label,
+      const QString &f_tip, const ValueSelection &v_sel)
+      : index(index), value(val), form_label(f_label), form_tip(f_tip),
+        value_selection(v_sel) {};
     Property(const QVariant &val, const Property &p)
-      : value(val), form_label(p.form_label), form_tip(p.form_tip),
+      : index(p.index), value(val), form_label(p.form_label), form_tip(p.form_tip),
         value_selection(p.value_selection) {};
     Property(const QVariant &val)
       : value(val) {};
     Property() {};
-    QVariant value;
+
+    int index;          // original index when read from file
+    QVariant value;     // the value stored in this property
     QString form_label; // descriptive label when showing this in a form
     QString form_tip;   // tooltip when showing this in a form
-    ValueSelection value_selection;
+    ValueSelection value_selection; // value selection method and options
   };
 
 
@@ -99,6 +104,8 @@ namespace gui{
 
 
   private:
+
+    bool preserve_order=false;
 
     QString xml_path;
 
