@@ -82,34 +82,28 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
   prop.index = size();
   int p_type_id=-1;
   QString p_val;
-  qDebug() << QObject::tr("Reading content of property %1").arg(node_name);
+  //qDebug() << QObject::tr("Reading content of property %1").arg(node_name);
 
   // keep reading until the end of this property node
   while (rs->readNextStartElement()) {
     if (rs->name() == "T") {
       p_type_id = string2type[rs->readElementText()];
-      qDebug() << QObject::tr("%1 type=%2").arg(node_name).arg(p_type_id);
+      //qDebug() << QObject::tr("%1 type=%2").arg(node_name).arg(p_type_id);
     } else if (rs->name() == "val") {
       p_val = rs->readElementText();
-      qDebug() << QObject::tr("%1 val=%2").arg(node_name).arg(p_val);
-      //rs->skipCurrentElement();
+      //qDebug() << QObject::tr("%1 val=%2").arg(node_name).arg(p_val);
     } else if (rs->name() == "label") {
       prop.form_label = rs->readElementText();
-      qDebug() << QObject::tr("%1 label=%2").arg(node_name).arg(prop.form_label);
-      //rs->skipCurrentElement();
+      //qDebug() << QObject::tr("%1 label=%2").arg(node_name).arg(prop.form_label);
     } else if (rs->name() == "tip") {
       prop.form_tip = rs->readElementText();
-      qDebug() << QObject::tr("%1 tip=%2").arg(node_name).arg(prop.form_tip);
-      //rs->skipCurrentElement();
+      //qDebug() << QObject::tr("%1 tip=%2").arg(node_name).arg(prop.form_tip);
     } else if (rs->name() == "value_selection") {
       if (rs->attributes().value("type") == "ComboBox") {
         readComboOptions(&prop, p_type_id, rs);
       }
-      for (ComboOption combo_option : prop.value_selection.combo_options) {
-        qDebug() << QObject::tr("Combo val is %1").arg(combo_option.val.toString());
-      }
     } else {
-      qDebug() << "else";
+      // TODO error message
       rs->skipCurrentElement();
     }
   }
@@ -120,8 +114,8 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
 
   prop.value = string2Type2QVariant(p_val, p_type_id);
 
-  qDebug() << QObject::tr("Got value of %1 with type %2")
-      .arg(prop.value.toString()).arg(p_type_id);
+  //qDebug() << QObject::tr("Got value of %1 with type %2")
+      //.arg(prop.value.toString()).arg(p_type_id);
 
   // add this property to the map
   insert(node_name, prop);

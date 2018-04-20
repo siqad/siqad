@@ -201,30 +201,6 @@ void SimManager::updateSimParams()
     sim_params_vl->addWidget(new QLabel("No simulation parameters available for this engine."));
   }
 
-  /* TODO delete
-  // clear out existing sim params layout, don't delete the widget if we're using the one provided by the engine
-  QLayoutItem *child;
-  while ((child = sim_params_vl->takeAt(0)) != 0) {
-    if (using_engine_sim_param_dialog) {
-      child->widget()->hide();
-    } else {
-      delete child->widget();
-      delete child;
-    }
-  }
-
-  // add the currently focused layout
-  QString curr_eng_name = combo_eng_sel->currentText();
-  QWidget *sim_param_dialog = getEngine(curr_eng_name)->simParamDialog();
-  if (sim_param_dialog) {
-    sim_param_dialog->show();
-    sim_params_vl->addWidget(sim_param_dialog);
-    using_engine_sim_param_dialog = true;
-  } else {
-    sim_params_vl->addWidget(new QLabel("No simulation parameters available for this engine."));
-    using_engine_sim_param_dialog = false;
-  }*/
-
   sim_setup_dialog->adjustSize();
 }
 
@@ -273,10 +249,7 @@ void SimManager::submitSimSetup()
 
   // create job object and extract simulation parameters from the engine's parameter widget
   prim::SimJob *new_job = new prim::SimJob(le_job_nm->text(), curr_engine);
-  //new_job->loadSimParamsFromEngineDialog(); TODO remove
-  qDebug() << "good?1";
   new_job->addSimParams(curr_sim_params_form->finalProperties());
-  qDebug() << "good?2";
 
   // engine
     // auto filled in: job export path, job result path
