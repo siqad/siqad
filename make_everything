@@ -38,6 +38,11 @@ echo "Building AFMMarcus... $FOR_OS"
 cd $qmake_dir/src/phys/afmmarcus/src
 make $multicore_compile FOR_OS=$FOR_OS
 
+# make poissolver
+echo "Building PoisSolver... $FOR_OS"
+cd $qmake_dir/src/phys/poissolver/PoisFFT
+make $multicore_compile FOR_OS=$FOR_OS
+
 # make the GUI and copy physics engine files over
 echo "Building GUI..."
 cd $make_dir && make $make_flag $multicore_compile install
