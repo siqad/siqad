@@ -34,26 +34,7 @@ namespace prim{
     //! destructor
     ~SimEngine() {};
 
-    //! read sim param dialog from provided *.ui file (xml)
-    bool constructSimParamDialog();
-    //! loads the simulation parameters entered in the SimManager dialog.
-    QList<QPair<QString, QString>> loadSimParamsFromDialog();
-
-    //! types of sim params expected for this engine
-    struct ExpectedSimParam {
-      ExpectedSimParam(const QString &param_nm, const QString &g_obj_nm, const QString &g_obj_type, const QString &g_def_txt = QString())
-        : name(param_nm), gui_object_name(g_obj_nm), gui_object_type(g_obj_type), gui_default_text(g_def_txt)
-      {
-      }
-      QString name;       // name of the parameter
-      QString gui_object_name;  // name of field element to read
-      QString gui_object_type;  // type of field element for casting (only support QLineEdit so far)
-      QString gui_default_text; // default text to appear in the element TODO remove if not needed
-    };
-    //! Add an expected simulation parameter, based on the option_dialog.ui file.
-    void addExpectedSimParam(const QString &param_nm, const QString &g_obj_nm, const QString &g_obj_type, const QString &g_def_txt) {expected_sim_params.append(ExpectedSimParam(param_nm, g_obj_nm, g_obj_type, g_def_txt));}
-    //! Get a list of the expected simulation parameters.
-    QList<ExpectedSimParam> *expectedSimParams() {return &expected_sim_params;}
+    // TODO property map with simulator information
     gui::PropertyMap sim_params_map;  // a property map containing all of the simulation parameters
 
     // ACCESSORS
@@ -71,9 +52,6 @@ namespace prim{
     QString paramDialogPath() {return param_dialog_path;}
     void setParamDialogPath(const QString &path) {param_dialog_path = path;}
 
-    // gui
-    QWidget *simParamDialog() {return sim_param_dialog;}
-
     // simulator info, for showing up in manager
     // available parameters and associated type, for user alteration
 
@@ -89,14 +67,6 @@ namespace prim{
     QString linked_script_path; // if the binary is a connector that calls another script, indicate the script here
     QString param_dialog_path;  // path to the gui dialog, defaults to "option_dialog.ui"
     QString runtime_temp_dir;   // root directory for all problems files for this engine
-
-    // GUI
-    QWidget *sim_param_dialog=0;// gui for setting sim params for this engine, loaded from *.ui
-    QList<ExpectedSimParam> expected_sim_params;
-
-
-    // TODO some stack/dictionary/etc with simulator info, for showing up in manager
-    // TODO something that stores default parameters, associated types (so the appropriate fields are used), for user alteration
   };
 
 } // end of prim namespace

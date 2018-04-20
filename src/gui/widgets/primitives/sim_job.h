@@ -56,9 +56,6 @@ namespace prim{
     //! Appends all entries in the provided PropertyMap to the list of simulation parameters
     void addSimParams(const gui::PropertyMap &sim_param_map);
 
-    //! Loads simulation parameters from the SimManager dialog.
-    void loadSimParamsFromEngineDialog();
-
 
     // JOB EXECUTION
 

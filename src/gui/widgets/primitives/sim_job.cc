@@ -28,12 +28,6 @@ void SimJob::addSimParams(const gui::PropertyMap &sim_params_map)
     addSimParam(key, sim_params_map[key].value.toString());
 }
 
-// load simulation parameters from engine sim params dialog
-void SimJob::loadSimParamsFromEngineDialog()
-{
-  addSimParams(engine->loadSimParamsFromDialog());
-}
-
 
 // invoke the simulator binary. Assumes that the problem file has already been written to
 // the path specified by problemFile()
