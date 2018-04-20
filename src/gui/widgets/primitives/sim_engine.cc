@@ -76,7 +76,7 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
               }
             } // end of sim_params*/
           } else if (rs.name() == "sim_params") {
-            sim_params_map.readPropertiesFromXMLStream(&rs, "sim_params");
+            sim_params_map.readPropertiesFromXMLStream(&rs);
             // TODO remove
             for (const QString &key : sim_params_map.keys())
               qDebug() << QObject::tr("sim_params_map[%1] = %2").arg(key).arg(sim_params_map[key].value.toString());

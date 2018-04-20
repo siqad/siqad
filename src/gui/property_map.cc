@@ -46,7 +46,10 @@ void PropertyMap::readPropertiesFromXML(const QString &fname)
   QXmlStreamReader rs(&file);
   qDebug() << QObject::tr("Beginning load from %1").arg(file.fileName());
 
-  readPropertiesFromXMLStream(&rs, "properties");
+  // enter the root node and start reading properties inside that node
+  rs.readNextStartElement();
+  if (rs.name() == "properties")
+    readPropertiesFromXMLStream(&rs);
 
   file.close();
   qDebug() << QObject::tr("Finished loading from %1").arg(file.fileName());
@@ -54,19 +57,10 @@ void PropertyMap::readPropertiesFromXML(const QString &fname)
 
 
 // read properties from XML stream until the end of the indicated tag
-void PropertyMap::readPropertiesFromXMLStream(QXmlStreamReader *rs, const QString &enclosed_tag)
+void PropertyMap::readPropertiesFromXMLStream(QXmlStreamReader *rs)
 {
-  while ( !rs->atEnd() && !(rs->name() == enclosed_tag && rs->isEndElement()) ) {
-    if (!rs->readNextStartElement())
-      continue;
-
-    // root node
-    if (rs->name() == enclosed_tag)
-      continue;
-
-    // read new property
+  while (rs->readNextStartElement())
     readProperty(rs->name().toString(), rs);
-  }
 
   if (rs->hasError())
     qCritical() << QObject::tr("XML error: ") << rs->errorString().data();
@@ -86,8 +80,7 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
   qDebug() << QObject::tr("Reading content of property %1").arg(node_name);
 
   // keep reading until the end of this property node
-  while ( !(rs->name() == node_name && rs->isEndElement())
-          && rs->readNextStartElement()) {
+  while (rs->readNextStartElement()) {
     if (rs->name() == "T") {
       p_type_id = string2type[rs->readElementText()];
       qDebug() << QObject::tr("%1 type=%2").arg(node_name).arg(p_type_id);
@@ -112,7 +105,7 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
       }
     } else {
       qDebug() << "else";
-      rs->readNext();
+      rs->skipCurrentElement();
     }
   }
 
@@ -133,8 +126,7 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
 void PropertyMap::readComboOptions(Property *prop, int type_id, QXmlStreamReader *rs)
 {
   prop->value_selection = Combo;
-  while ( !(rs->name() == "value_selection" && rs->isEndElement())
-          && rs->readNextStartElement()) {
+  while (rs->readNextStartElement()) {
     prop->value_selection.combo_options.append(
         ComboOption(string2Type2QVariant(rs->name().toString(), type_id),
                     rs->readElementText()));
