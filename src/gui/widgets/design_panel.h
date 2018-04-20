@@ -135,21 +135,40 @@ namespace gui{
     //! get afm_panel pointer
     AFMPanel *afmPanel() {return afm_panel;}
 
+
     // SAVE
 
     // flag if actions are performed after last saved
     int autosave_ind=0;
     int save_ind=0;
 
+    //! Save layers and items into the given write stream.
     void saveToFile(QXmlStreamWriter *stream, bool for_sim=false);
+
+
+    // LOAD
+
+    //! Load layers and items from the given read stream.
     void loadFromFile(QXmlStreamReader *);
 
+    //! Load GUI flags.
+    void loadGUIFlags(QXmlStreamReader *);
+
+    //! Load layer properties.
+    void loadLayerProps(QXmlStreamReader *);
+
+    //! Load design (items contained within layers).
+    void loadDesign(QXmlStreamReader *);
+    
 
     // SIMULATION RESULT DISPLAY
+
     //! Display the simulation result from SimAnneal
     void displaySimResults(prim::SimJob *job, int dist_int, bool avg_degen);
+
     //! Clear the simulation result from SimAnneal
     void clearSimResults();
+
     //! Display the simulation result from PoisSolver
     void displayPotentialPlot(QPixmap potential_plot, QRectF graph_container);
 

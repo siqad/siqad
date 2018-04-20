@@ -14,7 +14,8 @@
 #include <algorithm>
 
 
-prim::Lattice::Lattice(const QString &fname, int lay_id)
+prim::Lattice::Lattice(const QString &fname, int lay_id, const QPoint &lat_xy,
+    int cell_n, const QList<QPointF> &cell_b, const QList<QPointF> &lat_a)
   : Layer(tr("Lattice"),Layer::Lattice,0)
 {
   layer_id = lay_id;
@@ -22,26 +23,34 @@ prim::Lattice::Lattice(const QString &fname, int lay_id)
   // if(fname.isEmpty())
   //   settings::LatticeSettings::updateLattice(fname);
 
-  construct();
+  construct(lat_xy, cell_n, cell_b, lat_a);
 }
 
 
-void prim::Lattice::construct()
+void prim::Lattice::construct(const QPoint &lat_xy, int cell_n,
+    const QList<QPointF> &cell_b, const QList<QPointF> &lat_a)
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   settings::LatticeSettings *lattice_settings = settings::LatticeSettings::instance();
 
   // get values from the lattice_settings
-  n_cell = lattice_settings->get<int>("cell/N");
-  for(int i=0;i<n_cell;i++)
-    b.append(lattice_settings->get<QPointF>(QString("cell/b%1").arg(i+1)));
-  for(int i=0;i<2;i++)
-    a[i] = lattice_settings->get<QPointF>(QString("lattice/a%1").arg(i+1));
+  n_cell = (cell_n == -1) ? lattice_settings->get<int>("cell/N") : cell_n;
+  if (!cell_b.isEmpty()) {
+    b = QList<QPointF>(cell_b);
+  } else {
+    for(int i=0;i<n_cell;i++) {
+      b.append(lattice_settings->get<QPointF>(QString("cell/b%1").arg(i+1)));
+    }
+  }
+  for(int i=0;i<2;i++) {
+    QPointF a_curr = (!lat_a.isEmpty()) ? lat_a[i] : lattice_settings->get<QPointF>(QString("lattice/a%1").arg(i+1));
+    a[i] = a_curr;
+  }
 
   // construct bounds for lattice vectors
   qreal dx = qMax(qAbs(a[0].x()),qAbs(a[1].x()));
   qreal dy = qMax(qAbs(a[0].y()),qAbs(a[1].y()));
-  QPoint nxy = gui_settings->get<QPoint>("lattice/xy");
+  QPoint nxy = (lat_xy.isNull()) ? gui_settings->get<QPoint>("lattice/xy") : lat_xy;
 
   Lx = dx*nxy.x();
   Ly = dy*nxy.y();

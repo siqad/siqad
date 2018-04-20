@@ -533,13 +533,12 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
   while(!stream->atEnd()){
     if(stream->isStartElement()){
       // read program flags
-      if(stream->name() == "program"){
+      if (stream->name() == "program") {
         // TODO implement
         stream->readNext();
-      }
-      // read GUI flags
-      else if(stream->name() == "gui"){
-        stream->readNext();
+      } else if(stream->name() == "gui") {
+        loadGUIFlags(stream);
+        /*stream->readNext();
         // keep reading until end of gui tag
         while(stream->name() != "gui"){
           if(stream->isStartElement()){
@@ -565,9 +564,8 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
           }
           else
             stream->readNext();
-        }
-      }
-      else if(stream->name() == "layer_prop"){
+        }*/
+      } else if(stream->name() == "layer_prop") {
         // construct layers
         stream->readNext();
 
@@ -626,9 +624,9 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
         load_layer->setZHeight(zheight);
         load_layer->setVisible(layer_visible);
         load_layer->setActive(layer_active);
-      }
-      else if(stream->name() == "design") {
-        stream->readNext();
+      } else if(stream->name() == "design") {
+        loadDesign(stream);
+        /*stream->readNext();
         while(stream->name() != "design"){
           if(stream->name() == "layer"){
             // recursively populate layer with items
@@ -638,20 +636,64 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
           }
           else
             stream->readNext();
-        }
-      }
-      else{
+        }*/
+      } else {
         qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
         stream->readNext();
       }
-    }
-    else
+    } else {
       stream->readNext();
+    }
   }
 
   // show error if any
   if(stream->hasError()){
     qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
+  }
+}
+
+
+void gui::DesignPanel::loadGUIFlags(QXmlStreamReader *rs)
+{
+  qreal zoom=1, scroll_v=0, scroll_h=0;
+  //while ( !(rs->name() == "gui" && rs->isEndElement()) && rs->readNextStartElement()) {
+  while (rs->readNextStartElement()) {
+    if (rs->name() == "zoom") {
+      zoom = rs->readElementText().toDouble();
+    } else if (rs->name() == "scroll") {
+      scroll_v = rs->attributes().value("x").toInt();
+      scroll_h = rs->attributes().value("y").toInt();
+    } else {
+      qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
+      rs->readNext();
+    }
+  }
+  setTransform(QTransform(zoom,0,0,zoom,0,0));
+  verticalScrollBar()->setValue(scroll_v);
+  horizontalScrollBar()->setValue(scroll_h);
+}
+
+
+void gui::DesignPanel::loadLayerProps(QXmlStreamReader *)
+{
+  // TODO relocate layer props stuff here after layer_editor revamp has been completed
+}
+
+
+void gui::DesignPanel::loadDesign(QXmlStreamReader *rs)
+{
+  int layer_id=0;
+  //while ( !(rs->name() == "design" && rs->isEndElement()) && rs->readNextStartElement()) {
+  while (rs->readNextStartElement()) {
+    if (rs->name() == "layer") {
+      // recursively populate layer with items
+      rs->readNext();
+      getLayer(layer_id)->loadItems(rs, scene);
+      layer_id++;
+    } else {
+      qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
+      rs->readNext();
+    }
   }
 }
 

@@ -21,7 +21,10 @@ namespace prim{
   public:
 
     //! constructor
-    Lattice(const QString &fname = QString(), int lay_id=-1);
+    Lattice(const QString &fname = QString(), int lay_id=-1,
+            const QPoint &lat_xy=QPoint(), int cell_n=-1,
+            const QList<QPointF> &cell_b=QList<QPointF>(),
+            const QList<QPointF> &lat_a=QList<QPointF>());
 
     //! destructor
     ~Lattice() {}
@@ -39,7 +42,8 @@ namespace prim{
     qreal Ly;           // y-bound on lattice vectors, in Angstroms
 
     // construct lattice from lattice settings
-    void construct();
+    void construct(const QPoint &lat_xy, int cell_n, const QList<QPointF> &cell_b,
+        const QList<QPointF> &lat_a);
 
     // n==0: finds all pairs (m,l) such that m*a[0]+n*a[1] is in the drawing region
     void getLatticeInds(QList<QPoint> &inds, int n=0);
