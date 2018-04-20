@@ -998,11 +998,17 @@ void gui::ApplicationGUI::openFromFile()
   // read from XML stream
   QXmlStreamReader stream(&file);
   qDebug() << tr("Beginning load from %1").arg(file.fileName());
+  
   // TODO load program status here instead of from file
   // TODO if save type is simulation, warn the user when opening the file, especially the fact that sim params will not be retained the next time they save
+
+  // enter the root node and hand the loading over to design panel
+  stream.readNextStartElement();
   design_pan->loadFromFile(&stream);
-  qDebug() << tr("Load complete");
+
+  // clean up
   file.close();
+  qDebug() << tr("Load complete");
 }
 
 

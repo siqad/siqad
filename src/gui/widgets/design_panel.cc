@@ -520,129 +520,25 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream, bool for_sim)
 
 void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
 {
-  int layer_id=0;
-  QString layer_nm;
-  float zoffset, zheight;
-  prim::Layer::LayerType layer_type;
-  bool layer_visible, layer_active;
-
   // reset the design panel state
   resetDesignPanel();
 
   // read from XML stream (children will be created recursively, add those children to stack)
-  while(!stream->atEnd()){
-    if(stream->isStartElement()){
-      // read program flags
-      if (stream->name() == "program") {
-        // TODO implement
-        stream->readNext();
-      } else if(stream->name() == "gui") {
-        loadGUIFlags(stream);
-        /*stream->readNext();
-        // keep reading until end of gui tag
-        while(stream->name() != "gui"){
-          if(stream->isStartElement()){
-            qreal zoom=1, scroll_v=0, scroll_h=0;
-            if(stream->name() == "zoom"){
-              zoom = stream->readElementText().toDouble();
-            }
-            else if(stream->name() == "scroll"){
-              for(QXmlStreamAttribute &attr : stream->attributes()){
-                if(attr.name().toString() == QLatin1String("x"))
-                  scroll_v = attr.value().toInt();
-                else if(attr.name().toString() == QLatin1String("y"))
-                  scroll_h = attr.value().toInt();
-              }
-              setTransform(QTransform(zoom,0,0,zoom,0,0));
-              verticalScrollBar()->setValue(scroll_v);
-              horizontalScrollBar()->setValue(scroll_h);
-            }
-            else{
-              qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
-            }
-            stream->readNext();
-          }
-          else
-            stream->readNext();
-        }*/
-      } else if(stream->name() == "layer_prop") {
-        // construct layers
-        stream->readNext();
-
-        //bool visible_ld, active_ld;
-        layer_nm = QString();
-        layer_type = prim::Layer::DB;
-        zheight = 0;
-        zoffset = 0;
-        layer_visible = layer_active = false;
-
-        // keep reading until end of layer_prop tag
-        while(stream->name() != "layer_prop"){
-          if(stream->isStartElement()){
-            if(stream->name() == "name"){
-              layer_nm = stream->readElementText();
-              stream->readNext();
-            }
-            else if(stream->name() == "type"){
-              layer_type = static_cast<prim::Layer::LayerType>(QMetaEnum::fromType<prim::Layer::LayerType>().keyToValue(stream->readElementText().toStdString().c_str()));
-              stream->readNext();
-            }
-            else if(stream->name() == "zoffset"){
-              zoffset = stream->readElementText().toFloat();
-              stream->readNext();
-            }
-            else if(stream->name() == "zheight"){
-              zheight = stream->readElementText().toFloat();
-              stream->readNext();
-            }
-            else if(stream->name() == "visible"){
-              layer_visible = (stream->readElementText() == "1")?1:0;
-              stream->readNext();
-            }
-            else if(stream->name() == "active"){
-              layer_active = (stream->readElementText() == "1")?1:0;
-              stream->readNext();
-            }
-            else{
-              qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
-              stream->readNext();
-            }
-          }
-          else{
-            stream->readNext();
-          }
-        }
-        // edit layer if it exists, create new otherwise
-        qDebug() << tr("Loading layer %1 with type %2").arg(layer_nm).arg(layer_type);
-        prim::Layer* load_layer = getLayer(layer_nm);
-        if (!load_layer) {
-          addLayer(layer_nm);
-          load_layer = getLayer(layers.count()-1);
-        }
-        load_layer->setContentType(layer_type);
-        load_layer->setZOffset(zoffset);
-        load_layer->setZHeight(zheight);
-        load_layer->setVisible(layer_visible);
-        load_layer->setActive(layer_active);
-      } else if(stream->name() == "design") {
-        loadDesign(stream);
-        /*stream->readNext();
-        while(stream->name() != "design"){
-          if(stream->name() == "layer"){
-            // recursively populate layer with items
-            stream->readNext();
-            getLayer(layer_id)->loadItems(stream, scene);
-            layer_id++;
-          }
-          else
-            stream->readNext();
-        }*/
-      } else {
-        qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
-        stream->readNext();
-      }
+  while (stream->readNextStartElement()) {
+    // read program flags
+    if (stream->name() == "program") {
+      // TODO implement
+      stream->skipCurrentElement();
+    } else if(stream->name() == "gui") {
+      loadGUIFlags(stream);
+    } else if(stream->name() == "layer_prop") {
+      loadLayerProps(stream);
+    } else if(stream->name() == "design") {
+      loadDesign(stream);
     } else {
-      stream->readNext();
+      qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2")
+          .arg(stream->lineNumber()).arg(stream->name().toString());
+      stream->skipCurrentElement();
     }
   }
 
@@ -655,35 +551,76 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
 
 void gui::DesignPanel::loadGUIFlags(QXmlStreamReader *rs)
 {
+  qDebug() << "Loading GUI flags";
   qreal zoom=1, scroll_v=0, scroll_h=0;
-  //while ( !(rs->name() == "gui" && rs->isEndElement()) && rs->readNextStartElement()) {
   while (rs->readNextStartElement()) {
     if (rs->name() == "zoom") {
       zoom = rs->readElementText().toDouble();
     } else if (rs->name() == "scroll") {
       scroll_v = rs->attributes().value("x").toInt();
       scroll_h = rs->attributes().value("y").toInt();
+      rs->skipCurrentElement();
     } else {
-      qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
-      rs->readNext();
+      qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2")
+          .arg(rs->lineNumber()).arg(rs->name().toString());
+      rs->skipCurrentElement();
     }
   }
   setTransform(QTransform(zoom,0,0,zoom,0,0));
   verticalScrollBar()->setValue(scroll_v);
   horizontalScrollBar()->setValue(scroll_h);
+  qDebug() << tr("Zoom set to %1, scroll v=%2, h=%3").arg(zoom).arg(scroll_v).arg(scroll_h);
 }
 
 
-void gui::DesignPanel::loadLayerProps(QXmlStreamReader *)
+void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs)
 {
-  // TODO relocate layer props stuff here after layer_editor revamp has been completed
+  QString layer_nm;
+  float zoffset=0, zheight=0;
+  prim::Layer::LayerType layer_type = prim::Layer::DB;;
+  bool layer_visible=false, layer_active=false;
+
+  // keep reading until end of layer_prop tag
+  while (rs->readNextStartElement()) {
+    if (rs->name() == "name") {
+      layer_nm = rs->readElementText();
+    } else if (rs->name() == "type") {
+      layer_type = static_cast<prim::Layer::LayerType>(
+        QMetaEnum::fromType<prim::Layer::LayerType>().keyToValue(
+          rs->readElementText().toStdString().c_str()));
+    } else if (rs->name() == "zoffset") {
+      zoffset = rs->readElementText().toFloat();
+    } else if (rs->name() == "zheight") {
+      zheight = rs->readElementText().toFloat();
+    } else if (rs->name() == "visible") {
+      layer_visible = (rs->readElementText() == "1") ? true : false;
+    } else if (rs->name() == "active") {
+      layer_active = (rs->readElementText() == "1") ? true : false;
+    } else {
+      qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2")
+          .arg(rs->lineNumber()).arg(rs->name().toString());
+      rs->skipCurrentElement();
+    }
+  }
+  // edit layer if it exists, create new otherwise
+  qDebug() << tr("Loading layer %1 with type %2").arg(layer_nm).arg(layer_type);
+  prim::Layer* load_layer = getLayer(layer_nm);
+  if (!load_layer) {
+    addLayer(layer_nm);
+    load_layer = getLayer(layers.count()-1);
+  }
+  load_layer->setContentType(layer_type);
+  load_layer->setZOffset(zoffset);
+  load_layer->setZHeight(zheight);
+  load_layer->setVisible(layer_visible);
+  load_layer->setActive(layer_active);
 }
 
 
 void gui::DesignPanel::loadDesign(QXmlStreamReader *rs)
 {
+  qDebug() << "Loading design";
   int layer_id=0;
-  //while ( !(rs->name() == "design" && rs->isEndElement()) && rs->readNextStartElement()) {
   while (rs->readNextStartElement()) {
     if (rs->name() == "layer") {
       // recursively populate layer with items
@@ -692,7 +629,7 @@ void gui::DesignPanel::loadDesign(QXmlStreamReader *rs)
       layer_id++;
     } else {
       qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
-      rs->readNext();
+      rs->skipCurrentElement();
     }
   }
 }
