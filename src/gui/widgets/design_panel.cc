@@ -518,33 +518,33 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream, bool for_sim)
   stream->writeEndElement(); // end design level
 }
 
-void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
+void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
 {
   // reset the design panel state
   resetDesignPanel();
 
-  // read from XML stream (children will be created recursively, add those children to stack)
-  while (stream->readNextStartElement()) {
+  // read from xml stream and hand nodes off to appropriate functions
+  while (rs->readNextStartElement()) {
     // read program flags
-    if (stream->name() == "program") {
+    if (rs->name() == "program") {
       // TODO implement
-      stream->skipCurrentElement();
-    } else if(stream->name() == "gui") {
-      loadGUIFlags(stream);
-    } else if(stream->name() == "layer_prop") {
-      loadLayerProps(stream);
-    } else if(stream->name() == "design") {
-      loadDesign(stream);
+      rs->skipCurrentElement();
+    } else if(rs->name() == "gui") {
+      loadGUIFlags(rs);
+    } else if(rs->name() == "layer_prop") {
+      loadLayerProps(rs);
+    } else if(rs->name() == "design") {
+      loadDesign(rs);
     } else {
-      qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2")
-          .arg(stream->lineNumber()).arg(stream->name().toString());
-      stream->skipCurrentElement();
+      qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2")
+          .arg(rs->lineNumber()).arg(rs->name().toString());
+      rs->skipCurrentElement();
     }
   }
 
   // show error if any
-  if(stream->hasError()){
-    qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
+  if(rs->hasError()){
+    qCritical() << tr("XML error: ") << rs->errorString().data();
   }
 }
 
@@ -559,6 +559,7 @@ void gui::DesignPanel::loadGUIFlags(QXmlStreamReader *rs)
     } else if (rs->name() == "scroll") {
       scroll_v = rs->attributes().value("x").toInt();
       scroll_h = rs->attributes().value("y").toInt();
+      // no text is being read so the current element has to be explicitly skipped
       rs->skipCurrentElement();
     } else {
       qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2")
@@ -597,7 +598,7 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs)
     } else if (rs->name() == "active") {
       layer_active = (rs->readElementText() == "1") ? true : false;
     } else {
-      qDebug() << QObject::tr("Design Panel: invalid element encountered on line %1 - %2")
+      qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2")
           .arg(rs->lineNumber()).arg(rs->name().toString());
       rs->skipCurrentElement();
     }
@@ -628,7 +629,8 @@ void gui::DesignPanel::loadDesign(QXmlStreamReader *rs)
       getLayer(layer_id)->loadItems(rs, scene);
       layer_id++;
     } else {
-      qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
+      qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2")
+          .arg(rs->lineNumber()).arg(rs->name().toString());
       rs->skipCurrentElement();
     }
   }
