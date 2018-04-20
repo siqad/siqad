@@ -42,7 +42,7 @@ make $multicore_compile FOR_OS=$FOR_OS
 echo "Building PoisSolver... $FOR_OS"
 cd $qmake_dir/src/phys/poissolver/PoisFFT
 FILE=$1     
-if [ ! -f /bin/gcc/poisfft.o ]; then
+if [ ! -f ./bin/gcc/poisfft.o ]; then
    cd src
    scons
    scons test
