@@ -47,6 +47,7 @@ fi
 make $multicore_compile FOR_OS=$FOR_OS
 
 # use qmake to create Make files for the GUI
+cd "$qmake_dir"
 echo "Running qmake..."
 $QMAKE_COMMAND "$qmake_dir"
 
