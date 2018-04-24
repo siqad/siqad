@@ -238,23 +238,20 @@ void SimVisualize::updateElecDistOptions()
 
 void SimVisualize::updateOptions()
 {
-  if(!show_job){
-    // TODO don't show any options
+  if (!show_job) {
+    // don't show any options
     qDebug() << tr("Job is null, exiting.");
-  }
-  else if(!show_job->isComplete()){
+  } else if (!show_job->isComplete()) {
     // TODO show that the job is not complete
-    // maybe also set this up to catch job completion signals, so when a job is complete this panel also updates?
+    // maybe also set this up to catch job completion signals, so when a job is complete this panel also updates
     qDebug() << tr("Job isn't complete, exiting. Job Name: %1").arg(show_job->name());
-  }
-  else{
+  } else {
     // group box showing details of the simulation
     text_job_engine->setText(show_job->engineName());
     text_job_start_time->setText(show_job->startTime().toString("yyyy-MM-dd HH:mm:ss"));
     text_job_end_time->setText(show_job->endTime().toString("yyyy-MM-dd HH:mm:ss"));
-      // name - button for rename
 
-    // TODO result type selector (not needed for now)
+    // TODO result type selector
     updateElecDistOptions();
     if(show_job->engineName() == "PoisSolver"){
       showPotPlot();
@@ -416,6 +413,8 @@ void SimVisualize::jobSelUpdate()
 
 void SimVisualize::distSelUpdate()
 {
+  if (show_job->elec_dists.isEmpty())
+    return;
   int elec_ind = slider_dist_sel->sliderPosition() - 1;
   text_dist_selected->setText(tr("%1/%2").arg(
       slider_dist_sel->value()).arg(show_job->elec_dists.size()));
