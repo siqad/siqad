@@ -162,20 +162,28 @@ QSettings* settings::GUISettings::m_defs()
   // dangling bond parameters
   S->setValue("dbdot/diameter_m", 1.5);                     // dot diameter
   S->setValue("dbdot/diameter_l", 2);                     // dot diameter
-  S->setValue("dbdot/publish_scale", 2);                  // scaling for publish mode
-  S->setValue("dbdot/edge_width", .1);                    // edge width rel. to diameter
+  S->setValue("dbdot/publish_scale", 1.8);                  // scaling for publish mode
+  S->setValue("dbdot/edge_width", .2);                    // edge width rel. to diameter
   S->setValue("dbdot/edge_col", QColor(255,255,255));     // edge color
-  S->setValue("dbdot/edge_col_sel", QColor(0, 100, 255)); // edge color (selected)
-  S->setValue("dbdot/edge_col_hovered", QColor(0, 100, 255)); // edge color (hovered)
-  S->setValue("dbdot/edge_col_pb", QColor(0, 100, 255, 0)); // edge color (publish mode)
+  S->setValue("dbdot/edge_col_sel", QColor(0,100,255)); // edge color (selected)
+  S->setValue("dbdot/edge_col_hovered", QColor(0,100,255)); // edge color (hovered)
+  S->setValue("dbdot/edge_col_pb", QColor(0,0,0,0)); // edge color (publish)
   S->setValue("dbdot/fill_col", QColor(200,200,200));     // dot fill color
   S->setValue("dbdot/fill_col_sel", QColor(150,150,150)); // dot fill color (selected)
   S->setValue("dbdot/fill_col_hovered", QColor(220,220,220)); // dot fill color (hovered)
-  S->setValue("dbdot/fill_col_pb", QColor(150,150,150)); // dot fill color (publish mode)
-  S->setValue("dbdot/fill_col_drv", QColor(0,255,0));   // dot fill color for driver dot (forced electron=1)
-  S->setValue("dbdot/fill_col_drv_sel", QColor(0,150,0));  // dot fill color for driver dot (forced electron=1)
-  S->setValue("dbdot/fill_col_drv_hovered", QColor(0,180,0));  // dot fill color for driver dot (forced electron=1)
-  S->setValue("dbdot/fill_col_drv_pb", QColor(0,255,0));  // dot fill color for driver dot (forced electron=1)
+  S->setValue("dbdot/fill_col_pb", QColor(150,150,150)); // dot fill color (publish)
+  S->setValue("dbdot/edge_col_drv", QColor(255,255,255));     // edge color
+  S->setValue("dbdot/edge_col_drv_sel", QColor(0, 100, 255)); // edge color (selected)
+  S->setValue("dbdot/edge_col_drv_hovered", QColor(0, 100, 255)); // edge color (hovered)
+  S->setValue("dbdot/edge_col_drv_pb", QColor(0, 100, 255, 255)); // edge color (publish mode)
+  S->setValue("dbdot/fill_col_drv", QColor(0,255,0));   // driver dot fill
+  S->setValue("dbdot/fill_col_drv_sel", QColor(0,150,0));  // drver dot fill selected
+  S->setValue("dbdot/fill_col_drv_hovered", QColor(0,180,0));  // driver dot fill hovered
+  S->setValue("dbdot/fill_col_drv_pb", QColor(0,255,0));  // driver dot fill color publish
+  S->setValue("dbdot/edge_col_elec", QColor(255,90,90));     // edge color
+  S->setValue("dbdot/edge_col_elec_sel", QColor(255,90,90)); // edge color (selected)
+  S->setValue("dbdot/edge_col_elec_hovered", QColor(255,90,90)); // edge color (hovered)
+  S->setValue("dbdot/edge_col_elec_pb", QColor(255,90,90)); // edge color (publish mode)
   S->setValue("dbdot/fill_col_elec", QColor(255,90,90));   // dot fill color for dot showing electron
   S->setValue("dbdot/fill_col_elec_sel", QColor(255,90,90));  // dot fill color for dot showing electron
   S->setValue("dbdot/fill_col_elec_hovered", QColor(255,90,90));  // dot fill color for dot showing electron

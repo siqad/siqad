@@ -21,6 +21,8 @@ prim::Item::StateColors prim::DBDot::fill_col;           // normal dbdot
 prim::Item::StateColors prim::DBDot::fill_col_driver;    // driver (forced polarization)
 prim::Item::StateColors prim::DBDot::fill_col_electron;  // contains electron
 prim::Item::StateColors prim::DBDot::edge_col;           // edge of the dbdot
+prim::Item::StateColors prim::DBDot::edge_col_driver;    // edge of the dbdot
+prim::Item::StateColors prim::DBDot::edge_col_electron;  // edge of the dbdot
 
 
 prim::DBDot::DBDot(int lay_id, prim::LatticeDot *src, int elec_in)
@@ -153,7 +155,7 @@ void prim::DBDot::setSource(prim::LatticeDot *src)
 
 QRectF prim::DBDot::boundingRect() const
 {
-  qreal width = diameter_l+edge_width;
+  qreal width = diameter+edge_width;
   if (display_mode == gui::ScreenshotMode)
     width *= publish_scale;
   return QRectF(-.5*width, -.5*width, width, width);
@@ -163,20 +165,24 @@ QRectF prim::DBDot::boundingRect() const
 void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
   QColor fill_col_state;
+  QColor edge_col_state;
   if ( (display_mode == gui::SimDisplayMode ||
         display_mode == gui::ScreenshotMode) &&
         show_elec > 0) {
     setFill(show_elec);
     diameter = diameter_l;
     fill_col_state = getCurrentStateColor(fill_col_electron);
+    edge_col_state = getCurrentStateColor(edge_col_electron);
   } else if (elec > 0) {
     setFill(1);
     diameter = diameter_m;
     fill_col_state = getCurrentStateColor(fill_col_driver);
+    edge_col_state = getCurrentStateColor(edge_col_driver);
   } else {
     setFill(1);
     diameter = diameter_m;
     fill_col_state = getCurrentStateColor(fill_col);
+    edge_col_state = getCurrentStateColor(edge_col);
   }
 
   qreal edge_width_paint = edge_width;
@@ -188,14 +194,15 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
 
 
   QRectF rect = boundingRect();
-  qreal dxy = .5*edge_width_paint;
-  rect.adjust(dxy,dxy,-dxy,-dxy);
+  //qreal dxy = .45*edge_width_paint;
+  //rect.adjust(dxy,dxy,-dxy,-dxy);
 
   // draw inner fill
   if(fill_fact>0){
     QPointF center = rect.center();
     QSizeF size(diameter_paint, diameter_paint);
-    rect.setSize(size*qSqrt(fill_fact));
+    rect.setSize(size*fill_fact);
+    //rect.setSize(size*qSqrt(fill_fact));
     rect.moveCenter(center);
 
     painter->setPen(Qt::NoPen);
@@ -204,8 +211,10 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
   }
 
   // draw outer circle
-  painter->setPen(QPen(getCurrentStateColor(edge_col), edge_width));
-  painter->drawEllipse(rect);
+  painter->setPen(QPen(edge_col_state, edge_width_paint));
+  painter->setBrush(Qt::NoBrush);
+  //painter->drawEllipse(rect);
+  painter->drawEllipse(boundingRect());
 }
 
 
@@ -255,10 +264,20 @@ void prim::DBDot::constructStatics()
   fill_col.hovered = gui_settings->get<QColor>("dbdot/fill_col_hovered");
   fill_col.publish = gui_settings->get<QColor>("dbdot/fill_col_pb");
 
+  edge_col_driver.normal = gui_settings->get<QColor>("dbdot/edge_col_drv");
+  edge_col_driver.selected = gui_settings->get<QColor>("dbdot/edge_col_drv_sel");
+  edge_col_driver.hovered = gui_settings->get<QColor>("dbdot/edge_col_drv_hovered");
+  edge_col_driver.publish = gui_settings->get<QColor>("dbdot/edge_col_drv_pb");
+
   fill_col_driver.normal = gui_settings->get<QColor>("dbdot/fill_col_drv");
   fill_col_driver.selected = gui_settings->get<QColor>("dbdot/fill_col_drv_sel");
   fill_col_driver.hovered = gui_settings->get<QColor>("dbdot/fill_col_drv_hovered");
   fill_col_driver.publish = gui_settings->get<QColor>("dbdot/fill_col_drv_pb");
+
+  edge_col_electron.normal = gui_settings->get<QColor>("dbdot/edge_col_elec");
+  edge_col_electron.selected = gui_settings->get<QColor>("dbdot/edge_col_elec_sel");
+  edge_col_electron.hovered = gui_settings->get<QColor>("dbdot/edge_col_elec_hovered");
+  edge_col_electron.publish = gui_settings->get<QColor>("dbdot/edge_col_elec_pb");
 
   fill_col_electron.normal = gui_settings->get<QColor>("dbdot/fill_col_elec");
   fill_col_electron.selected = gui_settings->get<QColor>("dbdot/fill_col_elec_sel");

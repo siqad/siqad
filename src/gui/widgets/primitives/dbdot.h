@@ -89,6 +89,8 @@ namespace prim{
     static prim::Item::StateColors fill_col_driver;    // driver (forced polarization)
     static prim::Item::StateColors fill_col_electron;  // contains electron
     static prim::Item::StateColors edge_col;           // edge of the dbdot
+    static prim::Item::StateColors edge_col_driver;    // edge of the dbdot
+    static prim::Item::StateColors edge_col_electron;  // edge of the dbdot
 
 
     qreal diameter;      // dot diameter in angstroms
