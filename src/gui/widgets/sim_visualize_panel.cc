@@ -232,6 +232,7 @@ void SimVisualize::updateElecDistOptions()
     slider_dist_sel->setMaximum(dist_count);
     slider_dist_sel->setValue(min_sel);
     text_dist_selected->setText(tr("%1/%2").arg(min_sel).arg(dist_count));
+    distSelUpdate();
   }
 }
 
