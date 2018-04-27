@@ -163,7 +163,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("dbdot/diameter_m", 1.5);                     // dot diameter
   S->setValue("dbdot/diameter_l", 2);                     // dot diameter
   S->setValue("dbdot/publish_scale", 1.8);                  // scaling for publish mode
-  S->setValue("dbdot/edge_width", .2);                    // edge width rel. to diameter
+  S->setValue("dbdot/edge_width", .15);                    // edge width rel. to diameter
   S->setValue("dbdot/edge_col", QColor(255,255,255));     // edge color
   S->setValue("dbdot/edge_col_sel", QColor(0,100,255)); // edge color (selected)
   S->setValue("dbdot/edge_col_hovered", QColor(0,100,255)); // edge color (hovered)
@@ -183,7 +183,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("dbdot/edge_col_elec", QColor(255,90,90));     // edge color
   S->setValue("dbdot/edge_col_elec_sel", QColor(255,90,90)); // edge color (selected)
   S->setValue("dbdot/edge_col_elec_hovered", QColor(255,90,90)); // edge color (hovered)
-  S->setValue("dbdot/edge_col_elec_pb", QColor(255,90,90)); // edge color (publish mode)
+  S->setValue("dbdot/edge_col_elec_pb", QColor(0,0,0)); // edge color (publish mode)
   S->setValue("dbdot/fill_col_elec", QColor(255,90,90));   // dot fill color for dot showing electron
   S->setValue("dbdot/fill_col_elec_sel", QColor(255,90,90));  // dot fill color for dot showing electron
   S->setValue("dbdot/fill_col_elec_hovered", QColor(255,90,90));  // dot fill color for dot showing electron
