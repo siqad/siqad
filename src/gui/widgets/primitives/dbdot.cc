@@ -103,6 +103,8 @@ void prim::DBDot::initDBDot(int lay_id, prim::LatticeDot *src, int elec_in)
   if(diameter_m<0)
     constructStatics();
 
+  diameter = diameter_m;
+
   // set dot location in pixels
   setSource(src);
 
