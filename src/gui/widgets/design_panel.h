@@ -249,7 +249,8 @@ namespace gui{
     // copy/paste
     QList<prim::Item*> clipboard;  // cached deep copy of a set of items for pasting
 
-    QStack<prim::Layer*> layers;  // stack of all layers, order immutable
+    QStack<prim::Layer*> layers;    // stack of all layers, order immutable
+    prim::Lattice *lattice=0;       // lattice for reference
     prim::Layer *top_layer=0;       // new items added to this layer
     prim::Layer *electrode_layer=0; // add electrodes to this layer
     prim::Layer *afm_layer=0;       // add afm paths to this layer TODO request layers from Layer Manager instead of keeping pointers like these

@@ -11,6 +11,7 @@
 #include "src/settings/settings.h"
 
 #include <QtMath>
+#include <QDialog>
 #include <algorithm>
 
 
@@ -26,6 +27,40 @@ prim::Lattice::Lattice(const QString &fname, int lay_id)
 }
 
 
+QPointF prim::Lattice::nearestSite(const QPointF &p)
+{
+  int n0[2];
+  qreal proj;
+  QPointF x = p/prim::Item::scale_factor;
+  qreal x2 = QPointF::dotProduct(x,x);
+
+  for(int i=0; i<2; i++){
+    proj = QPointF::dotProduct(x, a[i])/a2[i];
+    n0[i] = qFloor(proj - coth*qSqrt(x2/a2[i]-proj*proj));
+  }
+
+  qreal mdist = qMax(a2[0], a2[1]);         // nearest Manhattan length
+  QPointF mp;                               // nearest lattice site
+  for(int n=n0[0]-1; n<n0[0]+2; n++){
+    for(int m=n0[1]-1; m<n0[1]+2; m++){
+      QPointF x0 = n*a[0]+m*a[1];
+      for(const QPointF& dp : b){
+        QPointF temp = x0 + dp;
+        qreal dist = (temp-x).manhattanLength();
+        if(dist<mdist){
+          mdist = dist;
+          mp = temp;
+        }
+      }
+    }
+  }
+
+  //qDebug() << tr("Nearest Lattice Site: %1 :: %2").arg(mp.x()).arg(mp.y());
+
+  return mp;
+}
+
+
 void prim::Lattice::construct()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
@@ -35,8 +70,10 @@ void prim::Lattice::construct()
   n_cell = lattice_settings->get<int>("cell/N");
   for(int i=0;i<n_cell;i++)
     b.append(lattice_settings->get<QPointF>(QString("cell/b%1").arg(i+1)));
-  for(int i=0;i<2;i++)
+  for(int i=0;i<2;i++){
     a[i] = lattice_settings->get<QPointF>(QString("lattice/a%1").arg(i+1));
+    a2[i] = QPointF::dotProduct(a[i], a[i]);
+  }
 
   // construct bounds for lattice vectors
   qreal dx = qMax(qAbs(a[0].x()),qAbs(a[1].x()));
@@ -45,6 +82,9 @@ void prim::Lattice::construct()
 
   Lx = dx*nxy.x();
   Ly = dy*nxy.y();
+
+  qreal dtrm = a[0].x()*a[1].y() - a[0].y()*a[1].x();
+  coth = QPointF::dotProduct(a[0], a[1]) / dtrm;
 
   // find all lattice vector indices within the bounding region
   QList<QPoint> inds;

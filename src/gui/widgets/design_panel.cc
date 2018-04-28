@@ -353,7 +353,7 @@ void gui::DesignPanel::buildLattice(const QString &fname)
     removeLayer(0);
 
   // build the new lattice
-  prim::Lattice *lattice = new prim::Lattice(fname, layers.size());
+  lattice = new prim::Lattice(fname, layers.size());
 
   // add the lattice dots to the scene
   for(prim::Item *const item : lattice->getItems())
@@ -1626,9 +1626,10 @@ void gui::DesignPanel::copySelection()
 void gui::DesignPanel::snapDBPreview(QPointF scene_pos)
 {
   // don't need to recheck snap target unless the cursor has moved significantly
-  if(snap_target != 0 && (scene_pos-snap_cache).manhattanLength()<.1*snap_diameter)
+  if(snap_target != 0 && (scene_pos-snap_cache).manhattanLength()<.2*snap_diameter)
     return;
   snap_cache = scene_pos;
+  lattice->nearestSite(snap_cache);
 
   // get nearest lattice site to cursor position
   QRectF rect;

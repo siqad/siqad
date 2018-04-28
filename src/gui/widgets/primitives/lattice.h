@@ -26,6 +26,9 @@ namespace prim{
     //! destructor
     ~Lattice() {}
 
+    // identify the nearest lattice site to the given physical position
+    QPointF nearestSite(const QPointF &p);
+
   private:
 
     int layer_id;       // index of this layer in design panel's stack
@@ -37,6 +40,9 @@ namespace prim{
 
     qreal Lx;           // x-bound on lattice vectors, in Angstroms
     qreal Ly;           // y-bound on lattice vectors, in Angstroms
+
+    qreal coth;         // cotangent of angle between lattice vectors
+    qreal a2[2];        // square magnitudes of lattice vectors
 
     // construct lattice from lattice settings
     void construct();
