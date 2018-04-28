@@ -26,8 +26,8 @@ namespace prim{
     //! destructor
     ~Lattice() {}
 
-    // identify the nearest lattice site to the given physical position
-    QPointF nearestSite(const QPointF &p);
+    // identify the nearest lattice site to the given scene position
+    QPointF nearestSite(const QPointF &scene_pos);
 
   private:
 

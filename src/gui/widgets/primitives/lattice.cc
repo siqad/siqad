@@ -27,11 +27,11 @@ prim::Lattice::Lattice(const QString &fname, int lay_id)
 }
 
 
-QPointF prim::Lattice::nearestSite(const QPointF &p)
+QPointF prim::Lattice::nearestSite(const QPointF &scene_pos)
 {
   int n0[2];
   qreal proj;
-  QPointF x = p/prim::Item::scale_factor;
+  QPointF x = scene_pos/prim::Item::scale_factor;
   qreal x2 = QPointF::dotProduct(x,x);
 
   for(int i=0; i<2; i++){
@@ -57,7 +57,8 @@ QPointF prim::Lattice::nearestSite(const QPointF &p)
 
   //qDebug() << tr("Nearest Lattice Site: %1 :: %2").arg(mp.x()).arg(mp.y());
 
-  return mp;
+  return mp;                            // physical (angstrom) coords
+  //return mp*prim::Item::scale_factor;   // scene (pixel) coords
 }
 
 
