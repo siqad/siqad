@@ -1629,7 +1629,7 @@ void gui::DesignPanel::snapDBPreview(QPointF scene_pos)
   if(snap_target != 0 && (scene_pos-snap_cache).manhattanLength()<.2*snap_diameter)
     return;
   snap_cache = scene_pos;
-  lattice->nearestSite(snap_cache);
+  //lattice->nearestSite(snap_cache);
 
   // get nearest lattice site to cursor position
   QRectF rect;
