@@ -168,9 +168,11 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
 {
   QColor fill_col_state;
   QColor edge_col_state;
-  if ( (display_mode == gui::SimDisplayMode ||
-        display_mode == gui::ScreenshotMode) &&
-        show_elec > 0) {
+  if (display_mode == gui::SimDisplayMode ||
+      display_mode == gui::ScreenshotMode) {
+  //if ( (display_mode == gui::SimDisplayMode ||
+  //      display_mode == gui::ScreenshotMode) &&
+  //      show_elec > 0) {
     setFill(show_elec);
     diameter = diameter_l;
     fill_col_state = getCurrentStateColor(fill_col_electron);
