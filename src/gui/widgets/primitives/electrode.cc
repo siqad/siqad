@@ -173,12 +173,14 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
 
   // top left and bottom right locations
   ss->writeEmptyElement("dim");
-  ss->writeAttribute("x1", QString::number(std::min(point1.x(), point2.x())));
-  ss->writeAttribute("y1", QString::number(std::min(point1.y(), point2.y())));
-  ss->writeAttribute("x2", QString::number(std::max(point1.x(), point2.x())));
-  ss->writeAttribute("y2", QString::number(std::max(point1.y(), point2.y())));
+  ss->writeAttribute("x1", QString::number(std::min(point1.x(), point2.x())*1.0E-10/scale_factor));
+  ss->writeAttribute("y1", QString::number(std::min(point1.y(), point2.y())*1.0E-10/scale_factor));
+  ss->writeAttribute("x2", QString::number(std::max(point1.x(), point2.x())*1.0E-10/scale_factor));
+  ss->writeAttribute("y2", QString::number(std::max(point1.y(), point2.y())*1.0E-10/scale_factor));
   ss->writeTextElement("potential", QString::number(getPotential()));
   ss->writeTextElement("electrode_type", QString::number(electrode_type));
+  ss->writeTextElement("pixel_per_angstrom", QString::number(scale_factor*1.0E-10));
+
   // other attributes
   // ......
 
@@ -201,6 +203,8 @@ void prim::Electrode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
   // setpot(potential+1);
   // qDebug() << QObject::tr("mouse pos = %1, %2").arg(e->pos().x()).arg(e->pos().y());
   qDebug() << QObject::tr("Electrode potential: %1").arg(potential);
+  // qDebug() << QObject::tr("Width: %1 m").arg(1.0E-10*getWidth()/scale_factor);
+  // qDebug() << QObject::tr("Height: %1 m").arg(1.0E-10*getHeight()/scale_factor);
 
 }
 
