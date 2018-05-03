@@ -181,7 +181,7 @@ sim_afmmarcus.files = \
     $$PHYS_DIR/afmmarcus/hopping_animator.physeng \
     $$PHYS_DIR/afmmarcus/marcus_and_pois.physeng
 win32:  sim_afmmarcus.files += \
-    $$PHYS_DIR/afmmarcus/src/python/afmmarcus.exe
+    $$PHYS_DIR/afmmarcus/src/afmmarcus.exe
 !win32: sim_afmmarcus.files += \
     $$PHYS_DIR/afmmarcus/src/afmmarcus \
     $$PHYS_DIR/afmmarcus/src/python/afm.py \
