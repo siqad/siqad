@@ -4,12 +4,12 @@
 # Author: Jake Retallick
 #####################################################################
 
-CONFIG -= debug	# uncomment to exclude debugging symbols
+#CONFIG -= debug	# uncomment to exclude debugging symbols
 
 # support of c++ range-based loops
 CONFIG += c++11
-#CONFIG += debug
-CONFIG += release
+CONFIG += debug
+#CONFIG += release
 
 QT += core gui widgets svg printsupport uitools
 
