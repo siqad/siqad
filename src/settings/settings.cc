@@ -194,7 +194,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("latdot/edge_width", .08);                  // edge width rel. to diameter
   S->setValue("latdot/publish_scale", 2);                  // scaling for publish mode
   S->setValue("latdot/edge_col", QColor(255,255,255,70)); // edge color
-  S->setValue("latdot/edge_col_pb", QColor(0,0,0,100)); // edge color (publish mode)
+  S->setValue("latdot/edge_col_pb", QColor(0,0,0,70)); // edge color (publish mode)
   S->setValue("latdot/fill_col", QColor(0,0,0,0));        // fill color
   S->setValue("latdot/fill_col_pb", QColor(0,0,0,0));     // fill color (publish mode)
   S->setValue("latdot/inner_fill", .5);                   // inner fill factor
