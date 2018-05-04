@@ -2,10 +2,6 @@
 
 set -e
 
-# Use PyInstaller to build Windows Python binaries. Install the Windows 10 SDK to ensure
-# the dependencies are included.
-# pyinstaller -F -p "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64" -p "C:\Program Files\Python36\Lib\site-packages\scipy\extra-dll" --hidden-import "scipy._lib.messagestream" db-sim-connector.py
-
 # determine number of physical cores to use for compilation
 cpu_cores=$(grep "^core id" /proc/cpuinfo | sort -u | wc -l)
 multicore_compile="-j $cpu_cores"
