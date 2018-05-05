@@ -197,8 +197,14 @@ win32:  sim_afmmarcus.files += \
 sim_afmmarcus_stylesheets.path = $$EXEC_DIR/src/phys/afmmarcus/stylesheets
 sim_afmmarcus_stylesheets.files = \
     $$PHYS_DIR/afmmarcus/src/python/stylesheets/animator.qss
+sim_afmmarcus_data.path = $$EXEC_DIR/src/phys/afmmarcus/data
+sim_afmmarcus_data.files = \
+		$$PHYS_DIR/afmmarcus/src/python/data/TIBB_vs_H.dat \
+		$$PHYS_DIR/afmmarcus/src/python/data/TIBB_vs_R_d200pm.dat \
+		$$PHYS_DIR/afmmarcus/src/python/data/tip_DB_system.py
 INSTALLS += sim_afmmarcus
 INSTALLS += sim_afmmarcus_stylesheets
+INSTALLS += sim_afmmarcus_data
 
 # PoisSolver
 
