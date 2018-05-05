@@ -254,9 +254,9 @@ void SimVisualize::updateOptions()
 
     // TODO result type selector
     updateElecDistOptions();
-    if(show_job->engineName() == "PoisSolver"){
-      showPotPlot();
-    }
+    // if(show_job->engineName() == "PoisSolver"){
+    //   showPotPlot();
+    // }
 
 
     qDebug() << tr("Engine Name: %1").arg(show_job->engineName());

@@ -194,8 +194,13 @@ sim_afmmarcus.files = \
 INSTALLS += sim_afmmarcus
 
 # PoisSolver
+# linux: sim_poissolver.files += $$PHYS_DIR/poissolver/PoisFFT/bin/objs/poissolver
 
 sim_poissolver.path = $$EXEC_DIR/src/phys/poissolver
 sim_poissolver.files = $$PHYS_DIR/poissolver/poissolver.physeng
-linux: sim_poissolver.files += $$PHYS_DIR/poissolver/PoisFFT/bin/objs/poissolver
+linux: sim_poissolver.files += \
+		$$PHYS_DIR/poissolver/FEM/src/poissolver \
+		$$PHYS_DIR/poissolver/FEM/src/python/Poisson_3D.py \
+		$$PHYS_DIR/poissolver/FEM/src/python/mesh_writer_3D.py \
+		$$PHYS_DIR/poissolver/FEM/src/python/electrode_parser.py
 INSTALLS += sim_poissolver

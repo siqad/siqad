@@ -61,7 +61,7 @@ bool SimJob::invokeBinary()
     // template: `/path/to/binary /path/to/problem/file /path/to/result/file`
     sim_process->setProgram(engine->binaryPath());
   }
-
+  
   cml_arguments << problem_file_info.canonicalFilePath(); // problem file
   cml_arguments << resultFile();                          // result file
 
