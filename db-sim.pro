@@ -4,11 +4,12 @@
 # Author: Jake Retallick
 #####################################################################
 
-# CONFIG -= debug	# uncomment to exclude debugging symbols
+#CONFIG -= debug	# uncomment to exclude debugging symbols
 
 # support of c++ range-based loops
 CONFIG += c++11
 CONFIG += debug
+#CONFIG += release
 
 QT += core gui widgets svg printsupport uitools
 
@@ -24,11 +25,11 @@ INCLUDEPATH += .
 
 VERSION = 0.0.1
 DEFINES += APP_VERSION=\\\"0.0.1\\\"
-DEFINES += APPLICATION_NAME=\\\"Quasics\\\"
+DEFINES += APPLICATION_NAME=\\\"SiQAD\\\"
 DEFINES += ORGANIZATION_NAME=\\\"WalusLab\\\"
 
 QMAKE_TARGET_COMPANY = "WalusLab"
-QMAKE_TARGET_PRODUCT = "Quasics"
+QMAKE_TARGET_PRODUCT = "SiQAD"
 QMAKE_TARGET_DESCRIPTION = "A CAD tool that enables the creation and simulation of quantum dot networks"
 QMAKE_TARGET_COPYRIGHT = "GPLv3"
 
@@ -178,7 +179,9 @@ sim_afmmarcus.path = $$EXEC_DIR/src/phys/afmmarcus
 sim_afmmarcus.files = \
     $$PHYS_DIR/afmmarcus/afm_line_scan.physeng \
     $$PHYS_DIR/afmmarcus/hopping_animator.physeng \
-    $$PHYS_DIR/afmmarcus/marcus_and_pois.physeng
+    $$PHYS_DIR/afmmarcus/marcus_and_pois.physeng \
+win32:  sim_afmmarcus.files += \
+    $$PHYS_DIR/afmmarcus/src/afmmarcus.exe
 !win32: sim_afmmarcus.files += \
     $$PHYS_DIR/afmmarcus/src/afmmarcus \
     $$PHYS_DIR/afmmarcus/src/python/afm.py \
@@ -191,7 +194,17 @@ sim_afmmarcus.files = \
     $$PHYS_DIR/afmmarcus/src/python/marcus.py \
     $$PHYS_DIR/afmmarcus/src/python/model.py \
     $$PHYS_DIR/afmmarcus/src/python/tip_model.py
+sim_afmmarcus_stylesheets.path = $$EXEC_DIR/src/phys/afmmarcus/stylesheets
+sim_afmmarcus_stylesheets.files = \
+    $$PHYS_DIR/afmmarcus/src/python/stylesheets/animator.qss
+sim_afmmarcus_data.path = $$EXEC_DIR/src/phys/afmmarcus/data
+sim_afmmarcus_data.files = \
+		$$PHYS_DIR/afmmarcus/src/python/data/TIBB_vs_H.dat \
+		$$PHYS_DIR/afmmarcus/src/python/data/TIBB_vs_R_d200pm.dat \
+		$$PHYS_DIR/afmmarcus/src/python/data/tip_DB_system.py
 INSTALLS += sim_afmmarcus
+INSTALLS += sim_afmmarcus_stylesheets
+INSTALLS += sim_afmmarcus_data
 
 # PoisSolver
 # linux: sim_poissolver.files += $$PHYS_DIR/poissolver/PoisFFT/bin/objs/poissolver

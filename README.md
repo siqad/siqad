@@ -1,4 +1,4 @@
-# qsi-sim
+# SiQAD
 
 Simulation Tool for QSi's dangling bonds. There are two proposed contributions:
 

@@ -30,3 +30,4 @@ doxygen
 *.swp
 .qmake.stash
 tempfig.pdf
+.temp/

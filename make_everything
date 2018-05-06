@@ -13,10 +13,12 @@ qmake_dir=$(cd `dirname $0` && pwd)
 # figure out which qmake command to use
 if [ "$FOR_OS" == "win32" ]; then
     export FOR_OS
+    export PATH="$PATH:/usr/lib/mxe/usr/bin"
     QMAKE_COMMAND=i686-w64-mingw32.static-qmake-qt5
     make_flag=release
 elif [ "$FOR_OS" == "win64" ]; then
     export FOR_OS
+    export PATH="$PATH:/usr/lib/mxe/usr/bin"
     QMAKE_COMMAND=x86_64-w64-mingw32.static-qmake-qt5
     make_flag=release
 else
@@ -47,10 +49,11 @@ cd $qmake_dir/src/phys/poissolver/FEM/src
 make $multicore_compile FOR_OS=$FOR_OS
 
 # use qmake to create Make files for the GUI
-cd "$qmake_dir"
+cd "$make_dir"
 echo "Running qmake..."
 $QMAKE_COMMAND "$qmake_dir"
 
 # make the GUI and copy physics engine files over
 echo "Building GUI..."
-cd $make_dir && make $make_flag $multicore_compile install
+cd $make_dir && make $make_flag $multicore_compile
+make install
