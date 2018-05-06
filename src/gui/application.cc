@@ -101,8 +101,8 @@ void gui::ApplicationGUI::initGUI()
           this, &gui::ApplicationGUI::designPanelReset);
   connect(design_pan, &gui::DesignPanel::sig_undoStackCleanChanged,
           this, &gui::ApplicationGUI::updateWindowTitle);
-  // connect(sim_visualize, &gui::SimVisualize::showPotPlotOnScene,
-  //         design_pan, &gui::DesignPanel::displayPotentialPlot);
+  connect(sim_visualize, &gui::SimVisualize::showPotPlotOnScene,
+          design_pan, &gui::DesignPanel::displayPotentialPlot);
   connect(design_pan, SIGNAL(sig_screenshot(QRect)),
           this, SLOT(designScreenshot(QRect)));
   connect(design_pan, SIGNAL(sig_showSimulationSetup()),

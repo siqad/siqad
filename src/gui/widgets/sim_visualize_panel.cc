@@ -103,68 +103,70 @@ void SimVisualize::showPotPlot()
     val_vec.append((*iter)[2]);
     // qDebug() << tr("x: %1, y: %2, val: %3").arg((*iter)[0]).arg((*iter)[1]).arg((*iter)[2]);
   }
-  qDebug() << tr("QVectors filled. Size of vectors: %1").arg(x_vec.size());
+  if( x_vec.size() > 0){
+    qDebug() << tr("QVectors filled. Size of vectors: %1").arg(x_vec.size());
+    QCPColorMap *colorMap = new QCPColorMap(customPlot->xAxis, customPlot->yAxis);
+    int nx = qSqrt(x_vec.size());
+    int ny = qSqrt(y_vec.size());
+    colorMap->data()->setSize(nx, ny);
+    // qDebug() << tr("Setting colurMap");
+    // set range for x and y in pixels.
+    colorMap->data()->setRange(QCPRange(x_vec.first(), x_vec.last()), QCPRange(y_vec.first(), y_vec.last()));
 
-  QCPColorMap *colorMap = new QCPColorMap(customPlot->xAxis, customPlot->yAxis);
-  int nx = qSqrt(x_vec.size());
-  int ny = qSqrt(y_vec.size());
-  colorMap->data()->setSize(nx, ny);
-  // qDebug() << tr("Setting colurMap");
-  // set range for x and y in pixels.
-  colorMap->data()->setRange(QCPRange(x_vec.first(), x_vec.last()), QCPRange(y_vec.first(), y_vec.last()));
-
-  qDebug() << tr("fill colorMap");
-  // now we assign some data, by accessing the QCPColorMapData instance of the color map:
-  int x_ind, y_ind;
-  for (int i=0; i<nx; ++i){
-    for (int j=0; j<ny; ++j){
-      // get corresponding cell index from coordinate
-      // qDebug() << tr("i: %1, j: %2").arg(i).arg(j);
-      colorMap->data()->coordToCell(x_vec[i*nx + j], y_vec[i*nx + j], &x_ind, &y_ind);
-      colorMap->data()->setCell(x_ind, y_ind, val_vec[i*nx + j]);
+    qDebug() << tr("fill colorMap");
+    // now we assign some data, by accessing the QCPColorMapData instance of the color map:
+    int x_ind, y_ind;
+    for (int i=0; i<nx; ++i){
+      for (int j=0; j<ny; ++j){
+        // get corresponding cell index from coordinate
+        // qDebug() << tr("i: %1, j: %2").arg(i).arg(j);
+        colorMap->data()->coordToCell(x_vec[i*nx + j], y_vec[i*nx + j], &x_ind, &y_ind);
+        colorMap->data()->setCell(x_ind, y_ind, val_vec[i*nx + j]);
+      }
     }
+    qDebug() << tr("colorMap filled");
+
+    // configure axis rect:
+    // customPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom); // this will also allow rescaling the color scale by dragging/zooming
+    // customPlot->axisRect()->setupFullAxesBox(true);
+    // customPlot->xAxis->setLabel("x");
+    // customPlot->yAxis->setLabel("y");
+    // down on graph is increase in y.
+    customPlot->yAxis->setRangeReversed(true);
+
+    // add a color scale:
+    QCPColorScale *colorScale = new QCPColorScale(customPlot);
+    // customPlot->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
+    // colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
+    colorMap->setColorScale(colorScale); // associate the color map with the color scale
+    // colorScale->axis()->setLabel("Magnetic Field Strength");
+
+    // set the color gradient of the color map to one of the presets:
+    colorMap->setGradient(QCPColorGradient::gpPolar);
+
+    // rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
+    colorMap->rescaleDataRange();
+
+    // make sure the axis rect and color scale synchronize their bottom and top margins (so they line up):
+    // QCPMarginGroup *marginGroup = new QCPMarginGroup(customPlot);
+    // customPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+    // colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+
+    // rescale the key (x) and value (y) axes so the whole color map is visible:
+
+    customPlot->xAxis->setVisible(false);
+    customPlot->yAxis->setVisible(false);
+    customPlot->setContentsMargins(0,0,0,0);
+    customPlot->axisRect()->setAutoMargins(QCP::msNone);
+    customPlot->axisRect()->setMargins(QMargins(0,0,0,0));
+
+    customPlot->rescaleAxes();
+    QPixmap potential_plot = customPlot->toPixmap();
+    QRectF graph_container(QPointF(x_vec.first(),y_vec.first()), QPointF(x_vec.last(),y_vec.last()));
+    emit showPotPlotOnScene(potential_plot, graph_container);
+  } else {
+    qDebug() << tr("QVector size 0. Please see logs for more info.");  
   }
-  qDebug() << tr("colorMap filled");
-
-  // configure axis rect:
-  // customPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom); // this will also allow rescaling the color scale by dragging/zooming
-  // customPlot->axisRect()->setupFullAxesBox(true);
-  // customPlot->xAxis->setLabel("x");
-  // customPlot->yAxis->setLabel("y");
-  // down on graph is increase in y.
-  customPlot->yAxis->setRangeReversed(true);
-
-  // add a color scale:
-  QCPColorScale *colorScale = new QCPColorScale(customPlot);
-  // customPlot->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
-  // colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
-  colorMap->setColorScale(colorScale); // associate the color map with the color scale
-  // colorScale->axis()->setLabel("Magnetic Field Strength");
-
-  // set the color gradient of the color map to one of the presets:
-  colorMap->setGradient(QCPColorGradient::gpPolar);
-
-  // rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
-  colorMap->rescaleDataRange();
-
-  // make sure the axis rect and color scale synchronize their bottom and top margins (so they line up):
-  // QCPMarginGroup *marginGroup = new QCPMarginGroup(customPlot);
-  // customPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
-  // colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
-
-  // rescale the key (x) and value (y) axes so the whole color map is visible:
-
-  customPlot->xAxis->setVisible(false);
-  customPlot->yAxis->setVisible(false);
-  customPlot->setContentsMargins(0,0,0,0);
-  customPlot->axisRect()->setAutoMargins(QCP::msNone);
-  customPlot->axisRect()->setMargins(QMargins(0,0,0,0));
-
-  customPlot->rescaleAxes();
-  QPixmap potential_plot = customPlot->toPixmap();
-  QRectF graph_container(QPointF(x_vec.first(),y_vec.first()), QPointF(x_vec.last(),y_vec.last()));
-  emit showPotPlotOnScene(potential_plot, graph_container);
-
 }
 
 
@@ -254,9 +256,9 @@ void SimVisualize::updateOptions()
 
     // TODO result type selector
     updateElecDistOptions();
-    // if(show_job->engineName() == "PoisSolver"){
-    //   showPotPlot();
-    // }
+    if(show_job->engineName() == "PoisSolver"){
+      showPotPlot();
+    }
 
 
     qDebug() << tr("Engine Name: %1").arg(show_job->engineName());
