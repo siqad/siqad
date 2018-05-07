@@ -39,13 +39,6 @@ make $multicore_compile FOR_OS=$FOR_OS
 # make poissolver
 echo "Building PoisSolver... $FOR_OS"
 cd $qmake_dir/src/phys/poissolver/FEM/src
-# FILE=$1     
-# if [ ! -f ./bin/gcc/poisfft.o ]; then
-   # cd src
-   # scons
-   # scons test
-   # cd ..
-# fi
 make $multicore_compile FOR_OS=$FOR_OS
 
 # use qmake to create Make files for the GUI

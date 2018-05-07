@@ -207,7 +207,6 @@ INSTALLS += sim_afmmarcus_stylesheets
 INSTALLS += sim_afmmarcus_data
 
 # PoisSolver
-# linux: sim_poissolver.files += $$PHYS_DIR/poissolver/PoisFFT/bin/objs/poissolver
 
 sim_poissolver.path = $$EXEC_DIR/src/phys/poissolver
 sim_poissolver.files = $$PHYS_DIR/poissolver/poissolver.physeng
