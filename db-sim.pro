@@ -183,7 +183,8 @@ sim_afmmarcus.files = \
 win32:  sim_afmmarcus.files += \
     $$PHYS_DIR/afmmarcus/src/afmmarcus.exe
 !win32: sim_afmmarcus.files += \
-    $$PHYS_DIR/afmmarcus/src/afmmarcus \
+    $$PHYS_DIR/afmmarcus/src/afmmarcus
+sim_afmmarcus.files += \
     $$PHYS_DIR/afmmarcus/src/python/afm.py \
     $$PHYS_DIR/afmmarcus/src/python/animator.py \
     $$PHYS_DIR/afmmarcus/src/python/channel.py \
@@ -193,7 +194,8 @@ win32:  sim_afmmarcus.files += \
     $$PHYS_DIR/afmmarcus/src/python/lineview.py \
     $$PHYS_DIR/afmmarcus/src/python/marcus.py \
     $$PHYS_DIR/afmmarcus/src/python/model.py \
-    $$PHYS_DIR/afmmarcus/src/python/tip_model.py
+    $$PHYS_DIR/afmmarcus/src/python/tip_model.py \
+    $$PHYS_DIR/afmmarcus/src/python/pyqt_import.py
 sim_afmmarcus_stylesheets.path = $$EXEC_DIR/src/phys/afmmarcus/stylesheets
 sim_afmmarcus_stylesheets.files = \
     $$PHYS_DIR/afmmarcus/src/python/stylesheets/animator.qss
