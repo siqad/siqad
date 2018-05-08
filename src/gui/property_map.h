@@ -98,6 +98,9 @@ namespace gui{
     //! Read combo_options for a combo box
     void readComboOptions(Property *prop, int type_id, QXmlStreamReader *rs);
 
+    //! Write property map to XML stream
+    void writePropertiesToXMLStream(QXmlStreamWriter *ws);
+
     //! Convert value to specified type and return a QVariant containing that
     //! converted value. Give the type_id in terms of QMetaType's enum.
     static QVariant string2Type2QVariant(const QString &val, int type_id);

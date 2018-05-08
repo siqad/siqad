@@ -152,21 +152,22 @@ void SimManager::initSimSetupDialog()
 
   // Buttons
   button_run = new QPushButton(tr("&Run"));
-  //QPushButton *button_export = new QPushButton(tr("&Export"));
-  //QPushButton *button_import = new QPushButton(tr("&Import"));
+  button_save_as_default = new QPushButton(tr("Save as Default"));
+  // TODO drop down menu for reset to user default, reset to engine default
   button_cancel = new QPushButton(tr("Cancel"));
 
-  connect(button_run, &QAbstractButton::clicked, this, &gui::SimManager::submitSimSetup);
-  // TODO connect export and import buttons
-  connect(button_cancel, &QAbstractButton::clicked, sim_setup_dialog, &QWidget::hide);
+  connect(button_save_as_default, &QAbstractButton::clicked,
+          this, &gui::SimManager::saveSettingsAsDefault);
+  connect(button_run, &QAbstractButton::clicked,
+          this, &gui::SimManager::submitSimSetup);
+  connect(button_cancel, &QAbstractButton::clicked,
+          sim_setup_dialog, &QWidget::hide);
 
   button_cancel->setShortcut(tr("Esc"));
 
   bottom_buttons_hl = new QHBoxLayout;
   bottom_buttons_hl->addStretch(1);
   bottom_buttons_hl->addWidget(button_run);
-  //bottom_buttons_hl->addWidget(button_export);
-  //bottom_buttons_hl->addWidget(button_import);
   bottom_buttons_hl->addWidget(button_cancel);
 
 
@@ -257,6 +258,29 @@ void SimManager::submitSimSetup()
 
   addJob(new_job);
   emit emitSimJob(new_job);
+}
+
+
+void SimManager::saveSettingsAsDefault()
+{
+  QString write_path;
+  QFile write_file(write_path);
+
+  if (!write_file.open(QIODevice::WriteOnly)) {
+    qCritical() << tr("Export Simulation Settings: error when opening file to save");
+    return;
+  }
+  QXmlStreamWriter ws(&write_file);
+  qDebug() << tr("Export begin");
+  ws.setAutoFormatting(true);
+  ws.writeStartDocument();
+
+  ws.writeStartElement("properties");
+  curr_sim_params_form->finalProperties().writePropertiesToXMLStream(&ws);
+  ws.writeEndElement();
+
+  write_file.close();
+  qDebug() << tr("Export complete");
 }
 
 

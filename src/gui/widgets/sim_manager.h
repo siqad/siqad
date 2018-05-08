@@ -76,6 +76,7 @@ private:
   void updateEngineSelectionList();
   void updateJobNameDateTime();
   void submitSimSetup();
+  void saveSettingsAsDefault();
 
   void initEngines();
   bool exportSimProblem();          // generate problem XML
@@ -101,6 +102,7 @@ private:
   // button group
   QHBoxLayout *bottom_buttons_hl;
   QVBoxLayout *new_setup_dialog_l;
+  QPushButton *button_save_as_default;
   QPushButton *button_run;
   QPushButton *button_cancel;
 };
