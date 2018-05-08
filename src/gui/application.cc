@@ -866,7 +866,7 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   } else if (working_path.isEmpty() || flag==SaveAs) {
     save_dialog.setDefaultSuffix("qad");
     write_path = save_dialog.getSaveFileName(this, tr("Save File"),
-                  save_dir.filePath("new-db-layout.qad"), tr("QAD (*.qad);;All files (*.*)"));
+                  save_dir.filePath("new-db-layout.qad"), tr("QAD (*.qad);;XML (*.xml);;All files (*)"));
     if (write_path.isEmpty())
       return false;
   } else {
@@ -874,7 +874,8 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   }
 
   // add .xml extension if there isn't
-  if (!write_path.endsWith(".qad", Qt::CaseInsensitive))
+  if (! (write_path.endsWith(".qad", Qt::CaseInsensitive) ||
+        write_path.endsWith(".xml", Qt::CaseInsensitive)) )
     write_path.append(".qad");
 
   // set file name of [whatevername].writing while writing to prevent loss of previous save if this save fails
