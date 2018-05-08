@@ -104,11 +104,53 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
   scene->addItem(this);
 }
 
+// Resize according to given coordinates
+void prim::Electrode::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
+    bool update_handles)
+{
+  //setPos(scenePos() + QPointF(dx1, dy1));
+  prepareGeometryChange();
+  top_left += QPointF(dx1, dy1);
+  bot_right += QPointF(dx2, dy2);
+
+  // reverse change if user resizes past the other edge
+  if (top_left.x() > bot_right.x() ||
+      top_left.y() > bot_right.y()) {
+    top_left -= QPointF(dx1, dy1);
+    bot_right -= QPointF(dx2, dy2);
+  }
+
+  setPos(getTopLeft());
+  update();
+
+  if (update_handles && resize_frame)
+    resize_frame->updateHandlePositions();
+}
+
+QVariant prim::Electrode::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+  if (change == QGraphicsItem::ItemSelectedChange) {
+    if (value == true) {
+      if (!resize_frame) {
+        resize_frame = new prim::ResizeFrame(this);
+      }
+      resize_frame->setVisible(true);
+    } else {
+      if (resize_frame) {
+        resize_frame->setVisible(false);
+      }
+    }
+  }
+
+  return QGraphicsItem::itemChange(change, value);
+}
+
+
 void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point2_in, double potential_in, int electrode_type_in)
 {
   layer_id = lay_id;
-  point1 = point1_in;
-  point2 = point2_in;
+  QPointF point1 = point1_in;
+  QPointF point2 = point2_in;
   potential = potential_in;
   electrode_type = static_cast<prim::Electrode::ElectrodeType>(electrode_type_in);
   constructStatics();
@@ -116,6 +158,8 @@ void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point
 
   top_left.setX(std::min(point1.x(), point2.x()));
   top_left.setY(std::min(point1.y(), point2.y()));
+  bot_right.setX(std::max(point1.x(), point2.x()));
+  bot_right.setY(std::max(point1.y(), point2.y()));
   setZValue(-1);
   setPos(mapToScene(top_left).toPoint());
   // flags
@@ -159,7 +203,7 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
 prim::Item *prim::Electrode::deepCopy() const
 {
-  prim::Electrode *elec = new Electrode(layer_id, point1, point2);
+  prim::Electrode *elec = new Electrode(layer_id, top_left, bot_right);
   elec->setPos(pos());
   return elec;
 }
@@ -173,10 +217,10 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
 
   // top left and bottom right locations
   ss->writeEmptyElement("dim");
-  ss->writeAttribute("x1", QString::number(std::min(point1.x(), point2.x())));
-  ss->writeAttribute("y1", QString::number(std::min(point1.y(), point2.y())));
-  ss->writeAttribute("x2", QString::number(std::max(point1.x(), point2.x())));
-  ss->writeAttribute("y2", QString::number(std::max(point1.y(), point2.y())));
+  ss->writeAttribute("x1", QString::number(std::min(top_left.x(), bot_right.x())));
+  ss->writeAttribute("y1", QString::number(std::min(top_left.y(), bot_right.y())));
+  ss->writeAttribute("x2", QString::number(std::max(top_left.x(), bot_right.x())));
+  ss->writeAttribute("y2", QString::number(std::max(top_left.y(), bot_right.y())));
   ss->writeTextElement("potential", QString::number(getPotential()));
   ss->writeTextElement("electrode_type", QString::number(electrode_type));
   ss->writeTextElement("pixel_per_angstrom", QString::number(scale_factor));
@@ -216,8 +260,8 @@ void prim::Electrode::setPotential(double givenPotential)
 void prim::Electrode::updatePoints(QPointF offset)
 {
   //use after moving electrode with mouse. Graphic in correct place, but points need updating.
-  point1 += offset;
-  point2 += offset;
+  top_left += offset;
+  bot_right += offset;
 }
 
 void prim::Electrode::constructStatics() //needs to be changed to look at electrode settings instead.

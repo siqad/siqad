@@ -367,6 +367,7 @@ namespace gui{
     class MoveItem;         // move a single Item
 
     class CreateElectrode;  // create an electrode at the given points
+    class ResizeElectrode;    // resize an electrode
 
     class CreatePotPlot;  // create an electrode at the given points
 
@@ -398,6 +399,10 @@ namespace gui{
 
     // resize AFM Area
     void resizeAFMArea(prim::AFMArea *afm_area, const QRectF &orig_rect,
+        const QRectF &new_rect);
+
+    // resize electrode
+    void resizeElectrode(prim::Electrode *electrode, const QRectF &orig_rect,
         const QRectF &new_rect);
 
     // destroy AFM path and included nodes
@@ -562,7 +567,6 @@ namespace gui{
 
     QPointF point1;
     QPointF point2;
-
     bool invert;
 
     // internals
@@ -708,6 +712,33 @@ namespace gui{
     QRectF orig_rect;
     QRectF new_rect;
   };
+
+  class DesignPanel::ResizeElectrode : public QUndoCommand
+  {
+  public:
+    // resize the electrode from the original positions to the new positions
+    ResizeElectrode(int layer_index, DesignPanel *dp,
+        const QRectF &orig_rect, const QRectF &new_rect,
+        int electrode_index, bool invert=false, QUndoCommand *parent=0);
+
+    // resize from new to original positions
+    virtual void undo();
+
+    // resize from original to new positions
+    virtual void redo();
+
+  private:
+    bool invert;
+
+    int layer_index;
+    DesignPanel *dp;
+    int electrode_index; // the electrode's index in its layer
+    QPointF top_left_delta;
+    QPointF bot_right_delta;
+    QRectF orig_rect;
+    QRectF new_rect;
+  };
+
 
 
 } // end gui namespace
