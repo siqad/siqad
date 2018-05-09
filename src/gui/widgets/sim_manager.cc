@@ -157,7 +157,7 @@ void SimManager::initSimSetupDialog()
   // save or reset settings
   QAction *action_save_as_default = new QAction("Save as Default");
   QAction *action_reset_to_usr_default = new QAction("Reset to User Default");
-  QAction *action_reset_to_eng_default = new QAction("Reset to Engine Default");
+  QAction *action_reset_to_eng_default = new QAction("Reset to Engine Default (also deletes user default)");
   tb_save_as_default->setDefaultAction(action_save_as_default);
   tb_save_as_default->addAction(action_reset_to_usr_default);
   tb_save_as_default->addAction(action_reset_to_eng_default);
