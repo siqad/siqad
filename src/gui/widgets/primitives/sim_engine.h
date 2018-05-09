@@ -38,17 +38,28 @@ namespace prim{
     gui::PropertyMap sim_params_map;  // a property map containing all of the simulation parameters
 
     // ACCESSORS
+    QString descriptionFilePath() {return eng_desc_file;}
+    void setDescriptionFilePath(const QString &path) {eng_desc_file = path;}
+
+    QString userConfigurationFilePath() {return eng_usr_cfg_file;}
+
     QString name() {return eng_name;}
     void setName(const QString &nm) {eng_name = nm;}
+
     QString version() {return eng_version;}
     void setVersion(const QString &ver) {eng_version = ver;}
+
     QString runtimeInterpreter() {return runtime_interpreter;}
     void setRuntimeInterpreter(const QString &inter) {runtime_interpreter = inter;}
+
     QString binaryPath() {return bin_path;}
     void setBinaryPath(const QString &path) {bin_path = path;}
+
     QString runtimeTempDir();
-    void setLinkedScriptPath(const QString &path) {linked_script_path = path;}
+
     QString linkedScriptPath() {return linked_script_path;}
+    void setLinkedScriptPath(const QString &path) {linked_script_path = path;}
+
     QString paramDialogPath() {return param_dialog_path;}
     void setParamDialogPath(const QString &path) {param_dialog_path = path;}
 
@@ -59,6 +70,7 @@ namespace prim{
   private:
     // variables like binary location, temp file location, etc.
     QString eng_desc_file;      // description file of this engine
+    QString eng_usr_cfg_file;   // user default settings of this engine
     QString eng_name;           // name of this engine
     QString eng_root;           // root directory of this engine containing description and more
     QString eng_version;

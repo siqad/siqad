@@ -168,6 +168,7 @@ void SimManager::initSimSetupDialog()
   bottom_buttons_hl = new QHBoxLayout;
   bottom_buttons_hl->addStretch(1);
   bottom_buttons_hl->addWidget(button_run);
+  bottom_buttons_hl->addWidget(button_save_as_default);
   bottom_buttons_hl->addWidget(button_cancel);
 
 
@@ -193,12 +194,20 @@ void SimManager::updateSimParams()
 
   // add the property form of the currently selected engine
   QString curr_eng_name = combo_eng_sel->currentText();
-  PropertyMap sim_params_map = getEngine(curr_eng_name)->sim_params_map;
+  prim::SimEngine *curr_engine = getEngine(curr_eng_name);
+  PropertyMap sim_params_map = curr_engine->sim_params_map;
   if (!sim_params_map.isEmpty()) {
+    // update the map with user configurations
+    QString usr_cfg_file_path = curr_engine->userConfigurationFilePath();
+    if (QFileInfo::exists(usr_cfg_file_path))
+      sim_params_map.updateValuesFromXML(usr_cfg_file_path);
+
+    // create a property form with the map and show
     curr_sim_params_form = new PropertyForm(sim_params_map, this);
     curr_sim_params_form->show();
     sim_params_vl->addWidget(curr_sim_params_form);
   } else {
+    curr_sim_params_form = 0;
     sim_params_vl->addWidget(new QLabel("No simulation parameters available for this engine."));
   }
 
@@ -252,10 +261,6 @@ void SimManager::submitSimSetup()
   prim::SimJob *new_job = new prim::SimJob(le_job_nm->text(), curr_engine);
   new_job->addSimParams(curr_sim_params_form->finalProperties());
 
-  // engine
-    // auto filled in: job export path, job result path
-    // TODO option to change job export/result paths and option to keep the files after
-
   addJob(new_job);
   emit emitSimJob(new_job);
 }
@@ -263,20 +268,29 @@ void SimManager::submitSimSetup()
 
 void SimManager::saveSettingsAsDefault()
 {
-  QString write_path;
-  QFile write_file(write_path);
+  prim::SimEngine *curr_engine = getEngine(combo_eng_sel->currentIndex());
+
+  if (!curr_engine || !curr_sim_params_form) {
+    qCritical() << tr("Invalid engine selection or engine doesn't have parameters");
+    return;
+  }
+
+  QString usr_cfg_file_path = curr_engine->userConfigurationFilePath();
+  QFileInfo usr_cfg_file_inf(usr_cfg_file_path);
+  usr_cfg_file_inf.dir().mkpath(".");
+  QFile write_file(usr_cfg_file_path);
 
   if (!write_file.open(QIODevice::WriteOnly)) {
     qCritical() << tr("Export Simulation Settings: error when opening file to save");
     return;
   }
   QXmlStreamWriter ws(&write_file);
-  qDebug() << tr("Export begin");
+  qDebug() << tr("Beginning export to %1").arg(usr_cfg_file_path);
   ws.setAutoFormatting(true);
   ws.writeStartDocument();
 
   ws.writeStartElement("properties");
-  curr_sim_params_form->finalProperties().writePropertiesToXMLStream(&ws);
+  PropertyMap::writeValuesToXMLStream(curr_sim_params_form->finalProperties(), &ws);
   ws.writeEndElement();
 
   write_file.close();
