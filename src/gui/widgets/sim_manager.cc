@@ -39,15 +39,6 @@ void SimManager::showSimSetupDialog()
   updateJobNameDateTime();
 }
 
-void SimManager::newSimSetup()
-{
-  // TODO dialog with simulation parameter settings
-
-  // for now, just jump directly to export stage
-  exportSimProblem(); // todo: indicate path
-}
-
-
 bool SimManager::addJob(prim::SimJob *job)
 {
   if(!job)
@@ -96,7 +87,7 @@ void SimManager::initSimManager()
 
 void SimManager::initSimActionsPan()
 {
-  QPushButton *new_simulation = new QPushButton(tr("&New Simulation"));
+  /*QPushButton *new_simulation = new QPushButton(tr("&New Simulation"));
   QPushButton *close_button = new QPushButton(tr("Close"));
 
   connect(new_simulation, &QAbstractButton::clicked, this, &gui::SimManager::newSimSetup);
@@ -106,7 +97,7 @@ void SimManager::initSimActionsPan()
 
   sim_actions_pan->addWidget(new_simulation);
   sim_actions_pan->addWidget(close_button);
-  sim_actions_pan->addStretch(1);
+  sim_actions_pan->addStretch(1);*/
 }
 
 void SimManager::initSimSetupDialog()
@@ -152,25 +143,38 @@ void SimManager::initSimSetupDialog()
 
   // Buttons
   button_run = new QPushButton(tr("&Run"));
-  button_save_as_default = new QPushButton(tr("Save as Default"));
-  // TODO drop down menu for reset to user default, reset to engine default
   button_cancel = new QPushButton(tr("Cancel"));
+  button_cancel->setShortcut(tr("Esc"));
 
-  connect(button_save_as_default, &QAbstractButton::clicked,
-          this, &gui::SimManager::saveSettingsAsDefault);
+  QToolButton *tb_save_as_default = new QToolButton();
+  tb_save_as_default->setPopupMode(QToolButton::MenuButtonPopup);
+
   connect(button_run, &QAbstractButton::clicked,
           this, &gui::SimManager::submitSimSetup);
   connect(button_cancel, &QAbstractButton::clicked,
           sim_setup_dialog, &QWidget::hide);
 
-  button_cancel->setShortcut(tr("Esc"));
+  // save or reset settings
+  QAction *action_save_as_default = new QAction("Save as Default");
+  QAction *action_reset_to_usr_default = new QAction("Reset to User Default");
+  QAction *action_reset_to_eng_default = new QAction("Reset to Engine Default");
+  tb_save_as_default->setDefaultAction(action_save_as_default);
+  tb_save_as_default->addAction(action_reset_to_usr_default);
+  tb_save_as_default->addAction(action_reset_to_eng_default);
 
+  connect(action_save_as_default, &QAction::triggered,
+          this, &gui::SimManager::saveSettingsAsDefault);
+  connect(action_reset_to_usr_default, &QAction::triggered,
+          this, &gui::SimManager::resetToUserDefault);
+  connect(action_reset_to_eng_default, &QAction::triggered,
+          this, &gui::SimManager::resetToEngineDefault);
+
+  // layouts
   bottom_buttons_hl = new QHBoxLayout;
   bottom_buttons_hl->addStretch(1);
   bottom_buttons_hl->addWidget(button_run);
-  bottom_buttons_hl->addWidget(button_save_as_default);
   bottom_buttons_hl->addWidget(button_cancel);
-
+  bottom_buttons_hl->addWidget(tb_save_as_default);
 
   // Combine into one dialog
   new_setup_dialog_l = new QVBoxLayout;
@@ -298,6 +302,25 @@ void SimManager::saveSettingsAsDefault()
 }
 
 
+void SimManager::resetToUserDefault()
+{
+  updateSimParams();
+}
+
+
+void SimManager::resetToEngineDefault()
+{
+  prim::SimEngine *curr_engine = getEngine(combo_eng_sel->currentIndex());
+  QFile usr_cfg_file(curr_engine->userConfigurationFilePath());
+  if (usr_cfg_file.remove()) {
+    updateSimParams();
+    qDebug() << tr("Removed user config file");
+  } else {
+    qCritical() << tr("Failed to remove user config file");
+  }
+}
+
+
 void SimManager::initEngines()
 {
   QString engine_lib_dir_path = settings::AppSettings::instance()->getPath("phys/eng_lib_dir");
@@ -333,14 +356,6 @@ void SimManager::initEngines()
   }
 
   qDebug() << tr("Successfully read physics engine files");
-}
-
-bool SimManager::exportSimProblem()
-{
-  // call save function in application.cc with path going to appropriate directory (still need to finalize directory)
-  // returns whether export is successful
-  //return static_cast<gui::ApplicationGUI*>(parent())->saveToFile(parent()->SaveFlag::Simulation, "problem_export.xml"); // TODO change file name
-  return true;
 }
 
 } // end gui namespace
