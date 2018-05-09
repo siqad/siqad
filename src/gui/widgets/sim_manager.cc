@@ -39,15 +39,6 @@ void SimManager::showSimSetupDialog()
   updateJobNameDateTime();
 }
 
-void SimManager::newSimSetup()
-{
-  // TODO dialog with simulation parameter settings
-
-  // for now, just jump directly to export stage
-  exportSimProblem(); // todo: indicate path
-}
-
-
 bool SimManager::addJob(prim::SimJob *job)
 {
   if(!job)
@@ -96,7 +87,7 @@ void SimManager::initSimManager()
 
 void SimManager::initSimActionsPan()
 {
-  QPushButton *new_simulation = new QPushButton(tr("&New Simulation"));
+  /*QPushButton *new_simulation = new QPushButton(tr("&New Simulation"));
   QPushButton *close_button = new QPushButton(tr("Close"));
 
   connect(new_simulation, &QAbstractButton::clicked, this, &gui::SimManager::newSimSetup);
@@ -106,7 +97,7 @@ void SimManager::initSimActionsPan()
 
   sim_actions_pan->addWidget(new_simulation);
   sim_actions_pan->addWidget(close_button);
-  sim_actions_pan->addStretch(1);
+  sim_actions_pan->addStretch(1);*/
 }
 
 void SimManager::initSimSetupDialog()
@@ -152,23 +143,38 @@ void SimManager::initSimSetupDialog()
 
   // Buttons
   button_run = new QPushButton(tr("&Run"));
-  //QPushButton *button_export = new QPushButton(tr("&Export"));
-  //QPushButton *button_import = new QPushButton(tr("&Import"));
   button_cancel = new QPushButton(tr("Cancel"));
-
-  connect(button_run, &QAbstractButton::clicked, this, &gui::SimManager::submitSimSetup);
-  // TODO connect export and import buttons
-  connect(button_cancel, &QAbstractButton::clicked, sim_setup_dialog, &QWidget::hide);
-
   button_cancel->setShortcut(tr("Esc"));
 
+  QToolButton *tb_save_as_default = new QToolButton();
+  tb_save_as_default->setPopupMode(QToolButton::MenuButtonPopup);
+
+  connect(button_run, &QAbstractButton::clicked,
+          this, &gui::SimManager::submitSimSetup);
+  connect(button_cancel, &QAbstractButton::clicked,
+          sim_setup_dialog, &QWidget::hide);
+
+  // save or reset settings
+  QAction *action_save_as_default = new QAction("Save as Default");
+  QAction *action_reset_to_usr_default = new QAction("Reset to User Default");
+  QAction *action_reset_to_eng_default = new QAction("Reset to Engine Default (also deletes user default)");
+  tb_save_as_default->setDefaultAction(action_save_as_default);
+  tb_save_as_default->addAction(action_reset_to_usr_default);
+  tb_save_as_default->addAction(action_reset_to_eng_default);
+
+  connect(action_save_as_default, &QAction::triggered,
+          this, &gui::SimManager::saveSettingsAsDefault);
+  connect(action_reset_to_usr_default, &QAction::triggered,
+          this, &gui::SimManager::resetToUserDefault);
+  connect(action_reset_to_eng_default, &QAction::triggered,
+          this, &gui::SimManager::resetToEngineDefault);
+
+  // layouts
   bottom_buttons_hl = new QHBoxLayout;
   bottom_buttons_hl->addStretch(1);
   bottom_buttons_hl->addWidget(button_run);
-  //bottom_buttons_hl->addWidget(button_export);
-  //bottom_buttons_hl->addWidget(button_import);
   bottom_buttons_hl->addWidget(button_cancel);
-
+  bottom_buttons_hl->addWidget(tb_save_as_default);
 
   // Combine into one dialog
   new_setup_dialog_l = new QVBoxLayout;
@@ -192,12 +198,20 @@ void SimManager::updateSimParams()
 
   // add the property form of the currently selected engine
   QString curr_eng_name = combo_eng_sel->currentText();
-  PropertyMap sim_params_map = getEngine(curr_eng_name)->sim_params_map;
+  prim::SimEngine *curr_engine = getEngine(curr_eng_name);
+  PropertyMap sim_params_map = curr_engine->sim_params_map;
   if (!sim_params_map.isEmpty()) {
+    // update the map with user configurations
+    QString usr_cfg_file_path = curr_engine->userConfigurationFilePath();
+    if (QFileInfo::exists(usr_cfg_file_path))
+      sim_params_map.updateValuesFromXML(usr_cfg_file_path);
+
+    // create a property form with the map and show
     curr_sim_params_form = new PropertyForm(sim_params_map, this);
     curr_sim_params_form->show();
     sim_params_vl->addWidget(curr_sim_params_form);
   } else {
+    curr_sim_params_form = 0;
     sim_params_vl->addWidget(new QLabel("No simulation parameters available for this engine."));
   }
 
@@ -251,12 +265,59 @@ void SimManager::submitSimSetup()
   prim::SimJob *new_job = new prim::SimJob(le_job_nm->text(), curr_engine);
   new_job->addSimParams(curr_sim_params_form->finalProperties());
 
-  // engine
-    // auto filled in: job export path, job result path
-    // TODO option to change job export/result paths and option to keep the files after
-
   addJob(new_job);
   emit emitSimJob(new_job);
+}
+
+
+void SimManager::saveSettingsAsDefault()
+{
+  prim::SimEngine *curr_engine = getEngine(combo_eng_sel->currentIndex());
+
+  if (!curr_engine || !curr_sim_params_form) {
+    qCritical() << tr("Invalid engine selection or engine doesn't have parameters");
+    return;
+  }
+
+  QString usr_cfg_file_path = curr_engine->userConfigurationFilePath();
+  QFileInfo usr_cfg_file_inf(usr_cfg_file_path);
+  usr_cfg_file_inf.dir().mkpath(".");
+  QFile write_file(usr_cfg_file_path);
+
+  if (!write_file.open(QIODevice::WriteOnly)) {
+    qCritical() << tr("Export Simulation Settings: error when opening file to save");
+    return;
+  }
+  QXmlStreamWriter ws(&write_file);
+  qDebug() << tr("Beginning export to %1").arg(usr_cfg_file_path);
+  ws.setAutoFormatting(true);
+  ws.writeStartDocument();
+
+  ws.writeStartElement("properties");
+  PropertyMap::writeValuesToXMLStream(curr_sim_params_form->finalProperties(), &ws);
+  ws.writeEndElement();
+
+  write_file.close();
+  qDebug() << tr("Export complete");
+}
+
+
+void SimManager::resetToUserDefault()
+{
+  updateSimParams();
+}
+
+
+void SimManager::resetToEngineDefault()
+{
+  prim::SimEngine *curr_engine = getEngine(combo_eng_sel->currentIndex());
+  QFile usr_cfg_file(curr_engine->userConfigurationFilePath());
+  if (usr_cfg_file.remove()) {
+    updateSimParams();
+    qDebug() << tr("Removed user config file");
+  } else {
+    qCritical() << tr("Failed to remove user config file");
+  }
 }
 
 
@@ -295,14 +356,6 @@ void SimManager::initEngines()
   }
 
   qDebug() << tr("Successfully read physics engine files");
-}
-
-bool SimManager::exportSimProblem()
-{
-  // call save function in application.cc with path going to appropriate directory (still need to finalize directory)
-  // returns whether export is successful
-  //return static_cast<gui::ApplicationGUI*>(parent())->saveToFile(parent()->SaveFlag::Simulation, "problem_export.xml"); // TODO change file name
-  return true;
 }
 
 } // end gui namespace

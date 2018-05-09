@@ -38,7 +38,6 @@ public:
   void showSimSetupDialog();
 
   // manager actions
-  void newSimSetup();               // walks user through simulation setup
   bool addJob(prim::SimJob *job);   // add a simulation job
 
   // ACCESSORS
@@ -77,8 +76,12 @@ private:
   void updateJobNameDateTime();
   void submitSimSetup();
 
+  // save or reset engine settings
+  void saveSettingsAsDefault();
+  void resetToUserDefault();
+  void resetToEngineDefault();
+
   void initEngines();
-  bool exportSimProblem();          // generate problem XML
 
   // dialogs
   QWidget *sim_manager_dialog;

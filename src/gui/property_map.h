@@ -98,6 +98,13 @@ namespace gui{
     //! Read combo_options for a combo box
     void readComboOptions(Property *prop, int type_id, QXmlStreamReader *rs);
 
+    //! Update property values from provided XML file path. Keys that don't exist
+    //! in this map are ignored.
+    void updateValuesFromXML(const QString &fname);
+
+    //! Write only property map values to XML stream
+    static void writeValuesToXMLStream(const PropertyMap &map, QXmlStreamWriter *ws);
+
     //! Convert value to specified type and return a QVariant containing that
     //! converted value. Give the type_id in terms of QMetaType's enum.
     static QVariant string2Type2QVariant(const QString &val, int type_id);
