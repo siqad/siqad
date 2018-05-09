@@ -33,6 +33,31 @@ prim::Item::Item(ItemType type, int lay_id, QGraphicsItem *parent)
 }
 
 
+enum ItemType{Aggregate, DBDot, LatticeDot, Ghost, GhostDot, Text,
+    Electrode, GhostBox, AFMArea, AFMPath, AFMNode, AFMSeg, PotPlot,
+    ResizeFrame, ResizeHandle};
+
+QString prim::Item::getQStringItemType()
+{
+  switch (item_type) {
+    case prim::Item::Aggregate: return "Aggregate";
+    case prim::Item::DBDot: return "DBDot";
+    case prim::Item::LatticeDot: return "LatticeDot";
+    case prim::Item::Ghost: return "Ghost";
+    case prim::Item::GhostDot: return "GhostDot";
+    case prim::Item::Electrode: return "Electrode";
+    case prim::Item::GhostBox: return "GhostBox";
+    case prim::Item::AFMArea: return "AFMArea";
+    case prim::Item::AFMPath: return "AFMPath";
+    case prim::Item::AFMNode: return "AFMNode";
+    case prim::Item::AFMSeg: return "AFMSeg";
+    case prim::Item::PotPlot: return "PotPlot";
+    case prim::Item::ResizeFrame: return "ResizeFrame";
+    case prim::Item::ResizeHandle: return "ResizeHandle";
+    default: return "Erroneous Item";
+  }
+
+}
 
 bool prim::Item::upSelected()
 {

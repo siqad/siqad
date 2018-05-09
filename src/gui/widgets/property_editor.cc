@@ -26,7 +26,7 @@ void PropertyEditor::showForms(QList<prim::Item*> target_items)
       continue;
     }
     form_item_pair.append(qMakePair(new PropertyForm(item->properties(), this), item));
-    form_tab_widget->addTab(form_item_pair.back().first, "TODO item class name");
+    form_tab_widget->addTab(form_item_pair.back().first, item->getQStringItemType());
   }
   show();
 }

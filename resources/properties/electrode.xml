@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties>
+  <potential>
+    <T>float</T>
+    <val>0.0</val>
+    <label>Potential</label>
+    <tip>Electric potential to set on the electrode during simulation.</tip>
+  </potential>
+</properties>

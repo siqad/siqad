@@ -59,6 +59,9 @@ namespace prim{
     //! true if the item or its parent has been seleted, recursive to highest level parent
     bool upSelected();
 
+    //! returns the item type as a QString
+    QString getQStringItemType();
+
     //! set hovered state
     void setHovered(bool flag) {hovered = flag;}
     //! get hovered state

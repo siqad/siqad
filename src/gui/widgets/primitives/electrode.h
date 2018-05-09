@@ -65,6 +65,8 @@ namespace prim{
 
     // saving to design
     virtual void saveItems(QXmlStreamWriter *) const override;
+    //! Return the class default property map
+    virtual gui::PropertyMap *classPropertyMap() override {return &default_class_properties;}
 
   protected:
 
@@ -72,12 +74,14 @@ namespace prim{
     virtual QVariant itemChange(GraphicsItemChange change,
         const QVariant &value) Q_DECL_OVERRIDE;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
-    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
+    // virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
   private:
     // construct static variables
     void constructStatics();
 
+    // properties of this item class
+    static gui::PropertyMap default_class_properties; //! Default properties for this class
     // VARIABLES
     // QPointF point1;
     // QPointF point2;

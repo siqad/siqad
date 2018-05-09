@@ -13,8 +13,8 @@
 
 
 // Initialize statics
+gui::PropertyMap prim::Electrode::default_class_properties;
 qreal prim::Electrode::edge_width = -1;
-
 QColor prim::Electrode::edge_col;
 QColor prim::Electrode::fill_col;
 QColor prim::Electrode::selected_col; // edge colour, selected
@@ -235,19 +235,23 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
   switch(e->buttons()){
     default:
+      qDebug() << "should be showing property form.";
+      prim::Emitter::instance()->sig_showProperty(this);
       prim::Item::mousePressEvent(e);
+      setPotential(getProperty("potential").value.toFloat());
+      qDebug() << QObject::tr("Electrode potential set to: %1").arg(potential);
       break;
   }
 }
 
-void prim::Electrode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
-{
-  // qDebug() << QObject::tr("Electrode has seen the mouseDoubleClickEvent");
-  //do something here to manipulate potential. Maybe dialog box?
-  // setpot(potential+1);
-  // qDebug() << QObject::tr("mouse pos = %1, %2").arg(e->pos().x()).arg(e->pos().y());
-  qDebug() << QObject::tr("Electrode potential: %1").arg(potential);
-}
+// void prim::Electrode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
+// {
+//   // qDebug() << QObject::tr("Electrode has seen the mouseDoubleClickEvent");
+//   //do something here to manipulate potential. Maybe dialog box?
+//   // setpot(potential+1);
+//   // qDebug() << QObject::tr("mouse pos = %1, %2").arg(e->pos().x()).arg(e->pos().y());
+//   // qDebug() << QObject::tr("Electrode potential: %1").arg(potential);
+// }
 
 void prim::Electrode::setPotential(double givenPotential)
 {
@@ -266,6 +270,9 @@ void prim::Electrode::updatePoints(QPointF offset)
 
 void prim::Electrode::constructStatics() //needs to be changed to look at electrode settings instead.
 {
+  
+  default_class_properties.readPropertiesFromXML(":/properties/electrode.xml");
+
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   edge_width = gui_settings->get<qreal>("electrode/edge_width");
   edge_col= gui_settings->get<QColor>("electrode/edge_col");
