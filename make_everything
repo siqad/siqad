@@ -50,3 +50,18 @@ $QMAKE_COMMAND "$qmake_dir"
 echo "Building GUI..."
 cd $make_dir && make $make_flag $multicore_compile
 make install
+
+
+# extra actions if building for Windows
+if [ "$FOR_OS" == "win64" ] || [ "$FOR_OF" == "win32" ] ; then
+    cd "$make_dir/build/release/"
+    rm -rf .moc .obj .qrc
+
+    cd "$make_dir/build/release/src/phys/"
+    rm -rf poissolver
+    sed -i 's/<\/bin_path>/\.exe&/' ./simanneal/sim_anneal.physeng
+    sed -i 's/<\/bin_path>/\.exe&/' ./afmmarcus/hopping_animator.physeng
+
+    cd "$make_dir/build/"
+    zip -r "siqad_64.zip" "release"
+fi
