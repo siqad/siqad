@@ -146,8 +146,8 @@ void SimManager::initSimSetupDialog()
   button_cancel = new QPushButton(tr("Cancel"));
   button_cancel->setShortcut(tr("Esc"));
 
-  QToolButton *tb_save_as_default = new QToolButton();
-  tb_save_as_default->setPopupMode(QToolButton::MenuButtonPopup);
+  QToolButton *tb_more = new QToolButton();
+  tb_more->setPopupMode(QToolButton::InstantPopup);
 
   connect(button_run, &QAbstractButton::clicked,
           this, &gui::SimManager::submitSimSetup);
@@ -155,12 +155,20 @@ void SimManager::initSimSetupDialog()
           sim_setup_dialog, &QWidget::hide);
 
   // save or reset settings
+  //QAction *action_more = new QAction("More");
+  QMenu *menu_more = new QMenu("More");
   QAction *action_save_as_default = new QAction("Save as Default");
   QAction *action_reset_to_usr_default = new QAction("Reset to User Default");
   QAction *action_reset_to_eng_default = new QAction("Reset to Engine Default (also deletes user default)");
-  tb_save_as_default->setDefaultAction(action_save_as_default);
-  tb_save_as_default->addAction(action_reset_to_usr_default);
-  tb_save_as_default->addAction(action_reset_to_eng_default);
+  tb_more->setText("Save/Reset");
+  tb_more->setMenu(menu_more);
+  menu_more->addAction(action_save_as_default);
+  menu_more->addAction(action_reset_to_usr_default);
+  menu_more->addAction(action_reset_to_eng_default);
+  /*tb_more->setDefaultAction(action_more);
+  tb_more->addAction(action_save_as_default);
+  tb_more->addAction(action_reset_to_usr_default);
+  tb_more->addAction(action_reset_to_eng_default);*/
 
   connect(action_save_as_default, &QAction::triggered,
           this, &gui::SimManager::saveSettingsAsDefault);
@@ -174,7 +182,7 @@ void SimManager::initSimSetupDialog()
   bottom_buttons_hl->addStretch(1);
   bottom_buttons_hl->addWidget(button_run);
   bottom_buttons_hl->addWidget(button_cancel);
-  bottom_buttons_hl->addWidget(tb_save_as_default);
+  bottom_buttons_hl->addWidget(tb_more);
 
   // Combine into one dialog
   new_setup_dialog_l = new QVBoxLayout;
@@ -313,11 +321,11 @@ void SimManager::resetToEngineDefault()
   prim::SimEngine *curr_engine = getEngine(combo_eng_sel->currentIndex());
   QFile usr_cfg_file(curr_engine->userConfigurationFilePath());
   if (usr_cfg_file.remove()) {
-    updateSimParams();
     qDebug() << tr("Removed user config file");
   } else {
-    qCritical() << tr("Failed to remove user config file");
+    qDebug() << tr("No user config file to remove");
   }
+  updateSimParams();
 }
 
 
