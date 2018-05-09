@@ -85,7 +85,7 @@ void gui::DesignPanel::initDesignPanel() {
 
   // color scheme
   QColor col;
-  setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col")));
+  //setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col")));
   setFrameShadow(QFrame::Raised);
 
   setCacheMode(QGraphicsView::CacheBackground);
@@ -354,6 +354,7 @@ void gui::DesignPanel::buildLattice(const QString &fname)
 
   // build the new lattice
   lattice = new prim::Lattice(fname, layers.size());
+  scene->setBackgroundBrush(QBrush(QImage(lattice->tileableLatticeImage())));
 
   // add the lattice dots to the scene
   for(prim::Item *const item : lattice->getItems())
@@ -468,15 +469,10 @@ void gui::DesignPanel::setDisplayMode(DisplayMode mode)
   display_mode = mode;
   prim::Item::display_mode = mode;
 
-  /*settings::GUISettings *gui_settings = settings::GUISettings::instance();
-  if (mode == gui::ScreenshotMode)
-    setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col_hc")));
-  else
-    setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col")));*/
-  if (mode == gui::ScreenshotMode)
+  /*if (mode == gui::ScreenshotMode)
     setBackgroundBrush(QBrush(background_col_publish));
   else
-    setBackgroundBrush(QBrush(background_col));
+    setBackgroundBrush(QBrush(background_col));*/
 }
 
 

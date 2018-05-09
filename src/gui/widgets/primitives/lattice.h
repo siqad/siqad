@@ -26,11 +26,14 @@ namespace prim{
     //! destructor
     ~Lattice() {}
 
-    // identify the nearest lattice site to the given scene position
+    //! identify the nearest lattice site to the given scene position
     QPointF nearestSite(const QPointF &scene_pos);
 
-    // identify the bounding rect of an approximately rectangular supercell
+    //! identify the bounding rect of an approximately rectangular supercell
     QRectF tileApprox();
+
+    //! Return a tileable image that represents the lattice.
+    QImage tileableLatticeImage();
 
   private:
 

@@ -84,6 +84,20 @@ QRectF prim::Lattice::tileApprox()
 }
 
 
+QImage prim::Lattice::tileableLatticeImage()
+{
+  QImage background_img(QSize(
+            QSizeF(tileApprox().size()*prim::Item::scale_factor).toSize()),
+            QImage::Format_ARGB32);
+  QPainter painter(&background_img);
+  painter.setBrush(Qt::NoBrush);
+  painter.setPen(Qt::red);
+  painter.drawEllipse(0, 0, 10, 10);
+  painter.end();
+  return background_img;
+}
+
+
 void prim::Lattice::construct()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
