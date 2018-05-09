@@ -15,6 +15,9 @@
 #include <algorithm>
 
 
+qreal prim::Lattice::rtn_acc = 1e-3;
+int prim::Lattice::rtn_iters = 1;
+
 prim::Lattice::Lattice(const QString &fname, int lay_id)
   : Layer(tr("Lattice"),Layer::Lattice,0)
 {
@@ -24,6 +27,7 @@ prim::Lattice::Lattice(const QString &fname, int lay_id)
   //   settings::LatticeSettings::updateLattice(fname);
 
   construct();
+  //tileApprox();
 }
 
 
@@ -59,6 +63,24 @@ QPointF prim::Lattice::nearestSite(const QPointF &scene_pos)
 
   return mp;                            // physical (angstrom) coords
   //return mp*prim::Item::scale_factor;   // scene (pixel) coords
+}
+
+
+QRectF prim::Lattice::tileApprox()
+{
+  qreal r = QPointF::dotProduct(a[0], a[1])/QPointF::dotProduct(a[0], a[0]);
+  QPair<int,int> frac = rationalize(r);
+
+  qDebug() << tr("Lattice skew: %1 :: ( %2 / %3 )").arg(r).arg(frac.first).arg(frac.second);
+  qreal height = qSqrt(QPointF::dotProduct(a[0], a[0]));
+  QPointF v = frac.first*a[0] - frac.second*a[1];
+  qreal width = qSqrt(QPointF::dotProduct(v,v));
+
+  QRectF rect(0,0,width,height);
+
+  qDebug() << tr("Width: %1 :: Height: %2").arg(width).arg(height);
+
+  return rect;
 }
 
 
@@ -176,4 +198,26 @@ void prim::Lattice::buildUnitCell(const QPoint &ind)
     dot->setFlag(QGraphicsItem::ItemIsSelectable, true);
     addItem(dot);
   }
+}
+
+
+QPair<int,int> prim::Lattice::rationalize(qreal x, int k)
+{
+  int n = qFloor(x);
+  qreal r = x - n;
+
+  qDebug() << tr("%1 :: %2 :: %3").arg(x).arg(n).arg(r);
+  QPair<int,int> pair;
+
+  if ( r < rtn_acc || k == rtn_iters ){
+    pair.first = n;
+    pair.second = 1;
+  }
+  else{
+    QPair<int,int> other = rationalize(1./r, k+1);
+    pair.first = other.first*n+other.second;
+    pair.second = other.first;
+  }
+
+  return pair;
 }

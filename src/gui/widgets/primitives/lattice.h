@@ -29,6 +29,9 @@ namespace prim{
     // identify the nearest lattice site to the given scene position
     QPointF nearestSite(const QPointF &scene_pos);
 
+    // identify the bounding rect of an approximately rectangular supercell
+    QRectF tileApprox();
+
   private:
 
     int layer_id;       // index of this layer in design panel's stack
@@ -44,6 +47,11 @@ namespace prim{
     qreal coth;         // cotangent of angle between lattice vectors
     qreal a2[2];        // square magnitudes of lattice vectors
 
+    // constants
+
+    static qreal rtn_acc; // termination precision for rationalize
+    static int rtn_iters;    // max iterations of rationalize
+
     // construct lattice from lattice settings
     void construct();
 
@@ -56,6 +64,9 @@ namespace prim{
     // construct the lattice dots for the unit cell corresponding to the given
     // lattice vector indices
     void buildUnitCell(const QPoint &ind);
+
+    // Find a rational approximation of a given float
+    QPair<int,int> rationalize(qreal x, int k=0);
   };
 
 } // end prim namespace
