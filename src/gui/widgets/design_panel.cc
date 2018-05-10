@@ -415,6 +415,9 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
   // reset selected items
   scene->clearSelection();
 
+  // destroy DB previews
+  destroyDBPreviews();
+
   // inform all items of select mode
   prim::Item::tool_type = tool;
 
