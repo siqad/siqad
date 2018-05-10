@@ -226,7 +226,6 @@ namespace gui{
     void pasteAction();
     void deleteAction();
     void electrodeSetPotentialAction();
-    void toggleDBElecAction();
 
   private:
 
@@ -470,7 +469,6 @@ namespace gui{
 
     DesignPanel *dp;  // DesignPanel pointer
     int layer_index;  // index of layer in dp->layers stack
-    int elec;         // elec content of the db
 
     // internals
     int index;              // index of DBDot item in the layer item stack

@@ -146,7 +146,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("Panel/logw", 400);
 
   S->setValue("lattice/fname", QString("src/settings/lattices/si_100_2x1.ini"));
-  S->setValue("lattice/xy", QPoint(100,100));
+  //S->setValue("lattice/xy", QPoint(100,100));
 
   // QGraphicsView
   S->setValue("view/scale_fact", 100);           // pixels/angstrom in the main view
@@ -173,14 +173,6 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("dbdot/fill_col_sel", QColor(150,150,150)); // dot fill color (selected)
   S->setValue("dbdot/fill_col_hovered", QColor(220,220,220)); // dot fill color (hovered)
   S->setValue("dbdot/fill_col_pb", QColor(150,150,150)); // dot fill color (publish)
-  S->setValue("dbdot/edge_col_drv", QColor(255,255,255));     // edge color
-  S->setValue("dbdot/edge_col_drv_sel", QColor(0, 100, 255)); // edge color (selected)
-  S->setValue("dbdot/edge_col_drv_hovered", QColor(0, 100, 255)); // edge color (hovered)
-  S->setValue("dbdot/edge_col_drv_pb", QColor(0, 100, 255, 255)); // edge color (publish mode)
-  S->setValue("dbdot/fill_col_drv", QColor(0,255,0));   // driver dot fill
-  S->setValue("dbdot/fill_col_drv_sel", QColor(0,150,0));  // drver dot fill selected
-  S->setValue("dbdot/fill_col_drv_hovered", QColor(0,180,0));  // driver dot fill hovered
-  S->setValue("dbdot/fill_col_drv_pb", QColor(0,255,0));  // driver dot fill color publish
   S->setValue("dbdot/edge_col_elec", QColor(255,90,90));     // edge color
   S->setValue("dbdot/edge_col_elec_sel", QColor(255,90,90)); // edge color (selected)
   S->setValue("dbdot/edge_col_elec_hovered", QColor(255,90,90)); // edge color (hovered)

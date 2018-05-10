@@ -866,8 +866,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 
   } else if (!clicked && tool_type == DBGenTool) {
     // show preview location of new DB
-    QPointF scene_pos = mapToScene(e->pos());
-    snapDBPreview(scene_pos);
+    lattice->nearestSite(mapToScene(e->pos()));
 
   } else if (clicked) {
     // not ghosting, mouse dragging of some sort
@@ -1330,21 +1329,6 @@ void gui::DesignPanel::electrodeSetPotentialAction()
 }
 
 
-void gui::DesignPanel::toggleDBElecAction()
-{
-  // toggling is not an un-doable action for now.
-  // qDebug() << tr("toggleDBElecAction...");
-  QList<prim::Item*> selection = selectedItems();
-  if(selection.isEmpty()){ //TODO:figure out how we want to handle right click without selection
-    qDebug() << tr("Please select an item...");
-  } else { //at least 1 item was selected, toggle elec in dots.
-    for(prim::Item *item : selection){
-      if(item->item_type == prim::Item::DBDot)
-        static_cast<prim::DBDot*>(item)->toggleElec();
-    }
-  }
-}
-
 void gui::DesignPanel::createActions()
 {
   action_undo = new QAction(tr("&Undo"), this);
@@ -1367,9 +1351,6 @@ void gui::DesignPanel::createActions()
 
   action_set_potential = new QAction(tr("&Set Potential"), this);
   connect(action_set_potential, &QAction::triggered, this, &gui::DesignPanel::electrodeSetPotentialAction);
-
-  action_toggle_db_elec = new QAction(tr("&Toggle Lattice<->DB"), this);
-  connect(action_toggle_db_elec, &QAction::triggered, this, &gui::DesignPanel::toggleDBElecAction);
 }
 
 
@@ -1724,7 +1705,6 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
   // dbdot index in layer
   prim::Layer *layer = dp->getLayer(layer_index);
   index = invert ? layer->getItems().indexOf(dbdot) : layer->getItems().size();
-  elec = src_db ? src_db->getElec() : 0;
 }
 
 void gui::DesignPanel::CreateDB::undo()

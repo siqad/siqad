@@ -16,6 +16,14 @@
 
 namespace prim{
 
+  struct LatticeCoord {
+    LatticeCoord(int a1, int a2, int b) : a1(a1), a2(a2), b(b) {};
+    LatticeCoord() {};
+    int a1;
+    int a2;
+    int b;
+  };
+
   class Lattice : public prim::Layer
   {
   public:
@@ -57,16 +65,6 @@ namespace prim{
 
     // construct lattice from lattice settings
     void construct();
-
-    // n==0: finds all pairs (m,l) such that m*a[0]+n*a[1] is in the drawing region
-    void getLatticeInds(QList<QPoint> &inds, int n=0);
-
-    // find lower and upper bounds on m for a given n
-    void findBounds(int &lo, int &hi, int n);
-
-    // construct the lattice dots for the unit cell corresponding to the given
-    // lattice vector indices
-    void buildUnitCell(const QPoint &ind);
 
     // Find a rational approximation of a given float
     QPair<int,int> rationalize(qreal x, int k=0);
