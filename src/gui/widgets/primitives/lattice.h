@@ -33,7 +33,7 @@ namespace prim{
     QRectF tileApprox();
 
     //! Return a tileable image that represents the lattice.
-    QImage tileableLatticeImage();
+    QImage tileableLatticeImage(QColor bkg_col);
 
   private:
 

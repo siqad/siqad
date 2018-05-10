@@ -354,7 +354,7 @@ void gui::DesignPanel::buildLattice(const QString &fname)
 
   // build the new lattice
   lattice = new prim::Lattice(fname, layers.size());
-  scene->setBackgroundBrush(QBrush(QImage(lattice->tileableLatticeImage())));
+  scene->setBackgroundBrush(QBrush(lattice->tileableLatticeImage(background_col)));
 
   // add the lattice dots to the scene
   for(prim::Item *const item : lattice->getItems())

@@ -105,7 +105,7 @@ QSettings *settings::AppSettings::m_defs()
   S->setValue("log/tofile", false);
   S->setValue("log/logfile", QString("<SYSTMP>/log/log.txt"));
 
-  S->setValue("snap/diameter", 5.); //relative to scale_fact
+  S->setValue("snap/diameter", .5); //relative to scale_fact
 
   S->setValue("dir/lattice", QString("<BINPATH>/src/settings/lattices"));
 
@@ -149,7 +149,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("lattice/xy", QPoint(100,100));
 
   // QGraphicsView
-  S->setValue("view/scale_fact", 10);           // pixels/angstrom in the main view
+  S->setValue("view/scale_fact", 100);           // pixels/angstrom in the main view
   S->setValue("view/bg_col", QColor(40,50,60)); // background color
   S->setValue("view/bg_col_pb", QColor(255,255,255)); // background color
   S->setValue("view/zoom_factor", 0.1);         // scaling factor for zoom operations
@@ -193,9 +193,9 @@ QSettings* settings::GUISettings::m_defs()
   // lattice dot parameters
   S->setValue("latdot/diameter", 1.0);                    // dot diameter
   S->setValue("latdot/edge_width", .08);                  // edge width rel. to diameter
-  S->setValue("latdot/publish_scale", 2);                  // scaling for publish mode
+  S->setValue("latdot/publish_scale", 2);                 // scaling for publish mode
   S->setValue("latdot/edge_col", QColor(255,255,255,70)); // edge color
-  S->setValue("latdot/edge_col_pb", QColor(0,0,0,70)); // edge color (publish mode)
+  S->setValue("latdot/edge_col_pb", QColor(0,0,0,70));    // edge color (publish mode)
   S->setValue("latdot/fill_col", QColor(0,0,0,0));        // fill color
   S->setValue("latdot/fill_col_pb", QColor(0,0,0,0));     // fill color (publish mode)
   S->setValue("latdot/inner_fill", .5);                   // inner fill factor

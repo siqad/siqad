@@ -72,9 +72,9 @@ QRectF prim::Lattice::tileApprox()
   QPair<int,int> frac = rationalize(r);
 
   qDebug() << tr("Lattice skew: %1 :: ( %2 / %3 )").arg(r).arg(frac.first).arg(frac.second);
-  qreal height = qSqrt(QPointF::dotProduct(a[0], a[0]));
+  qreal width = qSqrt(QPointF::dotProduct(a[0], a[0]));
   QPointF v = frac.first*a[0] - frac.second*a[1];
-  qreal width = qSqrt(QPointF::dotProduct(v,v));
+  qreal height = qSqrt(QPointF::dotProduct(v,v));
 
   QRectF rect(0,0,width,height);
 
@@ -84,17 +84,39 @@ QRectF prim::Lattice::tileApprox()
 }
 
 
-QImage prim::Lattice::tileableLatticeImage()
+QImage prim::Lattice::tileableLatticeImage(QColor bkg_col)
 {
-  QImage background_img(QSize(
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  qreal lat_diam = gui_settings->get<qreal>("latdot/diameter") * prim::Item::scale_factor;
+  qreal lat_edge_width = gui_settings->get<qreal>("latdot/edge_width") * lat_diam;
+  QColor lat_edge_col = gui_settings->get<QColor>("latdot/edge_col");
+  // TODO the rest
+
+  // first generate a single tile with fully contained circles
+  QPixmap bkg_pixmap(QSize(QSizeF(tileApprox().size()*prim::Item::scale_factor).toSize()));
+  bkg_pixmap.fill(bkg_col);
+  QPainter painter(&bkg_pixmap);
+  painter.setBrush(Qt::NoBrush);
+  painter.setPen(QPen(lat_edge_col, lat_edge_width));
+  painter.setRenderHint(QPainter::Antialiasing);
+  for (QPointF site : b) {
+    painter.drawEllipse(site.x()*prim::Item::scale_factor+lat_edge_width, site.y()*prim::Item::scale_factor+lat_edge_width, lat_diam, lat_diam);
+  }
+  painter.end();
+  //return background_img.toImage();
+
+  // then generate a single tile with properly offset circles
+  QImage bkg_img(QSize(
             QSizeF(tileApprox().size()*prim::Item::scale_factor).toSize()),
             QImage::Format_ARGB32);
-  QPainter painter(&background_img);
-  painter.setBrush(Qt::NoBrush);
-  painter.setPen(Qt::red);
-  painter.drawEllipse(0, 0, 10, 10);
-  painter.end();
-  return background_img;
+  QPainter painter_offset(&bkg_img);
+  int offset = 0.5 * lat_diam + lat_edge_width;
+  painter_offset.drawTiledPixmap(bkg_pixmap.rect(), bkg_pixmap, QPoint(offset,offset));
+  painter_offset.end();
+
+  qDebug() << QObject::tr("Background QRect(%1,%2)").arg(bkg_img.width()).arg(bkg_img.height());
+  // TODO QImage size
+  return bkg_img;
 }
 
 
