@@ -74,9 +74,9 @@ void prim::LatticeDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *
   }
 
   // draw outer circle
-  painter->setPen(QPen(getCurrentStateColor(edge_col), edge_width_paint));
+  /*painter->setPen(QPen(getCurrentStateColor(edge_col), edge_width_paint));
   painter->setBrush(getCurrentStateColor(fill_col));
-  painter->drawEllipse(rect);
+  painter->drawEllipse(rect);*/
 
   // draw inner circle
   if(tool_type == gui::ToolType::DBGenTool && isSelected()){

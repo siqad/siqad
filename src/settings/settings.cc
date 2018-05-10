@@ -105,7 +105,7 @@ QSettings *settings::AppSettings::m_defs()
   S->setValue("log/tofile", false);
   S->setValue("log/logfile", QString("<SYSTMP>/log/log.txt"));
 
-  S->setValue("snap/diameter", .5); //relative to scale_fact
+  S->setValue("snap/diameter", 5.); //relative to scale_fact
 
   S->setValue("dir/lattice", QString("<BINPATH>/src/settings/lattices"));
 
@@ -154,8 +154,8 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("view/bg_col_pb", QColor(255,255,255)); // background color
   S->setValue("view/zoom_factor", 0.1);         // scaling factor for zoom operations
   S->setValue("view/zoom_boost", 2);            // must have factor*boost < 1
-  S->setValue("view/zoom_min", .1);             // minimum zoom factor
-  S->setValue("view/zoom_max", 10);             // maximum zoom factor
+  S->setValue("view/zoom_min", .01);             // minimum zoom factor
+  S->setValue("view/zoom_max", 1);             // maximum zoom factor
   S->setValue("view/wheel_pan_step", 20);       // screen pan per wheel tick
   S->setValue("view/wheel_pan_boost", 5);       // shift-boost factor
   S->setValue("view/padding", .1);              // additional space around draw region
@@ -192,9 +192,9 @@ QSettings* settings::GUISettings::m_defs()
 
   // lattice dot parameters
   S->setValue("latdot/diameter", 1.0);                    // dot diameter
-  S->setValue("latdot/edge_width", .08);                  // edge width rel. to diameter
+  S->setValue("latdot/edge_width", .15);                  // edge width rel. to diameter
   S->setValue("latdot/publish_scale", 2);                 // scaling for publish mode
-  S->setValue("latdot/edge_col", QColor(255,255,255,70)); // edge color
+  S->setValue("latdot/edge_col", QColor(255,255,255,60)); // edge color
   S->setValue("latdot/edge_col_pb", QColor(0,0,0,70));    // edge color (publish mode)
   S->setValue("latdot/fill_col", QColor(0,0,0,0));        // fill color
   S->setValue("latdot/fill_col_pb", QColor(0,0,0,0));     // fill color (publish mode)

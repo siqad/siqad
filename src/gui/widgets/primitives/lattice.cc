@@ -103,7 +103,6 @@ QImage prim::Lattice::tileableLatticeImage(QColor bkg_col)
     painter.drawEllipse(site.x()*prim::Item::scale_factor+lat_edge_width, site.y()*prim::Item::scale_factor+lat_edge_width, lat_diam, lat_diam);
   }
   painter.end();
-  //return background_img.toImage();
 
   // then generate a single tile with properly offset circles
   QImage bkg_img(QSize(
@@ -114,8 +113,6 @@ QImage prim::Lattice::tileableLatticeImage(QColor bkg_col)
   painter_offset.drawTiledPixmap(bkg_pixmap.rect(), bkg_pixmap, QPoint(offset,offset));
   painter_offset.end();
 
-  qDebug() << QObject::tr("Background QRect(%1,%2)").arg(bkg_img.width()).arg(bkg_img.height());
-  // TODO QImage size
   return bkg_img;
 }
 

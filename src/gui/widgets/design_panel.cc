@@ -58,7 +58,6 @@ void gui::DesignPanel::initDesignPanel() {
   connect(undo_stack, SIGNAL(cleanChanged(bool)),
           this, SLOT(emitUndoStackCleanChanged(bool)));
 
-  settings::GUISettings *gui_settings = settings::GUISettings::instance();
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 
   scene = new QGraphicsScene(this);
@@ -79,6 +78,7 @@ void gui::DesignPanel::initDesignPanel() {
   setTransformationAnchor(QGraphicsView::NoAnchor);
   setResizeAnchor(QGraphicsView::AnchorViewCenter);
   resetMatrix(); // resets QTransform, which undoes the zoom
+  scale(0.1, 0.1);
 
   setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing |
             QPainter::HighQualityAntialiasing | QPainter::SmoothPixmapTransform);
@@ -539,7 +539,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *stream)
         // keep reading until end of gui tag
         while(stream->name() != "gui"){
           if(stream->isStartElement()){
-            qreal zoom=1, scroll_v=0, scroll_h=0;
+            qreal zoom=0.1, scroll_v=0, scroll_h=0;
             if(stream->name() == "zoom"){
               zoom = stream->readElementText().toDouble();
             }
@@ -1405,7 +1405,7 @@ void gui::DesignPanel::rubberBandUpdate(QPoint pos){
 
   // do nothing if mouse hasn't moved much
   // TODO change snap_diameter to a separate variable
-  if((pos-rb_cache).manhattanLength()<.1*snap_diameter)
+  if((pos-rb_cache).manhattanLength()<.01*snap_diameter)
     return;
   rb_cache = pos;
 
@@ -1622,7 +1622,7 @@ void gui::DesignPanel::copySelection()
 void gui::DesignPanel::snapDBPreview(QPointF scene_pos)
 {
   // don't need to recheck snap target unless the cursor has moved significantly
-  if(snap_target != 0 && (scene_pos-snap_cache).manhattanLength()<.2*snap_diameter)
+  if(snap_target != 0 && (scene_pos-snap_cache).manhattanLength()<.02*snap_diameter)
     return;
   snap_cache = scene_pos;
   //lattice->nearestSite(snap_cache);
