@@ -17,11 +17,17 @@
 namespace prim{
 
   struct LatticeCoord {
-    LatticeCoord(int a1, int a2, int b) : a1(a1), a2(a2), b(b) {};
+    LatticeCoord(int n, int m, int l) : n(n), m(m), l(l) {};
     LatticeCoord() {};
-    int a1;
-    int a2;
-    int b;
+    int n;
+    int m;
+    int l;
+
+    bool operator==(const LatticeCoord &other) {
+      if (other.n == n && other.m == m && other.l == l)
+        return true;
+      return false;
+    }
   };
 
   class Lattice : public prim::Layer
@@ -34,8 +40,14 @@ namespace prim{
     //! destructor
     ~Lattice() {}
 
+    //! Return specified lattice vector after graphical scaling
+    QPoint sceneLatticeVector(int dim) {return a_scene[dim];}
+
+    //! Return specified site vector after graphical scaling
+    QPoint sceneSiteVector(int ind) {return b_scene[ind];}
+
     //! identify the nearest lattice site to the given scene position
-    QPointF nearestSite(const QPointF &scene_pos);
+    LatticeCoord nearestSite(const QPointF &scene_pos);
 
     //! identify the bounding rect of an approximately rectangular supercell
     QRectF tileApprox();
@@ -50,7 +62,9 @@ namespace prim{
     int n_cell;         // number of atoms in unit cell
 
     QPointF a[2];       // lattice vectors
+    QPoint a_scene[2];  // lattice vector after graphical scaling
     QList<QPointF> b;   // unit cell site vectors
+    QList<QPoint> b_scene;  // unit cell site vectors after graphical scaling
 
     qreal Lx;           // x-bound on lattice vectors, in Angstroms
     qreal Ly;           // y-bound on lattice vectors, in Angstroms

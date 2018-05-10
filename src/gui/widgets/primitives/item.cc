@@ -33,10 +33,6 @@ prim::Item::Item(ItemType type, int lay_id, QGraphicsItem *parent)
 }
 
 
-enum ItemType{Aggregate, DBDot, LatticeDot, Ghost, GhostDot, Text,
-    Electrode, GhostBox, AFMArea, AFMPath, AFMNode, AFMSeg, PotPlot,
-    ResizeFrame, ResizeHandle};
-
 QString prim::Item::getQStringItemType()
 {
   switch (item_type) {

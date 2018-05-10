@@ -110,6 +110,9 @@ namespace gui{
     void buildLattice(const QString &fname=QString());
     void setScenePadding();
 
+    //! Convert lattice coordinates to QPointF
+    QPointF latticeCoord2QPointF(prim::LatticeCoord l_coord);
+
     //! update the tool type
     void setTool(gui::ToolType tool);
 
@@ -262,6 +265,9 @@ namespace gui{
     bool pasting;   // evoked some kind of pasting
     bool resizing;  // currently resizing an item
 
+    // DB previews
+    QList<prim::DBDotPreview*> db_previews;
+
     // snapping
     qreal snap_diameter;            // size of region to search for snap points
     prim::LatticeDot *snap_target;  // current snap target, LatticeDot
@@ -338,13 +344,24 @@ namespace gui{
     void initMove();
 
     // set the selectability of the lattice dots for the given Item
-    void setLatticeDotSelectability(prim::Item *item, bool flag);
+    // TODO remove
+    // void setLatticeDotSelectability(prim::Item *item, bool flag);
 
     // deep copy the current selection to the clipboard
     void copySelection();
 
     // dbgen Location Indicator
     void snapDBPreview(QPointF scene_pos);
+
+    //! Create graphical previews for provided DB coordinates (always destroys
+    //! existing previews).
+    void createDBPreviews(QList<prim::LatticeCoord> coords);
+
+    //! Add DB graphical previews without destroying existing ones.
+    void appendDBPreviews(QList<prim::LatticeCoord> coords);
+
+    //! Destroy DB graphical previews.
+    void destroyDBPreviews();
 
     // return the scene position of the nearest prim::Item with the specified item types.
     // returns a null pointer if no eligible item falls within the search range.
@@ -379,7 +396,7 @@ namespace gui{
 
     // functions including undo/redo behaviour
 
-    // create dangling bonds in the surface at all selected lattice dots
+    // Create DBs at DB preview locations stored in db_previews list.
     void createDBs();
 
     void createElectrodes(QPoint point1);
@@ -450,9 +467,12 @@ namespace gui{
   class DesignPanel::CreateDB : public QUndoCommand
   {
   public:
-    // create a dangling bond at the given lattice dot, set invert if deleting DB
-    CreateDB(prim::LatticeDot *ldot, int layer_index, DesignPanel *dp, prim::DBDot *src_db=0,
-                              bool invert=false, QUndoCommand *parent=0);
+    //! Create a dangling bond at the given lattice dot, set invert if deleting
+    //! DB. Set src_db if copying DB.
+    CreateDB(prim::LatticeCoord l_coord, int layer_index, DesignPanel *dp,
+        prim::DBDot *cp_src=0, bool invert=false, QUndoCommand *parent=0);
+    /* TODO remove CreateDB(prim::LatticeDot *ldot, int layer_index, DesignPanel *dp,
+        prim::DBDot *src_db=0, bool invert=false, QUndoCommand *parent=0);*/
 
     // destroy the dangling bond and update the lattice dot
     virtual void undo();
@@ -462,17 +482,20 @@ namespace gui{
 
   private:
 
-    void create();  // create the dangling bond
-    void destroy(); // destroy the dangling bond
+    void create();    // create the dangling bond
+    void destroy();   // destroy the dangling bond
 
     bool invert;      // swaps create/delete on redo/undo
+
+    prim::LatticeCoord lat_coord;
+    prim::DBDot *db_at_loc=0;
+    prim::DBDot *cp_src;
 
     DesignPanel *dp;  // DesignPanel pointer
     int layer_index;  // index of layer in dp->layers stack
 
     // internals
-    int index;              // index of DBDot item in the layer item stack
-    prim::LatticeDot *ldot; // Lattice dot beneath dangling bond
+    int index;        // index of DBDot item in the layer item stack
   };
 
 

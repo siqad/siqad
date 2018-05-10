@@ -33,7 +33,7 @@ namespace prim{
     //! to distinguish them in functions which accept Item objects. Derived
     //! classes can be declared and implemented elsewhere as long as they are
     //! defined before use
-    enum ItemType{Aggregate, DBDot, LatticeDot, Ghost, GhostDot, Text,
+    enum ItemType{Aggregate, DBDot, DBDotPreview, LatticeDot, Ghost, GhostDot, Text,
         Electrode, GhostBox, AFMArea, AFMPath, AFMNode, AFMSeg, PotPlot,
         ResizeFrame, ResizeHandle};
 

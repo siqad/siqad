@@ -46,12 +46,12 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *scene)
       }
       else if(rs->name() == "physloc"){
         for(QXmlStreamAttribute &attr : rs->attributes()){
-          if (attr.name().toString() == QLatin1String("a1"))
-            read_coord.a1 = attr.value().toInt();
-          else if (attr.name().toString() == QLatin1String("a2"))
-            read_coord.a2 = attr.value().toInt();
-          else if (attr.name().toString() == QLatin1String("b"))
-            read_coord.b = attr.value().toInt();
+          if (attr.name().toString() == QLatin1String("n"))
+            read_coord.n = attr.value().toInt();
+          else if (attr.name().toString() == QLatin1String("m"))
+            read_coord.m = attr.value().toInt();
+          else if (attr.name().toString() == QLatin1String("l"))
+            read_coord.l = attr.value().toInt();
         }
         rs->readNext();
       }
@@ -81,6 +81,13 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *scene)
 }
 
 
+QPointF prim::DBDot::getPhysLoc() const
+{
+  // TODO implement
+  return QPointF();
+}
+
+
 void prim::DBDot::initDBDot(prim::LatticeCoord l_coord, int lay_id)
 {
   // construct static class variables
@@ -106,7 +113,7 @@ void prim::DBDot::setShowElec(float se_in)
 
 QRectF prim::DBDot::boundingRect() const
 {
-  qreal width = diameter+edge_width;
+  qreal width = diameter+2*edge_width;
   if (display_mode == gui::ScreenshotMode)
     width *= publish_scale;
   return QRectF(-.5*width, -.5*width, width, width);
@@ -232,4 +239,64 @@ void prim::DBDot::mousePressEvent(QGraphicsSceneMouseEvent *e)
       prim::Item::mousePressEvent(e);
       break;
   }
+}
+
+
+
+// DBDotPreview Class
+
+// Static variables
+QColor prim::DBDotPreview::fill_col;
+QColor prim::DBDotPreview::edge_col;
+
+qreal prim::DBDotPreview::diameter=-1;
+qreal prim::DBDotPreview::edge_width;
+qreal prim::DBDotPreview::fill_fact;
+
+prim::DBDotPreview::DBDotPreview(prim::LatticeCoord l_coord)
+  : prim::Item(prim::Item::DBDotPreview)
+{
+  if (diameter == -1)
+    constructStatics();
+
+  lat_coord = l_coord;
+}
+
+QRectF prim::DBDotPreview::boundingRect() const
+{
+  qreal width = diameter + 2*edge_width;
+  return QRectF(-.5*width, -.5*width, width, width);
+}
+
+void prim::DBDotPreview::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+{
+  QRectF rect = boundingRect();
+  // draw inner fill
+  if (fill_fact > 0) {
+    QPointF center = rect.center();
+    QSizeF size(diameter, diameter);
+    rect.setSize(size*fill_fact);
+    rect.moveCenter(center);
+
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(fill_col);
+    painter->drawEllipse(rect);
+  }
+
+  // draw outer ring
+  painter->setPen(QPen(edge_col, edge_width));
+  painter->setBrush(Qt::NoBrush);
+  painter->drawEllipse(rect);
+}
+
+void prim::DBDotPreview::constructStatics()
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+
+  fill_col = gui_settings->get<QColor>("dbdotprev/fill_col");
+  edge_col = gui_settings->get<QColor>("dbdotprev/edge_col");
+
+  diameter = gui_settings->get<qreal>("dbdotprev/diameter")*prim::Item::scale_factor;
+  edge_width = gui_settings->get<qreal>("dbdotprev/edge_width")*diameter;
+  fill_fact = gui_settings->get<qreal>("dbdotprev/fill_fact");
 }

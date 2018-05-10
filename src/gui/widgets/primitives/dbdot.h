@@ -89,6 +89,42 @@ namespace prim{
 
   };
 
+
+  class DBDotPreview : public prim::Item
+  {
+  public:
+
+    //! Contruct a DB dot preview.
+    DBDotPreview(prim::LatticeCoord l_coord);
+
+    //! Destructor.
+    ~DBDotPreview() {}
+
+    // Accessors
+
+    //! Get the lattice coordinates of the DB Preview
+    prim::LatticeCoord latticeCoord() {return lat_coord;}
+
+    // Graphics
+    virtual QRectF boundingRect() const override;
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
+
+  private:
+    //! Construct static variables on first creation.
+    void constructStatics();
+
+    // Variables
+    prim::LatticeCoord lat_coord; // lattice coordinates of the DB Preview
+
+    // Static class variables
+    static QColor fill_col;
+    static QColor edge_col;
+
+    static qreal diameter;
+    static qreal edge_width;
+    static qreal fill_fact;
+  };
+
 } // end prim namespace
 
 

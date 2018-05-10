@@ -31,8 +31,9 @@ prim::Lattice::Lattice(const QString &fname, int lay_id)
 }
 
 
-QPointF prim::Lattice::nearestSite(const QPointF &scene_pos)
+prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos)
 {
+  LatticeCoord coord;
   int n0[2];
   qreal proj;
   QPointF x = scene_pos/prim::Item::scale_factor;
@@ -48,20 +49,24 @@ QPointF prim::Lattice::nearestSite(const QPointF &scene_pos)
   for(int n=n0[0]-1; n<n0[0]+2; n++){
     for(int m=n0[1]-1; m<n0[1]+2; m++){
       QPointF x0 = n*a[0]+m*a[1];
-      for(const QPointF& dp : b){
-        QPointF temp = x0 + dp;
+      for (int l=0; l<b.size(); l++){
+        QPointF temp = x0 + b[l];
         qreal dist = (temp-x).manhattanLength();
         if(dist<mdist){
           mdist = dist;
           mp = temp;
+          coord.n = n;
+          coord.m = m;
+          coord.l = l;
         }
       }
     }
   }
 
-  qDebug() << tr("Nearest Lattice Site: %1 :: %2").arg(mp.x()).arg(mp.y());
+  //qDebug() << tr("Nearest Lattice Site: %1 :: %2").arg(mp.x()).arg(mp.y());
 
-  return mp;                            // physical (angstrom) coords
+  return coord;
+  //return mp;                            // physical (angstrom) coords
   //return mp*prim::Item::scale_factor;   // scene (pixel) coords
 }
 
@@ -93,14 +98,21 @@ QImage prim::Lattice::tileableLatticeImage(QColor bkg_col)
   // TODO the rest
 
   // first generate a single tile with fully contained circles
-  QPixmap bkg_pixmap(QSize(QSizeF(tileApprox().size()*prim::Item::scale_factor).toSize()));
+  a_scene[0] = QPointF(tileApprox().topRight() * prim::Item::scale_factor).toPoint();
+  a_scene[1] = QPointF(tileApprox().bottomLeft() * prim::Item::scale_factor).toPoint();
+  for (QPointF site : b)
+    b_scene.append(QPointF(site * prim::Item::scale_factor).toPoint());
+
+  //QPixmap bkg_pixmap(QSize(QSizeF(tileApprox().size()*prim::Item::scale_factor).toSize()));
+  QPixmap bkg_pixmap(QSize(a_scene[0].x(), a_scene[1].y()));
   bkg_pixmap.fill(bkg_col);
   QPainter painter(&bkg_pixmap);
   painter.setBrush(Qt::NoBrush);
   painter.setPen(QPen(lat_edge_col, lat_edge_width));
   painter.setRenderHint(QPainter::Antialiasing);
-  for (QPointF site : b) {
-    painter.drawEllipse(site.x()*prim::Item::scale_factor+lat_edge_width, site.y()*prim::Item::scale_factor+lat_edge_width, lat_diam, lat_diam);
+  for (QPoint site : b_scene) {
+    //painter.drawEllipse(site.x()*prim::Item::scale_factor+lat_edge_width, site.y()*prim::Item::scale_factor+lat_edge_width, lat_diam, lat_diam);
+    painter.drawEllipse(site.x()+lat_edge_width, site.y()+lat_edge_width, lat_diam, lat_diam);
   }
   painter.end();
 
