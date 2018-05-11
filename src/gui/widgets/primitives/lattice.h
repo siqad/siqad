@@ -13,20 +13,35 @@
 
 #include "layer.h"
 #include "latdot.h"
+#include <QHash>
 
 namespace prim{
 
   struct LatticeCoord {
+    //! Construct a lattice coordinate with n, m and l coordinates.
     LatticeCoord(int n, int m, int l) : n(n), m(m), l(l) {};
+    //! Construct empty lattice coordinates
     LatticeCoord() {};
     int n;
     int m;
-    int l;
+    int l;  // invalid if l < 0
 
-    bool operator==(const LatticeCoord &other) {
+    bool operator==(const LatticeCoord &other) const {
       if (other.n == n && other.m == m && other.l == l)
         return true;
       return false;
+    }
+
+    //! Lattice coordinate addition, returned lattice coordinate might not be
+    //! valid!
+    LatticeCoord operator+(const LatticeCoord other) const {
+      return LatticeCoord(n+other.n, m+other.m, l+other.l);
+    }
+
+    //! Lattice coordinate subtraction, returned lattice coordinate might not be
+    //! valid!
+    LatticeCoord operator-(const LatticeCoord other) const {
+      return LatticeCoord(n-other.n, m-other.m, l-other.l);
     }
   };
 
@@ -53,11 +68,36 @@ namespace prim{
     //! it in lattice coordinates and updates the reference QPointF site_pos.
     LatticeCoord nearestSite(const QPointF &scene_pos, QPointF &nearest_site_pos) const;
 
-    //! Convert lattice coordinates to QPointF
-    QPointF latticeCoord2ScenePos(prim::LatticeCoord l_coord) const;
+    //! Convert lattice coordinates to QPointF. Returns a QPointF() if invalid.
+    QPointF latticeCoord2ScenePos(const prim::LatticeCoord &l_coord) const;
 
     //! Return whether a given scene_pos collides with the given lattice position
     bool collidesWithLatticeDot(const QPointF &scene_pos, const LatticeCoord &l_coord) const;
+
+    //! Set lattice dot location to be occupied
+    void setOccupied(const prim::LatticeCoord &l_coord, prim::Item *dbdot) {
+      occ_latdots.insert(l_coord, dbdot);
+    }
+
+    //! Set lattice dot location to be unoccupied
+    void setUnoccupied(const prim::LatticeCoord &l_coord) {
+      occ_latdots.remove(l_coord);
+    }
+
+    //! Return whether lattice dot location is occupied.
+    bool isOccupied(const prim::LatticeCoord &l_coord) {
+      return occ_latdots.contains(l_coord);
+    }
+
+    //! Return whether the given lattice coordinate is a valid coordinate.
+    bool isValid(const prim::LatticeCoord &l_coord) const {
+      return (l_coord.l >= 0 && l_coord.l < b.length());
+    }
+
+    //! Return the DBDot pointer at the specified lattice coord, or 0 if none.
+    prim::Item *dbAt(const prim::LatticeCoord &l_coord) {
+      return occ_latdots.contains(l_coord) ? occ_latdots.value(l_coord) : 0;
+    }
 
     //! identify the bounding rect of an approximately rectangular supercell
     QRectF tileApprox();
@@ -82,6 +122,8 @@ namespace prim{
     qreal coth;         // cotangent of angle between lattice vectors
     qreal a2[2];        // square magnitudes of lattice vectors
 
+    QHash<prim::LatticeCoord, prim::Item*> occ_latdots; // set of occupied lattice dots
+
     // constants
 
     static qreal rtn_acc;     // termination precision for rationalize
@@ -94,8 +136,18 @@ namespace prim{
     QPair<int,int> rationalize(qreal x, int k=0);
   };
 
-} // end prim namespace
+  inline uint qHash(const prim::LatticeCoord &l_coord, uint seed=0)
+  {
+    return ::qHash(l_coord.n, seed) + ::qHash(l_coord.m, seed) + ::qHash(l_coord.l, seed);
+  }
 
+/*inline bool operator==(const prim::LatticeCoord coord1, const prim::LatticeCoord coord2)
+{
+  if (coord1.n == coord2.n && coord1.m == coord2.m && coord1.l == coord2.l)
+    return true;
+  return false;
+}*/
+} // end prim namespace
 
 
 #endif

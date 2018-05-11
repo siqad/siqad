@@ -270,8 +270,8 @@ namespace gui{
 
     // snapping
     qreal snap_diameter;            // size of region to search for snap points
-    prim::LatticeDot *snap_target;  // current snap target, LatticeDot
-    prim::LatticeCoord snap_coord; // current snap target, lattice coordinate
+    prim::LatticeCoord snap_target; // current snap target, LatticeDot
+    prim::LatticeCoord snap_coord;  // current snap target, lattice coordinate
     QPointF snap_cache;             // cursor position of last snap update
 
     // AFM ghost
@@ -339,7 +339,7 @@ namespace gui{
 
     // snap the ghost to the nearest possible lattice position. Returns true if
     // the snap_target was update (need to change the ghost location).
-    bool snapGhost(QPointF scene_pos, QPointF &offset);
+    bool snapGhost(QPointF scene_pos, prim::LatticeCoord &offset);
 
     // initialize an item move
     void initMove();

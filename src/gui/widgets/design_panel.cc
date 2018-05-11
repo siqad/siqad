@@ -70,7 +70,7 @@ void gui::DesignPanel::initDesignPanel() {
   // initialising parameters
   snap_diameter = app_settings->get<qreal>("snap/diameter")*prim::Item::scale_factor;
   qDebug() << tr("SD: %1").arg(snap_diameter);
-  snap_target = 0;
+  snap_target = prim::LatticeCoord();
 
   tool_type = gui::ToolType::NoneTool;     // now setTool will update the tool
 
@@ -817,9 +817,10 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 
       } else if (tool_type == DBGenTool) {
         // start the rubber band at the snap_target if it exists
+        /* TODO implement when trying to do lattice dot rubber band creation
         if (tool_type == DBGenTool && snap_target)
           rb_start = snap_target->pos().toPoint();
-        else
+        else*/
           rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
 
@@ -852,9 +853,12 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
   if (ghosting) {
     // update snap
     QPointF scene_pos = mapToScene(e->pos());
-    QPointF offset;
-    if(snapGhost(scene_pos, offset)) //if there are db dots
-      prim::Ghost::instance()->moveBy(offset.x(), offset.y());
+    prim::LatticeCoord offset;
+    if (snapGhost(scene_pos, offset)) { // if there are db dots
+      qDebug() << tr("Lattice coord offset (%1,%2)").arg(offset.n).arg(offset.m);
+      QPointF offset_pt = lattice->latticeCoord2ScenePos(offset);
+      prim::Ghost::instance()->moveByCoord(offset);
+    }
 
   } else if (tool_type == AFMPathTool) {
     // update ghost node and ghost segment if there is a focused node, only update
@@ -1446,9 +1450,11 @@ void gui::DesignPanel::createGhost(bool paste)
 
   if (paste) {
     ghost->prepare(clipboard);
-    QPointF offset;
-    if(snapGhost(mapToScene(mapFromGlobal(QCursor::pos())), offset))
-      ghost->moveBy(offset.x(), offset.y());
+    prim::LatticeCoord offset;
+    if (snapGhost(mapToScene(mapFromGlobal(QCursor::pos())), offset)) {
+      QPointF offset_pt = lattice->latticeCoord2ScenePos(offset);
+      ghost->moveBy(offset_pt.x(), offset_pt.y());
+    }
   } else {
     QPointF scene_pos = mapToScene(mapFromGlobal(QCursor::pos()));
     //get QList of selected Item object
@@ -1463,11 +1469,11 @@ void gui::DesignPanel::clearGhost()
   ///qDebug() << tr("Clearing ghost...");
   prim::Ghost::instance()->cleanGhost();
   ghosting=false;
-  snap_target=0;
+  snap_target=prim::LatticeCoord();
 }
 
 
-bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
+bool gui::DesignPanel::snapGhost(QPointF scene_pos, prim::LatticeCoord &offset)
 {
   bool is_all_floating = true;
 
@@ -1493,8 +1499,8 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
     }
     return false;
   } else {
-    // if holding any non-floating (for now just db dots or lat dots)
-    // don't need to recheck snap target unless the cursor has moved significantly
+    // if holding any non-floating (for now just DBs), don't need to recheck
+    // snap target unless the cursor has moved significantly
     if ((scene_pos-snap_cache).manhattanLength()<.3*snap_diameter)
       return false;
     snap_cache = scene_pos;
@@ -1504,58 +1510,30 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
 
     // if no anchor, allow free movement of the ghost
     if(anchor==0){
-      offset = QPointF();
+      offset = prim::LatticeCoord();
       return true;
     }
     // otherwise restrict possible ghost position to lattice sites
-    QPointF old_anchor = anchor->scenePos();
+    prim::LatticeCoord old_anchor = anchor->latticeCoord();
     QPointF free_anchor = ghost->freeAnchor(scene_pos);
 
     // get the nearest lattice site to the free anchor
-    QPointF nearest_site_pos; // will be set by lattice->nearestSite by reference
-    prim::LatticeCoord nearest_site = lattice->nearestSite(free_anchor, nearest_site_pos);
+    prim::LatticeCoord nearest_site = lattice->nearestSite(free_anchor);
 
-    // do nothing if target has not changed
-    if (nearest_site == snap_coord)
+    // do nothing if target site is not valid or has not changed
+    if (!lattice->isValid(nearest_site) || nearest_site == snap_coord)
       return false;
 
-    // TODO check if the new location is valid
-
-    // move ghost
-    offset = nearest_site_pos - old_anchor;
+    // move ghost and update validity hash table
+    offset = nearest_site - old_anchor;
     snap_coord = nearest_site;
+    if (!ghost->valid_hash.contains(nearest_site))
+      ghost->valid_hash[nearest_site] = ghost->checkValid(offset);
+    snap_target = nearest_site;
+    ghost->setValid(ghost->valid_hash[nearest_site]);
 
     return true;
     /*
-    // get nearest lattice site to free anchor
-    QRectF rect;
-    rect.setSize(QSize(snap_diameter, snap_diameter));
-    rect.moveCenter(free_anchor);
-    QList<QGraphicsItem*> near_items = scene->items(rect);
-
-    // if no items nearby, change nothing
-    if(near_items.count()==0)
-      return false;
-
-    // select the nearest lattice point to the free_anchor
-    prim::LatticeDot *target=0;
-    qreal mdist=-1, dist;
-
-    for(QGraphicsItem *gitem : near_items){
-      // lattice dot
-      if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::LatticeDot){
-        dist = (gitem->pos()-free_anchor).manhattanLength();
-        if(mdist<0 || dist<mdist){
-          target = static_cast<prim::LatticeDot*>(gitem);
-          mdist=dist;
-        }
-      }
-    }
-    // if no valid target or target has not changed, do nothing
-    if(!target || (target==snap_target))
-      return false;
-
-
     // move ghost and update validity hash table.
     offset = target->scenePos()-old_anchor;
     if(!ghost->valid_hash.contains(target))
@@ -1693,14 +1671,8 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeCoord l_coord, int layer_index
   : QUndoCommand(parent), invert(invert), lat_coord(l_coord), cp_src(cp_src),
       dp(dp), layer_index(layer_index)
 {
-  for (QGraphicsItem *gitem : dp->scene->items(dp->lattice->latticeCoord2ScenePos(l_coord))) {
-    if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::DBDot) {
-      prim::DBDot *db_found = static_cast<prim::DBDot*>(gitem);
-      if (db_found->latticeCoord() == l_coord) {
-        db_at_loc = db_found;
-      }
-    }
-  }
+  db_at_loc = static_cast<prim::DBDot*>(dp->lattice->dbAt(l_coord));
+
   if (invert && !db_at_loc)
     qFatal("Trying to remove a non-existing DB");
   else if (!invert && db_at_loc)
@@ -1746,10 +1718,9 @@ void gui::DesignPanel::CreateDB::create()
 {
   // add dangling bond to layer and scene, index in layer item stack will be
   // equal to layer->getItems().size()
-  // TODO update with new DB scheme
-  //dp->addItem(new prim::DBDot(lat_coord, layer_index), layer_index, index);
   prim::DBDot *new_db = new prim::DBDot(lat_coord, layer_index);
   new_db->setPos(dp->lattice->latticeCoord2ScenePos(lat_coord));
+  dp->lattice->setOccupied(lat_coord, new_db);
   dp->addItem(new_db, layer_index, index);
   db_at_loc=new_db;
 }
@@ -1757,18 +1728,10 @@ void gui::DesignPanel::CreateDB::create()
 void gui::DesignPanel::CreateDB::destroy()
 {
   if (db_at_loc) {
+    dp->lattice->setUnoccupied(db_at_loc->latticeCoord());
     dp->removeItem(db_at_loc, dp->getLayer(db_at_loc->layer_id));
     db_at_loc = 0;
   }
-  /* TODO remove
-  if(dbdot != 0){
-    // make source lattice site selectable again
-    dbdot->getSource()->setDBDot(0);
-
-    // destroy dbdot
-    dp->removeItem(dbdot, dp->getLayer(dbdot->layer_id));  // deletes dbdot
-    dbdot = 0;
-  }*/
 }
 
 
@@ -2673,8 +2636,7 @@ bool gui::DesignPanel::moveToGhost(bool kill)
   prim::Ghost *ghost = prim::Ghost::instance();
   moving = false;
   // get the move offset
-  //QPointF offset = (!kill && ghost->valid_hash[snap_target]) ? ghost->moveOffset() : QPointF();
-  QPointF offset = (!kill) ? ghost->moveOffset() : QPointF();
+  QPointF offset = (!kill && ghost->valid_hash[snap_target]) ? ghost->moveOffset() : QPointF();
 
   if (offset.isNull()) {
     // There is no offset for dbs. Check if selection is all electrodes, and if it is, move them.

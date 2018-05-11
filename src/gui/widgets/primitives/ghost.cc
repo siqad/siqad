@@ -8,6 +8,7 @@
 
 
 #include "ghost.h"
+#include "dbdot.h"
 
 
 // GHOSTDOT CLASS
@@ -23,6 +24,9 @@ prim::GhostDot::GhostDot(prim::Item *item, prim::Item *parent, QColor *pcol)
 
   // create dot at item center, assumes item local boundingRect centered at 0.
   setPos(item->pos());
+
+  // get the DB's lattice coordinate
+  lat_coord = static_cast<prim::DBDot*>(item)->latticeCoord();
 }
 
 QRectF prim::GhostDot::boundingRect() const
@@ -122,9 +126,11 @@ void prim::Ghost::cleanGhost()
 }
 
 
-void prim::Ghost::prepare(const QList<prim::Item*> &items, QPointF scene_pos)
+void prim::Ghost::prepare(const QList<prim::Item*> &items, QPointF scene_pos,
+    prim::Lattice *lat)
 {
   cleanGhost();
+  lattice = lat;
   for(prim::Item *item : items)
     prepareItem(item, &aggnode);
   zeroGhost(scene_pos);
@@ -133,17 +139,19 @@ void prim::Ghost::prepare(const QList<prim::Item*> &items, QPointF scene_pos)
 }
 
 
-
-void prim::Ghost::prepare(prim::Item *item, QPointF)
-{
-  QList<prim::Item*> items;
-  items.append(item);
-  prepare(items);
-}
-
 void prim::Ghost::moveTo(QPointF pos)
 {
   setPos(pos-zero_offset);
+}
+
+
+void prim::Ghost::moveByCoord(prim::LatticeCoord coord_offset)
+{
+  for (prim::GhostDot *dot : dots) {
+    dot->setLatticeCoord(dot->latticeCoord() + coord_offset);
+  }
+  QPointF offset = lattice->latticeCoord2ScenePos(coord_offset);
+  instance()->moveBy(offset.x(), offset.y());
 }
 
 
@@ -180,6 +188,26 @@ QList<prim::LatticeDot*> prim::Ghost::getLattice(const QPointF &offset) const
     }
   }
   return ldots;
+}
+
+
+QList<bool> prim::Ghost::getLatticeAvailability(const prim::LatticeCoord &offset) const
+{
+  QList<bool> avail;
+  for (int i=0; i<dots.count(); i++) {
+    qDebug() << QObject::tr("ghost dot at (%1, %2, %3)").arg(dots.at(i)->latticeCoord().n).arg(dots.at(i)->latticeCoord().m).arg(dots.at(i)->latticeCoord().l);
+    /*if (!lattice->isValid(dots.at(i)->latticeCoord()+offset)) {
+      avail.append(false);
+      continue;
+    }*/
+    /*if (lattice->isOccupied(dots.at(i)->latticeCoord())
+        || !lattice->isValid(dots.at(i)->latticeCoord() + offset)) {
+      avail.append(false);
+      continue;
+    }*/
+    avail.append(true);
+  }
+  return avail;
 }
 
 prim::LatticeDot *prim::Ghost::getLatticeDot(prim::DBDot *db)
@@ -220,17 +248,20 @@ void prim::Ghost::setValid(bool val)
 }
 
 
-bool prim::Ghost::checkValid(const QPointF &offset)
+bool prim::Ghost::checkValid(const prim::LatticeCoord &offset)
 {
-  QList<prim::LatticeDot*> ldots = getLattice(offset);
+  QList<bool> lattice_avail = getLatticeAvailability(offset);
+
+
+  //QList<prim::LatticeDot*> ldots = getLattice(offset);
 
   // invalid if a dangling bond is associated with no selectable lattice dot or
   // an unselectable lattice dot
-  for(int i=0; i<sources.count(); i++)
-    if(sources.at(i)->item_type != prim::Item::DBDot)
-      continue;
-    else if(ldots.at(i)==0 || ldots.at(i)->flags()^QGraphicsItem::ItemIsSelectable)
+  for(int i=0; i<dots.count(); i++)
+    if (!lattice_avail.at(i))
       return false;
+    /*else if(ldots.at(i)==0 || ldots.at(i)->flags()^QGraphicsItem::ItemIsSelectable)
+      return false;*/
 
   return true;
 }

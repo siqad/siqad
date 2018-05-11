@@ -79,8 +79,10 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos, QPointF 
 }
 
 
-QPointF prim::Lattice::latticeCoord2ScenePos(prim::LatticeCoord l_coord) const
+QPointF prim::Lattice::latticeCoord2ScenePos(const prim::LatticeCoord &l_coord) const
 {
+  if (!isValid(l_coord))
+    return QPointF();
   QPointF lattice_scene_loc;
   lattice_scene_loc += l_coord.n * a_scene[0];
   lattice_scene_loc += l_coord.m * a_scene[1];
