@@ -31,8 +31,17 @@ prim::Lattice::Lattice(const QString &fname, int lay_id)
 }
 
 
-prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos)
+prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos) const
 {
+  QPointF dummy_site_pos;
+  return nearestSite(scene_pos, dummy_site_pos);
+}
+
+
+prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos, QPointF &nearest_site_pos) const
+{
+  // TODO ask Jake if these calculations should be done using the scene integer
+  //      version of the variables
   LatticeCoord coord;
   int n0[2];
   qreal proj;
@@ -45,7 +54,6 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos)
   }
 
   qreal mdist = qMax(a2[0], a2[1]);         // nearest Manhattan length
-  QPointF mp;                               // nearest lattice site
   for(int n=n0[0]-1; n<n0[0]+2; n++){
     for(int m=n0[1]-1; m<n0[1]+2; m++){
       QPointF x0 = n*a[0]+m*a[1];
@@ -54,7 +62,7 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos)
         qreal dist = (temp-x).manhattanLength();
         if(dist<mdist){
           mdist = dist;
-          mp = temp;
+          nearest_site_pos = temp * prim::Item::scale_factor;
           coord.n = n;
           coord.m = m;
           coord.l = l;
@@ -68,6 +76,28 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos)
   return coord;
   //return mp;                            // physical (angstrom) coords
   //return mp*prim::Item::scale_factor;   // scene (pixel) coords
+}
+
+
+QPointF prim::Lattice::latticeCoord2ScenePos(prim::LatticeCoord l_coord) const
+{
+  QPointF lattice_scene_loc;
+  lattice_scene_loc += l_coord.n * a_scene[0];
+  lattice_scene_loc += l_coord.m * a_scene[1];
+  lattice_scene_loc += b_scene[l_coord.l];
+  return lattice_scene_loc;
+}
+
+
+bool prim::Lattice::collidesWithLatticeDot(const QPointF &scene_pos,
+    const prim::LatticeCoord &l_coord) const
+{
+  QPointF target_pos = latticeCoord2ScenePos(l_coord);
+  QPointF delta = target_pos - scene_pos;
+  if (delta.manhattanLength() < 0.5 * settings::GUISettings::instance()->
+      get<qreal>("latdot/diameter") * prim::Item::scale_factor)
+    return true;
+  return false;
 }
 
 

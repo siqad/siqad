@@ -110,8 +110,8 @@ namespace gui{
     void buildLattice(const QString &fname=QString());
     void setScenePadding();
 
-    //! Convert lattice coordinates to QPointF
-    QPointF latticeCoord2QPointF(prim::LatticeCoord l_coord);
+    //! Check if given QPointF falls within a lattice dot
+    bool isLatticeDot(QPointF scene_pos);
 
     //! update the tool type
     void setTool(gui::ToolType tool);
@@ -271,6 +271,7 @@ namespace gui{
     // snapping
     qreal snap_diameter;            // size of region to search for snap points
     prim::LatticeDot *snap_target;  // current snap target, LatticeDot
+    prim::LatticeCoord snap_coord; // current snap target, lattice coordinate
     QPointF snap_cache;             // cursor position of last snap update
 
     // AFM ghost
@@ -349,9 +350,6 @@ namespace gui{
 
     // deep copy the current selection to the clipboard
     void copySelection();
-
-    // dbgen Location Indicator
-    void snapDBPreview(QPointF scene_pos);
 
     //! Create graphical previews for provided DB coordinates (always destroys
     //! existing previews).

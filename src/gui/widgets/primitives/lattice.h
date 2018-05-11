@@ -41,13 +41,23 @@ namespace prim{
     ~Lattice() {}
 
     //! Return specified lattice vector after graphical scaling
-    QPoint sceneLatticeVector(int dim) {return a_scene[dim];}
+    QPoint sceneLatticeVector(int dim) const {return a_scene[dim];}
 
     //! Return specified site vector after graphical scaling
-    QPoint sceneSiteVector(int ind) {return b_scene[ind];}
+    QPoint sceneSiteVector(int ind) const {return b_scene[ind];}
 
-    //! identify the nearest lattice site to the given scene position
-    LatticeCoord nearestSite(const QPointF &scene_pos);
+    //! Identify the nearest lattice site to the given scene position.
+    LatticeCoord nearestSite(const QPointF &scene_pos) const;
+
+    //! Identify the nearest lattice site to the given scene position, returns
+    //! it in lattice coordinates and updates the reference QPointF site_pos.
+    LatticeCoord nearestSite(const QPointF &scene_pos, QPointF &nearest_site_pos) const;
+
+    //! Convert lattice coordinates to QPointF
+    QPointF latticeCoord2ScenePos(prim::LatticeCoord l_coord) const;
+
+    //! Return whether a given scene_pos collides with the given lattice position
+    bool collidesWithLatticeDot(const QPointF &scene_pos, const LatticeCoord &l_coord) const;
 
     //! identify the bounding rect of an approximately rectangular supercell
     QRectF tileApprox();
@@ -74,8 +84,8 @@ namespace prim{
 
     // constants
 
-    static qreal rtn_acc; // termination precision for rationalize
-    static int rtn_iters;    // max iterations of rationalize
+    static qreal rtn_acc;     // termination precision for rationalize
+    static int rtn_iters;     // max iterations of rationalize
 
     // construct lattice from lattice settings
     void construct();

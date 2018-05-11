@@ -154,7 +154,6 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
     QPointF center = rect.center();
     QSizeF size(diameter_paint, diameter_paint);
     rect.setSize(size*qSqrt(fill_fact));
-    //rect.setSize(size*qSqrt(fill_fact));
     rect.moveCenter(center);
 
     painter->setPen(Qt::NoPen);
@@ -165,8 +164,7 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
   // draw outer circle
   painter->setPen(QPen(edge_col_state, edge_width_paint));
   painter->setBrush(Qt::NoBrush);
-  //painter->drawEllipse(rect);
-  painter->drawEllipse(boundingRect());
+  painter->drawEllipse(rect);
 }
 
 
