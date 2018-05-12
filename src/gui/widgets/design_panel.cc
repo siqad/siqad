@@ -144,10 +144,7 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
 // reset
 void gui::DesignPanel::resetDesignPanel()
 {
-  // TODO fold this into a single initDesignPanel function
-
   clearDesignPanel(true);
-
   initDesignPanel();
 
   // REBUILD
@@ -942,9 +939,6 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             break;
           case gui::ToolType::DBGenTool:
             // identify free lattice sites and create dangling bonds
-            /* TODO remove
-            filterSelection(false);
-            createDBs();*/
             createDBs();
             break;
           case gui::ToolType::ElectrodeTool:
@@ -1451,10 +1445,8 @@ void gui::DesignPanel::createGhost(bool paste)
   if (paste) {
     ghost->prepare(clipboard);
     prim::LatticeCoord offset;
-    if (snapGhost(mapToScene(mapFromGlobal(QCursor::pos())), offset)) {
-      QPointF offset_pt = lattice->latticeCoord2ScenePos(offset);
-      ghost->moveBy(offset_pt.x(), offset_pt.y());
-    }
+    if (snapGhost(mapToScene(mapFromGlobal(QCursor::pos())), offset))
+      ghost->moveByCoord(offset, lattice);
   } else {
     QPointF scene_pos = mapToScene(mapFromGlobal(QCursor::pos()));
     //get QList of selected Item object
@@ -2203,28 +2195,6 @@ void gui::DesignPanel::createDBs()
   undo_stack->endMacro();
 
   destroyDBPreviews();
-
-  /* TODO remove
-  // do something only if there is a selection
-  QList<prim::Item*> selection = selectedItems();
-  if(selection.isEmpty())
-    return;
-
-  // check that the selection is valid
-  for(prim::Item *item : selection){
-    if(item->item_type != prim::Item::LatticeDot){
-      qCritical() << tr("Dangling bond target is not a lattice dot...");
-      return;
-    }
-  }
-
-  // push actions onto the QUndoStack
-  int layer_index = layers.indexOf(top_layer);
-  undo_stack->beginMacro(tr("create dangling bonds at selected sites"));
-  for(prim::Item *item : selection)
-    undo_stack->push(new CreateDB(static_cast<prim::LatticeDot *>(item), layer_index, this));
-  undo_stack->endMacro();
-  //qDebug() << tr("Finished endMacro");*/
 }
 
 void gui::DesignPanel::createElectrodes(QPoint point1)
@@ -2476,9 +2446,8 @@ void gui::DesignPanel::destroyAggregate(prim::Aggregate *agg)
   for(prim::Item* item : items){
     switch(item->item_type){
       case prim::Item::DBDot:
-        // TODO update with new DB scheme
-        //undo_stack->push(new CreateDB(static_cast<prim::DBDot*>(item)->getSource(),
-                                      //item->layer_id, this, 0, true));
+        undo_stack->push(new CreateDB(static_cast<prim::DBDot*>(item)->latticeCoord(),
+                                      item->layer_id, this, 0, true));
         break;
       case prim::Item::Aggregate:
         destroyAggregate(static_cast<prim::Aggregate*>(item));
@@ -2544,9 +2513,9 @@ void gui::DesignPanel::pasteItem(prim::Ghost *ghost, prim::Item *item)
 void gui::DesignPanel::pasteDBDot(prim::Ghost *ghost, prim::DBDot *db)
 {
   // get the target lattice dor
+  qDebug() << "shoud paste DB now";
   prim::LatticeCoord l_coord = ghost->getLatticeCoord(db);
-  if (l_coord.l == -1)
-    undo_stack->push(new CreateDB(l_coord, getLayerIndex(top_layer), this, db));
+  undo_stack->push(new CreateDB(l_coord, getLayerIndex(top_layer), this, db));
 }
 
 void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)

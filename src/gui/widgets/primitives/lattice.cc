@@ -85,7 +85,7 @@ QPointF prim::Lattice::latticeCoord2ScenePos(const prim::LatticeCoord &l_coord) 
 {
   if (l_coord.l >= b_scene.size() || l_coord.l <= -b_scene.size())
     qCritical() << QObject::tr("coordinate invalid! (%1,%2,%3)").arg(l_coord.n).arg(l_coord.m).arg(l_coord.l);
-  qDebug() << QObject::tr("Coordinates: (%1,%2,%3)").arg(l_coord.n).arg(l_coord.m).arg(l_coord.l);
+  //qDebug() << QObject::tr("Coordinates: (%1,%2,%3)").arg(l_coord.n).arg(l_coord.m).arg(l_coord.l);
   QPointF lattice_scene_loc;
   lattice_scene_loc += l_coord.n * a_scene[0];
   lattice_scene_loc += l_coord.m * a_scene[1];

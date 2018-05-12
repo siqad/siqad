@@ -209,6 +209,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("ghostbox/valid_col", QColor(0, 150, 0));
 
   // aggregate parameters
+  S->setValue("aggregate/edge_width", .1);                      // will be scaled by scale_factor
   S->setValue("aggregate/edge_col", QColor(9, 255, 200, 150));  // bounding box color
   S->setValue("aggregate/edge_col_hovered", QColor(9, 255, 200, 150));  // bounding box color
 

@@ -9,6 +9,7 @@
 #include "aggregate.h"
 #include "dbdot.h"
 
+qreal prim::Aggregate::edge_width;
 QColor prim::Aggregate::edge_col;
 QColor prim::Aggregate::edge_col_hovered;
 
@@ -130,25 +131,28 @@ QRectF prim::Aggregate::boundingRect() const
     }
   }
 
-  qreal width = xmax-xmin;
-  qreal height = ymax-ymin;
+  qreal width = xmax-xmin+edge_width;
+  qreal height = ymax-ymin+edge_width;
   return QRectF(.5*(xmax+xmin-width), .5*(ymax+ymin-height), width, height);
 }
 
 void prim::Aggregate::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+  // resize the rectangle to omit the edge width
+  QRectF rect = boundingRect();
+  QSizeF size(rect.size() - QSizeF(edge_width, edge_width));
+  QPointF center = rect.center();
+  rect.setSize(size);
+  rect.moveCenter(center);
+
   // Scene will handle drawing the children, just draw the bounding box
   if(tool_type == gui::SelectTool && upSelected()){
-    QRectF rect = boundingRect();
-
-    painter->setPen(QPen(edge_col));
+    painter->setPen(QPen(edge_col, edge_width));
     painter->setBrush(Qt::NoBrush);
     painter->drawRect(rect);
   }
   else if(upHovered()){
-    QRectF rect = boundingRect();
-
-    painter->setPen(QPen(edge_col_hovered));
+    painter->setPen(QPen(edge_col_hovered, edge_width));
     painter->setBrush(Qt::NoBrush);
     painter->drawRect(rect);
   }
@@ -181,6 +185,7 @@ void prim::Aggregate::saveItems(QXmlStreamWriter *stream) const {
 void prim::Aggregate::prepareStatics()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  edge_width = gui_settings->get<qreal>("aggregate/edge_width") * prim::Item::scale_factor;
   edge_col = gui_settings->get<QColor>("aggregate/edge_col");
   edge_col_hovered = gui_settings->get<QColor>("aggregate/edge_col_hovered");
 }

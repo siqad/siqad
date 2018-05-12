@@ -262,7 +262,7 @@ prim::DBDotPreview::DBDotPreview(prim::LatticeCoord l_coord)
 
 QRectF prim::DBDotPreview::boundingRect() const
 {
-  qreal width = diameter + 2*edge_width;
+  qreal width = diameter + edge_width;
   return QRectF(-.5*width, -.5*width, width, width);
 }
 

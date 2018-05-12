@@ -465,8 +465,6 @@ namespace gui{
     //! DB. Set src_db if copying DB.
     CreateDB(prim::LatticeCoord l_coord, int layer_index, DesignPanel *dp,
         prim::DBDot *cp_src=0, bool invert=false, QUndoCommand *parent=0);
-    /* TODO remove CreateDB(prim::LatticeDot *ldot, int layer_index, DesignPanel *dp,
-        prim::DBDot *src_db=0, bool invert=false, QUndoCommand *parent=0);*/
 
     // destroy the dangling bond and update the lattice dot
     virtual void undo();
