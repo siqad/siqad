@@ -44,7 +44,7 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *scene)
         lay_id = rs->readElementText().toInt();
         rs->readNext();
       }
-      else if(rs->name() == "physloc"){
+      else if(rs->name() == "latcoord"){
         for(QXmlStreamAttribute &attr : rs->attributes()){
           if (attr.name().toString() == QLatin1String("n"))
             read_coord.n = attr.value().toInt();
@@ -77,7 +77,7 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *scene)
 
   // initialize
   initDBDot(read_coord, lay_id);
-  scene->addItem(this);
+  prim::Emitter::instance()->addItemToScene(this);
 }
 
 
@@ -88,13 +88,20 @@ QPointF prim::DBDot::getPhysLoc() const
 }
 
 
-void prim::DBDot::initDBDot(prim::LatticeCoord l_coord, int lay_id)
+void prim::DBDot::setLatticeCoord(prim::LatticeCoord l_coord)
+{
+  lat_coord = l_coord;
+  prim::Emitter::instance()->moveItemToLatticeCoord(this, lat_coord);
+}
+
+
+void prim::DBDot::initDBDot(prim::LatticeCoord coord, int lay_id)
 {
   // construct static class variables
   if(diameter_m<0)
     constructStatics();
 
-  lat_coord = l_coord;
+  setLatticeCoord(coord);
   setLayerIndex(lay_id);
   fill_fact = 0.;
   diameter = diameter_m;
@@ -184,9 +191,10 @@ void prim::DBDot::saveItems(QXmlStreamWriter *ws) const
   ws->writeTextElement("layer_id", QString::number(layer_id));
 
   // physical location
-  ws->writeEmptyElement("physloc");
-  ws->writeAttribute("x", QString::number(getPhysLoc().x()));
-  ws->writeAttribute("y", QString::number(getPhysLoc().y()));
+  ws->writeEmptyElement("latcoord");
+  ws->writeAttribute("n", QString::number(lat_coord.n));
+  ws->writeAttribute("m", QString::number(lat_coord.m));
+  ws->writeAttribute("l", QString::number(lat_coord.l));
 
   ws->writeEndElement();
 }

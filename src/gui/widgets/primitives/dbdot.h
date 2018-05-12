@@ -27,7 +27,7 @@ namespace prim{
     DBDot(QXmlStreamReader *, QGraphicsScene *);
 
     // initializer
-    void initDBDot(prim::LatticeCoord l_coord, int lay_id);
+    void initDBDot(prim::LatticeCoord coord, int lay_id);
 
     // destructor
     ~DBDot(){}
@@ -41,7 +41,7 @@ namespace prim{
     prim::LatticeCoord latticeCoord() {return lat_coord;}
 
     //! Set the lattice coordinates of the DB
-    void setLatticeCoord(prim::LatticeCoord l_coord) {lat_coord = l_coord;}
+    void setLatticeCoord(prim::LatticeCoord l_coord);
 
     //! Set electron occupant visibility
     void setShowElec(float se_in);

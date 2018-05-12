@@ -166,12 +166,6 @@ namespace gui{
     //! Show the property of an item.
     void showItemProperty(prim::Item *item) {property_editor->showForms(QList<prim::Item*>({item}));}
 
-    //! Add the given item to scene.
-    void addItemToSceneRequest(prim::Item *item) {addItemToScene(item);}
-
-    //! Remove the given item from scene.
-    void removeItemFromSceneRequest(prim::Item *item) {removeItemFromScene(item);}
-
     //! Begin resizing an item.
     void resizeBegin();
 

@@ -167,30 +167,6 @@ QList<prim::Item*> prim::Ghost::getTopItems() const
 }
 
 
-QList<prim::LatticeDot*> prim::Ghost::getLattice(const QPointF &offset) const
-{
-  QList<prim::LatticeDot*> ldots;
-  for(int i=0; i<sources.count(); i++){
-    if(sources.at(i)->item_type != prim::Item::DBDot)
-      ldots.append(0);
-    else{
-      // get list of items which intersect the ghost dot
-      QList<QGraphicsItem*> cands = scene()->items(dots.at(i)->scenePos()+offset);
-      // use first LatticeDot candidate
-      prim::LatticeDot *ldot=0;
-      for(QGraphicsItem *cand : cands)
-        if(static_cast<prim::Item*>(cand)->item_type == prim::Item::LatticeDot &&
-            cand->flags() & QGraphicsItem::ItemIsSelectable){
-          ldot = static_cast<prim::LatticeDot*>(cand);
-          break;
-        }
-      ldots.append(ldot);
-    }
-  }
-  return ldots;
-}
-
-
 QList<bool> prim::Ghost::getLatticeAvailability(const prim::LatticeCoord &offset,
     prim::Lattice *lattice) const
 {
@@ -212,23 +188,6 @@ QList<bool> prim::Ghost::getLatticeAvailability(const prim::LatticeCoord &offset
   return avail;
 }
 
-prim::LatticeDot *prim::Ghost::getLatticeDot(prim::DBDot *db)
-{
-  // get index of source
-  int index = sources.indexOf(static_cast<prim::Item*>(db));
-  if(index==-1)
-    return 0;
-
-  // search for LatticeDot under GhostDot
-  for(QGraphicsItem *cand : scene()->items(dots.at(index)->scenePos()))
-    if(static_cast<prim::Item*>(cand)->item_type == prim::Item::LatticeDot &&
-      cand->flags() & QGraphicsItem::ItemIsSelectable){
-        return static_cast<prim::LatticeDot*>(cand);
-      }
-
-  // no valid LatticeDot found, return 0
-  return 0;
-}
 
 prim::LatticeCoord prim::Ghost::getLatticeCoord(prim::DBDot *db) const
 {
@@ -264,16 +223,11 @@ bool prim::Ghost::checkValid(const prim::LatticeCoord &offset, prim::Lattice *la
 {
   QList<bool> lattice_avail = getLatticeAvailability(offset, lattice);
 
-
-  //QList<prim::LatticeDot*> ldots = getLattice(offset);
-
   // invalid if a dangling bond is associated with no selectable lattice dot or
   // an unselectable lattice dot
   for(int i=0; i<dots.count(); i++)
     if (!lattice_avail.at(i))
       return false;
-    /*else if(ldots.at(i)==0 || ldots.at(i)->flags()^QGraphicsItem::ItemIsSelectable)
-      return false;*/
 
   return true;
 }

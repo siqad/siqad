@@ -12,7 +12,6 @@
 #include "item.h"
 #include "aggregate.h"
 #include "dbdot.h"
-#include "latdot.h"
 #include "ghost.h"
 #include "electrode.h"
 #include "afmarea.h"

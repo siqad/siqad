@@ -36,7 +36,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   connect(prim::Emitter::instance(), &prim::Emitter::sig_showProperty,
           this, &gui::DesignPanel::showItemProperty);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_addItemToScene,
-          this, &gui::DesignPanel::addItemToSceneRequest);
+          this, &gui::DesignPanel::addItemToScene);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_removeItemFromScene,
           this, &gui::DesignPanel::removeItemFromScene);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeBegin,
@@ -1685,7 +1685,6 @@ void gui::DesignPanel::CreateDB::create()
   // add dangling bond to layer and scene, index in layer item stack will be
   // equal to layer->getItems().size()
   prim::DBDot *new_db = new prim::DBDot(lat_coord, layer_index);
-  new_db->setPos(dp->lattice->latticeCoord2ScenePos(lat_coord));
   dp->lattice->setOccupied(lat_coord, new_db);
   dp->addItem(new_db, layer_index, index);
   db_at_loc=new_db;
@@ -2158,14 +2157,13 @@ void gui::DesignPanel::MoveItem::moveItem(prim::Item *item, const QPointF &delta
 
 void gui::DesignPanel::MoveItem::moveDBDot(prim::DBDot *dot, const QPointF &delta)
 {
-  // get the target LatticeDot
+  // get the target lattice site coordinate
   QPointF new_pos = dot->scenePos() + delta;
   QPointF nearest_site_pos;
-  prim::LatticeCoord l_coord = dp->lattice->nearestSite(new_pos, nearest_site_pos);
-  if (dp->lattice->collidesWithLatticeDot(new_pos, l_coord)) {
-    dot->setLatticeCoord(l_coord);
-    dot->setPos(nearest_site_pos);
-    dp->lattice->setOccupied(l_coord, dot);
+  prim::LatticeCoord coord = dp->lattice->nearestSite(new_pos, nearest_site_pos);
+  if (dp->lattice->collidesWithLatticeSite(new_pos, coord)) {
+    dot->setLatticeCoord(coord);
+    dp->lattice->setOccupied(coord, dot);
   } else {
     qCritical() << tr("Failed to move DBDot");
   }

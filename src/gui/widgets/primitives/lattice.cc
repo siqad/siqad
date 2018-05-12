@@ -94,7 +94,7 @@ QPointF prim::Lattice::latticeCoord2ScenePos(const prim::LatticeCoord &l_coord) 
 }
 
 
-bool prim::Lattice::collidesWithLatticeDot(const QPointF &scene_pos,
+bool prim::Lattice::collidesWithLatticeSite(const QPointF &scene_pos,
     const prim::LatticeCoord &l_coord) const
 {
   QPointF target_pos = latticeCoord2ScenePos(l_coord);

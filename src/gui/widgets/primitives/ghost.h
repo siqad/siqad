@@ -147,18 +147,8 @@ namespace prim{
     //! free IndexList pointer after use
     prim::AggNode &getTopIndices(){return aggnode;}
 
-    //! get a list corresponding to the LatticeDot associated with each GhostDot.
-    //! If the Item associated with the GhostDot is not a dangling bond the list
-    //! will contain a 0.
-    QList<prim::LatticeDot*> getLattice(const QPointF &offset = QPointF()) const;
-
-
     QList<bool> getLatticeAvailability(const prim::LatticeCoord &offset,
         prim::Lattice *lattice) const;
-
-    //! attempt to get the lattice dot under the GhostDot correponding to the given
-    //! DBDot item.
-    prim::LatticeDot* getLatticeDot(prim::DBDot *db);
 
     //! Attempt to get the lattice site under the ghost dot corresponding to the
     //! given DBDot item. Returns a coordinate of (0,0,-1) otherwise.

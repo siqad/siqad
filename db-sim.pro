@@ -61,7 +61,6 @@ HEADERS += \
 	src/gui/widgets/primitives/item.h \
 	src/gui/widgets/primitives/aggregate.h \
 	src/gui/widgets/primitives/dbdot.h \
-	src/gui/widgets/primitives/latdot.h \
 	src/gui/widgets/primitives/ghost.h \
 	src/gui/widgets/primitives/items.h \
 	src/gui/widgets/primitives/layer.h \
@@ -82,7 +81,6 @@ SOURCES += \
 	src/gui/widgets/primitives/item.cc \
 	src/gui/widgets/primitives/aggregate.cc \
 	src/gui/widgets/primitives/dbdot.cc \
-	src/gui/widgets/primitives/latdot.cc \
 	src/gui/widgets/primitives/ghost.cc \
 	src/gui/widgets/primitives/layer.cc \
 	src/gui/widgets/primitives/lattice.cc \

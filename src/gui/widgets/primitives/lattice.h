@@ -12,7 +12,6 @@
 #define _GUI_PR_LATTICE_H_
 
 #include "layer.h"
-#include "latdot.h"
 #include <QHash>
 
 namespace prim{
@@ -72,7 +71,7 @@ namespace prim{
     QPointF latticeCoord2ScenePos(const prim::LatticeCoord &l_coord) const;
 
     //! Return whether a given scene_pos collides with the given lattice position
-    bool collidesWithLatticeDot(const QPointF &scene_pos, const LatticeCoord &l_coord) const;
+    bool collidesWithLatticeSite(const QPointF &scene_pos, const LatticeCoord &l_coord) const;
 
     //! Set lattice dot location to be occupied
     void setOccupied(const prim::LatticeCoord &l_coord, prim::Item *dbdot) {
