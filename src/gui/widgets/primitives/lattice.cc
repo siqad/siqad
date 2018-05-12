@@ -60,7 +60,7 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos, QPointF 
       for (int l=0; l<b.size(); l++){
         QPointF temp = x0 + b[l];
         qreal dist = (temp-x).manhattanLength();
-        if(dist<mdist){
+        if(dist<=mdist){
           mdist = dist;
           nearest_site_pos = temp * prim::Item::scale_factor;
           coord.n = n;
@@ -81,12 +81,13 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos, QPointF 
 
 QPointF prim::Lattice::latticeCoord2ScenePos(const prim::LatticeCoord &l_coord) const
 {
-  if (!isValid(l_coord))
-    return QPointF();
+  if (l_coord.l >= b_scene.size() || l_coord.l <= -b_scene.size())
+    qCritical() << QObject::tr("coordinate invalid! (%1,%2,%3)").arg(l_coord.n).arg(l_coord.m).arg(l_coord.l);
+  qDebug() << QObject::tr("Coordinates: (%1,%2,%3)").arg(l_coord.n).arg(l_coord.m).arg(l_coord.l);
   QPointF lattice_scene_loc;
   lattice_scene_loc += l_coord.n * a_scene[0];
   lattice_scene_loc += l_coord.m * a_scene[1];
-  lattice_scene_loc += b_scene[l_coord.l];
+  lattice_scene_loc += b_scene[qAbs(l_coord.l)] * (l_coord.l > 0 ? 1 : -1);
   return lattice_scene_loc;
 }
 
@@ -127,25 +128,16 @@ QImage prim::Lattice::tileableLatticeImage(QColor bkg_col)
   qreal lat_diam = gui_settings->get<qreal>("latdot/diameter") * prim::Item::scale_factor;
   qreal lat_edge_width = gui_settings->get<qreal>("latdot/edge_width") * lat_diam;
   QColor lat_edge_col = gui_settings->get<QColor>("latdot/edge_col");
-  // TODO the rest
+  // TODO publish mode
 
-  // first generate a single tile with fully contained circles
-  a_scene[0] = QPointF(tileApprox().topRight() * prim::Item::scale_factor).toPoint();
-  a_scene[1] = QPointF(tileApprox().bottomLeft() * prim::Item::scale_factor).toPoint();
-  for (QPointF site : b)
-    b_scene.append(QPointF(site * prim::Item::scale_factor).toPoint());
-
-  //QPixmap bkg_pixmap(QSize(QSizeF(tileApprox().size()*prim::Item::scale_factor).toSize()));
   QPixmap bkg_pixmap(QSize(a_scene[0].x(), a_scene[1].y()));
   bkg_pixmap.fill(bkg_col);
   QPainter painter(&bkg_pixmap);
   painter.setBrush(Qt::NoBrush);
   painter.setPen(QPen(lat_edge_col, lat_edge_width));
   painter.setRenderHint(QPainter::Antialiasing);
-  for (QPoint site : b_scene) {
-    //painter.drawEllipse(site.x()*prim::Item::scale_factor+lat_edge_width, site.y()*prim::Item::scale_factor+lat_edge_width, lat_diam, lat_diam);
+  for (QPoint site : b_scene)
     painter.drawEllipse(site.x()+lat_edge_width, site.y()+lat_edge_width, lat_diam, lat_diam);
-  }
   painter.end();
 
   // then generate a single tile with properly offset circles
@@ -173,6 +165,12 @@ void prim::Lattice::construct()
     a[i] = lattice_settings->get<QPointF>(QString("lattice/a%1").arg(i+1));
     a2[i] = QPointF::dotProduct(a[i], a[i]);
   }
+
+  // generate lattice and site vectors for display (all integer)
+  a_scene[0] = QPointF(tileApprox().topRight() * prim::Item::scale_factor).toPoint();
+  a_scene[1] = QPointF(tileApprox().bottomLeft() * prim::Item::scale_factor).toPoint();
+  for (QPointF site : b)
+    b_scene.append(QPointF(site * prim::Item::scale_factor).toPoint());
 }
 
 

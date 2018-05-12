@@ -344,10 +344,6 @@ namespace gui{
     // initialize an item move
     void initMove();
 
-    // set the selectability of the lattice dots for the given Item
-    // TODO remove
-    // void setLatticeDotSelectability(prim::Item *item, bool flag);
-
     // deep copy the current selection to the clipboard
     void copySelection();
 

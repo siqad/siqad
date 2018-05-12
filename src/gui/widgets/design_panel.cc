@@ -855,9 +855,9 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     QPointF scene_pos = mapToScene(e->pos());
     prim::LatticeCoord offset;
     if (snapGhost(scene_pos, offset)) { // if there are db dots
-      qDebug() << tr("Lattice coord offset (%1,%2)").arg(offset.n).arg(offset.m);
+      qDebug() << tr("Lattice coord offset (%1,%2,%3)").arg(offset.n).arg(offset.m).arg(offset.l);
       QPointF offset_pt = lattice->latticeCoord2ScenePos(offset);
-      prim::Ghost::instance()->moveByCoord(offset);
+      prim::Ghost::instance()->moveByCoord(offset, lattice);
     }
 
   } else if (tool_type == AFMPathTool) {
@@ -1528,7 +1528,7 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, prim::LatticeCoord &offset)
     offset = nearest_site - old_anchor;
     snap_coord = nearest_site;
     if (!ghost->valid_hash.contains(nearest_site))
-      ghost->valid_hash[nearest_site] = ghost->checkValid(offset);
+      ghost->valid_hash[nearest_site] = ghost->checkValid(offset, lattice);
     snap_target = nearest_site;
     ghost->setValid(ghost->valid_hash[nearest_site]);
 
@@ -1548,35 +1548,15 @@ void gui::DesignPanel::initMove()
 {
   createGhost(false);
 
-  // set lattice dots of objects to be moved as selectable
-  /*for(prim::Item *item : selectedItems())
-    setLatticeDotSelectability(item, true);*/
+  // set lattice dots of selected DBs to be unoccupied
+  for (prim::Item *item : selectedItems()) {
+    if (item->item_type == prim::Item::DBDot)
+      lattice->setUnoccupied(static_cast<prim::DBDot*>(item)->latticeCoord());
+  }
 
   moving = true;
 }
 
-
-/* TODO remove
-void gui::DesignPanel::setLatticeDotSelectability(prim::Item *item, bool flag)
-{
-  prim::LatticeDot *ldot=0;
-  switch(item->item_type){
-    case prim::Item::DBDot:
-      ldot = static_cast<prim::DBDot*>(item)->getSource();
-      ldot->setFlag(QGraphicsItem::ItemIsSelectable, flag);
-      break;
-    case prim::Item::Aggregate:
-      for(prim::Item *it : static_cast<prim::Aggregate*>(item)->getChildren())
-        setLatticeDotSelectability(it, flag);
-      break;
-    case prim::Item::LatticeDot:
-      ldot = static_cast<prim::LatticeDot*>(item);
-      ldot->setFlag(QGraphicsItem::ItemIsSelectable, flag);
-      break;
-    default:
-      break;
-  }
-}*/
 
 void gui::DesignPanel::copySelection()
 {
@@ -1612,6 +1592,8 @@ void gui::DesignPanel::createDBPreviews(QList<prim::LatticeCoord> coords)
 void gui::DesignPanel::appendDBPreviews(QList<prim::LatticeCoord> coords)
 {
   for (prim::LatticeCoord coord : coords) {
+    if (lattice->isOccupied(coord))
+      continue;
     prim::DBDotPreview *db_prev = new prim::DBDotPreview(coord);
     db_prev->setPos(lattice->latticeCoord2ScenePos(coord));
     db_previews.append(db_prev);
@@ -1682,27 +1664,6 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeCoord l_coord, int layer_index
   prim::Layer *layer = dp->getLayer(layer_index);
   index = invert ? layer->getItems().indexOf(db_at_loc) : layer->getItems().size();
 }
-
-/* TODO remove
-gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
-                        gui::DesignPanel *dp, prim::DBDot *src_db, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), ldot(ldot)
-{
-  prim::DBDot *dbdot = ldot->getDBDot();
-  // dbdot should be 0 if invert is false else non-zero
-  if (!invert && dbdot!=0) {
-    qDebug() << tr("latdot loc: (%1, %2)").arg(ldot->x()).arg(ldot->y());
-    qFatal("Trying to make a new db at a location that already has one");
-  }
-  if (invert && dbdot==0) {
-    qDebug() << tr("latdot loc: (%1, %2)").arg(ldot->x()).arg(ldot->y());
-    qFatal("Trying to delete a non-existing DB");
-  }
-
-  // dbdot index in layer
-  prim::Layer *layer = dp->getLayer(layer_index);
-  index = invert ? layer->getItems().indexOf(dbdot) : layer->getItems().size();
-}*/
 
 void gui::DesignPanel::CreateDB::undo()
 {
@@ -2199,6 +2160,7 @@ void gui::DesignPanel::MoveItem::moveDBDot(prim::DBDot *dot, const QPointF &delt
   if (dp->lattice->collidesWithLatticeDot(new_pos, l_coord)) {
     dot->setLatticeCoord(l_coord);
     dot->setPos(nearest_site_pos);
+    dp->lattice->setOccupied(l_coord, dot);
   } else {
     qCritical() << tr("Failed to move DBDot");
   }
@@ -2643,10 +2605,12 @@ bool gui::DesignPanel::moveToGhost(bool kill)
     // reset the original lattice dot selectability and return false
     for (prim::Item *item : selectedItems()) {
       if (item->item_type != prim::Item::Electrode &&
-          item->item_type!= prim::Item::AFMArea) {
+          item->item_type != prim::Item::AFMArea) {
         is_all_floating = false;
       }
-      //setLatticeDotSelectability(item, false); TODO remove
+      if (item->item_type == prim::Item::DBDot) {
+        lattice->setOccupied(static_cast<prim::DBDot*>(item)->latticeCoord(), item);
+      }
     }
 
     if (is_all_floating) {//selection is all electrodes. try to move them without snapping.

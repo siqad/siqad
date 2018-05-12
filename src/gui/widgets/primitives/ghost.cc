@@ -126,11 +126,9 @@ void prim::Ghost::cleanGhost()
 }
 
 
-void prim::Ghost::prepare(const QList<prim::Item*> &items, QPointF scene_pos,
-    prim::Lattice *lat)
+void prim::Ghost::prepare(const QList<prim::Item*> &items, QPointF scene_pos)
 {
   cleanGhost();
-  lattice = lat;
   for(prim::Item *item : items)
     prepareItem(item, &aggnode);
   zeroGhost(scene_pos);
@@ -145,11 +143,13 @@ void prim::Ghost::moveTo(QPointF pos)
 }
 
 
-void prim::Ghost::moveByCoord(prim::LatticeCoord coord_offset)
+void prim::Ghost::moveByCoord(prim::LatticeCoord coord_offset, prim::Lattice *lattice)
 {
-  for (prim::GhostDot *dot : dots) {
+  prim::LatticeCoord fin_coord = anchor->latticeCoord() + coord_offset;
+  qDebug() << QObject::tr("anchor (%1,%2,%3) + offset (%4,%5,%6) = final (%7,%8,%9)").arg(anchor->latticeCoord().n).arg(anchor->latticeCoord().m).arg(anchor->latticeCoord().l).arg(coord_offset.n).arg(coord_offset.m).arg(coord_offset.l).arg(fin_coord.n).arg(fin_coord.m).arg(fin_coord.l);
+
+  for (prim::GhostDot *dot : dots)
     dot->setLatticeCoord(dot->latticeCoord() + coord_offset);
-  }
   QPointF offset = lattice->latticeCoord2ScenePos(coord_offset);
   instance()->moveBy(offset.x(), offset.y());
 }
@@ -191,20 +191,22 @@ QList<prim::LatticeDot*> prim::Ghost::getLattice(const QPointF &offset) const
 }
 
 
-QList<bool> prim::Ghost::getLatticeAvailability(const prim::LatticeCoord &offset) const
+QList<bool> prim::Ghost::getLatticeAvailability(const prim::LatticeCoord &offset,
+    prim::Lattice *lattice) const
 {
   QList<bool> avail;
   for (int i=0; i<dots.count(); i++) {
     qDebug() << QObject::tr("ghost dot at (%1, %2, %3)").arg(dots.at(i)->latticeCoord().n).arg(dots.at(i)->latticeCoord().m).arg(dots.at(i)->latticeCoord().l);
-    /*if (!lattice->isValid(dots.at(i)->latticeCoord()+offset)) {
+    if (!lattice->isValid(dots.at(i)->latticeCoord()+offset)) {
+      qDebug() << "Target site is not valid";
       avail.append(false);
       continue;
-    }*/
-    /*if (lattice->isOccupied(dots.at(i)->latticeCoord())
-        || !lattice->isValid(dots.at(i)->latticeCoord() + offset)) {
+    }
+    if (lattice->isOccupied(dots.at(i)->latticeCoord()+offset)) {
+      qDebug() << "Target site is occupied";
       avail.append(false);
       continue;
-    }*/
+    }
     avail.append(true);
   }
   return avail;
@@ -248,9 +250,9 @@ void prim::Ghost::setValid(bool val)
 }
 
 
-bool prim::Ghost::checkValid(const prim::LatticeCoord &offset)
+bool prim::Ghost::checkValid(const prim::LatticeCoord &offset, prim::Lattice *lattice)
 {
-  QList<bool> lattice_avail = getLatticeAvailability(offset);
+  QList<bool> lattice_avail = getLatticeAvailability(offset, lattice);
 
 
   //QList<prim::LatticeDot*> ldots = getLattice(offset);

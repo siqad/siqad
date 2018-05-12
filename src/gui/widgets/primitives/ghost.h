@@ -116,19 +116,19 @@ namespace prim{
 
     //! create a ghost image from a list of Item objects
     //! if moving, scene_pos gives the current mouse location
-    void prepare(const QList<prim::Item*> &items, QPointF scene_pos=QPointF(), prim::Lattice *lat=0);
+    void prepare(const QList<prim::Item*> &items, QPointF scene_pos=QPointF());
     //! create a ghost image from a single Item
     //! if moving, scene_pos gives the current mouse location
-    void prepare(Item *item, QPointF scene_pos=QPointF(), prim::Lattice *lat=0)
+    void prepare(Item *item, QPointF scene_pos=QPointF())
     {
-      prepare(QList<prim::Item*>({item}), scene_pos, lat);
+      prepare(QList<prim::Item*>({item}), scene_pos);
     }
 
     //! move center of Ghost to the given position
     void moveTo(QPointF pos);
 
     //! move the ghost by the given lattice coordinate offset
-    void moveByCoord(prim::LatticeCoord coord_offset);
+    void moveByCoord(prim::LatticeCoord coord_offset, prim::Lattice *lattice);
 
     //! get the items associated with the GhostDots
     QList<prim::Item*>& getSources() {return sources;}
@@ -153,7 +153,8 @@ namespace prim{
     QList<prim::LatticeDot*> getLattice(const QPointF &offset = QPointF()) const;
 
 
-    QList<bool> getLatticeAvailability(const prim::LatticeCoord &offset = prim::LatticeCoord()) const;
+    QList<bool> getLatticeAvailability(const prim::LatticeCoord &offset,
+        prim::Lattice *lattice) const;
 
     //! attempt to get the lattice dot under the GhostDot correponding to the given
     //! DBDot item.
@@ -177,7 +178,7 @@ namespace prim{
     void setValid(bool val);
 
     //! check if the current position is valid.
-    bool checkValid(const prim::LatticeCoord &offset = prim::LatticeCoord());
+    bool checkValid(const prim::LatticeCoord &offset, prim::Lattice *lattice);
 
     //! change in position between the first source and GhostDot, for moving Items
     QPointF moveOffset() const;

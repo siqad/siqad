@@ -68,7 +68,7 @@ namespace prim{
     //! it in lattice coordinates and updates the reference QPointF site_pos.
     LatticeCoord nearestSite(const QPointF &scene_pos, QPointF &nearest_site_pos) const;
 
-    //! Convert lattice coordinates to QPointF. Returns a QPointF() if invalid.
+    //! Convert lattice coordinates to QPointF. Does not check for validity!
     QPointF latticeCoord2ScenePos(const prim::LatticeCoord &l_coord) const;
 
     //! Return whether a given scene_pos collides with the given lattice position
