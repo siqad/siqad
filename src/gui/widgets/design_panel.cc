@@ -851,11 +851,8 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     // update snap
     QPointF scene_pos = mapToScene(e->pos());
     prim::LatticeCoord offset;
-    if (snapGhost(scene_pos, offset)) { // if there are db dots
-      qDebug() << tr("Lattice coord offset (%1,%2,%3)").arg(offset.n).arg(offset.m).arg(offset.l);
-      QPointF offset_pt = lattice->latticeCoord2ScenePos(offset);
+    if (snapGhost(scene_pos, offset)) // if there are db dots
       prim::Ghost::instance()->moveByCoord(offset, lattice);
-    }
 
   } else if (tool_type == AFMPathTool) {
     // update ghost node and ghost segment if there is a focused node, only update
@@ -1541,12 +1538,28 @@ void gui::DesignPanel::initMove()
   createGhost(false);
 
   // set lattice dots of selected DBs to be unoccupied
-  for (prim::Item *item : selectedItems()) {
-    if (item->item_type == prim::Item::DBDot)
-      lattice->setUnoccupied(static_cast<prim::DBDot*>(item)->latticeCoord());
-  }
+  for (prim::Item *item : selectedItems())
+    setLatticeSiteOccupancy(item, false);
 
   moving = true;
+}
+
+void gui::DesignPanel::setLatticeSiteOccupancy(prim::Item *item, bool flag)
+{
+  switch(item->item_type){
+    case prim::Item::DBDot:
+      if (flag)
+        lattice->setOccupied(static_cast<prim::DBDot*>(item)->latticeCoord(), item);
+      else
+        lattice->setUnoccupied(static_cast<prim::DBDot*>(item)->latticeCoord());
+      break;
+    case prim::Item::Aggregate:
+      for(prim::Item *it : static_cast<prim::Aggregate*>(item)->getChildren())
+        setLatticeSiteOccupancy(it, flag);
+      break;
+    default:
+      break;
+  }
 }
 
 
@@ -2574,9 +2587,7 @@ bool gui::DesignPanel::moveToGhost(bool kill)
           item->item_type != prim::Item::AFMArea) {
         is_all_floating = false;
       }
-      if (item->item_type == prim::Item::DBDot) {
-        lattice->setOccupied(static_cast<prim::DBDot*>(item)->latticeCoord(), item);
-      }
+      setLatticeSiteOccupancy(item, true);
     }
 
     if (is_all_floating) {//selection is all electrodes. try to move them without snapping.
