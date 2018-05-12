@@ -230,6 +230,16 @@ prim::LatticeDot *prim::Ghost::getLatticeDot(prim::DBDot *db)
   return 0;
 }
 
+prim::LatticeCoord prim::Ghost::getLatticeCoord(prim::DBDot *db) const
+{
+  // get index of source
+  int index = sources.indexOf(static_cast<prim::Item*>(db));
+  if (index==-1)
+    return prim::LatticeCoord(0,0,-1);
+  else
+    return dots.at(index)->latticeCoord();
+}
+
 QPointF prim::Ghost::freeAnchor(QPointF scene_pos)
 {
   return scene_pos+anchor_offset;

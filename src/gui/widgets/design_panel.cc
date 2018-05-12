@@ -2544,12 +2544,9 @@ void gui::DesignPanel::pasteItem(prim::Ghost *ghost, prim::Item *item)
 void gui::DesignPanel::pasteDBDot(prim::Ghost *ghost, prim::DBDot *db)
 {
   // get the target lattice dor
-  prim::LatticeDot *ldot = ghost->getLatticeDot(db);
-  if(ldot){
-    // TODO reimplement with DB scheme
-    // undo_stack->push(new CreateDB(ldot, getLayerIndex(top_layer), this, db));
-  }
-
+  prim::LatticeCoord l_coord = ghost->getLatticeCoord(db);
+  if (l_coord.l == -1)
+    undo_stack->push(new CreateDB(l_coord, getLayerIndex(top_layer), this, db));
 }
 
 void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)

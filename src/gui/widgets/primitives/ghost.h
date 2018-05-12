@@ -160,6 +160,10 @@ namespace prim{
     //! DBDot item.
     prim::LatticeDot* getLatticeDot(prim::DBDot *db);
 
+    //! Attempt to get the lattice site under the ghost dot corresponding to the
+    //! given DBDot item. Returns a coordinate of (0,0,-1) otherwise.
+    prim::LatticeCoord getLatticeCoord(prim::DBDot *db) const;
+
     //! get the GhostDot nearest to the center of the Ghost. If db is set, will
     //! return the neatest dangling bond GhostDot if any exists else 0.
     prim::GhostDot *snapAnchor() {return anchor;}
