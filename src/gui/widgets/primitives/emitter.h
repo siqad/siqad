@@ -14,7 +14,6 @@
 
 #include <QObject>
 #include <QGraphicsItem>
-#include "lattice.h"
 
 namespace prim{
 
@@ -44,7 +43,7 @@ namespace prim{
     void removeItemFromScene(Item *);
 
     //! emit a signal teeling DesignPanel to move item to lattice coordinate
-    void moveItemToLatticeCoord(Item *, prim::LatticeCoord coord);
+    void moveItemToLatticeCoord(Item *, int n, int m, int l);
 
   signals:
 
@@ -56,7 +55,7 @@ namespace prim{
 
     void sig_removeItemFromScene(Item *);
 
-    void sig_moveItemToLatticeCoord(Item *, prim::LatticeCoord coord);
+    void sig_moveItemToLatticeCoord(Item *, int, int, int);
 
     void sig_resizeBegin();
 

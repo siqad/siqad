@@ -43,6 +43,8 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
           this, &gui::DesignPanel::resizeBegin);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeFinalize,
           this, &gui::DesignPanel::resizeItem);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_moveItemToLatticeCoord,
+          this, &gui::DesignPanel::moveItemToLatticeCoord);
 }
 
 // destructor
@@ -770,6 +772,11 @@ void gui::DesignPanel::rotateCcw()
   // recenter the view to the original center before the rotation
   QPointF delta = mapToScene(viewport()->rect().center()) - old_center;
   scrollDelta(delta);
+}
+
+void gui::DesignPanel::moveItemToLatticeCoord(prim::Item *item, int n, int m, int l)
+{
+  item->setPos(lattice->latticeCoord2ScenePos(prim::LatticeCoord(n,m,l)));
 }
 
 // INTERRUPTS

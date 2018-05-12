@@ -176,6 +176,10 @@ namespace gui{
     void rotateCw();
     void rotateCcw();
 
+    //! Move item to given lattice coordinates. Mainly for Item Emitter to instruct
+    //! movements, use setPos directly otherwise.
+    void moveItemToLatticeCoord(prim::Item *, int, int, int);
+
     //! Emitted when the undo stack clean stage has changed.
     void emitUndoStackCleanChanged(bool c) {emit sig_undoStackCleanChanged(c);}
 
