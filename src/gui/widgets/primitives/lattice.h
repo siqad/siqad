@@ -54,6 +54,9 @@ namespace prim{
     //! destructor
     ~Lattice() {}
 
+    //! Save the lattice layer to XML stream.
+    void saveLayer(QXmlStreamWriter *) const override;
+
     //! Return specified lattice vector after graphical scaling
     QPoint sceneLatticeVector(int dim) const {return a_scene[dim];}
 
@@ -66,6 +69,11 @@ namespace prim{
     //! Identify the nearest lattice site to the given scene position, returns
     //! it in lattice coordinates and updates the reference QPointF site_pos.
     LatticeCoord nearestSite(const QPointF &scene_pos, QPointF &nearest_site_pos) const;
+
+    //! Return all sites enclosed in given lattice coordinates. WARNING this won't
+    //! work with rotated lattices!
+    QList<prim::LatticeCoord> enclosedSites(const prim::LatticeCoord &coord1,
+        const prim::LatticeCoord &coord2) const;
 
     //! Convert lattice coordinates to QPointF. Does not check for validity!
     QPointF latticeCoord2ScenePos(const prim::LatticeCoord &l_coord) const;

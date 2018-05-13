@@ -143,18 +143,25 @@ void prim::Layer::setActive(bool act)
   }
 }
 
-void prim::Layer::saveLayer(QXmlStreamWriter *stream) const
+void prim::Layer::saveLayer(QXmlStreamWriter *ws) const
 {
-  stream->writeStartElement("layer_prop");
+  ws->writeStartElement("layer_prop");
+  saveLayerProperties(ws);
+  ws->writeEndElement();
+}
 
-  stream->writeTextElement("name", name);
-  stream->writeTextElement("type", getContentTypeString());
-  stream->writeTextElement("zoffset", QString::number(zoffset));
-  stream->writeTextElement("zheight", QString::number(zheight));
-  stream->writeTextElement("visible", QString::number(visible));
-  stream->writeTextElement("active", QString::number(active));
+void prim::Layer::saveLayerProperties(QXmlStreamWriter *ws) const
+{
+  int fp = settings::AppSettings::instance()->get<int>("float_prc");
+  char fmt = settings::AppSettings::instance()->get<char>("float_fmt");
+  QString str;
 
-  stream->writeEndElement();
+  ws->writeTextElement("name", getName());
+  ws->writeTextElement("type", "Lattice");
+  ws->writeTextElement("zoffset", str.setNum(zOffset(), fmt, fp));
+  ws->writeTextElement("zheight", str.setNum(zHeight(), fmt, fp));
+  ws->writeTextElement("visible", QString::number(isVisible()));
+  ws->writeTextElement("active", QString::number(isActive()));
 }
 
 void prim::Layer::saveItems(QXmlStreamWriter *stream) const

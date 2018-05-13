@@ -268,8 +268,8 @@ namespace gui{
 
     // snapping
     qreal snap_diameter;            // size of region to search for snap points
-    prim::LatticeCoord snap_target; // current snap target, LatticeDot
     prim::LatticeCoord snap_coord;  // current snap target, lattice coordinate
+    prim::LatticeCoord coord_start; // lattice coordinate of mouse click location
     QPointF snap_cache;             // cursor position of last snap update
 
     // AFM ghost

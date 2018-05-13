@@ -30,7 +30,7 @@ prim::DBDot::DBDot(prim::LatticeCoord l_coord, int lay_id)
 }
 
 
-prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *scene)
+prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *)
   : prim::Item(prim::Item::DBDot)
 {
   prim::LatticeCoord read_coord;

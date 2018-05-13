@@ -31,6 +31,36 @@ prim::Lattice::Lattice(const QString &fname, int lay_id)
 }
 
 
+void prim::Lattice::saveLayer(QXmlStreamWriter *ws) const
+{
+  ws->writeStartElement("layer_prop");
+
+  int fp = settings::AppSettings::instance()->get<int>("float_prc");
+  char fmt = settings::AppSettings::instance()->get<char>("float_fmt");
+  QString str;
+
+  // common layer properties
+  saveLayerProperties(ws);
+
+  // lattice specific properties
+  ws->writeStartElement("lat_vec");
+  for (int i=0; i<2; i++) {
+    ws->writeEmptyElement(QObject::tr("a%1").arg(i+1));
+    ws->writeAttribute("x", str.setNum(a[i].x(), fmt, fp));
+    ws->writeAttribute("y", str.setNum(a[i].y(), fmt, fp));
+  }
+  ws->writeTextElement("N", QString::number(n_cell));
+  for (int i=0; i<b.size(); i++) {
+    ws->writeEmptyElement(QObject::tr("b%1").arg(i+1));
+    ws->writeAttribute("x", str.setNum(b[i].x(), fmt, fp));
+    ws->writeAttribute("y", str.setNum(b[i].y(), fmt, fp));
+  }
+  ws->writeEndElement();  // end of lat_vec
+
+  ws->writeEndElement();  // end of layer_prop
+}
+
+
 prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos) const
 {
   QPointF dummy_site_pos;
@@ -42,7 +72,7 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos, QPointF 
 {
   // TODO ask Jake if these calculations should be done using the scene integer
   //      version of the variables
-  LatticeCoord coord;
+  LatticeCoord coord(0,0,-1);
   int n0[2];
   qreal proj;
   QPointF x = scene_pos/prim::Item::scale_factor;
@@ -53,8 +83,8 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos, QPointF 
     n0[i] = qFloor(proj - coth*qSqrt(x2/a2[i]-proj*proj));
   }
 
-  //qreal mdist = qMax(a2[0], a2[1]);         // nearest Manhattan length
-  qreal mdist = m_big;
+  qreal mdist = qMax(a2[0], a2[1]);         // nearest Manhattan length
+  //qreal mdist = m_big;
   //qreal mdist = -1;
   for(int n=n0[0]-1; n<n0[0]+2; n++){
     for(int m=n0[1]-1; m<n0[1]+2; m++){
@@ -62,7 +92,7 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos, QPointF 
       for (int l=0; l<b.size(); l++){
         QPointF temp = x0 + b[l];
         qreal dist = (temp-x).manhattanLength();
-        if(dist<=mdist){ //|| mdist == -1){
+        if(dist<=mdist) {// || mdist == -1){
           mdist = dist;
           nearest_site_pos = temp * prim::Item::scale_factor;
           coord.n = n;
@@ -73,11 +103,49 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos, QPointF 
     }
   }
 
+  if (coord.l == -1)
+    qFatal("No result for nearest site");
+
   //qDebug() << tr("Nearest Lattice Site: %1 :: %2").arg(mp.x()).arg(mp.y());
 
   return coord;
   //return mp;                            // physical (angstrom) coords
   //return mp*prim::Item::scale_factor;   // scene (pixel) coords
+}
+
+
+QList<prim::LatticeCoord> prim::Lattice::enclosedSites(const prim::LatticeCoord &coord1,
+    const prim::LatticeCoord &coord2) const
+{
+  // WARNING assumes n is purely horizontal and m is purely vertical. Might not
+  // be the case!
+  int n_min = qMin(coord1.n, coord2.n);
+  int n_max = qMax(coord1.n, coord2.n);
+  int m_min = qMin(coord1.m, coord2.m);
+  int m_max = qMax(coord1.m, coord2.m);
+  int l_tl, l_br; // top left and bottom right
+  if (coord1.m == coord2.m) {
+    l_tl = qMin(coord1.l, coord2.l);
+    l_br = qMax(coord1.l, coord2.l);
+  } else {
+    l_tl = coord1.m < coord2.m ? coord1.l : coord2.l; // top left
+    l_br = coord1.m > coord2.m ? coord1.l : coord2.l; // bottom right
+  }
+
+  QList<prim::LatticeCoord> coords;
+
+  for (int n_site=n_min; n_site<=n_max; n_site++) {
+    for (int m_site=m_min; m_site<=m_max; m_site++) {
+      for (int l_site=0; l_site<n_cell; l_site++) {
+        if (  !(m_min == m_max && l_tl != l_br)
+              && ((m_site == m_min && l_site < l_tl)
+                  || (m_site == m_max && l_site > l_br)))
+          continue;
+        coords.append(prim::LatticeCoord(n_site, m_site, l_site));
+      }
+    }
+  }
+  return coords;
 }
 
 

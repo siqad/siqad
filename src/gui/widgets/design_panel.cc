@@ -72,7 +72,7 @@ void gui::DesignPanel::initDesignPanel() {
   // initialising parameters
   snap_diameter = app_settings->get<qreal>("snap/diameter")*prim::Item::scale_factor;
   qDebug() << tr("SD: %1").arg(snap_diameter);
-  snap_target = prim::LatticeCoord();
+  snap_coord = prim::LatticeCoord();
 
   tool_type = gui::ToolType::NoneTool;     // now setTool will update the tool
 
@@ -828,6 +828,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
         else*/
           rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
+        coord_start = lattice->nearestSite(mapToScene(e->pos()));
 
       } else {
         QGraphicsView::mousePressEvent(e);
@@ -865,6 +866,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
   } else if (tool_type == AFMPathTool) {
     // update ghost node and ghost segment if there is a focused node, only update
     // ghost node if there's none.
+    /* TODO re-enable it later
     QList<prim::Item::ItemType> target_types;
     target_types.append(prim::Item::LatticeDot);
     target_types.append(prim::Item::DBDot);
@@ -872,7 +874,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     if (snap_target) {
       afm_panel->ghostNode()->setPos(snap_target->scenePos());
       afm_panel->showGhost(true);
-    }
+    }*/
 
   } else if (!clicked && tool_type == DBGenTool) {
     // show preview location of new DB
@@ -882,10 +884,11 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
       case Qt::LeftButton:
-        if (tool_type == SelectTool || tool_type == DBGenTool ||
-            tool_type == ElectrodeTool || tool_type == AFMAreaTool ||
-            tool_type == ScreenshotAreaTool) {
+        if (tool_type == SelectTool || tool_type == ElectrodeTool ||
+            tool_type == AFMAreaTool || tool_type == ScreenshotAreaTool) {
           rubberBandUpdate(e->pos());
+        } else if (tool_type == DBGenTool) {
+          createDBPreviews(lattice->enclosedSites(coord_start, lattice->nearestSite(mapToScene(e->pos()))));
         }
         // use default behaviour for left mouse button
         QGraphicsView::mouseMoveEvent(e);
@@ -1466,7 +1469,7 @@ void gui::DesignPanel::clearGhost()
   ///qDebug() << tr("Clearing ghost...");
   prim::Ghost::instance()->cleanGhost();
   ghosting=false;
-  snap_target=prim::LatticeCoord();
+  snap_coord=prim::LatticeCoord();
 }
 
 
@@ -1523,10 +1526,9 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, prim::LatticeCoord &offset)
 
     // move ghost and update validity hash table
     offset = nearest_site - old_anchor;
-    snap_coord = nearest_site;
     if (!ghost->valid_hash.contains(nearest_site))
       ghost->valid_hash[nearest_site] = ghost->checkValid(offset, lattice);
-    snap_target = nearest_site;
+    snap_coord = nearest_site;
     ghost->setValid(ghost->valid_hash[nearest_site]);
 
     return true;
@@ -2494,7 +2496,7 @@ bool gui::DesignPanel::pasteAtGhost()
   if (clipboard.isEmpty()) {
     return false;
   } else {
-    if (!is_all_floating && !ghost->valid_hash[snap_target]) {
+    if (!is_all_floating && !ghost->valid_hash[snap_coord]) {
       return false;
     }
   }
@@ -2583,7 +2585,7 @@ bool gui::DesignPanel::moveToGhost(bool kill)
   prim::Ghost *ghost = prim::Ghost::instance();
   moving = false;
   // get the move offset
-  QPointF offset = (!kill && ghost->valid_hash[snap_target]) ? ghost->moveOffset() : QPointF();
+  QPointF offset = (!kill && ghost->valid_hash[snap_coord]) ? ghost->moveOffset() : QPointF();
 
   if (offset.isNull()) {
     // There is no offset for dbs. Check if selection is all electrodes, and if it is, move them.

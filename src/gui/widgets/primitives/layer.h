@@ -56,12 +56,12 @@ namespace prim{
     //! set the zoffset of the layer
     void setZOffset(const float z_offset) {zoffset = z_offset;}
     //! get the zoffset of the layer
-    float zOffset() {return zoffset;}
+    float zOffset() const {return zoffset;}
 
     //! set the zheight of the layer
     void setZHeight(const float z_height) {zheight = z_height;}
     //! get the zheight of the layer
-    float zHeight() {return zheight;}
+    float zHeight() const {return zheight;}
 
     //! add a new Item to the current layer. If the Item is already in the layer,
     //! do nothing.
@@ -87,7 +87,7 @@ namespace prim{
     //! check if the layer should be active
     bool isActive() const {return active;}
 
-    //! get the Layer name, possibly change return to const QString&
+    //! get the Layer name
     const QString& getName() const {return name;}
 
     //! set the Layer content type
@@ -109,6 +109,7 @@ namespace prim{
 
     // SAVE LOAD
     virtual void saveLayer(QXmlStreamWriter *) const;
+    void saveLayerProperties(QXmlStreamWriter *) const;
     virtual void saveItems(QXmlStreamWriter *) const;
     virtual void loadItems(QXmlStreamReader *, QGraphicsScene *);
 
