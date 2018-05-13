@@ -40,6 +40,7 @@ namespace prim{
 
     virtual Item *deepCopy() const override;
 
+    static qreal edge_width;
     static QColor edge_col;
     static QColor edge_col_hovered;
 

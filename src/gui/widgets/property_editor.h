@@ -4,8 +4,7 @@
 // @editted:  2018.03.28  - Samuel
 // @license:  GNU LGPL v3
 //
-// @desc:     Provides a standard QWidget arranging properties as a form for
-//            users to edit.
+// @desc:     Allows users to edit item properties.
 
 #ifndef _GUI_PROPERTY_EDITOR_H_
 #define _GUI_PROPERTY_EDITOR_H_
@@ -13,14 +12,12 @@
 #include <QtWidgets>
 #include <QtCore>
 
-#include "primitives/item.h"
 #include "../../global.h"
 #include "../property_map.h"
+#include "property_form.h"
+#include "primitives/item.h"
 
 namespace gui{
-
-  // Forward declaration of property form
-  class PropertyForm;
 
   //! The property editor generates forms from provided PropertyMaps which
   //! allows users to edit properties of supported sub-classes of prim::Item.
@@ -68,37 +65,12 @@ namespace gui{
 
     // VARS
 
-    QList<PropertyForm*> current_forms;   //! Forms that are currently in use.
+    QList<QPair<PropertyForm*, prim::Item*>> form_item_pair; //! Forms that are currently in use.
 
     QTabWidget *form_tab_widget=0;        //! a tab widget showing all current forms
 
 
   };  // end of PropertyEditor class
-
-
-  //! A user-editable form for editing item properties.
-  class PropertyForm : public QWidget
-  {
-    Q_OBJECT
-
-  public:
-
-    //! Constructor
-    PropertyForm(prim::Item *target_item, QWidget *parent);
-
-    //! Destructor
-    ~PropertyForm() {}
-
-    //! Return a list of properties that have been changed. Compares the content
-    //! in the form with the target_item's own property map.
-    void pushPropertyChanges();
-
-  private:
-    //! Initialize the form
-    void initForm();
-
-    prim::Item *target_item;      //! Item currently being edited.
-  };
 
 } // end of gui namespace
 

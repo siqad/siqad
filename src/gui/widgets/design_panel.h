@@ -110,6 +110,9 @@ namespace gui{
     void buildLattice(const QString &fname=QString());
     void setScenePadding();
 
+    //! Check if given QPointF falls within a lattice dot
+    bool isLatticeDot(QPointF scene_pos);
+
     //! update the tool type
     void setTool(gui::ToolType tool);
 
@@ -182,12 +185,6 @@ namespace gui{
     //! Show the property of an item.
     void showItemProperty(prim::Item *item) {property_editor->showForms(QList<prim::Item*>({item}));}
 
-    //! Add the given item to scene.
-    void addItemToSceneRequest(prim::Item *item) {addItemToScene(item);}
-
-    //! Remove the given item from scene.
-    void removeItemFromSceneRequest(prim::Item *item) {removeItemFromScene(item);}
-
     //! Begin resizing an item.
     void resizeBegin();
 
@@ -197,6 +194,10 @@ namespace gui{
     // gui
     void rotateCw();
     void rotateCcw();
+
+    //! Move item to given lattice coordinates. Mainly for Item Emitter to instruct
+    //! movements, use setPos directly otherwise.
+    void moveDBToLatticeCoord(prim::Item *, int, int, int);
 
     //! Emitted when the undo stack clean stage has changed.
     void emitUndoStackCleanChanged(bool c) {emit sig_undoStackCleanChanged(c);}
@@ -245,7 +246,6 @@ namespace gui{
     void pasteAction();
     void deleteAction();
     void electrodeSetPotentialAction();
-    void toggleDBElecAction();
 
   private:
 
@@ -268,11 +268,12 @@ namespace gui{
     // copy/paste
     QList<prim::Item*> clipboard;  // cached deep copy of a set of items for pasting
 
-    QStack<prim::Layer*> layers;  // stack of all layers, order immutable
-    prim::Layer *top_layer;       // new items added to this layer
-    prim::Layer *electrode_layer; // add electrodes to this layer
-    prim::Layer *afm_layer;       // add afm paths to this layer TODO request layers from Layer Manager instead of keeping pointers like these
-    prim::Layer *plot_layer;      // add potential plots to this layer
+    QStack<prim::Layer*> layers;    // stack of all layers, order immutable
+    prim::Lattice *lattice=0;       // lattice for reference
+    prim::Layer *top_layer=0;       // new items added to this layer
+    prim::Layer *electrode_layer=0; // add electrodes to this layer
+    prim::Layer *afm_layer=0;       // add afm paths to this layer TODO request layers from Layer Manager instead of keeping pointers like these
+    prim::Layer *plot_layer=0;      // add potential plots to this layer
 
     // flags, change later to bit flags
     bool clicked;   // mouse left button is clicked
@@ -281,9 +282,13 @@ namespace gui{
     bool pasting;   // evoked some kind of pasting
     bool resizing;  // currently resizing an item
 
+    // DB previews
+    QList<prim::DBDotPreview*> db_previews;
+
     // snapping
     qreal snap_diameter;            // size of region to search for snap points
-    prim::LatticeDot *snap_target;  // current snap target, LatticeDot
+    prim::LatticeCoord snap_coord;  // current snap target, lattice coordinate
+    prim::LatticeCoord coord_start; // lattice coordinate of mouse click location
     QPointF snap_cache;             // cursor position of last snap update
 
     // AFM ghost
@@ -351,19 +356,26 @@ namespace gui{
 
     // snap the ghost to the nearest possible lattice position. Returns true if
     // the snap_target was update (need to change the ghost location).
-    bool snapGhost(QPointF scene_pos, QPointF &offset);
+    bool snapGhost(QPointF scene_pos, prim::LatticeCoord &offset);
 
     // initialize an item move
     void initMove();
 
     // set the selectability of the lattice dots for the given Item
-    void setLatticeDotSelectability(prim::Item *item, bool flag);
+    void setLatticeSiteOccupancy(prim::Item *item, bool flag);
 
     // deep copy the current selection to the clipboard
     void copySelection();
 
-    // dbgen Location Indicator
-    void snapDBPreview(QPointF scene_pos);
+    //! Create graphical previews for provided DB coordinates (always destroys
+    //! existing previews).
+    void createDBPreviews(QList<prim::LatticeCoord> coords);
+
+    //! Add DB graphical previews without destroying existing ones.
+    void appendDBPreviews(QList<prim::LatticeCoord> coords);
+
+    //! Destroy DB graphical previews.
+    void destroyDBPreviews();
 
     // return the scene position of the nearest prim::Item with the specified item types.
     // returns a null pointer if no eligible item falls within the search range.
@@ -385,6 +397,7 @@ namespace gui{
     class MoveItem;         // move a single Item
 
     class CreateElectrode;  // create an electrode at the given points
+    class ResizeElectrode;    // resize an electrode
 
     class CreatePotPlot;  // create an electrode at the given points
 
@@ -397,7 +410,7 @@ namespace gui{
 
     // functions including undo/redo behaviour
 
-    // create dangling bonds in the surface at all selected lattice dots
+    // Create DBs at DB preview locations stored in db_previews list.
     void createDBs();
 
     void createElectrodes(QPoint point1);
@@ -416,6 +429,10 @@ namespace gui{
 
     // resize AFM Area
     void resizeAFMArea(prim::AFMArea *afm_area, const QRectF &orig_rect,
+        const QRectF &new_rect);
+
+    // resize electrode
+    void resizeElectrode(prim::Electrode *electrode, const QRectF &orig_rect,
         const QRectF &new_rect);
 
     // destroy AFM path and included nodes
@@ -464,9 +481,10 @@ namespace gui{
   class DesignPanel::CreateDB : public QUndoCommand
   {
   public:
-    // create a dangling bond at the given lattice dot, set invert if deleting DB
-    CreateDB(prim::LatticeDot *ldot, int layer_index, DesignPanel *dp, prim::DBDot *src_db=0,
-                              bool invert=false, QUndoCommand *parent=0);
+    //! Create a dangling bond at the given lattice dot, set invert if deleting
+    //! DB. Set src_db if copying DB.
+    CreateDB(prim::LatticeCoord l_coord, int layer_index, DesignPanel *dp,
+        prim::DBDot *cp_src=0, bool invert=false, QUndoCommand *parent=0);
 
     // destroy the dangling bond and update the lattice dot
     virtual void undo();
@@ -476,18 +494,20 @@ namespace gui{
 
   private:
 
-    void create();  // create the dangling bond
-    void destroy(); // destroy the dangling bond
+    void create();    // create the dangling bond
+    void destroy();   // destroy the dangling bond
 
     bool invert;      // swaps create/delete on redo/undo
 
+    prim::LatticeCoord lat_coord;
+    prim::DBDot *db_at_loc=0;
+    prim::DBDot *cp_src;
+
     DesignPanel *dp;  // DesignPanel pointer
     int layer_index;  // index of layer in dp->layers stack
-    int elec;         // elec content of the db
 
     // internals
-    int index;              // index of DBDot item in the layer item stack
-    prim::LatticeDot *ldot; // Lattice dot beneath dangling bond
+    int index;        // index of DBDot item in the layer item stack
   };
 
 
@@ -580,7 +600,6 @@ namespace gui{
 
     QPointF point1;
     QPointF point2;
-
     bool invert;
 
     // internals
@@ -726,6 +745,33 @@ namespace gui{
     QRectF orig_rect;
     QRectF new_rect;
   };
+
+  class DesignPanel::ResizeElectrode : public QUndoCommand
+  {
+  public:
+    // resize the electrode from the original positions to the new positions
+    ResizeElectrode(int layer_index, DesignPanel *dp,
+        const QRectF &orig_rect, const QRectF &new_rect,
+        int electrode_index, bool invert=false, QUndoCommand *parent=0);
+
+    // resize from new to original positions
+    virtual void undo();
+
+    // resize from original to new positions
+    virtual void redo();
+
+  private:
+    bool invert;
+
+    int layer_index;
+    DesignPanel *dp;
+    int electrode_index; // the electrode's index in its layer
+    QPointF top_left_delta;
+    QPointF bot_right_delta;
+    QRectF orig_rect;
+    QRectF new_rect;
+  };
+
 
 
 } // end gui namespace

@@ -1,6 +1,7 @@
 <RCC>
 <qresource>
 	<file>properties/afmarea.xml</file>
+	<file>properties/electrode.xml</file>
 	<file>ico/select.svg</file>
 	<file>ico/drag.svg</file>
 	<file>ico/dbgen.svg</file>

@@ -33,6 +33,27 @@ prim::Item::Item(ItemType type, int lay_id, QGraphicsItem *parent)
 }
 
 
+QString prim::Item::getQStringItemType()
+{
+  switch (item_type) {
+    case prim::Item::Aggregate: return "Aggregate";
+    case prim::Item::DBDot: return "DBDot";
+    case prim::Item::LatticeDot: return "LatticeDot";
+    case prim::Item::Ghost: return "Ghost";
+    case prim::Item::GhostDot: return "GhostDot";
+    case prim::Item::Electrode: return "Electrode";
+    case prim::Item::GhostBox: return "GhostBox";
+    case prim::Item::AFMArea: return "AFMArea";
+    case prim::Item::AFMPath: return "AFMPath";
+    case prim::Item::AFMNode: return "AFMNode";
+    case prim::Item::AFMSeg: return "AFMSeg";
+    case prim::Item::PotPlot: return "PotPlot";
+    case prim::Item::ResizeFrame: return "ResizeFrame";
+    case prim::Item::ResizeHandle: return "ResizeHandle";
+    default: return "Erroneous Item";
+  }
+
+}
 
 bool prim::Item::upSelected()
 {
@@ -44,6 +65,27 @@ bool prim::Item::upHovered()
 {
   prim::Item *parent = static_cast<prim::Item*>(parentItem());
   return parent==0 ? isHovered() : parent->upHovered();
+}
+
+gui::PropertyMap prim::Item::properties()
+{
+  gui::PropertyMap all_props;
+
+  // assume that there aren't local properties if there's no class property
+  if (!classPropertyMap())
+    return gui::PropertyMap();
+
+  for (const QString &key : classPropertyMap()->keys()) {
+    if (local_props.contains(key)) {
+      // use the local value + default attributes
+      all_props[key] = gui::Property(local_props.value(key), classPropertyMap()->value(key));
+    } else {
+      // use the default value + attributes
+      all_props[key] = classPropertyMap()->value(key);
+    }
+  }
+
+  return all_props;
 }
 
 gui::Property prim::Item::getProperty(const QString &key)

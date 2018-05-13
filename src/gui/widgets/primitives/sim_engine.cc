@@ -15,11 +15,12 @@ namespace prim{
 SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
   : QObject(parent)
 {
-  QString eng_nm, eng_rt;
+  eng_desc_file = eng_desc_path;
 
   QFile eng_f(eng_desc_path);
-  QFileInfo fileInfo(eng_desc_path);
-  eng_rt = fileInfo.absolutePath();
+  QFileInfo file_info(eng_desc_path);
+  QString eng_rt = file_info.absolutePath();
+  QString eng_nm;
   QDir eng_dir(eng_rt);
 
   if (!eng_f.open(QFile::ReadOnly | QFile::Text)) {
@@ -52,27 +53,7 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
           } else if (rs.name() == "gui_dialog_path") {
             setParamDialogPath(eng_dir.absoluteFilePath(rs.readElementText()));
           } else if (rs.name() == "sim_params") {
-            while (!(rs.isEndElement() && rs.name() == "sim_params")) {
-              if (!rs.readNextStartElement())
-                continue;
-
-              if (rs.name() == "param") {
-                // add expectedSimParams entry
-                QString gui_obj_nm, gui_obj_type, gui_def_txt, param_nm;
-                for (QXmlStreamAttribute &attr : rs.attributes()) {
-                  if (attr.name().toString() == QLatin1String("gui_object_name")) {
-                    gui_obj_nm = attr.value().toString();
-                  } else if (attr.name().toString() == QLatin1String("gui_object_type")) {
-                    gui_obj_type = attr.value().toString();
-                  } else if (attr.name().toString() == QLatin1String("default_text")) {
-                    gui_def_txt = attr.value().toString();
-                  }
-                }
-                param_nm = rs.readElementText();
-                addExpectedSimParam(param_nm, gui_obj_nm, gui_obj_type, gui_def_txt);
-                //qDebug() << QObject::tr("addExpectedSimParam(%1, %2, %3, %4)").arg(param_nm).arg(gui_obj_nm).arg(gui_obj_type).arg(gui_def_txt);
-              }
-            } // end of sim_params
+            sim_params_map.readPropertiesFromXMLStream(&rs);
           }
         } // end of physeng
         rs.readNext();
@@ -84,6 +65,12 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
     }
   }
   eng_f.close();
+
+  // store user engine settings path in case of need
+  QString usr_cfg_dir_path = settings::AppSettings::instance()->getPath("phys/eng_usr_cfg_dir");
+  usr_cfg_dir_path += file_info.dir().dirName();
+  QDir usr_cfg_dir(usr_cfg_dir_path);
+  eng_usr_cfg_file = usr_cfg_dir.absoluteFilePath(file_info.fileName());
 
   initSimEngine(eng_nm, eng_rt);
 }
@@ -98,61 +85,7 @@ void SimEngine::initSimEngine(const QString &eng_nm, const QString &eng_rt)
 {
   eng_name = eng_nm;
   eng_root = eng_rt;
-
-  constructSimParamDialog();
 }
-
-bool SimEngine::constructSimParamDialog()
-{
-  // check if file exists
-  QDir eng_dir(eng_root);
-  if (param_dialog_path.isEmpty())
-    param_dialog_path = eng_dir.absoluteFilePath("option_dialog.ui");
-
-  // check file readability
-  QFile ui_file(param_dialog_path);
-  if (!ui_file.open(QFile::ReadOnly | QFile::Text)) {
-    qCritical() << QObject::tr("SimEngine: cannot open UI file %1").arg(ui_file.fileName());
-    return false;
-  }
-
-  if (simParamDialog()) {
-    delete sim_param_dialog;
-    sim_param_dialog = 0;
-  }
-
-  // use QUiLoader to load the ui
-  QUiLoader ui_loader;
-  sim_param_dialog = ui_loader.load(&ui_file); // TODO in sim manager, set itself as the parent of this dialog
-  ui_file.close();
-
-  return true;
-}
-
-QList<QPair<QString, QString>> SimEngine::loadSimParamsFromDialog()
-{
-  QList<QPair<QString, QString>> retrieved_sim_params;
-  if (!simParamDialog()) {
-    qDebug() << QObject::tr("Engine %1 doesn't have its own simulation parameter widget, skipping load.").arg(name());
-    return retrieved_sim_params;
-  }
-
-  // acquire all expected simulation parameters
-  for (ExpectedSimParam param : expected_sim_params) {
-    QWidget *find_widget = simParamDialog()->findChild<QWidget*>(param.gui_object_name);
-    if (param.gui_object_type == "QLineEdit") {
-      retrieved_sim_params.append(QPair<QString, QString>(param.name, static_cast<QLineEdit*>(find_widget)->text()));
-      qDebug() << QObject::tr("Added sim param %1 with content %2").arg(param.name).arg(static_cast<QLineEdit*>(find_widget)->text());
-    } else if (param.gui_object_type == "QComboBox") {
-      retrieved_sim_params.append(QPair<QString, QString>(param.name, static_cast<QComboBox*>(find_widget)->currentText()));
-      qDebug() << QObject::tr("Added sim param %1 with content %2").arg(param.name).arg(static_cast<QComboBox*>(find_widget)->currentText());
-    }
-    // TODO radio buttons
-  }
-
-  return retrieved_sim_params;
-}
-
 
 QString SimEngine::runtimeTempDir()
 {

@@ -21,10 +21,11 @@ SimJob::SimJob(const QString &nm, SimEngine *eng, QWidget *parent)
 }
 
 
-// load simulation parameters from engine sim params dialog
-void SimJob::loadSimParamsFromEngineDialog()
+// append all entries in the provided PropertyMap to the list of simulation parameters
+void SimJob::addSimParams(const gui::PropertyMap &sim_params_map)
 {
-  addSimParams(engine->loadSimParamsFromDialog());
+  for (const QString &key : sim_params_map.keys())
+    addSimParam(key, sim_params_map[key].value.toString());
 }
 
 
@@ -60,7 +61,7 @@ bool SimJob::invokeBinary()
     // template: `/path/to/binary /path/to/problem/file /path/to/result/file`
     sim_process->setProgram(engine->binaryPath());
   }
-
+  
   cml_arguments << problem_file_info.canonicalFilePath(); // problem file
   cml_arguments << resultFile();                          // result file
 

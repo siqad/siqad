@@ -33,10 +33,6 @@ void PropertyMap::readPropertiesFromXML(const QString &fname)
 {
   xml_path = fname;
 
-  qDebug() << QObject::tr("int=%1, float=%2, double=%3, string=%4")
-      .arg(string2type["int"]).arg(string2type["float"])
-      .arg(string2type["double"]).arg(string2type["string"]);
-
   QFile file(xml_path);
 
   // test whether file can be opened to read
@@ -50,24 +46,28 @@ void PropertyMap::readPropertiesFromXML(const QString &fname)
   QXmlStreamReader rs(&file);
   qDebug() << QObject::tr("Beginning load from %1").arg(file.fileName());
 
-  while (!rs.atEnd()) {
-    // skip until the next start element
-    if (!rs.readNextStartElement())
-      continue;
+  // enter the root node and read relevant attributes
+  rs.readNextStartElement();
+  if (rs.attributes().value("preserve_order") == "true")
+    preserve_order = true;
 
-    // root node
-    if (rs.name() == "properties")
-      continue;
-
-    // read new property
-    readProperty(rs.name().toString(), &rs);
-  }
-
-  if (rs.hasError())
-    qCritical() << QObject::tr("XML error: ") << rs.errorString().data();
+  // start reading properties
+  if (rs.name() == "properties")
+    readPropertiesFromXMLStream(&rs);
 
   file.close();
   qDebug() << QObject::tr("Finished loading from %1").arg(file.fileName());
+}
+
+
+// read properties from XML stream until the end of the indicated tag
+void PropertyMap::readPropertiesFromXMLStream(QXmlStreamReader *rs)
+{
+  while (rs->readNextStartElement())
+    readProperty(rs->name().toString(), rs);
+
+  if (rs->hasError())
+    qCritical() << QObject::tr("XML error: ") << rs->errorString().data();
 }
 
 
@@ -79,31 +79,32 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
     qCritical() << QObject::tr("Property %1 has been repeated").arg(node_name);
 
   Property prop;
+  prop.index = size();
   int p_type_id=-1;
   QString p_val;
-  qDebug() << QObject::tr("Reading content of property %1").arg(node_name);
+  //qDebug() << QObject::tr("Reading content of property %1").arg(node_name);
 
   // keep reading until the end of this property node
-  while ( !(rs->name() == node_name && rs->isEndElement())
-        && rs->readNextStartElement()) {
+  while (rs->readNextStartElement()) {
     if (rs->name() == "T") {
       p_type_id = string2type[rs->readElementText()];
-      qDebug() << QObject::tr("%1 type=%2").arg(node_name).arg(p_type_id);
+      //qDebug() << QObject::tr("%1 type=%2").arg(node_name).arg(p_type_id);
     } else if (rs->name() == "val") {
       p_val = rs->readElementText();
-      qDebug() << QObject::tr("%1 val=%2").arg(node_name).arg(p_val);
-      //rs->skipCurrentElement();
+      //qDebug() << QObject::tr("%1 val=%2").arg(node_name).arg(p_val);
     } else if (rs->name() == "label") {
       prop.form_label = rs->readElementText();
-      qDebug() << QObject::tr("%1 label=%2").arg(node_name).arg(prop.form_label);
-      //rs->skipCurrentElement();
+      //qDebug() << QObject::tr("%1 label=%2").arg(node_name).arg(prop.form_label);
     } else if (rs->name() == "tip") {
       prop.form_tip = rs->readElementText();
-      qDebug() << QObject::tr("%1 tip=%2").arg(node_name).arg(prop.form_tip);
-      //rs->skipCurrentElement();
+      //qDebug() << QObject::tr("%1 tip=%2").arg(node_name).arg(prop.form_tip);
+    } else if (rs->name() == "value_selection") {
+      if (rs->attributes().value("type") == "ComboBox") {
+        readComboOptions(&prop, p_type_id, rs);
+      }
     } else {
-      qDebug() << "else";
-      rs->readNext();
+      // TODO error message
+      rs->skipCurrentElement();
     }
   }
 
@@ -113,12 +114,74 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
 
   prop.value = string2Type2QVariant(p_val, p_type_id);
 
-  qDebug() << QObject::tr("Got value of %1 with type %2")
-      .arg(prop.value.toString()).arg(p_type_id);
+  //qDebug() << QObject::tr("Got value of %1 with type %2")
+      //.arg(prop.value.toString()).arg(p_type_id);
 
   // add this property to the map
   insert(node_name, prop);
 }
+
+// read combo options
+void PropertyMap::readComboOptions(Property *prop, int type_id, QXmlStreamReader *rs)
+{
+  prop->value_selection = Combo;
+  while (rs->readNextStartElement()) {
+    prop->value_selection.combo_options.append(
+        ComboOption(string2Type2QVariant(rs->name().toString(), type_id),
+                    rs->readElementText()));
+  }
+}
+
+// read property values and update the current map
+void PropertyMap::updateValuesFromXML(const QString &fname)
+{
+  QFile file(fname);
+
+  // test whether file can be opened to read
+  if (!file.open(QFile::ReadOnly | QFile::Text)) {
+    qFatal(QObject::tr("Error when opening properties file to read: %1")
+        .arg(file.errorString()).toLatin1().constData(), 0);
+    return;
+  }
+
+  // read from XML stream
+  QXmlStreamReader rs(&file);
+  qDebug() << QObject::tr("Beginning load from %1").arg(file.fileName());
+
+  // enter the root node and read relevant attributes
+  rs.readNextStartElement();
+
+  // traverse through properties
+  while (rs.readNextStartElement()) {
+    QString key = rs.name().toString();
+    if (!contains(key)) {
+      qDebug() << QObject::tr("Encountered undefined key: %1").arg(key);
+      rs.skipCurrentElement();
+      continue;
+    }
+    // traverse through property content
+    while (rs.readNextStartElement()) {
+      if (rs.name() == "val") {
+        QVariant new_val = string2Type2QVariant(rs.readElementText(),
+                                                value(key).value.userType());
+        (*this)[key].value = new_val;
+      }
+    }
+  }
+
+  file.close();
+  qDebug() << QObject::tr("Finished loading from %1").arg(file.fileName());
+}
+
+void PropertyMap::writeValuesToXMLStream(const PropertyMap &map, QXmlStreamWriter *ws)
+{
+  for (const QString &key : map.keys()) {
+    ws->writeStartElement(key);
+    ws->writeTextElement("val", map[key].value.toString());
+    ws->writeEndElement();
+  }
+}
+
 
 QVariant PropertyMap::string2Type2QVariant(const QString &val, int type_id)
 {

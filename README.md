@@ -1,4 +1,4 @@
-# qsi-sim
+# SiQAD
 
 Simulation Tool for QSi's dangling bonds. There are two proposed contributions:
 
@@ -38,8 +38,12 @@ git clone --recurse-submodules https://github.com/retallickj/qsi-sim.git
 You may be prompted for your Github credentials as this is a private repository. Next, install required dependencies:
 
 ```
+# gui, simanneal and hoppingdynamics dependencies
 sudo apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5* qttools5-dev qttools5-dev-tools libboost-dev libboost-filesystem-dev libboost-system-dev pkg-config
-sudo pip3 install matplotlib numpy pyqt5
+# poissolver dependencies
+sudo apt install scons gfortran fftw3 fftw3-dev libfftw3-mpi-dev openmpi-bin libopenmpi-dev libgoogle-perftools-dev m4 autoconf
+# hoppingdynamics python dependencies
+sudo pip3 install matplotlib numpy scipy pyqt5
 ```
 
 Next, compile the physics engines. The Marcus simulator is the exciting deal now so that will be the only one built in this tutorial. Build the AFM Marcus simulator:

@@ -13,53 +13,46 @@
 
 #include <QtWidgets>
 #include "item.h"
-#include "latdot.h"
+#include "lattice.h"
 
 namespace prim{
 
-  //! Specific Item derived class for a dangling bond on the lattice. Each
-  //! dangling bond should correspond to a source lattice dot. For
-  //! generality, each DBDot has its own physical location that will typically
-  //! be the same as the source LatticeDot.
   class DBDot: public prim::Item
   {
   public:
 
     //! constructor, creating DBDot using the DBGenTool.
-    DBDot(int lay_id, prim::LatticeDot *src=0, int elec_in=0);
+    DBDot(prim::LatticeCoord l_coord, int lay_id);
     //! constructor, creating DBDot from a design file.
     DBDot(QXmlStreamReader *, QGraphicsScene *);
 
     // initializer
-    void initDBDot(int lay_id, prim::LatticeDot *src=0, int elec_in=0);
+    void initDBDot(prim::LatticeCoord coord, int lay_id);
 
     // destructor
     ~DBDot(){}
 
     // accessors
-    QPointF getPhysLoc() const {return phys_loc;}
 
-    //! Toggle between occupied and unoccupied.
-    void toggleElec();
-    //! Set electron occupancy.
-    void setElec(int e_in);
-    //! Get electron occupancy.
-    int getElec() {return elec;}
+    //! Get the physical location of the dot
+    QPointF getPhysLoc() const; // TODO calculate from lattice coord
+
+    //! Get the lattice coordinates of the DB
+    prim::LatticeCoord latticeCoord() {return lat_coord;}
+
+    //! Set the lattice coordinates of the DB
+    void setLatticeCoord(prim::LatticeCoord l_coord);
 
     //! Set electron occupant visibility
     void setShowElec(float se_in);
 
-    //! Set the DBDot source as src, and update phys_loc to that of src.
-    void setSource(prim::LatticeDot *src);
-    //! Get the DBDot source.
-    prim::LatticeDot *getSource() const {return source;}
-
+    //! Set the graphical fill of the DB
     void setFill(float fill){fill_fact = fill;}
 
     // inherited abstract method implementations
 
-    QRectF boundingRect() const override;
-    void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
+    virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
 
     prim::Item *deepCopy() const override;
 
@@ -75,20 +68,17 @@ namespace prim{
     void constructStatics();
 
     // VARIABLES
-    QPointF phys_loc;         // physical location of dot in angstroms
-    int elec=0;                 // 1=forced electron on this db
+    prim::LatticeCoord lat_coord; // lattice coordinates of the DB
     float show_elec=0;            // simulation result visualization electron, 1=has electron
-
-    prim::LatticeDot *source=0; // lattice site beneath dot
 
     qreal fill_fact;          // area proportional of dot filled
 
     // static class parameters for painting
 
     static prim::Item::StateColors fill_col;           // normal dbdot
-    static prim::Item::StateColors fill_col_driver;    // driver (forced polarization)
     static prim::Item::StateColors fill_col_electron;  // contains electron
     static prim::Item::StateColors edge_col;           // edge of the dbdot
+    static prim::Item::StateColors edge_col_electron;  // edge of the dbdot
 
 
     qreal diameter;      // dot diameter in angstroms
@@ -97,6 +87,42 @@ namespace prim{
     static qreal edge_width;    // proportional width of dot boundary edge
     static qreal publish_scale; // size scaling factor when in publish screenshot mode
 
+  };
+
+
+  class DBDotPreview : public prim::Item
+  {
+  public:
+
+    //! Contruct a DB dot preview.
+    DBDotPreview(prim::LatticeCoord l_coord);
+
+    //! Destructor.
+    ~DBDotPreview() {}
+
+    // Accessors
+
+    //! Get the lattice coordinates of the DB Preview
+    prim::LatticeCoord latticeCoord() {return lat_coord;}
+
+    // Graphics
+    virtual QRectF boundingRect() const override;
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
+
+  private:
+    //! Construct static variables on first creation.
+    void constructStatics();
+
+    // Variables
+    prim::LatticeCoord lat_coord; // lattice coordinates of the DB Preview
+
+    // Static class variables
+    static QColor fill_col;
+    static QColor edge_col;
+
+    static qreal diameter;
+    static qreal edge_width;
+    static qreal fill_fact;
   };
 
 } // end prim namespace

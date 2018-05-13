@@ -859,12 +859,14 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
 {
   QString write_path;
 
+  QFileDialog save_dialog;
   // determine target file
   if (!path.isEmpty()) {
     write_path = path;
   } else if (working_path.isEmpty() || flag==SaveAs) {
-    write_path = QFileDialog::getSaveFileName(this, tr("Save File"),
-                  save_dir.filePath("New DB Layout.xml"), tr("XML files (*.xml)"));
+    save_dialog.setDefaultSuffix("qad");
+    write_path = save_dialog.getSaveFileName(this, tr("Save File"),
+                  save_dir.filePath("new-db-layout.qad"), tr("QAD (*.qad);;XML (*.xml);;All files (*)"));
     if (write_path.isEmpty())
       return false;
   } else {
@@ -872,8 +874,9 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   }
 
   // add .xml extension if there isn't
-  if(!write_path.endsWith(".xml", Qt::CaseInsensitive))
-    write_path.append(".xml");
+  if (! (write_path.endsWith(".qad", Qt::CaseInsensitive) ||
+        write_path.endsWith(".xml", Qt::CaseInsensitive)) )
+    write_path.append(".qad");
 
   // set file name of [whatevername].writing while writing to prevent loss of previous save if this save fails
   QFile file(write_path+".writing");
@@ -979,8 +982,10 @@ void gui::ApplicationGUI::openFromFile()
       return;
 
   // file dialog
-  QString prompt_path = QFileDialog::getOpenFileName(this, tr("Open File"),
-      save_dir.absolutePath(), tr("XML files (*.xml)"));
+  QFileDialog load_dialog;
+  load_dialog.setDefaultSuffix("qad");
+  QString prompt_path = load_dialog.getOpenFileName(this, tr("Open File"),
+      save_dir.absolutePath(), tr("QAD (*.qad);;XML (*.xml);;All files (*.*)"));
 
   if(prompt_path.isEmpty())
     return;

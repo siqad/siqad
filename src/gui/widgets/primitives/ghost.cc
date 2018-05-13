@@ -8,6 +8,7 @@
 
 
 #include "ghost.h"
+#include "dbdot.h"
 
 
 // GHOSTDOT CLASS
@@ -23,6 +24,9 @@ prim::GhostDot::GhostDot(prim::Item *item, prim::Item *parent, QColor *pcol)
 
   // create dot at item center, assumes item local boundingRect centered at 0.
   setPos(item->pos());
+
+  // get the DB's lattice coordinate
+  lat_coord = static_cast<prim::DBDot*>(item)->latticeCoord();
 }
 
 QRectF prim::GhostDot::boundingRect() const
@@ -133,17 +137,21 @@ void prim::Ghost::prepare(const QList<prim::Item*> &items, QPointF scene_pos)
 }
 
 
-
-void prim::Ghost::prepare(prim::Item *item, QPointF)
-{
-  QList<prim::Item*> items;
-  items.append(item);
-  prepare(items);
-}
-
 void prim::Ghost::moveTo(QPointF pos)
 {
   setPos(pos-zero_offset);
+}
+
+
+void prim::Ghost::moveByCoord(prim::LatticeCoord coord_offset, prim::Lattice *lattice)
+{
+  prim::LatticeCoord fin_coord = anchor->latticeCoord() + coord_offset;
+  qDebug() << QObject::tr("anchor (%1,%2,%3) + offset (%4,%5,%6) = final (%7,%8,%9)").arg(anchor->latticeCoord().n).arg(anchor->latticeCoord().m).arg(anchor->latticeCoord().l).arg(coord_offset.n).arg(coord_offset.m).arg(coord_offset.l).arg(fin_coord.n).arg(fin_coord.m).arg(fin_coord.l);
+
+  for (prim::GhostDot *dot : dots)
+    dot->setLatticeCoord(dot->latticeCoord() + coord_offset);
+  QPointF offset = lattice->latticeCoord2ScenePos(coord_offset);
+  instance()->moveBy(offset.x(), offset.y());
 }
 
 
@@ -159,45 +167,36 @@ QList<prim::Item*> prim::Ghost::getTopItems() const
 }
 
 
-QList<prim::LatticeDot*> prim::Ghost::getLattice(const QPointF &offset) const
+QList<bool> prim::Ghost::getLatticeAvailability(const prim::LatticeCoord &offset,
+    prim::Lattice *lattice) const
 {
-  QList<prim::LatticeDot*> ldots;
-  for(int i=0; i<sources.count(); i++){
-    if(sources.at(i)->item_type != prim::Item::DBDot)
-      ldots.append(0);
-    else{
-      // get list of items which intersect the ghost dot
-      QList<QGraphicsItem*> cands = scene()->items(dots.at(i)->scenePos()+offset);
-      // use first LatticeDot candidate
-      prim::LatticeDot *ldot=0;
-      for(QGraphicsItem *cand : cands)
-        if(static_cast<prim::Item*>(cand)->item_type == prim::Item::LatticeDot &&
-            cand->flags() & QGraphicsItem::ItemIsSelectable){
-          ldot = static_cast<prim::LatticeDot*>(cand);
-          break;
-        }
-      ldots.append(ldot);
+  QList<bool> avail;
+  for (int i=0; i<dots.count(); i++) {
+    qDebug() << QObject::tr("ghost dot at (%1, %2, %3)").arg(dots.at(i)->latticeCoord().n).arg(dots.at(i)->latticeCoord().m).arg(dots.at(i)->latticeCoord().l);
+    if (!lattice->isValid(dots.at(i)->latticeCoord()+offset)) {
+      qDebug() << "Target site is not valid";
+      avail.append(false);
+      continue;
     }
+    if (lattice->isOccupied(dots.at(i)->latticeCoord()+offset)) {
+      qDebug() << "Target site is occupied";
+      avail.append(false);
+      continue;
+    }
+    avail.append(true);
   }
-  return ldots;
+  return avail;
 }
 
-prim::LatticeDot *prim::Ghost::getLatticeDot(prim::DBDot *db)
+
+prim::LatticeCoord prim::Ghost::getLatticeCoord(prim::DBDot *db) const
 {
   // get index of source
   int index = sources.indexOf(static_cast<prim::Item*>(db));
-  if(index==-1)
-    return 0;
-
-  // search for LatticeDot under GhostDot
-  for(QGraphicsItem *cand : scene()->items(dots.at(index)->scenePos()))
-    if(static_cast<prim::Item*>(cand)->item_type == prim::Item::LatticeDot &&
-      cand->flags() & QGraphicsItem::ItemIsSelectable){
-        return static_cast<prim::LatticeDot*>(cand);
-      }
-
-  // no valid LatticeDot found, return 0
-  return 0;
+  if (index==-1)
+    return prim::LatticeCoord(0,0,-1);
+  else
+    return dots.at(index)->latticeCoord();
 }
 
 QPointF prim::Ghost::freeAnchor(QPointF scene_pos)
@@ -220,16 +219,14 @@ void prim::Ghost::setValid(bool val)
 }
 
 
-bool prim::Ghost::checkValid(const QPointF &offset)
+bool prim::Ghost::checkValid(const prim::LatticeCoord &offset, prim::Lattice *lattice)
 {
-  QList<prim::LatticeDot*> ldots = getLattice(offset);
+  QList<bool> lattice_avail = getLatticeAvailability(offset, lattice);
 
   // invalid if a dangling bond is associated with no selectable lattice dot or
   // an unselectable lattice dot
-  for(int i=0; i<sources.count(); i++)
-    if(sources.at(i)->item_type != prim::Item::DBDot)
-      continue;
-    else if(ldots.at(i)==0 || ldots.at(i)->flags()^QGraphicsItem::ItemIsSelectable)
+  for(int i=0; i<dots.count(); i++)
+    if (!lattice_avail.at(i))
       return false;
 
   return true;

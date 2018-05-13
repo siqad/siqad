@@ -13,20 +13,18 @@ qmake_dir=$(cd `dirname $0` && pwd)
 # figure out which qmake command to use
 if [ "$FOR_OS" == "win32" ]; then
     export FOR_OS
+    export PATH="$PATH:/usr/lib/mxe/usr/bin"
     QMAKE_COMMAND=i686-w64-mingw32.static-qmake-qt5
     make_flag=release
 elif [ "$FOR_OS" == "win64" ]; then
     export FOR_OS
+    export PATH="$PATH:/usr/lib/mxe/usr/bin"
     QMAKE_COMMAND=x86_64-w64-mingw32.static-qmake-qt5
     make_flag=release
 else
     QMAKE_COMMAND=qmake
 fi
 
-
-# use qmake to create Make files for the GUI
-echo "Running qmake..."
-$QMAKE_COMMAND "$qmake_dir"
 
 # make simanneal
 echo "Building SimAnneal... $FOR_OS"
@@ -38,6 +36,32 @@ echo "Building AFMMarcus... $FOR_OS"
 cd $qmake_dir/src/phys/afmmarcus/src
 make $multicore_compile FOR_OS=$FOR_OS
 
+# make poissolver
+echo "Building PoisSolver... $FOR_OS"
+cd $qmake_dir/src/phys/poissolver/FEM/src
+make $multicore_compile FOR_OS=$FOR_OS
+
+# use qmake to create Make files for the GUI
+cd "$make_dir"
+echo "Running qmake..."
+$QMAKE_COMMAND "$qmake_dir"
+
 # make the GUI and copy physics engine files over
 echo "Building GUI..."
-cd $make_dir && make $make_flag $multicore_compile install
+cd $make_dir && make $make_flag $multicore_compile
+make install
+
+
+# extra actions if building for Windows
+if [ "$FOR_OS" == "win64" ] || [ "$FOR_OF" == "win32" ] ; then
+    cd "$make_dir/build/release/"
+    rm -rf .moc .obj .qrc
+
+    cd "$make_dir/build/release/src/phys/"
+    rm -rf poissolver
+    sed -i 's/<\/bin_path>/\.exe&/' ./simanneal/sim_anneal.physeng
+    sed -i 's/<\/bin_path>/\.exe&/' ./afmmarcus/hopping_animator.physeng
+
+    cd "$make_dir/build/"
+    zip -r "siqad_64.zip" "release"
+fi

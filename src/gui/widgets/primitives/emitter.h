@@ -42,6 +42,9 @@ namespace prim{
     //! emit a signal telling DesignPanel to remove item from scene
     void removeItemFromScene(Item *);
 
+    //! emit a signal teeling DesignPanel to move item to lattice coordinate
+    void moveDBToLatticeCoord(Item *, int n, int m, int l);
+
   signals:
 
     void sig_selectClicked(Item *);
@@ -51,6 +54,8 @@ namespace prim{
     void sig_addItemToScene(Item *);
 
     void sig_removeItemFromScene(Item *);
+
+    void sig_moveDBToLatticeCoord(Item *, int, int, int);
 
     void sig_resizeBegin();
 

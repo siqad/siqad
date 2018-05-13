@@ -11,11 +11,14 @@
 #include "src/settings/settings.h"
 
 #include <QtMath>
+#include <QDialog>
 #include <algorithm>
 
 
-prim::Lattice::Lattice(const QString &fname, int lay_id, const QPoint &lat_xy,
-    int cell_n, const QList<QPointF> &cell_b, const QList<QPointF> &lat_a)
+qreal prim::Lattice::rtn_acc = 1e-3;
+int prim::Lattice::rtn_iters = 1;
+
+prim::Lattice::Lattice(const QString &fname, int lay_id)
   : Layer(tr("Lattice"),Layer::Lattice,0)
 {
   layer_id = lay_id;
@@ -23,125 +26,245 @@ prim::Lattice::Lattice(const QString &fname, int lay_id, const QPoint &lat_xy,
   // if(fname.isEmpty())
   //   settings::LatticeSettings::updateLattice(fname);
 
-  construct(lat_xy, cell_n, cell_b, lat_a);
+  construct();
+  //tileApprox();
 }
 
 
-void prim::Lattice::construct(const QPoint &lat_xy, int cell_n,
-    const QList<QPointF> &cell_b, const QList<QPointF> &lat_a)
+void prim::Lattice::saveLayer(QXmlStreamWriter *ws) const
+{
+  ws->writeStartElement("layer_prop");
+
+  int fp = settings::AppSettings::instance()->get<int>("float_prc");
+  char fmt = settings::AppSettings::instance()->get<char>("float_fmt");
+  QString str;
+
+  // common layer properties
+  saveLayerProperties(ws);
+
+  // lattice specific properties
+  ws->writeStartElement("lat_vec");
+  for (int i=0; i<2; i++) {
+    ws->writeEmptyElement(QObject::tr("a%1").arg(i+1));
+    ws->writeAttribute("x", str.setNum(a[i].x(), fmt, fp));
+    ws->writeAttribute("y", str.setNum(a[i].y(), fmt, fp));
+  }
+  ws->writeTextElement("N", QString::number(n_cell));
+  for (int i=0; i<b.size(); i++) {
+    ws->writeEmptyElement(QObject::tr("b%1").arg(i+1));
+    ws->writeAttribute("x", str.setNum(b[i].x(), fmt, fp));
+    ws->writeAttribute("y", str.setNum(b[i].y(), fmt, fp));
+  }
+  ws->writeEndElement();  // end of lat_vec
+
+  ws->writeEndElement();  // end of layer_prop
+}
+
+
+prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos) const
+{
+  QPointF dummy_site_pos;
+  return nearestSite(scene_pos, dummy_site_pos);
+}
+
+
+prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos, QPointF &nearest_site_pos) const
+{
+  // TODO ask Jake if these calculations should be done using the scene integer
+  //      version of the variables
+  LatticeCoord coord(0,0,-1);
+  int n0[2];
+  qreal proj;
+  QPointF x = scene_pos/prim::Item::scale_factor;
+  qreal x2 = QPointF::dotProduct(x,x);
+
+  for(int i=0; i<2; i++){
+    proj = QPointF::dotProduct(x, a[i])/a2[i];
+    n0[i] = qFloor(proj - coth*qSqrt(x2/a2[i]-proj*proj));
+  }
+
+  qreal mdist = qMax(a2[0], a2[1]);         // nearest Manhattan length
+  //qreal mdist = m_big;
+  //qreal mdist = -1;
+  for(int n=n0[0]-1; n<n0[0]+2; n++){
+    for(int m=n0[1]-1; m<n0[1]+2; m++){
+      QPointF x0 = n*a[0]+m*a[1];
+      for (int l=0; l<b.size(); l++){
+        QPointF temp = x0 + b[l];
+        qreal dist = (temp-x).manhattanLength();
+        if(dist<=mdist) {// || mdist == -1){
+          mdist = dist;
+          nearest_site_pos = temp * prim::Item::scale_factor;
+          coord.n = n;
+          coord.m = m;
+          coord.l = l;
+        }
+      }
+    }
+  }
+
+  if (coord.l == -1)
+    qFatal("No result for nearest site");
+
+  //qDebug() << tr("Nearest Lattice Site: %1 :: %2").arg(mp.x()).arg(mp.y());
+
+  return coord;
+  //return mp;                            // physical (angstrom) coords
+  //return mp*prim::Item::scale_factor;   // scene (pixel) coords
+}
+
+
+QList<prim::LatticeCoord> prim::Lattice::enclosedSites(const prim::LatticeCoord &coord1,
+    const prim::LatticeCoord &coord2) const
+{
+  // WARNING assumes n is purely horizontal and m is purely vertical. Might not
+  // be the case!
+  int n_min = qMin(coord1.n, coord2.n);
+  int n_max = qMax(coord1.n, coord2.n);
+  int m_min = qMin(coord1.m, coord2.m);
+  int m_max = qMax(coord1.m, coord2.m);
+  int l_tl, l_br; // top left and bottom right
+  if (coord1.m == coord2.m) {
+    l_tl = qMin(coord1.l, coord2.l);
+    l_br = qMax(coord1.l, coord2.l);
+  } else {
+    l_tl = coord1.m < coord2.m ? coord1.l : coord2.l; // top left
+    l_br = coord1.m > coord2.m ? coord1.l : coord2.l; // bottom right
+  }
+
+  QList<prim::LatticeCoord> coords;
+
+  for (int n_site=n_min; n_site<=n_max; n_site++) {
+    for (int m_site=m_min; m_site<=m_max; m_site++) {
+      for (int l_site=0; l_site<n_cell; l_site++) {
+        if (  !(m_min == m_max && l_tl != l_br)
+              && ((m_site == m_min && l_site < l_tl)
+                  || (m_site == m_max && l_site > l_br)))
+          continue;
+        coords.append(prim::LatticeCoord(n_site, m_site, l_site));
+      }
+    }
+  }
+  return coords;
+}
+
+
+QPointF prim::Lattice::latticeCoord2ScenePos(const prim::LatticeCoord &l_coord) const
+{
+  if (l_coord.l >= b_scene.size() || l_coord.l <= -b_scene.size())
+    qCritical() << QObject::tr("coordinate invalid! (%1,%2,%3)").arg(l_coord.n).arg(l_coord.m).arg(l_coord.l);
+  //qDebug() << QObject::tr("Coordinates: (%1,%2,%3)").arg(l_coord.n).arg(l_coord.m).arg(l_coord.l);
+  QPointF lattice_scene_loc;
+  lattice_scene_loc += l_coord.n * a_scene[0];
+  lattice_scene_loc += l_coord.m * a_scene[1];
+  lattice_scene_loc += b_scene[qAbs(l_coord.l)] * (l_coord.l > 0 ? 1 : -1);
+  return lattice_scene_loc;
+}
+
+
+bool prim::Lattice::collidesWithLatticeSite(const QPointF &scene_pos,
+    const prim::LatticeCoord &l_coord) const
+{
+  QPointF target_pos = latticeCoord2ScenePos(l_coord);
+  QPointF delta = target_pos - scene_pos;
+  if (delta.manhattanLength() < 0.5 * settings::GUISettings::instance()->
+      get<qreal>("latdot/diameter") * prim::Item::scale_factor)
+    return true;
+  return false;
+}
+
+
+QRectF prim::Lattice::tileApprox()
+{
+  qreal r = QPointF::dotProduct(a[0], a[1])/QPointF::dotProduct(a[0], a[0]);
+  QPair<int,int> frac = rationalize(r);
+
+  qDebug() << tr("Lattice skew: %1 :: ( %2 / %3 )").arg(r).arg(frac.first).arg(frac.second);
+  qreal width = qSqrt(QPointF::dotProduct(a[0], a[0]));
+  QPointF v = frac.first*a[0] - frac.second*a[1];
+  qreal height = qSqrt(QPointF::dotProduct(v,v));
+
+  QRectF rect(0,0,width,height);
+
+  qDebug() << tr("Width: %1 :: Height: %2").arg(width).arg(height);
+
+  return rect;
+}
+
+
+QImage prim::Lattice::tileableLatticeImage(QColor bkg_col)
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  qreal lat_diam = gui_settings->get<qreal>("latdot/diameter") * prim::Item::scale_factor;
+  qreal lat_edge_width = gui_settings->get<qreal>("latdot/edge_width") * lat_diam;
+  QColor lat_edge_col = gui_settings->get<QColor>("latdot/edge_col");
+  // TODO publish mode
+
+  QPixmap bkg_pixmap(QSize(a_scene[0].x(), a_scene[1].y()));
+  bkg_pixmap.fill(bkg_col);
+  QPainter painter(&bkg_pixmap);
+  painter.setBrush(Qt::NoBrush);
+  painter.setPen(QPen(lat_edge_col, lat_edge_width));
+  painter.setRenderHint(QPainter::Antialiasing);
+  for (QPoint site : b_scene)
+    painter.drawEllipse(site.x()+lat_edge_width, site.y()+lat_edge_width, lat_diam, lat_diam);
+  painter.end();
+
+  // then generate a single tile with properly offset circles
+  QImage bkg_img(QSize(
+            QSizeF(tileApprox().size()*prim::Item::scale_factor).toSize()),
+            QImage::Format_ARGB32);
+  QPainter painter_offset(&bkg_img);
+  int offset = 0.5 * lat_diam + lat_edge_width;
+  painter_offset.drawTiledPixmap(bkg_pixmap.rect(), bkg_pixmap, QPoint(offset,offset));
+  painter_offset.end();
+
+  return bkg_img;
+}
+
+
+void prim::Lattice::construct()
+{
   settings::LatticeSettings *lattice_settings = settings::LatticeSettings::instance();
 
   // get values from the lattice_settings
-  n_cell = (cell_n == -1) ? lattice_settings->get<int>("cell/N") : cell_n;
-  if (!cell_b.isEmpty()) {
-    b = QList<QPointF>(cell_b);
-  } else {
-    for(int i=0;i<n_cell;i++) {
-      b.append(lattice_settings->get<QPointF>(QString("cell/b%1").arg(i+1)));
-    }
-  }
-  for(int i=0;i<2;i++) {
-    QPointF a_curr = (!lat_a.isEmpty()) ? lat_a[i] : lattice_settings->get<QPointF>(QString("lattice/a%1").arg(i+1));
-    a[i] = a_curr;
+  n_cell = lattice_settings->get<int>("cell/N");
+  for(int i=0;i<n_cell;i++)
+    b.append(lattice_settings->get<QPointF>(QString("cell/b%1").arg(i+1)));
+  for(int i=0;i<2;i++){
+    a[i] = lattice_settings->get<QPointF>(QString("lattice/a%1").arg(i+1));
+    a2[i] = QPointF::dotProduct(a[i], a[i]);
   }
 
-  // construct bounds for lattice vectors
-  qreal dx = qMax(qAbs(a[0].x()),qAbs(a[1].x()));
-  qreal dy = qMax(qAbs(a[0].y()),qAbs(a[1].y()));
-  QPoint nxy = (lat_xy.isNull()) ? gui_settings->get<QPoint>("lattice/xy") : lat_xy;
+  m_big = a[0].manhattanLength() + a[1].manhattanLength();
+  qreal dtrm = a[0].x()*a[1].y() - a[0].y()*a[1].x();
+  coth = QPointF::dotProduct(a[0], a[1]) / dtrm;
 
-  Lx = dx*nxy.x();
-  Ly = dy*nxy.y();
-
-  // find all lattice vector indices within the bounding region
-  QList<QPoint> inds;
-  getLatticeInds(inds);
-
-  // for each set of indices, create the associated unit cell
-  for(int i=0; i<inds.count(); i++)
-    buildUnitCell(inds.at(i));
+  // generate lattice and site vectors for display (all integer)
+  a_scene[0] = QPointF(tileApprox().topRight() * prim::Item::scale_factor).toPoint();
+  a_scene[1] = QPointF(tileApprox().bottomLeft() * prim::Item::scale_factor).toPoint();
+  for (QPointF site : b)
+    b_scene.append(QPointF(site * prim::Item::scale_factor).toPoint());
 }
 
 
-void prim::Lattice::getLatticeInds(QList<QPoint> &inds, int n)
+QPair<int,int> prim::Lattice::rationalize(qreal x, int k)
 {
-  // both lattice vectors must have non-zero length
-  if(a[0].manhattanLength()==0 || a[1].manhattanLength()==0)
-    qFatal("Lattice vector has zero length...");
+  int n = qFloor(x);
+  qreal r = x - n;
 
-  // if a[1].x()==0, we must have 0 <= n*a[0].x() <= Lx to have pairs (n,m)
-  if(a[1].x()==0 && (n*a[0].x()<0 || n*a[0].x()>Lx))
-    return;
+  qDebug() << tr("%1 :: %2 :: %3").arg(x).arg(n).arg(r);
+  QPair<int,int> pair;
 
-  // if a[1].y()==0, we must have 0 <= n*a[0].y() <= Ly to have pairs (n,m)
-  if(a[1].x()==0 && (n*a[0].x()<0 || n*a[0].x()>Lx))
-    return;
-
-  // find inclusive lower and upper bounds for m
-  int lo, hi;
-  findBounds(lo, hi, n);
-
-  // if no valid values of m, terminate recursion in branch
-  if(lo>hi)
-    return;
-
-  // append indices to list
-  for(int m=lo; m<=hi; m++)
-    inds.append(QPoint(n,m));
-
-  // if n==0, step in both directions, else continue with sign of n
-  if(n>=0)
-    getLatticeInds(inds, n+1);
-  if(n<=0)
-    getLatticeInds(inds, n-1);
-}
-
-void prim::Lattice::findBounds(int &lo, int &hi, int n)
-{
-  // compute useful values for finding bound of m
-  qreal sx, tx, sy, ty;
-  if(a[1].x()!=0){
-    sx = -n*a[0].x()/a[1].x();
-    tx = sx+Lx/a[1].x();
-  }
-  if(a[1].y()!=0){
-    sy = -n*a[0].y()/a[1].y();
-    ty = sy+Ly/a[1].y();
-  }
-
-  // now swap s and t if ex. a[1].x()<0
-  if(a[1].x()<0)
-    std::swap(sx, tx);
-
-  if(a[1].y()<0)
-    std::swap(sy, ty);
-
-  // select tight bounds
-  if(a[1].x()==0){
-    lo = qCeil(sy);
-    hi = qFloor(ty);
-  }
-  else if(a[1].y()==0){
-    lo = qCeil(sx);
-    hi = qFloor(tx);
+  if ( r < rtn_acc || k == rtn_iters ){
+    pair.first = n;
+    pair.second = 1;
   }
   else{
-    lo = qCeil(qMax(sx,sy));
-    hi = qFloor(qMin(tx,ty));
+    QPair<int,int> other = rationalize(1./r, k+1);
+    pair.first = other.first*n+other.second;
+    pair.second = other.first;
   }
-}
 
-
-void prim::Lattice::buildUnitCell(const QPoint &ind)
-{
-  // compute unit cell origin
-  QPointF lattice_loc = a[0]*ind.x()+a[1]*ind.y();
-
-  for(int n=0; n<n_cell; n++){
-    prim::LatticeDot *dot = new prim::LatticeDot(layer_id, lattice_loc+b.at(n));
-    dot->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    addItem(dot);
-  }
+  return pair;
 }

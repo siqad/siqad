@@ -36,13 +36,15 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   connect(prim::Emitter::instance(), &prim::Emitter::sig_showProperty,
           this, &gui::DesignPanel::showItemProperty);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_addItemToScene,
-          this, &gui::DesignPanel::addItemToSceneRequest);
+          this, &gui::DesignPanel::addItemToScene);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_removeItemFromScene,
           this, &gui::DesignPanel::removeItemFromScene);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeBegin,
           this, &gui::DesignPanel::resizeBegin);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeFinalize,
           this, &gui::DesignPanel::resizeItem);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_moveDBToLatticeCoord,
+          this, &gui::DesignPanel::moveDBToLatticeCoord);
 }
 
 // destructor
@@ -58,7 +60,6 @@ void gui::DesignPanel::initDesignPanel() {
   connect(undo_stack, SIGNAL(cleanChanged(bool)),
           this, SLOT(emitUndoStackCleanChanged(bool)));
 
-  settings::GUISettings *gui_settings = settings::GUISettings::instance();
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 
   scene = new QGraphicsScene(this);
@@ -71,7 +72,7 @@ void gui::DesignPanel::initDesignPanel() {
   // initialising parameters
   snap_diameter = app_settings->get<qreal>("snap/diameter")*prim::Item::scale_factor;
   qDebug() << tr("SD: %1").arg(snap_diameter);
-  snap_target = 0;
+  snap_coord = prim::LatticeCoord();
 
   tool_type = gui::ToolType::NoneTool;     // now setTool will update the tool
 
@@ -79,13 +80,14 @@ void gui::DesignPanel::initDesignPanel() {
   setTransformationAnchor(QGraphicsView::NoAnchor);
   setResizeAnchor(QGraphicsView::AnchorViewCenter);
   resetMatrix(); // resets QTransform, which undoes the zoom
+  scale(0.1, 0.1);
 
   setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing |
             QPainter::HighQualityAntialiasing | QPainter::SmoothPixmapTransform);
 
   // color scheme
   QColor col;
-  setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col")));
+  //setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col")));
   setFrameShadow(QFrame::Raised);
 
   setCacheMode(QGraphicsView::CacheBackground);
@@ -144,10 +146,7 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
 // reset
 void gui::DesignPanel::resetDesignPanel()
 {
-  // TODO fold this into a single initDesignPanel function
-
   clearDesignPanel(true);
-
   initDesignPanel();
 
   // REBUILD
@@ -353,7 +352,8 @@ void gui::DesignPanel::buildLattice(const QString &fname)
     removeLayer(0);
 
   // build the new lattice
-  prim::Lattice *lattice = new prim::Lattice(fname, layers.size());
+  lattice = new prim::Lattice(fname, layers.size());
+  scene->setBackgroundBrush(QBrush(lattice->tileableLatticeImage(background_col)));
 
   // add the lattice dots to the scene
   for(prim::Item *const item : lattice->getItems())
@@ -383,7 +383,8 @@ void gui::DesignPanel::buildLattice(const QString &fname)
 
 
 
-void gui::DesignPanel::setScenePadding(){
+void gui::DesignPanel::setScenePadding()
+{
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
   // resize the scene with padding
@@ -402,6 +403,9 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
 
   // reset selected items
   scene->clearSelection();
+
+  // destroy DB previews
+  destroyDBPreviews();
 
   // inform all items of select mode
   prim::Item::tool_type = tool;
@@ -447,7 +451,7 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
 void gui::DesignPanel::setFills(float *fills)
 {
   QList<prim::DBDot *> dbs = getSurfaceDBs();
-  for(int i=0; i<dbs.count(); i++){
+  for (int i=0; i<dbs.count(); i++) {
     if(qAbs(fills[i])>1.)
       qWarning() << tr("Given fill invalid");
     else
@@ -468,15 +472,10 @@ void gui::DesignPanel::setDisplayMode(DisplayMode mode)
   display_mode = mode;
   prim::Item::display_mode = mode;
 
-  /*settings::GUISettings *gui_settings = settings::GUISettings::instance();
-  if (mode == gui::ScreenshotMode)
-    setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col_hc")));
-  else
-    setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col")));*/
-  if (mode == gui::ScreenshotMode)
+  /*if (mode == gui::ScreenshotMode)
     setBackgroundBrush(QBrush(background_col_publish));
   else
-    setBackgroundBrush(QBrush(background_col));
+    setBackgroundBrush(QBrush(background_col));*/
 }
 
 
@@ -552,7 +551,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
 void gui::DesignPanel::loadGUIFlags(QXmlStreamReader *rs)
 {
   qDebug() << "Loading GUI flags";
-  qreal zoom=1, scroll_v=0, scroll_h=0;
+  qreal zoom=0.1, scroll_v=0, scroll_h=0;
   while (rs->readNextStartElement()) {
     if (rs->name() == "zoom") {
       zoom = rs->readElementText().toDouble();
@@ -756,6 +755,12 @@ void gui::DesignPanel::rotateCcw()
   scrollDelta(delta);
 }
 
+void gui::DesignPanel::moveDBToLatticeCoord(prim::Item *item, int n, int m, int l)
+{
+  item->setPos(lattice->latticeCoord2ScenePos(prim::LatticeCoord(n,m,l)));
+  setLatticeSiteOccupancy(item, true);
+}
+
 // INTERRUPTS
 
 // most behaviour will be connected to mouse move/release. However, when
@@ -798,11 +803,13 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 
       } else if (tool_type == DBGenTool) {
         // start the rubber band at the snap_target if it exists
+        /* TODO implement when trying to do lattice dot rubber band creation
         if (tool_type == DBGenTool && snap_target)
           rb_start = snap_target->pos().toPoint();
-        else
+        else*/
           rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
+        coord_start = lattice->nearestSite(mapToScene(e->pos()));
 
       } else {
         QGraphicsView::mousePressEvent(e);
@@ -833,13 +840,14 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
   if (ghosting) {
     // update snap
     QPointF scene_pos = mapToScene(e->pos());
-    QPointF offset;
-    if(snapGhost(scene_pos, offset)) //if there are db dots
-      prim::Ghost::instance()->moveBy(offset.x(), offset.y());
+    prim::LatticeCoord offset;
+    if (snapGhost(scene_pos, offset)) // if there are db dots
+      prim::Ghost::instance()->moveByCoord(offset, lattice);
 
   } else if (tool_type == AFMPathTool) {
     // update ghost node and ghost segment if there is a focused node, only update
     // ghost node if there's none.
+    /* TODO re-enable it later
     QList<prim::Item::ItemType> target_types;
     target_types.append(prim::Item::LatticeDot);
     target_types.append(prim::Item::DBDot);
@@ -847,21 +855,21 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     if (snap_target) {
       afm_panel->ghostNode()->setPos(snap_target->scenePos());
       afm_panel->showGhost(true);
-    }
+    }*/
 
   } else if (!clicked && tool_type == DBGenTool) {
     // show preview location of new DB
-    QPointF scene_pos = mapToScene(e->pos());
-    snapDBPreview(scene_pos);
+    createDBPreviews({lattice->nearestSite(mapToScene(e->pos()))});
 
   } else if (clicked) {
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
       case Qt::LeftButton:
-        if (tool_type == SelectTool || tool_type == DBGenTool ||
-            tool_type == ElectrodeTool || tool_type == AFMAreaTool ||
-            tool_type == ScreenshotAreaTool) {
+        if (tool_type == SelectTool || tool_type == ElectrodeTool ||
+            tool_type == AFMAreaTool || tool_type == ScreenshotAreaTool) {
           rubberBandUpdate(e->pos());
+        } else if (tool_type == DBGenTool) {
+          createDBPreviews(lattice->enclosedSites(coord_start, lattice->nearestSite(mapToScene(e->pos()))));
         }
         // use default behaviour for left mouse button
         QGraphicsView::mouseMoveEvent(e);
@@ -920,7 +928,6 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             break;
           case gui::ToolType::DBGenTool:
             // identify free lattice sites and create dangling bonds
-            filterSelection(false);
             createDBs();
             break;
           case gui::ToolType::ElectrodeTool:
@@ -1315,21 +1322,6 @@ void gui::DesignPanel::electrodeSetPotentialAction()
 }
 
 
-void gui::DesignPanel::toggleDBElecAction()
-{
-  // toggling is not an un-doable action for now.
-  // qDebug() << tr("toggleDBElecAction...");
-  QList<prim::Item*> selection = selectedItems();
-  if(selection.isEmpty()){ //TODO:figure out how we want to handle right click without selection
-    qDebug() << tr("Please select an item...");
-  } else { //at least 1 item was selected, toggle elec in dots.
-    for(prim::Item *item : selection){
-      if(item->item_type == prim::Item::DBDot)
-        static_cast<prim::DBDot*>(item)->toggleElec();
-    }
-  }
-}
-
 void gui::DesignPanel::createActions()
 {
   action_undo = new QAction(tr("&Undo"), this);
@@ -1352,9 +1344,6 @@ void gui::DesignPanel::createActions()
 
   action_set_potential = new QAction(tr("&Set Potential"), this);
   connect(action_set_potential, &QAction::triggered, this, &gui::DesignPanel::electrodeSetPotentialAction);
-
-  action_toggle_db_elec = new QAction(tr("&Toggle Lattice<->DB"), this);
-  connect(action_toggle_db_elec, &QAction::triggered, this, &gui::DesignPanel::toggleDBElecAction);
 }
 
 
@@ -1390,7 +1379,7 @@ void gui::DesignPanel::rubberBandUpdate(QPoint pos){
 
   // do nothing if mouse hasn't moved much
   // TODO change snap_diameter to a separate variable
-  if((pos-rb_cache).manhattanLength()<.1*snap_diameter)
+  if((pos-rb_cache).manhattanLength()<.01*snap_diameter)
     return;
   rb_cache = pos;
 
@@ -1444,9 +1433,9 @@ void gui::DesignPanel::createGhost(bool paste)
 
   if (paste) {
     ghost->prepare(clipboard);
-    QPointF offset;
-    if(snapGhost(mapToScene(mapFromGlobal(QCursor::pos())), offset))
-      ghost->moveBy(offset.x(), offset.y());
+    prim::LatticeCoord offset;
+    if (snapGhost(mapToScene(mapFromGlobal(QCursor::pos())), offset))
+      ghost->moveByCoord(offset, lattice);
   } else {
     QPointF scene_pos = mapToScene(mapFromGlobal(QCursor::pos()));
     //get QList of selected Item object
@@ -1461,11 +1450,11 @@ void gui::DesignPanel::clearGhost()
   ///qDebug() << tr("Clearing ghost...");
   prim::Ghost::instance()->cleanGhost();
   ghosting=false;
-  snap_target=0;
+  snap_coord=prim::LatticeCoord();
 }
 
 
-bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
+bool gui::DesignPanel::snapGhost(QPointF scene_pos, prim::LatticeCoord &offset)
 {
   bool is_all_floating = true;
 
@@ -1491,8 +1480,8 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
     }
     return false;
   } else {
-    // if holding any non-floating (for now just db dots or lat dots)
-    // don't need to recheck snap target unless the cursor has moved significantly
+    // if holding any non-floating (for now just DBs), don't need to recheck
+    // snap target unless the cursor has moved significantly
     if ((scene_pos-snap_cache).manhattanLength()<.3*snap_diameter)
       return false;
     snap_cache = scene_pos;
@@ -1502,47 +1491,36 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, QPointF &offset)
 
     // if no anchor, allow free movement of the ghost
     if(anchor==0){
-      offset = QPointF();
+      offset = prim::LatticeCoord();
       return true;
     }
     // otherwise restrict possible ghost position to lattice sites
-    QPointF old_anchor = anchor->scenePos();
+    prim::LatticeCoord old_anchor = anchor->latticeCoord();
     QPointF free_anchor = ghost->freeAnchor(scene_pos);
 
-    // get nearest lattice site to free anchor
-    QRectF rect;
-    rect.setSize(QSize(snap_diameter, snap_diameter));
-    rect.moveCenter(free_anchor);
-    QList<QGraphicsItem*> near_items = scene->items(rect);
+    // get the nearest lattice site to the free anchor
+    prim::LatticeCoord nearest_site = lattice->nearestSite(free_anchor);
 
-    // if no items nearby, change nothing
-    if(near_items.count()==0)
+    // do nothing if target site is not valid or has not changed
+    if (!lattice->isValid(nearest_site) || nearest_site == snap_coord)
       return false;
 
-    // select the nearest lattice point to the free_anchor
-    prim::LatticeDot *target=0;
-    qreal mdist=-1, dist;
+    // move ghost and update validity hash table
+    offset = nearest_site - old_anchor;
+    if (!ghost->valid_hash.contains(nearest_site))
+      ghost->valid_hash[nearest_site] = ghost->checkValid(offset, lattice);
+    snap_coord = nearest_site;
+    ghost->setValid(ghost->valid_hash[nearest_site]);
 
-    for(QGraphicsItem *gitem : near_items){
-      // lattice dot
-      if(static_cast<prim::Item*>(gitem)->item_type == prim::Item::LatticeDot){
-        dist = (gitem->pos()-free_anchor).manhattanLength();
-        if(mdist<0 || dist<mdist){
-          target = static_cast<prim::LatticeDot*>(gitem);
-          mdist=dist;
-        }
-      }
-    }
-    // if no valid target or target has not changed, do nothing
-    if(!target || (target==snap_target))
-      return false;
+    return true;
+    /*
     // move ghost and update validity hash table.
     offset = target->scenePos()-old_anchor;
     if(!ghost->valid_hash.contains(target))
       ghost->valid_hash[target] = ghost->checkValid(offset);
     snap_target = target;
     ghost->setValid(ghost->valid_hash[target]);
-    return true;
+    return true;*/
   }
 }
 
@@ -1550,34 +1528,31 @@ void gui::DesignPanel::initMove()
 {
   createGhost(false);
 
-  // set lattice dots of objects to be moved as selectable
-  for(prim::Item *item : selectedItems())
-    setLatticeDotSelectability(item, true);
+  // set lattice dots of selected DBs to be unoccupied
+  for (prim::Item *item : selectedItems())
+    setLatticeSiteOccupancy(item, false);
 
   moving = true;
 }
 
-
-void gui::DesignPanel::setLatticeDotSelectability(prim::Item *item, bool flag)
+void gui::DesignPanel::setLatticeSiteOccupancy(prim::Item *item, bool flag)
 {
-  prim::LatticeDot *ldot=0;
   switch(item->item_type){
     case prim::Item::DBDot:
-      ldot = static_cast<prim::DBDot*>(item)->getSource();
-      ldot->setFlag(QGraphicsItem::ItemIsSelectable, flag);
+      if (flag)
+        lattice->setOccupied(static_cast<prim::DBDot*>(item)->latticeCoord(), item);
+      else
+        lattice->setUnoccupied(static_cast<prim::DBDot*>(item)->latticeCoord());
       break;
     case prim::Item::Aggregate:
       for(prim::Item *it : static_cast<prim::Aggregate*>(item)->getChildren())
-        setLatticeDotSelectability(it, flag);
-      break;
-    case prim::Item::LatticeDot:
-      ldot = static_cast<prim::LatticeDot*>(item);
-      ldot->setFlag(QGraphicsItem::ItemIsSelectable, flag);
+        setLatticeSiteOccupancy(it, flag);
       break;
     default:
       break;
   }
 }
+
 
 void gui::DesignPanel::copySelection()
 {
@@ -1604,52 +1579,31 @@ void gui::DesignPanel::copySelection()
   }
 }
 
-void gui::DesignPanel::snapDBPreview(QPointF scene_pos)
+void gui::DesignPanel::createDBPreviews(QList<prim::LatticeCoord> coords)
 {
-  // don't need to recheck snap target unless the cursor has moved significantly
-  if(snap_target != 0 && (scene_pos-snap_cache).manhattanLength()<.1*snap_diameter)
-    return;
-  snap_cache = scene_pos;
+  destroyDBPreviews();
+  appendDBPreviews(coords);
+}
 
-  // get nearest lattice site to cursor position
-  QRectF rect;
-  rect.setSize(QSize(snap_diameter, snap_diameter));
-  rect.moveCenter(scene_pos);
-  QList<QGraphicsItem*> near_items = scene->items(rect);
-
-  // if no items nearby, change nothing
-  if(near_items.count()==0){
-    if(snap_target){
-      snap_target->setSelected(false); // unselect the previous target
-      snap_target = 0;
-    }
-    return;
+void gui::DesignPanel::appendDBPreviews(QList<prim::LatticeCoord> coords)
+{
+  for (prim::LatticeCoord coord : coords) {
+    if (lattice->isOccupied(coord))
+      continue;
+    prim::DBDotPreview *db_prev = new prim::DBDotPreview(coord);
+    db_prev->setPos(lattice->latticeCoord2ScenePos(coord));
+    db_previews.append(db_prev);
+    scene->addItem(db_prev);
   }
+}
 
-  // select the nearest latdot to cursor position
-  prim::LatticeDot *target=0;
-  qreal mdist=-1, dist;
-
-  for(QGraphicsItem *gitem : near_items) {
-    // lattice dot
-    dist = (gitem->pos()-scene_pos).manhattanLength();
-    if(mdist<0 || dist<mdist){
-      target = static_cast<prim::LatticeDot*>(gitem);
-      mdist=dist;
-    }
+void gui::DesignPanel::destroyDBPreviews()
+{
+  while (!db_previews.isEmpty()) {
+    prim::DBDotPreview *db_prev = db_previews.takeFirst();
+    scene->removeItem(db_prev);
+    delete db_prev;
   }
-
-  // if no valid target or target has not changed, do nothing
-  if(!target || target==snap_target)
-    return;
-
-  // move db indicator
-  if(snap_target)
-    snap_target->setSelected(false); // unselect the previous target
-  snap_target = target;
-  snap_target->setSelected(true); // select the new target
-
-  return;
 }
 
 prim::Item *gui::DesignPanel::filteredSnapTarget(QPointF scene_pos, QList<prim::Item::ItemType> &target_types, qreal search_box_width)
@@ -1690,25 +1644,21 @@ prim::Item *gui::DesignPanel::filteredSnapTarget(QPointF scene_pos, QList<prim::
 // UNDO/REDO STACK METHODS
 // CreateDB class
 
-gui::DesignPanel::CreateDB::CreateDB(prim::LatticeDot *ldot, int layer_index,
-                        gui::DesignPanel *dp, prim::DBDot *src_db, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index), ldot(ldot)
+gui::DesignPanel::CreateDB::CreateDB(prim::LatticeCoord l_coord, int layer_index,
+    DesignPanel *dp, prim::DBDot *cp_src, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), invert(invert), lat_coord(l_coord), cp_src(cp_src),
+      dp(dp), layer_index(layer_index)
 {
-  prim::DBDot *dbdot = ldot->getDBDot();
-  // dbdot should be 0 if invert is false else non-zero
-  if (!invert && dbdot!=0) {
-    qDebug() << tr("latdot loc: (%1, %2)").arg(ldot->x()).arg(ldot->y());
-    qFatal("Trying to make a new db at a location that already has one");
-  }
-  if (invert && dbdot==0) {
-    qDebug() << tr("latdot loc: (%1, %2)").arg(ldot->x()).arg(ldot->y());
-    qFatal("Trying to delete a non-existing DB");
-  }
+  db_at_loc = static_cast<prim::DBDot*>(dp->lattice->dbAt(l_coord));
+
+  if (invert && !db_at_loc)
+    qFatal("Trying to remove a non-existing DB");
+  else if (!invert && db_at_loc)
+    qFatal("Trying to make a new DB at a location that already has one");
 
   // dbdot index in layer
   prim::Layer *layer = dp->getLayer(layer_index);
-  index = invert ? layer->getItems().indexOf(dbdot) : layer->getItems().size();
-  elec = src_db ? src_db->getElec() : 0;
+  index = invert ? layer->getItems().indexOf(db_at_loc) : layer->getItems().size();
 }
 
 void gui::DesignPanel::CreateDB::undo()
@@ -1725,20 +1675,18 @@ void gui::DesignPanel::CreateDB::create()
 {
   // add dangling bond to layer and scene, index in layer item stack will be
   // equal to layer->getItems().size()
-  dp->addItem(new prim::DBDot(layer_index, ldot, elec), layer_index, index);
+  prim::DBDot *new_db = new prim::DBDot(lat_coord, layer_index);
+  dp->lattice->setOccupied(lat_coord, new_db);
+  dp->addItem(new_db, layer_index, index);
+  db_at_loc=new_db;
 }
 
 void gui::DesignPanel::CreateDB::destroy()
 {
-  prim::DBDot *dbdot = static_cast<prim::DBDot*>(dp->getLayer(layer_index)->getItem(index));
-
-  if(dbdot != 0){
-    // make source lattice site selectable again
-    dbdot->getSource()->setDBDot(0);
-
-    // destroy dbdot
-    dp->removeItem(dbdot, dp->getLayer(dbdot->layer_id));  // deletes dbdot
-    dbdot = 0;
+  if (db_at_loc) {
+    dp->lattice->setUnoccupied(db_at_loc->latticeCoord());
+    dp->removeItem(db_at_loc, dp->getLayer(db_at_loc->layer_id));
+    db_at_loc = 0;
   }
 }
 
@@ -1976,6 +1924,45 @@ void gui::DesignPanel::ResizeAFMArea::redo()
 }
 
 
+// ResizeElectrode class
+gui::DesignPanel::ResizeElectrode::ResizeElectrode(int layer_index, DesignPanel *dp,
+    const QRectF &orig_rect, const QRectF &new_rect, int electrode_index,
+    bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), invert(invert), layer_index(layer_index), dp(dp),
+        electrode_index(electrode_index), orig_rect(orig_rect), new_rect(new_rect)
+{
+  top_left_delta = new_rect.topLeft() - orig_rect.topLeft();
+  bot_right_delta = new_rect.bottomRight() - orig_rect.bottomRight();
+}
+
+void gui::DesignPanel::ResizeElectrode::undo()
+{
+  prim::Electrode *electrode = static_cast<prim::Electrode*>(
+      dp->getLayer(layer_index)->getItem(electrode_index));
+
+  if (electrode->boundingRect().topLeft() == orig_rect.topLeft() &&
+      electrode->boundingRect().bottomRight() == orig_rect.bottomRight())
+    return;
+
+  electrode->resize(-top_left_delta.x(), -top_left_delta.y(),
+      -bot_right_delta.x(), -bot_right_delta.y(), true);
+}
+
+void gui::DesignPanel::ResizeElectrode::redo()
+{
+  prim::Electrode *electrode = static_cast<prim::Electrode*>(
+      dp->getLayer(layer_index)->getItem(electrode_index));
+
+  // if the user resized the afm area with the cursor, then the area might
+  // already be the right size, in which case do nothing
+  if (electrode->boundingRect().topLeft() == new_rect.topLeft() &&
+      electrode->boundingRect().bottomRight() == new_rect.bottomRight())
+    return;
+
+  electrode->resize(top_left_delta.x(), top_left_delta.y(),
+      bot_right_delta.x(), bot_right_delta.y(), true);
+}
+
 
 // FromAggregate class
 gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
@@ -2161,19 +2148,16 @@ void gui::DesignPanel::MoveItem::moveItem(prim::Item *item, const QPointF &delta
 
 void gui::DesignPanel::MoveItem::moveDBDot(prim::DBDot *dot, const QPointF &delta)
 {
-  // get the target LatticeDot
-  QList<QGraphicsItem*> cands = dot->scene()->items(dot->scenePos()+delta);
-  prim::LatticeDot *ldot=0;
-  for(QGraphicsItem *cand : cands){
-    if(static_cast<prim::Item*>(cand)->item_type == prim::Item::LatticeDot){
-      ldot=static_cast<prim::LatticeDot*>(cand);
-      break;
-    }
-  }
-  if(ldot==0)
+  // get the target lattice site coordinate
+  QPointF new_pos = dot->scenePos() + delta;
+  QPointF nearest_site_pos;
+  prim::LatticeCoord coord = dp->lattice->nearestSite(new_pos, nearest_site_pos);
+  if (dp->lattice->collidesWithLatticeSite(new_pos, coord)) {
+    dot->setLatticeCoord(coord);
+    dp->lattice->setOccupied(coord, dot);
+  } else {
     qCritical() << tr("Failed to move DBDot");
-  else
-    dot->setSource(ldot);
+  }
 }
 
 
@@ -2205,26 +2189,14 @@ void gui::DesignPanel::MoveItem::moveAFMArea(prim::AFMArea *afm_area,
 
 void gui::DesignPanel::createDBs()
 {
-  // do something only if there is a selection
-  QList<prim::Item*> selection = selectedItems();
-  if(selection.isEmpty())
-    return;
-
-  // check that the selection is valid
-  for(prim::Item *item : selection){
-    if(item->item_type != prim::Item::LatticeDot){
-      qCritical() << tr("Dangling bond target is not a lattice dot...");
-      return;
-    }
-  }
-
-  // push actions onto the QUndoStack
+  // create DBs at preview DB locations
   int layer_index = layers.indexOf(top_layer);
-  undo_stack->beginMacro(tr("create dangling bonds at selected sites"));
-  for(prim::Item *item : selection)
-    undo_stack->push(new CreateDB(static_cast<prim::LatticeDot *>(item), layer_index, this));
+  undo_stack->beginMacro(tr("create dangling bonds at DB preview locations"));
+  for (prim::DBDotPreview *db_prev : db_previews)
+    undo_stack->push(new CreateDB(db_prev->latticeCoord(), layer_index, this));
   undo_stack->endMacro();
-  //qDebug() << tr("Finished endMacro");
+
+  destroyDBPreviews();
 }
 
 void gui::DesignPanel::createElectrodes(QPoint point1)
@@ -2240,8 +2212,7 @@ void gui::DesignPanel::createElectrodes(QPoint point1)
 void gui::DesignPanel::createPotPlot(QPixmap potential_plot, QRectF graph_container)
 {
   int layer_index = layers.indexOf(plot_layer);
-  //only ever create one electrode at a time
-  undo_stack->beginMacro(tr("create electrode with given corners"));
+  undo_stack->beginMacro(tr("create potential plot with given corners"));
   undo_stack->push(new CreatePotPlot(layer_index, this, potential_plot, graph_container));
   undo_stack->endMacro();
 }
@@ -2293,6 +2264,9 @@ void gui::DesignPanel::resizeItem(prim::Item *item,
     case prim::Item::AFMArea:
       resizeAFMArea(static_cast<prim::AFMArea*>(item), orig_rect, new_rect);
       break;
+    case prim::Item::Electrode:
+      resizeElectrode(static_cast<prim::Electrode*>(item), orig_rect, new_rect);
+      break;
     default:
       break;
   }
@@ -2304,6 +2278,16 @@ void gui::DesignPanel::resizeAFMArea(prim::AFMArea *afm_area,
   undo_stack->beginMacro(tr("Resize AFM Area"));
   int ind_in_layer = getLayer(afm_area->layer_id)->getItemIndex(afm_area);
   undo_stack->push(new ResizeAFMArea(afm_area->layer_id, this, orig_rect,
+      new_rect, ind_in_layer));
+  undo_stack->endMacro();
+}
+
+void gui::DesignPanel::resizeElectrode(prim::Electrode *electrode,
+    const QRectF &orig_rect, const QRectF &new_rect)
+{
+  undo_stack->beginMacro(tr("Resize Electrode"));
+  int ind_in_layer = getLayer(electrode->layer_id)->getItemIndex(electrode);
+  undo_stack->push(new ResizeElectrode(electrode->layer_id, this, orig_rect,
       new_rect, ind_in_layer));
   undo_stack->endMacro();
 }
@@ -2347,7 +2331,7 @@ void gui::DesignPanel::deleteSelection()
   for(prim::Item *item : selection){
     switch(item->item_type){
       case prim::Item::DBDot:
-        undo_stack->push(new CreateDB( static_cast<prim::DBDot*>(item)->getSource(),
+        undo_stack->push(new CreateDB(static_cast<prim::DBDot*>(item)->latticeCoord(),
                                       item->layer_id, this, 0, true));
         break;
       case prim::Item::Aggregate:
@@ -2464,7 +2448,7 @@ void gui::DesignPanel::destroyAggregate(prim::Aggregate *agg)
   for(prim::Item* item : items){
     switch(item->item_type){
       case prim::Item::DBDot:
-        undo_stack->push(new CreateDB(static_cast<prim::DBDot*>(item)->getSource(),
+        undo_stack->push(new CreateDB(static_cast<prim::DBDot*>(item)->latticeCoord(),
                                       item->layer_id, this, 0, true));
         break;
       case prim::Item::Aggregate:
@@ -2493,7 +2477,7 @@ bool gui::DesignPanel::pasteAtGhost()
   if (clipboard.isEmpty()) {
     return false;
   } else {
-    if (!is_all_floating && !ghost->valid_hash[snap_target]) {
+    if (!is_all_floating && !ghost->valid_hash[snap_coord]) {
       return false;
     }
   }
@@ -2531,11 +2515,9 @@ void gui::DesignPanel::pasteItem(prim::Ghost *ghost, prim::Item *item)
 void gui::DesignPanel::pasteDBDot(prim::Ghost *ghost, prim::DBDot *db)
 {
   // get the target lattice dor
-  prim::LatticeDot *ldot = ghost->getLatticeDot(db);
-  if(ldot){
-    undo_stack->push(new CreateDB(ldot, getLayerIndex(top_layer), this, db));
-  }
-
+  qDebug() << "shoud paste DB now";
+  prim::LatticeCoord l_coord = ghost->getLatticeCoord(db);
+  undo_stack->push(new CreateDB(l_coord, getLayerIndex(top_layer), this, db));
 }
 
 void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)
@@ -2584,17 +2566,17 @@ bool gui::DesignPanel::moveToGhost(bool kill)
   prim::Ghost *ghost = prim::Ghost::instance();
   moving = false;
   // get the move offset
-  QPointF offset = (!kill && ghost->valid_hash[snap_target]) ? ghost->moveOffset() : QPointF();
+  QPointF offset = (!kill && ghost->valid_hash[snap_coord]) ? ghost->moveOffset() : QPointF();
 
   if (offset.isNull()) {
     // There is no offset for dbs. Check if selection is all electrodes, and if it is, move them.
     // reset the original lattice dot selectability and return false
     for (prim::Item *item : selectedItems()) {
       if (item->item_type != prim::Item::Electrode &&
-          item->item_type!= prim::Item::AFMArea) {
+          item->item_type != prim::Item::AFMArea) {
         is_all_floating = false;
       }
-      setLatticeDotSelectability(item, false);
+      setLatticeSiteOccupancy(item, true);
     }
 
     if (is_all_floating) {//selection is all electrodes. try to move them without snapping.

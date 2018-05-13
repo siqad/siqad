@@ -113,7 +113,11 @@ QSettings *settings::AppSettings::m_defs()
   S->setValue("phys/epsr", 10);
 
   S->setValue("phys/eng_lib_dir", QString("<BINPATH>/src/phys/"));
+  S->setValue("phys/eng_usr_cfg_dir", QString("<CONFIG>/phys/"));
   S->setValue("phys/runtime_temp_dir", QString("<SYSTMP>/phys/"));
+
+  S->setValue("float_prc", 6);  // float precision specified in QString::setNum
+  S->setValue("float_fmt", "g");   // float format specified in QString::setNum
 
   S->setValue("save/autosaveroot", QString("<SYSTMP>/autosave/"));
   S->setValue("save/autosavenum", 3);
@@ -145,48 +149,54 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("Panel/logw", 400);
 
   S->setValue("lattice/fname", QString("src/settings/lattices/si_100_2x1.ini"));
-  S->setValue("lattice/xy", QPoint(100,100));
+  //S->setValue("lattice/xy", QPoint(100,100));
 
   // QGraphicsView
-  S->setValue("view/scale_fact", 10);           // pixels/angstrom in the main view
+  S->setValue("view/scale_fact", 100);           // pixels/angstrom in the main view
   S->setValue("view/bg_col", QColor(40,50,60)); // background color
   S->setValue("view/bg_col_pb", QColor(255,255,255)); // background color
   S->setValue("view/zoom_factor", 0.1);         // scaling factor for zoom operations
   S->setValue("view/zoom_boost", 2);            // must have factor*boost < 1
-  S->setValue("view/zoom_min", .1);             // minimum zoom factor
-  S->setValue("view/zoom_max", 10);             // maximum zoom factor
+  S->setValue("view/zoom_min", .01);             // minimum zoom factor
+  S->setValue("view/zoom_max", 1);             // maximum zoom factor
   S->setValue("view/wheel_pan_step", 20);       // screen pan per wheel tick
   S->setValue("view/wheel_pan_boost", 5);       // shift-boost factor
   S->setValue("view/padding", .1);              // additional space around draw region
 
   // dangling bond parameters
-  S->setValue("dbdot/diameter_m", 1.5);                     // dot diameter
-  S->setValue("dbdot/diameter_l", 2);                     // dot diameter
-  S->setValue("dbdot/publish_scale", 2);                  // scaling for publish mode
-  S->setValue("dbdot/edge_width", .1);                    // edge width rel. to diameter
+  S->setValue("dbdot/diameter_m", 1.5);         // dot diameter (mid)
+  S->setValue("dbdot/diameter_l", 2);           // dot diameter (large)
+  S->setValue("dbdot/publish_scale", 1.8);      // scaling for publish mode
+  S->setValue("dbdot/edge_width", .15);         // edge width rel. to diameter
   S->setValue("dbdot/edge_col", QColor(255,255,255));     // edge color
-  S->setValue("dbdot/edge_col_sel", QColor(0, 100, 255)); // edge color (selected)
-  S->setValue("dbdot/edge_col_hovered", QColor(0, 100, 255)); // edge color (hovered)
-  S->setValue("dbdot/edge_col_pb", QColor(0, 100, 255, 0)); // edge color (publish mode)
+  S->setValue("dbdot/edge_col_sel", QColor(0,100,255));   // edge color (selected)
+  S->setValue("dbdot/edge_col_hovered", QColor(0,100,255)); // edge color (hovered)
+  S->setValue("dbdot/edge_col_pb", QColor(0,0,0,0));      // edge color (publish)
   S->setValue("dbdot/fill_col", QColor(200,200,200));     // dot fill color
   S->setValue("dbdot/fill_col_sel", QColor(150,150,150)); // dot fill color (selected)
   S->setValue("dbdot/fill_col_hovered", QColor(220,220,220)); // dot fill color (hovered)
-  S->setValue("dbdot/fill_col_pb", QColor(150,150,150)); // dot fill color (publish mode)
-  S->setValue("dbdot/fill_col_drv", QColor(0,255,0));   // dot fill color for driver dot (forced electron=1)
-  S->setValue("dbdot/fill_col_drv_sel", QColor(0,150,0));  // dot fill color for driver dot (forced electron=1)
-  S->setValue("dbdot/fill_col_drv_hovered", QColor(0,180,0));  // dot fill color for driver dot (forced electron=1)
-  S->setValue("dbdot/fill_col_drv_pb", QColor(0,255,0));  // dot fill color for driver dot (forced electron=1)
+  S->setValue("dbdot/fill_col_pb", QColor(150,150,150)); // dot fill color (publish)
+  S->setValue("dbdot/edge_col_elec", QColor(255,90,90));     // edge color
+  S->setValue("dbdot/edge_col_elec_sel", QColor(255,90,90)); // edge color (selected)
+  S->setValue("dbdot/edge_col_elec_hovered", QColor(255,90,90)); // edge color (hovered)
+  S->setValue("dbdot/edge_col_elec_pb", QColor(0,0,0)); // edge color (publish mode)
   S->setValue("dbdot/fill_col_elec", QColor(255,90,90));   // dot fill color for dot showing electron
   S->setValue("dbdot/fill_col_elec_sel", QColor(255,90,90));  // dot fill color for dot showing electron
   S->setValue("dbdot/fill_col_elec_hovered", QColor(255,90,90));  // dot fill color for dot showing electron
   S->setValue("dbdot/fill_col_elec_pb", QColor(255,90,90));  // dot fill color for dot showing electron
 
+  S->setValue("dbdotprev/diameter", 1.0);
+  S->setValue("dbdotprev/edge_width", .15);
+  S->setValue("dbdotprev/fill_fact", .5);
+  S->setValue("dbdotprev/edge_col", QColor(0,0,0,0));
+  S->setValue("dbdotprev/fill_col", QColor(255,255,0));
+
   // lattice dot parameters
   S->setValue("latdot/diameter", 1.0);                    // dot diameter
-  S->setValue("latdot/edge_width", .08);                  // edge width rel. to diameter
-  S->setValue("latdot/publish_scale", 2);                  // scaling for publish mode
-  S->setValue("latdot/edge_col", QColor(255,255,255,70)); // edge color
-  S->setValue("latdot/edge_col_pb", QColor(0,0,0,100)); // edge color (publish mode)
+  S->setValue("latdot/edge_width", .15);                  // edge width rel. to diameter
+  S->setValue("latdot/publish_scale", 2);                 // scaling for publish mode
+  S->setValue("latdot/edge_col", QColor(255,255,255,60)); // edge color
+  S->setValue("latdot/edge_col_pb", QColor(0,0,0,70));    // edge color (publish mode)
   S->setValue("latdot/fill_col", QColor(0,0,0,0));        // fill color
   S->setValue("latdot/fill_col_pb", QColor(0,0,0,0));     // fill color (publish mode)
   S->setValue("latdot/inner_fill", .5);                   // inner fill factor
@@ -202,6 +212,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("ghostbox/valid_col", QColor(0, 150, 0));
 
   // aggregate parameters
+  S->setValue("aggregate/edge_width", .1);                      // will be scaled by scale_factor
   S->setValue("aggregate/edge_col", QColor(9, 255, 200, 150));  // bounding box color
   S->setValue("aggregate/edge_col_hovered", QColor(9, 255, 200, 150));  // bounding box color
 
@@ -257,7 +268,7 @@ QSettings* settings::LatticeSettings::m_defs()
   S->setValue("cell/N", 2);
 
   S->setValue("cell/b1", QPointF(0, 0));
-  S->setValue("cell/b2", QPointF(0, 2.4));
+  S->setValue("cell/b2", QPointF(0, 2.25));
 
   S->setValue("lattice/a1", QPointF(3.84, 0));
   S->setValue("lattice/a2", QPointF(0, 7.68));

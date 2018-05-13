@@ -18,113 +18,96 @@ qreal prim::DBDot::edge_width;
 qreal prim::DBDot::publish_scale;
 
 prim::Item::StateColors prim::DBDot::fill_col;           // normal dbdot
-prim::Item::StateColors prim::DBDot::fill_col_driver;    // driver (forced polarization)
 prim::Item::StateColors prim::DBDot::fill_col_electron;  // contains electron
 prim::Item::StateColors prim::DBDot::edge_col;           // edge of the dbdot
+prim::Item::StateColors prim::DBDot::edge_col_electron;  // edge of the dbdot
 
 
-prim::DBDot::DBDot(int lay_id, prim::LatticeDot *src, int elec_in)
+prim::DBDot::DBDot(prim::LatticeCoord l_coord, int lay_id)
   : prim::Item(prim::Item::DBDot), show_elec(0)
 {
-  initDBDot(lay_id, src, elec_in);
+  initDBDot(l_coord, lay_id);
 }
 
 
-prim::DBDot::DBDot(QXmlStreamReader *stream, QGraphicsScene *scene)
+prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *)
   : prim::Item(prim::Item::DBDot)
 {
-  QPointF scene_loc; // physical location from file
-  int lay_id=-1; // layer id from file
-  int elec_in=0;
+  prim::LatticeCoord read_coord;
+  int lay_id=-1;      // layer id from file
 
-  while(!stream->atEnd()){
-    if(stream->isStartElement()){
-      if(stream->name() == "dbdot")
-        stream->readNext();
-      else if(stream->name() == "layer_id"){
-        lay_id = stream->readElementText().toInt();
-        stream->readNext();
+  while(!rs->atEnd()){
+    if(rs->isStartElement()){
+      if(rs->name() == "dbdot")
+        rs->readNext();
+      else if(rs->name() == "layer_id"){
+        lay_id = rs->readElementText().toInt();
+        rs->readNext();
       }
-      else if(stream->name() == "elec"){
-        elec_in = stream->readElementText().toInt();
-        stream->readNext();
-      }
-      else if(stream->name() == "physloc"){
-        for(QXmlStreamAttribute &attr : stream->attributes()){
-          if(attr.name().toString() == QLatin1String("x"))
-            scene_loc.setX(scale_factor*attr.value().toFloat());
-          else if(attr.name().toString() == QLatin1String("y"))
-            scene_loc.setY(scale_factor*attr.value().toFloat());
+      else if(rs->name() == "latcoord"){
+        for(QXmlStreamAttribute &attr : rs->attributes()){
+          if (attr.name().toString() == QLatin1String("n"))
+            read_coord.n = attr.value().toInt();
+          else if (attr.name().toString() == QLatin1String("m"))
+            read_coord.m = attr.value().toInt();
+          else if (attr.name().toString() == QLatin1String("l"))
+            read_coord.l = attr.value().toInt();
         }
-        stream->readNext();
+        rs->readNext();
       }
       else{
-        qDebug() << QObject::tr("DBDot: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
-        stream->readNext();
+        qDebug() << QObject::tr("DBDot: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
+        rs->readNext();
       }
     }
-    else if(stream->isEndElement()){
-      // break out of stream if the end of this element has been reached
-      if(stream->name() == "dbdot"){
-        stream->readNext();
+    else if(rs->isEndElement()){
+      // break out of rs if the end of this element has been reached
+      if(rs->name() == "dbdot"){
+        rs->readNext();
         break;
       }
-      stream->readNext();
+      rs->readNext();
     }
     else
-      stream->readNext();
+      rs->readNext();
   }
 
-  if(stream->hasError())
-    qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
-
-  // find the lattice dot located at scene_loc
-  prim::LatticeDot *src_latdot = static_cast<prim::LatticeDot*>(scene->itemAt(scene_loc, QTransform()));
-  if(!src_latdot){
-    qCritical() << QObject::tr("No lattice dot at %1, %2").arg(scene_loc.x()).arg(scene_loc.y());
-    // TODO error alert dialog?
-  }
+  if(rs->hasError())
+    qCritical() << QObject::tr("XML error: ") << rs->errorString().data();
 
   // initialize
-  initDBDot(lay_id, src_latdot, elec_in);
-  scene->addItem(this);
+  initDBDot(read_coord, lay_id);
+  prim::Emitter::instance()->addItemToScene(this);
 }
 
 
-void prim::DBDot::initDBDot(int lay_id, prim::LatticeDot *src, int elec_in)
+QPointF prim::DBDot::getPhysLoc() const
 {
-  fill_fact = 0.;
+  // TODO implement
+  return QPointF();
+}
 
-  setLayerIndex(lay_id);
 
+void prim::DBDot::setLatticeCoord(prim::LatticeCoord l_coord)
+{
+  lat_coord = l_coord;
+  prim::Emitter::instance()->moveDBToLatticeCoord(this, lat_coord.n, lat_coord.m, lat_coord.l);
+}
+
+
+void prim::DBDot::initDBDot(prim::LatticeCoord coord, int lay_id)
+{
   // construct static class variables
   if(diameter_m<0)
     constructStatics();
 
-  // set dot location in pixels
-  setSource(src);
-
-  // set electron occupation
-  setElec(elec_in);
+  setLatticeCoord(coord);
+  setLayerIndex(lay_id);
+  fill_fact = 0.;
+  diameter = diameter_m;
 
   // flags
   setFlag(QGraphicsItem::ItemIsSelectable, true);
-}
-
-
-void prim::DBDot::toggleElec()
-{
-  if(elec)
-    setElec(0);
-  else
-    setElec(1);
-}
-
-
-void prim::DBDot::setElec(int e_in)
-{
-  elec = e_in;
-  update();
 }
 
 
@@ -135,25 +118,9 @@ void prim::DBDot::setShowElec(float se_in)
 }
 
 
-void prim::DBDot::setSource(prim::LatticeDot *src)
-{
-  if(src){
-    // unset the previous LatticeDot
-    if(source && source->getDBDot() == this)
-      source->setDBDot(0);
-
-    // move to new LatticeDot
-    src->setDBDot(this);
-    source=src;
-    phys_loc = src->getPhysLoc();
-    setPos(src->pos());
-  }
-}
-
-
 QRectF prim::DBDot::boundingRect() const
 {
-  qreal width = diameter_l+edge_width;
+  qreal width = diameter+2*edge_width;
   if (display_mode == gui::ScreenshotMode)
     width *= publish_scale;
   return QRectF(-.5*width, -.5*width, width, width);
@@ -163,20 +130,18 @@ QRectF prim::DBDot::boundingRect() const
 void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
   QColor fill_col_state;
-  if ( (display_mode == gui::SimDisplayMode ||
-        display_mode == gui::ScreenshotMode) &&
-        show_elec > 0) {
+  QColor edge_col_state;
+  if (display_mode == gui::SimDisplayMode ||
+      display_mode == gui::ScreenshotMode) {
     setFill(show_elec);
     diameter = diameter_l;
     fill_col_state = getCurrentStateColor(fill_col_electron);
-  } else if (elec > 0) {
-    setFill(1);
-    diameter = diameter_m;
-    fill_col_state = getCurrentStateColor(fill_col_driver);
+    edge_col_state = getCurrentStateColor(edge_col_electron);
   } else {
     setFill(1);
     diameter = diameter_m;
     fill_col_state = getCurrentStateColor(fill_col);
+    edge_col_state = getCurrentStateColor(edge_col);
   }
 
   qreal edge_width_paint = edge_width;
@@ -188,8 +153,8 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
 
 
   QRectF rect = boundingRect();
-  qreal dxy = .5*edge_width_paint;
-  rect.adjust(dxy,dxy,-dxy,-dxy);
+  //qreal dxy = .45*edge_width_paint;
+  //rect.adjust(dxy,dxy,-dxy,-dxy);
 
   // draw inner fill
   if(fill_fact>0){
@@ -204,35 +169,34 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
   }
 
   // draw outer circle
-  painter->setPen(QPen(getCurrentStateColor(edge_col), edge_width));
+  painter->setPen(QPen(edge_col_state, edge_width_paint));
+  painter->setBrush(Qt::NoBrush);
   painter->drawEllipse(rect);
 }
 
 
 prim::Item *prim::DBDot::deepCopy() const
 {
-  prim::DBDot *cp = new DBDot(layer_id, 0, elec);
+  prim::DBDot *cp = new DBDot(lat_coord, layer_id);
   cp->setPos(pos());
   return cp;
 }
 
 
-void prim::DBDot::saveItems(QXmlStreamWriter *stream) const
+void prim::DBDot::saveItems(QXmlStreamWriter *ws) const
 {
-  stream->writeStartElement("dbdot");
+  ws->writeStartElement("dbdot");
 
   // layer id
-  stream->writeTextElement("layer_id", QString::number(layer_id));
-
-  // elec
-  stream->writeTextElement("elec", QString::number(elec));
+  ws->writeTextElement("layer_id", QString::number(layer_id));
 
   // physical location
-  stream->writeEmptyElement("physloc");
-  stream->writeAttribute("x", QString::number(getPhysLoc().x()));
-  stream->writeAttribute("y", QString::number(getPhysLoc().y()));
+  ws->writeEmptyElement("latcoord");
+  ws->writeAttribute("n", QString::number(lat_coord.n));
+  ws->writeAttribute("m", QString::number(lat_coord.m));
+  ws->writeAttribute("l", QString::number(lat_coord.l));
 
-  stream->writeEndElement();
+  ws->writeEndElement();
 }
 
 
@@ -255,10 +219,10 @@ void prim::DBDot::constructStatics()
   fill_col.hovered = gui_settings->get<QColor>("dbdot/fill_col_hovered");
   fill_col.publish = gui_settings->get<QColor>("dbdot/fill_col_pb");
 
-  fill_col_driver.normal = gui_settings->get<QColor>("dbdot/fill_col_drv");
-  fill_col_driver.selected = gui_settings->get<QColor>("dbdot/fill_col_drv_sel");
-  fill_col_driver.hovered = gui_settings->get<QColor>("dbdot/fill_col_drv_hovered");
-  fill_col_driver.publish = gui_settings->get<QColor>("dbdot/fill_col_drv_pb");
+  edge_col_electron.normal = gui_settings->get<QColor>("dbdot/edge_col_elec");
+  edge_col_electron.selected = gui_settings->get<QColor>("dbdot/edge_col_elec_sel");
+  edge_col_electron.hovered = gui_settings->get<QColor>("dbdot/edge_col_elec_hovered");
+  edge_col_electron.publish = gui_settings->get<QColor>("dbdot/edge_col_elec_pb");
 
   fill_col_electron.normal = gui_settings->get<QColor>("dbdot/fill_col_elec");
   fill_col_electron.selected = gui_settings->get<QColor>("dbdot/fill_col_elec_sel");
@@ -281,4 +245,64 @@ void prim::DBDot::mousePressEvent(QGraphicsSceneMouseEvent *e)
       prim::Item::mousePressEvent(e);
       break;
   }
+}
+
+
+
+// DBDotPreview Class
+
+// Static variables
+QColor prim::DBDotPreview::fill_col;
+QColor prim::DBDotPreview::edge_col;
+
+qreal prim::DBDotPreview::diameter=-1;
+qreal prim::DBDotPreview::edge_width;
+qreal prim::DBDotPreview::fill_fact;
+
+prim::DBDotPreview::DBDotPreview(prim::LatticeCoord l_coord)
+  : prim::Item(prim::Item::DBDotPreview)
+{
+  if (diameter == -1)
+    constructStatics();
+
+  lat_coord = l_coord;
+}
+
+QRectF prim::DBDotPreview::boundingRect() const
+{
+  qreal width = diameter + edge_width;
+  return QRectF(-.5*width, -.5*width, width, width);
+}
+
+void prim::DBDotPreview::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+{
+  QRectF rect = boundingRect();
+  // draw inner fill
+  if (fill_fact > 0) {
+    QPointF center = rect.center();
+    QSizeF size(diameter, diameter);
+    rect.setSize(size*fill_fact);
+    rect.moveCenter(center);
+
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(fill_col);
+    painter->drawEllipse(rect);
+  }
+
+  // draw outer ring
+  painter->setPen(QPen(edge_col, edge_width));
+  painter->setBrush(Qt::NoBrush);
+  painter->drawEllipse(rect);
+}
+
+void prim::DBDotPreview::constructStatics()
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+
+  fill_col = gui_settings->get<QColor>("dbdotprev/fill_col");
+  edge_col = gui_settings->get<QColor>("dbdotprev/edge_col");
+
+  diameter = gui_settings->get<qreal>("dbdotprev/diameter")*prim::Item::scale_factor;
+  edge_width = gui_settings->get<qreal>("dbdotprev/edge_width")*diameter;
+  fill_fact = gui_settings->get<qreal>("dbdotprev/fill_fact");
 }

@@ -33,7 +33,7 @@ namespace prim{
     //! to distinguish them in functions which accept Item objects. Derived
     //! classes can be declared and implemented elsewhere as long as they are
     //! defined before use
-    enum ItemType{Aggregate, DBDot, LatticeDot, Ghost, GhostDot, Text,
+    enum ItemType{Aggregate, DBDot, DBDotPreview, LatticeDot, Ghost, GhostDot, Text,
         Electrode, GhostBox, AFMArea, AFMPath, AFMNode, AFMSeg, PotPlot,
         ResizeFrame, ResizeHandle};
 
@@ -58,6 +58,9 @@ namespace prim{
 
     //! true if the item or its parent has been seleted, recursive to highest level parent
     bool upSelected();
+
+    //! returns the item type as a QString
+    QString getQStringItemType();
 
     //! set hovered state
     void setHovered(bool flag) {hovered = flag;}
@@ -91,6 +94,9 @@ namespace prim{
 
     //! Retreve the class default property map of this item
     virtual gui::PropertyMap *classPropertyMap() {return 0;};
+
+    //! Get a PropertyMap with the default and local properties combined
+    gui::PropertyMap properties();
 
     //! Get property from the property map
     gui::Property getProperty(const QString &key);

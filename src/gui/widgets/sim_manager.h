@@ -12,6 +12,8 @@
 
 #include <QtWidgets>
 #include <QDialog>
+
+#include "property_form.h"
 #include "primitives/sim_engine.h"
 #include "primitives/sim_job.h"
 
@@ -36,7 +38,6 @@ public:
   void showSimSetupDialog();
 
   // manager actions
-  void newSimSetup();               // walks user through simulation setup
   bool addJob(prim::SimJob *job);   // add a simulation job
 
   // ACCESSORS
@@ -75,13 +76,17 @@ private:
   void updateJobNameDateTime();
   void submitSimSetup();
 
+  // save or reset engine settings
+  void saveSettingsAsDefault();
+  void resetToUserDefault();
+  void resetToEngineDefault();
+
   void initEngines();
-  bool exportSimProblem();          // generate problem XML
 
   // dialogs
   QWidget *sim_manager_dialog;
-  QWidget *sim_setup_dialog;        // TODO maybe make a subclass for this
-  bool using_engine_sim_param_dialog=false;
+  QWidget *sim_setup_dialog;
+  PropertyForm *curr_sim_params_form=0;
 
   // manager panes
   QListWidget *sim_list_pan;
