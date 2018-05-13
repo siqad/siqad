@@ -91,7 +91,7 @@ QPointF prim::DBDot::getPhysLoc() const
 void prim::DBDot::setLatticeCoord(prim::LatticeCoord l_coord)
 {
   lat_coord = l_coord;
-  prim::Emitter::instance()->moveItemToLatticeCoord(this, lat_coord.n, lat_coord.m, lat_coord.l);
+  prim::Emitter::instance()->moveDBToLatticeCoord(this, lat_coord.n, lat_coord.m, lat_coord.l);
 }
 
 

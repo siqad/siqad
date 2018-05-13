@@ -43,8 +43,8 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
           this, &gui::DesignPanel::resizeBegin);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeFinalize,
           this, &gui::DesignPanel::resizeItem);
-  connect(prim::Emitter::instance(), &prim::Emitter::sig_moveItemToLatticeCoord,
-          this, &gui::DesignPanel::moveItemToLatticeCoord);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_moveDBToLatticeCoord,
+          this, &gui::DesignPanel::moveDBToLatticeCoord);
 }
 
 // destructor
@@ -774,9 +774,10 @@ void gui::DesignPanel::rotateCcw()
   scrollDelta(delta);
 }
 
-void gui::DesignPanel::moveItemToLatticeCoord(prim::Item *item, int n, int m, int l)
+void gui::DesignPanel::moveDBToLatticeCoord(prim::Item *item, int n, int m, int l)
 {
   item->setPos(lattice->latticeCoord2ScenePos(prim::LatticeCoord(n,m,l)));
+  setLatticeSiteOccupancy(item, true);
 }
 
 // INTERRUPTS

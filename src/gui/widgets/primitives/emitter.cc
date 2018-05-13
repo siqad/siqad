@@ -42,7 +42,7 @@ void prim::Emitter::removeItemFromScene(prim::Item *item)
   emit sig_removeItemFromScene(item);
 }
 
-void prim::Emitter::moveItemToLatticeCoord(Item *item, int n, int m, int l)
+void prim::Emitter::moveDBToLatticeCoord(Item *item, int n, int m, int l)
 {
-  emit sig_moveItemToLatticeCoord(item, n, m, l);
+  emit sig_moveDBToLatticeCoord(item, n, m, l);
 }
