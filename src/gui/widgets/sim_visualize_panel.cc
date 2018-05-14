@@ -94,14 +94,14 @@ void SimVisualize::showPotPlot()
   QVector<qreal> x_vec;
   QVector<qreal> y_vec;
   QVector<qreal> val_vec;
-
+  qreal pixels_per_angstrom = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
+  qreal angstrom_per_meter = 1E10;
   qDebug() << tr("fill QVectors");
   QList<QVector<float>>::iterator iter;
   for(iter=show_job->potentials.begin(); iter!=show_job->potentials.end(); ++iter){
-    x_vec.append((*iter)[0]);
-    y_vec.append((*iter)[1]);
+    x_vec.append((*iter)[0]*angstrom_per_meter*pixels_per_angstrom);
+    y_vec.append((*iter)[1]*angstrom_per_meter*pixels_per_angstrom);
     val_vec.append((*iter)[2]);
-    // qDebug() << tr("x: %1, y: %2, val: %3").arg((*iter)[0]).arg((*iter)[1]).arg((*iter)[2]);
   }
   if( x_vec.size() > 0){
     qDebug() << tr("QVectors filled. Size of vectors: %1").arg(x_vec.size());
@@ -165,7 +165,7 @@ void SimVisualize::showPotPlot()
     QRectF graph_container(QPointF(x_vec.first(),y_vec.first()), QPointF(x_vec.last(),y_vec.last()));
     emit showPotPlotOnScene(potential_plot, graph_container);
   } else {
-    qDebug() << tr("QVector size 0. Please see logs for more info.");  
+    qDebug() << tr("QVector size 0. Please see logs for more info.");
   }
 }
 
