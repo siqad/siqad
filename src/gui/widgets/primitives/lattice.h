@@ -128,7 +128,6 @@ namespace prim{
 
     qreal coth;         // cotangent of angle between lattice vectors
     qreal a2[2];        // square magnitudes of lattice vectors
-    qreal m_big;        // maximum distance in search for nearest site
 
     QHash<prim::LatticeCoord, prim::Item*> occ_latdots; // set of occupied lattice dots
 

@@ -80,19 +80,17 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos, QPointF 
 
   for(int i=0; i<2; i++){
     proj = QPointF::dotProduct(x, a[i])/a2[i];
-    n0[i] = qFloor(proj - coth*qSqrt(x2/a2[i]-proj*proj));
+    n0[i] = qFloor(proj - coth*qSqrt(qMax(0.,x2/a2[i]-proj*proj)));
   }
 
   qreal mdist = qMax(a2[0], a2[1]);         // nearest Manhattan length
-  //qreal mdist = m_big;
-  //qreal mdist = -1;
   for(int n=n0[0]-1; n<n0[0]+2; n++){
     for(int m=n0[1]-1; m<n0[1]+2; m++){
       QPointF x0 = n*a[0]+m*a[1];
       for (int l=0; l<b.size(); l++){
         QPointF temp = x0 + b[l];
         qreal dist = (temp-x).manhattanLength();
-        if(dist<=mdist) {// || mdist == -1){
+        if(dist<=mdist) {
           mdist = dist;
           nearest_site_pos = temp * prim::Item::scale_factor;
           coord.n = n;
@@ -236,7 +234,6 @@ void prim::Lattice::construct()
     a2[i] = QPointF::dotProduct(a[i], a[i]);
   }
 
-  m_big = a[0].manhattanLength() + a[1].manhattanLength();
   qreal dtrm = a[0].x()*a[1].y() - a[0].y()*a[1].x();
   coth = QPointF::dotProduct(a[0], a[1]) / dtrm;
 
