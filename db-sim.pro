@@ -73,7 +73,11 @@ HEADERS += \
   src/gui/widgets/primitives/afmnode.h \
   src/gui/widgets/primitives/afmseg.h \
   src/gui/widgets/primitives/pot_plot.h \
-	src/gui/widgets/primitives/resize_frame.h
+	src/gui/widgets/primitives/resize_frame.h \
+	src/gui/widgets/primitives/hull/hull.h \
+	src/gui/widgets/primitives/hull/convex.h \
+	src/gui/widgets/primitives/hull/hulls.h
+
 
 
 SOURCES += \
@@ -92,7 +96,9 @@ SOURCES += \
 	src/gui/widgets/primitives/afmnode.cc \
 	src/gui/widgets/primitives/afmseg.cc \
   src/gui/widgets/primitives/pot_plot.cc \
-	src/gui/widgets/primitives/resize_frame.cc
+	src/gui/widgets/primitives/resize_frame.cc \
+	src/gui/widgets/primitives/hull/hull.cc \
+	src/gui/widgets/primitives/hull/convex.cc 
 
 
 # widgets
