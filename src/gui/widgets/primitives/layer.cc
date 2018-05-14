@@ -27,46 +27,36 @@ prim::Layer::Layer(const QString &nm, LayerType cnt_type, const float z_offset, 
 }
 
 
-prim::Layer::Layer(QXmlStreamReader *stream)
-  : visible(true), active(false)
+prim::Layer::Layer(QXmlStreamReader *rs, int lay_id)
+  : layer_id(lay_id), visible(true), active(false)
 {
-  int lay_id;
-  QString name_ld;
-  bool visible_ld, active_ld;
+  QString nm;
+  prim::Layer::LayerType type = prim::Layer::NoType;
 
-  while(!stream->atEnd()){
-    if(stream->isStartElement()){
-      if(stream->name() == "id")
-        lay_id = stream->readElementText().toInt();
-      else if(stream->name() == "name")
-        name_ld = stream->readElementText();
-      else if(stream->name() == "visible")
-        visible_ld = (stream->readElementText() == "1")?1:0;
-      else if(stream->name() == "active")
-        active_ld = (stream->readElementText() == "1")?1:0;
-      else
-        qDebug() << QObject::tr("Layer: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
-      stream->readNext();
+  while (rs->readNextStartElement()) {
+    if (rs->name() == "name") {
+      nm = rs->readElementText();
+    } else if (rs->name() == "type") {
+      type = static_cast<LayerType>(
+          QMetaEnum::fromType<LayerType>().keyToValue(
+          rs->readElementText().toStdString().c_str()));
+    } else if (rs->name() == "zoffset") {
+      zoffset = rs->readElementText().toFloat();
+    } else if (rs->name() == "zheight") {
+      zheight = rs->readElementText().toFloat();
+    } else if (rs->name() == "visible") {
+      visible = (rs->readElementText() == "1") ? true : false;
+    } else if (rs->name() == "active") {
+      active = (rs->readElementText() == "1") ? true : false;
+    } else {
+      qDebug() << tr("Layer: invalid element encountered on line %1 - %2")
+          .arg(rs->lineNumber()).arg(rs->name().toString());
+      rs->skipCurrentElement();
     }
-    else if(stream->isEndElement()){
-      // break out of stream if the end of this element has been reached
-      if(stream->name() == "layer_prop"){
-        stream->readNext();
-        break;
-      }
-    }
-    stream->readNext();
-  }
-
-  if(stream->hasError()){
-    qCritical() << tr("XML error: ") << stream->errorString().data();
   }
 
   // make layer object using loaded information
-  layer_id = lay_id;
-  name = name_ld.isEmpty() ? name_ld : QString("Layer %1").arg(layer_count++);
-  setVisible(visible_ld);
-  setActive(active_ld);
+  name = nm.isEmpty() ? nm : QString("Layer %1").arg(layer_count++);
 }
 
 

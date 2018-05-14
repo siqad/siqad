@@ -23,8 +23,6 @@ prim::Lattice::Lattice(const QString &fname, int lay_id)
 {
   layer_id = lay_id;
   settings::LatticeSettings::updateLattice(fname);
-  // if(fname.isEmpty())
-  //   settings::LatticeSettings::updateLattice(fname);
 
   construct();
   //tileApprox();
@@ -236,7 +234,6 @@ void prim::Lattice::construct()
     a2[i] = QPointF::dotProduct(a[i], a[i]);
   }
 
-  m_big = a[0].manhattanLength() + a[1].manhattanLength();
   qreal dtrm = a[0].x()*a[1].y() - a[0].y()*a[1].x();
   coth = QPointF::dotProduct(a[0], a[1]) / dtrm;
 

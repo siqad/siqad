@@ -31,15 +31,16 @@ namespace prim{
   public:
 
     //! enum type for different layer contents
-    enum LayerType{Lattice, DB, Electrode, AFMTip, Plot};
+    enum LayerType{Lattice, DB, Electrode, AFMTip, Plot, NoType};
     Q_ENUM(LayerType)
 
 
     //! constructor, create a Layer with the given name. If no name is given,
     //! use the default naming scheme with layer_count.
     Layer(const QString &nm = QString(), const LayerType cnt_type=DB, const float z_offset=0, const float z_height=0, int lay_id=-1, QObject *parent=0);
-    //! constructor, create a Layer from the design file.
-    Layer(QXmlStreamReader *stream);
+
+    //! Construct layer from XML stream.
+    Layer(QXmlStreamReader *, int lay_id=-1);
 
     // destructor
     // ~Layer();
@@ -120,20 +121,20 @@ namespace prim{
 
   private:
 
-    int layer_id;   // layer index in design panel's layers stack
+    int layer_id;     // layer index in design panel's layers stack
     static uint layer_count;  // number of created Layer() objects, does not decrement
-    float zoffset;  // layer distance from surface. +ve for above, -ve for below.
-    float zheight;  // layer height, +ve for height in top direction, -ve for bot direction
+    float zoffset=0;  // layer distance from surface. +ve for above, -ve for below.
+    float zheight=0;  // layer height, +ve for height in top direction, -ve for bot direction
 
-    QString name;   // arbitrary layer name, layers can be selected by name
+    QString name;     // arbitrary layer name, layers can be selected by name
     LayerType content_type;
 
     // list of items in order of insertion, should probably be a linked list
     QStack<prim::Item*> items;
 
     // flags
-    bool visible; // layer is shown. If false, active should aso be false
-    bool active;  // layer is edittable
+    bool visible=true;// layer is shown. If false, active should aso be false
+    bool active=true; // layer is edittable
   };
 
 } // end prim namespace
