@@ -481,40 +481,38 @@ void gui::DesignPanel::setDisplayMode(DisplayMode mode)
 
 // SAVE
 
-void gui::DesignPanel::saveToFile(QXmlStreamWriter *stream, bool for_sim)
+void gui::DesignPanel::saveToFile(QXmlStreamWriter *ws, bool for_sim)
 {
   if(for_sim){
     // if saving for simulation, do something
   }
   // save gui flags
-  stream->writeComment("GUI Flags");
-  stream->writeStartElement("gui");
+  ws->writeComment("GUI Flags");
+  ws->writeStartElement("gui");
 
   // save zoom and scroll bar position
-  stream->writeTextElement("zoom", QString::number(transform().m11())); // m11 of qtransform
-  stream->writeEmptyElement("scroll");
-  stream->writeAttribute("x", QString::number(verticalScrollBar()->value()));
-  stream->writeAttribute("y", QString::number(horizontalScrollBar()->value()));
+  ws->writeTextElement("zoom", QString::number(transform().m11())); // m11 of qtransform
+  ws->writeEmptyElement("scroll");
+  ws->writeAttribute("x", QString::number(verticalScrollBar()->value()));
+  ws->writeAttribute("y", QString::number(horizontalScrollBar()->value()));
 
-  // TODO lattice type
-
-  stream->writeEndElement();
+  ws->writeEndElement();  // end of gui node
 
   // save layer properties
-  stream->writeComment("Layer Properties");
-  stream->writeComment("Layer ID is intrinsic to the layer order");
+  ws->writeComment("Layer Properties");
+  ws->writeComment("Layer ID is intrinsic to the layer order");
   for(prim::Layer *layer : layers){
-    layer->saveLayer(stream);
+    layer->saveLayer(ws);
   }
 
   // save item hierarchy
-  stream->writeComment("Item Hierarchy");
-  stream->writeStartElement("design");
+  ws->writeComment("Item Hierarchy");
+  ws->writeStartElement("design");
   for(prim::Layer *layer : layers){
-    stream->writeComment(layer->getName());
-    layer->saveItems(stream);
+    ws->writeComment(layer->getName());
+    layer->saveItems(ws);
   }
-  stream->writeEndElement(); // end design level
+  ws->writeEndElement(); // end of design node
 }
 
 void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
@@ -577,7 +575,7 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs)
 {
   QString layer_nm;
   float zoffset=0, zheight=0;
-  prim::Layer::LayerType layer_type = prim::Layer::DB;;
+  prim::Layer::LayerType layer_type = prim::Layer::DB;
   bool layer_visible=false, layer_active=false;
 
   // keep reading until end of layer_prop tag

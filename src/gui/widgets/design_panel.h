@@ -146,7 +146,7 @@ namespace gui{
     int save_ind=0;
 
     //! Save layers and items into the given write stream.
-    void saveToFile(QXmlStreamWriter *stream, bool for_sim=false);
+    void saveToFile(QXmlStreamWriter *, bool for_sim=false);
 
 
     // LOAD
@@ -162,7 +162,7 @@ namespace gui{
 
     //! Load design (items contained within layers).
     void loadDesign(QXmlStreamReader *);
-    
+
 
     // SIMULATION RESULT DISPLAY
 

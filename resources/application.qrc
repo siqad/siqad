@@ -1,5 +1,6 @@
 <RCC>
 <qresource>
+	<file>blank_save.xml</file>
 	<file>properties/afmarea.xml</file>
 	<file>properties/electrode.xml</file>
 	<file>ico/select.svg</file>

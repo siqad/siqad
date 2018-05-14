@@ -157,7 +157,7 @@ void prim::Layer::saveLayerProperties(QXmlStreamWriter *ws) const
   QString str;
 
   ws->writeTextElement("name", getName());
-  ws->writeTextElement("type", "Lattice");
+  ws->writeTextElement("type", getContentTypeString());
   ws->writeTextElement("zoffset", str.setNum(zOffset(), fmt, fp));
   ws->writeTextElement("zheight", str.setNum(zHeight(), fmt, fp));
   ws->writeTextElement("visible", QString::number(isVisible()));
@@ -166,10 +166,6 @@ void prim::Layer::saveLayerProperties(QXmlStreamWriter *ws) const
 
 void prim::Layer::saveItems(QXmlStreamWriter *stream) const
 {
-  // Control layer type content not saved
-  if (getContentType() == Control)
-    return;
-
   stream->writeStartElement("layer");
   stream->writeAttribute("type", getContentTypeString());
 

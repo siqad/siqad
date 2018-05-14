@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dbdesigner>
+    <!--Program Flags-->
+    <program ignore="true" />
+    <!--GUI Flags-->
+    <gui>
+        <zoom>0.1</zoom>
+        <scroll x="0" y="0"/>
+    </gui>
+    <!--Layer Properties-->
+    <!--Layer ID is intrinsic to the layer order-->
+    <layer_prop>
+        <name>Lattice</name>
+        <type>Lattice</type>
+        <zoffset>0.000000</zoffset>
+        <zheight>0.000000</zheight>
+        <visible>1</visible>
+        <active>1</active>
+        <lat_vec ignore="true" />
+    </layer_prop>
+    <layer_prop>
+        <name>Surface</name>
+        <type>DB</type>
+        <zoffset>0.000000</zoffset>
+        <zheight>0.000000</zheight>
+        <visible>1</visible>
+        <active>1</active>
+    </layer_prop>
+    <layer_prop>
+        <name>Metal</name>
+        <type>Electrode</type>
+        <zoffset>-0.000000</zoffset>
+        <zheight>0.000000</zheight>
+        <visible>1</visible>
+        <active>1</active>
+    </layer_prop>
+    <layer_prop>
+        <name>AFM</name>
+        <type>AFMTip</type>
+        <zoffset>0.000000</zoffset>
+        <zheight>0.000000</zheight>
+        <visible>1</visible>
+        <active>1</active>
+    </layer_prop>
+    <layer_prop>
+        <name>Plot</name>
+        <type>Plot</type>
+        <zoffset>-0.000000</zoffset>
+        <zheight>0.000000</zheight>
+        <visible>1</visible>
+        <active>1</active>
+    </layer_prop>
+    <!--Item Hierarchy-->
+    <design ignore="true" />
+</dbdesigner>
