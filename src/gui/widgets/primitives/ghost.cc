@@ -89,6 +89,12 @@ void prim::GhostBox::constructStatics()
 }
 
 
+
+
+
+
+
+
 // GHOST CLASS
 prim::Ghost* prim::Ghost::inst = 0;
 
@@ -104,9 +110,14 @@ void prim::Ghost::cleanGhost()
 {
   // clear lists
   sources.clear();
-  for(prim::GhostDot *dot : dots)
-    delete dot;
-  dots.clear();
+  aggnode.reset();
+
+  for(QList<prim::GhostDot*> &set : sets){
+    for(prim::GhostDot *dot : set)
+      delete dot;
+    set.clear();
+  }
+  sets.clear();
 
   // qDebug() << QObject::tr("Deleting Ghost Box");
   box_sources.clear();
@@ -120,17 +131,22 @@ void prim::Ghost::cleanGhost()
   anchor=0;
   valid_hash.clear();
 
-  aggnode.reset();
-
   hide();
 }
 
 
-void prim::Ghost::prepare(const QList<prim::Item*> &items, QPointF scene_pos)
+void prim::Ghost::prepare(const QList<prim::Item*> &items, int count, QPointF scene_pos)
 {
   cleanGhost();
+
+  // set up the sets
+  for(int i=0; i<count; i++)
+    sets.append(QList<prim::GhostDot*>());
+
+  // populate sets
   for(prim::Item *item : items)
     prepareItem(item, &aggnode);
+
   zeroGhost(scene_pos);
   setAnchor();
   show();
@@ -145,15 +161,15 @@ void prim::Ghost::moveTo(QPointF pos)
 
 void prim::Ghost::moveByCoord(prim::LatticeCoord coord_offset, prim::Lattice *lattice)
 {
-  prim::LatticeCoord fin_coord = anchor->latticeCoord() + coord_offset;
-  qDebug() << QObject::tr("anchor (%1,%2,%3) + offset (%4,%5,%6) = final (%7,%8,%9)").arg(anchor->latticeCoord().n).arg(anchor->latticeCoord().m).arg(anchor->latticeCoord().l).arg(coord_offset.n).arg(coord_offset.m).arg(coord_offset.l).arg(fin_coord.n).arg(fin_coord.m).arg(fin_coord.l);
+  //prim::LatticeCoord fin_coord = anchor->latticeCoord() + coord_offset;
 
-  for (prim::GhostDot *dot : dots)
-    dot->setLatticeCoord(dot->latticeCoord() + coord_offset);
+  for(int n=0; n < sets.count(); n++)
+    for (prim::GhostDot *dot : sets.at(n))
+      dot->setLatticeCoord(dot->latticeCoord() + coord_offset*(n+1));
   QPointF offset = lattice->latticeCoord2ScenePos(coord_offset);
-  instance()->moveBy(offset.x(), offset.y());
-}
 
+  instance()->translate(offset.x(), offset.y());
+}
 
 QList<prim::Item*> prim::Ghost::getTopItems() const
 {
@@ -166,37 +182,17 @@ QList<prim::Item*> prim::Ghost::getTopItems() const
   return items;
 }
 
-
-QList<bool> prim::Ghost::getLatticeAvailability(const prim::LatticeCoord &offset,
-    prim::Lattice *lattice) const
+QList<prim::LatticeCoord> prim::Ghost::getLatticeCoords(prim::DBDot *db) const
 {
-  QList<bool> avail;
-  for (int i=0; i<dots.count(); i++) {
-    qDebug() << QObject::tr("ghost dot at (%1, %2, %3)").arg(dots.at(i)->latticeCoord().n).arg(dots.at(i)->latticeCoord().m).arg(dots.at(i)->latticeCoord().l);
-    if (!lattice->isValid(dots.at(i)->latticeCoord()+offset)) {
-      qDebug() << "Target site is not valid";
-      avail.append(false);
-      continue;
-    }
-    if (lattice->isOccupied(dots.at(i)->latticeCoord()+offset)) {
-      qDebug() << "Target site is occupied";
-      avail.append(false);
-      continue;
-    }
-    avail.append(true);
-  }
-  return avail;
-}
+  QList<prim::LatticeCoord> coords;
 
-
-prim::LatticeCoord prim::Ghost::getLatticeCoord(prim::DBDot *db) const
-{
   // get index of source
   int index = sources.indexOf(static_cast<prim::Item*>(db));
-  if (index==-1)
-    return prim::LatticeCoord(0,0,-1);
-  else
-    return dots.at(index)->latticeCoord();
+  if (index>=0)
+    for (QList<prim::GhostDot*> set : sets)
+      coords.append(set.at(index)->latticeCoord());
+
+  return coords;
 }
 
 QPointF prim::Ghost::freeAnchor(QPointF scene_pos)
@@ -221,14 +217,13 @@ void prim::Ghost::setValid(bool val)
 
 bool prim::Ghost::checkValid(const prim::LatticeCoord &offset, prim::Lattice *lattice)
 {
-  QList<bool> lattice_avail = getLatticeAvailability(offset, lattice);
 
-  // invalid if a dangling bond is associated with no selectable lattice dot or
-  // an unselectable lattice dot
-  for(int i=0; i<dots.count(); i++)
-    if (!lattice_avail.at(i))
-      return false;
-
+  for(int n=0; n<sets.count(); n++)
+    for(prim::GhostDot *dot : sets.at(n)){
+      prim::LatticeCoord coord = dot->latticeCoord()+offset*(n+1);
+      if(!lattice->isValid(coord) || lattice->isOccupied(coord))
+        return false;
+    }
   return true;
 }
 
@@ -236,7 +231,7 @@ bool prim::Ghost::checkValid(const prim::LatticeCoord &offset, prim::Lattice *la
 QPointF prim::Ghost::moveOffset() const
 {
   if(sources.count())
-    return dots.first()->scenePos()-sources.first()->scenePos();
+    return sets.at(0).first()->scenePos()-sources.first()->scenePos();
   else
     return QPointF();
 }
@@ -290,9 +285,11 @@ void prim::Ghost::createGhostDot(prim::Item *item)
   if(item->item_type == prim::Item::Aggregate)
     qWarning() << QObject::tr("Creating a ghost dot for an aggregate...");
 
-  prim::GhostDot *dot = new prim::GhostDot(item, this, &col);
+  for(QList<prim::GhostDot*> &set : sets){
+    prim::GhostDot *dot = new prim::GhostDot(item, this, &col);
+    set.append(dot);
+  }
 
-  dots.append(dot);
   sources.append(item);
 }
 
@@ -358,7 +355,7 @@ void prim::Ghost::zeroGhost(QPointF scene_pos)
   // compute center of effective bounding rect for all items
   qreal xmin=0, xmax=0, ymin=0, ymax=0;
   bool unset=true;
-  for(prim::GhostDot *dot : dots){
+  for(prim::GhostDot *dot : sets.at(0)){
     QRectF rect = dot->boundingRect();
     rect.moveCenter(dot->pos());
     if(unset){
@@ -385,10 +382,10 @@ void prim::Ghost::setAnchor()
   // find nearest GhostDot to the zero_offset, by Manhattan length
   prim::GhostDot *dot=anchor=0;
   qreal mdist=-1, dist;
-  for(int i=0; i<dots.count(); i++){
+  for(int i=0; i<sources.count(); i++){
     if(sources.at(i)->item_type != prim::Item::DBDot)
       continue;
-    dot = dots.at(i);
+    dot = sets.at(0).at(i);
     dist = (dot->scenePos()-zero_offset).manhattanLength();
     if(mdist < 0 || mdist > dist){
       anchor = dot;
@@ -416,4 +413,13 @@ prim::Item *prim::Ghost::getNodeItem(prim::AggNode *node) const
   else
     return 0;
 
+}
+
+
+void prim::Ghost::translate(qreal dx, qreal dy)
+{
+  moveBy(dx, dy);
+  for(int n=1; n<sets.count(); n++)
+    for(prim::GhostDot *dot : sets.at(n))
+      dot->moveBy(n*dx, n*dy);
 }

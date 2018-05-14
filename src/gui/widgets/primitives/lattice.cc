@@ -73,14 +73,18 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos, QPointF 
   // TODO ask Jake if these calculations should be done using the scene integer
   //      version of the variables
   LatticeCoord coord(0,0,-1);
+
   int n0[2];
   qreal proj;
   QPointF x = scene_pos/prim::Item::scale_factor;
-  qreal x2 = QPointF::dotProduct(x,x);
 
   for(int i=0; i<2; i++){
     proj = QPointF::dotProduct(x, a[i])/a2[i];
-    n0[i] = qFloor(proj - coth*qSqrt(qMax(0.,x2/a2[i]-proj*proj)));
+    if(!orthog){
+      qreal x2 = QPointF::dotProduct(x,x);
+      proj += (proj>0 ? -1:1)*coth*qSqrt(qMax(0.,x2/a2[i]-proj*proj));
+    }
+    n0[i] = qFloor(proj);
   }
 
   qreal mdist = qMax(a2[0], a2[1]);         // nearest Manhattan length
@@ -236,6 +240,8 @@ void prim::Lattice::construct()
 
   qreal dtrm = a[0].x()*a[1].y() - a[0].y()*a[1].x();
   coth = QPointF::dotProduct(a[0], a[1]) / dtrm;
+
+  orthog = qAbs(coth) < 1e-4;
 
   // generate lattice and site vectors for display (all integer)
   a_scene[0] = QPointF(tileApprox().topRight() * prim::Item::scale_factor).toPoint();

@@ -42,6 +42,10 @@ namespace prim{
     LatticeCoord operator-(const LatticeCoord other) const {
       return LatticeCoord(n-other.n, m-other.m, l-other.l);
     }
+
+    LatticeCoord operator*(int k) const{
+      return LatticeCoord(n*k, m*k, l*k);
+    }
   };
 
   class Lattice : public prim::Layer
@@ -127,6 +131,7 @@ namespace prim{
     qreal Ly;           // y-bound on lattice vectors, in Angstroms
 
     qreal coth;         // cotangent of angle between lattice vectors
+    bool orthog;        // lattice vectors are orthogonal
     qreal a2[2];        // square magnitudes of lattice vectors
 
     QHash<prim::LatticeCoord, prim::Item*> occ_latdots; // set of occupied lattice dots

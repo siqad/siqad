@@ -1086,6 +1086,10 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
           createGhost(true);
         break;
       }
+      case Qt::Key_D:
+        if(display_mode == DesignMode)
+          duplicateSelection();
+        break;
       case Qt::Key_Z:{
           if(display_mode == DesignMode){
             // undo/redo based on keymods
@@ -1152,6 +1156,22 @@ void gui::DesignPanel::constructStatics()
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   background_col = gui_settings->get<QColor>("view/bg_col");
   background_col_publish = gui_settings->get<QColor>("view/bg_col_pb");
+}
+
+
+void gui::DesignPanel::duplicateSelection()
+{
+  // get list of selected items
+  auto items = selectedItems();
+  if(items.count()==0)
+    return;
+
+  // raise prompt
+  int count = QInputDialog::getInt(this, tr("Selection duplication"),
+                tr("Count:"), 1, 0, 1000, 1);
+
+  copySelection();
+  createGhost(true, count);
 }
 
 void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
@@ -1442,8 +1462,10 @@ void gui::DesignPanel::rubberBandEnd(){
 }
 
 
-void gui::DesignPanel::createGhost(bool paste)
+void gui::DesignPanel::createGhost(bool paste, int count)
 {
+  clearGhost();
+
   // qDebug() << tr("Creating ghost...");
   prim::Ghost *ghost = prim::Ghost::instance();
   pasting=paste;
@@ -1451,7 +1473,7 @@ void gui::DesignPanel::createGhost(bool paste)
   snap_cache = QPointF();
 
   if (paste) {
-    ghost->prepare(clipboard);
+    ghost->prepare(clipboard, count);
     prim::LatticeCoord offset;
     if (snapGhost(mapToScene(mapFromGlobal(QCursor::pos())), offset))
       ghost->moveByCoord(offset, lattice);
@@ -1459,7 +1481,7 @@ void gui::DesignPanel::createGhost(bool paste)
     QPointF scene_pos = mapToScene(mapFromGlobal(QCursor::pos()));
     //get QList of selected Item object
     filterSelection(true);
-    ghost->prepare(selectedItems(), scene_pos);
+    ghost->prepare(selectedItems(), 1, scene_pos);
   }
 }
 
@@ -2504,8 +2526,8 @@ bool gui::DesignPanel::pasteAtGhost()
   // paste each item in the clipboard, same as ghost top items (preferred order)
   for(prim::Item *item : ghost->getTopItems())
     pasteItem(ghost, item);
-
   undo_stack->endMacro();
+
   pasting=false;
   return true;
 }
@@ -2533,10 +2555,9 @@ void gui::DesignPanel::pasteItem(prim::Ghost *ghost, prim::Item *item)
 
 void gui::DesignPanel::pasteDBDot(prim::Ghost *ghost, prim::DBDot *db)
 {
-  // get the target lattice dor
-  qDebug() << "shoud paste DB now";
-  prim::LatticeCoord l_coord = ghost->getLatticeCoord(db);
-  undo_stack->push(new CreateDB(l_coord, getLayerIndex(top_layer), this, db));
+  // get the target lattice dot
+  for(prim::LatticeCoord coord: ghost->getLatticeCoords(db))
+    undo_stack->push(new CreateDB(coord, getLayerIndex(top_layer), this, db));
 }
 
 void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)

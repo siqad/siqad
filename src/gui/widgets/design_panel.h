@@ -293,6 +293,9 @@ namespace gui{
     // construct static variables on first init
     void constructStatics();
 
+    // array generation of selected items
+    void duplicateSelection();
+
     // perform scene zoom based on wheel rotation
     void wheelZoom(QWheelEvent *e, bool boost);
 
@@ -330,7 +333,7 @@ namespace gui{
 
     // GHOSTclass UndoCommand;e a Ghost for the current selection or clipboard
     // create a ghost. scene_pos is only needed if not pasting
-    void createGhost(bool paste);
+    void createGhost(bool paste, int count=1);
 
     // clear the current Ghost
     void clearGhost();
