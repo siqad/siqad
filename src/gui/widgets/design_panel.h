@@ -19,6 +19,7 @@
 #include "../../global.h"
 
 #include "afm_panel.h"
+#include "layer_manager.h"
 #include "property_editor.h"
 
 #include "primitives/layer.h"
@@ -84,10 +85,6 @@ namespace gui{
     void removeLayer(const QString &name);
     //! attempt to remove a layer, by index
     void removeLayer(int n);
-
-    //! retreieve entire layer stack
-    //TODO might not be needed, delete if true
-    QStack<prim::Layer*>* getLayers() {return &layers;}
 
     //! returns a pointer to the requested layer if it exists, else 0
     prim::Layer* getLayer(const QString &name) const;
@@ -255,6 +252,7 @@ namespace gui{
     QUndoStack *undo_stack;   // undo stack
 
     // contained widgets
+    gui::LayerManager *layer_manager;
     gui::PropertyEditor *property_editor;
 
     // background color presets

@@ -23,7 +23,6 @@
 #include "widgets/dialog_panel.h"
 #include "widgets/input_field.h"
 #include "widgets/info_panel.h"
-#include "widgets/layer_editor.h"
 #include "widgets/sim_manager.h"
 #include "widgets/sim_visualize_panel.h"
 #include "widgets/primitives/sim_job.h" // TODO move these stuff to SimManager later
@@ -139,7 +138,7 @@ namespace gui{
     void initSideBar();           // initialise the GUI sidebar, toolbar
     void initDialogDock();        // initialise the bottom dialog dock
     void initSimVisualizeDock();  // initialise the side sim visualize dock
-    void initLayerDock();         // initialise the side layer dock
+    //void initLayerDock();         // initialise the side layer dock
 
     // prepare any extra actions not attched to an icon or meny
     void initActions();
@@ -171,7 +170,6 @@ namespace gui{
     gui::DesignPanel  *design_pan;  // mainwindow design panel
     gui::InfoPanel    *info_pan;    // mainwindow info panel
     gui::InputField   *input_field; // mainwindow input field
-    gui::LayerEditor  *layer_editor;// pop-up layer editor
     gui::SimManager   *sim_manager; // pop-up simulator manager
     gui::SimVisualize *sim_visualize; // simulation visualizer that goes in sim visualize dock
     settings::SettingsDialog *settings_dialog;  // dialog for changing settings

@@ -75,7 +75,6 @@ void gui::ApplicationGUI::initGUI()
   info_pan = new gui::InfoPanel(this);
 
   // detachable/pop-up widgets, order matters in some cases due to pointers
-  layer_editor = new gui::LayerEditor(design_pan, this);
   sim_manager = new gui::SimManager(this);
   sim_visualize = new gui::SimVisualize(sim_manager, this);
 
@@ -85,7 +84,7 @@ void gui::ApplicationGUI::initGUI()
   // initialise docks
   initSimVisualizeDock();
   initDialogDock();
-  initLayerDock();
+  //initLayerDock();
 
   // initialise bars
   initMenuBar(); // must run before initTopBar
@@ -397,7 +396,7 @@ void gui::ApplicationGUI::initSimVisualizeDock()
 }
 
 
-void gui::ApplicationGUI::initLayerDock()
+/*void gui::ApplicationGUI::initLayerDock()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
@@ -416,7 +415,7 @@ void gui::ApplicationGUI::initLayerDock()
   layer_dock->setWidget(layer_editor);
   layer_dock->show();
   addDockWidget(area, layer_dock);
-}
+}*/
 
 
 void gui::ApplicationGUI::initActions()
@@ -429,7 +428,7 @@ void gui::ApplicationGUI::initActions()
   connect(design_pan, &gui::DesignPanel::sig_toolChangeRequest,
             this, &gui::ApplicationGUI::setTool);
 
-  layer_editor->populateLayerTable(); // TODO move to appropriate place
+  //layer_editor->populateLayerTable(); // TODO move to appropriate place
 }
 
 
@@ -630,7 +629,7 @@ void gui::ApplicationGUI::parseInputField()
 void gui::ApplicationGUI::designPanelReset()
 {
   initState();
-  layer_editor->populateLayerTable();
+  //layer_editor->populateLayerTable();
 }
 
 
@@ -1003,7 +1002,7 @@ void gui::ApplicationGUI::openFromFile()
   // read from XML stream
   QXmlStreamReader stream(&file);
   qDebug() << tr("Beginning load from %1").arg(file.fileName());
-  
+
   // TODO load program status here instead of from file
   // TODO if save type is simulation, warn the user when opening the file, especially the fact that sim params will not be retained the next time they save
 

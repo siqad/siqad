@@ -29,6 +29,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   initDesignPanel();
 
   // initialize contained widgets
+  layer_manager = new LayerManager(layers, this);
   property_editor = new PropertyEditor(this);
 
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,

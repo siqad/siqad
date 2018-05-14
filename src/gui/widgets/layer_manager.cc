@@ -1,4 +1,4 @@
-// @file:     layer_editor.cc
+// @file:     layer_manager.cc
 // @author:   Samuel
 // @created:  2017.12.22
 // @editted:  2017.12.22 - Samuel
@@ -6,19 +6,19 @@
 //
 // @desc:     widget for configuring
 
-#include "layer_editor.h"
+#include "layer_manager.h"
 
 namespace gui {
 
 // constructor
-LayerEditor::LayerEditor(gui::DesignPanel *design_pan, QWidget *parent)
-  : QWidget(parent, Qt::Dialog), dp(design_pan)
+LayerManager::LayerManager(QStack<prim::Layer*> *layers, QWidget *parent)
+  : QWidget(parent, Qt::Dialog), layers(layers)
 {
-  initLayerEditor();
+  initLayerManager();
 }
 
 // destructor
-LayerEditor::~LayerEditor()
+LayerManager::~LayerManager()
 {
   clearLayerTable();
 }
@@ -27,7 +27,7 @@ LayerEditor::~LayerEditor()
 // PRIVATE
 
 // initialize widget
-void LayerEditor::initLayerEditor()
+void LayerManager::initLayerManager()
 {
   // top buttons
   QPushButton *bt_add = new QPushButton(tr("Add")); // TODO implement function
@@ -50,7 +50,7 @@ void LayerEditor::initLayerEditor()
 }
 
 
-void LayerEditor::initLayerTableHeaders()
+void LayerManager::initLayerTableHeaders()
 {
   qDebug() << "Initializing layer table headers";
   QStringList table_headers;
@@ -86,10 +86,9 @@ void LayerEditor::initLayerTableHeaders()
 }
 
 
-void LayerEditor::populateLayerTable()
+void LayerManager::populateLayerTable()
 {
   clearLayerTable();
-  layers = dp->getLayers();
 
   // populate table with layer info
   qDebug() << "Populating layer table";
@@ -104,14 +103,14 @@ void LayerEditor::populateLayerTable()
 }
 
 
-void LayerEditor::refreshLayerTable()
+void LayerManager::refreshLayerTable()
 {
   // reload all rows and update with changes, including added/deleted layers
   // TODO
 }
 
 
-void LayerEditor::clearLayerTable()
+void LayerManager::clearLayerTable()
 {
   // Delete layer rows and disconnect all signals within the table.
   // Called by destructor on exit or by design panel when loading new file.
@@ -125,12 +124,12 @@ void LayerEditor::clearLayerTable()
 }
 
 
-void LayerEditor::updateLayerPropFromTable(int row, int column)
+void LayerManager::updateLayerPropFromTable(int row, int column)
 {
   // TODO really need to not hard code layer ID and column position, need some sort of table that translates between readable name and row/col number
   QString layer_name = layer_table->item(row, static_cast<int>(Name))->text();
   //qDebug() << QObject::tr("Row=%1, Col=%2, Layer name=%3").arg(row).arg(column).arg(layer_name);
-  prim::Layer* layer = dp->getLayer(layer_name); // get layer according to Layer Name
+  prim::Layer* layer = getLayer(layer_name); // get layer according to Layer Name
 
   switch(column) {
     case static_cast<int>(ID):
@@ -163,7 +162,7 @@ void LayerEditor::updateLayerPropFromTable(int row, int column)
 
 
 // update widget
-void LayerEditor::addLayerRow(prim::Layer *layer)
+void LayerManager::addLayerRow(prim::Layer *layer)
 {
   LayerTableRowContent *curr_row_content = new LayerTableRowContent;
   curr_row_content->layer = layer;
@@ -198,7 +197,7 @@ void LayerEditor::addLayerRow(prim::Layer *layer)
 }
 
 
-void LayerEditor::addLayerRow(LayerTableRowContent *row_content)
+void LayerManager::addLayerRow(LayerTableRowContent *row_content)
 {
   table_row_contents.append(row_content);
 
@@ -221,7 +220,7 @@ void LayerEditor::addLayerRow(LayerTableRowContent *row_content)
 }
 
 
-QIcon LayerEditor::layerType2Icon(const prim::Layer::LayerType layer_type)
+QIcon LayerManager::layerType2Icon(const prim::Layer::LayerType layer_type)
 {
   // TODO make enumerated layer type instead of hard code string
   if (layer_type == prim::Layer::Lattice)
