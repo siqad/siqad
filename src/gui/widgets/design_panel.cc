@@ -1162,16 +1162,19 @@ void gui::DesignPanel::constructStatics()
 void gui::DesignPanel::duplicateSelection()
 {
   // get list of selected items
-  auto items = selectedItems();
-  if(items.count()==0)
+  cache.clear();
+  cache = selectedItems();
+  if(cache.count()==0)
     return;
 
   // raise prompt
   int count = QInputDialog::getInt(this, tr("Selection duplication"),
-                tr("Count:"), 1, 0, 1000, 1);
+                tr("Count:"), 2, 2, 1000, 1);
 
-  copySelection();
-  createGhost(true, count);
+  if(count >= 2){
+    copySelection();
+    createGhost(true, count-1);
+  }
 }
 
 void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
@@ -2522,30 +2525,37 @@ bool gui::DesignPanel::pasteAtGhost()
       return false;
     }
   }
+
+
   undo_stack->beginMacro(tr("Paste %1 items").arg(clipboard.count()));
-  // paste each item in the clipboard, same as ghost top items (preferred order)
-  for(prim::Item *item : ghost->getTopItems())
-    pasteItem(ghost, item);
+
+  for(int i=0; i<ghost->getCount(); i++){
+    for(prim::Item *item : ghost->getTopItems())
+      pasteItem(ghost, i, item);
+  }
   undo_stack->endMacro();
+
+  for(prim::Item *item: cache)
+    item->setSelected(true);
 
   pasting=false;
   return true;
 }
 
-void gui::DesignPanel::pasteItem(prim::Ghost *ghost, prim::Item *item)
+void gui::DesignPanel::pasteItem(prim::Ghost *ghost, int n, prim::Item *item)
 {
   switch(item->item_type){
     case prim::Item::DBDot:
-      pasteDBDot(ghost, static_cast<prim::DBDot*>(item));
+      pasteDBDot(ghost, n, static_cast<prim::DBDot*>(item));
       break;
     case prim::Item::Aggregate:
-      pasteAggregate(ghost, static_cast<prim::Aggregate*>(item));
+      pasteAggregate(ghost, n, static_cast<prim::Aggregate*>(item));
       break;
     case prim::Item::Electrode:
-      pasteElectrode(ghost, static_cast<prim::Electrode*>(item));
+      pasteElectrode(ghost, n, static_cast<prim::Electrode*>(item));
       break;
     case prim::Item::AFMArea:
-      pasteAFMArea(ghost, static_cast<prim::AFMArea*>(item));
+      pasteAFMArea(ghost, n, static_cast<prim::AFMArea*>(item));
       break;
     default:
       qCritical() << tr("No functionality for pasting given item... update pasteItem");
@@ -2553,21 +2563,22 @@ void gui::DesignPanel::pasteItem(prim::Ghost *ghost, prim::Item *item)
   }
 }
 
-void gui::DesignPanel::pasteDBDot(prim::Ghost *ghost, prim::DBDot *db)
+void gui::DesignPanel::pasteDBDot(prim::Ghost *ghost, int n, prim::DBDot *db)
 {
   // get the target lattice dot
-  for(prim::LatticeCoord coord: ghost->getLatticeCoords(db))
+  auto coord = ghost->getLatticeCoord(db, n);
+  if(lattice->isValid(coord))
     undo_stack->push(new CreateDB(coord, getLayerIndex(top_layer), this, db));
 }
 
-void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)
+void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, int n, prim::Aggregate *agg)
 {
   undo_stack->beginMacro("Paste an aggregate");
 
   // paste all the children items
   QList<prim::Item*> items;
   for(prim::Item *item : agg->getChildren()){
-    pasteItem(ghost, item);
+    pasteItem(ghost, n, item);
     // new item will be at the top of the Layer Item stack
     items.append(top_layer->getItems().top());
   }
@@ -2579,7 +2590,7 @@ void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)
 
 }
 
-void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec)
+void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, int n, prim::Electrode *elec)
 {
   undo_stack->beginMacro(tr("create electrode with given corners"));
   undo_stack->push(new CreateElectrode(elec->layer_id, this, ghost->pos()+elec->pos(),
@@ -2587,7 +2598,7 @@ void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec)
   undo_stack->endMacro();
 }
 
-void gui::DesignPanel::pasteAFMArea(prim::Ghost *ghost, prim::AFMArea *afm_area)
+void gui::DesignPanel::pasteAFMArea(prim::Ghost *ghost, int n, prim::AFMArea *afm_area)
 {
   undo_stack->beginMacro(tr("create AFMArea with given afm_area params"));
   // TODO copy AFM tip attributes
