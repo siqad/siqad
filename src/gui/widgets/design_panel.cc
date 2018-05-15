@@ -869,7 +869,8 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     /* TODO re-enable it later
     QList<prim::Item::ItemType> target_types;
     target_types.append(prim::Item::LatticeDot);
-    target_types.append(prim::Item::DBDot);
+    target_types.append(prim::I
+    tem::DBDot);
     prim::Item *snap_target = filteredSnapTarget(mapToScene(e->pos()), target_types, snap_diameter);
     if (snap_target) {
       afm_panel->ghostNode()->setPos(snap_target->scenePos());
@@ -1582,12 +1583,14 @@ void gui::DesignPanel::initMove()
 void gui::DesignPanel::setLatticeSiteOccupancy(prim::Item *item, bool flag)
 {
   switch(item->item_type){
-    case prim::Item::DBDot:
+    case prim::Item::DBDot:{
+      prim::DBDot *dot = static_cast<prim::DBDot*>(item);
       if (flag)
-        lattice->setOccupied(static_cast<prim::DBDot*>(item)->latticeCoord(), item);
+        lattice->setOccupied(dot->latticeCoord(), dot);
       else
-        lattice->setUnoccupied(static_cast<prim::DBDot*>(item)->latticeCoord());
+        lattice->setUnoccupied(dot->latticeCoord());
       break;
+    }
     case prim::Item::Aggregate:
       for(prim::Item *it : static_cast<prim::Aggregate*>(item)->getChildren())
         setLatticeSiteOccupancy(it, flag);
@@ -1693,7 +1696,7 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeCoord l_coord, int layer_index
   : QUndoCommand(parent), invert(invert), lat_coord(l_coord), cp_src(cp_src),
       dp(dp), layer_index(layer_index)
 {
-  db_at_loc = static_cast<prim::DBDot*>(dp->lattice->dbAt(l_coord));
+  db_at_loc = dp->lattice->dbAt(l_coord);
 
   if (invert && !db_at_loc)
     qFatal("Trying to remove a non-existing DB");
@@ -1727,6 +1730,7 @@ void gui::DesignPanel::CreateDB::create()
 
 void gui::DesignPanel::CreateDB::destroy()
 {
+  qDebug() << tr("Destroying DB: (%1,%2,%3)").arg(lat_coord.n).arg(lat_coord.m).arg(lat_coord.l);
   if (db_at_loc) {
     dp->lattice->setUnoccupied(db_at_loc->latticeCoord());
     dp->removeItem(db_at_loc, dp->getLayer(db_at_loc->layer_id));

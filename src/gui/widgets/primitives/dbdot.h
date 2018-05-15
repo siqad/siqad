@@ -22,12 +22,12 @@ namespace prim{
   public:
 
     //! constructor, creating DBDot using the DBGenTool.
-    DBDot(prim::LatticeCoord l_coord, int lay_id);
+    DBDot(prim::LatticeCoord l_coord, int lay_id, bool cp=false);
     //! constructor, creating DBDot from a design file.
     DBDot(QXmlStreamReader *, QGraphicsScene *);
 
     // initializer
-    void initDBDot(prim::LatticeCoord coord, int lay_id);
+    void initDBDot(prim::LatticeCoord coord, int lay_id, bool cp);
 
     // destructor
     ~DBDot(){}

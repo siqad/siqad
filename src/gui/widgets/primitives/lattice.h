@@ -16,6 +16,8 @@
 
 namespace prim{
 
+  class DBDot;
+
   struct LatticeCoord {
     //! Construct a lattice coordinate with n, m and l coordinates.
     LatticeCoord(int n, int m, int l) : n(n), m(m), l(l) {};
@@ -86,7 +88,7 @@ namespace prim{
     bool collidesWithLatticeSite(const QPointF &scene_pos, const LatticeCoord &l_coord) const;
 
     //! Set lattice dot location to be occupied
-    void setOccupied(const prim::LatticeCoord &l_coord, prim::Item *dbdot) {
+    void setOccupied(const prim::LatticeCoord &l_coord, prim::DBDot *dbdot) {
       occ_latdots.insert(l_coord, dbdot);
     }
 
@@ -106,7 +108,7 @@ namespace prim{
     }
 
     //! Return the DBDot pointer at the specified lattice coord, or 0 if none.
-    prim::Item *dbAt(const prim::LatticeCoord &l_coord) {
+    prim::DBDot *dbAt(const prim::LatticeCoord &l_coord) {
       return occ_latdots.contains(l_coord) ? occ_latdots.value(l_coord) : 0;
     }
 
@@ -134,7 +136,7 @@ namespace prim{
     bool orthog;        // lattice vectors are orthogonal
     qreal a2[2];        // square magnitudes of lattice vectors
 
-    QHash<prim::LatticeCoord, prim::Item*> occ_latdots; // set of occupied lattice dots
+    QHash<prim::LatticeCoord, prim::DBDot*> occ_latdots; // set of occupied lattice dots
 
     // constants
 
