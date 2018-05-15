@@ -34,7 +34,8 @@ void prim::Lattice::saveLayer(QXmlStreamWriter *ws) const
   ws->writeStartElement("layer_prop");
 
   int fp = settings::AppSettings::instance()->get<int>("float_prc");
-  char fmt = settings::AppSettings::instance()->get<char>("float_fmt");
+  QString fmt_st = settings::AppSettings::instance()->get<QString>("float_fmt");
+  char fmt = fmt_st.at(0).toLatin1();
   QString str;
 
   // common layer properties

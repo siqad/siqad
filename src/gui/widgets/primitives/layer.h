@@ -37,13 +37,13 @@ namespace prim{
 
     //! constructor, create a Layer with the given name. If no name is given,
     //! use the default naming scheme with layer_count.
-    Layer(const QString &nm = QString(), const LayerType cnt_type=DB, const float z_offset=0, const float z_height=0, int lay_id=-1, QObject *parent=0);
+    Layer(const QString &nm = QString(), const LayerType cnt_type=DB, float z_offset=0, float z_height=0, int lay_id=-1, QObject *parent=0);
 
     //! Construct layer from XML stream.
     Layer(QXmlStreamReader *, int lay_id=-1);
 
     // destructor
-    // ~Layer();
+    ~Layer();
 
     // RESET
     //! reset layers for new document
@@ -95,8 +95,8 @@ namespace prim{
     void setContentType(LayerType type) {content_type = type;}
 
     //! get the Layer content type, like "electrode", "dbdots", etc.
-    LayerType getContentType() const {return content_type;}
-    const QString getContentTypeString() const {return QString(QMetaEnum::fromType<LayerType>().valueToKey(content_type));}
+    LayerType contentType() const {return content_type;}
+    const QString contentTypeString() const {return QString(QMetaEnum::fromType<LayerType>().valueToKey(content_type));}
 
     //! if i is within bounds, return a pointer to the indexed item in the Layer
     //! item stack; otherwise, return 0

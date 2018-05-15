@@ -117,7 +117,7 @@ QSettings *settings::AppSettings::m_defs()
   S->setValue("phys/runtime_temp_dir", QString("<SYSTMP>/phys/"));
 
   S->setValue("float_prc", 6);  // float precision specified in QString::setNum
-  S->setValue("float_fmt", "e");   // float format specified in QString::setNum
+  S->setValue("float_fmt", "g");   // float format specified in QString::setNum
 
   S->setValue("save/autosaveroot", QString("<SYSTMP>/autosave/"));
   S->setValue("save/autosavenum", 3);

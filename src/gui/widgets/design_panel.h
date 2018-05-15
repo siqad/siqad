@@ -57,12 +57,18 @@ namespace gui{
 
     // ACCESSORS
 
+    //! Return the layer manager pointer.
+    QDockWidget *layerManagerDockWidget() {return layman->dockWidget();}
+
     //! add a new Item to the Layer at the given index of the stack. If layer_index==-1,
     //! add the new item to the top_layer. If ind != -1, inserts the Item into the given
     //! location of the Layer Item stack.
     void addItem(prim::Item *item, int layer_index=-1, int ind=-1);
 
-    //! remove the given Item from the given Layer if possible
+    //! Remove the given item from the layer at the given index if possible.
+    void removeItem(prim::Item *item, int layer_index);
+
+    //! Remove the given Item from the given Layer if possible.
     void removeItem(prim::Item *item, prim::Layer* layer);
 
     //! add a new Item to the graphics scene. This either means the Item is already owned
@@ -77,30 +83,8 @@ namespace gui{
     //! return a list of selected prim::Items
     QList<prim::Item*> selectedItems();
 
-    //! add a new layer with the given name. If no name is given, a default scheme
-    //! is used. Checks if the layer already exists.
-    void addLayer(const QString &name = QString(), const prim::Layer::LayerType cnt_type=prim::Layer::DB, const float zoffset = 0, const float zheight = 0);
-
-    //! attempt to remove a layer, by name
-    void removeLayer(const QString &name);
-    //! attempt to remove a layer, by index
-    void removeLayer(int n);
-
-    //! returns a pointer to the requested layer if it exists, else 0
-    prim::Layer* getLayer(const QString &name) const;
-    //! returns a pointer to the requested layer if it exists, else 0
-    prim::Layer* getLayer(int n) const;
-
-    //! get the top_layer index
-    int getLayerIndex(prim::Layer *layer=0) const;
-
     //! get a list of all the surface dangling bonds
-    QList<prim::DBDot *> getSurfaceDBs() const;
-
-    //! change the top layer to the requested layer
-    void setLayer(const QString &name);
-    //! change the top layer to the requested layer
-    void setLayer(int n);
+    QList<prim::DBDot*> getSurfaceDBs() const;
 
     //! resets the drawing layer and builds a lattice from the given <lattice>.ini
     //! file. If no file is given, the default lattice is used
@@ -252,7 +236,7 @@ namespace gui{
     QUndoStack *undo_stack;   // undo stack
 
     // contained widgets
-    gui::LayerManager *layer_manager;
+    gui::LayerManager *layman;
     gui::PropertyEditor *property_editor;
 
     // background color presets
@@ -266,12 +250,7 @@ namespace gui{
     // copy/paste
     QList<prim::Item*> clipboard;  // cached deep copy of a set of items for pasting
 
-    QStack<prim::Layer*> layers;    // stack of all layers, order immutable
     prim::Lattice *lattice=0;       // lattice for reference
-    prim::Layer *top_layer=0;       // new items added to this layer
-    prim::Layer *electrode_layer=0; // add electrodes to this layer
-    prim::Layer *afm_layer=0;       // add afm paths to this layer TODO request layers from Layer Manager instead of keeping pointers like these
-    prim::Layer *plot_layer=0;      // add potential plots to this layer
 
     // flags, change later to bit flags
     bool clicked;   // mouse left button is clicked

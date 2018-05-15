@@ -28,10 +28,6 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   // initialize design panel
   initDesignPanel();
 
-  // initialize contained widgets
-  layer_manager = new LayerManager(layers, this);
-  property_editor = new PropertyEditor(this);
-
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
           this, &gui::DesignPanel::selectClicked);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_showProperty,
@@ -60,6 +56,10 @@ void gui::DesignPanel::initDesignPanel() {
   undo_stack = new QUndoStack();
   connect(undo_stack, SIGNAL(cleanChanged(bool)),
           this, SLOT(emitUndoStackCleanChanged(bool)));
+
+  // initialize contained widgets
+  layman = new LayerManager(this);
+  property_editor = new PropertyEditor(this);
 
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 
@@ -112,7 +112,7 @@ void gui::DesignPanel::initDesignPanel() {
 
 
   // construct widgets
-  afm_panel = new AFMPanel(getLayerIndex(afm_layer), this);
+  afm_panel = new AFMPanel(layman->indexOf(layman->getMRULayer(prim::Layer::AFMTip)), this);
   scene->addItem(afm_panel->ghostNode());
   scene->addItem(afm_panel->ghostSegment());
   connect(this, &gui::DesignPanel::sig_toolChanged,
@@ -124,6 +124,11 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
 {
   // delete child widgets
   delete afm_panel;
+  delete property_editor;
+
+  // delete layers and contained items
+  layman->removeAllLayers();
+  if(reset) prim::Layer::resetLayers(); // reset layer counter
 
   // delete all graphical items from the scene
   scene->clear();
@@ -134,12 +139,6 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   for(prim::Item *item : clipboard)
     delete item;
   clipboard.clear();
-
-  // delete all the layers
-  for(prim::Layer *layer : layers)
-    delete layer;
-  layers.clear();
-  if(reset) prim::Layer::resetLayers();
 
   delete undo_stack;
 }
@@ -163,12 +162,13 @@ void gui::DesignPanel::resetDesignPanel()
 void gui::DesignPanel::addItem(prim::Item *item, int layer_index, int ind)
 {
   // check valid layer index, should not allow access to lattice layer
-  if(layer_index == 0 || layer_index >= layers.count()){
+  if(layer_index == 0 || layer_index >= layman->layerCount()){
     qCritical() << tr("Invalid layer index");
     return;
   }
 
-  prim::Layer *layer = layer_index > 0 ? layers.at(layer_index) : top_layer;
+  //prim::Layer *layer = layer_index > 0 ? layers.at(layer_index) : top_layer;
+  prim::Layer *layer = layer_index > 0 ? layman->getLayer(layer_index) : layman->activeLayer();
   if(ind > layer->getItems().count()){
     qCritical() << tr("Invalid item index");
     return;
@@ -176,6 +176,11 @@ void gui::DesignPanel::addItem(prim::Item *item, int layer_index, int ind)
   // add Item
   layer->addItem(item, ind);
   scene->addItem(item);
+}
+
+void gui::DesignPanel::removeItem(prim::Item *item, int layer_index)
+{
+  removeItem(item, layman->getLayer(layer_index));
 }
 
 void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
@@ -208,132 +213,25 @@ QList<prim::Item*> gui::DesignPanel::selectedItems()
   return casted_list;
 }
 
-void gui::DesignPanel::addLayer(const QString &name, const prim::Layer::LayerType cnt_type, const float zoffset, const float zheight)
-{
-  // check if name already taken
-  bool taken = false;
-  for(prim::Layer *layer : layers)
-    if(layer->getName() == name){
-      taken = true;
-      break;
-    }
-
-  if(taken){
-    qWarning() << tr("A layer already exists with the name : %1").arg(name);
-    return;
-  }
-
-  // layer is added to the end of layers stack, so ID = layers.size() before it was added
-  prim::Layer *layer = new prim::Layer(name, cnt_type, zoffset, zheight, layers.size());
-  layers.append(layer);
-}
-
-void gui::DesignPanel::removeLayer(const QString &name)
-{
-  bool removed = false;
-  for(int i=0; i<layers.count(); i++){
-    if(layers.at(i)->getName() == name){
-      removeLayer(i);
-      removed=true;
-      break;
-    }
-  }
-
-  if(!removed)
-    qWarning() << tr("Failed to remove layer : %1").arg(name);
-
-}
-
-void gui::DesignPanel::removeLayer(int n)
-{
-  if(n<0 ||  n>= layers.count())
-    qWarning() << tr("Layer index out of bounds...");
-  else{
-    // delete all items in the layer
-    prim::Layer *layer = layers.at(n);
-    for(prim::Item *item : layer->getItems())
-      removeItem(item, layer);
-
-    // delete layer
-    delete layer;
-    layers.removeAt(n);
-
-    // update layer_id for subsequent layers in the stack and their contained items
-    for(int i=n; i<layers.count(); i++)
-      layers.at(i)->setLayerIndex(i);
-
-    // if top_layer was removed, default to surface if available else NULL
-    if(top_layer==layer)
-      top_layer = layers.count() > 1 ? layers.at(1) : 0;
-  }
-
-}
-
-
-prim::Layer* gui::DesignPanel::getLayer(const QString &name) const
-{
-  for(prim::Layer *layer : layers)
-    if(layer->getName() == name)
-      return layer;
-
-  // no layer had a matching name, return 0
-  qWarning() << tr("Failed to find layer : %1").arg(name);
-  return 0;
-}
-
-
-prim::Layer* gui::DesignPanel::getLayer(int n) const
-{
-  if(n<0 || n>=layers.count()){
-    qWarning() << tr("Layer index out of bounds...");
-    return 0;
-  }
-  else
-    return layers.at(n);
-}
-
-
-int gui::DesignPanel::getLayerIndex(prim::Layer *layer) const
-{
-  return layer==0 ? layers.indexOf(top_layer) : layers.indexOf(layer);
-}
-
 
 QList<prim::DBDot *> gui::DesignPanel::getSurfaceDBs() const
 {
-  if(layers.count()<2){
-    qWarning() << tr("Requested non-existing surface...");
-    return QList<prim::DBDot *>();
+  QList<prim::Layer*> db_layers = layman->getLayers(prim::Layer::DB);
+  if (db_layers.count() == 0) {
+    qWarning() << tr("No DB layers found");
+    return QList<prim::DBDot*>();
   }
 
-  // extract all DBDot items from the first (surface) layer.
+  // extract all DBDot items from the DB layers
   QList<prim::DBDot *> dbs;
-  for(prim::Item *item : layers.at(1)->getItems())
-    if(item->item_type==prim::Item::DBDot)
-      dbs.append(static_cast<prim::DBDot *>(item));
+  for (prim::Layer* layer : db_layers)
+    for(prim::Item *item : layer->getItems())
+      if(item->item_type==prim::Item::DBDot)
+        dbs.append(static_cast<prim::DBDot *>(item));
 
   return dbs;
 }
 
-void gui::DesignPanel::setLayer(const QString &name)
-{
-  for(prim::Layer *layer : layers)
-    if(layer->getName() == name){
-      top_layer = layer;
-      return;
-    }
-
-  // no layer had a matching name, do nothing...
-  qWarning() << tr("Failed to find layer : %1").arg(name);
-}
-
-void gui::DesignPanel::setLayer(int n)
-{
-  if(n<0 || n>=layers.count())
-    qWarning() << tr("Layer index out of bounds...");
-  else
-    top_layer = layers.at(n);
-}
 
 void gui::DesignPanel::buildLattice(const QString &fname)
 {
@@ -341,7 +239,7 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   if(!fname.isEmpty() && DEFAULT_OVERRIDE){
     qWarning() << tr("Cannot change lattice when DEFAULT_OVERRIDE set");
     // do nothing if the lattice has previously been defined
-    if(!layers.isEmpty())
+    if(!layman->layerCount() == 0)
       return;
   }
 
@@ -349,11 +247,10 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   // NOTE: probably want a prompt to make sure user want to change the lattice
 
   // destroy all layers if they exist
-  while(layers.count()>0)
-    removeLayer(0);
+  layman->removeAllLayers();
 
   // build the new lattice
-  lattice = new prim::Lattice(fname, layers.size());
+  lattice = new prim::Lattice(fname, layman->layerCount());
   scene->setBackgroundBrush(QBrush(lattice->tileableLatticeImage(background_col)));
 
   // add the lattice dots to the scene
@@ -361,25 +258,21 @@ void gui::DesignPanel::buildLattice(const QString &fname)
     scene->addItem(item);
 
   // add the lattice to the layers, as layer 0
-  layers.append(lattice);
-
-  // TODO transfer all the hard-coded layer potitions to actual functions in LayerManager
+  layman->addLattice(lattice);
 
   // add in the dangling bond surface
-  addLayer(tr("Surface"),prim::Layer::DB,0,0);
-  top_layer = layers.at(1);
+  layman->addLayer("Surface", prim::Layer::DB,0,0);
 
   // add in the metal layer for electrodes
-  addLayer(tr("Metal"),prim::Layer::Electrode,-100E-9,10E-9);
-  electrode_layer = layers.at(2);
+  layman->addLayer("Metal", prim::Layer::Electrode,-100E-9,10E-9);
 
   // add in the AFM layer for AFM tip travel paths
-  addLayer(tr("AFM"), prim::Layer::AFMTip,500E-12,50E-12);
-  afm_layer = layers.at(3);
+  layman->addLayer("AFM", prim::Layer::AFMTip,500E-12,50E-12);
 
   // add in the potential layer for potential plots
-  addLayer(tr("Plot"), prim::Layer::Plot,-50E-9,0);
-  plot_layer = layers.at(4);
+  layman->addLayer("Plot", prim::Layer::Plot,-50E-9,0);
+
+  layman->populateLayerTable();
 }
 
 
@@ -413,7 +306,6 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
 
   switch(tool){
     case gui::ToolType::SelectTool:
-      // replaced with custom rubberBandUpdate, delete this later
       setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
       break;
@@ -422,19 +314,21 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
       setInteractive(false);
       break;
     case gui::ToolType::DBGenTool:
-      // replaced with custom rubberBandUpdate, delete this later
+      layman->setActiveLayer(layman->getMRULayer(prim::Layer::DB));
       setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
       break;
     case gui::ToolType::ElectrodeTool:
-      // replaced with custom rubberBandUpdate, delete this later
+      layman->setActiveLayer(layman->getMRULayer(prim::Layer::Electrode));
       setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
       break;
     case gui::ToolType::AFMAreaTool:
+      layman->setActiveLayer(layman->getMRULayer(prim::Layer::AFMTip));
       setInteractive(true);
       break;
     case gui::ToolType::AFMPathTool:
+      layman->setActiveLayer(layman->getMRULayer(prim::Layer::AFMTip));
       setInteractive(true);
       break;
     case gui::ToolType::ScreenshotAreaTool:
@@ -502,17 +396,12 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *ws, bool for_sim)
   // save layer properties
   ws->writeComment("Layer Properties");
   ws->writeComment("Layer ID is intrinsic to the layer order");
-  for(prim::Layer *layer : layers){
-    layer->saveLayer(ws);
-  }
+  layman->saveLayers(ws);
 
   // save item hierarchy
   ws->writeComment("Item Hierarchy");
   ws->writeStartElement("design");
-  for(prim::Layer *layer : layers){
-    ws->writeComment(layer->getName());
-    layer->saveItems(ws);
-  }
+  layman->saveLayerItems(ws);
   ws->writeEndElement(); // end of design node
 }
 
@@ -603,10 +492,11 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs)
   }
   // edit layer if it exists, create new otherwise
   qDebug() << tr("Loading layer %1 with type %2").arg(layer_nm).arg(layer_type);
-  prim::Layer* load_layer = getLayer(layer_nm);
+  // TODO rethink this layer loading method
+  prim::Layer* load_layer = layman->getLayer(layer_nm);
   if (!load_layer) {
-    addLayer(layer_nm);
-    load_layer = getLayer(layers.count()-1);
+    layman->addLayer(layer_nm);
+    load_layer = layman->getLayer(layman->layerCount()-1);
   }
   load_layer->setContentType(layer_type);
   load_layer->setZOffset(zoffset);
@@ -624,7 +514,7 @@ void gui::DesignPanel::loadDesign(QXmlStreamReader *rs)
     if (rs->name() == "layer") {
       // recursively populate layer with items
       rs->readNext();
-      getLayer(layer_id)->loadItems(rs, scene);
+      layman->getLayer(layer_id)->loadItems(rs, scene);
       layer_id++;
     } else {
       qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2")
@@ -1656,7 +1546,7 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeCoord l_coord, int layer_index
     qFatal("Trying to make a new DB at a location that already has one");
 
   // dbdot index in layer
-  prim::Layer *layer = dp->getLayer(layer_index);
+  prim::Layer *layer = dp->layman->getLayer(layer_index);
   index = invert ? layer->getItems().indexOf(db_at_loc) : layer->getItems().size();
 }
 
@@ -1684,7 +1574,7 @@ void gui::DesignPanel::CreateDB::destroy()
 {
   if (db_at_loc) {
     dp->lattice->setUnoccupied(db_at_loc->latticeCoord());
-    dp->removeItem(db_at_loc, dp->getLayer(db_at_loc->layer_id));
+    dp->removeItem(db_at_loc, dp->layman->getLayer(db_at_loc->layer_id));
     db_at_loc = 0;
   }
 }
@@ -1695,7 +1585,7 @@ void gui::DesignPanel::CreateDB::destroy()
 gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignPanel *dp, QPointF point1, QPointF point2, prim::Electrode *elec, bool invert, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), layer_index(layer_index), point1(point1), point2(point2), invert(invert)
 {  //if called to destroy, *elec points to selected electrode. if called to create, *elec = 0
-  prim::Layer *layer = dp->getLayer(layer_index);
+  prim::Layer *layer = dp->layman->getLayer(layer_index);
   index = invert ? layer->getItems().indexOf(elec) : layer->getItems().size();
 }
 
@@ -1717,10 +1607,10 @@ void gui::DesignPanel::CreateElectrode::create()
 
 void gui::DesignPanel::CreateElectrode::destroy()
 {
-  prim::Electrode *electrode = static_cast<prim::Electrode*>(dp->getLayer(layer_index)->getItem(index));
+  prim::Electrode *electrode = static_cast<prim::Electrode*>(dp->layman->getLayer(layer_index)->getItem(index));
   if(electrode != 0){
     // destroy electrode
-    dp->removeItem(electrode, dp->getLayer(electrode->layer_id));  // deletes electrode
+    dp->removeItem(electrode, dp->layman->getLayer(electrode->layer_id));  // deletes electrode
     electrode = 0;
   }
 }
@@ -1730,7 +1620,7 @@ void gui::DesignPanel::CreateElectrode::destroy()
 gui::DesignPanel::CreatePotPlot::CreatePotPlot(int layer_index, gui::DesignPanel *dp, QPixmap potential_plot, QRectF graph_container, prim::PotPlot *pp, bool invert, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), layer_index(layer_index), potential_plot(potential_plot), graph_container(graph_container), invert(invert)
 {  //if called to destroy, *elec points to selected electrode. if called to create, *elec = 0
-  prim::Layer *layer = dp->getLayer(layer_index);
+  prim::Layer *layer = dp->layman->getLayer(layer_index);
   index = invert ? layer->getItems().indexOf(pp) : layer->getItems().size();
 }
 
@@ -1752,9 +1642,9 @@ void gui::DesignPanel::CreatePotPlot::create()
 
 void gui::DesignPanel::CreatePotPlot::destroy()
 {
-  prim::PotPlot *pp = static_cast<prim::PotPlot*>(dp->getLayer(layer_index)->getItem(index));
+  prim::PotPlot *pp = static_cast<prim::PotPlot*>(dp->layman->getLayer(layer_index)->getItem(index));
   if(pp != 0){
-    dp->removeItem(pp, dp->getLayer(pp->layer_id));  // deletes PotPlot
+    dp->removeItem(pp, dp->layman->getLayer(pp->layer_id));  // deletes PotPlot
     pp = 0;
   }
 }
@@ -1768,7 +1658,7 @@ gui::DesignPanel::CreateAFMArea::CreateAFMArea(int layer_index,
   : QUndoCommand(parent), dp(dp), layer_index(layer_index),
     point1(point1), point2(point2), invert(invert)
 {
-  prim::Layer *layer = dp->getLayer(layer_index);
+  prim::Layer *layer = dp->layman->getLayer(layer_index);
   index = invert ? layer->getItems().indexOf(afm_area) : layer->getItems().size();
 }
 
@@ -1790,10 +1680,10 @@ void gui::DesignPanel::CreateAFMArea::create()
 void gui::DesignPanel::CreateAFMArea::destroy()
 {
   prim::AFMArea *afmarea = static_cast<prim::AFMArea*>(
-      dp->getLayer(layer_index)->getItem(index));
+      dp->layman->getLayer(layer_index)->getItem(index));
   if (afmarea != 0) {
     // destroy AFMArea
-    dp->removeItem(afmarea, dp->getLayer(afmarea->layer_id));
+    dp->removeItem(afmarea, dp->layman->getLayer(afmarea->layer_id));
   }
 }
 
@@ -1805,7 +1695,7 @@ gui::DesignPanel::CreateAFMPath::CreateAFMPath(int layer_index, gui::DesignPanel
   : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index)
 {
   //qDebug() << tr("Entered CreateAFMPath");
-  prim::Layer *layer = dp->getLayer(layer_index);
+  prim::Layer *layer = dp->layman->getLayer(layer_index);
   index = invert ? layer->getItemIndex(afm_path) : layer->getItems().size();
   if (index == -1)
     qCritical() << tr("Index for AFMPath is -1, this shouldn't happen.");
@@ -1832,11 +1722,11 @@ void gui::DesignPanel::CreateAFMPath::create()
 void gui::DesignPanel::CreateAFMPath::destroy()
 {
   //qDebug() << tr("Entered CreateAFMPath::destroy()");
-  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(index));
+  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->layman->getLayer(layer_index)->getItem(index));
 
   // contained nodes and segments should be deleted automatically when deleting the path
   // since they're children items to the path.
-  dp->removeItem(afm_path, dp->getLayer(afm_path->layer_id));
+  dp->removeItem(afm_path, dp->layman->getLayer(afm_path->layer_id));
   dp->afmPanel()->setFocusedPath(0);
 }
 
@@ -1849,7 +1739,7 @@ gui::DesignPanel::CreateAFMNode::CreateAFMNode(int layer_index, gui::DesignPanel
   : QUndoCommand(parent), invert(invert), layer_index(layer_index), dp(dp),
       afm_index(afm_index), scenepos(scenepos), z_offset(z_offset)
 {
-  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
+  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->layman->getLayer(layer_index)->getItem(afm_index));
   node_index = (index_in_path == -1) ? afm_path->nodeCount() : index_in_path;
 }
 
@@ -1866,7 +1756,7 @@ void gui::DesignPanel::CreateAFMNode::redo()
 void gui::DesignPanel::CreateAFMNode::create()
 {
   //qDebug() << tr("Entered CreateAFMNode::create()");
-  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
+  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->layman->getLayer(layer_index)->getItem(afm_index));
   prim::AFMNode *new_node = new prim::AFMNode(layer_index, scenepos, z_offset);
   afm_path->insertNode(new_node, node_index);
 
@@ -1877,7 +1767,7 @@ void gui::DesignPanel::CreateAFMNode::create()
 void gui::DesignPanel::CreateAFMNode::destroy()
 {
   //qDebug() << tr("Entered CreateAFMNode::destroy()");
-  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->getLayer(layer_index)->getItem(afm_index));
+  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->layman->getLayer(layer_index)->getItem(afm_index));
   afm_path->removeNode(node_index); // pointer cleanup is done by AFMPath
   dp->afmPanel()->setFocusedNodeIndex(node_index-1);
 }
@@ -1897,7 +1787,7 @@ gui::DesignPanel::ResizeAFMArea::ResizeAFMArea(int layer_index, DesignPanel *dp,
 void gui::DesignPanel::ResizeAFMArea::undo()
 {
   prim::AFMArea *afm_area = static_cast<prim::AFMArea*>(
-      dp->getLayer(layer_index)->getItem(afm_area_index));
+      dp->layman->getLayer(layer_index)->getItem(afm_area_index));
 
   if (afm_area->boundingRect().topLeft() == orig_rect.topLeft() &&
       afm_area->boundingRect().bottomRight() == orig_rect.bottomRight())
@@ -1910,7 +1800,7 @@ void gui::DesignPanel::ResizeAFMArea::undo()
 void gui::DesignPanel::ResizeAFMArea::redo()
 {
   prim::AFMArea *afm_area = static_cast<prim::AFMArea*>(
-      dp->getLayer(layer_index)->getItem(afm_area_index));
+      dp->layman->getLayer(layer_index)->getItem(afm_area_index));
 
   // if the user resized the afm area with the cursor, then the area might
   // already be the right size, in which case do nothing
@@ -1937,7 +1827,7 @@ gui::DesignPanel::ResizeElectrode::ResizeElectrode(int layer_index, DesignPanel 
 void gui::DesignPanel::ResizeElectrode::undo()
 {
   prim::Electrode *electrode = static_cast<prim::Electrode*>(
-      dp->getLayer(layer_index)->getItem(electrode_index));
+      dp->layman->getLayer(layer_index)->getItem(electrode_index));
 
   if (electrode->boundingRect().topLeft() == orig_rect.topLeft() &&
       electrode->boundingRect().bottomRight() == orig_rect.bottomRight())
@@ -1950,7 +1840,7 @@ void gui::DesignPanel::ResizeElectrode::undo()
 void gui::DesignPanel::ResizeElectrode::redo()
 {
   prim::Electrode *electrode = static_cast<prim::Electrode*>(
-      dp->getLayer(layer_index)->getItem(electrode_index));
+      dp->layman->getLayer(layer_index)->getItem(electrode_index));
 
   // if the user resized the afm area with the cursor, then the area might
   // already be the right size, in which case do nothing
@@ -1975,7 +1865,7 @@ gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
 
   // get layer_index, and check that it is the same for all items
   layer_index = items.at(0)->layer_id;
-  prim::Layer *layer = dp->getLayer(layer_index);
+  prim::Layer *layer = dp->layman->getLayer(layer_index);
   for(prim::Item *item : items)
     if(item->layer_id != layer_index){
       qWarning() << tr("Aggregates can only be formed from items in the same layer");
@@ -1997,7 +1887,7 @@ gui::DesignPanel::FormAggregate::FormAggregate(prim::Aggregate *agg, int offset,
   //prim::Layer *layer = agg->layer;
   //layer_index = dp->getLayerIndex(layer);
   layer_index = agg->layer_id;
-  prim::Layer *layer = dp->getLayer(layer_index);
+  prim::Layer *layer = dp->layman->getLayer(layer_index);
 
   // aggregate index
   QStack<prim::Item*> layer_items = layer->getItems();
@@ -2024,7 +1914,7 @@ void gui::DesignPanel::FormAggregate::redo()
 
 void gui::DesignPanel::FormAggregate::form()
 {
-  prim::Layer *layer = dp->getLayer(layer_index);
+  prim::Layer *layer = dp->layman->getLayer(layer_index);
 
   // all items should be in the same layer as the aggregate was and have no parents
   prim::Item *item=0;
@@ -2054,7 +1944,7 @@ void gui::DesignPanel::FormAggregate::form()
 
 void gui::DesignPanel::FormAggregate::split()
 {
-  prim::Layer *layer = dp->getLayer(layer_index);
+  prim::Layer *layer = dp->layman->getLayer(layer_index);
   prim::Item *item = layer->takeItem(agg_index);
 
   if(item->item_type != prim::Item::Aggregate)
@@ -2089,7 +1979,7 @@ gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
   : QUndoCommand(parent), dp(dp), offset(offset)
 {
   layer_index = item->layer_id;
-  item_index = dp->getLayer(layer_index)->getItems().indexOf(item);
+  item_index = dp->layman->getLayer(layer_index)->getItems().indexOf(item);
 }
 
 
@@ -2106,7 +1996,7 @@ void gui::DesignPanel::MoveItem::redo()
 
 void gui::DesignPanel::MoveItem::move(bool invert)
 {
-  prim::Layer *layer = dp->getLayer(layer_index);
+  prim::Layer *layer = dp->layman->getLayer(layer_index);
   prim::Item *item = layer->getItem(item_index);
 
   QPointF delta = invert ? -offset : offset;
@@ -2189,7 +2079,7 @@ void gui::DesignPanel::MoveItem::moveAFMArea(prim::AFMArea *afm_area,
 void gui::DesignPanel::createDBs()
 {
   // create DBs at preview DB locations
-  int layer_index = layers.indexOf(top_layer);
+  int layer_index = layman->indexOf(layman->activeLayer());
   undo_stack->beginMacro(tr("create dangling bonds at DB preview locations"));
   for (prim::DBDotPreview *db_prev : db_previews)
     undo_stack->push(new CreateDB(db_prev->latticeCoord(), layer_index, this));
@@ -2201,7 +2091,7 @@ void gui::DesignPanel::createDBs()
 void gui::DesignPanel::createElectrodes(QPoint point1)
 {
   QPoint point2 = mapToScene(mouse_pos_cached).toPoint(); //get coordinates relative to top-left
-  int layer_index = layers.indexOf(electrode_layer);
+  int layer_index = layman->indexOf(layman->activeLayer());
   //only ever create one electrode at a time
   undo_stack->beginMacro(tr("create electrode with given corners"));
   undo_stack->push(new CreateElectrode(layer_index, this, mapToScene(point1).toPoint(), point2));
@@ -2210,7 +2100,7 @@ void gui::DesignPanel::createElectrodes(QPoint point1)
 
 void gui::DesignPanel::createPotPlot(QPixmap potential_plot, QRectF graph_container)
 {
-  int layer_index = layers.indexOf(plot_layer);
+  int layer_index = layman->indexOf(layman->getMRULayer(prim::Layer::Plot));
   undo_stack->beginMacro(tr("create potential plot with given corners"));
   undo_stack->push(new CreatePotPlot(layer_index, this, potential_plot, graph_container));
   undo_stack->endMacro();
@@ -2220,7 +2110,7 @@ void gui::DesignPanel::createAFMArea(QPoint point1)
 {
   point1 = mapToScene(point1).toPoint();
   QPoint point2 = mapToScene(mouse_pos_cached).toPoint();
-  int layer_index = getLayerIndex(afm_layer);
+  int layer_index = layman->indexOf(layman->activeLayer());
 
   // create the AFM area
   undo_stack->beginMacro(tr("create AFM area with given corners"));
@@ -2231,7 +2121,7 @@ void gui::DesignPanel::createAFMArea(QPoint point1)
 void gui::DesignPanel::createAFMNode()
 {
   //qDebug() << tr("Entered createAFMNode()");
-  int layer_index = getLayerIndex(afm_layer);
+  int layer_index = layman->indexOf(layman->activeLayer());
   QPointF scene_pos;
   if (afm_panel->ghostNode())
     scene_pos = afm_panel->ghostNode()->scenePos();
@@ -2240,16 +2130,14 @@ void gui::DesignPanel::createAFMNode()
 
   // TODO UNDOable version
   undo_stack->beginMacro(tr("create AFMNode in the focused AFMPath after the focused AFMNode"));
-  //qDebug() << tr("AFMNode creation macro began");
   if (!afm_panel->focusedPath()) {
-    //qDebug() << tr("No existing focused path, making new");
     // create new path if there's no focused path
     prim::AFMPath *new_path = new prim::AFMPath(layer_index);
     afm_panel->setFocusedPath(new_path);
     undo_stack->push(new CreateAFMPath(layer_index, this));
   }
+  prim::Layer *afm_layer = layman->activeLayer();
   int afm_path_index = afm_layer->getItemIndex(afm_panel->focusedPath());
-  //qDebug() << tr("About to push new AFMNode to undo stack, afm_path_index=%1").arg(afm_path_index);
   undo_stack->push(new CreateAFMNode(layer_index, this, scene_pos, afm_layer->zOffset(),
                                         afm_path_index));
   undo_stack->endMacro();
@@ -2275,7 +2163,7 @@ void gui::DesignPanel::resizeAFMArea(prim::AFMArea *afm_area,
     const QRectF &orig_rect, const QRectF &new_rect)
 {
   undo_stack->beginMacro(tr("Resize AFM Area"));
-  int ind_in_layer = getLayer(afm_area->layer_id)->getItemIndex(afm_area);
+  int ind_in_layer = layman->getLayer(afm_area->layer_id)->getItemIndex(afm_area);
   undo_stack->push(new ResizeAFMArea(afm_area->layer_id, this, orig_rect,
       new_rect, ind_in_layer));
   undo_stack->endMacro();
@@ -2285,7 +2173,7 @@ void gui::DesignPanel::resizeElectrode(prim::Electrode *electrode,
     const QRectF &orig_rect, const QRectF &new_rect)
 {
   undo_stack->beginMacro(tr("Resize Electrode"));
-  int ind_in_layer = getLayer(electrode->layer_id)->getItemIndex(electrode);
+  int ind_in_layer = layman->getLayer(electrode->layer_id)->getItemIndex(electrode);
   undo_stack->push(new ResizeElectrode(electrode->layer_id, this, orig_rect,
       new_rect, ind_in_layer));
   undo_stack->endMacro();
@@ -2303,7 +2191,7 @@ void gui::DesignPanel::destroyAFMPath(prim::AFMPath *afm_path)
     afm_node = afm_path->getLastNode();
 
     //qDebug() << "getting afm and node indices";
-    int afm_index = getLayer(afm_node->layer_id)->getItemIndex(afm_path);
+    int afm_index = layman->getLayer(afm_node->layer_id)->getItemIndex(afm_path);
     int node_index = afm_path->getNodeIndex(afm_node);
     //qDebug() << tr("pushing to undo stack. layer_id=%1, zoffset=%2, afm_index=%3, node_index=%4").arg(afm_node->layer_id).arg(afm_node->zOffset()).arg(afm_index).arg(node_index);
     undo_stack->push(new CreateAFMNode(afm_node->layer_id, this, afm_node->scenePos(),
@@ -2356,7 +2244,7 @@ void gui::DesignPanel::deleteSelection()
         {
         prim::AFMNode *afm_node = static_cast<prim::AFMNode*>(item);
         prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(afm_node->parentItem());
-        int afm_index = getLayer(afm_node->layer_id)->getItemIndex(afm_path);
+        int afm_index = layman->getLayer(afm_node->layer_id)->getItemIndex(afm_path);
         int node_index = afm_path->getNodeIndex(afm_node);
         undo_stack->push(new CreateAFMNode(afm_node->layer_id, this,
             afm_node->scenePos(), afm_node->zOffset(), afm_index, node_index, true));
@@ -2516,7 +2404,7 @@ void gui::DesignPanel::pasteDBDot(prim::Ghost *ghost, prim::DBDot *db)
   // get the target lattice dor
   qDebug() << "shoud paste DB now";
   prim::LatticeCoord l_coord = ghost->getLatticeCoord(db);
-  undo_stack->push(new CreateDB(l_coord, getLayerIndex(top_layer), this, db));
+  undo_stack->push(new CreateDB(l_coord, layman->indexOf(layman->activeLayer()), this, db));
 }
 
 void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)
@@ -2528,7 +2416,7 @@ void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)
   for(prim::Item *item : agg->getChildren()){
     pasteItem(ghost, item);
     // new item will be at the top of the Layer Item stack
-    items.append(top_layer->getItems().top());
+    items.append(layman->activeLayer()->getItems().top());
   }
 
   // form Aggregate from Items

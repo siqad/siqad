@@ -18,7 +18,8 @@
 uint prim::Layer::layer_count = 0;
 
 
-prim::Layer::Layer(const QString &nm, LayerType cnt_type, const float z_offset, const float z_height, int lay_id, QObject *parent)
+prim::Layer::Layer(const QString &nm, LayerType cnt_type, float z_offset,
+    float z_height, int lay_id, QObject *parent)
   : QObject(parent), layer_id(lay_id), zoffset(z_offset), zheight(z_height),
         visible(true), active(false)
 {
@@ -57,6 +58,16 @@ prim::Layer::Layer(QXmlStreamReader *rs, int lay_id)
 
   // make layer object using loaded information
   name = nm.isEmpty() ? nm : QString("Layer %1").arg(layer_count++);
+}
+
+
+prim::Layer::~Layer()
+{
+  while (!items.isEmpty()) {
+    prim::Item *item = items.pop();
+    removeItem(item);
+    prim::Emitter::instance()->removeItemFromScene(item);
+  }
 }
 
 
@@ -143,11 +154,12 @@ void prim::Layer::saveLayer(QXmlStreamWriter *ws) const
 void prim::Layer::saveLayerProperties(QXmlStreamWriter *ws) const
 {
   int fp = settings::AppSettings::instance()->get<int>("float_prc");
-  char fmt = settings::AppSettings::instance()->get<char>("float_fmt");
+  QString fmt_st = settings::AppSettings::instance()->get<QString>("float_fmt");
+  char fmt = fmt_st.at(0).toLatin1();
   QString str;
 
   ws->writeTextElement("name", getName());
-  ws->writeTextElement("type", getContentTypeString());
+  ws->writeTextElement("type", contentTypeString());
   ws->writeTextElement("zoffset", str.setNum(zOffset(), fmt, fp));
   ws->writeTextElement("zheight", str.setNum(zHeight(), fmt, fp));
   ws->writeTextElement("visible", QString::number(isVisible()));
@@ -157,7 +169,7 @@ void prim::Layer::saveLayerProperties(QXmlStreamWriter *ws) const
 void prim::Layer::saveItems(QXmlStreamWriter *stream) const
 {
   stream->writeStartElement("layer");
-  stream->writeAttribute("type", getContentTypeString());
+  stream->writeAttribute("type", contentTypeString());
 
   for(prim::Item *item : items){
     item->saveItems(stream);

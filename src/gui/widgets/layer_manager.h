@@ -13,6 +13,7 @@
 
 #include "primitives/items.h"
 #include "primitives/layer.h"
+#include "primitives/lattice.h"
 
 namespace gui{
 
@@ -26,10 +27,13 @@ namespace gui{
     Q_ENUM(LayerManagerColumn)
 
     //! Constructor.
-    LayerManager(QStack<prim::Layer*> *layers, QWidget *parent);
+    LayerManager(QWidget *parent);
 
     //! Destructor.
     ~LayerManager();
+
+    //! Add a lattice.
+    void addLattice(prim::Lattice *lattice) {layers.append(lattice);}
 
     //! Add a new layer with the given name. If no name is given, a default scheme
     //! is used. Checks if the layer already exists.
@@ -41,20 +45,60 @@ namespace gui{
     //! Attempt to remove a layer, by index.
     void removeLayer(int n);
 
+    //! Attempt to remove a layer, by pointer.
+    void removeLayer(prim::Layer *layer);
+
+    //! Attempt to remove all layers.
+    void removeAllLayers();
+
     //! Returns a pointer to the requested layer if it exists, else 0.
     prim::Layer* getLayer(const QString &name) const;
 
     //! Returns a pointer to the requested layer if it exists, else 0.
     prim::Layer* getLayer(int n) const;
 
+    //! Returns all layer pointers for the specified layer type, or an empty list
+    //! if none exists.
+    QList<prim::Layer*> getLayers(prim::Layer::LayerType);
+
+    //! Returns the number of layers in the layers stack.
+    int layerCount() {return layers.count();}
+
+    //! Returns the pointer to the active layer.
+    prim::Layer* activeLayer() {return active_layer;}
+
+    //! Set the active layer to the given layer name.
+    void setActiveLayer(const QString &name);
+
+    //! Set the active layer to the given layer index.
+    void setActiveLayer(int n);
+
+    //! Set the active layer to the given layer pointer.
+    void setActiveLayer(prim::Layer *layer);
+
     //! Get the top_layer index
-    int getLayerIndex(prim::Layer *layer=0) const;
+    //int getLayerIndex(prim::Layer *layer=0) const;
+    int indexOf(prim::Layer *layer=0) const;
 
     //! Return the most recently used layer of the indicated type, or return
     //! the layer of that type with the smallest index if there isn't an MRU one.
-    prim::Layer *getMRULayer(prim::Lattice::LayerType);
+    //! Returns 0 if none is found.
+    prim::Layer *getMRULayer(prim::Layer::LayerType);
 
-    //!
+
+    // SAVE / LOAD
+
+    //! Save properties of all layers to XML stream. TODO improve structure
+    void saveLayers(QXmlStreamWriter *) const;
+
+    //! Save items contained in all layers to XML stream. TODO improve structure
+    void saveLayerItems(QXmlStreamWriter *) const;
+
+
+    // GUI
+
+    //! Return a pointer to the layer dock widget.
+    QDockWidget *dockWidget() {return dock_widget;}
 
     // GUI items in layer list grid
     struct LayerTableRowContent
@@ -69,6 +113,7 @@ namespace gui{
     };
 
     void initLayerManager();
+    void initDockWidget();
     void populateLayerTable();
     void refreshLayerTable();
     void clearLayerTable();
@@ -90,11 +135,13 @@ namespace gui{
 
 
     // vars
-    QStack<prim::Layer*> *layers;
+    prim::Layer *active_layer;
+    QStack<prim::Layer*> layers;
     QHash<prim::Layer::LayerType, prim::Layer*> mru_layers;
     // TODO table column order (mapped with string)
 
     // GUI
+    QDockWidget *dock_widget=0;
     QList<LayerTableRowContent*> table_row_contents;
 
     QVBoxLayout *layer_list_vl;

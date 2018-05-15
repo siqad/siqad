@@ -84,7 +84,7 @@ void gui::ApplicationGUI::initGUI()
   // initialise docks
   initSimVisualizeDock();
   initDialogDock();
-  //initLayerDock();
+  initLayerDock();
 
   // initialise bars
   initMenuBar(); // must run before initTopBar
@@ -396,9 +396,9 @@ void gui::ApplicationGUI::initSimVisualizeDock()
 }
 
 
-/*void gui::ApplicationGUI::initLayerDock()
+void gui::ApplicationGUI::initLayerDock()
 {
-  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  /*settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
   // recall or initialise layer dock location
   Qt::DockWidgetArea area;
@@ -412,10 +412,18 @@ void gui::ApplicationGUI::initSimVisualizeDock()
   // size policy
   layer_dock->setMinimumWidth(gui_settings->get<int>("LAYDOCK/mw"));
 
-  layer_dock->setWidget(layer_editor);
+  layer_dock->setWidget(design_pan->layerManager());
+  layer_dock->show();*/
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+
+  // recall or initialise layer dock location
+  Qt::DockWidgetArea area;
+  area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("LAYDOCK/loc"));
+
+  layer_dock = design_pan->layerManagerDockWidget();
   layer_dock->show();
   addDockWidget(area, layer_dock);
-}*/
+}
 
 
 void gui::ApplicationGUI::initActions()
@@ -427,8 +435,6 @@ void gui::ApplicationGUI::initActions()
   // set tool
   connect(design_pan, &gui::DesignPanel::sig_toolChangeRequest,
             this, &gui::ApplicationGUI::setTool);
-
-  //layer_editor->populateLayerTable(); // TODO move to appropriate place
 }
 
 
@@ -629,7 +635,6 @@ void gui::ApplicationGUI::parseInputField()
 void gui::ApplicationGUI::designPanelReset()
 {
   initState();
-  //layer_editor->populateLayerTable();
 }
 
 

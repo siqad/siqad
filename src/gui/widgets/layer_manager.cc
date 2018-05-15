@@ -11,18 +11,182 @@
 namespace gui {
 
 // constructor
-LayerManager::LayerManager(QStack<prim::Layer*> *layers, QWidget *parent)
-  : QWidget(parent, Qt::Dialog), layers(layers)
+LayerManager::LayerManager(QWidget *parent)
+  : QWidget(parent, Qt::Dialog)
 {
   initLayerManager();
+  initDockWidget();
 }
 
 // destructor
 LayerManager::~LayerManager()
 {
   clearLayerTable();
+
+  // delete the layers
+  removeAllLayers();
 }
 
+void LayerManager::addLayer(const QString &name, const prim::Layer::LayerType cnt_type, const float zoffset, const float zheight)
+{
+  // check if name already taken
+  bool taken = false;
+  for(prim::Layer *layer : layers) {
+    if(layer->getName() == name){
+      taken = true;
+      break;
+    }
+  }
+
+  if(taken){
+    qWarning() << tr("A layer already exists with the name : %1").arg(name);
+    return;
+  }
+
+  // layer is added to the end of layers stack, so ID = layers.size() before it was added
+  prim::Layer *layer = new prim::Layer(name, cnt_type, zoffset, zheight, layers.size());
+  layers.append(layer);
+}
+
+void LayerManager::removeLayer(const QString &name)
+{
+  bool removed = false;
+  for(int i=0; i<layers.count(); i++){
+    if(layers.at(i)->getName() == name){
+      removeLayer(layers.at(i));
+      removed=true;
+      break;
+    }
+  }
+
+  if(!removed)
+    qWarning() << tr("Requested layer removal of %1 failed").arg(name);
+
+}
+
+void LayerManager::removeLayer(int n)
+{
+  if(n<0 ||  n>= layers.count()) {
+    qWarning() << tr("Layer index out of bounds...");
+  }else{
+    prim::Layer *layer = layers.at(n);
+    removeLayer(layer);
+  }
+}
+
+void LayerManager::removeLayer(prim::Layer *layer)
+{
+  if(!layers.contains(layer)) {
+    qFatal("Cannot remove layer, layer pointer doesn't exist");
+  }else{
+    int n = indexOf(layer);
+    delete layer;
+    layers.removeAt(n);
+
+    // update layer_id for subsequent layers in the stack and their contained items
+    for(int i=n; i<layers.count(); i++)
+      layers.at(i)->setLayerIndex(i);
+
+    // if top_layer was removed, default to surface if available else NULL
+    if(active_layer==layer)
+      active_layer = layers.count() > 1 ? layers.at(1) : 0;
+  }
+}
+
+void LayerManager::removeAllLayers()
+{
+  while (!layers.isEmpty())
+    removeLayer(0);
+}
+
+prim::Layer* LayerManager::getLayer(const QString &name) const
+{
+  for(prim::Layer *layer : layers)
+    if(layer->getName() == name)
+      return layer;
+
+  // no layer had a matching name, return 0
+  qWarning() << tr("Failed to find layer : %1").arg(name);
+  return 0;
+}
+
+prim::Layer* LayerManager::getLayer(int n) const
+{
+  if(n<0 || n>=layers.count()){
+    qWarning() << tr("Layer index out of bounds...");
+    return 0;
+  }
+  else
+    return layers.at(n);
+}
+
+QList<prim::Layer*> LayerManager::getLayers(prim::Layer::LayerType type)
+{
+  QList<prim::Layer*> layers_found;
+  for (prim::Layer *layer : layers)
+    if (layer->contentType() == type)
+      layers_found.append(layer);
+  return layers_found;
+}
+
+void LayerManager::setActiveLayer(const QString &name)
+{
+  for(prim::Layer *layer : layers)
+    if(layer->getName() == name){
+      setActiveLayer(layer);
+      return;
+    }
+
+  // no layer had a matching name, do nothing...
+  qWarning() << tr("Failed to find layer : %1").arg(name);
+}
+
+void LayerManager::setActiveLayer(int n)
+{
+  if(n<0 || n>=layers.count())
+    qWarning() << tr("Layer index out of bounds...");
+  else
+    setActiveLayer(layers.at(n));
+}
+
+void LayerManager::setActiveLayer(prim::Layer *layer)
+{
+  active_layer = layer;
+  // TODO GUI stuff
+}
+
+int LayerManager::indexOf(prim::Layer *layer) const
+{
+  return layer==0 ? layers.indexOf(active_layer) : layers.indexOf(layer);
+}
+
+prim::Layer *LayerManager::getMRULayer(prim::Layer::LayerType type)
+{
+  // find that layer in the MRU hash table
+  if (mru_layers.contains(type))
+    return mru_layers[type];
+
+  // if no record in MRU, return the first occurance of the type in layers
+  for (prim::Layer *layer : layers)
+    if (layer->contentType() == type)
+      return layer;
+
+  return 0;
+}
+
+void LayerManager::saveLayers(QXmlStreamWriter *ws) const
+{
+  for(prim::Layer *layer : layers)
+    layer->saveLayer(ws);
+}
+
+void LayerManager::saveLayerItems(QXmlStreamWriter *ws) const
+{
+  for(prim::Layer *layer : layers){
+    ws->writeComment(layer->getName());
+    layer->saveItems(ws);
+  }
+}
 
 // PRIVATE
 
@@ -47,6 +211,26 @@ void LayerManager::initLayerManager()
   setLayout(main_vl);
 
   // TODO change add/remove to signal based
+}
+
+
+void LayerManager::initDockWidget()
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+
+  // recall or initialise layer dock location
+  Qt::DockWidgetArea area;
+  area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("LAYDOCK/loc"));
+
+  dock_widget = new QDockWidget(tr("Layer Manager"));
+
+  // location behaviour
+  dock_widget->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea|Qt::BottomDockWidgetArea);
+
+  // size policy
+  dock_widget->setMinimumWidth(gui_settings->get<int>("LAYDOCK/mw"));
+
+  dock_widget->setWidget(this);
 }
 
 
@@ -92,7 +276,7 @@ void LayerManager::populateLayerTable()
 
   // populate table with layer info
   qDebug() << "Populating layer table";
-  for (prim::Layer* layer : *layers)
+  for (prim::Layer* layer : layers)
     addLayerRow(layer);
 
   // signals originating from the table
@@ -182,9 +366,9 @@ void LayerManager::addLayerRow(prim::Layer *layer)
   connect(curr_row_content->bt_editability, SIGNAL(toggled(bool)), layer, SLOT(editabilityPushButtonChanged(bool)));
 
   // other items
-  curr_row_content->type = new QTableWidgetItem(layer->getContentTypeString());
-  curr_row_content->type->setIcon(layerType2Icon(layer->getContentType()));
-  curr_row_content->type->setToolTip(layer->getContentTypeString());
+  curr_row_content->type = new QTableWidgetItem(layer->contentTypeString());
+  curr_row_content->type->setIcon(layerType2Icon(layer->contentType()));
+  curr_row_content->type->setToolTip(layer->contentTypeString());
 
   curr_row_content->name = new QTableWidgetItem(layer->getName());
   curr_row_content->zoffset = new QTableWidgetItem(QString::number(layer->zOffset()));
