@@ -134,8 +134,8 @@ namespace prim{
     //! get the items associated with the GhostDots
     QList<prim::Item*>& getSources() {return sources;}
 
-    //! get the GhostDots
-    QList<prim::GhostDot*>& getDots() {return sets[0];}
+    //! get the number of GhostDot sets
+    int getCount() const {return sets.count();}
 
     //! get the items associated with the GhostBoxes
     QList<prim::Item*>& getBoxSources() {return box_sources;}
@@ -153,9 +153,9 @@ namespace prim{
     QList<bool> getLatticeAvailability(const prim::LatticeCoord &offset,
         prim::Lattice *lattice) const;
 
-    //! Gets the list of lattice coordinates under the GhostDots that correspond
-    //! to the given source DBDot if any.s
-    QList<prim::LatticeCoord> getLatticeCoords(prim::DBDot *db) const;
+    //! Gets the lattice coordinates of the GhostDot in the given set that
+    //! corresponds to the given DBDot; otherwise return invalid LatticeCoord
+    prim::LatticeCoord getLatticeCoord(prim::DBDot *db, int n=0) const;
 
     //! get the GhostDot nearest to the center of the Ghost. If db is set, will
     //! return the neatest dangling bond GhostDot if any exists else 0.

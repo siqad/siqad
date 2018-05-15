@@ -247,7 +247,8 @@ namespace gui{
     // TODO layer manager
 
     // copy/paste
-    QList<prim::Item*> clipboard;  // cached deep copy of a set of items for pasting
+    QList<prim::Item*> clipboard;   // cached deep copy of a set of items for pasting
+    QList<prim::Item*> cache;       // general purpose cache
 
     QStack<prim::Layer*> layers;    // stack of all layers, order immutable
     prim::Lattice *lattice=0;       // lattice for reference
@@ -437,12 +438,12 @@ namespace gui{
     // paste the current Ghost, returns True if successful
     bool pasteAtGhost();
 
-    // helper functions for pasting specific items
-    void pasteItem(prim::Ghost *ghost, prim::Item *item);
-    void pasteDBDot(prim::Ghost *ghost, prim::DBDot *db);
-    void pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg);
-    void pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec);
-    void pasteAFMArea(prim::Ghost *ghost, prim::AFMArea *afm_area);
+    // helper functions for pasting specific items to indexd ghost set
+    void pasteItem(prim::Ghost *ghost, int n, prim::Item *item);
+    void pasteDBDot(prim::Ghost *ghost, int n, prim::DBDot *db);
+    void pasteAggregate(prim::Ghost *ghost, int n, prim::Aggregate *agg);
+    void pasteElectrode(prim::Ghost *ghost, int n, prim::Electrode *elec);
+    void pasteAFMArea(prim::Ghost *ghost, int n, prim::AFMArea *afm_area);
 
     // move the selected items to the current Ghost, returns True if successful
     bool moveToGhost(bool kill=false);

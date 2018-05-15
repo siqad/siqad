@@ -182,17 +182,14 @@ QList<prim::Item*> prim::Ghost::getTopItems() const
   return items;
 }
 
-QList<prim::LatticeCoord> prim::Ghost::getLatticeCoords(prim::DBDot *db) const
+prim::LatticeCoord prim::Ghost::getLatticeCoord(prim::DBDot *db, int n) const
 {
-  QList<prim::LatticeCoord> coords;
-
   // get index of source
   int index = sources.indexOf(static_cast<prim::Item*>(db));
   if (index>=0)
-    for (QList<prim::GhostDot*> set : sets)
-      coords.append(set.at(index)->latticeCoord());
-
-  return coords;
+    return sets.at(n).at(index)->latticeCoord();
+  else
+    return prim::LatticeCoord(0,0,-1);
 }
 
 QPointF prim::Ghost::freeAnchor(QPointF scene_pos)
