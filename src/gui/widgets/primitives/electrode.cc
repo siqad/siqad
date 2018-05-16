@@ -224,7 +224,6 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
   ss->writeTextElement("potential", QString::number(getPotential()));
   ss->writeTextElement("electrode_type", QString::number(electrode_type));
   ss->writeTextElement("pixel_per_angstrom", QString::number(scale_factor));
-
   // other attributes
   // ......
 
@@ -270,7 +269,7 @@ void prim::Electrode::updatePoints(QPointF offset)
 
 void prim::Electrode::constructStatics() //needs to be changed to look at electrode settings instead.
 {
-  
+
   default_class_properties.readPropertiesFromXML(":/properties/electrode.xml");
 
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
