@@ -141,6 +141,8 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   clipboard.clear();
 
   delete undo_stack;
+
+  qDebug() << tr("Finished clearing design panel");
 }
 
 // reset
@@ -262,6 +264,7 @@ void gui::DesignPanel::buildLattice(const QString &fname)
 
   // add in the dangling bond surface
   layman->addLayer("Surface", prim::Layer::DB,0,0);
+  layman->setActiveLayer(layman->getLayer("Surface"));
 
   // add in the metal layer for electrodes
   layman->addLayer("Metal", prim::Layer::Electrode,-100E-9,10E-9);

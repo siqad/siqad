@@ -135,7 +135,7 @@ namespace gui{
 
 
     // vars
-    prim::Layer *active_layer;
+    prim::Layer *active_layer=0;
     QStack<prim::Layer*> layers;
     QHash<prim::Layer::LayerType, prim::Layer*> mru_layers;
     // TODO table column order (mapped with string)

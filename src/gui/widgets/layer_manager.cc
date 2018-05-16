@@ -51,9 +51,9 @@ void LayerManager::addLayer(const QString &name, const prim::Layer::LayerType cn
 void LayerManager::removeLayer(const QString &name)
 {
   bool removed = false;
-  for(int i=0; i<layers.count(); i++){
-    if(layers.at(i)->getName() == name){
-      removeLayer(layers.at(i));
+  for (prim::Layer *layer : layers) {
+    if (layer->getName() == name) {
+      removeLayer(layer);
       removed=true;
       break;
     }
@@ -61,42 +61,37 @@ void LayerManager::removeLayer(const QString &name)
 
   if(!removed)
     qWarning() << tr("Requested layer removal of %1 failed").arg(name);
-
 }
 
 void LayerManager::removeLayer(int n)
 {
-  if(n<0 ||  n>= layers.count()) {
-    qWarning() << tr("Layer index out of bounds...");
-  }else{
-    prim::Layer *layer = layers.at(n);
-    removeLayer(layer);
-  }
+  if (n < 0 || n >= layers.count())
+    qFatal("Layer index out of bounds, cannot delete layer");
+
+  prim::Layer *layer = layers.takeAt(n);
+  delete layer;
+
+  // update layer_id for subsequent layers in the stack and their contained items
+  for (int i=n; i<layers.count(); i++)
+    layers.at(i)->setLayerIndex(i);
+
+  // if active layer was removed, default to surface if available else 0
+  if (active_layer == layer)
+    active_layer = layers.count() > 1 ? layers.at(1) : 0;
 }
 
 void LayerManager::removeLayer(prim::Layer *layer)
 {
-  if(!layers.contains(layer)) {
+  if(!layers.contains(layer))
     qFatal("Cannot remove layer, layer pointer doesn't exist");
-  }else{
-    int n = indexOf(layer);
-    delete layer;
-    layers.removeAt(n);
 
-    // update layer_id for subsequent layers in the stack and their contained items
-    for(int i=n; i<layers.count(); i++)
-      layers.at(i)->setLayerIndex(i);
-
-    // if top_layer was removed, default to surface if available else NULL
-    if(active_layer==layer)
-      active_layer = layers.count() > 1 ? layers.at(1) : 0;
-  }
+  removeLayer(indexOf(layer));
 }
 
 void LayerManager::removeAllLayers()
 {
   while (!layers.isEmpty())
-    removeLayer(0);
+    removeLayer(layers.count()-1);
 }
 
 prim::Layer* LayerManager::getLayer(const QString &name) const

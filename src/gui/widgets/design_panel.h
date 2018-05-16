@@ -190,6 +190,8 @@ namespace gui{
     void sig_resetDesignPanel();
     void sig_undoStackCleanChanged(bool); // emitted when undo_stack emits cleanChanged(bool)
 
+    void sig_setLayerManagerWidget(QWidget*);
+
     //! Request ApplicationGUI to show simulation setup dialog
     void sig_showSimulationSetup();
 

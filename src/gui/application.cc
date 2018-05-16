@@ -53,6 +53,9 @@ gui::ApplicationGUI::~ApplicationGUI()
   delete dialog_pan;
   dialog_pan = 0;
 
+  // disown the layer dock widget so it can be properly destructed by design panel
+  layer_dock->setParent(0);
+
   // free memory, parent delete child Widgets so Graphical Items are already
   // handled. Still need to free Settings
 
@@ -84,7 +87,7 @@ void gui::ApplicationGUI::initGUI()
   // initialise docks
   initSimVisualizeDock();
   initDialogDock();
-  initLayerDock();
+  //initLayerDock();
 
   // initialise bars
   initMenuBar(); // must run before initTopBar
@@ -100,6 +103,8 @@ void gui::ApplicationGUI::initGUI()
           this, &gui::ApplicationGUI::designPanelReset);
   connect(design_pan, &gui::DesignPanel::sig_undoStackCleanChanged,
           this, &gui::ApplicationGUI::updateWindowTitle);
+  connect(design_pan, &gui::DesignPanel::sig_setLayerManagerWidget,
+          this, &gui::ApplicationGUI::setLayerManagerWidget);
   connect(sim_visualize, &gui::SimVisualize::showPotPlotOnScene,
           design_pan, &gui::DesignPanel::displayPotentialPlot);
   connect(design_pan, SIGNAL(sig_screenshot(QRect)),
@@ -423,6 +428,12 @@ void gui::ApplicationGUI::initLayerDock()
   layer_dock = design_pan->layerManagerDockWidget();
   layer_dock->show();
   addDockWidget(area, layer_dock);
+}
+
+
+void gui::ApplicationGUI::setLayerManagerWidget()
+{
+  // TODO
 }
 
 

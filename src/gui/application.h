@@ -139,6 +139,7 @@ namespace gui{
     void initDialogDock();        // initialise the bottom dialog dock
     void initSimVisualizeDock();  // initialise the side sim visualize dock
     void initLayerDock();         // initialise the side layer dock
+    void setLayerManagerWidget(QWidget *widget);
 
     // prepare any extra actions not attched to an icon or meny
     void initActions();
