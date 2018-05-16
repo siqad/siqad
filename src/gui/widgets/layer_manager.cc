@@ -15,7 +15,7 @@ LayerManager::LayerManager(QWidget *parent)
   : QWidget(parent, Qt::Dialog)
 {
   initLayerManager();
-  initDockWidget();
+  //initDockWidget();
 }
 
 // destructor
@@ -211,6 +211,63 @@ void LayerManager::initLayerManager()
 
 void LayerManager::initDockWidget()
 {
+  QList<QPair<float, prim::Layer*>> sorted_layers;
+  for (prim::Layer *layer : layers)
+    sorted_layers.append(qMakePair(layer->zHeight(), layer));
+  qSort(sorted_layers.begin(), sorted_layers.end(), QPairFirstComparer());
+
+  // construct layer widgets row by row
+  QVBoxLayout *layers_vl = new QVBoxLayout;
+  QHBoxLayout *row_hl = new QHBoxLayout;
+  for (int i=0; i<sorted_layers.size(); i++) {
+    prim::Layer *layer = sorted_layers[i].second;
+    QLabel *lb_layer_nm = new QLabel(layer->getName());
+    qDebug() << tr("Creating entry for %1").arg(layer->getName());
+
+    QHBoxLayout *layer_hl = new QHBoxLayout;
+    layer_hl->addWidget(lb_layer_nm);
+
+    QWidget *layer_wg = new QWidget;
+    layer_wg->setLayout(layer_hl);
+
+    /*row_hl->addWidget(layer_wg);
+    layers_vl->addLayout(row_hl);*/
+    if (i > 0 && layer->zHeight() == sorted_layers[i].second->zHeight()) {
+      // add to the same row as before
+      row_hl->addWidget(layer_wg);
+    } else if (i == sorted_layers.size()-1) {
+      row_hl->addWidget(layer_wg);
+      layers_vl->addLayout(row_hl);
+    } else {
+      layers_vl->addLayout(row_hl);
+      row_hl = new QHBoxLayout;
+      row_hl->addWidget(layer_wg);
+    }
+  }
+
+  /*for (float key : map_layers.keys()) {
+    QList<prim::Layer*> row_layers = map_layers.values(key);
+    QHBoxLayout *row_hl = new QHBoxLayout;
+    for (prim::Layer *layer : row_layers) {
+      // widget of individual layer
+      QLabel *lb_layer_nm = new QLabel(layer->getName());
+
+      QHBoxLayout *layer_hl = new QHBoxLayout;
+      layer_hl->addWidget(lb_layer_nm);
+
+      QWidget *layer_wg = new QWidget;
+      layer_wg->setLayout(layer_hl);
+      row_hl->addWidget(layer_wg);
+    }
+    layers_vl->insertLayout(0, row_hl);
+  }*/
+
+  side_widget = new QWidget();
+  side_widget->setLayout(layers_vl);
+
+
+
+
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
   // recall or initialise layer dock location
@@ -225,7 +282,7 @@ void LayerManager::initDockWidget()
   // size policy
   dock_widget->setMinimumWidth(gui_settings->get<int>("LAYDOCK/mw"));
 
-  dock_widget->setWidget(this);
+  dock_widget->setWidget(side_widget);
 }
 
 

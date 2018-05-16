@@ -127,7 +127,8 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   delete property_editor;
 
   // delete layers and contained items
-  layman->removeAllLayers();
+  delete layman;
+  //layman->removeAllLayers();
   if(reset) prim::Layer::resetLayers(); // reset layer counter
 
   // delete all graphical items from the scene
@@ -241,12 +242,9 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   if(!fname.isEmpty() && DEFAULT_OVERRIDE){
     qWarning() << tr("Cannot change lattice when DEFAULT_OVERRIDE set");
     // do nothing if the lattice has previously been defined
-    if(!layman->layerCount() == 0)
+    if(layman->layerCount() != 0)
       return;
   }
-
-
-  // NOTE: probably want a prompt to make sure user want to change the lattice
 
   // destroy all layers if they exist
   layman->removeAllLayers();
@@ -264,7 +262,6 @@ void gui::DesignPanel::buildLattice(const QString &fname)
 
   // add in the dangling bond surface
   layman->addLayer("Surface", prim::Layer::DB,0,0);
-  layman->setActiveLayer(layman->getLayer("Surface"));
 
   // add in the metal layer for electrodes
   layman->addLayer("Metal", prim::Layer::Electrode,-100E-9,10E-9);
@@ -276,6 +273,9 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   layman->addLayer("Plot", prim::Layer::Plot,-50E-9,0);
 
   layman->populateLayerTable();
+  layman->initDockWidget();
+
+  layman->setActiveLayer(layman->getLayer("Surface"));
 }
 
 

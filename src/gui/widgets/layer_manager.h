@@ -97,7 +97,8 @@ namespace gui{
 
     // GUI
 
-    //! Return a pointer to the layer dock widget.
+    //! Return a pointer to the layer dock widget, which is intended to be owned
+    //! by ApplicaionGUI and has reduced functionality from the full layer manager.
     QDockWidget *dockWidget() {return dock_widget;}
 
     // GUI items in layer list grid
@@ -142,6 +143,7 @@ namespace gui{
 
     // GUI
     QDockWidget *dock_widget=0;
+    QWidget *side_widget=0;
     QList<LayerTableRowContent*> table_row_contents;
 
     QVBoxLayout *layer_list_vl;

@@ -20,4 +20,13 @@ namespace gui{
 
 } // end global namespace
 
+struct QPairFirstComparer
+{
+  template<typename T1, typename T2>
+  bool operator()(const QPair<T1,T2> &a, const QPair<T1,T2> &b) const
+  {
+    return a.first < b.first;
+  }
+};
+
 #endif
