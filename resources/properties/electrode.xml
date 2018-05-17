@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <properties>
   <potential>
-    <T>float</T>
+    <T>double</T>
     <val>0.0</val>
     <label>Potential</label>
     <tip>Electric potential to set on the electrode during simulation.</tip>
   </potential>
+  <phase>
+    <T>double</T>
+    <val>0.0</val>
+    <label>Phase shift</label>
+    <tip>Sinusoidal phase shift in degrees.</tip>
+  </phase>
+  <type>
+    <T>string</T>
+    <val>Fixed</val>
+    <label>Electrode type</label>
+    <tip>Clocked electrodes have sinusoidal potentials, unclocked electrodes are fixed.</tip>
+    <value_selection type="ComboBox">
+      <fixed>Fixed</fixed>
+      <clocked>Clocked</clocked>
+    </value_selection>
+  </type>
 </properties>

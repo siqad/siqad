@@ -222,6 +222,7 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
   ss->writeAttribute("x2", QString::number(std::max(top_left.x(), bot_right.x())));
   ss->writeAttribute("y2", QString::number(std::max(top_left.y(), bot_right.y())));
   ss->writeTextElement("potential", QString::number(getPotential()));
+  ss->writeTextElement("phase", QString::number(getPhase()));
   ss->writeTextElement("electrode_type", QString::number(electrode_type));
   ss->writeTextElement("pixel_per_angstrom", QString::number(scale_factor));
   // other attributes
@@ -237,9 +238,21 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
       qDebug() << "should be showing property form.";
       prim::Emitter::instance()->sig_showProperty(this);
       prim::Item::mousePressEvent(e);
-      setPotential(getProperty("potential").value.toFloat());
-      qDebug() << QObject::tr("Electrode potential set to: %1").arg(potential);
+      setPotential(getProperty("potential").value.toDouble());
+      setPhase(getProperty("phase").value.toDouble());
+      std::string selection = getProperty("type").value.toString().toStdString();
+      setType(selection);
       break;
+  }
+}
+
+void prim::Electrode::setType(std::string selection)
+{
+  qDebug() << QObject::tr("Setting type to %1").arg(selection.c_str());
+  if (selection == "fixed"){
+    electrode_type = ElectrodeType::Fix;
+  } else if (selection == "clocked"){
+    electrode_type = ElectrodeType::Clock;
   }
 }
 
@@ -251,6 +264,14 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 //   // qDebug() << QObject::tr("mouse pos = %1, %2").arg(e->pos().x()).arg(e->pos().y());
 //   // qDebug() << QObject::tr("Electrode potential: %1").arg(potential);
 // }
+
+void prim::Electrode::setPhase(double in_phase)
+{
+  if (in_phase == in_phase)//check for NULL argument
+  {
+    phase = in_phase;
+  }
+}
 
 void prim::Electrode::setPotential(double givenPotential)
 {
