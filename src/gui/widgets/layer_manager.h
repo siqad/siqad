@@ -99,7 +99,7 @@ namespace gui{
 
     //! Return a pointer to the layer dock widget, which is intended to be owned
     //! by ApplicaionGUI and has reduced functionality from the full layer manager.
-    QDockWidget *dockWidget() {return dock_widget;}
+    QWidget *sideWidget() {return side_widget;}
 
     // GUI items in layer list grid
     struct LayerTableRowContent
@@ -114,7 +114,7 @@ namespace gui{
     };
 
     void initLayerManager();
-    void initDockWidget();
+    void initSideWidget();
     void populateLayerTable();
     void refreshLayerTable();
     void clearLayerTable();
@@ -142,7 +142,6 @@ namespace gui{
     // TODO table column order (mapped with string)
 
     // GUI
-    QDockWidget *dock_widget=0;
     QWidget *side_widget=0;
     QList<LayerTableRowContent*> table_row_contents;
 

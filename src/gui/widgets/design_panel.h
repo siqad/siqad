@@ -57,8 +57,7 @@ namespace gui{
 
     // ACCESSORS
 
-    //! Return the layer manager pointer.
-    QDockWidget *layerManagerDockWidget() {return layman->dockWidget();}
+    QWidget *layerManagerSideWidget() {return layman->sideWidget();}
 
     //! add a new Item to the Layer at the given index of the stack. If layer_index==-1,
     //! add the new item to the top_layer. If ind != -1, inserts the Item into the given
@@ -190,9 +189,10 @@ namespace gui{
     void sig_resetDesignPanel();
     void sig_undoStackCleanChanged(bool); // emitted when undo_stack emits cleanChanged(bool)
 
+    //! Request ApplicationGUI to update the layer manager widget being used.
     void sig_setLayerManagerWidget(QWidget*);
 
-    //! Request ApplicationGUI to show simulation setup dialog
+    //! Request ApplicationGUI to show simulation setup dialog.
     void sig_showSimulationSetup();
 
     //! Request SimManager to quickly run a simulation without showing the dialog.

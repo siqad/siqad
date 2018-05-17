@@ -95,24 +95,28 @@ void gui::ApplicationGUI::initGUI()
   initSideBar();
 
   // inter-widget signals
-  connect(sim_manager, &gui::SimManager::emitSimJob,
-          this, &gui::ApplicationGUI::runSimulation);
   connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene,
           design_pan, &gui::DesignPanel::displaySimResults);
-  connect(design_pan, &gui::DesignPanel::sig_resetDesignPanel,
-          this, &gui::ApplicationGUI::designPanelReset);
-  connect(design_pan, &gui::DesignPanel::sig_undoStackCleanChanged,
-          this, &gui::ApplicationGUI::updateWindowTitle);
   connect(sim_visualize, &gui::SimVisualize::showPotPlotOnScene,
           design_pan, &gui::DesignPanel::displayPotentialPlot);
-  connect(design_pan, SIGNAL(sig_screenshot(QRect)),
-          this, SLOT(designScreenshot(QRect)));
-  connect(design_pan, SIGNAL(sig_showSimulationSetup()),
-          this, SLOT(simulationSetup()));
-  connect(design_pan, SIGNAL(sig_quickRunSimulation()),
-          sim_manager, SLOT(quickRun()));
-  connect(design_pan, SIGNAL(sig_cancelScreenshot()),
-          this, SLOT(endScreenshotMode()));
+  connect(design_pan, &gui::DesignPanel::sig_quickRunSimulation,
+          sim_manager, &gui::SimManager::quickRun);
+
+  // widget-app gui signals
+  connect(sim_manager, &gui::SimManager::emitSimJob,
+          this, &gui::ApplicationGUI::runSimulation);
+  connect(design_pan, &gui::DesignPanel::sig_resetDesignPanel,
+          this, &gui::ApplicationGUI::designPanelReset);
+  connect(design_pan, &gui::DesignPanel::sig_setLayerManagerWidget,
+          this, &gui::ApplicationGUI::setLayerManagerWidget);
+  connect(design_pan, &gui::DesignPanel::sig_undoStackCleanChanged,
+          this, &gui::ApplicationGUI::updateWindowTitle);
+  connect(design_pan, &gui::DesignPanel::sig_screenshot,
+          this, QOverload<QRect>::of(&gui::ApplicationGUI::designScreenshot));
+  connect(design_pan, &gui::DesignPanel::sig_showSimulationSetup,
+          this, &gui::ApplicationGUI::simulationSetup);
+  connect(design_pan, &gui::DesignPanel::sig_cancelScreenshot,
+          this, &gui::ApplicationGUI::endScreenshotMode);
 
   // layout management
   QWidget *main_widget = new QWidget(this); // main widget for mainwindow
@@ -401,31 +405,33 @@ void gui::ApplicationGUI::initSimVisualizeDock()
 
 void gui::ApplicationGUI::initLayerDock()
 {
-  /*settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
-  // recall or initialise layer dock location
+  layer_dock = new QDockWidget("Layer Manager");
+
   Qt::DockWidgetArea area;
   area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("LAYDOCK/loc"));
 
-  layer_dock = new QDockWidget(tr("Layer Editor"));
-
-  // location behaviour
   layer_dock->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea|Qt::BottomDockWidgetArea);
 
-  // size policy
   layer_dock->setMinimumWidth(gui_settings->get<int>("LAYDOCK/mw"));
 
-  layer_dock->setWidget(design_pan->layerManager());
-  layer_dock->show();*/
+  layer_dock->setWidget(design_pan->layerManagerSideWidget());
+  layer_dock->show();
+  addDockWidget(area, layer_dock);
+}
+
+
+void gui::ApplicationGUI::setLayerManagerWidget(QWidget *widget)
+{
+  qDebug() << "Making layer manager widget";
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
   // recall or initialise layer dock location
   Qt::DockWidgetArea area;
   area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("LAYDOCK/loc"));
 
-  layer_dock = design_pan->layerManagerDockWidget();
-  layer_dock->show();
-  addDockWidget(area, layer_dock);
+  layer_dock->setWidget(widget);
 }
 
 

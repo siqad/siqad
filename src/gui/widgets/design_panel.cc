@@ -128,7 +128,6 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
 
   // delete layers and contained items
   delete layman;
-  //layman->removeAllLayers();
   if(reset) prim::Layer::resetLayers(); // reset layer counter
 
   // delete all graphical items from the scene
@@ -259,6 +258,11 @@ void gui::DesignPanel::buildLattice(const QString &fname)
 
   // add the lattice to the layers, as layer 0
   layman->addLattice(lattice);
+  int min_size = settings::GUISettings::instance()->get<int>("lattice/minsize");
+  QPoint bot_right = min_size * (lattice->sceneLatticeVector(0) + lattice->sceneLatticeVector(1));
+  QRect scene_rect(QPoint(0,0),bot_right);
+  scene_rect.moveCenter(QPoint(0,0));
+  setSceneRect(scene_rect);
 
   // add in the dangling bond surface
   layman->addLayer("Surface", prim::Layer::DB,0,0);
@@ -273,7 +277,8 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   layman->addLayer("Plot", prim::Layer::Plot,-50E-9,0);
 
   layman->populateLayerTable();
-  layman->initDockWidget();
+  layman->initSideWidget();
+  emit sig_setLayerManagerWidget(layman->sideWidget());
 
   layman->setActiveLayer(layman->getLayer("Surface"));
 }

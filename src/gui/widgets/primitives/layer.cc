@@ -66,7 +66,7 @@ prim::Layer::~Layer()
   while (!items.isEmpty()) {
     prim::Item *item = items.pop();
     delete item;
-    prim::Emitter::instance()->removeItemFromScene(item);
+    //prim::Emitter::instance()->removeItemFromScene(item);
   }
 }
 

@@ -209,7 +209,7 @@ void LayerManager::initLayerManager()
 }
 
 
-void LayerManager::initDockWidget()
+void LayerManager::initSideWidget()
 {
   QList<QPair<float, prim::Layer*>> sorted_layers;
   for (prim::Layer *layer : layers)
@@ -259,27 +259,15 @@ void LayerManager::initDockWidget()
     }
   }
 
-  side_widget = new QWidget();
+  QPushButton *pb_adv = new QPushButton("Advanced");
+  connect(pb_adv, &QAbstractButton::clicked, this, &QWidget::show);
+  QHBoxLayout *btn_hl = new QHBoxLayout;
+  btn_hl->addStretch();
+  btn_hl->addWidget(pb_adv);
+  layers_vl->addLayout(btn_hl);
+
+  side_widget = new QWidget(0, Qt::Dialog);
   side_widget->setLayout(layers_vl);
-
-
-
-
-  settings::GUISettings *gui_settings = settings::GUISettings::instance();
-
-  // recall or initialise layer dock location
-  Qt::DockWidgetArea area;
-  area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("LAYDOCK/loc"));
-
-  dock_widget = new QDockWidget(tr("Layer Manager"));
-
-  // location behaviour
-  dock_widget->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea|Qt::BottomDockWidgetArea);
-
-  // size policy
-  dock_widget->setMinimumWidth(gui_settings->get<int>("LAYDOCK/mw"));
-
-  dock_widget->setWidget(side_widget);
 }
 
 
@@ -331,6 +319,8 @@ void LayerManager::populateLayerTable()
   // signals originating from the table
   connect(layer_table, SIGNAL(cellChanged(int,int)),
             this, SLOT(updateLayerPropFromTable(int,int)));
+
+  adjustSize();
   // TODO UNDOable z-height change
   // TODO UNDOable layer creation in DesignPanel
 }
@@ -411,8 +401,10 @@ void LayerManager::addLayerRow(prim::Layer *layer)
   curr_row_content->bt_editability->setCheckable(true);
   curr_row_content->bt_editability->setChecked(layer->isActive());
 
-  connect(curr_row_content->bt_visibility, SIGNAL(toggled(bool)), layer, SLOT(setVisible(bool)));
-  connect(curr_row_content->bt_editability, SIGNAL(toggled(bool)), layer, SLOT(setVisible(bool)));
+  connect(curr_row_content->bt_visibility, &QAbstractButton::toggled,
+          layer, &prim::Layer::setVisible);
+  connect(curr_row_content->bt_editability, &QAbstractButton::toggled,
+          layer, &prim::Layer::setActive);
 
   // other items
   curr_row_content->type = new QTableWidgetItem(layer->contentTypeString());

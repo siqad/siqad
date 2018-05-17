@@ -56,12 +56,15 @@ public:
 signals:
   void emitSimJob(prim::SimJob *new_job);
 
-private slots:
-  void updateSimParams();
+public slots:
 
   //! Without showing the dialog, just activate "Run" and start a job with
   //! whatever settings are on the dialog.
   void quickRun();
+
+
+private slots:
+  void updateSimParams();
 
 private:
   // sim manager related (like showing all jobs, all engines, etc.)

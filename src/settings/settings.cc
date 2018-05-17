@@ -149,19 +149,19 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("Panel/logw", 400);
 
   S->setValue("lattice/fname", QString("src/settings/lattices/si_100_2x1.ini"));
-  //S->setValue("lattice/xy", QPoint(100,100));
+  S->setValue("lattice/minsize", 50);  // minimum lattice n, m size
 
   // QGraphicsView
-  S->setValue("view/scale_fact", 100);           // pixels/angstrom in the main view
-  S->setValue("view/bg_col", QColor(40,50,60)); // background color
+  S->setValue("view/scale_fact", 100);            // pixels/angstrom in the main view
+  S->setValue("view/bg_col", QColor(40,50,60));   // background color
   S->setValue("view/bg_col_pb", QColor(255,255,255)); // background color
-  S->setValue("view/zoom_factor", 0.1);         // scaling factor for zoom operations
-  S->setValue("view/zoom_boost", 2);            // must have factor*boost < 1
-  S->setValue("view/zoom_min", .01);             // minimum zoom factor
-  S->setValue("view/zoom_max", 1);             // maximum zoom factor
-  S->setValue("view/wheel_pan_step", 20);       // screen pan per wheel tick
-  S->setValue("view/wheel_pan_boost", 5);       // shift-boost factor
-  S->setValue("view/padding", .1);              // additional space around draw region
+  S->setValue("view/zoom_factor", 0.1);           // scaling factor for zoom operations
+  S->setValue("view/zoom_boost", 2);              // must have factor*boost < 1
+  S->setValue("view/zoom_min", .01);              // minimum zoom factor
+  S->setValue("view/zoom_max", 1);                // maximum zoom factor
+  S->setValue("view/wheel_pan_step", 20);         // screen pan per wheel tick
+  S->setValue("view/wheel_pan_boost", 5);         // shift-boost factor
+  S->setValue("view/padding", .1);                // additional space around draw region
 
   // dangling bond parameters
   S->setValue("dbdot/diameter_m", 1.5);         // dot diameter (mid)
@@ -219,7 +219,7 @@ QSettings* settings::GUISettings::m_defs()
   // electrode parameters
   S->setValue("electrode/edge_width", .05);                   // edge width of box lines
   S->setValue("electrode/edge_col", QColor(60,60,60));        // edge color
-  S->setValue("electrode/fill_col", QColor("#AACBB560"));     // fill color
+  S->setValue("electrode/fill_col", QColor("#aad2be74"));     // fill color
   S->setValue("electrode/selected_col", QColor(0, 100, 255)); // edge color, selected
 
   // potplot parameters
