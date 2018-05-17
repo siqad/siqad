@@ -1,0 +1,6 @@
+Add the required files for installation to the @packages\COMPONENT\data@
+
+Generate installer with
+
+binarycreator --offline-only -c config/config.xml -p packages installer
+
