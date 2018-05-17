@@ -145,7 +145,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("DDOCK/mh", 120);     // dialog dock minimum height
   S->setValue("DDOCK/loc", 8);      // dialog dock default to bottom
   S->setValue("LAYDOCK/mw", 120);   // layer dock minimum width
-  S->setValue("LAYDOCK/loc", 8);    // layer dock default to bottom
+  S->setValue("LAYDOCK/loc", 2);    // layer dock default to bottom
   S->setValue("Panel/logw", 400);
 
   S->setValue("lattice/fname", QString("src/settings/lattices/si_100_2x1.ini"));
@@ -219,7 +219,7 @@ QSettings* settings::GUISettings::m_defs()
   // electrode parameters
   S->setValue("electrode/edge_width", .05);                   // edge width of box lines
   S->setValue("electrode/edge_col", QColor(60,60,60));        // edge color
-  S->setValue("electrode/fill_col", QColor(100,100,100));     // fill color
+  S->setValue("electrode/fill_col", QColor("#AACBB560"));     // fill color
   S->setValue("electrode/selected_col", QColor(0, 100, 255)); // edge color, selected
 
   // potplot parameters

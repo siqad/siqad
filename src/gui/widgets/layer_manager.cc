@@ -213,29 +213,43 @@ void LayerManager::initDockWidget()
 {
   QList<QPair<float, prim::Layer*>> sorted_layers;
   for (prim::Layer *layer : layers)
-    sorted_layers.append(qMakePair(layer->zHeight(), layer));
-  qSort(sorted_layers.begin(), sorted_layers.end(), QPairFirstComparer());
+    sorted_layers.append(qMakePair(layer->zOffset(), layer));
+  qSort(sorted_layers.begin(), sorted_layers.end(), QPairFirstReverseComparer());
 
   // construct layer widgets row by row
   QVBoxLayout *layers_vl = new QVBoxLayout;
+  layers_vl->setAlignment(Qt::AlignTop);
   QHBoxLayout *row_hl = new QHBoxLayout;
   for (int i=0; i<sorted_layers.size(); i++) {
     prim::Layer *layer = sorted_layers[i].second;
     QLabel *lb_layer_nm = new QLabel(layer->getName());
-    qDebug() << tr("Creating entry for %1").arg(layer->getName());
+    QPushButton *pb_vsb = new QPushButton(QIcon(":/ico/visible.svg"), "", this);
+    QPushButton *pb_atv = new QPushButton(QIcon(":/ico/editable.svg"), "", this);
+    qDebug() << tr("Creating entry for %1 with zOffset %2").arg(layer->getName()).arg(layer->zOffset());
+
+    pb_vsb->setCheckable(true);
+    pb_vsb->setChecked(layer->isVisible());
+    pb_atv->setCheckable(true);
+    pb_atv->setChecked(layer->isActive());
+
+    connect(pb_vsb, &QAbstractButton::toggled, layer, &prim::Layer::setVisible);
+    connect(pb_atv, &QAbstractButton::toggled, layer, &prim::Layer::setActive);
 
     QHBoxLayout *layer_hl = new QHBoxLayout;
     layer_hl->addWidget(lb_layer_nm);
+    layer_hl->addStretch();
+    layer_hl->addWidget(pb_vsb);
+    layer_hl->addWidget(pb_atv);
 
-    QWidget *layer_wg = new QWidget;
+    QGroupBox *layer_wg = new QGroupBox;
     layer_wg->setLayout(layer_hl);
 
-    /*row_hl->addWidget(layer_wg);
-    layers_vl->addLayout(row_hl);*/
-    if (i > 0 && layer->zHeight() == sorted_layers[i].second->zHeight()) {
+    if (i > 0 && layer->zOffset() == sorted_layers[i-1].second->zOffset()) {
       // add to the same row as before
       row_hl->addWidget(layer_wg);
     } else if (i == sorted_layers.size()-1) {
+      layers_vl->addLayout(row_hl);
+      row_hl = new QHBoxLayout;
       row_hl->addWidget(layer_wg);
       layers_vl->addLayout(row_hl);
     } else {
@@ -244,23 +258,6 @@ void LayerManager::initDockWidget()
       row_hl->addWidget(layer_wg);
     }
   }
-
-  /*for (float key : map_layers.keys()) {
-    QList<prim::Layer*> row_layers = map_layers.values(key);
-    QHBoxLayout *row_hl = new QHBoxLayout;
-    for (prim::Layer *layer : row_layers) {
-      // widget of individual layer
-      QLabel *lb_layer_nm = new QLabel(layer->getName());
-
-      QHBoxLayout *layer_hl = new QHBoxLayout;
-      layer_hl->addWidget(lb_layer_nm);
-
-      QWidget *layer_wg = new QWidget;
-      layer_wg->setLayout(layer_hl);
-      row_hl->addWidget(layer_wg);
-    }
-    layers_vl->insertLayout(0, row_hl);
-  }*/
 
   side_widget = new QWidget();
   side_widget->setLayout(layers_vl);
@@ -414,8 +411,8 @@ void LayerManager::addLayerRow(prim::Layer *layer)
   curr_row_content->bt_editability->setCheckable(true);
   curr_row_content->bt_editability->setChecked(layer->isActive());
 
-  connect(curr_row_content->bt_visibility, SIGNAL(toggled(bool)), layer, SLOT(visibilityPushButtonChanged(bool)));
-  connect(curr_row_content->bt_editability, SIGNAL(toggled(bool)), layer, SLOT(editabilityPushButtonChanged(bool)));
+  connect(curr_row_content->bt_visibility, SIGNAL(toggled(bool)), layer, SLOT(setVisible(bool)));
+  connect(curr_row_content->bt_editability, SIGNAL(toggled(bool)), layer, SLOT(setVisible(bool)));
 
   // other items
   curr_row_content->type = new QTableWidgetItem(layer->contentTypeString());

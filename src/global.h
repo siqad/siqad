@@ -29,4 +29,30 @@ struct QPairFirstComparer
   }
 };
 
+struct QPairSecondComparer
+{
+  template<typename T1, typename T2>
+  bool operator()(const QPair<T1,T2> &a, const QPair<T1,T2> &b) const
+  {
+    return a.second < b.second;
+  }
+};
+
+struct QPairFirstReverseComparer
+{
+  template<typename T1, typename T2>
+  bool operator()(const QPair<T1,T2> &a, const QPair<T1,T2> &b) const
+  {
+    return a.first > b.first;
+  }
+};
+
+struct QPairSecondReverseComparer
+{
+  template<typename T1, typename T2>
+  bool operator()(const QPair<T1,T2> &a, const QPair<T1,T2> &b) const
+  {
+    return a.second > b.second;
+  }
+};
 #endif

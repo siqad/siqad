@@ -114,11 +114,6 @@ namespace prim{
     virtual void saveItems(QXmlStreamWriter *) const;
     virtual void loadItems(QXmlStreamReader *, QGraphicsScene *);
 
-  public slots:
-    void visibilityCheckBoxChanged(int check_state);
-    void visibilityPushButtonChanged(bool checked) {setVisible(checked);}
-    void editabilityPushButtonChanged(bool checked) {setActive(checked);}
-
   private:
 
     int layer_id;     // layer index in design panel's layers stack
