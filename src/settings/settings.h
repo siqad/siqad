@@ -24,6 +24,7 @@ const QString app_settings_path = "<CONFIG>/app_settings.ini";
 const QString gui_settings_path = "<CONFIG>/gui_settings.ini";
 const QString lattice_settings_path = "<CONFIG>/lattices/si_100_2x1.ini";
 
+
 // abstract container class for settings with a templated accessor function.
 // The typical use case is throintoor now, assert .ini format for OS compatability.
 class Settings: public QSettings

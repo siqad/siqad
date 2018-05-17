@@ -8,6 +8,7 @@
 
 #include "aggregate.h"
 #include "dbdot.h"
+#include "hull/hulls.h"
 
 qreal prim::Aggregate::edge_width;
 QColor prim::Aggregate::edge_col;
@@ -138,24 +139,39 @@ QRectF prim::Aggregate::boundingRect() const
 
 void prim::Aggregate::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+  QPainterPath path = shape();
+
   // resize the rectangle to omit the edge width
-  QRectF rect = boundingRect();
-  QSizeF size(rect.size() - QSizeF(edge_width, edge_width));
-  QPointF center = rect.center();
-  rect.setSize(size);
-  rect.moveCenter(center);
+  // QRectF rect = boundingRect();
+  // QSizeF size(rect.size() - QSizeF(edge_width, edge_width));
+  // QPointF center = rect.center();
+  // rect.setSize(size);
+  // rect.moveCenter(center);
 
   // Scene will handle drawing the children, just draw the bounding box
   if(tool_type == gui::SelectTool && upSelected()){
     painter->setPen(QPen(edge_col, edge_width));
     painter->setBrush(Qt::NoBrush);
-    painter->drawRect(rect);
+    painter->drawPath(path);
   }
   else if(upHovered()){
     painter->setPen(QPen(edge_col_hovered, edge_width));
     painter->setBrush(Qt::NoBrush);
-    painter->drawRect(rect);
+    painter->drawPath(path);
   }
+}
+
+
+QPainterPath prim::Aggregate::shape() const
+{
+  QPainterPath path;
+
+  hull::ConvexHull hull(items);
+  hull.solve();
+  path.addPolygon(hull.getPolygon());
+  path.closeSubpath();
+
+  return path;
 }
 
 

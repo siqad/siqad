@@ -250,7 +250,8 @@ namespace gui{
     // TODO layer manager
 
     // copy/paste
-    QList<prim::Item*> clipboard;  // cached deep copy of a set of items for pasting
+    QList<prim::Item*> clipboard;   // cached deep copy of a set of items for pasting
+    QList<prim::Item*> cache;       // general purpose cache
 
     prim::Lattice *lattice=0;       // lattice for reference
 
@@ -291,6 +292,9 @@ namespace gui{
     // construct static variables on first init
     void constructStatics();
 
+    // array generation of selected items
+    void duplicateSelection();
+
     // perform scene zoom based on wheel rotation
     void wheelZoom(QWheelEvent *e, bool boost);
 
@@ -328,7 +332,7 @@ namespace gui{
 
     // GHOSTclass UndoCommand;e a Ghost for the current selection or clipboard
     // create a ghost. scene_pos is only needed if not pasting
-    void createGhost(bool paste);
+    void createGhost(bool paste, int count=1);
 
     // clear the current Ghost
     void clearGhost();
@@ -432,12 +436,12 @@ namespace gui{
     // paste the current Ghost, returns True if successful
     bool pasteAtGhost();
 
-    // helper functions for pasting specific items
-    void pasteItem(prim::Ghost *ghost, prim::Item *item);
-    void pasteDBDot(prim::Ghost *ghost, prim::DBDot *db);
-    void pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg);
-    void pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec);
-    void pasteAFMArea(prim::Ghost *ghost, prim::AFMArea *afm_area);
+    // helper functions for pasting specific items to indexd ghost set
+    void pasteItem(prim::Ghost *ghost, int n, prim::Item *item);
+    void pasteDBDot(prim::Ghost *ghost, int n, prim::DBDot *db);
+    void pasteAggregate(prim::Ghost *ghost, int n, prim::Aggregate *agg);
+    void pasteElectrode(prim::Ghost *ghost, int n, prim::Electrode *elec);
+    void pasteAFMArea(prim::Ghost *ghost, int n, prim::AFMArea *afm_area);
 
     // move the selected items to the current Ghost, returns True if successful
     bool moveToGhost(bool kill=false);

@@ -116,12 +116,13 @@ namespace prim{
 
     //! create a ghost image from a list of Item objects
     //! if moving, scene_pos gives the current mouse location
-    void prepare(const QList<prim::Item*> &items, QPointF scene_pos=QPointF());
+    void prepare(const QList<prim::Item*> &items, int count=1, QPointF scene_pos=QPointF());
+
     //! create a ghost image from a single Item
     //! if moving, scene_pos gives the current mouse location
-    void prepare(Item *item, QPointF scene_pos=QPointF())
+    void prepare(Item *item, int count=1, QPointF scene_pos=QPointF())
     {
-      prepare(QList<prim::Item*>({item}), scene_pos);
+      prepare(QList<prim::Item*>({item}), count, scene_pos);
     }
 
     //! move center of Ghost to the given position
@@ -132,11 +133,13 @@ namespace prim{
 
     //! get the items associated with the GhostDots
     QList<prim::Item*>& getSources() {return sources;}
-    //! get the GhostDots
-    QList<prim::GhostDot*> getDots() {return dots;}
+
+    //! get the number of GhostDot sets
+    int getCount() const {return sets.count();}
 
     //! get the items associated with the GhostBoxes
     QList<prim::Item*>& getBoxSources() {return box_sources;}
+
     //! get the GhostBoxes
     QList<prim::GhostBox*> getBoxes() {return boxes;}
 
@@ -150,9 +153,9 @@ namespace prim{
     QList<bool> getLatticeAvailability(const prim::LatticeCoord &offset,
         prim::Lattice *lattice) const;
 
-    //! Attempt to get the lattice site under the ghost dot corresponding to the
-    //! given DBDot item. Returns a coordinate of (0,0,-1) otherwise.
-    prim::LatticeCoord getLatticeCoord(prim::DBDot *db) const;
+    //! Gets the lattice coordinates of the GhostDot in the given set that
+    //! corresponds to the given DBDot; otherwise return invalid LatticeCoord
+    prim::LatticeCoord getLatticeCoord(prim::DBDot *db, int n=0) const;
 
     //! get the GhostDot nearest to the center of the Ghost. If db is set, will
     //! return the neatest dangling bond GhostDot if any exists else 0.
@@ -222,9 +225,13 @@ namespace prim{
     // get the Item associated with the given AggNode
     prim::Item *getNodeItem(prim::AggNode *node) const;
 
+    // Move the ghost by the given pixel values
+    void translate(qreal dx, qreal dy);
+
     QList<Item*> sources;         // list of Item objects for each GhostDot
-    QList<prim::GhostDot*> dots;  // list of GhostDots
     prim::AggNode aggnode;        // nested structure of sources
+
+    QList< QList<prim::GhostDot*> > sets; // sets of ghost dots
 
     QList<Item*> box_sources; // list of Item objects for each GhostBox
     QList<prim::GhostBox*> boxes; // list of GhostBoxes

@@ -273,6 +273,5 @@ QSettings* settings::LatticeSettings::m_defs()
   S->setValue("lattice/a1", QPointF(3.84, 0));
   S->setValue("lattice/a2", QPointF(0, 7.68));
 
-
   return S;
 }

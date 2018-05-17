@@ -37,6 +37,7 @@ namespace prim{
     // necessary derived class member functions
     virtual QRectF boundingRect() const override;
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
+    virtual QPainterPath shape() const override;
 
     virtual Item *deepCopy() const override;
 

@@ -23,10 +23,10 @@ prim::Item::StateColors prim::DBDot::edge_col;           // edge of the dbdot
 prim::Item::StateColors prim::DBDot::edge_col_electron;  // edge of the dbdot
 
 
-prim::DBDot::DBDot(prim::LatticeCoord l_coord, int lay_id)
+prim::DBDot::DBDot(prim::LatticeCoord l_coord, int lay_id, bool cp)
   : prim::Item(prim::Item::DBDot), show_elec(0)
 {
-  initDBDot(l_coord, lay_id);
+  initDBDot(l_coord, lay_id, cp);
 }
 
 
@@ -76,7 +76,7 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *)
     qCritical() << QObject::tr("XML error: ") << rs->errorString().data();
 
   // initialize
-  initDBDot(read_coord, lay_id);
+  initDBDot(read_coord, lay_id, false);
   prim::Emitter::instance()->addItemToScene(this);
 }
 
@@ -95,13 +95,17 @@ void prim::DBDot::setLatticeCoord(prim::LatticeCoord l_coord)
 }
 
 
-void prim::DBDot::initDBDot(prim::LatticeCoord coord, int lay_id)
+void prim::DBDot::initDBDot(prim::LatticeCoord coord, int lay_id, bool cp)
 {
   // construct static class variables
   if(diameter_m<0)
     constructStatics();
 
-  setLatticeCoord(coord);
+  if(cp)
+    lat_coord = coord;
+  else
+    setLatticeCoord(coord);
+
   setLayerIndex(lay_id);
   fill_fact = 0.;
   diameter = diameter_m;
@@ -177,7 +181,7 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
 
 prim::Item *prim::DBDot::deepCopy() const
 {
-  prim::DBDot *cp = new DBDot(lat_coord, layer_id);
+  prim::DBDot *cp = new DBDot(lat_coord, layer_id, true);
   cp->setPos(pos());
   return cp;
 }

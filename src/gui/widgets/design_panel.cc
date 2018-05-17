@@ -747,7 +747,8 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     /* TODO re-enable it later
     QList<prim::Item::ItemType> target_types;
     target_types.append(prim::Item::LatticeDot);
-    target_types.append(prim::Item::DBDot);
+    target_types.append(prim::I
+    tem::DBDot);
     prim::Item *snap_target = filteredSnapTarget(mapToScene(e->pos()), target_types, snap_diameter);
     if (snap_target) {
       afm_panel->ghostNode()->setPos(snap_target->scenePos());
@@ -964,6 +965,10 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
           createGhost(true);
         break;
       }
+      case Qt::Key_D:
+        if(display_mode == DesignMode)
+          duplicateSelection();
+        break;
       case Qt::Key_Z:{
           if(display_mode == DesignMode){
             // undo/redo based on keymods
@@ -1030,6 +1035,25 @@ void gui::DesignPanel::constructStatics()
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   background_col = gui_settings->get<QColor>("view/bg_col");
   background_col_publish = gui_settings->get<QColor>("view/bg_col_pb");
+}
+
+
+void gui::DesignPanel::duplicateSelection()
+{
+  // get list of selected items
+  cache.clear();
+  cache = selectedItems();
+  if(cache.count()==0)
+    return;
+
+  // raise prompt
+  int count = QInputDialog::getInt(this, tr("Selection duplication"),
+                tr("Count:"), 2, 2, 1000, 1);
+
+  if(count >= 2){
+    copySelection();
+    createGhost(true, count-1);
+  }
 }
 
 void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
@@ -1320,8 +1344,10 @@ void gui::DesignPanel::rubberBandEnd(){
 }
 
 
-void gui::DesignPanel::createGhost(bool paste)
+void gui::DesignPanel::createGhost(bool paste, int count)
 {
+  clearGhost();
+
   // qDebug() << tr("Creating ghost...");
   prim::Ghost *ghost = prim::Ghost::instance();
   pasting=paste;
@@ -1329,7 +1355,7 @@ void gui::DesignPanel::createGhost(bool paste)
   snap_cache = QPointF();
 
   if (paste) {
-    ghost->prepare(clipboard);
+    ghost->prepare(clipboard, count);
     prim::LatticeCoord offset;
     if (snapGhost(mapToScene(mapFromGlobal(QCursor::pos())), offset))
       ghost->moveByCoord(offset, lattice);
@@ -1337,7 +1363,7 @@ void gui::DesignPanel::createGhost(bool paste)
     QPointF scene_pos = mapToScene(mapFromGlobal(QCursor::pos()));
     //get QList of selected Item object
     filterSelection(true);
-    ghost->prepare(selectedItems(), scene_pos);
+    ghost->prepare(selectedItems(), 1, scene_pos);
   }
 }
 
@@ -1435,12 +1461,14 @@ void gui::DesignPanel::initMove()
 void gui::DesignPanel::setLatticeSiteOccupancy(prim::Item *item, bool flag)
 {
   switch(item->item_type){
-    case prim::Item::DBDot:
+    case prim::Item::DBDot:{
+      prim::DBDot *dot = static_cast<prim::DBDot*>(item);
       if (flag)
-        lattice->setOccupied(static_cast<prim::DBDot*>(item)->latticeCoord(), item);
+        lattice->setOccupied(dot->latticeCoord(), dot);
       else
-        lattice->setUnoccupied(static_cast<prim::DBDot*>(item)->latticeCoord());
+        lattice->setUnoccupied(dot->latticeCoord());
       break;
+    }
     case prim::Item::Aggregate:
       for(prim::Item *it : static_cast<prim::Aggregate*>(item)->getChildren())
         setLatticeSiteOccupancy(it, flag);
@@ -1546,7 +1574,7 @@ gui::DesignPanel::CreateDB::CreateDB(prim::LatticeCoord l_coord, int layer_index
   : QUndoCommand(parent), invert(invert), lat_coord(l_coord), cp_src(cp_src),
       dp(dp), layer_index(layer_index)
 {
-  db_at_loc = static_cast<prim::DBDot*>(dp->lattice->dbAt(l_coord));
+  db_at_loc = dp->lattice->dbAt(l_coord);
 
   if (invert && !db_at_loc)
     qFatal("Trying to remove a non-existing DB");
@@ -1580,6 +1608,7 @@ void gui::DesignPanel::CreateDB::create()
 
 void gui::DesignPanel::CreateDB::destroy()
 {
+  qDebug() << tr("Destroying DB: (%1,%2,%3)").arg(lat_coord.n).arg(lat_coord.m).arg(lat_coord.l);
   if (db_at_loc) {
     dp->lattice->setUnoccupied(db_at_loc->latticeCoord());
     dp->removeItem(db_at_loc, dp->layman->getLayer(db_at_loc->layer_id));
@@ -2376,30 +2405,37 @@ bool gui::DesignPanel::pasteAtGhost()
       return false;
     }
   }
-  undo_stack->beginMacro(tr("Paste %1 items").arg(clipboard.count()));
-  // paste each item in the clipboard, same as ghost top items (preferred order)
-  for(prim::Item *item : ghost->getTopItems())
-    pasteItem(ghost, item);
 
+
+  undo_stack->beginMacro(tr("Paste %1 items").arg(clipboard.count()));
+
+  for(int i=0; i<ghost->getCount(); i++){
+    for(prim::Item *item : ghost->getTopItems())
+      pasteItem(ghost, i, item);
+  }
   undo_stack->endMacro();
+
+  for(prim::Item *item: cache)
+    item->setSelected(true);
+
   pasting=false;
   return true;
 }
 
-void gui::DesignPanel::pasteItem(prim::Ghost *ghost, prim::Item *item)
+void gui::DesignPanel::pasteItem(prim::Ghost *ghost, int n, prim::Item *item)
 {
   switch(item->item_type){
     case prim::Item::DBDot:
-      pasteDBDot(ghost, static_cast<prim::DBDot*>(item));
+      pasteDBDot(ghost, n, static_cast<prim::DBDot*>(item));
       break;
     case prim::Item::Aggregate:
-      pasteAggregate(ghost, static_cast<prim::Aggregate*>(item));
+      pasteAggregate(ghost, n, static_cast<prim::Aggregate*>(item));
       break;
     case prim::Item::Electrode:
-      pasteElectrode(ghost, static_cast<prim::Electrode*>(item));
+      pasteElectrode(ghost, n, static_cast<prim::Electrode*>(item));
       break;
     case prim::Item::AFMArea:
-      pasteAFMArea(ghost, static_cast<prim::AFMArea*>(item));
+      pasteAFMArea(ghost, n, static_cast<prim::AFMArea*>(item));
       break;
     default:
       qCritical() << tr("No functionality for pasting given item... update pasteItem");
@@ -2407,22 +2443,22 @@ void gui::DesignPanel::pasteItem(prim::Ghost *ghost, prim::Item *item)
   }
 }
 
-void gui::DesignPanel::pasteDBDot(prim::Ghost *ghost, prim::DBDot *db)
+void gui::DesignPanel::pasteDBDot(prim::Ghost *ghost, int n, prim::DBDot *db)
 {
-  // get the target lattice dor
-  qDebug() << "shoud paste DB now";
-  prim::LatticeCoord l_coord = ghost->getLatticeCoord(db);
-  undo_stack->push(new CreateDB(l_coord, layman->indexOf(layman->activeLayer()), this, db));
+  // get the target lattice dot
+  auto coord = ghost->getLatticeCoord(db, n);
+  if(lattice->isValid(coord))
+    undo_stack->push(new CreateDB(coord, getLayerIndex(top_layer), this, db));
 }
 
-void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)
+void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, int n, prim::Aggregate *agg)
 {
   undo_stack->beginMacro("Paste an aggregate");
 
   // paste all the children items
   QList<prim::Item*> items;
   for(prim::Item *item : agg->getChildren()){
-    pasteItem(ghost, item);
+    pasteItem(ghost, n, item);
     // new item will be at the top of the Layer Item stack
     items.append(layman->activeLayer()->getItems().top());
   }
@@ -2434,7 +2470,7 @@ void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, prim::Aggregate *agg)
 
 }
 
-void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec)
+void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, int n, prim::Electrode *elec)
 {
   undo_stack->beginMacro(tr("create electrode with given corners"));
   undo_stack->push(new CreateElectrode(elec->layer_id, this, ghost->pos()+elec->pos(),
@@ -2442,7 +2478,7 @@ void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, prim::Electrode *elec)
   undo_stack->endMacro();
 }
 
-void gui::DesignPanel::pasteAFMArea(prim::Ghost *ghost, prim::AFMArea *afm_area)
+void gui::DesignPanel::pasteAFMArea(prim::Ghost *ghost, int n, prim::AFMArea *afm_area)
 {
   undo_stack->beginMacro(tr("create AFMArea with given afm_area params"));
   // TODO copy AFM tip attributes
