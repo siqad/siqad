@@ -30,9 +30,7 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
   prim::Item(prim::Item::Electrode)
 {
   int lay_id=-1;
-  double potential_in;
   QPointF ld_point1, ld_point2;
-  int electrode_type_in;
   while(!ls->atEnd()){
     if(ls->isStartElement()){
       if(ls->name() == "electrode")
@@ -41,10 +39,6 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
         lay_id = ls->readElementText().toInt();
         ls->readNext();
       }
-      /*else if(ls->name() == "elec"){
-        elec_in = ls->readElementText().toInt();
-        ls->readNext();
-      }*/
       else if(ls->name() == "dim"){
         for(QXmlStreamAttribute &attr : ls->attributes()){
           if(attr.name().toString() == QLatin1String("x1"))
@@ -58,15 +52,11 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
         }
         ls->readNext();
       }
-      else if(ls->name() == "potential"){
-        potential_in = ls->readElementText().toDouble();
+      else if(ls->name() == "property_map"){
+        qDebug() << QObject::tr("FOUND PROPMAP");
+        propMapFromXml(ls);
         ls->readNext();
       }
-      else if(ls->name() == "electrode_type"){
-        electrode_type_in = ls->readElementText().toInt();
-        ls->readNext();
-      }
-
       // TODO the rest of the variables
       else{
         qDebug() << QObject::tr("Electrode: invalid element encountered on line %1 - %2").arg(ls->lineNumber()).arg(ls->name().toString());
@@ -95,12 +85,8 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
   if(ld_point2.isNull()){
     qWarning() << "ld_point2 is null";
   }
-  //if potential is uninitialized, will have some random double value, never null.
-  // debug
-  // qDebug() << QObject::tr("Electrode point 1: x=%1, y=%2").arg(ld_point1.x()).arg(ld_point1.y());
-
   //load all read data into init_electrode
-  initElectrode(lay_id, ld_point1, ld_point2, potential_in, electrode_type_in);
+  initElectrode(lay_id, ld_point1, ld_point2);
   scene->addItem(this);
 }
 
@@ -146,14 +132,14 @@ QVariant prim::Electrode::itemChange(GraphicsItemChange change, const QVariant &
 }
 
 
-void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point2_in, double potential_in, int electrode_type_in)
+void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point2_in)
 {
   layer_id = lay_id;
   QPointF point1 = point1_in;
   QPointF point2 = point2_in;
-  potential = potential_in;
-  electrode_type = static_cast<prim::Electrode::ElectrodeType>(electrode_type_in);
-  constructStatics();
+  if(edge_width == -1){
+    constructStatics();
+  }
   qDebug() << QObject::tr("%1 %2").arg(getWidth()).arg(getHeight());
 
   top_left.setX(std::min(point1.x(), point2.x()));
@@ -211,7 +197,6 @@ prim::Item *prim::Electrode::deepCopy() const
 void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
 {
   ss->writeStartElement("electrode");
-
   // layer id
   ss->writeTextElement("layer_id", QString::number(layer_id));
 
@@ -221,13 +206,12 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
   ss->writeAttribute("y1", QString::number(std::min(top_left.y(), bot_right.y())));
   ss->writeAttribute("x2", QString::number(std::max(top_left.x(), bot_right.x())));
   ss->writeAttribute("y2", QString::number(std::max(top_left.y(), bot_right.y())));
-  ss->writeTextElement("potential", QString::number(getPotential()));
-  ss->writeTextElement("phase", QString::number(getPhase()));
-  ss->writeTextElement("electrode_type", QString::number(electrode_type));
   ss->writeTextElement("pixel_per_angstrom", QString::number(scale_factor));
+  ss->writeStartElement("property_map");
+  gui::PropertyMap::writeValuesToXMLStream(properties(), ss);
   // other attributes
   // ......
-
+  ss->writeEndElement();
   ss->writeEndElement();
 }
 
@@ -238,48 +222,14 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
       qDebug() << "should be showing property form.";
       prim::Emitter::instance()->sig_showProperty(this);
       prim::Item::mousePressEvent(e);
-      setPotential(getProperty("potential").value.toDouble());
-      setPhase(getProperty("phase").value.toDouble());
-      std::string selection = getProperty("type").value.toString().toStdString();
-      setType(selection);
       break;
-  }
-}
-
-void prim::Electrode::setType(std::string selection)
-{
-  qDebug() << QObject::tr("Setting type to %1").arg(selection.c_str());
-  if (selection == "fixed"){
-    electrode_type = ElectrodeType::Fix;
-  } else if (selection == "clocked"){
-    electrode_type = ElectrodeType::Clock;
   }
 }
 
 // void prim::Electrode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
 // {
 //   // qDebug() << QObject::tr("Electrode has seen the mouseDoubleClickEvent");
-//   //do something here to manipulate potential. Maybe dialog box?
-//   // setpot(potential+1);
-//   // qDebug() << QObject::tr("mouse pos = %1, %2").arg(e->pos().x()).arg(e->pos().y());
-//   // qDebug() << QObject::tr("Electrode potential: %1").arg(potential);
 // }
-
-void prim::Electrode::setPhase(double in_phase)
-{
-  if (in_phase == in_phase)//check for NULL argument
-  {
-    phase = in_phase;
-  }
-}
-
-void prim::Electrode::setPotential(double givenPotential)
-{
-  if (givenPotential == givenPotential)//check for NULL argument
-  {
-    potential = givenPotential;
-  }
-}
 
 void prim::Electrode::updatePoints(QPointF offset)
 {

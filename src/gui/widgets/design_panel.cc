@@ -726,7 +726,6 @@ void gui::DesignPanel::clearSimResults()
 
 void gui::DesignPanel::displayPotentialPlot(QPixmap potential_plot, QRectF graph_container)
 {
-  qDebug() << tr("displayPotentialPlot");
   qDebug() << tr("graph_container height: ") << graph_container.height();
   qDebug() << tr("graph_container width: ") << graph_container.width();
   qDebug() << tr("graph_container topLeft: ") << graph_container.topLeft().x() << tr(", ") << graph_container.topLeft().y();
@@ -1246,10 +1245,10 @@ void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
     qDebug() << tr("Item clicked was at: (%1 , %2)").arg(gitem->x()).arg(gitem->y());
     if (static_cast<prim::Item*>(gitem)->upSelected()) {
       //Something was selected, so determine the type and give the correct context menu.
-      if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::Electrode) {
-        menu.addAction(action_set_potential);
-        menu.addSeparator();
-      } else if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::DBDot) {
+      // if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::Electrode) {
+      //   menu.addAction(action_set_potential);
+      //   menu.addSeparator();
+      if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::DBDot) {
         menu.addAction(action_toggle_db_elec);
         menu.addSeparator();
       }
@@ -1305,33 +1304,33 @@ void gui::DesignPanel::deleteAction()
     deleteSelection();
 }
 
-void gui::DesignPanel::electrodeSetPotentialAction()
-{
-  // setting potential is not an un-doable action for now.
-  bool ok = false;
-  double potential;
-  // qDebug() << tr("electrodeSetPotential...");
-  QList<prim::Item*> selection = selectedItems();
-  if(selection.isEmpty()){ //TODO:figure out how we want to handle right click without selection
-    qDebug() << tr("Please select an item...");
-  } else {
-    if(selection.count() == 1){
-      potential = QInputDialog::getDouble(this, tr("Set Potential"),
-                  tr("Set electrode potential(s) to:"), static_cast<prim::Electrode*>(selection.at(0))->getPotential(),
-                  -2147483647, 2147483647, 3, &ok);
-    } else {
-      potential = QInputDialog::getDouble(this, tr("Set Potential"),
-                  tr("WARNING: Multiple electrodes selected.\nSet electrode potential(s) to:"), 0.0,
-                  -2147483647, 2147483647, 3, &ok);
-    }
-    if(ok){
-      for(prim::Item *item : selection){
-        if(item->item_type == prim::Item::Electrode)
-          static_cast<prim::Electrode*>(item)->setPotential(potential);
-      }
-    }
-  }
-}
+// void gui::DesignPanel::electrodeSetPotentialAction()
+// {
+//   // setting potential is not an un-doable action for now.
+//   bool ok = false;
+//   double potential;
+//   // qDebug() << tr("electrodeSetPotential...");
+//   QList<prim::Item*> selection = selectedItems();
+//   if(selection.isEmpty()){ //TODO:figure out how we want to handle right click without selection
+//     qDebug() << tr("Please select an item...");
+//   } else {
+//     if(selection.count() == 1){
+//       potential = QInputDialog::getDouble(this, tr("Set Potential"),
+//                   tr("Set electrode potential(s) to:"), static_cast<prim::Electrode*>(selection.at(0))->getPotential(),
+//                   -2147483647, 2147483647, 3, &ok);
+//     } else {
+//       potential = QInputDialog::getDouble(this, tr("Set Potential"),
+//                   tr("WARNING: Multiple electrodes selected.\nSet electrode potential(s) to:"), 0.0,
+//                   -2147483647, 2147483647, 3, &ok);
+//     }
+//     if(ok){
+//       for(prim::Item *item : selection){
+//         if(item->item_type == prim::Item::Electrode)
+//           static_cast<prim::Electrode*>(item)->setPotential(potential);
+//       }
+//     }
+//   }
+// }
 
 
 void gui::DesignPanel::toggleDBElecAction()
@@ -1369,8 +1368,8 @@ void gui::DesignPanel::createActions()
   action_delete = new QAction(tr("&Delete"), this);
   connect(action_delete, &QAction::triggered, this, &gui::DesignPanel::deleteAction);
 
-  action_set_potential = new QAction(tr("&Set Potential"), this);
-  connect(action_set_potential, &QAction::triggered, this, &gui::DesignPanel::electrodeSetPotentialAction);
+  // action_set_potential = new QAction(tr("&Set Potential"), this);
+  // connect(action_set_potential, &QAction::triggered, this, &gui::DesignPanel::electrodeSetPotentialAction);
 
   action_toggle_db_elec = new QAction(tr("&Toggle Lattice<->DB"), this);
   connect(action_toggle_db_elec, &QAction::triggered, this, &gui::DesignPanel::toggleDBElecAction);

@@ -31,23 +31,13 @@ namespace prim{
     //! Clock types will vary over time. Fix types are static.
     enum ElectrodeType{Fix, Clock};
     // Initializer for initial attribute values.
-    void initElectrode(int lay_id, QPointF point1_in, QPointF point2_in, double potential_in=0, int electrode_type_in=0);
+    void initElectrode(int lay_id, QPointF point1_in, QPointF point2_in);
 
     //! sets the electrode potential to givenPotential.
-    void setPotential(double givenPotential);
-    //! gets the electrode potential to givenPotential.
-    double getPotential(void) const {return potential;}
-
-    //! sets the phase shift.
-    void setPhase(double in_phase);
-    //! gets the currently set phase shift
-    double getPhase(void) const {return phase;}
-
-    //! sets the electrode type.
-    void setType(std::string selection);
-    //! gets the currently set electrode type.
-    ElectrodeType getType(void) const {return electrode_type;}
-
+    // void setPotential(double givenPotential);
+    // //! gets the electrode potential to givenPotential.
+    // double getPotential(void) const {return potential;}
+    //
     //! Resize according to given coordinates.
     virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
         bool update_handles=false) override;
@@ -74,6 +64,7 @@ namespace prim{
     virtual void saveItems(QXmlStreamWriter *) const override;
     //! Return the class default property map
     virtual gui::PropertyMap *classPropertyMap() override {return &default_class_properties;}
+    virtual gui::PropertyMap *classPropertyMap() const override {return &default_class_properties;}
 
   protected:
 
@@ -94,12 +85,8 @@ namespace prim{
     // QPointF point2;
     QPointF top_left; //top left point, since the two points given could be any two opposite points
     QPointF bot_right; //bottom right point, since the two points given could be any two opposite points
-    double potential = 0;
-    double phase = 0;
     qreal elec_depth;
     qreal top_depth;
-    ElectrodeType electrode_type;
-
 
     static qreal edge_width;  // proportional width of dot boundary edge
     static QColor fill_col;   // dot fill color (same for all lattice dots)

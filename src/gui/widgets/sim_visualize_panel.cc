@@ -95,7 +95,7 @@ void SimVisualize::showPotPlot()
   QVector<qreal> y_vec;
   QVector<qreal> val_vec;
   qreal pixels_per_angstrom = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
-  qreal angstrom_per_meter = 1E10;
+  qreal angstrom_per_meter = 1.0E10;
   qDebug() << tr("fill QVectors");
   QList<QVector<float>>::iterator iter;
   for(iter=show_job->potentials.begin(); iter!=show_job->potentials.end(); ++iter){
@@ -167,6 +167,7 @@ void SimVisualize::showPotPlot()
   } else {
     qDebug() << tr("QVector size 0. Please see logs for more info.");
   }
+    delete customPlot;
 }
 
 

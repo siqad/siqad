@@ -102,6 +102,8 @@ namespace gui{
     //! in this map are ignored.
     void updateValuesFromXML(const QString &fname);
 
+    void readValsFromXML(QXmlStreamReader *rs);
+
     //! Write only property map values to XML stream
     static void writeValuesToXMLStream(const PropertyMap &map, QXmlStreamWriter *ws);
 

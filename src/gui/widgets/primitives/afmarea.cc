@@ -225,6 +225,7 @@ void AFMArea::mousePressEvent(QGraphicsSceneMouseEvent *e)
       qDebug() << "should be showing property form.";
       prim::Emitter::instance()->sig_showProperty(this);
       prim::Item::mousePressEvent(e);
+      qDebug() << h_speed;
       break;
     }
   }

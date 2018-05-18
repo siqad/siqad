@@ -225,7 +225,7 @@ namespace gui{
     void copyAction();
     void pasteAction();
     void deleteAction();
-    void electrodeSetPotentialAction();
+    // void electrodeSetPotentialAction();
     void toggleDBElecAction();
 
   private:
@@ -440,7 +440,7 @@ namespace gui{
     QAction *action_copy;
     QAction *action_paste;
     QAction *action_delete;
-    QAction *action_set_potential;
+    // QAction *action_set_potential;
     QAction *action_toggle_db_elec;
   };
 
