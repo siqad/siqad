@@ -2448,7 +2448,7 @@ void gui::DesignPanel::pasteDBDot(prim::Ghost *ghost, int n, prim::DBDot *db)
   // get the target lattice dot
   auto coord = ghost->getLatticeCoord(db, n);
   if(lattice->isValid(coord))
-    undo_stack->push(new CreateDB(coord, getLayerIndex(top_layer), this, db));
+    undo_stack->push(new CreateDB(coord, layman->indexOf(layman->getMRULayer(prim::Layer::DB)), this, db));
 }
 
 void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, int n, prim::Aggregate *agg)
