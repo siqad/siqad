@@ -1063,7 +1063,7 @@ bool gui::ApplicationGUI::exportToLabview()
   QPointF phys_loc;
   QMap<int, QList<int>> db_y_map; // [y,x] y is already sorted by QMap, x needs to be further sorted
   for(auto db : dbdots){
-    phys_loc = db->getPhysLoc();
+    phys_loc = db->physLoc();
     //qDebug() << tr("x=%1, y=%2");
     //qDebug() << tr("  2*floor(%1 / %2) = %3").arg(phys_loc.x()).arg(h_dimer_len).arg(2*floor(phys_loc.x() / h_dimer_len));
     //qDebug() << tr("  %1 % %2 / %3 = %4").arg(phys_loc.x()).arg(h_dimer_len).arg(dimer_width).arg(fmod(phys_loc.x(), h_dimer_len) / dimer_width);

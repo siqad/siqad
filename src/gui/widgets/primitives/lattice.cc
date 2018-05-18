@@ -18,9 +18,18 @@
 qreal prim::Lattice::rtn_acc = 1e-3;
 int prim::Lattice::rtn_iters = 1;
 
+qreal prim::Lattice::lat_diam = -1;
+qreal prim::Lattice::lat_edge_width;
+qreal prim::Lattice::pub_scale;
+QColor prim::Lattice::lat_edge_col;
+QColor prim::Lattice::lat_edge_col_pb;
+
 prim::Lattice::Lattice(const QString &fname, int lay_id)
   : Layer(tr("Lattice"),Layer::Lattice,0)
 {
+  if (lat_diam == -1)
+    constructStatics();
+
   layer_id = lay_id;
   settings::LatticeSettings::updateLattice(fname);
 
@@ -163,6 +172,16 @@ QPointF prim::Lattice::latticeCoord2ScenePos(const prim::LatticeCoord &l_coord) 
 }
 
 
+QPointF prim::Lattice::latticeCoord2PhysLoc(const prim::LatticeCoord &coord) const
+{
+  QPointF physloc;
+  physloc += coord.n * a[0];
+  physloc += coord.m * a[1];
+  physloc += b[coord.l];
+  return physloc;
+}
+
+
 bool prim::Lattice::collidesWithLatticeSite(const QPointF &scene_pos,
     const prim::LatticeCoord &l_coord) const
 {
@@ -193,22 +212,24 @@ QRectF prim::Lattice::tileApprox()
 }
 
 
-QImage prim::Lattice::tileableLatticeImage(QColor bkg_col)
+QImage prim::Lattice::tileableLatticeImage(QColor bkg_col, bool publish)
 {
-  settings::GUISettings *gui_settings = settings::GUISettings::instance();
-  qreal lat_diam = gui_settings->get<qreal>("latdot/diameter") * prim::Item::scale_factor;
-  qreal lat_edge_width = gui_settings->get<qreal>("latdot/edge_width") * lat_diam;
-  QColor lat_edge_col = gui_settings->get<QColor>("latdot/edge_col");
-  // TODO publish mode
+  qreal lat_diam_paint = lat_diam;
+  qreal lat_edge_width_paint = lat_edge_width;
+  QColor lat_edge_col_paint = publish ? lat_edge_col_pb : lat_edge_col;
+  if (publish) {
+    lat_diam_paint *= pub_scale;
+    lat_edge_width_paint *= pub_scale;
+  }
 
   QPixmap bkg_pixmap(QSize(a_scene[0].x(), a_scene[1].y()));
   bkg_pixmap.fill(bkg_col);
   QPainter painter(&bkg_pixmap);
   painter.setBrush(Qt::NoBrush);
-  painter.setPen(QPen(lat_edge_col, lat_edge_width));
+  painter.setPen(QPen(lat_edge_col_paint, lat_edge_width_paint));
   painter.setRenderHint(QPainter::Antialiasing);
   for (QPoint site : b_scene)
-    painter.drawEllipse(site.x()+lat_edge_width, site.y()+lat_edge_width, lat_diam, lat_diam);
+    painter.drawEllipse(site.x()+lat_edge_width_paint, site.y()+lat_edge_width_paint, lat_diam_paint, lat_diam_paint);
   painter.end();
 
   // then generate a single tile with properly offset circles
@@ -216,7 +237,7 @@ QImage prim::Lattice::tileableLatticeImage(QColor bkg_col)
             QSizeF(tileApprox().size()*prim::Item::scale_factor).toSize()),
             QImage::Format_ARGB32);
   QPainter painter_offset(&bkg_img);
-  int offset = 0.5 * lat_diam + lat_edge_width;
+  int offset = 0.5 * lat_diam_paint + lat_edge_width_paint;
   painter_offset.drawTiledPixmap(bkg_pixmap.rect(), bkg_pixmap, QPoint(offset,offset));
   painter_offset.end();
 
@@ -269,4 +290,15 @@ QPair<int,int> prim::Lattice::rationalize(qreal x, int k)
   }
 
   return pair;
+}
+
+
+void prim::Lattice::constructStatics()
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  lat_diam = gui_settings->get<qreal>("latdot/diameter") * prim::Item::scale_factor;
+  lat_edge_width = gui_settings->get<qreal>("latdot/edge_width") * lat_diam;
+  lat_edge_col = gui_settings->get<QColor>("latdot/edge_col");
+  lat_edge_col_pb = gui_settings->get<QColor>("latdot/edge_col_pb");
+  pub_scale = gui_settings->get<qreal>("latdot/publish_scale");
 }

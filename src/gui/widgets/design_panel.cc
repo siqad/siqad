@@ -88,7 +88,6 @@ void gui::DesignPanel::initDesignPanel() {
 
   // color scheme
   QColor col;
-  //setBackgroundBrush(QBrush(gui_settings->get<QColor>("view/bg_col")));
   setFrameShadow(QFrame::Raised);
 
   setCacheMode(QGraphicsView::CacheBackground);
@@ -371,10 +370,10 @@ void gui::DesignPanel::setDisplayMode(DisplayMode mode)
   display_mode = mode;
   prim::Item::display_mode = mode;
 
-  /*if (mode == gui::ScreenshotMode)
-    setBackgroundBrush(QBrush(background_col_publish));
+  if (mode == gui::ScreenshotMode)
+    scene->setBackgroundBrush(QBrush(lattice->tileableLatticeImage(background_col_publish, true)));
   else
-    setBackgroundBrush(QBrush(background_col));*/
+    scene->setBackgroundBrush(QBrush(lattice->tileableLatticeImage(background_col, false)));
 }
 
 
@@ -651,6 +650,7 @@ void gui::DesignPanel::rotateCcw()
 void gui::DesignPanel::moveDBToLatticeCoord(prim::Item *item, int n, int m, int l)
 {
   item->setPos(lattice->latticeCoord2ScenePos(prim::LatticeCoord(n,m,l)));
+  static_cast<prim::DBDot*>(item)->setPhysLoc(lattice->latticeCoord2PhysLoc(prim::LatticeCoord(n,m,l)));
   setLatticeSiteOccupancy(item, true);
 }
 

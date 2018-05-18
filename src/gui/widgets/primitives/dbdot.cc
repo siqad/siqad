@@ -81,13 +81,6 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *)
 }
 
 
-QPointF prim::DBDot::getPhysLoc() const
-{
-  // TODO implement
-  return QPointF();
-}
-
-
 void prim::DBDot::setLatticeCoord(prim::LatticeCoord l_coord)
 {
   lat_coord = l_coord;
@@ -157,11 +150,17 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
 
 
   QRectF rect = boundingRect();
-  //qreal dxy = .45*edge_width_paint;
-  //rect.adjust(dxy,dxy,-dxy,-dxy);
+  qreal dxy = 0.5 * edge_width_paint;
+  rect.adjust(dxy,dxy,-dxy,-dxy);
+
+  // draw outer circle
+  painter->setPen(QPen(edge_col_state, edge_width_paint));
+  painter->setBrush(Qt::NoBrush);
+  painter->drawEllipse(rect);
 
   // draw inner fill
   if(fill_fact>0){
+    QRectF rect = boundingRect();
     QPointF center = rect.center();
     QSizeF size(diameter_paint, diameter_paint);
     rect.setSize(size*qSqrt(fill_fact));
@@ -171,11 +170,6 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
     painter->setBrush(fill_col_state);
     painter->drawEllipse(rect);
   }
-
-  // draw outer circle
-  painter->setPen(QPen(edge_col_state, edge_width_paint));
-  painter->setBrush(Qt::NoBrush);
-  painter->drawEllipse(rect);
 }
 
 
@@ -199,6 +193,10 @@ void prim::DBDot::saveItems(QXmlStreamWriter *ws) const
   ws->writeAttribute("n", QString::number(lat_coord.n));
   ws->writeAttribute("m", QString::number(lat_coord.m));
   ws->writeAttribute("l", QString::number(lat_coord.l));
+
+  ws->writeEmptyElement("physloc");
+  ws->writeAttribute("x", QString::number(physloc.x()));
+  ws->writeAttribute("y", QString::number(physloc.y()));
 
   ws->writeEndElement();
 }

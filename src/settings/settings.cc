@@ -194,7 +194,7 @@ QSettings* settings::GUISettings::m_defs()
   // lattice dot parameters
   S->setValue("latdot/diameter", 1.0);                    // dot diameter
   S->setValue("latdot/edge_width", .15);                  // edge width rel. to diameter
-  S->setValue("latdot/publish_scale", 2);                 // scaling for publish mode
+  S->setValue("latdot/publish_scale", 1.8);                 // scaling for publish mode
   S->setValue("latdot/edge_col", QColor(255,255,255,60)); // edge color
   S->setValue("latdot/edge_col_pb", QColor(0,0,0,70));    // edge color (publish mode)
   S->setValue("latdot/fill_col", QColor(0,0,0,0));        // fill color

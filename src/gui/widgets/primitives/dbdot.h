@@ -34,8 +34,12 @@ namespace prim{
 
     // accessors
 
-    //! Get the physical location of the dot
-    QPointF getPhysLoc() const; // TODO calculate from lattice coord
+    //! Set the physical location of the DB (Design panel calls this when the
+    //! moveDBToLatticeCoord signal is emitted, don't call this otherwise).
+    void setPhysLoc(QPointF loc) {physloc = loc;}
+
+    //! Get the physical location of the DB
+    QPointF physLoc() const {return physloc;}
 
     //! Get the lattice coordinates of the DB
     prim::LatticeCoord latticeCoord() {return lat_coord;}
@@ -69,6 +73,7 @@ namespace prim{
 
     // VARIABLES
     prim::LatticeCoord lat_coord; // lattice coordinates of the DB
+    QPointF physloc;             // physical location
     float show_elec=0;            // simulation result visualization electron, 1=has electron
 
     qreal fill_fact;          // area proportional of dot filled

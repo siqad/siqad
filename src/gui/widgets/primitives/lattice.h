@@ -81,8 +81,11 @@ namespace prim{
     QList<prim::LatticeCoord> enclosedSites(const prim::LatticeCoord &coord1,
         const prim::LatticeCoord &coord2) const;
 
-    //! Convert lattice coordinates to QPointF. Does not check for validity!
+    //! Convert lattice coordinates to scene position in QPointF. Does not check for validity!
     QPointF latticeCoord2ScenePos(const prim::LatticeCoord &l_coord) const;
+
+    //! Convert lattice coordinates to physical location in angstrom. Does not check for validity!
+    QPointF latticeCoord2PhysLoc(const prim::LatticeCoord &coord) const;
 
     //! Return whether a given scene_pos collides with the given lattice position
     bool collidesWithLatticeSite(const QPointF &scene_pos, const LatticeCoord &l_coord) const;
@@ -116,7 +119,7 @@ namespace prim{
     QRectF tileApprox();
 
     //! Return a tileable image that represents the lattice.
-    QImage tileableLatticeImage(QColor bkg_col);
+    QImage tileableLatticeImage(QColor bkg_col, bool publish=false);
 
   private:
 
@@ -148,6 +151,16 @@ namespace prim{
 
     // Find a rational approximation of a given float
     QPair<int,int> rationalize(qreal x, int k=0);
+
+    // construct lattice statics
+    void constructStatics();
+
+    // GUI statics
+    static qreal lat_diam;
+    static qreal lat_edge_width;
+    static qreal pub_scale;
+    static QColor lat_edge_col;
+    static QColor lat_edge_col_pb;
   };
 
   inline uint qHash(const prim::LatticeCoord &l_coord, uint seed=0)
