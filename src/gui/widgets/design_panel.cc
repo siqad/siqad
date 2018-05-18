@@ -93,19 +93,21 @@ void gui::DesignPanel::initDesignPanel() {
 
   setCacheMode(QGraphicsView::CacheBackground);
 
-  //createActions
+  // createActions
   createActions();
 
   // make lattice and surface layer
   buildLattice();
-  setScenePadding();
+  setSceneMinSize();
 
   // initialise the Ghost and set the scene
   prim::Ghost::instance()->setScene(scene);
 
-  // set scroll to top left
-  verticalScrollBar()->setValue(verticalScrollBar()->minimum());
-  horizontalScrollBar()->setValue(horizontalScrollBar()->minimum());
+  // initialise scroll bar position and policies
+  verticalScrollBar()->setValue((verticalScrollBar()->minimum()+verticalScrollBar()->maximum())/2);
+  horizontalScrollBar()->setValue((horizontalScrollBar()->minimum()+horizontalScrollBar()->maximum())/2);
+  setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
   // set display mode
   setDisplayMode(DesignMode);
@@ -258,11 +260,6 @@ void gui::DesignPanel::buildLattice(const QString &fname)
 
   // add the lattice to the layers, as layer 0
   layman->addLattice(lattice);
-  int min_size = settings::GUISettings::instance()->get<int>("lattice/minsize");
-  QPoint bot_right = min_size * (lattice->sceneLatticeVector(0) + lattice->sceneLatticeVector(1));
-  QRect scene_rect(QPoint(0,0),bot_right);
-  scene_rect.moveCenter(QPoint(0,0));
-  setSceneRect(scene_rect);
 
   // add in the dangling bond surface
   layman->addLayer("Surface", prim::Layer::DB,0,0);
@@ -285,15 +282,14 @@ void gui::DesignPanel::buildLattice(const QString &fname)
 
 
 
-void gui::DesignPanel::setScenePadding()
+void gui::DesignPanel::setSceneMinSize()
 {
-  settings::GUISettings *gui_settings = settings::GUISettings::instance();
-
-  // resize the scene with padding
-  QRectF rect = scene->sceneRect();
-  qreal pad = qMin(rect.width(), rect.height())*gui_settings->get<qreal>("view/padding");
-  rect.adjust(-.5*pad, -.5*pad, pad, pad);
-  scene->setSceneRect(rect);
+  // add an invisible rectangle to the scene to set a minimum scene rect
+  int min_size = settings::GUISettings::instance()->get<int>("lattice/minsize");
+  QPoint bot_right = min_size * (lattice->sceneLatticeVector(0) + lattice->sceneLatticeVector(1));
+  QRect scene_rect(QPoint(0,0),bot_right);
+  scene_rect.moveCenter(QPoint(0,0));
+  scene->addItem(new QGraphicsRectItem(scene_rect));
 }
 
 
@@ -1112,8 +1108,29 @@ void gui::DesignPanel::wheelPan(bool shift_scroll, bool boost)
     dy *= boost_fact;
   }
 
-  verticalScrollBar()->setValue(verticalScrollBar()->value() + ((shift_scroll) ? dx : dy));
-  horizontalScrollBar()->setValue(horizontalScrollBar()->value()+ ((shift_scroll) ? dy: dx));
+  // flip x and y appropriately if shift is pressed
+  if (shift_scroll) {
+    qreal temp = dx;
+    dx = dy;
+    dy = temp;
+  }
+
+  // if scrolling past the current max / min, extend the scrolling area
+  qreal xf = horizontalScrollBar()->value() + dx;
+  qreal yf = verticalScrollBar()->value() + dy;
+  if (xf > horizontalScrollBar()->maximum())
+    horizontalScrollBar()->setMaximum(xf);
+  else if (xf < horizontalScrollBar()->minimum())
+    horizontalScrollBar()->setMinimum(xf);
+  else if (yf > verticalScrollBar()->maximum()) {
+    verticalScrollBar()->setMaximum(yf);
+    qDebug() << tr("new v max %1").arg(verticalScrollBar()->maximum());
+  } else if (yf < verticalScrollBar()->minimum()) {
+    verticalScrollBar()->setMinimum(yf);
+  }
+
+  horizontalScrollBar()->setValue(horizontalScrollBar()->value()+ dx);
+  verticalScrollBar()->setValue(verticalScrollBar()->value() + dy);
 }
 
 

@@ -88,7 +88,7 @@ namespace gui{
     //! resets the drawing layer and builds a lattice from the given <lattice>.ini
     //! file. If no file is given, the default lattice is used
     void buildLattice(const QString &fname=QString());
-    void setScenePadding();
+    void setSceneMinSize();
 
     //! Check if given QPointF falls within a lattice dot
     bool isLatticeDot(QPointF scene_pos);
