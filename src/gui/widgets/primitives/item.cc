@@ -76,9 +76,9 @@ gui::PropertyMap prim::Item::properties()
   gui::PropertyMap all_props;
 
   // assume that there aren't local properties if there's no class property
-  if (!classPropertyMap())
+  if (!classPropertyMap()){
     return gui::PropertyMap();
-
+  }
   for (const QString &key : classPropertyMap()->keys()) {
     if (local_props.contains(key)) {
       // use the local value + default attributes
