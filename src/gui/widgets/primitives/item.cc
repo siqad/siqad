@@ -94,7 +94,12 @@ gui::PropertyMap prim::Item::properties()
 
 void prim::Item::propMapFromXml(QXmlStreamReader *rs)
 {
-  properties().readValsFromXML(rs);
+  gui::PropertyMap temp_prop = properties();
+  temp_prop.readValsFromXML(rs);
+  for(auto key : temp_prop.keys()){
+    qDebug() << QObject::tr("key: %1, val: %2").arg(key).arg(temp_prop.value(key).value.toString());
+    setProperty(key, temp_prop.value(key).value);
+  }
 }
 
 

@@ -23,12 +23,18 @@ QColor prim::Electrode::selected_col; // edge colour, selected
 prim::Electrode::Electrode(int lay_id, QPointF point1, QPointF point2):
   prim::Item(prim::Item::Electrode)
 {
+  if(edge_width == -1){
+    constructStatics();
+  }
   initElectrode(lay_id, point1, point2);
 }
 
 prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
   prim::Item(prim::Item::Electrode)
 {
+  if(edge_width == -1){
+    constructStatics();
+  }
   int lay_id=-1;
   QPointF ld_point1, ld_point2;
   while(!ls->atEnd()){
@@ -137,10 +143,11 @@ void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point
   layer_id = lay_id;
   QPointF point1 = point1_in;
   QPointF point2 = point2_in;
+  qDebug() << QObject::tr("%1 %2").arg(getWidth()).arg(getHeight());
+
   if(edge_width == -1){
     constructStatics();
   }
-  qDebug() << QObject::tr("%1 %2").arg(getWidth()).arg(getHeight());
 
   top_left.setX(std::min(point1.x(), point2.x()));
   top_left.setY(std::min(point1.y(), point2.y()));
@@ -222,6 +229,7 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
       qDebug() << "should be showing property form.";
       prim::Emitter::instance()->sig_showProperty(this);
       prim::Item::mousePressEvent(e);
+      qDebug() << QObject::tr("Potential: %1").arg(getProperty("potential").value.toString());
       break;
   }
 }

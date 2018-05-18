@@ -75,8 +75,6 @@ void PropertyMap::readValsFromXML(QXmlStreamReader *rs)
   // traverse through properties
   while (rs->readNextStartElement()) {
     QString key = rs->name().toString();
-    qDebug() << QObject::tr("Key: %1").arg(key);
-    qDebug() << QObject::tr("QMap size: %1").arg(size());
     if (!contains(key)) {
       qDebug() << QObject::tr("Encountered undefined key: %1").arg(key);
       rs->skipCurrentElement();
@@ -87,7 +85,6 @@ void PropertyMap::readValsFromXML(QXmlStreamReader *rs)
       if (rs->name() == "val") {
         QVariant new_val = string2Type2QVariant(rs->readElementText(),
                                                 value(key).value.userType());
-        qDebug() << QObject::tr("Setting %1 value to %2").arg(key).arg(new_val.toString());
         (*this)[key].value = new_val;
       }
     }
