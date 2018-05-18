@@ -179,6 +179,9 @@ void gui::DesignPanel::addItem(prim::Item *item, int layer_index, int ind)
   // add Item
   layer->addItem(item, ind);
   scene->addItem(item);
+
+  // update scene rect
+  scene->setSceneRect(scene->itemsBoundingRect());
 }
 
 void gui::DesignPanel::removeItem(prim::Item *item, int layer_index)
@@ -193,6 +196,8 @@ void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
   if(layer->removeItem(item)){
     scene->removeItem(item);
     delete item;
+    scene->setSceneRect(scene->itemsBoundingRect());
+    // TODO minimum size
   }
 }
 
@@ -289,6 +294,7 @@ void gui::DesignPanel::setSceneMinSize()
   QRect scene_rect(QPoint(0,0),bot_right);
   scene_rect.moveCenter(QPoint(0,0));
   scene->addItem(new QGraphicsRectItem(scene_rect));
+  //scene->setSceneRect(scene_rect); // TODO reenable this line when implementing minimum set scene rect
 }
 
 
@@ -2096,6 +2102,9 @@ void gui::DesignPanel::MoveItem::moveDBDot(prim::DBDot *dot, const QPointF &delt
   QPointF nearest_site_pos;
   prim::LatticeCoord coord = dp->lattice->nearestSite(new_pos, nearest_site_pos);
   if (dp->lattice->collidesWithLatticeSite(new_pos, coord)) {
+    // set the previous site as unoccupied if that site still points to this dot
+    if (dp->lattice->dbAt(dot->latticeCoord()) == dot)
+      dp->lattice->setUnoccupied(dot->latticeCoord());
     dot->setLatticeCoord(coord);
     dp->lattice->setOccupied(coord, dot);
   } else {
