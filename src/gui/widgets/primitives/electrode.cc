@@ -153,7 +153,9 @@ void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point
   QPointF point2 = point2_in;
   potential = potential_in;
   electrode_type = static_cast<prim::Electrode::ElectrodeType>(electrode_type_in);
-  constructStatics();
+  if (edge_width == -1){
+    constructStatics();    
+  }
   qDebug() << QObject::tr("%1 %2").arg(getWidth()).arg(getHeight());
 
   top_left.setX(std::min(point1.x(), point2.x()));
