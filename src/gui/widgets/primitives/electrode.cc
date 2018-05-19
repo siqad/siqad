@@ -59,7 +59,6 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
         ls->readNext();
       }
       else if(ls->name() == "property_map"){
-        qDebug() << QObject::tr("FOUND PROPMAP");
         propMapFromXml(ls);
         ls->readNext();
       }
@@ -229,7 +228,6 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
       qDebug() << "should be showing property form.";
       prim::Emitter::instance()->sig_showProperty(this);
       prim::Item::mousePressEvent(e);
-      qDebug() << QObject::tr("Potential: %1").arg(getProperty("potential").value.toString());
       break;
   }
 }
