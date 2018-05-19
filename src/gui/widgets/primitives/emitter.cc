@@ -46,3 +46,8 @@ void prim::Emitter::moveDBToLatticeCoord(Item *item, int n, int m, int l)
 {
   emit sig_moveDBToLatticeCoord(item, n, m, l);
 }
+
+void prim::Emitter::physLoc2LatticeCoord(QPointF physloc, int &n, int &m, int &l)
+{
+  emit sig_physLoc2LatticeCoord(physloc, n, m, l);
+}

@@ -48,6 +48,7 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *)
     } else if (rs->name() == "physloc") {
       loc.setX(rs->attributes().value("x").toFloat());
       loc.setY(rs->attributes().value("y").toFloat());
+      qDebug() << QObject::tr("Read physloc of DB: (%1, %2)").arg(loc.x()).arg(loc.y());
       rs->skipCurrentElement();
     } else {
       qDebug() << QObject::tr("DBDot: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
@@ -60,7 +61,7 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *)
     if (!loc.isNull()) {
       int n,m,l;
       prim::Emitter::instance()->physLoc2LatticeCoord(loc, n, m, l);
-      read_coord = prim::LatticeCoord(); // TODO magic function
+      read_coord = prim::LatticeCoord(n,m,l); // TODO magic function
     } else {
       qFatal("Neither physical location nor lattice coordinates available when loading DB");
     }

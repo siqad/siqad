@@ -42,6 +42,8 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
           this, &gui::DesignPanel::resizeItem);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_moveDBToLatticeCoord,
           this, &gui::DesignPanel::moveDBToLatticeCoord);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_physLoc2LatticeCoord,
+          this, &gui::DesignPanel::physLoc2LatticeCoord);
 }
 
 // destructor
@@ -658,6 +660,14 @@ void gui::DesignPanel::moveDBToLatticeCoord(prim::Item *item, int n, int m, int 
   item->setPos(lattice->latticeCoord2ScenePos(prim::LatticeCoord(n,m,l)));
   static_cast<prim::DBDot*>(item)->setPhysLoc(lattice->latticeCoord2PhysLoc(prim::LatticeCoord(n,m,l)));
   setLatticeSiteOccupancy(item, true);
+}
+
+void gui::DesignPanel::physLoc2LatticeCoord(QPointF physloc, int &n, int &m, int &l)
+{
+  prim::LatticeCoord coord = lattice->nearestSite(physloc * prim::Item::scale_factor);
+  n = coord.n;
+  m = coord.m;
+  l = coord.l;
 }
 
 // INTERRUPTS

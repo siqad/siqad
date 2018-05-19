@@ -45,6 +45,9 @@ namespace prim{
     //! emit a signal teeling DesignPanel to move item to lattice coordinate
     void moveDBToLatticeCoord(Item *, int n, int m, int l);
 
+    //! emit a signal telling DP to convert a physical location to lattice coordinates
+    void physLoc2LatticeCoord(QPointF physloc, int &n, int &m, int &l);
+
   signals:
 
     void sig_selectClicked(Item *);
@@ -56,6 +59,8 @@ namespace prim{
     void sig_removeItemFromScene(Item *);
 
     void sig_moveDBToLatticeCoord(Item *, int, int, int);
+
+    void sig_physLoc2LatticeCoord(QPointF physloc, int &n, int &m, int &l);
 
     void sig_resizeBegin();
 

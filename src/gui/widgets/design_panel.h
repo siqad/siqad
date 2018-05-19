@@ -179,6 +179,8 @@ namespace gui{
     //! movements, use setPos directly otherwise.
     void moveDBToLatticeCoord(prim::Item *, int, int, int);
 
+    void physLoc2LatticeCoord(QPointF physloc, int &n, int &m, int &l);
+
     //! Emitted when the undo stack clean stage has changed.
     void emitUndoStackCleanChanged(bool c) {emit sig_undoStackCleanChanged(c);}
 
