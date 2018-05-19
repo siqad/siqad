@@ -183,7 +183,10 @@ void gui::DesignPanel::addItem(prim::Item *item, int layer_index, int ind)
   scene->addItem(item);
 
   // update scene rect
-  scene->setSceneRect(scene->itemsBoundingRect());
+  QRectF sbr = scene->itemsBoundingRect();
+  QRectF vp = mapToScene(viewport()->rect()).boundingRect();
+  setSceneRect(min_scene_rect | sbr | vp);
+  scene->setSceneRect(min_scene_rect | sbr);
 }
 
 void gui::DesignPanel::removeItem(prim::Item *item, int layer_index)
@@ -198,8 +201,10 @@ void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
   if(layer->removeItem(item)){
     scene->removeItem(item);
     delete item;
-    scene->setSceneRect(scene->itemsBoundingRect());
-    // TODO minimum size
+    QRectF sbr = scene->itemsBoundingRect();
+    QRectF vp = mapToScene(viewport()->rect()).boundingRect();
+    setSceneRect(min_scene_rect | sbr | vp);
+    scene->setSceneRect(min_scene_rect | sbr);
   }
 }
 
@@ -293,10 +298,10 @@ void gui::DesignPanel::setSceneMinSize()
   // add an invisible rectangle to the scene to set a minimum scene rect
   int min_size = settings::GUISettings::instance()->get<int>("lattice/minsize");
   QPoint bot_right = min_size * (lattice->sceneLatticeVector(0) + lattice->sceneLatticeVector(1));
-  QRect scene_rect(QPoint(0,0),bot_right);
-  scene_rect.moveCenter(QPoint(0,0));
-  scene->addItem(new QGraphicsRectItem(scene_rect));
-  //scene->setSceneRect(scene_rect); // TODO reenable this line when implementing minimum set scene rect
+  min_scene_rect = QRectF(QPoint(0,0),bot_right);
+  min_scene_rect.moveCenter(QPoint(0,0));
+  //scene->addItem(new QGraphicsRectItem(scene_rect));
+  scene->setSceneRect(min_scene_rect); // TODO reenable this line when implementing minimum set scene rect
 }
 
 
@@ -1085,6 +1090,9 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
     // zoom under mouse, should be indep of transformationAnchor
     QPointF old_pos = mapToScene(e->pos());
     scale(1+ds,1+ds);   // perform the zoom
+    QRectF sbr = scene->itemsBoundingRect();
+    QRectF vp = mapToScene(viewport()->rect()).boundingRect();
+    setSceneRect(min_scene_rect | sbr | vp);
     QPointF delta = mapToScene(e->pos()) - old_pos;
     scrollDelta(delta); // scroll with anchoring
   }
@@ -1140,7 +1148,6 @@ void gui::DesignPanel::wheelPan(bool shift_scroll, bool boost)
     horizontalScrollBar()->setMinimum(xf);
   else if (yf > verticalScrollBar()->maximum()) {
     verticalScrollBar()->setMaximum(yf);
-    qDebug() << tr("new v max %1").arg(verticalScrollBar()->maximum());
   } else if (yf < verticalScrollBar()->minimum()) {
     verticalScrollBar()->setMinimum(yf);
   }
