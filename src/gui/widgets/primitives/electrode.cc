@@ -142,14 +142,6 @@ void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point
   layer_id = lay_id;
   QPointF point1 = point1_in;
   QPointF point2 = point2_in;
-<<<<<<< HEAD
-=======
-  potential = potential_in;
-  electrode_type = static_cast<prim::Electrode::ElectrodeType>(electrode_type_in);
-  if (edge_width == -1){
-    constructStatics();    
-  }
->>>>>>> master
   qDebug() << QObject::tr("%1 %2").arg(getWidth()).arg(getHeight());
 
   if(edge_width == -1){
