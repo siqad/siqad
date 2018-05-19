@@ -1089,12 +1089,24 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
   if(ds!=0){
     // zoom under mouse, should be indep of transformationAnchor
     QPointF old_pos = mapToScene(e->pos());
-    scale(1+ds,1+ds);   // perform the zoom
+
+    // pre-zoom scene rect update
     QRectF sbr = scene->itemsBoundingRect();
     QRectF vp = mapToScene(viewport()->rect()).boundingRect();
+    if (ds < 0)
+      vp.adjust(-vp.width(), -vp.height(), vp.width(), vp.height()); // account for zoom out viewport size
     setSceneRect(min_scene_rect | sbr | vp);
+
+    // perform zoom
+    scale(1+ds,1+ds);
+
+    // move to anchor
     QPointF delta = mapToScene(e->pos()) - old_pos;
     scrollDelta(delta); // scroll with anchoring
+
+    // post-zoom scene rect update
+    vp = mapToScene(viewport()->rect()).boundingRect();
+    setSceneRect(min_scene_rect | sbr | vp);
   }
 
   // reset both scrolls (avoid repeat from |x|>=120)
@@ -1146,11 +1158,10 @@ void gui::DesignPanel::wheelPan(bool shift_scroll, bool boost)
     horizontalScrollBar()->setMaximum(xf);
   else if (xf < horizontalScrollBar()->minimum())
     horizontalScrollBar()->setMinimum(xf);
-  else if (yf > verticalScrollBar()->maximum()) {
+  else if (yf > verticalScrollBar()->maximum())
     verticalScrollBar()->setMaximum(yf);
-  } else if (yf < verticalScrollBar()->minimum()) {
+  else if (yf < verticalScrollBar()->minimum())
     verticalScrollBar()->setMinimum(yf);
-  }
 
   horizontalScrollBar()->setValue(horizontalScrollBar()->value()+ dx);
   verticalScrollBar()->setValue(verticalScrollBar()->value() + dy);
@@ -1648,7 +1659,6 @@ void gui::DesignPanel::CreateDB::create()
 
 void gui::DesignPanel::CreateDB::destroy()
 {
-  qDebug() << tr("Destroying DB: (%1,%2,%3)").arg(lat_coord.n).arg(lat_coord.m).arg(lat_coord.l);
   if (db_at_loc) {
     dp->lattice->setUnoccupied(db_at_loc->latticeCoord());
     dp->removeItem(db_at_loc, dp->layman->getLayer(db_at_loc->layer_id));
