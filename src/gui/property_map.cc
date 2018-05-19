@@ -70,6 +70,27 @@ void PropertyMap::readPropertiesFromXMLStream(QXmlStreamReader *rs)
     qCritical() << QObject::tr("XML error: ") << rs->errorString().data();
 }
 
+void PropertyMap::readValsFromXML(QXmlStreamReader *rs)
+{
+  // traverse through properties
+  while (rs->readNextStartElement()) {
+    QString key = rs->name().toString();
+    if (!contains(key)) {
+      qDebug() << QObject::tr("Encountered undefined key: %1").arg(key);
+      rs->skipCurrentElement();
+      continue;
+    }
+    // traverse through property content
+    while (rs->readNextStartElement()) {
+      if (rs->name() == "val") {
+        QVariant new_val = string2Type2QVariant(rs->readElementText(),
+                                                value(key).value.userType());
+        (*this)[key].value = new_val;
+      }
+    }
+  }
+}
+
 
 // read one property in the XML stream, assuming that the entry point is already
 // the beginning of the property

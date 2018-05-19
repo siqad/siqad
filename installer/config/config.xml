@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Installer>
-     <Name>DBDesigner</Name>
-     <Version>0.0.1</Version>
-     <Title>DBDesigner Installer</Title>
-     <Publisher>Walus Lab</Publisher>
-     <StartMenuDir>DBDesigner</StartMenuDir>
-     <TargetDir>@ApplicationsDir@/DBDesigner</TargetDir>
+    <Name>SiQAD</Name>
+    <Version>0.1.0</Version>
+    <Title>SiQAD Installer</Title>
+    <Publisher>Qt-Project</Publisher>
+    <!-- Directory name is used in component.xml -->
+   <StartMenuDir>SiQAD</StartMenuDir>
+    <TargetDir>C:/Program Files (x86)/SiQAD</TargetDir>
+	<ControlScript>controllScript.qs</ControlScript>
 </Installer>

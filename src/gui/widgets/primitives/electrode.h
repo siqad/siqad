@@ -29,16 +29,15 @@ namespace prim{
     //! destructor
     ~Electrode(){}
     //! Clock types will vary over time. Fix types are static.
-    enum ElectrodeType{Clock, Fix};
-    ElectrodeType electrode_type;
+    enum ElectrodeType{Fix, Clock};
     // Initializer for initial attribute values.
-    void initElectrode(int lay_id, QPointF point1_in, QPointF point2_in, double potential_in=0, int electrode_type_in=0);
+    void initElectrode(int lay_id, QPointF point1_in, QPointF point2_in);
 
     //! sets the electrode potential to givenPotential.
-    void setPotential(double givenPotential);
-    //! gets the electrode potential to givenPotential.
-    double getPotential(void) const {return potential;}
-
+    // void setPotential(double givenPotential);
+    // //! gets the electrode potential to givenPotential.
+    // double getPotential(void) const {return potential;}
+    //
     //! Resize according to given coordinates.
     virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
         bool update_handles=false) override;
@@ -51,8 +50,6 @@ namespace prim{
     qreal getTopDepth(void){return top_depth;}
     qreal getWidth(void) const {return bot_right.x() - top_left.x();}
     qreal getHeight(void) const {return bot_right.y() - top_left.y();}
-    // qreal getWidth(void) const {return std::max(top_left.x(), point2.x()) - std::min(top_left.x(), point2.x());}
-    // qreal getHeight(void) const {return std::max(top_left.y(), point2.y()) - std::min(top_left.y(), point2.y());}
     qreal getDepth(void){return elec_depth;}
 
     //! Updates the electrode with its new location. Call this after moving the electrode.
@@ -67,6 +64,7 @@ namespace prim{
     virtual void saveItems(QXmlStreamWriter *) const override;
     //! Return the class default property map
     virtual gui::PropertyMap *classPropertyMap() override {return &default_class_properties;}
+    virtual gui::PropertyMap *classPropertyMap() const override {return &default_class_properties;}
 
   protected:
 
@@ -87,7 +85,6 @@ namespace prim{
     // QPointF point2;
     QPointF top_left; //top left point, since the two points given could be any two opposite points
     QPointF bot_right; //bottom right point, since the two points given could be any two opposite points
-    double potential = 0;
     qreal elec_depth;
     qreal top_depth;
 

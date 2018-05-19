@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<Package>
+    <DisplayName>Python Dependencies</DisplayName>
+    <Description>This component does not depend on any other component.</Description>
+    <Version>0.1.0</Version>
+    <ReleaseDate>2018-05-18</ReleaseDate>
+	<Default>true</Default>
+    <SortingPriority>40</SortingPriority>
+</Package>

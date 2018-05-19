@@ -218,7 +218,8 @@ sim_poissolver.path = $$EXEC_DIR/src/phys/poissolver
 sim_poissolver.files = $$PHYS_DIR/poissolver/poissolver.physeng
 linux: sim_poissolver.files += \
 		$$PHYS_DIR/poissolver/FEM/src/poissolver \
-		$$PHYS_DIR/poissolver/FEM/src/python/Poisson_3D.py \
+		$$PHYS_DIR/poissolver/FEM/src/python/poisson3D.py \
 		$$PHYS_DIR/poissolver/FEM/src/python/mesh_writer_3D.py \
-		$$PHYS_DIR/poissolver/FEM/src/python/electrode_parser.py
+		$$PHYS_DIR/poissolver/FEM/src/python/phys_connector.py \
+		$$PHYS_DIR/poissolver/FEM/src/python/_phys_connector.cpython-36m-x86_64-linux-gnu.so
 INSTALLS += sim_poissolver
