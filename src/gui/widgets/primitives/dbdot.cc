@@ -33,47 +33,38 @@ prim::DBDot::DBDot(prim::LatticeCoord l_coord, int lay_id, bool cp)
 prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *)
   : prim::Item(prim::Item::DBDot)
 {
-  prim::LatticeCoord read_coord;
+  prim::LatticeCoord read_coord(0,0,-1);
+  QPointF loc;
   int lay_id=-1;      // layer id from file
 
-  while(!rs->atEnd()){
-    if(rs->isStartElement()){
-      if(rs->name() == "dbdot")
-        rs->readNext();
-      else if(rs->name() == "layer_id"){
-        lay_id = rs->readElementText().toInt();
-        rs->readNext();
-      }
-      else if(rs->name() == "latcoord"){
-        for(QXmlStreamAttribute &attr : rs->attributes()){
-          if (attr.name().toString() == QLatin1String("n"))
-            read_coord.n = attr.value().toInt();
-          else if (attr.name().toString() == QLatin1String("m"))
-            read_coord.m = attr.value().toInt();
-          else if (attr.name().toString() == QLatin1String("l"))
-            read_coord.l = attr.value().toInt();
-        }
-        rs->readNext();
-      }
-      else{
-        qDebug() << QObject::tr("DBDot: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
-        rs->readNext();
-      }
+  while (rs->readNextStartElement()) {
+    if (rs->name() == "layer_id") {
+      lay_id = rs->readElementText().toInt();
+    } else if (rs->name() == "latcoord") {
+      read_coord.n = rs->attributes().value("n").toInt();
+      read_coord.m = rs->attributes().value("m").toInt();
+      read_coord.l = rs->attributes().value("l").toInt();
+      rs->skipCurrentElement();
+    } else if (rs->name() == "physloc") {
+      loc.setX(rs->attributes().value("x").toFloat());
+      loc.setY(rs->attributes().value("y").toFloat());
+      rs->skipCurrentElement();
+    } else {
+      qDebug() << QObject::tr("DBDot: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
+      rs->skipCurrentElement();
     }
-    else if(rs->isEndElement()){
-      // break out of rs if the end of this element has been reached
-      if(rs->name() == "dbdot"){
-        rs->readNext();
-        break;
-      }
-      rs->readNext();
-    }
-    else
-      rs->readNext();
   }
 
-  if(rs->hasError())
-    qCritical() << QObject::tr("XML error: ") << rs->errorString().data();
+  // if lattice coord not available (legacy saves), use the physloc
+  if (read_coord.l == -1) {
+    if (!loc.isNull()) {
+      int n,m,l;
+      prim::Emitter::instance()->physLoc2LatticeCoord(loc, n, m, l);
+      read_coord = prim::LatticeCoord(); // TODO magic function
+    } else {
+      qFatal("Neither physical location nor lattice coordinates available when loading DB");
+    }
+  }
 
   // initialize
   initDBDot(read_coord, lay_id, false);
