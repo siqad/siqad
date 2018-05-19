@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<Package>
+    <DisplayName>SiQAD Simulator</DisplayName>
+    <Description>This is the SiQAD Simulator component; installation is mandatory.</Description>
+    <Version>0.1.0</Version>
+    <ReleaseDate>2018-05-18</ReleaseDate>
+	<ForcedInstallation>true</ForcedInstallation>
+	<Script>installscript.qs</Script>
+    <SortingPriority>100</SortingPriority>
+</Package>

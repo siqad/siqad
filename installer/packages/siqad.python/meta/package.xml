@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>Python 3</DisplayName>
+    <Description>Python 3 is required to gain full functionality. The Python Installer is triggered after SiQAD installation.
+	PLEASE NOTE: If you know you that Python 3 is installed on this machine, do not install this component.</Description>
+	<Version>3</Version>
+    <ReleaseDate>2018-03-28</ReleaseDate>
+	<Default>script</Default>
+	<SortingPriority>50</SortingPriority>
+</Package>
