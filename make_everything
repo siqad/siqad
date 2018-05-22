@@ -44,8 +44,8 @@ then
     cd $qmake_dir/src/phys/poissolver/FEM/src/python/phys_connector_swig
     ./script.sh
 fi
-cd $qmake_dir/src/phys/poissolver/FEM/src
-make $multicore_compile FOR_OS=$FOR_OS
+#cd $qmake_dir/src/phys/poissolver/FEM/src
+#make $multicore_compile FOR_OS=$FOR_OS
 
 # use qmake to create Make files for the GUI
 cd "$make_dir"
