@@ -60,6 +60,9 @@ void PropertyForm::initForm()
       for (ComboOption combo_option : prop.value_selection.combo_options) {
         static_cast<QComboBox*>(prop_val_widget)->addItem(combo_option.label, combo_option.val);
       }
+      int select_ind = static_cast<QComboBox*>(prop_val_widget)->findData(prop.value);
+      if (select_ind != -1)
+        static_cast<QComboBox*>(prop_val_widget)->setCurrentIndex(select_ind);
     } else {
       prop_val_widget = new QLineEdit(prop.value.value<QString>());
     }
