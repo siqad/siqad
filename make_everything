@@ -42,10 +42,10 @@ if [[ "$@" == "-swig" ]]
 then
     echo "YES"
     cd $qmake_dir/src/phys/poissolver/FEM/src/python/phys_connector_swig
-    ./script.sh
+    ./script.sh FOR_OS=$FOR_OS
 fi
 cd $qmake_dir/src/phys/poissolver/FEM/src
-make $multicore_compile FOR_OS=$FOR_OS
+#make $multicore_compile FOR_OS=$FOR_OS
 
 # use qmake to create Make files for the GUI
 cd "$make_dir"
@@ -64,7 +64,7 @@ if [ "$FOR_OS" == "win64" ] || [ "$FOR_OF" == "win32" ] ; then
     rm -rf .moc .obj .qrc
 
     cd "$make_dir/build/release/src/phys/"
-    rm -rf poissolver
+    #rm -rf poissolver
     sed -i 's/<\/bin_path>/\.exe&/' ./simanneal/sim_anneal.physeng
     sed -i 's/<\/bin_path>/\.exe&/' ./afmmarcus/hopping_animator.physeng
 
