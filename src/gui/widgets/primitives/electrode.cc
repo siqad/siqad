@@ -48,13 +48,13 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
       else if(ls->name() == "dim"){
         for(QXmlStreamAttribute &attr : ls->attributes()){
           if(attr.name().toString() == QLatin1String("x1"))
-            ld_point1.setX(attr.value().toFloat());
+            ld_point1.setX(attr.value().toFloat()*scale_factor); //convert from angstrom to pixel
           else if(attr.name().toString() == QLatin1String("y1"))
-            ld_point1.setY(attr.value().toFloat());
+            ld_point1.setY(attr.value().toFloat()*scale_factor);
           else if(attr.name().toString() == QLatin1String("x2"))
-            ld_point2.setX(attr.value().toFloat());
+            ld_point2.setX(attr.value().toFloat()*scale_factor);
           else if(attr.name().toString() == QLatin1String("y2"))
-            ld_point2.setY(attr.value().toFloat());
+            ld_point2.setY(attr.value().toFloat()*scale_factor);
         }
         ls->readNext();
       }
@@ -208,10 +208,13 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
 
   // top left and bottom right locations
   ss->writeEmptyElement("dim");
-  ss->writeAttribute("x1", QString::number(std::min(top_left.x(), bot_right.x())));
-  ss->writeAttribute("y1", QString::number(std::min(top_left.y(), bot_right.y())));
-  ss->writeAttribute("x2", QString::number(std::max(top_left.x(), bot_right.x())));
-  ss->writeAttribute("y2", QString::number(std::max(top_left.y(), bot_right.y())));
+  ss->writeAttribute("x1", QString::number(top_left.x()/scale_factor)); //convert to angstrom
+  ss->writeAttribute("y1", QString::number(top_left.y()/scale_factor));
+  ss->writeAttribute("x2", QString::number(bot_right.x()/scale_factor));
+  ss->writeAttribute("y2", QString::number(bot_right.y()/scale_factor));
+  // ss->writeAttribute("y1", QString::number(std::min(top_left.y(), bot_right.y())));
+  // ss->writeAttribute("x2", QString::number(std::max(top_left.x(), bot_right.x())));
+  // ss->writeAttribute("y2", QString::number(std::max(top_left.y(), bot_right.y())));
   ss->writeTextElement("pixel_per_angstrom", QString::number(scale_factor));
   ss->writeStartElement("property_map");
   gui::PropertyMap::writeValuesToXMLStream(properties(), ss);
