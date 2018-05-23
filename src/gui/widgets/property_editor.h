@@ -60,6 +60,7 @@ namespace gui{
 
   protected:
     virtual void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
+    void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
   private:
 
     //! Initialize property editor
