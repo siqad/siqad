@@ -14,7 +14,7 @@
   </phase>
   <type>
     <T>string</T>
-    <val>Fixed</val>
+    <val>fixed</val>
     <label>Electrode type</label>
     <tip>Clocked electrodes have sinusoidal potentials, unclocked electrodes are fixed.</tip>
     <value_selection type="ComboBox">
