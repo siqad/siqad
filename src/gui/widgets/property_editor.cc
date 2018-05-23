@@ -31,6 +31,11 @@ void PropertyEditor::showForms(QList<prim::Item*> target_items)
   show();
 }
 
+void PropertyEditor::closeEvent(QCloseEvent *event)
+{
+  cancel();
+  event->accept();
+}
 
 void PropertyEditor::applyForms()
 {
