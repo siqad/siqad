@@ -30,7 +30,7 @@ DEFINES += ORGANIZATION_NAME=\\\"WalusLab\\\"
 
 QMAKE_TARGET_COMPANY = "WalusLab"
 QMAKE_TARGET_PRODUCT = "SiQAD"
-QMAKE_TARGET_DESCRIPTION = "A CAD tool that enables the creation and simulation of quantum dot networks"
+QMAKE_TARGET_DESCRIPTION = "Silicon Quantum Atomic Designer"
 QMAKE_TARGET_COPYRIGHT = "GPLv3"
 
 RESOURCES = resources/application.qrc
