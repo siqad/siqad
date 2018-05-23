@@ -72,6 +72,7 @@ void PropertyEditor::initPropertyEditor()
   QPushButton *pb_apply = new QPushButton("Apply");
   QPushButton *pb_ok = new QPushButton("OK");
   QPushButton *pb_cancel = new QPushButton("Cancel");
+  pb_ok->setDefault(true);
   buttons_hl->addWidget(pb_apply);
   buttons_hl->addWidget(pb_ok);
   buttons_hl->addWidget(pb_cancel);
@@ -89,6 +90,10 @@ void PropertyEditor::initPropertyEditor()
           this, &PropertyEditor::okay);
   connect(pb_cancel, &QAbstractButton::clicked,
           this, &PropertyEditor::cancel);
+
+  //allow enter key to double as a click on ok
+  pb_ok->setFocus();
+
 }
 
 
