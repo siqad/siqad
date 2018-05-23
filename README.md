@@ -41,7 +41,7 @@ You may be prompted for your Github credentials as this is a private repository.
 # gui, simanneal and hoppingdynamics dependencies
 sudo apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5* qttools5-dev qttools5-dev-tools libboost-dev libboost-filesystem-dev libboost-system-dev pkg-config
 # poissolver dependencies
-sudo apt install scons gfortran fftw3 fftw3-dev libfftw3-mpi-dev openmpi-bin libopenmpi-dev libgoogle-perftools-dev m4 autoconf
+sudo apt install python3-dolfin gmsh
 # hoppingdynamics python dependencies
 sudo pip3 install matplotlib numpy scipy pyqt5
 ```
