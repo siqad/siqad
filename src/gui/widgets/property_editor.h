@@ -59,7 +59,7 @@ namespace gui{
   signals:
 
   protected:
-    void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
+    // void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
     virtual void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
   private:
 
@@ -71,7 +71,7 @@ namespace gui{
     QList<QPair<PropertyForm*, prim::Item*>> form_item_pair; //! Forms that are currently in use.
 
     QTabWidget *form_tab_widget=0;        //! a tab widget showing all current forms
-
+    QShortcut *shortcut_enter;
 
   };  // end of PropertyEditor class
 

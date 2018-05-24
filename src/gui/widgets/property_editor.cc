@@ -37,21 +37,21 @@ void PropertyEditor::closeEvent(QCloseEvent *e)
   e->accept();
 }
 
-void PropertyEditor::keyPressEvent(QKeyEvent *e)
-{
-  switch(e->key()){
-    case Qt::Key_Escape:
-      cancel();
-      break;
-    case Qt::Key_Enter:
-      okay();
-      break;
-    case Qt::Key_Return:
-      okay();
-      break;
-  }
-  QWidget::keyPressEvent(e);
-}
+// void PropertyEditor::keyPressEvent(QKeyEvent *e)
+// {
+//   switch(e->key()){
+//     case Qt::Key_Escape:
+//       cancel();
+//       break;
+//     case Qt::Key_Enter:
+//       okay();
+//       break;
+//     case Qt::Key_Return:
+//       okay();
+//       break;
+//   }
+//   QWidget::keyPressEvent(e);
+// }
 
 void PropertyEditor::applyForms()
 {
@@ -87,10 +87,16 @@ void PropertyEditor::initPropertyEditor()
   QHBoxLayout *buttons_hl = new QHBoxLayout;
   QPushButton *pb_apply = new QPushButton("Apply");
   QPushButton *pb_ok = new QPushButton("OK");
+  pb_ok->setShortcut(Qt::Key_Return);
   QPushButton *pb_cancel = new QPushButton("Cancel");
+  pb_cancel->setShortcut(Qt::Key_Escape);
   buttons_hl->addWidget(pb_apply);
   buttons_hl->addWidget(pb_ok);
   buttons_hl->addWidget(pb_cancel);
+
+  //extra shortcuts
+  shortcut_enter = new QShortcut(QKeySequence(Qt::Key_Enter), pb_ok);
+  connect(shortcut_enter, SIGNAL(activated()), pb_ok, SLOT(animateClick()));
 
   // full form structure
   QVBoxLayout *editor_container = new QVBoxLayout;

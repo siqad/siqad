@@ -146,7 +146,6 @@ void SimManager::initSimSetupDialog()
   button_run->setShortcut(Qt::Key_Return);
   button_cancel = new QPushButton(tr("Cancel"));
   button_cancel->setShortcut(Qt::Key_Escape);
-  // button_run->setDefault(true);
 
   QToolButton *tb_more = new QToolButton();
   tb_more->setPopupMode(QToolButton::InstantPopup);
@@ -155,6 +154,10 @@ void SimManager::initSimSetupDialog()
           this, &gui::SimManager::submitSimSetup);
   connect(button_cancel, &QAbstractButton::clicked,
           sim_setup_dialog, &QWidget::hide);
+
+  //extra shortcuts
+  shortcut_enter = new QShortcut(QKeySequence(Qt::Key_Enter),button_run);
+  connect(shortcut_enter, SIGNAL(activated()), button_run, SLOT(animateClick()));
 
   // save or reset settings
   //QAction *action_more = new QAction("More");
@@ -194,25 +197,6 @@ void SimManager::initSimSetupDialog()
 
   sim_setup_dialog->setLayout(new_setup_dialog_l);
 }
-
-// void SimManager::keyPressEvent(QKeyEvent *e)
-// {
-//   switch(e->key()){
-//     case Qt::Key_Escape:
-//       qDebug() << tr("Escape");
-//       sim_setup_dialog->hide();
-//       break;
-//     case Qt::Key_Enter:
-//       qDebug() << tr("Enter");
-//       submitSimSetup();
-//       break;
-//     case Qt::Key_Return:
-//       qDebug() << tr("Return");
-//       submitSimSetup();
-//       break;
-//   }
-//   QWidget::keyPressEvent(e);
-// }
 
 //only called when combo_eng_sel selection is changed.
 void SimManager::updateSimParams()

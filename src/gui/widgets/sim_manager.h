@@ -12,6 +12,7 @@
 
 #include <QtWidgets>
 #include <QDialog>
+#include <QShortcut>
 
 #include "property_form.h"
 #include "primitives/sim_engine.h"
@@ -41,6 +42,7 @@ public:
   bool addJob(prim::SimJob *job);   // add a simulation job
 
   // ACCESSORS
+  QComboBox *getComboEngSel(){return combo_eng_sel;}
 
   // various ways to get simulation engine
   prim::SimEngine *getEngine(int index) {return (index >= 0 && index < sim_engines.length()) ? sim_engines.at(index) : 0;}  // by index
@@ -53,6 +55,7 @@ public:
   QList<prim::SimEngine*>  sim_engines;  // stack of all simulators
   QList<prim::SimJob*>     sim_jobs;     // stack of all jobs
 
+
 signals:
   void emitSimJob(prim::SimJob *new_job);
 
@@ -62,12 +65,9 @@ public slots:
   //! whatever settings are on the dialog.
   void quickRun();
 
-
 private slots:
   void updateSimParams();
-
-// protected:
-//   void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
+  void submitSimSetup();
 
 private:
   // sim manager related (like showing all jobs, all engines, etc.)
@@ -80,7 +80,6 @@ private:
   void initSimSetupDialog();
   void updateEngineSelectionList();
   void updateJobNameDateTime();
-  void submitSimSetup();
 
   // save or reset engine settings
   void saveSettingsAsDefault();
@@ -99,7 +98,6 @@ private:
   QVBoxLayout *sim_actions_pan;
   QGroupBox *sim_params_group;
   QVBoxLayout *sim_params_vl;
-  QComboBox *combo_eng_sel;
   QLineEdit *le_job_nm;
 
   // PoisSolver
@@ -112,6 +110,8 @@ private:
   QVBoxLayout *new_setup_dialog_l;
   QPushButton *button_run;
   QPushButton *button_cancel;
+  QShortcut *shortcut_enter;
+  QComboBox *combo_eng_sel;
 };
 
 

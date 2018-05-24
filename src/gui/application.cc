@@ -257,10 +257,14 @@ void gui::ApplicationGUI::initTopBar()
   top_bar->addAction(action_layer_sel);               // already initialised in menu bar
   top_bar->addAction(action_dialog_dock_visibility);  // already initialised in menu bar
 
+  action_run_ground_state = top_bar->addAction(QIcon(":/ico/unknown.svg"), tr("Run ground state simulation..."));
+  // action_run_ground_state->setShortcut(tr("F11"));
+
   //action_circuit_lib= top_bar->addAction(QIcon(":/ico/circuitlib.svg"), tr("Circuit Library"));
 
 
   connect(action_run_sim, &QAction::triggered, this, &gui::ApplicationGUI::simulationSetup);
+  connect(action_run_ground_state, &QAction::triggered, this, &gui::ApplicationGUI::runGroundState);
 
   addToolBar(Qt::TopToolBarArea, top_bar);
 }
@@ -652,6 +656,16 @@ void gui::ApplicationGUI::simulationSetup()
   sim_manager->showSimSetupDialog();
 }
 
+void gui::ApplicationGUI::runGroundState()
+{
+  int index = sim_manager->getComboEngSel()->findText("SimAnneal");
+  if (index != -1) { //if index found
+    sim_manager->getComboEngSel()->setCurrentIndex(index);
+    sim_manager->quickRun();
+  } else {
+    qDebug() << tr("Ground state engine not found.");
+  }
+}
 
 void gui::ApplicationGUI::runSimulation(prim::SimJob *job)
 {
