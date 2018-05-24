@@ -143,8 +143,10 @@ void SimManager::initSimSetupDialog()
 
   // Buttons
   button_run = new QPushButton(tr("&Run"));
+  button_run->setShortcut(Qt::Key_Return);
   button_cancel = new QPushButton(tr("Cancel"));
-  button_cancel->setShortcut(tr("Esc"));
+  button_cancel->setShortcut(Qt::Key_Escape);
+  // button_run->setDefault(true);
 
   QToolButton *tb_more = new QToolButton();
   tb_more->setPopupMode(QToolButton::InstantPopup);
@@ -193,6 +195,25 @@ void SimManager::initSimSetupDialog()
   sim_setup_dialog->setLayout(new_setup_dialog_l);
 }
 
+// void SimManager::keyPressEvent(QKeyEvent *e)
+// {
+//   switch(e->key()){
+//     case Qt::Key_Escape:
+//       qDebug() << tr("Escape");
+//       sim_setup_dialog->hide();
+//       break;
+//     case Qt::Key_Enter:
+//       qDebug() << tr("Enter");
+//       submitSimSetup();
+//       break;
+//     case Qt::Key_Return:
+//       qDebug() << tr("Return");
+//       submitSimSetup();
+//       break;
+//   }
+//   QWidget::keyPressEvent(e);
+// }
+
 //only called when combo_eng_sel selection is changed.
 void SimManager::updateSimParams()
 {
@@ -231,7 +252,6 @@ void SimManager::quickRun()
 {
   submitSimSetup();
 }
-
 
 void SimManager::updateEngineSelectionList()
 {

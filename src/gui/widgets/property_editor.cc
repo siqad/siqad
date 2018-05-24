@@ -39,8 +39,16 @@ void PropertyEditor::closeEvent(QCloseEvent *e)
 
 void PropertyEditor::keyPressEvent(QKeyEvent *e)
 {
-  if(e->key() == Qt::Key_Escape){
-    cancel();
+  switch(e->key()){
+    case Qt::Key_Escape:
+      cancel();
+      break;
+    case Qt::Key_Enter:
+      okay();
+      break;
+    case Qt::Key_Return:
+      okay();
+      break;
   }
   QWidget::keyPressEvent(e);
 }

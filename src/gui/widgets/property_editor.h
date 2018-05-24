@@ -59,8 +59,8 @@ namespace gui{
   signals:
 
   protected:
-    virtual void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
     void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
+    virtual void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
   private:
 
     //! Initialize property editor

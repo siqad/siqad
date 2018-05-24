@@ -66,6 +66,9 @@ public slots:
 private slots:
   void updateSimParams();
 
+// protected:
+//   void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
+
 private:
   // sim manager related (like showing all jobs, all engines, etc.)
   void initSimManager();
