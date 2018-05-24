@@ -1203,12 +1203,15 @@ void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
   QMenu menu(this); //create the context menu object
   if (QGraphicsItem *gitem = itemAt(e->pos())) {
     qDebug() << tr("Item clicked was at: (%1 , %2)").arg(gitem->x()).arg(gitem->y());
+    qDebug() << tr("item_type: %1").arg(static_cast<prim::Item*>(gitem)->item_type);
+    qDebug() << tr("zValue: %1").arg(static_cast<prim::Item*>(gitem)->zValue());
     if (static_cast<prim::Item*>(gitem)->upSelected()) {
       //Something was selected, so determine the type and give the correct context menu.
-      // if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::Electrode) {
+      if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::Electrode) {
+        qDebug() << tr("ELEC");
       //   menu.addAction(action_set_potential);
       //   menu.addSeparator();
-      if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::DBDot) {
+      } else if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::DBDot) {
         menu.addAction(action_toggle_db_elec);
         menu.addSeparator();
       }

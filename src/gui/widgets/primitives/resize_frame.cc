@@ -24,9 +24,12 @@ ResizeFrame::ResizeFrame(prim::Item *resize_target)
   if (border_width == -1)
     prepareStatics();
 
-  if (resize_target)
+  if (resize_target) {
     setParentItem(resize_target);
-
+    setFlag(QGraphicsItem::ItemIsSelectable, false);
+    setPos(mapFromScene(parentItem()->pos()));
+    setZValue(parentItem()->zValue()-1);
+  }
   // create a set of handles
   for (HandlePosition handle_pos : handle_positions) {
     prim::ResizeHandle *handle = new prim::ResizeHandle(handle_pos, this);
@@ -34,7 +37,6 @@ ResizeFrame::ResizeFrame(prim::Item *resize_target)
   }
 
   // Graphics
-  setFlag(QGraphicsItem::ItemIsSelectable, false);
 }
 
 
@@ -112,7 +114,6 @@ void ResizeFrame::prepareStatics()
 {
   handle_positions.append(QList<HandlePosition>({TopLeft, Top, TopRight, Right,
       BottomRight, Bottom, BottomLeft, Left}));
-
   // TODO graphics
 }
 

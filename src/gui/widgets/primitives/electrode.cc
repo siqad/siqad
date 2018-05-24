@@ -143,7 +143,6 @@ void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point
   QPointF point1 = point1_in;
   QPointF point2 = point2_in;
   qDebug() << QObject::tr("%1 %2").arg(getWidth()).arg(getHeight());
-
   if(edge_width == -1){
     constructStatics();
   }
@@ -224,9 +223,31 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
   ss->writeEndElement();
 }
 
+void prim::Electrode::contextMenuEvent(QGraphicsSceneContextMenuEvent *e)
+{
+  qDebug() << "CONTEXT";
+  switch (e->reason()) {
+    case QContextMenuEvent::Mouse:
+        e->accept();
+        // return;
+        break;
+    default:
+      break;
+        // QMenu menu;
+        // menu.exec(mapToGlobal(e->pos()));
+  }
+}
+
+
 void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
   switch(e->buttons()){
+    case Qt::RightButton:
+      qDebug() << "Right clicked!";
+      break;
+    case Qt::LeftButton:
+      qDebug() << "Left clicked!";
+      break;
     default:
       qDebug() << "should be showing property form.";
       prim::Emitter::instance()->sig_showProperty(this);
