@@ -146,7 +146,6 @@ void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point
   if(edge_width == -1){
     constructStatics();
   }
-
   top_left.setX(std::min(point1.x(), point2.x()));
   top_left.setY(std::min(point1.y(), point2.y()));
   bot_right.setX(std::max(point1.x(), point2.x()));
@@ -192,6 +191,7 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
   }
 }
 
+
 prim::Item *prim::Electrode::deepCopy() const
 {
   prim::Electrode *elec = new Electrode(layer_id, top_left, bot_right);
@@ -223,21 +223,11 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
   ss->writeEndElement();
 }
 
-void prim::Electrode::contextMenuEvent(QGraphicsSceneContextMenuEvent *e)
-{
-  qDebug() << "CONTEXT";
-  switch (e->reason()) {
-    case QContextMenuEvent::Mouse:
-        e->accept();
-        // return;
-        break;
-    default:
-      break;
-        // QMenu menu;
-        // menu.exec(mapToGlobal(e->pos()));
-  }
-}
-
+// void prim::Electrode::showProps()
+// {
+//   qDebug() << "Electrode showProps()";
+//   prim::Emitter::instance()->sig_showProperty(this);
+// }
 
 void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {

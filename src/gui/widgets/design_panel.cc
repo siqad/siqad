@@ -1200,33 +1200,39 @@ void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
   } else {
     action_delete->setEnabled(false);
   }
-  QMenu menu(this); //create the context menu object
+  QMenu *menu = new QMenu(this);
   if (QGraphicsItem *gitem = itemAt(e->pos())) {
     qDebug() << tr("Item clicked was at: (%1 , %2)").arg(gitem->x()).arg(gitem->y());
     qDebug() << tr("item_type: %1").arg(static_cast<prim::Item*>(gitem)->item_type);
     qDebug() << tr("zValue: %1").arg(static_cast<prim::Item*>(gitem)->zValue());
+    action_show_prop->setProperty("pos", e->pos());
+    menu->addAction(action_show_prop);
+    menu->addSeparator();
+
     if (static_cast<prim::Item*>(gitem)->upSelected()) {
       //Something was selected, so determine the type and give the correct context menu.
       if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::Electrode) {
         qDebug() << tr("ELEC");
+      }
       //   menu.addAction(action_set_potential);
       //   menu.addSeparator();
-      } else if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::DBDot) {
-        menu.addAction(action_toggle_db_elec);
-        menu.addSeparator();
-      }
+      // } else if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::DBDot) {
+      //   menu->addAction(action_toggle_db_elec);
+      //   menu->addSeparator();
+      // }
     }
-  } else {
+
   }
-  menu.addAction(action_undo);
-  menu.addAction(action_redo);
-  menu.addSeparator();
-  menu.addAction(action_cut);
-  menu.addAction(action_copy);
-  menu.addAction(action_paste);
-  menu.addSeparator();
-  menu.addAction(action_delete);
-  menu.exec(e->globalPos());
+  menu->addAction(action_undo);
+  menu->addAction(action_redo);
+  menu->addSeparator();
+  menu->addAction(action_cut);
+  menu->addAction(action_copy);
+  menu->addAction(action_paste);
+  menu->addSeparator();
+  menu->addAction(action_delete);
+  menu->exec(e->globalPos());
+  delete menu;
 }
 
 void gui::DesignPanel::undoAction()
@@ -1265,6 +1271,18 @@ void gui::DesignPanel::deleteAction()
 {
   if(tool_type == gui::ToolType::SelectTool && display_mode == DesignMode)
     deleteSelection();
+}
+
+void gui::DesignPanel::showPropAction()
+{
+  qDebug() << tr("showPropAction...");
+  qDebug() << tr("pos: %1, %2").arg(sender()->property("pos").toPointF().x()).arg(sender()->property("pos").toPointF().y());
+  QPoint pos = sender()->property("pos").toPoint();
+  if (QGraphicsItem *gitem = itemAt(pos)) {
+    qDebug() << tr("item_type: %1").arg(static_cast<prim::Item*>(gitem)->item_type);
+    qDebug() << tr("zValue: %1").arg(static_cast<prim::Item*>(gitem)->zValue());
+    static_cast<prim::Electrode*>(gitem)->showProps();
+  }
 }
 
 // void gui::DesignPanel::electrodeSetPotentialAction()
@@ -1315,6 +1333,11 @@ void gui::DesignPanel::createActions()
 
   action_delete = new QAction(tr("&Delete"), this);
   connect(action_delete, &QAction::triggered, this, &gui::DesignPanel::deleteAction);
+
+  action_show_prop = new QAction(tr("Show properties"), this);
+  connect(action_show_prop, &QAction::triggered, this, &gui::DesignPanel::showPropAction);
+
+
 }
 
 

@@ -32,7 +32,6 @@ prim::Item::Item(ItemType type, int lay_id, QGraphicsItem *parent)
     init();
 }
 
-
 QString prim::Item::getQStringItemType()
 {
   switch (item_type) {
@@ -155,6 +154,11 @@ QColor prim::Item::getCurrentStateColor(const prim::Item::StateColors &state_col
   return state_colors.normal;
 }
 
+
+void prim::Item::showProps()
+{
+  prim::Emitter::instance()->sig_showProperty(this);
+}
 
 // current functionality:
 // items that are selected emit a signal when left clicked if control not pressed

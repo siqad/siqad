@@ -32,7 +32,6 @@ namespace prim{
     enum ElectrodeType{Fix, Clock};
     // Initializer for initial attribute values.
     void initElectrode(int lay_id, QPointF point1_in, QPointF point2_in);
-
     //! sets the electrode potential to givenPotential.
     // void setPotential(double givenPotential);
     // //! gets the electrode potential to givenPotential.
@@ -65,6 +64,7 @@ namespace prim{
     //! Return the class default property map
     virtual gui::PropertyMap *classPropertyMap() override {return &default_class_properties;}
     virtual gui::PropertyMap *classPropertyMap() const override {return &default_class_properties;}
+    // void showProps();
 
   protected:
 
@@ -72,7 +72,7 @@ namespace prim{
     virtual QVariant itemChange(GraphicsItemChange change,
         const QVariant &value) Q_DECL_OVERRIDE;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
-    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *e) Q_DECL_OVERRIDE;
+
     // virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
   private:
@@ -97,7 +97,6 @@ namespace prim{
     // Resize
     prim::ResizeFrame *resize_frame=0;
     QRectF orig_rect;
-
   };
 
 } // end prim namespace

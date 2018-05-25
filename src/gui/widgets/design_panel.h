@@ -229,8 +229,9 @@ namespace gui{
     void cutAction();
     void copyAction();
     void pasteAction();
+    void showPropAction();
     void deleteAction();
-    
+
   private:
 
     QGraphicsScene *scene;    // scene for the QGraphicsView
@@ -455,6 +456,7 @@ namespace gui{
     QAction *action_copy;
     QAction *action_paste;
     QAction *action_delete;
+    QAction *action_show_prop;
     // QAction *action_set_potential;
     QAction *action_toggle_db_elec;
   };

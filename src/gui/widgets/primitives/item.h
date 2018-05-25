@@ -136,7 +136,7 @@ namespace prim{
 
     //! Get the color corresponding to the current state of the item.
     QColor getCurrentStateColor(const StateColors &state_colors);
-
+    void showProps();
   protected:
 
     bool hovered; //!< manipulated through setHovered(bool) and hovered()
