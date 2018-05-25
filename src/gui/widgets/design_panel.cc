@@ -1208,20 +1208,6 @@ void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
     action_show_prop->setProperty("pos", e->pos());
     menu->addAction(action_show_prop);
     menu->addSeparator();
-
-    if (static_cast<prim::Item*>(gitem)->upSelected()) {
-      //Something was selected, so determine the type and give the correct context menu.
-      if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::Electrode) {
-        qDebug() << tr("ELEC");
-      }
-      //   menu.addAction(action_set_potential);
-      //   menu.addSeparator();
-      // } else if (static_cast<prim::Item*>(gitem)->item_type == prim::Item::DBDot) {
-      //   menu->addAction(action_toggle_db_elec);
-      //   menu->addSeparator();
-      // }
-    }
-
   }
   menu->addAction(action_undo);
   menu->addAction(action_redo);
@@ -1237,32 +1223,27 @@ void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
 
 void gui::DesignPanel::undoAction()
 {
-    // qDebug() << tr("Undo...");
     undo_stack->undo();
 }
 
 void gui::DesignPanel::redoAction()
 {
-    // qDebug() << tr("Redo...");
     undo_stack->redo();
 }
 
 void gui::DesignPanel::cutAction()
 {
-    // qDebug() << tr("Cut...");
     copySelection();
     deleteSelection();
 }
 
 void gui::DesignPanel::copyAction()
 {
-    // qDebug() << tr("Copy...");
     copySelection();
 }
 
 void gui::DesignPanel::pasteAction()
 {
-    // qDebug() << tr("Paste...");
     if(!clipboard.isEmpty() && display_mode == DesignMode)
       createGhost(true);
 }
@@ -1275,44 +1256,11 @@ void gui::DesignPanel::deleteAction()
 
 void gui::DesignPanel::showPropAction()
 {
-  qDebug() << tr("showPropAction...");
-  qDebug() << tr("pos: %1, %2").arg(sender()->property("pos").toPointF().x()).arg(sender()->property("pos").toPointF().y());
   QPoint pos = sender()->property("pos").toPoint();
   if (QGraphicsItem *gitem = itemAt(pos)) {
-    qDebug() << tr("item_type: %1").arg(static_cast<prim::Item*>(gitem)->item_type);
-    qDebug() << tr("zValue: %1").arg(static_cast<prim::Item*>(gitem)->zValue());
     static_cast<prim::Electrode*>(gitem)->showProps();
   }
 }
-
-// void gui::DesignPanel::electrodeSetPotentialAction()
-// {
-//   // setting potential is not an un-doable action for now.
-//   bool ok = false;
-//   double potential;
-//   // qDebug() << tr("electrodeSetPotential...");
-//   QList<prim::Item*> selection = selectedItems();
-//   if(selection.isEmpty()){ //TODO:figure out how we want to handle right click without selection
-//     qDebug() << tr("Please select an item...");
-//   } else {
-//     if(selection.count() == 1){
-//       potential = QInputDialog::getDouble(this, tr("Set Potential"),
-//                   tr("Set electrode potential(s) to:"), static_cast<prim::Electrode*>(selection.at(0))->getPotential(),
-//                   -2147483647, 2147483647, 3, &ok);
-//     } else {
-//       potential = QInputDialog::getDouble(this, tr("Set Potential"),
-//                   tr("WARNING: Multiple electrodes selected.\nSet electrode potential(s) to:"), 0.0,
-//                   -2147483647, 2147483647, 3, &ok);
-//     }
-//     if(ok){
-//       for(prim::Item *item : selection){
-//         if(item->item_type == prim::Item::Electrode)
-//           static_cast<prim::Electrode*>(item)->setPotential(potential);
-//       }
-//     }
-//   }
-// }
-
 
 void gui::DesignPanel::createActions()
 {
@@ -1336,7 +1284,6 @@ void gui::DesignPanel::createActions()
 
   action_show_prop = new QAction(tr("Show properties"), this);
   connect(action_show_prop, &QAction::triggered, this, &gui::DesignPanel::showPropAction);
-
 
 }
 

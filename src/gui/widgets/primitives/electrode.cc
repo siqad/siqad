@@ -99,7 +99,6 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
 void prim::Electrode::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
     bool update_handles)
 {
-  //setPos(scenePos() + QPointF(dx1, dy1));
   prepareGeometryChange();
   top_left += QPointF(dx1, dy1);
   bot_right += QPointF(dx2, dy2);
@@ -178,7 +177,6 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
   // draw inner circle
   if(tool_type == gui::SelectTool && isSelected()){
 
-      // qDebug() << QObject::tr("Electrode selected");
     setPos(pos());
     QPointF center = rect.center();
     QSizeF size(getWidth()+edge_width, getHeight()+edge_width);
@@ -211,9 +209,6 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
   ss->writeAttribute("y1", QString::number(top_left.y()/scale_factor));
   ss->writeAttribute("x2", QString::number(bot_right.x()/scale_factor));
   ss->writeAttribute("y2", QString::number(bot_right.y()/scale_factor));
-  // ss->writeAttribute("y1", QString::number(std::min(top_left.y(), bot_right.y())));
-  // ss->writeAttribute("x2", QString::number(std::max(top_left.x(), bot_right.x())));
-  // ss->writeAttribute("y2", QString::number(std::max(top_left.y(), bot_right.y())));
   ss->writeTextElement("pixel_per_angstrom", QString::number(scale_factor));
   ss->writeStartElement("property_map");
   gui::PropertyMap::writeValuesToXMLStream(properties(), ss);
@@ -222,12 +217,6 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
   ss->writeEndElement();
   ss->writeEndElement();
 }
-
-// void prim::Electrode::showProps()
-// {
-//   qDebug() << "Electrode showProps()";
-//   prim::Emitter::instance()->sig_showProperty(this);
-// }
 
 void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
@@ -245,11 +234,6 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
       break;
   }
 }
-
-// void prim::Electrode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
-// {
-//   // qDebug() << QObject::tr("Electrode has seen the mouseDoubleClickEvent");
-// }
 
 void prim::Electrode::updatePoints(QPointF offset)
 {

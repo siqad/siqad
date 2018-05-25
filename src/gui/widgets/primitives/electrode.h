@@ -32,18 +32,11 @@ namespace prim{
     enum ElectrodeType{Fix, Clock};
     // Initializer for initial attribute values.
     void initElectrode(int lay_id, QPointF point1_in, QPointF point2_in);
-    //! sets the electrode potential to givenPotential.
-    // void setPotential(double givenPotential);
-    // //! gets the electrode potential to givenPotential.
-    // double getPotential(void) const {return potential;}
-    //
     //! Resize according to given coordinates.
     virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
         bool update_handles=false) override;
 
     // accessors
-    // QPointF getPoint1(void){return point1;}
-    // QPointF getPoint2(void){return point2;}
     QPointF getTopLeft(void){return top_left;}
     QPointF getBotRight(void){return bot_right;}
     qreal getTopDepth(void){return top_depth;}
@@ -64,7 +57,6 @@ namespace prim{
     //! Return the class default property map
     virtual gui::PropertyMap *classPropertyMap() override {return &default_class_properties;}
     virtual gui::PropertyMap *classPropertyMap() const override {return &default_class_properties;}
-    // void showProps();
 
   protected:
 
@@ -82,8 +74,6 @@ namespace prim{
     // properties of this item class
     static gui::PropertyMap default_class_properties; //! Default properties for this class
     // VARIABLES
-    // QPointF point1;
-    // QPointF point2;
     QPointF top_left; //top left point, since the two points given could be any two opposite points
     QPointF bot_right; //bottom right point, since the two points given could be any two opposite points
     qreal elec_depth;

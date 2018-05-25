@@ -26,11 +26,8 @@ ResizeFrame::ResizeFrame(prim::Item *resize_target)
 
   if (resize_target) {
     setParentItem(resize_target);
-    // setPos(parentItem()->pos());
-    qDebug() << QObject::tr("frame position: %1, %2").arg(pos().x()).arg(pos().y());
-    setZValue(parentItem()->zValue()-1);
+    setFlag(ItemStacksBehindParent, true);
   }
-  setFlag(QGraphicsItem::ItemIsSelectable, false);
   // create a set of handles
   for (HandlePosition handle_pos : handle_positions) {
     prim::ResizeHandle *handle = new prim::ResizeHandle(handle_pos, this);
@@ -130,7 +127,6 @@ ResizeHandle::ResizeHandle(prim::ResizeFrame::HandlePosition handle_pos,
 {
   if (handle_dim == -1)
     prepareStatics();
-
   updatePosition();
 
   switch (handle_position) {
