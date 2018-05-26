@@ -250,21 +250,28 @@ void gui::ApplicationGUI::initTopBar()
   top_bar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
   top_bar->setIconSize(QSize(ico_scale, ico_scale));
 
-  action_run_sim = top_bar->addAction(QIcon(":/ico/runsim.svg"), tr("Run Simulation..."));
-  action_run_sim->setShortcut(tr("F11"));
+  // initialize QActions
 
+  // run simulation
+  action_run_sim = new QAction(QIcon(":/ico/runsim.svg"), tr("Run Simulation..."));
+  action_run_sim->setShortcut(tr("F11"));
+  connect(action_run_sim, &QAction::triggered,
+          this, &gui::ApplicationGUI::simulationSetup);
+
+  // ground state simulation
+  action_run_ground_state = new QAction(QIcon(":/ico/sim_groundstate.svg"), tr("Run ground state simulation..."));
+  // action_run_ground_state->setShortcut(tr("F11"));
+  connect(action_run_ground_state, &QAction::triggered,
+          this, &gui::ApplicationGUI::runGroundState);
+
+  // add them to top bar
+  top_bar->addAction(action_run_sim);
+  top_bar->addAction(action_run_ground_state);
   top_bar->addAction(action_sim_visualize);           // already initialised in menu bar
   top_bar->addAction(action_layer_sel);               // already initialised in menu bar
   top_bar->addAction(action_dialog_dock_visibility);  // already initialised in menu bar
 
-  action_run_ground_state = top_bar->addAction(QIcon(":/ico/unknown.svg"), tr("Run ground state simulation..."));
-  // action_run_ground_state->setShortcut(tr("F11"));
-
   //action_circuit_lib= top_bar->addAction(QIcon(":/ico/circuitlib.svg"), tr("Circuit Library"));
-
-
-  connect(action_run_sim, &QAction::triggered, this, &gui::ApplicationGUI::simulationSetup);
-  connect(action_run_ground_state, &QAction::triggered, this, &gui::ApplicationGUI::runGroundState);
 
   addToolBar(Qt::TopToolBarArea, top_bar);
 }
@@ -404,6 +411,8 @@ void gui::ApplicationGUI::initSimVisualizeDock()
   sim_visualize_dock->hide();
   addDockWidget(area, sim_visualize_dock);
 
+  // set shortcuts
+  sim_visualize_dock->toggleViewAction()->setShortcut(Qt::Key_V);
 }
 
 
