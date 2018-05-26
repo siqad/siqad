@@ -679,8 +679,9 @@ void gui::DesignPanel::physLoc2LatticeCoord(QPointF physloc, int &n, int &m, int
 void gui::DesignPanel::setLatticeVisibility(bool visible)
 {
   QColor col = (display_mode == gui::ScreenshotMode) ? background_col_publish : background_col;
+  bool publish = display_mode == gui::ScreenshotMode;
   if (visible)
-    scene->setBackgroundBrush(QBrush(lattice->tileableLatticeImage(col)));
+    scene->setBackgroundBrush(QBrush(lattice->tileableLatticeImage(col, publish)));
   else
     scene->setBackgroundBrush(QBrush(col));
 }
