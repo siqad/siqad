@@ -16,7 +16,11 @@
 #include <QtCore>
 #include <QRegExp>
 
-#define DEFAULT_OVERRIDE true // always use default settings
+#ifdef QT_NO_DEBUG
+#define DEFAULT_OVERRIDE false  // use user settings for release compilation
+#else
+#define DEFAULT_OVERRIDE true   // use default settings for debug compilation
+#endif
 
 namespace settings{
 
