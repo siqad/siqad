@@ -44,6 +44,8 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
           this, &gui::DesignPanel::moveDBToLatticeCoord);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_physLoc2LatticeCoord,
           this, &gui::DesignPanel::physLoc2LatticeCoord);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_setLatticeVisibility,
+          this, &gui::DesignPanel::setLatticeVisibility);
 }
 
 // destructor
@@ -672,6 +674,15 @@ void gui::DesignPanel::physLoc2LatticeCoord(QPointF physloc, int &n, int &m, int
   n = coord.n;
   m = coord.m;
   l = coord.l;
+}
+
+void gui::DesignPanel::setLatticeVisibility(bool visible)
+{
+  QColor col = (display_mode == gui::ScreenshotMode) ? background_col_publish : background_col;
+  if (visible)
+    scene->setBackgroundBrush(QBrush(lattice->tileableLatticeImage(col)));
+  else
+    scene->setBackgroundBrush(QBrush(col));
 }
 
 // INTERRUPTS

@@ -232,7 +232,12 @@ void LayerManager::initSideWidget()
     pb_atv->setCheckable(true);
     pb_atv->setChecked(layer->isActive());
 
-    connect(pb_vsb, &QAbstractButton::toggled, layer, &prim::Layer::setVisible);
+    if (layer->contentType() == prim::Layer::Lattice) {
+      connect(pb_vsb, &QAbstractButton::toggled,
+              static_cast<prim::Lattice*>(layer), &prim::Lattice::setVisible);
+    } else {
+      connect(pb_vsb, &QAbstractButton::toggled, layer, &prim::Layer::setVisible);
+    }
     connect(pb_atv, &QAbstractButton::toggled, layer, &prim::Layer::setActive);
 
     QHBoxLayout *layer_hl = new QHBoxLayout;

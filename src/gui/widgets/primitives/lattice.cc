@@ -245,6 +245,12 @@ QImage prim::Lattice::tileableLatticeImage(QColor bkg_col, bool publish)
 }
 
 
+void prim::Lattice::setVisible(bool visible)
+{
+  prim::Emitter::instance()->setLatticeVisibility(visible);
+}
+
+
 void prim::Lattice::construct()
 {
   settings::LatticeSettings *lattice_settings = settings::LatticeSettings::instance();
