@@ -69,7 +69,7 @@ The simulation parameters form is very barebones right now consisting of only te
 
 ### Cross-compiling for Windows from a Ubuntu server
 
-The cross-compiling guide uses MXE for convenient access to pre-compiled cross-compilation binaries and toolchains. First, add their Debian PPA following the guide on their website: [http://pkg.mxe.cc/](http://pkg.mxe.cc/).
+The cross-compiling guide uses [MXE (M Cross Environment)](http://mxe.cc/) for convenient access to pre-compiled cross-compilation binaries and toolchains. First, add their Debian PPA following the guide on their website: [http://pkg.mxe.cc/](http://pkg.mxe.cc/).
 
 Install the following packages:
 ```
