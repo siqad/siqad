@@ -1224,14 +1224,16 @@ void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
     for (auto gitem: gitems) {
       if (!inserted_types.contains(static_cast<prim::Item*>(gitem)->item_type)){
         inserted_types.append(static_cast<prim::Item*>(gitem)->item_type);
-        menu->addSection(static_cast<prim::Item*>(gitem)->getQStringItemType());
         QList<QAction*> actions = static_cast<prim::Item*>(gitem)->contextMenuActions();
-        for (auto action : actions) {
-          action->setProperty("item_type", static_cast<prim::Item*>(gitem)->item_type);
-          action->setProperty("pos", e->pos());
-          menu->addAction(action);
-          //Qt::UniqueConnection prevents connecting multiple times.
-          connect(action, &QAction::triggered, this, &gui::DesignPanel::dummyAction, Qt::UniqueConnection);
+        if (!actions.isEmpty()) {
+          menu->addSection(static_cast<prim::Item*>(gitem)->getQStringItemType());
+          for (auto action : actions) {
+            action->setProperty("item_type", static_cast<prim::Item*>(gitem)->item_type);
+            action->setProperty("pos", e->pos());
+            menu->addAction(action);
+            //Qt::UniqueConnection prevents connecting multiple times.
+            connect(action, &QAction::triggered, this, &gui::DesignPanel::dummyAction, Qt::UniqueConnection);
+          }
         }
       }
     }
