@@ -48,6 +48,9 @@ namespace prim{
     //! emit a signal telling DP to convert a physical location to lattice coordinates
     void physLoc2LatticeCoord(QPointF physloc, int &n, int &m, int &l);
 
+    //! set lattice visibility
+    void setLatticeVisibility(bool visible) {emit sig_setLatticeVisibility(visible);}
+
   signals:
 
     void sig_selectClicked(Item *);
@@ -65,6 +68,8 @@ namespace prim{
     void sig_resizeBegin();
 
     void sig_resizeFinalize(Item *, QRectF orig_rect, QRectF final_rect);
+
+    void sig_setLatticeVisibility(bool);
 
   private:
 

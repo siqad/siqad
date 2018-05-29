@@ -121,6 +121,9 @@ namespace prim{
     //! Return a tileable image that represents the lattice.
     QImage tileableLatticeImage(QColor bkg_col, bool publish=false);
 
+    //! Set the visiblity of the lattice
+    void setVisible(bool);
+
   private:
 
     int layer_id;       // index of this layer in design panel's stack

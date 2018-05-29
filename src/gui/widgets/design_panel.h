@@ -184,6 +184,9 @@ namespace gui{
     //! Emitted when the undo stack clean stage has changed.
     void emitUndoStackCleanChanged(bool c) {emit sig_undoStackCleanChanged(c);}
 
+    //! Set the visibility of the lattice in the background
+    void setLatticeVisibility(bool);
+
   signals:
     void sig_toolChangeRequest(gui::ToolType tool);  // request ApplicationGUI to change tool
     void sig_toolChanged(gui::ToolType tool); // notify other components of the
