@@ -1201,14 +1201,30 @@ void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
     action_delete->setEnabled(false);
   }
   QMenu *menu = new QMenu(this);
-  if (QGraphicsItem *gitem = itemAt(e->pos())) {
-    qDebug() << tr("Item clicked was at: (%1 , %2)").arg(gitem->x()).arg(gitem->y());
-    qDebug() << tr("item_type: %1").arg(static_cast<prim::Item*>(gitem)->item_type);
-    qDebug() << tr("zValue: %1").arg(static_cast<prim::Item*>(gitem)->zValue());
-    action_show_prop->setProperty("pos", e->pos());
-    menu->addAction(action_show_prop);
-    menu->addSeparator();
+  if (itemAt(e->pos())) {
+  // if (QGraphicsItem *gitem = itemAt(e->pos())) {
+    // qDebug() << tr("Item clicked was at: (%1 , %2)").arg(gitem->x()).arg(gitem->y());
+    // qDebug() << tr("item_type: %1").arg(static_cast<prim::Item*>(gitem)->item_type);
+    // qDebug() << tr("zValue: %1").arg(static_cast<prim::Item*>(gitem)->zValue());
+    QList<QGraphicsItem*> gitems = items(e->pos());
+    //keep track of inserted types, so as to not double insert.
+    QList<int> inserted_types = QList<int>();
+    for (auto gitem: gitems) {
+      if (!inserted_types.contains(static_cast<prim::Item*>(gitem)->item_type)){
+        inserted_types.append(static_cast<prim::Item*>(gitem)->item_type);
+        menu->addSection(static_cast<prim::Item*>(gitem)->getQStringItemType());
+        QList<QAction*> actions = static_cast<prim::Item*>(gitem)->contextMenuActions();
+        for (auto action : actions) {
+          action->setProperty("item_type", static_cast<prim::Item*>(gitem)->item_type);
+          action->setProperty("pos", e->pos());
+          menu->addAction(action);
+          //Qt::UniqueConnection prevents connecting multiple times.
+          connect(action, &QAction::triggered, this, &gui::DesignPanel::dummyAction, Qt::UniqueConnection);
+        }
+      }
+    }
   }
+  menu->addSection("General");
   menu->addAction(action_undo);
   menu->addAction(action_redo);
   menu->addSeparator();
@@ -1254,11 +1270,20 @@ void gui::DesignPanel::deleteAction()
     deleteSelection();
 }
 
-void gui::DesignPanel::showPropAction()
+
+void gui::DesignPanel::dummyAction()
 {
   QPoint pos = sender()->property("pos").toPoint();
-  if (QGraphicsItem *gitem = itemAt(pos)) {
-    static_cast<prim::Electrode*>(gitem)->showProps();
+  if (itemAt(pos)) {
+    QList<QGraphicsItem*> gitems = items(pos);
+    for (auto gitem: gitems) {
+      //make sure the item type is correct.
+      if (static_cast<prim::Item*>(gitem)->item_type == sender()->property("item_type").toInt()) {
+        // QString item_type = static_cast<prim::Item*>(gitem)->getQStringItemType();
+        // qDebug() << tr("%1, %2").arg(item_type).arg(static_cast<QAction*>(sender())->text());
+        static_cast<prim::Item*>(gitem)->performAction(static_cast<QAction*>(sender()));
+      }
+    }
   }
 }
 
@@ -1266,27 +1291,17 @@ void gui::DesignPanel::createActions()
 {
   action_undo = new QAction(tr("&Undo"), this);
   connect(action_undo, &QAction::triggered, this, &gui::DesignPanel::undoAction);
-
   action_redo = new QAction(tr("&Redo"), this);
   connect(action_redo, &QAction::triggered, this, &gui::DesignPanel::redoAction);
-
   action_cut = new QAction(tr("Cut"), this);
   connect(action_cut, &QAction::triggered, this, &gui::DesignPanel::cutAction);
-
   action_copy = new QAction(tr("&Copy"), this);
   connect(action_copy, &QAction::triggered, this, &gui::DesignPanel::copyAction);
-
   action_paste = new QAction(tr("&Paste"), this);
   connect(action_paste, &QAction::triggered, this, &gui::DesignPanel::pasteAction);
-
   action_delete = new QAction(tr("&Delete"), this);
   connect(action_delete, &QAction::triggered, this, &gui::DesignPanel::deleteAction);
-
-  action_show_prop = new QAction(tr("Show properties"), this);
-  connect(action_show_prop, &QAction::triggered, this, &gui::DesignPanel::showPropAction);
-
 }
-
 
 
 void gui::DesignPanel::filterSelection(bool select_flag)

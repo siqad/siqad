@@ -155,10 +155,10 @@ QColor prim::Item::getCurrentStateColor(const prim::Item::StateColors &state_col
 }
 
 
-void prim::Item::showProps()
-{
-  prim::Emitter::instance()->sig_showProperty(this);
-}
+// void prim::Item::showProps()
+// {
+//   prim::Emitter::instance()->sig_showProperty(this);
+// }
 
 // current functionality:
 // items that are selected emit a signal when left clicked if control not pressed

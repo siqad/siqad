@@ -97,6 +97,8 @@ void AFMArea::initAFMArea(int lay_id, QPointF point1, QPointF point2,
   if (area_border_width == -1)
     prepareStatics();
 
+  createActions();
+
   QPointF top_left = QPointF(qMin(point1.x(), point2.x()),
       qMin(point1.y(), point2.y()));
   QPointF bot_right = QPointF(qMax(point1.x(), point2.x()),
@@ -247,6 +249,14 @@ QVariant AFMArea::itemChange(GraphicsItemChange change, const QVariant &value)
   }
 
   return QGraphicsItem::itemChange(change, value);
+}
+
+void prim::AFMArea::createActions()
+{
+  action_show_prop = new QAction(QObject::tr("Show properties"));
+  action_something_else = new QAction(QObject::tr("Something else"));
+  actions_list.append(action_show_prop);
+  actions_list.append(action_something_else);
 }
 
 void AFMArea::hoverEnterEvent(QGraphicsSceneHoverEvent *)

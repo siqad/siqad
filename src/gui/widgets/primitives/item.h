@@ -136,7 +136,10 @@ namespace prim{
 
     //! Get the color corresponding to the current state of the item.
     QColor getCurrentStateColor(const StateColors &state_colors);
-    void showProps();
+    // void showProps();
+    virtual void performAction(QAction*){};
+    virtual QList<QAction*> contextMenuActions(){return QList<QAction*>();}
+
   protected:
 
     bool hovered; //!< manipulated through setHovered(bool) and hovered()
@@ -145,7 +148,6 @@ namespace prim{
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *) override {}
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *) override {}
-
   private:
 
 
@@ -157,7 +159,7 @@ namespace prim{
     QMap<QString, QVariant> local_props;  //! Properties altered from default
 
   };
-
-} // end prim namespace
-
+}; // end prim namespace
+// Q_DECLARE_METATYPE(prim::Item)
+// Q_DECLARE_METATYPE(prim::Item*)
 #endif

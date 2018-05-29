@@ -135,6 +135,32 @@ QVariant prim::Electrode::itemChange(GraphicsItemChange change, const QVariant &
   return QGraphicsItem::itemChange(change, value);
 }
 
+void prim::Electrode::showProps()
+{
+  prim::Emitter::instance()->sig_showProperty(this);
+}
+
+void prim::Electrode::performAction(QAction *action)
+{
+  //switch case doesnt work on non-ints, use if else.
+  qDebug() << QObject::tr("PERFORM ACTION");
+  if (action->text() == action_show_prop->text()) {
+    qDebug() << QObject::tr("action_show_prop");
+    showProps();
+  } else if (action->text() == action_something_else->text()) {
+    qDebug() << QObject::tr("action_something_else");
+  } else {
+    qDebug() << QObject::tr("Matched no action.");
+  }
+}
+
+void prim::Electrode::createActions()
+{
+  action_show_prop = new QAction(QObject::tr("Show properties"));
+  action_something_else = new QAction(QObject::tr("Something else"));
+  actions_list.append(action_show_prop);
+  actions_list.append(action_something_else);
+}
 
 void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point2_in)
 {
@@ -145,6 +171,7 @@ void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point
   if(edge_width == -1){
     constructStatics();
   }
+  createActions();
   top_left.setX(std::min(point1.x(), point2.x()));
   top_left.setY(std::min(point1.y(), point2.y()));
   bot_right.setX(std::max(point1.x(), point2.x()));
@@ -154,6 +181,7 @@ void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point
   // flags
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemIsFocusable, true);
+
 }
 
 QRectF prim::Electrode::boundingRect() const
@@ -229,7 +257,7 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
       break;
     default:
       qDebug() << "should be showing property form.";
-      prim::Emitter::instance()->sig_showProperty(this);
+      // prim::Emitter::instance()->sig_showProperty(this);
       prim::Item::mousePressEvent(e);
       break;
   }

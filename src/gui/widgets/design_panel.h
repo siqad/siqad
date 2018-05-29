@@ -229,7 +229,8 @@ namespace gui{
     void cutAction();
     void copyAction();
     void pasteAction();
-    void showPropAction();
+    // void showPropAction();
+    void dummyAction();
     void deleteAction();
 
   private:
@@ -456,9 +457,6 @@ namespace gui{
     QAction *action_copy;
     QAction *action_paste;
     QAction *action_delete;
-    QAction *action_show_prop;
-    // QAction *action_set_potential;
-    QAction *action_toggle_db_elec;
   };
 
 

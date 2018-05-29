@@ -74,6 +74,7 @@ namespace prim{
 
     //! Return the class default property map
     virtual gui::PropertyMap *classPropertyMap() override {return &default_class_properties;}
+    virtual QList<QAction*> contextMenuActions() override {return actions_list;}
 
 
     // Graphics
@@ -112,6 +113,7 @@ namespace prim{
 
     //! Initialize static class variables.
     void prepareStatics();
+    void createActions();
 
     // 2D scan area parameters
     QPointF point_top_left;   //! Top left point.
@@ -137,6 +139,9 @@ namespace prim{
     // Resize
     prim::ResizeFrame *resize_frame=0;
     QRectF orig_rect;
+    QList<QAction*> actions_list;
+    QAction* action_show_prop;
+    QAction* action_something_else;
   };
 }
 

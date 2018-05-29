@@ -26,7 +26,7 @@ ResizeFrame::ResizeFrame(prim::Item *resize_target)
 
   if (resize_target) {
     setParentItem(resize_target);
-    setFlag(ItemStacksBehindParent, true);
+    // setFlag(ItemStacksBehindParent, true);
   }
   // create a set of handles
   for (HandlePosition handle_pos : handle_positions) {

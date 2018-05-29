@@ -57,6 +57,9 @@ namespace prim{
     //! Return the class default property map
     virtual gui::PropertyMap *classPropertyMap() override {return &default_class_properties;}
     virtual gui::PropertyMap *classPropertyMap() const override {return &default_class_properties;}
+    virtual QList<QAction*> contextMenuActions() override {return actions_list;}
+    // virtual QList<QAction*> contextMenuActions() override {return actions_list;}
+    virtual void performAction(QAction *action) override;
 
   protected:
 
@@ -70,7 +73,8 @@ namespace prim{
   private:
     // construct static variables
     void constructStatics();
-
+    void createActions();
+    void showProps();
     // properties of this item class
     static gui::PropertyMap default_class_properties; //! Default properties for this class
     // VARIABLES
@@ -87,6 +91,9 @@ namespace prim{
     // Resize
     prim::ResizeFrame *resize_frame=0;
     QRectF orig_rect;
+    QList<QAction*> actions_list;
+    QAction* action_show_prop;
+    QAction* action_something_else;
   };
 
 } // end prim namespace
