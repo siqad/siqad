@@ -143,9 +143,7 @@ void prim::Electrode::showProps()
 void prim::Electrode::performAction(QAction *action)
 {
   //switch case doesnt work on non-ints, use if else.
-  qDebug() << QObject::tr("PERFORM ACTION");
   if (action->text() == action_show_prop->text()) {
-    qDebug() << QObject::tr("action_show_prop");
     showProps();
   } else if (action->text() == action_something_else->text()) {
     qDebug() << QObject::tr("action_something_else");
@@ -256,8 +254,6 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
       qDebug() << "Left clicked!";
       break;
     default:
-      qDebug() << "should be showing property form.";
-      // prim::Emitter::instance()->sig_showProperty(this);
       prim::Item::mousePressEvent(e);
       break;
   }

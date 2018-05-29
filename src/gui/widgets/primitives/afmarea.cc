@@ -224,8 +224,6 @@ void AFMArea::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
   switch(e->buttons()) {
     default: {
-      qDebug() << "should be showing property form.";
-      prim::Emitter::instance()->sig_showProperty(this);
       prim::Item::mousePressEvent(e);
       qDebug() << h_speed;
       break;
@@ -250,6 +248,25 @@ QVariant AFMArea::itemChange(GraphicsItemChange change, const QVariant &value)
 
   return QGraphicsItem::itemChange(change, value);
 }
+
+void prim::AFMArea::showProps()
+{
+  prim::Emitter::instance()->sig_showProperty(this);
+}
+
+
+void prim::AFMArea::performAction(QAction *action)
+{
+  //switch case doesnt work on non-ints, use if else.
+  if (action->text() == action_show_prop->text()) {
+    showProps();
+  } else if (action->text() == action_something_else->text()) {
+    qDebug() << QObject::tr("action_something_else");
+  } else {
+    qDebug() << QObject::tr("Matched no action.");
+  }
+}
+
 
 void prim::AFMArea::createActions()
 {

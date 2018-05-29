@@ -229,7 +229,6 @@ namespace gui{
     void cutAction();
     void copyAction();
     void pasteAction();
-    // void showPropAction();
     void dummyAction();
     void deleteAction();
 

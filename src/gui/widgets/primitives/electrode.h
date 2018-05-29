@@ -58,7 +58,6 @@ namespace prim{
     virtual gui::PropertyMap *classPropertyMap() override {return &default_class_properties;}
     virtual gui::PropertyMap *classPropertyMap() const override {return &default_class_properties;}
     virtual QList<QAction*> contextMenuActions() override {return actions_list;}
-    // virtual QList<QAction*> contextMenuActions() override {return actions_list;}
     virtual void performAction(QAction *action) override;
 
   protected:
