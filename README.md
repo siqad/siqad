@@ -67,6 +67,27 @@ Finally, run `./build/debug/db-sim` (from the qsi-sim directory) to run the GUI.
 The simulation parameters form is very barebones right now consisting of only textboxes, improvements will be made shortly. Electrode and AFM paths have not been fully integrated for simulation yet, they will also be added soon.
 
 
+### Cross-compiling for Windows from a Ubuntu server
+
+The cross-compiling guide uses MXE for convenient access to pre-compiled cross-compilation binaries and toolchains. First, add their Debian PPA following the guide on their website: [http://pkg.mxe.cc/](http://pkg.mxe.cc/).
+
+Install the following packages:
+```
+sudo apt install mxe-x86-64-w64-mingw32.static-boost mxe-i686-w64-mingw32.static-boost mxe-x86-64-w64-mingw32.static-qtbase mxe-x86-64-w64-mingw32.static-qtsvg mxe-i686-w64-mingw32.static-qtbase mxe-i686-w64-mingw32.static-qtsvg mxe-x86-64-w64-mingw32.static-qttools mxe-i686-w64-mingw32.static-qttools
+```
+
+MXE's Qt does not support compiling in DEBUG mode, so take out the `debug` flag from `CONFIG` and add the `release` flag in `db-sim.pro`:
+```
+CONFIG += release
+```
+
+From the root directory of siqad, create a `win64` directory. From that directory, run:
+```
+FOR_OS=win64 ../make_everything
+```
+
+The `FOR_OS` flag informs the `make_everything` script which platform to cross-compile for, currently supported options are: `FOR_OS=<win32|win64>`. Leave blank if not cross-compiling.
+
 ## Licensing
 
 The open source version of Qt5 falls under the GNU LGPL v3 license, as does the GUI code. Qt5 includes some packages which include third-party content under different licenses. If these are used their specific licenses must be considered. Refer to http://doc.qt.io/qt-5/licenses-used-in-qt.html for a list of third-party licensed libraries.
