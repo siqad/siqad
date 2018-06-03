@@ -1,7 +1,9 @@
 #!/bin/bash
 
 swig -v -python -c++ siqadconn.i
-DEST_DIR=..
+DEST_DIR=lib
+
+mkdir -p "$DEST_DIR"
 
 if [ "$FOR_OS" == "win64" ]; then
     export PATH="$PATH:/usr/lib/mxe/usr/bin"

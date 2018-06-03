@@ -16,39 +16,38 @@ using namespace phys;
 
 
 //CONSTRUCTOR
-SiQADConnector::SiQADConnector(const std::string &eng_name_in,
-  const std::string &input_path_in, const std::string &output_path_in)
+SiQADConnector::SiQADConnector(const std::string &eng_name,
+  const std::string &input_path, const std::string &output_path)
+  : eng_name(eng_name), input_path(input_path), output_path(output_path)
 {
-  eng_name = eng_name_in;
-  input_path = input_path_in;
-  output_path = output_path_in;
-  initProblem();
-}
-
-void SiQADConnector::initCollections()
-{
+  // initialize variables
+  item_tree = std::make_shared<Aggregate>();
+  start_time = std::chrono::system_clock::now();
   elec_col = new ElectrodeCollection(item_tree);
   db_col = new DBCollection(item_tree);
+
+  // read problem from input_path
+  readProblem();
 }
 
 void SiQADConnector::setExport(std::string key, std::vector< std::pair< std::string, std::string > > &data_in)
 {
-    if (key == "db_loc"){
-      setDBLocData(data_in);
-    } else if (key == "db_charge"){
-      setDBChargeData(data_in);
-    }
+  if (key == "db_loc"){
+    setDBLocData(data_in);
+  } else if (key == "db_charge"){
+    setDBChargeData(data_in);
+  }
 }
 
 void SiQADConnector::setExport(std::string key, std::vector< std::vector< std::string > > &data_in)
 {
-    if (key == "potential"){
-      setElecPotentialData(data_in);
-    } else if (key == "electrodes"){
-      setElectrodeData(data_in);
-    } else if (key == "db_pot"){
-      setElectrodeData(data_in);
-    }
+  if (key == "potential"){
+    setElecPotentialData(data_in);
+  } else if (key == "electrodes"){
+    setElectrodeData(data_in);
+  } else if (key == "db_pot"){
+    setElectrodeData(data_in);
+  }
 }
 
 void SiQADConnector::setElecPotentialData(std::vector<std::vector<std::string>> &data_in)
@@ -79,22 +78,6 @@ void SiQADConnector::setDBChargeData(std::vector< std::pair< std::string, std::s
 {
   setExportDBChargeConfig(true);
   db_charge_data = data_in;
-}
-
-//What used to be problem
-void SiQADConnector::initProblem(void)
-{
-  item_tree = std::make_shared<Aggregate>();
-  expect_electrode = false;
-  expect_db = false;
-  expect_afm_path = false;
-  return_code = 0;
-  setExportElecPotential(false);
-  setExportDBChargeConfig(false);
-  setExportElectrode(false);
-  setExportDBLoc(false);
-  setExportDBPot(false);
-  start_time = std::chrono::system_clock::now();
 }
 
 // aggregate
@@ -279,13 +262,12 @@ void SiQADConnector::readSimulationParam(const bpt::ptree &sim_params_tree)
 void SiQADConnector::readDesign(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
 {
   std::cout << "Beginning to read design" << std::endl;
-  std::cout << expect_electrode << expect_db << expect_afm_path << std::endl;
   for (bpt::ptree::value_type const &layer_tree : subtree) {
     std::string layer_type = layer_tree.second.get<std::string>("<xmlattr>.type");
-    if ((!layer_type.compare("DB")) && (expect_db)) {
+    if ((!layer_type.compare("DB"))) {
       std::cout << "Encountered node " << layer_tree.first << " with type " << layer_type << ", entering" << std::endl;
       readItemTree(layer_tree.second, agg_parent);
-    } else if ( (!layer_type.compare("Electrode")) && (expect_electrode) ) {
+    } else if ( (!layer_type.compare("Electrode"))) {
       std::cout << "Encountered node " << layer_tree.first << " with type " << layer_type << ", entering" << std::endl;
       readItemTree(layer_tree.second, agg_parent);
     } else {
