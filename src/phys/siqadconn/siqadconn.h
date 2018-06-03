@@ -1,7 +1,7 @@
 // @file:     siqadconn.h
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2017.08.23 - Samuel
+// @editted:  2018.06.02 - Samuel
 // @license:  GNU LGPL v3
 //
 // @desc:     Convenient functions for interacting with SiQAD including
@@ -30,11 +30,21 @@
 namespace phys{
   namespace bpt = boost::property_tree;
 
+  // Layer
+  struct Layer;
+
+  // Electrode related
   struct Electrode;
   class ElectrodeCollection;
+
+  // DBDot related
   struct DBDot;
   class DBCollection;
+
+  // Aggregate
   struct Aggregate;
+
+  // Iterators
   class ElecIterator;
   class DBIterator;
 
@@ -43,10 +53,23 @@ namespace phys{
   typedef std::vector<std::shared_ptr<Electrode>>::const_iterator ElecIter;
   typedef std::vector<std::shared_ptr<Aggregate>>::const_iterator AggIter;
 
+  // layer struct
+  struct Layer {
+    Layer(std::string name, std::string type, float zoffset, float zheight)
+      : name(name), type(type), zoffset(zoffset), zheight(zheight) {};
+    Layer() {};
+    std::string name;   // layer name
+    std::string type;   // layer type
+    float zoffset=0;    // layer offset from lattice surface
+    float zheight=0;    // layer thickness
+  };
+
   // dangling bond
   struct DBDot {
     float x,y;  // physical location in angstroms
-    DBDot(float in_x, float in_y) : x(in_x), y(in_y){};
+    int n,m,l;  // location in lattice coordinates
+    DBDot(float in_x, float in_y, int n, int m, int l)
+      : x(in_x), y(in_y), n(n), m(m), l(l) {};
   };
 
   // a constant iterator that iterates through all dangling bonds in the problem
@@ -146,9 +169,9 @@ namespace phys{
   class SiQADConnector
   {
   public:
-    //CONSTRUCTOR
+    // CONSTRUCTOR
     SiQADConnector(const std::string &eng_name_in, const std::string &input_path_in, const std::string &output_path_in);
-    //DESTRUCTOR
+    // DESTRUCTOR
     ~SiQADConnector(){writeResultsXml();}
 
     void writeResultsXml();
@@ -157,12 +180,9 @@ namespace phys{
     void initProblem();
     void initCollections();
     // File Handling
-    bool readProblem();
+    void readProblem();
 
     // Accessors
-    //set a parameter as required for the simulation.
-    void setRequiredSimParam(std::string param_name);
-
     //Input flags
     void setExpectElectrode(bool set_val){expect_electrode = set_val;}
     void setExpectDB(bool set_val){expect_db = set_val;}
@@ -190,9 +210,6 @@ namespace phys{
     //set vector of strings as db data
     void setDBChargeData(std::vector<std::pair<std::string, std::string> > &data_in);
 
-    //get the required simulation parameter vector.
-    std::vector<std::string> getRequiredSimParam(void){return req_params;}
-
     //! Checks if a parameter exists given the parameter key.
     bool parameterExists(const std::string &key) {return sim_params.find(key) != sim_params.end();}
 
@@ -201,7 +218,13 @@ namespace phys{
     void setOutputPath(std::string path){output_path = path;}
     std::string getOutputPath(void){return output_path;}
     std::string getInputPath(void){return input_path;}
-    std::map<std::string, std::string> getProperty(const std::string identifier);
+
+    //! Return pointer to DB collection, which allows iteration through DBs
+    //! across all aggregate levels.
+    DBCollection* dbCollection() {return db_col;}
+
+    //! Return pointer to Electrode collection, which allows iteration through
+    //! electrodes across all electrode layers.
 
     //simulation inputs and outputs
     std::vector<std::vector<std::string>> pot_data;
@@ -211,39 +234,41 @@ namespace phys{
     std::vector<std::pair<std::string, std::string>> db_charge_data;
     std::vector<std::pair<float,float>> db_locs;
     boost::circular_buffer<std::vector<int>> db_charges;
-    ElectrodeCollection* elec_col;
-    DBCollection* db_col;
 
 
 
   private:
 
-    bool readProgramProp(const bpt::ptree &);
-    bool readMaterialProp(const bpt::ptree &);
-    bool readLayerProp(const bpt::ptree &top_tree);
-    bool readSimulationParam(const bpt::ptree &sim_params_tree);
-    bool readDesign(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
-    bool readItemTree(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
-    bool readElectrode(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
-    bool readDBDot(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
+    // Read program properties
+    void readProgramProp(const bpt::ptree &);
 
-    // Variables
-    std::shared_ptr<Aggregate> item_tree;
-    std::shared_ptr<Aggregate> db_tree;
-    std::shared_ptr<Aggregate> elec_tree;
-    std::map<std::string, std::string> program_props;
-    std::map<std::string, std::string> metal_props;
-    // std::map<std::string, std::string> material_props; TODO probably need a different structure for this
-    std::map<std::string, std::string> sim_params;
+    // Read layer properties
+    void readLayers(const bpt::ptree &);
+    void readLayerProp(const bpt::ptree &);
 
-    ElecIter elec_iter;               // points to the current electrode
-    std::shared_ptr<Aggregate> curr;  // current working Aggregate
-    std::stack<std::pair<std::shared_ptr<Aggregate>, AggIter>> agg_stack;
+    // Read simulation parameters
+    void readSimulationParam(const bpt::ptree &);
 
-    std::string eng_name;
-    std::string input_path;
-    std::string output_path;
-    std::vector<std::string> req_params;
+    // Read design
+    void readDesign(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
+    void readItemTree(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
+    void readElectrode(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
+    void readDBDot(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent);
+
+    // Iterable collections
+    ElectrodeCollection* elec_col;
+    DBCollection* db_col;
+
+    // Retrieved items and properties
+    std::map<std::string, std::string> program_props; // SiQAD properties
+    std::shared_ptr<Aggregate> item_tree;             // all physical items
+    std::vector<Layer> layers;                        // layers
+    std::map<std::string, std::string> sim_params;    // simulation parameters
+
+    // Engine properties
+    std::string eng_name;                 // name of simulation engine
+    std::string input_path;               // path to problem file
+    std::string output_path;              // path to result export
 
     bool expect_electrode;
     bool expect_db;

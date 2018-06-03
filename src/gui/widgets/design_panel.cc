@@ -414,7 +414,9 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *ws, bool for_sim)
   // save layer properties
   ws->writeComment("Layer Properties");
   ws->writeComment("Layer ID is intrinsic to the layer order");
+  ws->writeStartElement("layers");
   layman->saveLayers(ws);
+  ws->writeEndElement();
 
   // save item hierarchy
   ws->writeComment("Item Hierarchy");
@@ -436,7 +438,10 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
       rs->skipCurrentElement();
     } else if(rs->name() == "gui") {
       loadGUIFlags(rs);
+    } else if (rs->name() == "layers") {
+      loadLayers(rs);
     } else if(rs->name() == "layer_prop") {
+      // starting version 0.0.2 layer_prop should appear inside the layers level
       loadLayerProps(rs);
     } else if(rs->name() == "design") {
       loadDesign(rs);
@@ -476,6 +481,15 @@ void gui::DesignPanel::loadGUIFlags(QXmlStreamReader *rs)
   verticalScrollBar()->setValue(scroll_v);
   horizontalScrollBar()->setValue(scroll_h);
   qDebug() << tr("Zoom set to %1, scroll v=%2, h=%3").arg(zoom).arg(scroll_v).arg(scroll_h);
+}
+
+
+void gui::DesignPanel::loadLayers(QXmlStreamReader *rs)
+{
+  qDebug() << "Loading layers";
+  while (rs->readNextStartElement())
+    if (rs->name() == "layer_prop")
+      loadLayerProps(rs);
 }
 
 

@@ -23,8 +23,8 @@ INCLUDEPATH += .
 # APPLICATION INFORMATION #
 ###########################
 
-VERSION = 0.0.1
-DEFINES += APP_VERSION=\\\"0.0.1\\\"
+VERSION = 0.0.2
+DEFINES += APP_VERSION=\\\"0.0.2\\\"
 DEFINES += APPLICATION_NAME=\\\"SiQAD\\\"
 DEFINES += ORGANIZATION_NAME=\\\"WalusLab\\\"
 
@@ -98,7 +98,7 @@ SOURCES += \
   src/gui/widgets/primitives/pot_plot.cc \
 	src/gui/widgets/primitives/resize_frame.cc \
 	src/gui/widgets/primitives/hull/hull.cc \
-	src/gui/widgets/primitives/hull/convex.cc 
+	src/gui/widgets/primitives/hull/convex.cc
 
 
 # widgets
@@ -184,10 +184,10 @@ sim_afmmarcus.files = \
     $$PHYS_DIR/afmmarcus/afm_line_scan.physeng \
     $$PHYS_DIR/afmmarcus/hopping_animator.physeng \
     $$PHYS_DIR/afmmarcus/marcus_and_pois.physeng \
-win32:  sim_afmmarcus.files += \
-    $$PHYS_DIR/afmmarcus/src/afmmarcus.exe
-!win32: sim_afmmarcus.files += \
-    $$PHYS_DIR/afmmarcus/src/afmmarcus
+sim_afmmarcus.files += \
+    $$PHYS_DIR/afmmarcus/src/python/_siqadconn.cpython-36m-x86_64-linux-gnu.so
+win32: sim_afmmarcus.files += \
+    $$PHYS_DIR/afmmarcus/src/python/_siqadconn.pyd
 sim_afmmarcus.files += \
     $$PHYS_DIR/afmmarcus/src/python/afm.py \
     $$PHYS_DIR/afmmarcus/src/python/animator.py \
@@ -199,7 +199,8 @@ sim_afmmarcus.files += \
     $$PHYS_DIR/afmmarcus/src/python/marcus.py \
     $$PHYS_DIR/afmmarcus/src/python/model.py \
     $$PHYS_DIR/afmmarcus/src/python/tip_model.py \
-    $$PHYS_DIR/afmmarcus/src/python/pyqt_import.py
+    $$PHYS_DIR/afmmarcus/src/python/pyqt_import.py \
+		$$PHYS_DIR/afmmarcus/src/python/siqadconn.py
 sim_afmmarcus_stylesheets.path = $$EXEC_DIR/src/phys/afmmarcus/stylesheets
 sim_afmmarcus_stylesheets.files = \
     $$PHYS_DIR/afmmarcus/src/python/stylesheets/animator.qss

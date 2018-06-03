@@ -137,6 +137,9 @@ namespace gui{
     //! Load GUI flags.
     void loadGUIFlags(QXmlStreamReader *);
 
+    //! Load layers.
+    void loadLayers(QXmlStreamReader *);
+
     //! Load layer properties.
     void loadLayerProps(QXmlStreamReader *);
 

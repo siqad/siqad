@@ -25,23 +25,6 @@ SiQADConnector::SiQADConnector(const std::string &eng_name_in,
   initProblem();
 }
 
-void SiQADConnector::setRequiredSimParam(std::string param_name)
-{
-  req_params.push_back(param_name);
-}
-
-std::map<std::string, std::string> SiQADConnector::getProperty(const std::string identifier)
-{
-  if (identifier == "Metal"){
-    return metal_props;
-  } else if (identifier == "Program"){
-    return program_props;
-  } else {
-    std::map<std::string, std::string> empty;
-    return empty;
-  }
-}
-
 void SiQADConnector::initCollections()
 {
   elec_col = new ElectrodeCollection(item_tree);
@@ -231,91 +214,69 @@ void ElecIterator::pop()
 
 // FILE HANDLING
 // parse problem XML, return true if successful
-bool SiQADConnector::readProblem(void)
+void SiQADConnector::readProblem()
 {
   std::cout << "Reading problem file: " << input_path << std::endl;
 
   bpt::ptree tree; // create empty property tree object
   bpt::read_xml(input_path, tree, bpt::xml_parser::no_comments); // parse the input file into property tree
-  // TODO catch read error exception
 
   // parse XML
 
   // read program properties
   // TODO read program node
 
-  // read material properties
-  // TODO read material_prop node
-
   // read simulation parameters
   std::cout << "Read simulation parameters" << std::endl;
-  if(!readSimulationParam(tree.get_child("dbdesigner.sim_params")))
-    return false;
-
-  // read items
-  std::cout << "Read items tree" << std::endl;
-  if(!readDesign(tree.get_child("dbdesigner.design"), item_tree))
-    return false;
+  readSimulationParam(tree.get_child("siqad.sim_params"));
 
   // read layer properties
   std::cout << "Read layer properties" << std::endl;
-  if(!readLayerProp(tree.get_child("dbdesigner")))
-    return false;
+  readLayers(tree.get_child("siqad.layers"));
 
-  //return true;
-  return false;
+  // read items
+  std::cout << "Read items tree" << std::endl;
+  readDesign(tree.get_child("siqad.design"), item_tree);
 }
 
-bool SiQADConnector::readProgramProp(const bpt::ptree &program_prop_tree)
+void SiQADConnector::readProgramProp(const bpt::ptree &program_prop_tree)
 {
   for (bpt::ptree::value_type const &v : program_prop_tree) {
     program_props.insert(std::map<std::string, std::string>::value_type(v.first, v.second.data()));
     std::cout << "ProgramProp: Key=" << v.first << ", Value=" << program_props[v.first] << std::endl;
   }
-  return true;
 }
 
-bool SiQADConnector::readLayerProp(const bpt::ptree &top_tree)
+void SiQADConnector::readLayers(const bpt::ptree &layer_prop_tree)
 {
   // if this were structured the same way as readDesign, then only the first layer_prop subtree would be read.
   // TODO: make this more general.
-  for (bpt::ptree::value_type const &v : top_tree) {
-    if(v.first == "layer_prop"){
-      bool active = false;
-      for (bpt::ptree::value_type const &layer_prop_tree : v.second) {
-        // active will be true if we are in the Metal layer prop.
-        if (layer_prop_tree.second.data() == "Metal") {
-          active = true;
-        } else if (layer_prop_tree.first == "name" && layer_prop_tree.second.data() != "Metal"){
-          active = false;
-        }
-        if (active == true) {
-          metal_props.insert(std::map<std::string, std::string>::value_type(layer_prop_tree.first, layer_prop_tree.second.data()));
-          std::cout << "MetalProp: Key=" << layer_prop_tree.first << ", Value=" << metal_props[layer_prop_tree.first] << std::endl;
-        }
-      }
-    }
-  }
-  return true;
+  for (bpt::ptree::value_type const &v : layer_prop_tree)
+    readLayerProp(v.second);
 }
 
-
-bool SiQADConnector::readMaterialProp(const bpt::ptree &material_prop_tree)
+void SiQADConnector::readLayerProp(const bpt::ptree &layer_node)
 {
-  (void)material_prop_tree; // function to be implemented, suppress variable unused warning for now
-  return true;
+  Layer lay;
+  lay.name = layer_node.get<std::string>("name");
+  lay.type = layer_node.get<std::string>("type");
+  lay.zoffset = layer_node.get<float>("zoffset");
+  lay.zheight = layer_node.get<float>("zheight");
+
+  layers.push_back(lay);
+  std::cout << "Retrieved layer " << lay.name << " of type " << lay.type << std::endl;
 }
 
-bool SiQADConnector::readSimulationParam(const bpt::ptree &sim_params_tree)
+
+void SiQADConnector::readSimulationParam(const bpt::ptree &sim_params_tree)
 {
   for (bpt::ptree::value_type const &v : sim_params_tree) {
     sim_params.insert(std::map<std::string, std::string>::value_type(v.first, v.second.data()));
     std::cout << "SimParam: Key=" << v.first << ", Value=" << sim_params[v.first] << std::endl;
   }
-  return true;
 }
 
-bool SiQADConnector::readDesign(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
+void SiQADConnector::readDesign(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
 {
   std::cout << "Beginning to read design" << std::endl;
   std::cout << expect_electrode << expect_db << expect_afm_path << std::endl;
@@ -331,10 +292,9 @@ bool SiQADConnector::readDesign(const bpt::ptree &subtree, const std::shared_ptr
       std::cout << "Encountered node " << layer_tree.first << " with type " << layer_type << ", no defined action for this layer. Skipping." << std::endl;
     }
   }
-  return true;
 }
 
-bool SiQADConnector::readItemTree(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
+void SiQADConnector::readItemTree(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
 {
   for (bpt::ptree::value_type const &item_tree : subtree) {
     std::string item_name = item_tree.first;
@@ -353,10 +313,9 @@ bool SiQADConnector::readItemTree(const bpt::ptree &subtree, const std::shared_p
       std::cout << "Encountered unknown item node: " << item_tree.first << std::endl;
     }
   }
-  return true;
 }
 
-bool SiQADConnector::readElectrode(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
+void SiQADConnector::readElectrode(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
 {
   double x1, x2, y1, y2, pixel_per_angstrom, potential, phase;
   int layer_id, electrode_type;
@@ -380,25 +339,30 @@ bool SiQADConnector::readElectrode(const bpt::ptree &subtree, const std::shared_
   std::cout << "Electrode created with x1=" << agg_parent->elecs.back()->x1 << ", y1=" << agg_parent->elecs.back()->y1 <<
     ", x2=" << agg_parent->elecs.back()->x2 << ", y2=" << agg_parent->elecs.back()->y2 <<
     ", potential=" << agg_parent->elecs.back()->potential << std::endl;
-
-  return true;
 }
 
-bool SiQADConnector::readDBDot(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
+void SiQADConnector::readDBDot(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
 {
   float x, y;
+  int n, m, l;
 
-  // read x and y from XML stream
-  // elec = subtree.get<float>("elec");
+  // read x and y physical locations
   x = subtree.get<float>("physloc.<xmlattr>.x");
   y = subtree.get<float>("physloc.<xmlattr>.y");
 
-  agg_parent->dbs.push_back(std::make_shared<DBDot>(x,y));
+  // read n, m and l lattice coordinates
+  n = subtree.get<int>("latcoord.<xmlattr>.n");
+  m = subtree.get<int>("latcoord.<xmlattr>.m");
+  l = subtree.get<int>("latcoord.<xmlattr>.l");
 
-  // std::cout << "DBDot created with x=" << agg_parent->dbs.back()->x << ", y=" << agg_parent->dbs.back()->y << ", elec=" << agg_parent->dbs.back()->elec << std::endl;
-  std::cout << "DBDot created with x=" << agg_parent->dbs.back()->x << ", y=" << agg_parent->dbs.back()->y << std::endl;
+  agg_parent->dbs.push_back(std::make_shared<DBDot>(x, y, n, m, l));
 
-  return true;
+  std::cout << "DBDot created with x=" << agg_parent->dbs.back()->x
+            << ", y=" << agg_parent->dbs.back()->y
+            << ", n=" << agg_parent->dbs.back()->n
+            << ", m=" << agg_parent->dbs.back()->m
+            << ", l=" << agg_parent->dbs.back()->l
+            << std::endl;
 }
 
 void SiQADConnector::writeResultsXml()
