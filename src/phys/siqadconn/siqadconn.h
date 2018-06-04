@@ -1,7 +1,7 @@
 // @file:     siqadconn.h
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2018.06.02 - Samuel
+// @editted:  2018.06.03 - Samuel
 // @license:  GNU LGPL v3
 //
 // @desc:     Convenient functions for interacting with SiQAD including
@@ -23,7 +23,6 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <string>
 #include <vector>
-#include <boost/circular_buffer.hpp>
 #include <ctime>
 #include <chrono>
 
@@ -32,13 +31,13 @@ namespace phys{
 
   // forward declaration
   struct Layer;
-  struct Electrode;
-  class ElectrodeCollection;
   struct DBDot;
-  class DBCollection;
-  struct Aggregate;
-  class ElecIterator;
   class DBIterator;
+  class DBCollection;
+  struct Electrode;
+  class ElecIterator;
+  class ElectrodeCollection;
+  struct Aggregate;
 
   typedef std::vector<std::shared_ptr<DBDot>>::const_iterator DBIter;
   typedef std::vector<std::shared_ptr<Electrode>>::const_iterator ElecIter;
@@ -60,27 +59,9 @@ namespace phys{
 
     // EXPORTING
 
-    // Generalized export setter which calls one of the export functions below
-    void setExport(std::string key, std::vector< std::pair< std::string, std::string > > &data_in);
-    void setExport(std::string key, std::vector< std::vector< std::string > > &data_in);
-
-    // Set result types and contents to be exported
-    void setExportElecPotential(bool set_val){export_elec_potential = set_val;}
-    void setExportDBChargeConfig(bool set_val){export_db_charge_config = set_val;}
-    void setExportElectrode(bool set_val){export_electrode = set_val;}
-    void setExportDBLoc(bool set_val){export_db_loc = set_val;}
-    void setExportDBPot(bool set_val){export_db_pot = set_val;}
-
-    //set vector of strings as potential data
-    void setElecPotentialData(std::vector<std::vector<std::string>> &data_in);
-    //set vector of strings as electrode data
-    void setElectrodeData(std::vector<std::vector<std::string>> &data_in);
-    //set vector of strings as db data
-    void setDBLocData(std::vector< std::pair< std::string, std::string > > &data_in);
-    //set vector of strings as db data
-    void setDBPotData(std::vector< std::vector< std::string > > &data_in);
-    //set vector of strings as db data
-    void setDBChargeData(std::vector<std::pair<std::string, std::string> > &data_in);
+    // Set export type and variable
+    void setExport(std::string type, std::vector< std::pair< std::string, std::string > > &data_in);
+    void setExport(std::string type, std::vector< std::vector< std::string > > &data_in);
 
 
     // SIMULATION PARAMETERS
@@ -104,25 +85,15 @@ namespace phys{
 
 
     // Misc Accessors
+    std::string inputPath(){return input_path;}
+
     void setOutputPath(std::string path){output_path = path;}
-    std::string getOutputPath(void){return output_path;}
-    std::string getInputPath(void){return input_path;}
-
-
-    //simulation inputs and outputs
-    std::vector<std::vector<std::string>> pot_data;
-    std::vector<std::vector<std::string>> db_pot_data;
-    std::vector<std::vector<std::string>> elec_data;
-    std::vector<std::pair<std::string, std::string>> dbl_data;
-    std::vector<std::pair<std::string, std::string>> db_charge_data;
-    std::vector<std::pair<float,float>> db_locs;
-    boost::circular_buffer<std::vector<int>> db_charges;
-
+    std::string outputPath(){return output_path;}
 
   private:
 
     // Read the problem file
-    void readProblem();
+    void readProblem(const std::string &path);
 
     // Read program properties
     void readProgramProp(const bpt::ptree &);
@@ -140,6 +111,20 @@ namespace phys{
     void readElectrode(const bpt::ptree &, const std::shared_ptr<Aggregate> &);
     void readDBDot(const bpt::ptree &, const std::shared_ptr<Aggregate> &);
 
+    // Generate property trees for writing
+    bpt::ptree engInfoPropertyTree();
+    bpt::ptree simParamsPropertyTree();
+    bpt::ptree dbLocPropertyTree();
+    bpt::ptree dbChargePropertyTree();
+    bpt::ptree electrodePropertyTree();
+    bpt::ptree potentialPropertyTree();
+    bpt::ptree dbPotentialPropertyTree(); // TODO fix up this function, a lot of redundant information
+
+    // Engine properties
+    std::string eng_name;                 // name of simulation engine
+    std::string input_path;               // path to problem file
+    std::string output_path;              // path to result export
+
     // Iterable collections
     ElectrodeCollection* elec_col;
     DBCollection* db_col;
@@ -150,16 +135,14 @@ namespace phys{
     std::vector<Layer> layers;                        // layers
     std::map<std::string, std::string> sim_params;    // simulation parameters
 
-    // Engine properties
-    std::string eng_name;                 // name of simulation engine
-    std::string input_path;               // path to problem file
-    std::string output_path;              // path to result export
+    // Exportable data
+    std::vector<std::vector<std::string>> pot_data;
+    std::vector<std::vector<std::string>> db_pot_data;
+    std::vector<std::vector<std::string>> elec_data;
+    std::vector<std::pair<std::string, std::string>> dbl_data;        // pair of location x and y
+    std::vector<std::pair<std::string, std::string>> db_charge_data;  // pair of elec dist and energy
 
-    bool export_elec_potential=false;
-    bool export_db_charge_config=false;
-    bool export_electrode=false;
-    bool export_db_loc=false;
-    bool export_db_pot=false;
+    // Runtime information
     int return_code=0;
     std::chrono::time_point<std::chrono::system_clock> start_time;
     std::chrono::time_point<std::chrono::system_clock> end_time;

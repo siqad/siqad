@@ -1,13 +1,14 @@
 // @file:     siqadconn.cc
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2017.08.23 - Samuel
+// @editted:  2018.06.03 - Samuel
 // @license:  GNU LGPL v3
 //
 // @desc:     Convenient functions for interacting with SiQAD
 
 #include "siqadconn.h"
 #include <iostream>
+#include <stdexcept>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
@@ -27,182 +28,43 @@ SiQADConnector::SiQADConnector(const std::string &eng_name,
   db_col = new DBCollection(item_tree);
 
   // read problem from input_path
-  readProblem();
+  readProblem(input_path);
 }
 
-void SiQADConnector::setExport(std::string key, std::vector< std::pair< std::string, std::string > > &data_in)
+void SiQADConnector::setExport(std::string type, std::vector< std::pair< std::string, std::string > > &data_in)
 {
-  if (key == "db_loc"){
-    setDBLocData(data_in);
-  } else if (key == "db_charge"){
-    setDBChargeData(data_in);
-  }
+  if (type == "db_loc")
+    dbl_data = data_in;
+  else if (type == "db_charge")
+    db_charge_data = data_in;
+  else
+    throw std::invalid_argument(std::string("No candidate for export type '") +
+        type + std::string("' with class std::vector<std::pair<std::string, std::string>>"));
 }
 
-void SiQADConnector::setExport(std::string key, std::vector< std::vector< std::string > > &data_in)
+void SiQADConnector::setExport(std::string type, std::vector< std::vector< std::string > > &data_in)
 {
-  if (key == "potential"){
-    setElecPotentialData(data_in);
-  } else if (key == "electrodes"){
-    setElectrodeData(data_in);
-  } else if (key == "db_pot"){
-    setElectrodeData(data_in);
-  }
-}
-
-void SiQADConnector::setElecPotentialData(std::vector<std::vector<std::string>> &data_in)
-{
-  setExportElecPotential(true);
-  pot_data = data_in;
-}
-
-void SiQADConnector::setElectrodeData(std::vector<std::vector<std::string>> &data_in)
-{
-  setExportElectrode(true);
-  elec_data = data_in;
+  if (type == "potential")
+    pot_data = data_in;
+  else if (type == "electrodes")
+    elec_data = data_in;
+  else if (type == "db_pot")
+    db_pot_data = data_in;
+  else
+    throw std::invalid_argument(std::string("No candidate for export type '") +
+        type + std::string("' with class std::vector<std::vector<std::string>>"));
 }
 
 
-void SiQADConnector::setDBPotData(std::vector< std::vector< std::string > > &data_in){
-  setExportDBPot(true);
-  db_pot_data = data_in;
-}
-
-void SiQADConnector::setDBLocData(std::vector< std::pair< std::string, std::string > > &data_in)
-{
-  setExportDBLoc(true);
-  dbl_data = data_in;
-}
-
-void SiQADConnector::setDBChargeData(std::vector< std::pair< std::string, std::string > > &data_in)
-{
-  setExportDBChargeConfig(true);
-  db_charge_data = data_in;
-}
-
-// aggregate
-int Aggregate::size()
-{
-  int n_elecs=elecs.size();
-  if(!aggs.empty())
-    for(auto agg : aggs)
-      n_elecs += agg->size();
-  return n_elecs;
-}
-
-//DB ITERATOR
-
-DBIterator::DBIterator(std::shared_ptr<Aggregate> root, bool begin)
-{
-  if(begin){
-    // keep finding deeper aggregates until one that contains dbs is found
-    while(root->dbs.empty() && !root->aggs.empty()) {
-      push(root);
-      root = root->aggs.front();
-    }
-    push(root);
-  }
-  else{
-    db_iter = root->dbs.cend();
-  }
-}
-
-DBIterator& DBIterator::operator++()
-{
-  // exhaust the current Aggregate DBs first
-  if(db_iter != curr->dbs.cend())
-    return ++db_iter != curr->dbs.cend() ? *this : ++(*this);
-
-  // if available, push the next aggregate onto the stack
-  if(agg_stack.top().second != curr->aggs.cend()){
-    push(*agg_stack.top().second);
-    return db_iter != curr->dbs.cend() ? *this : ++(*this);
-  }
-
-  // aggregate is complete, pop off stack
-  pop();
-  return agg_stack.size() == 0 ? *this : ++(*this);
-}
-
-void DBIterator::push(std::shared_ptr<Aggregate> agg)
-{
-  if(!agg_stack.empty())
-    ++agg_stack.top().second;
-  agg_stack.push(std::make_pair(agg, agg->aggs.cbegin()));
-  db_iter = agg->dbs.cbegin();
-  curr = agg;
-}
-
-void DBIterator::pop()
-{
-  agg_stack.pop();              // pop complete aggregate off stack
-  if(agg_stack.size() > 0){
-    curr = agg_stack.top().first; // update current to new top
-    db_iter = curr->dbs.cend();   // don't reread dbs
-  }
-}
-
-
-
-// ELEC ITERATOR
-ElecIterator::ElecIterator(std::shared_ptr<Aggregate> root, bool begin)
-{
-  if(begin){
-    // keep finding deeper aggregates until one that contains dbs is found
-    while(root->elecs.empty() && !root->aggs.empty()) {
-      push(root);
-      root = root->aggs.front();
-    }
-    push(root);
-  }
-  else{
-    elec_iter = root->elecs.cend();
-  }
-}
-
-ElecIterator& ElecIterator::operator++()
-{
-  // exhaust the current Aggregate DBs first
-  if(elec_iter != curr->elecs.cend())
-    return ++elec_iter != curr->elecs.cend() ? *this : ++(*this);
-
-  // if available, push the next aggregate onto the stack
-  if(agg_stack.top().second != curr->aggs.cend()){
-    push(*agg_stack.top().second);
-    return elec_iter != curr->elecs.cend() ? *this : ++(*this);
-  }
-
-  // aggregate is complete, pop off stack
-  pop();
-  return agg_stack.size() == 0 ? *this : ++(*this);
-}
-
-void ElecIterator::push(std::shared_ptr<Aggregate> agg)
-{
-  if(!agg_stack.empty())
-    ++agg_stack.top().second;
-  agg_stack.push(std::make_pair(agg, agg->aggs.cbegin()));
-  elec_iter = agg->elecs.cbegin();
-  curr = agg;
-}
-
-void ElecIterator::pop()
-{
-  agg_stack.pop();              // pop complete aggregate off stack
-  if(agg_stack.size() > 0){
-    curr = agg_stack.top().first; // update current to new top
-    elec_iter = curr->elecs.cend();   // don't reread dbs
-  }
-}
 
 // FILE HANDLING
 // parse problem XML, return true if successful
-void SiQADConnector::readProblem()
+void SiQADConnector::readProblem(const std::string &path)
 {
   std::cout << "Reading problem file: " << input_path << std::endl;
 
   bpt::ptree tree; // create empty property tree object
-  bpt::read_xml(input_path, tree, bpt::xml_parser::no_comments); // parse the input file into property tree
+  bpt::read_xml(path, tree, bpt::xml_parser::no_comments); // parse the input file into property tree
 
   // parse XML
 
@@ -350,25 +212,52 @@ void SiQADConnector::readDBDot(const bpt::ptree &subtree, const std::shared_ptr<
 void SiQADConnector::writeResultsXml()
 {
   std::cout << "SiQADConnector::writeResultsXml()" << std::endl;
-  // define major XML nodes
-  boost::property_tree::ptree tree;
-  boost::property_tree::ptree node_root;       // <sim_out>
-  boost::property_tree::ptree node_eng_info;   // <eng_info>
-  boost::property_tree::ptree node_sim_params; // <sim_params>
-  boost::property_tree::ptree node_electrode;  // <electrode>
-  boost::property_tree::ptree node_potential_map;  // <potential>
-  boost::property_tree::ptree node_db_potentials;  // <db_potential>
-  boost::property_tree::ptree node_physloc;    // <physloc>
-  boost::property_tree::ptree node_elec_dist;  // <elec_dist>
+
+  boost::property_tree::ptree node_root;
 
   std::cout << "Write results to XML..." << std::endl;
-  // NOTE in the future, there's probably a range of stuff that can be exported.
-  // for now, only export charge config
 
   // eng_info
+  node_root.add_child("eng_info", engInfoPropertyTree());
+
+  // sim_params
+  node_root.add_child("sim_params", simParamsPropertyTree());
+
+  // DB locations
+  if (!dbl_data.empty())
+    node_root.add_child("physloc", dbLocPropertyTree());
+
+  // DB electron distributions
+  if(!db_charge_data.empty())
+    node_root.add_child("elec_dist", dbChargePropertyTree());
+
+  // electrode
+  if (!elec_data.empty())
+    node_root.add_child("electrode", electrodePropertyTree());
+
+  //electric potentials
+  if (!pot_data.empty())
+    node_root.add_child("potential_map", potentialPropertyTree());
+
+  //potentials at db locations
+  if (!db_pot_data.empty())
+    node_root.add_child("dbdots", dbPotentialPropertyTree());
+
+  // write full tree to file
+  boost::property_tree::ptree tree;
+  tree.add_child("sim_out", node_root);
+  boost::property_tree::write_xml(output_path, tree, std::locale(), boost::property_tree::xml_writer_make_settings<std::string>(' ',4));
+
+  std::cout << "Write to XML complete." << std::endl;
+}
+
+bpt::ptree SiQADConnector::engInfoPropertyTree()
+{
+  boost::property_tree::ptree node_eng_info;
   node_eng_info.put("engine", eng_name);
   node_eng_info.put("version", "TBD"); // TODO real version
   node_eng_info.put("return_code", std::to_string(return_code).c_str());
+
   //get timing information
   end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end_time-start_time;
@@ -377,97 +266,200 @@ void SiQADConnector::writeResultsXml()
   *std::remove(end_c_str, end_c_str+strlen(end_c_str), '\n') = '\0'; // removes _all_ new lines from the cstr
   node_eng_info.put("timestamp", end_c_str);
   node_eng_info.put("time_elapsed_s", std::to_string(elapsed_seconds.count()).c_str());
-  node_root.add_child("eng_info", node_eng_info);
 
-  // sim_params
-  // TODO
+  return node_eng_info;
+}
 
-  // DB locations
-  if (export_db_loc){
-    std::cout << "Exporting DB locations..." << std::endl;
-    for (unsigned int i = 0; i < dbl_data.size(); i++){
-      bpt::ptree node_dbdot;
-      node_dbdot.put("<xmlattr>.x", dbl_data[i].first.c_str());
-      node_dbdot.put("<xmlattr>.y", dbl_data[i].second.c_str());
-      node_physloc.add_child("dbdot", node_dbdot);
+bpt::ptree SiQADConnector::simParamsPropertyTree()
+{
+  bpt::ptree node_sim_params;
+  for (std::pair<std::string, std::string> param : sim_params)
+    node_sim_params.put(param.first, param.second);
+  return node_sim_params;
+}
+
+bpt::ptree SiQADConnector::dbLocPropertyTree()
+{
+  bpt::ptree node_physloc;
+  for (unsigned int i = 0; i < dbl_data.size(); i++){
+    bpt::ptree node_dbdot;
+    node_dbdot.put("<xmlattr>.x", dbl_data[i].first.c_str());
+    node_dbdot.put("<xmlattr>.y", dbl_data[i].second.c_str());
+    node_physloc.add_child("dbdot", node_dbdot);
+  }
+  return node_physloc;
+}
+
+bpt::ptree SiQADConnector::dbChargePropertyTree()
+{
+  bpt::ptree node_elec_dist;
+  for (unsigned int i = 0; i < db_charge_data.size(); i++){
+    bpt::ptree node_dist;
+    node_dist.put("", db_charge_data[i].first);
+    node_dist.put("<xmlattr>.energy", db_charge_data[i].second);
+    node_elec_dist.add_child("dist", node_dist);
+  }
+  return node_elec_dist;
+}
+
+bpt::ptree SiQADConnector::electrodePropertyTree()
+{
+  bpt::ptree node_electrode;
+  for (unsigned int i = 0; i < elec_data.size(); i++){
+    boost::property_tree::ptree node_dim;
+    node_dim.put("<xmlattr>.x1", elec_data[i][0].c_str());
+    node_dim.put("<xmlattr>.y1", elec_data[i][1].c_str());
+    node_dim.put("<xmlattr>.x2", elec_data[i][2].c_str());
+    node_dim.put("<xmlattr>.y2", elec_data[i][3].c_str());
+    node_electrode.add_child("dim", node_dim);
+    boost::property_tree::ptree node_pot;
+    node_pot.put("", elec_data[i][4].c_str());
+    node_electrode.add_child("potential", node_pot);
+  }
+  return node_electrode;
+}
+
+bpt::ptree SiQADConnector::potentialPropertyTree()
+{
+  bpt::ptree node_potential_map;
+  for (unsigned int i = 0; i < pot_data.size(); i++){
+    boost::property_tree::ptree node_potential_val;
+    node_potential_val.put("<xmlattr>.x", pot_data[i][0].c_str());
+    node_potential_val.put("<xmlattr>.y", pot_data[i][1].c_str());
+    node_potential_val.put("<xmlattr>.val", pot_data[i][2].c_str());
+    node_potential_map.add_child("potential_val", node_potential_val);
+  }
+  return node_potential_map;
+}
+
+bpt::ptree SiQADConnector::dbPotentialPropertyTree()
+{
+  bpt::ptree node_dbdots;
+  for (unsigned int i = 0; i < db_pot_data.size(); i++){
+    bpt::ptree node_dbdot;
+    bpt::ptree node_physloc;
+    node_physloc.put("<xmlattr>.x", db_pot_data[i][0].c_str());
+    node_physloc.put("<xmlattr>.y", db_pot_data[i][1].c_str());
+    node_dbdot.add_child("physloc", node_physloc);
+    boost::property_tree::ptree node_db_pot;
+    node_db_pot.put("", db_pot_data[i][2].c_str());
+    node_dbdot.add_child("potential", node_db_pot);
+    node_dbdots.add_child("dbdot", node_dbdot);
+  }
+  return node_dbdots;
+}
+
+//DB ITERATOR
+
+DBIterator::DBIterator(std::shared_ptr<Aggregate> root, bool begin)
+{
+  if(begin){
+    // keep finding deeper aggregates until one that contains dbs is found
+    while(root->dbs.empty() && !root->aggs.empty()) {
+      push(root);
+      root = root->aggs.front();
     }
-    node_root.add_child("physloc", node_physloc);
+    push(root);
+  }
+  else{
+    db_iter = root->dbs.cend();
+  }
+}
+
+DBIterator& DBIterator::operator++()
+{
+  // exhaust the current Aggregate DBs first
+  if(db_iter != curr->dbs.cend())
+    return ++db_iter != curr->dbs.cend() ? *this : ++(*this);
+
+  // if available, push the next aggregate onto the stack
+  if(agg_stack.top().second != curr->aggs.cend()){
+    push(*agg_stack.top().second);
+    return db_iter != curr->dbs.cend() ? *this : ++(*this);
   }
 
-  //DB elec distributions
-  if(export_db_charge_config){
-    std::cout << "Exporting DB electron distrbutions..." << std::endl;
-    for (unsigned int i = 0; i < db_charge_data.size(); i++){
-      bpt::ptree node_dist;
-      node_dist.put("", db_charge_data[i].first);
-      node_dist.put("<xmlattr>.energy", db_charge_data[i].second);
-      node_elec_dist.add_child("dist", node_dist);
-    }
-    node_root.add_child("elec_dist", node_elec_dist);
+  // aggregate is complete, pop off stack
+  pop();
+  return agg_stack.size() == 0 ? *this : ++(*this);
+}
+
+void DBIterator::push(std::shared_ptr<Aggregate> agg)
+{
+  if(!agg_stack.empty())
+    ++agg_stack.top().second;
+  agg_stack.push(std::make_pair(agg, agg->aggs.cbegin()));
+  db_iter = agg->dbs.cbegin();
+  curr = agg;
+}
+
+void DBIterator::pop()
+{
+  agg_stack.pop();              // pop complete aggregate off stack
+  if(agg_stack.size() > 0){
+    curr = agg_stack.top().first; // update current to new top
+    db_iter = curr->dbs.cend();   // don't reread dbs
   }
-  // electrode
-  if (export_electrode){
-    std::cout << "Exporting electrode data..." << std::endl;
-    for (unsigned int i = 0; i < elec_data.size(); i++){
-      boost::property_tree::ptree node_dim;
-      node_dim.put("<xmlattr>.x1", elec_data[i][0].c_str());
-      node_dim.put("<xmlattr>.y1", elec_data[i][1].c_str());
-      node_dim.put("<xmlattr>.x2", elec_data[i][2].c_str());
-      node_dim.put("<xmlattr>.y2", elec_data[i][3].c_str());
-      node_electrode.add_child("dim", node_dim);
-      boost::property_tree::ptree node_pot;
-      node_pot.put("", elec_data[i][4].c_str());
-      node_electrode.add_child("potential", node_pot);
+}
+
+
+// ELEC ITERATOR
+ElecIterator::ElecIterator(std::shared_ptr<Aggregate> root, bool begin)
+{
+  if(begin){
+    // keep finding deeper aggregates until one that contains dbs is found
+    while(root->elecs.empty() && !root->aggs.empty()) {
+      push(root);
+      root = root->aggs.front();
     }
-    node_root.add_child("electrode", node_electrode);
+    push(root);
+  }
+  else{
+    elec_iter = root->elecs.cend();
+  }
+}
+
+ElecIterator& ElecIterator::operator++()
+{
+  // exhaust the current Aggregate DBs first
+  if(elec_iter != curr->elecs.cend())
+    return ++elec_iter != curr->elecs.cend() ? *this : ++(*this);
+
+  // if available, push the next aggregate onto the stack
+  if(agg_stack.top().second != curr->aggs.cend()){
+    push(*agg_stack.top().second);
+    return elec_iter != curr->elecs.cend() ? *this : ++(*this);
   }
 
-  //electric potentials
-  if (export_elec_potential){
-    std::cout << "Exporting electric potential data..." << std::endl;
-    for (unsigned int i = 0; i < pot_data.size(); i++){
-      boost::property_tree::ptree node_potential_val;
-      node_potential_val.put("<xmlattr>.x", pot_data[i][0].c_str());
-      node_potential_val.put("<xmlattr>.y", pot_data[i][1].c_str());
-      node_potential_val.put("<xmlattr>.val", pot_data[i][2].c_str());
-      node_potential_map.add_child("potential_val", node_potential_val);
-    }
-    node_root.add_child("potential_map", node_potential_map);
+  // aggregate is complete, pop off stack
+  pop();
+  return agg_stack.size() == 0 ? *this : ++(*this);
+}
+
+void ElecIterator::push(std::shared_ptr<Aggregate> agg)
+{
+  if(!agg_stack.empty())
+    ++agg_stack.top().second;
+  agg_stack.push(std::make_pair(agg, agg->aggs.cbegin()));
+  elec_iter = agg->elecs.cbegin();
+  curr = agg;
+}
+
+void ElecIterator::pop()
+{
+  agg_stack.pop();              // pop complete aggregate off stack
+  if(agg_stack.size() > 0){
+    curr = agg_stack.top().first; // update current to new top
+    elec_iter = curr->elecs.cend();   // don't reread dbs
   }
-
-  //potentials at db locations
-  if (export_db_pot){
-    bpt::ptree node_dbdots;
-    std::cout << "Exporting electric potential data at dbs..." << std::endl;
-    for (unsigned int i = 0; i < db_pot_data.size(); i++){
-      bpt::ptree node_dbdot;
-      bpt::ptree node_physloc;
-      node_physloc.put("<xmlattr>.x", db_pot_data[i][0].c_str());
-      node_physloc.put("<xmlattr>.y", db_pot_data[i][1].c_str());
-      node_dbdot.add_child("physloc", node_physloc);
-      boost::property_tree::ptree node_db_pot;
-      node_db_pot.put("", db_pot_data[i][2].c_str());
-      node_dbdot.add_child("potential", node_db_pot);
-      node_dbdots.add_child("dbdot", node_dbdot);
-    }
-    node_root.add_child("dbdots", node_dbdots);
-  }
-  // if (export_db_loc){
-  //   std::cout << "Exporting DB locations..." << std::endl;
-  //   for (unsigned int i = 0; i < dbl_data.size(); i++){
-  //     bpt::ptree node_dbdot;
-  //     node_dbdot.put("<xmlattr>.x", dbl_data[i].first.c_str());
-  //     node_dbdot.put("<xmlattr>.y", dbl_data[i].second.c_str());
-  //     node_physloc.add_child("dbdot", node_dbdot);
-  //   }
-  //   node_root.add_child("physloc", node_physloc);
-  // }
+}
 
 
-
-  tree.add_child("sim_out", node_root);
-  // write to file
-  boost::property_tree::write_xml(output_path, tree, std::locale(), boost::property_tree::xml_writer_make_settings<std::string>(' ',4));
-
-  std::cout << "Write to XML complete." << std::endl;
+// AGGREGATE
+int Aggregate::size()
+{
+  int n_elecs=elecs.size();
+  if(!aggs.empty())
+    for(auto agg : aggs)
+      n_elecs += agg->size();
+  return n_elecs;
 }
