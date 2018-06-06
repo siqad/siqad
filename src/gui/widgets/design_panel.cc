@@ -620,9 +620,11 @@ void gui::DesignPanel::clearSimResults()
   setDisplayMode(DesignMode);
 
   // set show_elec of all DBDots to 0
-  if(!db_dots_result.isEmpty())
+  if(!db_dots_result.isEmpty()) {
     for(auto *db : db_dots_result)
       db->setShowElec(0);
+    db_dots_result.clear();
+  }
 }
 
 void gui::DesignPanel::displayPotentialPlot(QPixmap potential_plot, QRectF graph_container)
@@ -998,12 +1000,14 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
         }
         break;
       case Qt::Key_C:
-        // copy selected items to the clipboard
-        copySelection();
+	if (keymods == Qt::ControlModifier) {
+	  // copy selected items to the clipboard
+	  copySelection();
+	}
         break;
       case Qt::Key_V:{
         // create ghost for clipboard if any
-        if(!clipboard.isEmpty() && display_mode == DesignMode)
+        if(keymods == Qt::ControlModifier && !clipboard.isEmpty() && display_mode == DesignMode)
           createGhost(true);
         break;
       }
@@ -1669,8 +1673,9 @@ void gui::DesignPanel::CreateDB::create()
 
 void gui::DesignPanel::CreateDB::destroy()
 {
+  db_at_loc = dp->lattice->dbAt(lat_coord);
   if (db_at_loc) {
-    dp->lattice->setUnoccupied(db_at_loc->latticeCoord());
+    dp->lattice->setUnoccupied(lat_coord);
     dp->removeItem(db_at_loc, dp->layman->getLayer(db_at_loc->layer_id));
     db_at_loc = 0;
   }

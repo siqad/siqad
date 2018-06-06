@@ -56,6 +56,10 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *)
     }
   }
 
+  // if no layer id is available, something is wrong
+  if (lay_id == -1)
+    qFatal("No layer id found for DBDot, aborting");
+
   // if lattice coord not available (legacy saves), use the physloc
   if (read_coord.l == -1) {
     if (!loc.isNull()) {
