@@ -18,13 +18,13 @@ QColor prim::PotPlot::fill_col;
 QColor prim::PotPlot::selected_col; // edge colour, selected
 
 // Draw on layer 0 for now.
-prim::PotPlot::PotPlot(int lay_id, QPixmap potential_plot, QRectF graph_container):
+prim::PotPlot::PotPlot(int lay_id, QImage potential_plot, QRectF graph_container):
   prim::Item(prim::Item::PotPlot)
 {
   initPotPlot(lay_id, potential_plot, graph_container);
 }
 
-void prim::PotPlot::initPotPlot(int lay_id, QPixmap potential_plot_in, QRectF graph_container_in)
+void prim::PotPlot::initPotPlot(int lay_id, QImage potential_plot_in, QRectF graph_container_in)
 {
   layer_id = lay_id;
   potential_plot = potential_plot_in;
@@ -48,7 +48,8 @@ void prim::PotPlot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
 {
   painter->setOpacity(0.5);
   QRectF graph_container_draw = QRectF(qreal(0),qreal(0),graph_container.width(), graph_container.height());
-  painter->drawPixmap(graph_container_draw, potential_plot.scaled(graph_container.width(), graph_container.height()), graph_container_draw);
+  painter->drawImage(graph_container_draw, potential_plot);
+  // painter->drawPixmap(graph_container_draw, potential_plot.scaled(graph_container.width(), graph_container.height()), graph_container_draw);
   painter->setOpacity(1);
 }
 

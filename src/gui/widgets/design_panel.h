@@ -156,7 +156,7 @@ namespace gui{
     void clearSimResults();
 
     //! Display the simulation result from PoisSolver
-    void displayPotentialPlot(QPixmap potential_plot, QRectF graph_container);
+    void displayPotentialPlot(QImage potential_plot, QRectF graph_container);
 
 
   public slots:
@@ -408,7 +408,7 @@ namespace gui{
     void createElectrodes(QPoint point1);
 
     //create potential plot on panel
-    void createPotPlot(QPixmap potential_plot, QRectF graph_container);
+    void createPotPlot(QImage potential_plot, QRectF graph_container);
 
     // create AFM area with rubberband selected area
     void createAFMArea(QPoint point1);
@@ -601,7 +601,7 @@ namespace gui{
   {
   public:
     // create an electrode at the given points
-    CreatePotPlot(int layer_index, gui::DesignPanel *dp, QPixmap potential_plot, QRectF graph_container,
+    CreatePotPlot(int layer_index, gui::DesignPanel *dp, QImage potential_plot, QRectF graph_container,
       prim::PotPlot *pp = 0, bool invert=false, QUndoCommand *parent=0);
 
   private:
@@ -617,7 +617,7 @@ namespace gui{
     DesignPanel *dp;  // DesignPanel pointer
     int layer_index;  // index of layer in dp->layers stack
 
-    QPixmap potential_plot;
+    QImage potential_plot;
     QRectF graph_container;
 
     bool invert;

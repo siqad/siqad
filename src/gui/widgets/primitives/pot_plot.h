@@ -25,14 +25,14 @@ namespace prim{
   public:
     //! constructor, create a PotPlot given a QPixmap of the plot,
     //! and a QRectF to contain it.
-    PotPlot(int lay_id, QPixmap potential_plot, QRectF graph_container);
+    PotPlot(int lay_id, QImage potential_plot, QRectF graph_container);
 
     //! destructor
     ~PotPlot(){}
 
     //initializer
-    void initPotPlot(int lay_id, QPixmap potential_plot, QRectF graph_container);
-    QPixmap getPotentialPlot(void){return potential_plot;}
+    void initPotPlot(int lay_id, QImage potential_plot, QRectF graph_container);
+    QImage getPotentialPlot(void){return potential_plot;}
     QRectF getGraphContainer(void){return graph_container;}
     // inherited abstract method implementations
     QRectF boundingRect() const override;
@@ -48,7 +48,7 @@ namespace prim{
     void constructStatics();
 
     // VARIABLES
-    QPixmap potential_plot;
+    QImage potential_plot;
     QRectF graph_container;
     static qreal edge_width;  // proportional width of dot boundary edge
     static QColor fill_col;   // dot fill color (same for all lattice dots)

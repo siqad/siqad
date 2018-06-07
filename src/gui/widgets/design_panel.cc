@@ -627,7 +627,7 @@ void gui::DesignPanel::clearSimResults()
   }
 }
 
-void gui::DesignPanel::displayPotentialPlot(QPixmap potential_plot, QRectF graph_container)
+void gui::DesignPanel::displayPotentialPlot(QImage potential_plot, QRectF graph_container)
 {
   qDebug() << tr("graph_container height: ") << graph_container.height();
   qDebug() << tr("graph_container width: ") << graph_container.width();
@@ -1721,7 +1721,7 @@ void gui::DesignPanel::CreateElectrode::destroy()
 
 
 // CreatePotPlot class
-gui::DesignPanel::CreatePotPlot::CreatePotPlot(int layer_index, gui::DesignPanel *dp, QPixmap potential_plot, QRectF graph_container, prim::PotPlot *pp, bool invert, QUndoCommand *parent)
+gui::DesignPanel::CreatePotPlot::CreatePotPlot(int layer_index, gui::DesignPanel *dp, QImage potential_plot, QRectF graph_container, prim::PotPlot *pp, bool invert, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), layer_index(layer_index), potential_plot(potential_plot), graph_container(graph_container), invert(invert)
 {  //if called to destroy, *elec points to selected electrode. if called to create, *elec = 0
   prim::Layer *layer = dp->layman->getLayer(layer_index);
@@ -2205,7 +2205,7 @@ void gui::DesignPanel::createElectrodes(QPoint point1)
   undo_stack->endMacro();
 }
 
-void gui::DesignPanel::createPotPlot(QPixmap potential_plot, QRectF graph_container)
+void gui::DesignPanel::createPotPlot(QImage potential_plot, QRectF graph_container)
 {
   int layer_index = layman->indexOf(layman->getMRULayer(prim::Layer::Plot));
   undo_stack->beginMacro(tr("create potential plot with given corners"));
