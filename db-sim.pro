@@ -112,7 +112,6 @@ HEADERS += \
 	src/gui/widgets/dialog_panel.h \
 	src/gui/widgets/input_field.h \
 	src/gui/widgets/info_panel.h \
-	src/qcustomplot.h \
   src/gui/widgets/layer_manager.h \
   src/gui/widgets/sim_manager.h \
   src/gui/widgets/sim_visualize_panel.h \
@@ -128,7 +127,6 @@ SOURCES += \
 	src/gui/widgets/dialog_panel.cc \
 	src/gui/widgets/input_field.cc \
 	src/gui/widgets/info_panel.cc \
-	src/qcustomplot.cpp \
   src/gui/widgets/layer_manager.cc \
   src/gui/widgets/sim_manager.cc \
   src/gui/widgets/sim_visualize_panel.cc \

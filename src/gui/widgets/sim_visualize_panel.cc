@@ -7,9 +7,7 @@
 // @desc:     SimVisualize classes
 
 #include "sim_visualize_panel.h"
-#include "../../qcustomplot.h"
 #include <QImage>
-#include <QtMath>
 
 
 namespace gui{
