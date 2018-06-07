@@ -414,7 +414,9 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *ws, bool for_sim)
   // save layer properties
   ws->writeComment("Layer Properties");
   ws->writeComment("Layer ID is intrinsic to the layer order");
+  ws->writeStartElement("layers");
   layman->saveLayers(ws);
+  ws->writeEndElement();
 
   // save item hierarchy
   ws->writeComment("Item Hierarchy");
@@ -436,7 +438,10 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
       rs->skipCurrentElement();
     } else if(rs->name() == "gui") {
       loadGUIFlags(rs);
+    } else if (rs->name() == "layers") {
+      loadLayers(rs);
     } else if(rs->name() == "layer_prop") {
+      // starting version 0.0.2 layer_prop should appear inside the layers level
       loadLayerProps(rs);
     } else if(rs->name() == "design") {
       loadDesign(rs);
@@ -476,6 +481,15 @@ void gui::DesignPanel::loadGUIFlags(QXmlStreamReader *rs)
   verticalScrollBar()->setValue(scroll_v);
   horizontalScrollBar()->setValue(scroll_h);
   qDebug() << tr("Zoom set to %1, scroll v=%2, h=%3").arg(zoom).arg(scroll_v).arg(scroll_h);
+}
+
+
+void gui::DesignPanel::loadLayers(QXmlStreamReader *rs)
+{
+  qDebug() << "Loading layers";
+  while (rs->readNextStartElement())
+    if (rs->name() == "layer_prop")
+      loadLayerProps(rs);
 }
 
 
@@ -606,9 +620,11 @@ void gui::DesignPanel::clearSimResults()
   setDisplayMode(DesignMode);
 
   // set show_elec of all DBDots to 0
-  if(!db_dots_result.isEmpty())
+  if(!db_dots_result.isEmpty()) {
     for(auto *db : db_dots_result)
       db->setShowElec(0);
+    db_dots_result.clear();
+  }
 }
 
 void gui::DesignPanel::displayPotentialPlot(QPixmap potential_plot, QRectF graph_container)
@@ -984,12 +1000,14 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
         }
         break;
       case Qt::Key_C:
-        // copy selected items to the clipboard
-        copySelection();
+	if (keymods == Qt::ControlModifier) {
+	  // copy selected items to the clipboard
+	  copySelection();
+	}
         break;
       case Qt::Key_V:{
         // create ghost for clipboard if any
-        if(!clipboard.isEmpty() && display_mode == DesignMode)
+        if(keymods == Qt::ControlModifier && !clipboard.isEmpty() && display_mode == DesignMode)
           createGhost(true);
         break;
       }
@@ -1657,8 +1675,9 @@ void gui::DesignPanel::CreateDB::create()
 
 void gui::DesignPanel::CreateDB::destroy()
 {
+  db_at_loc = dp->lattice->dbAt(lat_coord);
   if (db_at_loc) {
-    dp->lattice->setUnoccupied(db_at_loc->latticeCoord());
+    dp->lattice->setUnoccupied(lat_coord);
     dp->removeItem(db_at_loc, dp->layman->getLayer(db_at_loc->layer_id));
     db_at_loc = 0;
   }

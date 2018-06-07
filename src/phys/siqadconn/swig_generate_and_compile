@@ -1,0 +1,27 @@
+#!/bin/bash
+
+swig -v -python -c++ siqadconn.i
+DEST_DIR=lib
+
+mkdir -p "$DEST_DIR"
+
+if [ "$FOR_OS" == "win64" ]; then
+    export PATH="$PATH:/usr/lib/mxe/usr/bin"
+    MAKE_COMMAND=x86_64-w64-mingw32.static-g++
+
+    $MAKE_COMMAND -O2 -fPIC -Wall -Wextra -std=c++11 -c siqadconn.cc
+    $MAKE_COMMAND -O2 -fPIC -Wall -Wextra -std=c++11 -c siqadconn_wrap.cxx -I/home/samuelngsh/Python36-64/include -L/home/samuelngsh/Python36-64/libs -lpython36
+    $MAKE_COMMAND -shared -o _siqadconn.pyd siqadconn.o siqadconn_wrap.o -static-libstdc++ -I/home/samuelngsh/Python36-64/include -L/home/samuelngsh/Python36-64/libs -lpython36
+
+    mv _siqadconn.pyd "${DEST_DIR}"
+else
+    python3 setup.py build_ext --inplace
+    mv _siqadconn.cpython-36m-x86_64-linux-gnu.so "${DEST_DIR}"
+fi
+
+mv siqadconn.py "${DEST_DIR}"
+
+# backup for minimal compilation script on Linux:
+#g++ -O2 -fPIC -Wall -Wextra -std=c++11 -c phys_connector.cc
+#g++ -O2 -fPIC -Wall -Wextra -std=c++11 -c phys_connector_wrap.cxx -I/usr/include/python3.6m
+#g++ -shared -o _phys_connector.so phys_connector.o phys_connector_wrap.o -static-libstdc++

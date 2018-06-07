@@ -33,8 +33,14 @@ make $multicore_compile FOR_OS=$FOR_OS
 
 # make afmmarcus
 echo "Building AFMMarcus... $FOR_OS"
-cd $qmake_dir/src/phys/afmmarcus/src
-make $multicore_compile FOR_OS=$FOR_OS
+if [[ "$@" == "-swig" ]]
+then
+    echo "Building swig for AFMMarcus"
+    cd $qmake_dir/src/phys/afmmarcus/src/python/swig_siqadconn
+    ./swig_generate_and_compile FOR_OS=$FOR_OS
+fi
+#cd $qmake_dir/src/phys/afmmarcus/src
+#make $multicore_compile FOR_OS=$FOR_OS
 
 # make poissolver
 echo "Building PoisSolver... $FOR_OS"
@@ -59,7 +65,7 @@ make install
 
 
 # extra actions if building for Windows
-if [ "$FOR_OS" == "win64" ] || [ "$FOR_OF" == "win32" ] ; then
+if [ "$FOR_OS" == "win64" ] || [ "$FOR_OS" == "win32" ] ; then
     cd "$make_dir/build/release/"
     rm -rf .moc .obj .qrc
 

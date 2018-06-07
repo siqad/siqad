@@ -929,7 +929,7 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   stream.writeStartDocument();
 
   // call the save functions for each relevant class
-  stream.writeStartElement("dbdesigner");
+  stream.writeStartElement("siqad");
 
   // save program flags
   stream.writeComment("Program Flags");

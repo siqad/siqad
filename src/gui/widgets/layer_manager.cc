@@ -108,7 +108,7 @@ prim::Layer* LayerManager::getLayer(const QString &name) const
 prim::Layer* LayerManager::getLayer(int n) const
 {
   if(n<0 || n>=layers.count()){
-    qWarning() << tr("Layer index out of bounds...");
+    qWarning() << tr("Layer index %1 out of bounds...").arg(n);
     return 0;
   }
   else
