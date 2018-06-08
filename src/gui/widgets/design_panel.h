@@ -264,6 +264,7 @@ namespace gui{
 
     QAction *action_form_agg;   // form DBDot aggregates
     QAction *action_split_agg;  // splite selected aggregate
+    QAction *action_dup;        // duplicate selected objects
 
     // children panels
     AFMPanel *afm_panel;

@@ -987,19 +987,6 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
           emit sig_toolChangeRequest(gui::ToolType::SelectTool);
         }
         break;
-        /*case Qt::Key_G:
-        if(display_mode == DesignMode){
-          // grouping behaviour for selecting surface dangling bonds
-          if(keymods == (Qt::ControlModifier | Qt::ShiftModifier))
-            splitAggregates();
-          else if(keymods == Qt::ControlModifier)
-            formAggregate();
-        }
-        break;*/
-      case Qt::Key_D:
-        if(display_mode == DesignMode)
-          duplicateSelection();
-        break;
       case Qt::Key_S:
         if (display_mode == ScreenshotMode) {
           sig_screenshot(prev_screenshot_area);
@@ -1267,6 +1254,7 @@ void gui::DesignPanel::initActions()
   action_delete = new QAction(tr("&Delete"), this);
   action_form_agg = new QAction(tr("Form A&ggregate"), this);
   action_split_agg = new QAction(tr("Split Aggregate"), this);
+  action_dup = new QAction(tr("Duplicate"), this);
 
   action_undo->setShortcut(tr("CTRL+Z"));
   action_redo->setShortcuts({ tr("CTRL+Y"), tr("CTRL+SHIFT+Z") });
@@ -1276,6 +1264,7 @@ void gui::DesignPanel::initActions()
   action_delete->setShortcuts({ tr("DELETE"), tr("BACKSPACE") });
   action_form_agg->setShortcut(tr("CTRL+G"));
   action_split_agg->setShortcut(tr("CTRL+SHIFT+G"));
+  action_dup->setShortcut(tr("D"));
   
 
   addAction(action_undo);
@@ -1286,6 +1275,7 @@ void gui::DesignPanel::initActions()
   addAction(action_delete);
   addAction(action_form_agg);
   addAction(action_split_agg);
+  addAction(action_dup);
 
   connect(action_undo, &QAction::triggered, this, &gui::DesignPanel::undoAction);
   connect(action_redo, &QAction::triggered, this, &gui::DesignPanel::redoAction);
@@ -1295,6 +1285,7 @@ void gui::DesignPanel::initActions()
   connect(action_delete, &QAction::triggered, this, &gui::DesignPanel::deleteAction);
   connect(action_form_agg, &QAction::triggered, this, &gui::DesignPanel::formAggregate);
   connect(action_split_agg, &QAction::triggered, this, &gui::DesignPanel::splitAggregates);
+  connect(action_dup, &QAction::triggered, this, &gui::DesignPanel::duplicateSelection);
 }
 
 
