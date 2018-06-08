@@ -42,14 +42,6 @@
         <visible>1</visible>
         <active>1</active>
     </layer_prop>
-    <layer_prop>
-        <name>Plot</name>
-        <type>Plot</type>
-        <zoffset>-0.000000</zoffset>
-        <zheight>0.000000</zheight>
-        <visible>1</visible>
-        <active>1</active>
-    </layer_prop>
     <!--Item Hierarchy-->
     <design ignore="true" />
 </dbdesigner>

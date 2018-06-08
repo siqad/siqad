@@ -283,9 +283,6 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   // add in the AFM layer for AFM tip travel paths
   layman->addLayer("AFM", prim::Layer::AFMTip,500E-12,50E-12);
 
-  // add in the potential layer for potential plots
-  layman->addLayer("Plot", prim::Layer::Plot,-50E-9,0);
-
   layman->populateLayerTable();
   layman->initSideWidget();
   emit sig_setLayerManagerWidget(layman->sideWidget());
@@ -1686,11 +1683,9 @@ void gui::DesignPanel::CreateElectrode::destroy()
 
 
 // CreatePotPlot class
-gui::DesignPanel::CreatePotPlot::CreatePotPlot(int layer_index, gui::DesignPanel *dp, QImage potential_plot, QRectF graph_container, prim::PotPlot *pp, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), dp(dp), layer_index(layer_index), potential_plot(potential_plot), graph_container(graph_container), invert(invert)
+gui::DesignPanel::CreatePotPlot::CreatePotPlot(gui::DesignPanel *dp, QImage potential_plot, QRectF graph_container, prim::PotPlot *pp, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), potential_plot(potential_plot), graph_container(graph_container), pp(pp), invert(invert)
 {  //if called to destroy, *elec points to selected electrode. if called to create, *elec = 0
-  prim::Layer *layer = dp->layman->getLayer(layer_index);
-  index = invert ? layer->getItems().indexOf(pp) : layer->getItems().size();
 }
 
 void gui::DesignPanel::CreatePotPlot::undo()
@@ -1706,14 +1701,14 @@ void gui::DesignPanel::CreatePotPlot::redo()
 
 void gui::DesignPanel::CreatePotPlot::create()
 {
-  dp->addItem(new prim::PotPlot(layer_index, potential_plot, graph_container), layer_index, index);
+  pp = new prim::PotPlot(potential_plot, graph_container);
+  dp->addItemToScene(static_cast<prim::Item*>(pp));
 }
 
 void gui::DesignPanel::CreatePotPlot::destroy()
 {
-  prim::PotPlot *pp = static_cast<prim::PotPlot*>(dp->layman->getLayer(layer_index)->getItem(index));
   if(pp != 0){
-    dp->removeItem(pp, dp->layman->getLayer(pp->layer_id));  // deletes PotPlot
+    dp->removeItemFromScene(static_cast<prim::Item*>(pp));  // deletes PotPlot
     pp = 0;
   }
 }
@@ -2172,9 +2167,9 @@ void gui::DesignPanel::createElectrodes(QPoint point1)
 
 void gui::DesignPanel::createPotPlot(QImage potential_plot, QRectF graph_container)
 {
-  int layer_index = layman->indexOf(layman->getMRULayer(prim::Layer::Plot));
+  // int layer_index = layman->indexOf(layman->getMRULayer(prim::Layer::Plot));
   undo_stack->beginMacro(tr("create potential plot with given corners"));
-  undo_stack->push(new CreatePotPlot(layer_index, this, potential_plot, graph_container));
+  undo_stack->push(new CreatePotPlot(this, potential_plot, graph_container));
   undo_stack->endMacro();
 }
 
@@ -2326,7 +2321,7 @@ void gui::DesignPanel::deleteSelection()
       case prim::Item::PotPlot:
         {
         prim::PotPlot *pp = static_cast<prim::PotPlot*>(item);
-        undo_stack->push(new CreatePotPlot( pp->layer_id, this,
+        undo_stack->push(new CreatePotPlot(this,
             pp->getPotentialPlot(), pp->getGraphContainer(),
             static_cast<prim::PotPlot*>(item), true));
         break;

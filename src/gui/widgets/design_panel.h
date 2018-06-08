@@ -607,8 +607,8 @@ namespace gui{
   class DesignPanel::CreatePotPlot : public QUndoCommand
   {
   public:
-    // create an electrode at the given points
-    CreatePotPlot(int layer_index, gui::DesignPanel *dp, QImage potential_plot, QRectF graph_container,
+    // create an plot at the given points
+    CreatePotPlot(gui::DesignPanel *dp, QImage potential_plot, QRectF graph_container,
       prim::PotPlot *pp = 0, bool invert=false, QUndoCommand *parent=0);
 
   private:
@@ -622,15 +622,11 @@ namespace gui{
     void destroy(); // destroy the dangling bond
 
     DesignPanel *dp;  // DesignPanel pointer
-    int layer_index;  // index of layer in dp->layers stack
-
     QImage potential_plot;
     QRectF graph_container;
+    prim::PotPlot* pp;
 
     bool invert;
-
-    // internals
-    int index;              // index of electrode item in the layer item stack
   };
 
 
