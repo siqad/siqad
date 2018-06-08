@@ -283,9 +283,6 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   // add in the AFM layer for AFM tip travel paths
   layman->addLayer("AFM", prim::Layer::AFMTip,500E-12,50E-12);
 
-  // add in the potential layer for potential plots
-  layman->addLayer("Plot", prim::Layer::Plot,-50E-9,0);
-
   layman->populateLayerTable();
   layman->initSideWidget();
   emit sig_setLayerManagerWidget(layman->sideWidget());

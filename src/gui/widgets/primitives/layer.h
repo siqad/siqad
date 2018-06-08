@@ -31,7 +31,7 @@ namespace prim{
   public:
 
     //! enum type for different layer contents
-    enum LayerType{Lattice, DB, Electrode, AFMTip, Plot, NoType};
+    enum LayerType{Lattice, DB, Electrode, AFMTip, NoType};
     Q_ENUM(LayerType)
 
 
