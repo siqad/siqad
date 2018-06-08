@@ -15,9 +15,6 @@
 
 namespace prim{
 
-  // forward declarations
-  class Layer;
-
   //! An item that implements a colour map of the electrostatic potential due to
   //! electrodes in the system.
   class PotPlot: public prim::Item
@@ -25,13 +22,13 @@ namespace prim{
   public:
     //! constructor, create a PotPlot given a QPixmap of the plot,
     //! and a QRectF to contain it.
-    PotPlot(int lay_id, QImage potential_plot, QRectF graph_container);
+    PotPlot(QImage potential_plot, QRectF graph_container);
 
     //! destructor
     ~PotPlot(){}
 
     //initializer
-    void initPotPlot(int lay_id, QImage potential_plot, QRectF graph_container);
+    void initPotPlot(QImage potential_plot, QRectF graph_container);
     QImage getPotentialPlot(void){return potential_plot;}
     QRectF getGraphContainer(void){return graph_container;}
     // inherited abstract method implementations

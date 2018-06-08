@@ -17,16 +17,14 @@ QColor prim::PotPlot::edge_col;
 QColor prim::PotPlot::fill_col;
 QColor prim::PotPlot::selected_col; // edge colour, selected
 
-// Draw on layer 0 for now.
-prim::PotPlot::PotPlot(int lay_id, QImage potential_plot, QRectF graph_container):
+prim::PotPlot::PotPlot(QImage potential_plot, QRectF graph_container):
   prim::Item(prim::Item::PotPlot)
 {
-  initPotPlot(lay_id, potential_plot, graph_container);
+  initPotPlot(potential_plot, graph_container);
 }
 
-void prim::PotPlot::initPotPlot(int lay_id, QImage potential_plot_in, QRectF graph_container_in)
+void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container_in)
 {
-  layer_id = lay_id;
   potential_plot = potential_plot_in;
   graph_container = graph_container_in;
   constructStatics();
@@ -55,7 +53,7 @@ void prim::PotPlot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
 
 prim::Item *prim::PotPlot::deepCopy() const
 {
-  prim::PotPlot *pp = new PotPlot(layer_id, potential_plot, graph_container);
+  prim::PotPlot *pp = new PotPlot(potential_plot, graph_container);
   return pp;
 }
 
