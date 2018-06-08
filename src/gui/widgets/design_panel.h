@@ -255,12 +255,15 @@ namespace gui{
     static QColor background_col_publish; // background color in publishing mode
 
     // Common actions used in the design panel
-    QAction *action_undo;
-    QAction *action_redo;
-    QAction *action_cut;
-    QAction *action_copy;
-    QAction *action_paste;
-    QAction *action_delete;
+    QAction *action_undo;       // reverse in the undo stack
+    QAction *action_redo;       // advance in the undo stack
+    QAction *action_cut;        // cut selected items
+    QAction *action_copy;       // copy selected items
+    QAction *action_paste;      // paste items in clipboard
+    QAction *action_delete;     // delete selected items
+
+    QAction *action_form_agg;   // form DBDot aggregates
+    QAction *action_split_agg;  // splite selected aggregate
 
     // children panels
     AFMPanel *afm_panel;

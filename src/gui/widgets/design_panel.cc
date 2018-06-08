@@ -990,7 +990,7 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
           emit sig_toolChangeRequest(gui::ToolType::SelectTool);
         }
         break;
-      case Qt::Key_G:
+        /*case Qt::Key_G:
         if(display_mode == DesignMode){
           // grouping behaviour for selecting surface dangling bonds
           if(keymods == (Qt::ControlModifier | Qt::ShiftModifier))
@@ -998,7 +998,7 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
           else if(keymods == Qt::ControlModifier)
             formAggregate();
         }
-        break;
+        break;*/
       case Qt::Key_D:
         if(display_mode == DesignMode)
           duplicateSelection();
@@ -1268,6 +1268,8 @@ void gui::DesignPanel::initActions()
   action_copy = new QAction(tr("&Copy"), this);
   action_paste = new QAction(tr("&Paste"), this);
   action_delete = new QAction(tr("&Delete"), this);
+  action_form_agg = new QAction(tr("Form A&ggregate"), this);
+  action_split_agg = new QAction(tr("Split Aggregate"), this);
 
   action_undo->setShortcut(tr("CTRL+Z"));
   action_redo->setShortcuts({ tr("CTRL+Y"), tr("CTRL+SHIFT+Z") });
@@ -1275,6 +1277,9 @@ void gui::DesignPanel::initActions()
   action_copy->setShortcut(tr("CTRL+C"));
   action_paste->setShortcut(tr("CTRL+V"));
   action_delete->setShortcuts({ tr("DELETE"), tr("BACKSPACE") });
+  action_form_agg->setShortcut(tr("CTRL+G"));
+  action_split_agg->setShortcut(tr("CTRL+SHIFT+G"));
+  
 
   addAction(action_undo);
   addAction(action_redo);
@@ -1282,6 +1287,8 @@ void gui::DesignPanel::initActions()
   addAction(action_copy);
   addAction(action_paste);
   addAction(action_delete);
+  addAction(action_form_agg);
+  addAction(action_split_agg);
 
   connect(action_undo, &QAction::triggered, this, &gui::DesignPanel::undoAction);
   connect(action_redo, &QAction::triggered, this, &gui::DesignPanel::redoAction);
@@ -1289,6 +1296,8 @@ void gui::DesignPanel::initActions()
   connect(action_copy, &QAction::triggered, this, &gui::DesignPanel::copyAction);
   connect(action_paste, &QAction::triggered, this, &gui::DesignPanel::pasteAction);
   connect(action_delete, &QAction::triggered, this, &gui::DesignPanel::deleteAction);
+  connect(action_form_agg, &QAction::triggered, this, &gui::DesignPanel::formAggregate);
+  connect(action_split_agg, &QAction::triggered, this, &gui::DesignPanel::splitAggregates);
 }
 
 
