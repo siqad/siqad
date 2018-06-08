@@ -96,8 +96,8 @@ void gui::DesignPanel::initDesignPanel() {
 
   setCacheMode(QGraphicsView::CacheBackground);
 
-  // createActions
-  createActions();
+  // initialize actions, some bound to keyboard shortcuts
+  initActions();
 
   // make lattice and surface layer
   buildLattice();
@@ -999,74 +999,15 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
             formAggregate();
         }
         break;
-      case Qt::Key_C:
-	if (keymods == Qt::ControlModifier) {
-	  // copy selected items to the clipboard
-	  copySelection();
-	}
-        break;
-      case Qt::Key_V:{
-        // create ghost for clipboard if any
-        if(keymods == Qt::ControlModifier && !clipboard.isEmpty() && display_mode == DesignMode)
-          createGhost(true);
-        break;
-      }
       case Qt::Key_D:
         if(display_mode == DesignMode)
           duplicateSelection();
-        break;
-      case Qt::Key_Z:{
-          if(display_mode == DesignMode){
-            // undo/redo based on keymods
-            //qDebug() << tr("Index before undo/redo: %1").arg(undo_stack->index());
-            if(keymods == (Qt::ControlModifier | Qt::ShiftModifier))
-              undo_stack->redo();
-            else if(keymods == Qt::ControlModifier)
-              undo_stack->undo();
-            //qDebug() << tr("Index after undo/redo: %1").arg(undo_stack->index());
-            //qDebug() << tr("ptr %1").arg((size_t)undo_stack->command(undo_stack->index()));
-          }
-        }
-        break;
-      case Qt::Key_Y:{
-        if(keymods == Qt::ControlModifier && display_mode == DesignMode)
-          undo_stack->redo();
-        break;
-      }
-      case Qt::Key_X:{
-        if(keymods == Qt::ControlModifier && display_mode == DesignMode){
-          // copy current selection
-          copySelection();
-          // delete current selection
-          deleteSelection();
-        }
-        break;
-      }
-      case Qt::Key_Backspace:
-      case Qt::Key_Delete:
-        // delete selected items
-        if(tool_type == gui::ToolType::SelectTool && display_mode == DesignMode)
-          deleteSelection();
         break;
       case Qt::Key_S:
         if (display_mode == ScreenshotMode) {
           sig_screenshot(prev_screenshot_area);
         }
         break;
-      case Qt::Key_R:{
-        if (keymods == (Qt::ControlModifier | Qt::ShiftModifier)) {
-          QMessageBox::StandardButton reply;
-          reply = QMessageBox::question(this, "Quick run simulation",
-              "Are you sure you want to run a simulation with previous settings?",
-              QMessageBox::Yes | QMessageBox::No);
-          if (reply == QMessageBox::Yes) {
-            emit sig_quickRunSimulation();
-          }
-        } else if (keymods == Qt::ControlModifier) {
-          emit sig_showSimulationSetup();
-        }
-        break;
-      }
       default:
         QGraphicsView::keyReleaseEvent(e);
         break;
@@ -1319,19 +1260,34 @@ void gui::DesignPanel::dummyAction()
   }
 }
 
-void gui::DesignPanel::createActions()
+void gui::DesignPanel::initActions()
 {
   action_undo = new QAction(tr("&Undo"), this);
-  connect(action_undo, &QAction::triggered, this, &gui::DesignPanel::undoAction);
   action_redo = new QAction(tr("&Redo"), this);
-  connect(action_redo, &QAction::triggered, this, &gui::DesignPanel::redoAction);
   action_cut = new QAction(tr("Cut"), this);
-  connect(action_cut, &QAction::triggered, this, &gui::DesignPanel::cutAction);
   action_copy = new QAction(tr("&Copy"), this);
-  connect(action_copy, &QAction::triggered, this, &gui::DesignPanel::copyAction);
   action_paste = new QAction(tr("&Paste"), this);
-  connect(action_paste, &QAction::triggered, this, &gui::DesignPanel::pasteAction);
   action_delete = new QAction(tr("&Delete"), this);
+
+  action_undo->setShortcut(tr("CTRL+Z"));
+  action_redo->setShortcuts({ tr("CTRL+Y"), tr("CTRL+SHIFT+Z") });
+  action_cut->setShortcut(tr("CTRL+X"));
+  action_copy->setShortcut(tr("CTRL+C"));
+  action_paste->setShortcut(tr("CTRL+V"));
+  action_delete->setShortcuts({ tr("DELETE"), tr("BACKSPACE") });
+
+  addAction(action_undo);
+  addAction(action_redo);
+  addAction(action_cut);
+  addAction(action_copy);
+  addAction(action_paste);
+  addAction(action_delete);
+
+  connect(action_undo, &QAction::triggered, this, &gui::DesignPanel::undoAction);
+  connect(action_redo, &QAction::triggered, this, &gui::DesignPanel::redoAction);
+  connect(action_cut, &QAction::triggered, this, &gui::DesignPanel::cutAction);
+  connect(action_copy, &QAction::triggered, this, &gui::DesignPanel::copyAction);
+  connect(action_paste, &QAction::triggered, this, &gui::DesignPanel::pasteAction);
   connect(action_delete, &QAction::triggered, this, &gui::DesignPanel::deleteAction);
 }
 

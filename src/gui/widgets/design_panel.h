@@ -254,6 +254,14 @@ namespace gui{
     static QColor background_col;         // normal background color
     static QColor background_col_publish; // background color in publishing mode
 
+    // Common actions used in the design panel
+    QAction *action_undo;
+    QAction *action_redo;
+    QAction *action_cut;
+    QAction *action_copy;
+    QAction *action_paste;
+    QAction *action_delete;
+
     // children panels
     AFMPanel *afm_panel;
     // TODO layer manager
@@ -297,6 +305,9 @@ namespace gui{
     QList<prim::DBDot*> db_dots_result;
 
     // INTERNAL METHODS
+
+    // initialize actions
+    void initActions();
 
     // construct static variables on first init
     void constructStatics();
@@ -455,13 +466,6 @@ namespace gui{
     // move the selected items to the current Ghost, returns True if successful
     bool moveToGhost(bool kill=false);
 
-    void createActions();
-    QAction *action_undo;
-    QAction *action_redo;
-    QAction *action_cut;
-    QAction *action_copy;
-    QAction *action_paste;
-    QAction *action_delete;
   };
 
 

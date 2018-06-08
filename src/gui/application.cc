@@ -254,9 +254,15 @@ void gui::ApplicationGUI::initTopBar()
 
   // run simulation
   action_run_sim = new QAction(QIcon(":/ico/runsim.svg"), tr("Run Simulation..."));
-  action_run_sim->setShortcut(tr("F11"));
+  action_run_sim->setShortcut(tr("CTRL+R"));
   connect(action_run_sim, &QAction::triggered,
           this, &gui::ApplicationGUI::simulationSetup);
+
+  action_repeat_sim = new QAction(tr("Repeat Previous Simulation"), this);
+  action_repeat_sim->setShortcut(tr("CTRL+SHIFT+R"));
+  connect(action_repeat_sim, &QAction::triggered,
+	  this, &gui::ApplicationGUI::repeatSimulation);
+  addAction(action_repeat_sim);
 
   // ground state simulation
   action_run_ground_state = new QAction(QIcon(":/ico/sim_groundstate.svg"), tr("Run ground state simulation..."));
@@ -663,6 +669,17 @@ void gui::ApplicationGUI::designPanelReset()
 void gui::ApplicationGUI::simulationSetup()
 {
   sim_manager->showSimSetupDialog();
+}
+
+void gui::ApplicationGUI::repeatSimulation()
+{
+  QMessageBox::StandardButton reply;
+  reply = QMessageBox::question(this, "Quick run simulation",
+				"Are you sure you want to run a simulation with previous settings?",
+				QMessageBox::Yes | QMessageBox::No);
+  if (reply == QMessageBox::Yes) {
+    sim_manager->quickRun();
+  }
 }
 
 void gui::ApplicationGUI::runGroundState()

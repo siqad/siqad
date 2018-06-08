@@ -11,6 +11,7 @@
 
 // Qt includes
 #include <QtWidgets>
+#include <QDialog>
 
 // Global
 #include "../global.h"
@@ -82,8 +83,17 @@ namespace gui{
     // in the background: will need to be able to display results on request
     // after job finished.
     void simulationSetup();
+
+    // Repeat previous simulation
+    void repeatSimulation();
+
+    // Run ground state simulation
     void runGroundState();
-    void runSimulation(prim::SimJob *job);             // high-level structure for running simulation
+
+    // Dispatch simulation job
+    void runSimulation(prim::SimJob *job);  // high-level structure for running simulation
+
+    // Read simulation results
     bool readSimResult(const QString &result_path);                // read simulator output
 
     // SANDBOX
@@ -191,6 +201,7 @@ namespace gui{
     QAction *action_afmpath_tool; // change cursor tool to AFM Path tool
     QAction *action_label_tool;   // change cursor tool to label
     QAction *action_run_sim;      // run the current simulation method
+    QAction *action_repeat_sim;
     QAction *action_run_ground_state;      // run the current simulation method
     QAction *action_sim_visualize;// show the sim visualize dock which allows simulation visualization
     QAction *action_layer_sel;
