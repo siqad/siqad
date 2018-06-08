@@ -43,8 +43,9 @@ namespace gui{
     void showAverageElecDist();       // average the elec charges when showing
     void showAverageElecDistDegen();  // average the elec charges of degenerate states
     void updateElecDistOptions();
+    void updateViewPotentialOptions();
     void updateOptions();
-
+    void showPotential();
     // TODO generate a list of DBDot* with the same order as physlocs in show_job
 
   signals:
@@ -74,6 +75,10 @@ namespace gui{
     QSlider *slider_dist_sel;
     QLabel *text_dist_selected;
     QLabel *text_dist_energy;
+
+    // potential viewer
+    QGroupBox *view_potential_group;
+    QLabel *potential_window;
   };
 
 } // end of gui namespace
