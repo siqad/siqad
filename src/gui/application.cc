@@ -158,10 +158,11 @@ void gui::ApplicationGUI::initMenuBar()
   // file menu actions
   QAction *new_file = new QAction(tr("&New"), this);
   QAction *save = new QAction(tr("&Save"), this);
-  QAction *save_as = new QAction(tr("Save As..."), this);
+  QAction *save_as = new QAction(tr("Save &As..."), this);
   QAction *open_save = new QAction(tr("&Open..."), this);
   QAction *export_lvm = new QAction(tr("&Export to QSi LV"), this);
   QAction *quit = new QAction(tr("&Quit"), this);
+  new_file->setShortcut(tr("CTRL+N"));
   save->setShortcut(tr("CTRL+S"));
   save_as->setShortcut(tr("CTRL+SHIFT+S"));
   open_save->setShortcut(tr("CTRL+O"));

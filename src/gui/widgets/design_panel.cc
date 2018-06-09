@@ -1266,17 +1266,6 @@ void gui::DesignPanel::initActions()
   action_split_agg->setShortcut(tr("CTRL+SHIFT+G"));
   action_dup->setShortcut(tr("D"));
   
-
-  addAction(action_undo);
-  addAction(action_redo);
-  addAction(action_cut);
-  addAction(action_copy);
-  addAction(action_paste);
-  addAction(action_delete);
-  addAction(action_form_agg);
-  addAction(action_split_agg);
-  addAction(action_dup);
-
   connect(action_undo, &QAction::triggered, this, &gui::DesignPanel::undoAction);
   connect(action_redo, &QAction::triggered, this, &gui::DesignPanel::redoAction);
   connect(action_cut, &QAction::triggered, this, &gui::DesignPanel::cutAction);
@@ -1286,6 +1275,10 @@ void gui::DesignPanel::initActions()
   connect(action_form_agg, &QAction::triggered, this, &gui::DesignPanel::formAggregate);
   connect(action_split_agg, &QAction::triggered, this, &gui::DesignPanel::splitAggregates);
   connect(action_dup, &QAction::triggered, this, &gui::DesignPanel::duplicateSelection);
+
+  // add the actions to design panel so they're activated
+  addActions({action_undo, action_redo, action_cut, action_copy, action_paste,
+              action_delete, action_form_agg, action_split_agg, action_dup});
 }
 
 
