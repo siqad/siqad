@@ -297,9 +297,8 @@ namespace gui{
     prim::AFMSeg *ghost_afm_seg=0;
 
     // mouse functionality
-    QPointF press_scene_pos;   // the scene position at the last mouse press event
-    QPoint mouse_pos_old;     // old mouse position in pixels on click
-    QPoint mouse_pos_cached;  // parameter for caching relevant mouse positions on click, in pixels
+    QPoint press_scene_pos;   // mouse position on click (view coord)
+    QPoint prev_pan_pos;      // mouse position on last panning update (view coord)
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
 
     // screenshot
@@ -338,9 +337,10 @@ namespace gui{
 
     // RUBBER BAND
 
-    QRubberBand *rb=0;  // rubber band object
-    QPoint rb_start; // starting point of rubber band (scene)
-    QPoint rb_cache; // cached to compare mouse movement (view)
+    QRubberBand *rb=0;    // rubber band object
+    QPoint rb_start;      // starting point of rubber band (scene)
+    QPoint rb_cache;      // cached to compare mouse movement (view)
+    QRect rb_scene_rect;  // rubberband selection area in scene coordinates
     QList<QGraphicsItem*> rb_shift_selected; // list of previously selected items, for shift select
 
     // update rubberband during mouse movement
@@ -420,13 +420,16 @@ namespace gui{
     // Create DBs at DB preview locations stored in db_previews list.
     void createDBs();
 
-    void createElectrodes(QPoint point1);
+    //! Create electrode with rubberband area, assumes the given rect is already
+    //! in scene coordinates.
+    void createElectrodes(QRect scene_rect);
 
     //create potential plot on panel
     void createPotPlot(QImage potential_plot, QRectF graph_container);
 
-    // create AFM area with rubberband selected area
-    void createAFMArea(QPoint point1);
+    //! Create AFM area with rubberband selected area, assumes the given rect is
+    //! already in scene coordinates.
+    void createAFMArea(QRect scene_rect);
 
     // create AFM node in focused path after focused node
     void createAFMNode();

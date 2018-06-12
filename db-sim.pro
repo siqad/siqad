@@ -76,7 +76,9 @@ HEADERS += \
 	src/gui/widgets/primitives/resize_frame.h \
 	src/gui/widgets/primitives/hull/hull.h \
 	src/gui/widgets/primitives/hull/convex.h \
-	src/gui/widgets/primitives/hull/hulls.h
+	src/gui/widgets/primitives/hull/hulls.h \
+    src/gui/widgets/primitives/labels/labelgroup.h \
+    src/gui/widgets/primitives/labels/textlabel.h
 
 
 
@@ -98,7 +100,9 @@ SOURCES += \
   src/gui/widgets/primitives/pot_plot.cc \
 	src/gui/widgets/primitives/resize_frame.cc \
 	src/gui/widgets/primitives/hull/hull.cc \
-	src/gui/widgets/primitives/hull/convex.cc
+	src/gui/widgets/primitives/hull/convex.cc \
+    src/gui/widgets/primitives/labels/labelgroup.cc \
+    src/gui/widgets/primitives/labels/textlabel.cc
 
 
 # widgets

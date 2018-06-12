@@ -68,6 +68,7 @@ namespace gui{
     void setToolAFMArea();
     void setToolAFMPath();
     void setToolScreenshotArea();
+    void setToolLabel();
 
     // change lattice
     void changeLattice();

@@ -349,6 +349,9 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
     case gui::ToolType::ScreenshotAreaTool:
       setInteractive(true);
       break;
+    case gui::ToolType::LabelTool:
+      setInteractive(true);
+      break;
     default:
       qCritical() << tr("Invalid ToolType... should not have happened");
       return;
@@ -709,15 +712,14 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
 
   // set clicked flag and store current mouse position for move behaviour
-  mouse_pos_old = e->pos();
-  mouse_pos_cached = e->pos(); // this might be a referencing clash, check.
-  press_scene_pos = mapToScene(e->pos()); // the scene position of the click event
+  clicked = true;
+  press_scene_pos = mapToScene(e->pos()).toPoint();
+  prev_pan_pos = e->pos();
 
   // if other buttons are clicked during rubber band selection, end selection
   if(rb)
     rubberBandEnd();
 
-  clicked = true;
   switch(e->button()){
     case Qt::LeftButton:
       if (tool_type == ScreenshotAreaTool) {
@@ -726,7 +728,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
         rb_cache = e->pos();
 
       } else if (tool_type == SelectTool || tool_type == ElectrodeTool ||
-          tool_type == AFMAreaTool) {
+          tool_type == AFMAreaTool || tool_type == LabelTool) {
         // rubber band variables
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
@@ -805,7 +807,8 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     switch(e->buttons()){
       case Qt::LeftButton:
         if (tool_type == SelectTool || tool_type == ElectrodeTool ||
-            tool_type == AFMAreaTool || tool_type == ScreenshotAreaTool) {
+            tool_type == AFMAreaTool || tool_type == ScreenshotAreaTool ||
+            tool_type == LabelTool) {
           rubberBandUpdate(e->pos());
         } else if (tool_type == DBGenTool) {
           createDBPreviews(lattice->enclosedSites(coord_start, lattice->nearestSite(mapToScene(e->pos()))));
@@ -815,12 +818,12 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
         break;
       case Qt::MidButton:
         // middle button always pans
-        mouse_pos_del = e->pos()-mouse_pos_old;
+        mouse_pos_del = e->pos()-prev_pan_pos;
         dx = mouse_pos_del.x();
         dy = mouse_pos_del.y();
         verticalScrollBar()->setValue(verticalScrollBar()->value()-dy);
         horizontalScrollBar()->setValue(horizontalScrollBar()->value()-dx);
-        mouse_pos_old = e->pos();
+        prev_pan_pos = e->pos();
         break;
       case Qt::RightButton:
         // right button will be for context menus in future
@@ -842,10 +845,6 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
   QGraphicsView::mouseReleaseEvent(e);
   // QPointF scene_pos = mapToScene(e->pos());
   QTransform trans = transform();
-
-  // end rubber band if active
-  if (rb)
-    rubberBandEnd();
 
   // case specific behaviour
   if (ghosting) {
@@ -872,11 +871,11 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
           case gui::ToolType::ElectrodeTool:
             // get start and end locations, and create the electrode.
             filterSelection(false);
-            createElectrodes(e->pos());
+            createElectrodes(rb_scene_rect);
             break;
           case gui::ToolType::AFMAreaTool:
             filterSelection(false);
-            createAFMArea(e->pos());
+            createAFMArea(rb_scene_rect);
             break;
           case gui::ToolType::AFMPathTool:
             // Make node at the ghost position
@@ -885,14 +884,22 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
           case gui::ToolType::ScreenshotAreaTool:
             // take a screenshot of the rubberband area
             filterSelection(false);
-            sig_screenshot(QRect(press_scene_pos.toPoint(), mapToScene(e->pos()).toPoint()));
+            sig_screenshot(rb_scene_rect);
             break;
+          case gui::ToolType::LabelTool:
+            {
+            // create a label with the rubberband area
+            addItem(new prim::TextLabel("label", rb_scene_rect,
+                                        layman->indexOf(layman->activeLayer())),
+                    layman->indexOf(layman->activeLayer()));
+            break;
+            }
           case gui::ToolType::DragTool:
             // pan ends
             break;
           case gui::ToolType::MeasureTool:{
             // display measurement from start to finish
-            QPointF delta = e->pos()-mouse_pos_cached;
+            QPointF delta = mapToScene(e->pos())-press_scene_pos;
             qreal dx = delta.x()*trans.m11()*prim::Item::scale_factor;
             qreal dy = delta.y()*trans.m22()*prim::Item::scale_factor;
             qDebug() << tr("Measure: x: %1 :: y: %2").arg(dx).arg(dy);
@@ -906,6 +913,11 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
         break;
     }
   }
+
+  // end rubber band if active
+  if (rb)
+    rubberBandEnd();
+
   clicked=false;
 }
 
@@ -1326,22 +1338,19 @@ void gui::DesignPanel::rubberBandUpdate(QPoint pos){
   else{
     // update rubberband rectangle
     rb->setGeometry(QRect(mapFromScene(rb_start), pos).normalized());
-    QRect rb_rect_scene;
-    rb_rect_scene.setTopLeft(mapFromScene(rb_start));
-    rb_rect_scene.setBottomRight(pos);
-    rb_rect_scene = rb_rect_scene.normalized();
+    rb_scene_rect = QRect(rb_start, mapToScene(pos).toPoint()).normalized();
 
-    // deselect items that are no longer contained
+    // deselect all items
     QList<QGraphicsItem*> selected_items = scene->selectedItems();
     for(QGraphicsItem* selected_item : selected_items)
       selected_item->setSelected(false);
 
-    // select the new items
-    QList<QGraphicsItem*> rb_items = scene->items(QRect(rb_start,mapToScene(pos).toPoint()).normalized());
+    // select items that are now enclosed by the rubberband
+    QList<QGraphicsItem*> rb_items = scene->items(rb_scene_rect);
     for(QGraphicsItem* rb_item : rb_items)
       rb_item->setSelected(true);
 
-    // select shift list items
+    // append shift-selected items
     for(QGraphicsItem* shift_selected_item : rb_shift_selected)
       shift_selected_item->setSelected(true);
   }
@@ -2139,13 +2148,14 @@ void gui::DesignPanel::createDBs()
   destroyDBPreviews();
 }
 
-void gui::DesignPanel::createElectrodes(QPoint point1)
+void gui::DesignPanel::createElectrodes(QRect scene_rect)
 {
-  QPoint point2 = mapToScene(mouse_pos_cached).toPoint(); //get coordinates relative to top-left
+  QPoint point1 = scene_rect.topLeft();
+  QPoint point2 = scene_rect.bottomRight();
   int layer_index = layman->indexOf(layman->activeLayer());
   //only ever create one electrode at a time
   undo_stack->beginMacro(tr("create electrode with given corners"));
-  undo_stack->push(new CreateElectrode(layer_index, this, mapToScene(point1).toPoint(), point2));
+  undo_stack->push(new CreateElectrode(layer_index, this, point1, point2));
   undo_stack->endMacro();
 }
 
@@ -2157,10 +2167,10 @@ void gui::DesignPanel::createPotPlot(QImage potential_plot, QRectF graph_contain
   undo_stack->endMacro();
 }
 
-void gui::DesignPanel::createAFMArea(QPoint point1)
+void gui::DesignPanel::createAFMArea(QRect scene_rect)
 {
-  point1 = mapToScene(point1).toPoint();
-  QPoint point2 = mapToScene(mouse_pos_cached).toPoint();
+  QPoint point1 = scene_rect.topLeft();
+  QPoint point2 = scene_rect.bottomRight();
   int layer_index = layman->indexOf(layman->activeLayer());
 
   // create the AFM area
@@ -2177,7 +2187,7 @@ void gui::DesignPanel::createAFMNode()
   if (afm_panel->ghostNode())
     scene_pos = afm_panel->ghostNode()->scenePos();
   else
-    scene_pos = mapToScene(mouse_pos_cached);
+    scene_pos = press_scene_pos;
 
   // TODO UNDOable version
   undo_stack->beginMacro(tr("create AFMNode in the focused AFMPath after the focused AFMNode"));

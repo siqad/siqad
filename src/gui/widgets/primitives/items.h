@@ -18,5 +18,7 @@
 #include "afmpath.h"
 #include "pot_plot.h"
 #include "resize_frame.h"
+#include "labels/labelgroup.h"
+#include "labels/textlabel.h"
 
 #endif
