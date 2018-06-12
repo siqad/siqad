@@ -12,6 +12,7 @@
 // Qt includes
 #include <QtWidgets>
 #include <QDialog>
+#include <QCommandLineParser>
 
 // Global
 #include "../global.h"
@@ -217,7 +218,7 @@ namespace gui{
     int autosave_num;          // number of autosaves to keep
 
     QString working_path;         // path currently in use
-
+    QCommandLineParser *parser;
   };
 
 } // end gui namespace

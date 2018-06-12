@@ -94,6 +94,9 @@ void gui::ApplicationGUI::initGUI()
   initTopBar();
   initSideBar();
 
+  // initialise parser
+  parser = new QCommandLineParser();
+
   // inter-widget signals
   connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene,
           design_pan, &gui::DesignPanel::displaySimResults);
@@ -655,7 +658,11 @@ void gui::ApplicationGUI::parseInputField()
 
   // if input string is not empty, do something
   if(!input.isEmpty()){
-    // for now, just echo input to stdout
+    //check the current setting for sending to terminal
+    if(settings::AppSettings::instance()->value("log/override").toBool()){
+      dialog_pan->echo(input);
+    }
+    //print to external terminal regardless
     qDebug() << input;
   }
 }
