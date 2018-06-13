@@ -190,6 +190,9 @@ namespace gui{
     //! Set the visibility of the lattice in the background
     void setLatticeVisibility(bool);
 
+    //! Edit text label
+    void editTextLabel(prim::Item *text_lab, const QString &new_text);
+
   signals:
     void sig_toolChangeRequest(gui::ToolType tool);  // request ApplicationGUI to change tool
     void sig_toolChanged(gui::ToolType tool); // notify other components of the
@@ -408,12 +411,15 @@ namespace gui{
 
     class CreatePotPlot;  // create an electrode at the given points
 
-    class CreateAFMArea;    // create an AFM area
-
     class CreateAFMPath;    // create an empty AFMPath that should later contain AFMNodes
     class CreateAFMNode;    // create AFMNodes that should be children of AFMPath
 
     class ResizeAFMArea;    // resize an AFM Area
+
+    class CreateTextLabel;  // create a text label
+    class EditTextLabel;
+
+    class CreateItem;
 
     // functions including undo/redo behaviour
 
@@ -433,6 +439,12 @@ namespace gui{
 
     // create AFM node in focused path after focused node
     void createAFMNode();
+
+    //! Create a text label
+    void createTextLabel(const QRect &scene_rect);
+
+    //! Edit a text label
+    void editTextLabel(prim::TextLabel *text_lab, const QString &new_text);
 
     void resizeItem(prim::Item *item, const QRectF &orig_rect,
         const QRectF &new_rect);
@@ -584,7 +596,9 @@ namespace gui{
   {
   public:
     // create an electrode at the given points
-    CreateElectrode(int layer_index, gui::DesignPanel *dp, QPointF point1, QPointF point2, prim::Electrode *elec = 0, bool invert=false, QUndoCommand *parent=0);
+    CreateElectrode(int layer_index, gui::DesignPanel *dp, QPointF point1,
+                    QPointF point2, prim::Electrode *elec = 0, bool invert=false,
+                    QUndoCommand *parent=0);
 
   private:
 
@@ -631,35 +645,6 @@ namespace gui{
     prim::PotPlot* pp;
 
     bool invert;
-  };
-
-
-  class DesignPanel::CreateAFMArea : public QUndoCommand
-  {
-  public:
-    //! Create an AFMArea at the given points
-    CreateAFMArea(int layer_index, gui::DesignPanel *dp, QPointF point1,
-        QPointF point2, prim::AFMArea *afm_area=0, bool invert=false,
-        QUndoCommand *parent=0);
-
-  private:
-    //! Destroy the AFMArea
-    virtual void undo();
-    //! Re-create the AFMArea
-    virtual void redo();
-
-    void create();    //! Create the AFMArea.
-    void destroy();   //! Destroy the AFMArea.
-
-    DesignPanel *dp;  //! Pointer to the DesignPanel
-    int layer_index;  //! Index of layer in dp->layers stack
-
-    QPointF point1;
-    QPointF point2;
-
-    bool invert;
-
-    int index;        //! Index of this item in the layer item stack.
   };
 
 
@@ -767,6 +752,73 @@ namespace gui{
     QPointF bot_right_delta;
     QRectF orig_rect;
     QRectF new_rect;
+  };
+
+  class DesignPanel::CreateTextLabel : public QUndoCommand
+  {
+  public:
+    //! Create a text label
+    CreateTextLabel(int layer_index, DesignPanel *dp, const QRectF &scene_rect,
+                    const QString &text, prim::TextLabel *text_lab=0,
+                    bool invert=false, QUndoCommand *parent=0);
+
+    virtual void undo();
+    virtual void redo();
+
+  private:
+    void create();
+    void destroy();
+
+    DesignPanel *dp;
+    bool invert;
+    int layer_index;    // index of layer in layer manager
+    int item_index;     // index of item in layer
+    QRectF scene_rect;  // rectangle that the label takes up in scene coords
+    QString text;       // text contained in the label
+  };
+
+  class DesignPanel::EditTextLabel : public QUndoCommand
+  {
+  public:
+    //! Specify text label to edit
+    EditTextLabel(int layer_index, DesignPanel *dp, const QString &new_text,
+                  prim::TextLabel *text_lab, bool invert=false,
+                  QUndoCommand *parent=0);
+
+    virtual void undo();
+    virtual void redo();
+
+  private:
+    DesignPanel *dp;
+    bool invert;
+    int layer_index;    // index of layer in layer manager
+    int item_index;     // index of item in layer
+    QString text_orig;  // original text
+    QString text_new;   // new text
+  };
+
+  //! Generic undoable item creation
+  class DesignPanel::CreateItem : public QUndoCommand
+  {
+  public:
+    CreateItem(int layer_index, DesignPanel *dp, prim::Item *item,
+               bool invert=false, QUndoCommand *parent=0);
+
+    ~CreateItem();
+
+    virtual void undo();
+    virtual void redo();
+
+  private:
+    void create();
+    void destroy();
+
+    DesignPanel *dp;
+    bool invert;
+    bool in_scene;
+    int layer_index;  // index of layer in layer manager
+    int item_index;   // index of item in layer
+    prim::Item *item; // pointer to item, this pointer should always be valid for recreation
   };
 
 

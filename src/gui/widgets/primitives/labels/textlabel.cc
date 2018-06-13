@@ -10,20 +10,33 @@
 #include "textlabel.h"
 #include "src/settings/settings.h"
 
+#include <QInputDialog>
+
 namespace prim {
 
-TextLabel::TextLabel(const QString &text, QRectF rect, int lay_id)
-  : prim::Item(prim::Item::TextLabel, lay_id), block_text(text), block_rect(rect)
+TextLabel::TextLabel(const QRectF &rect, int lay_id, const QString &text)
+  : prim::Item(prim::Item::TextLabel, lay_id)
 {
-  setPos(block_rect.topLeft());
+  initTextLabel(rect, text);
 }
 
-  /*
-QWidget *TextLabel::EditDialog(TextLabel *text_label)
+TextLabel::TextLabel(const QRectF &rect, int lay_id)
+  : prim::Item(prim::Item::TextLabel, lay_id)
 {
-  return 0;
+  initTextLabel(rect, textPrompt());
 }
-  */
+
+void TextLabel::setText(const QString &text)
+{
+  block_text = text;
+  update();
+}
+
+QString TextLabel::textPrompt(const QString &default_text, bool *ok)
+{
+  return QInputDialog::getMultiLineText(0, QObject::tr("Change label text"),
+                                        QObject::tr("Text"), default_text, ok);
+}
 
 QRectF TextLabel::boundingRect() const
 {
@@ -45,6 +58,27 @@ void TextLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
   font.setPointSize(font.pointSize() * 5);
   painter->setFont(font);
   painter->drawText(boundingRect(), Qt::AlignCenter, text());
+}
+
+prim::Item *TextLabel::deepCopy() const
+{
+  return new TextLabel(block_rect, layer_id, block_text);
+}
+
+void TextLabel::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e)
+{
+  //setText(textPrompt(text()));
+  bool ok;
+  QString new_text = textPrompt(text(), &ok);
+  if (ok)
+    emit prim::Emitter::instance()->editTextLabel(this, new_text);
+}
+
+void TextLabel::initTextLabel(const QRectF &rect, const QString &text)
+{
+  block_text = text;
+  block_rect = rect;
+  setPos(block_rect.topLeft());
 }
 
 } // end of prim namespace

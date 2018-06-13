@@ -46,6 +46,8 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
           this, &gui::DesignPanel::physLoc2LatticeCoord);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_setLatticeVisibility,
           this, &gui::DesignPanel::setLatticeVisibility);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_editTextLabel,
+          this, QOverload<prim::Item*, const QString &>::of(&gui::DesignPanel::editTextLabel));
 }
 
 // destructor
@@ -702,6 +704,12 @@ void gui::DesignPanel::setLatticeVisibility(bool visible)
     scene->setBackgroundBrush(QBrush(col));
 }
 
+void gui::DesignPanel::editTextLabel(prim::Item *text_lab,
+                                     const QString &new_text)
+{
+  editTextLabel(reinterpret_cast<prim::TextLabel*>(text_lab), new_text);
+}
+
 // INTERRUPTS
 
 // most behaviour will be connected to mouse move/release. However, when
@@ -887,13 +895,9 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             sig_screenshot(rb_scene_rect);
             break;
           case gui::ToolType::LabelTool:
-            {
             // create a label with the rubberband area
-            addItem(new prim::TextLabel("label", rb_scene_rect,
-                                        layman->indexOf(layman->activeLayer())),
-                    layman->indexOf(layman->activeLayer()));
+            createTextLabel(rb_scene_rect);
             break;
-            }
           case gui::ToolType::DragTool:
             // pan ends
             break;
@@ -1707,44 +1711,6 @@ void gui::DesignPanel::CreatePotPlot::destroy()
 }
 
 
-// CreateAFMArea class
-
-gui::DesignPanel::CreateAFMArea::CreateAFMArea(int layer_index,
-    gui::DesignPanel *dp, QPointF point1, QPointF point2,
-    prim::AFMArea *afm_area, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), dp(dp), layer_index(layer_index),
-    point1(point1), point2(point2), invert(invert)
-{
-  prim::Layer *layer = dp->layman->getLayer(layer_index);
-  index = invert ? layer->getItems().indexOf(afm_area) : layer->getItems().size();
-}
-
-void gui::DesignPanel::CreateAFMArea::undo()
-{
-  invert ? create() : destroy();
-}
-
-void gui::DesignPanel::CreateAFMArea::redo()
-{
-  invert ? destroy() : create();
-}
-
-void gui::DesignPanel::CreateAFMArea::create()
-{
-  dp->addItem(new prim::AFMArea(layer_index, point1, point2), layer_index, index);
-}
-
-void gui::DesignPanel::CreateAFMArea::destroy()
-{
-  prim::AFMArea *afmarea = static_cast<prim::AFMArea*>(
-      dp->layman->getLayer(layer_index)->getItem(index));
-  if (afmarea != 0) {
-    // destroy AFMArea
-    dp->removeItem(afmarea, dp->layman->getLayer(afmarea->layer_id));
-  }
-}
-
-
 // CreateAFMPath class
 
 gui::DesignPanel::CreateAFMPath::CreateAFMPath(int layer_index, gui::DesignPanel *dp,
@@ -1907,6 +1873,129 @@ void gui::DesignPanel::ResizeElectrode::redo()
 
   electrode->resize(top_left_delta.x(), top_left_delta.y(),
       bot_right_delta.x(), bot_right_delta.y(), true);
+}
+
+
+// Create Text Label class
+gui::DesignPanel::CreateTextLabel::CreateTextLabel(int layer_index,
+    DesignPanel *dp, const QRectF &scene_rect, const QString &text,
+    prim::TextLabel *text_lab, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), invert(invert), layer_index(layer_index),
+    scene_rect(scene_rect), text(text)
+{
+  prim::Layer *layer = dp->layman->getLayer(layer_index);
+  item_index = invert ? layer->getItems().indexOf(text_lab) : layer->getItems().size();
+}
+
+void gui::DesignPanel::CreateTextLabel::undo()
+{
+  invert ? create() : destroy();
+}
+
+void gui::DesignPanel::CreateTextLabel::redo()
+{
+  invert ? destroy() : create();
+}
+
+void gui::DesignPanel::CreateTextLabel::create()
+{
+  dp->addItem(new prim::TextLabel(scene_rect, layer_index, text), layer_index,
+              item_index);
+}
+
+void gui::DesignPanel::CreateTextLabel::destroy()
+{
+  prim::TextLabel *text_lab = reinterpret_cast<prim::TextLabel*>
+    (dp->layman->getLayer(layer_index)->getItem(item_index));
+  if (text_lab != 0) {
+    dp->removeItem(text_lab, dp->layman->getLayer(text_lab->layer_id));
+    text_lab = 0;
+  } else {
+    qCritical() << tr("Trying to delete non-existent text label");
+  }
+}
+
+
+// EditTextLabel class
+gui::DesignPanel::EditTextLabel::EditTextLabel(int layer_index, DesignPanel *dp,
+                                               const QString &new_text,
+                                               prim::TextLabel *text_lab,
+                                               bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), invert(invert), layer_index(layer_index),
+    text_new(new_text)
+{
+  prim::Layer *layer= dp->layman->getLayer(layer_index);
+  item_index = layer->getItems().indexOf(text_lab);
+  text_orig = text_lab->text();
+}
+
+void gui::DesignPanel::EditTextLabel::undo()
+{
+  prim::TextLabel *text_lab = reinterpret_cast<prim::TextLabel*>
+    (dp->layman->getLayer(layer_index)->getItem(item_index));
+  if (!invert)
+    text_lab->setText(text_orig);
+  else
+    text_lab->setText(text_new);
+}
+
+void gui::DesignPanel::EditTextLabel::redo()
+{
+  prim::TextLabel *text_lab = reinterpret_cast<prim::TextLabel*>
+    (dp->layman->getLayer(layer_index)->getItem(item_index));
+  if (!invert)
+    text_lab->setText(text_new);
+  else
+    text_lab->setText(text_orig);
+}
+
+
+// CreateItem class
+gui::DesignPanel::CreateItem::CreateItem(int layer_index, DesignPanel *dp,
+                                         prim::Item *item, bool invert,
+                                         QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), invert(invert), layer_index(layer_index),
+    item(item)
+{
+  prim::Layer *layer = dp->layman->getLayer(layer_index);
+  item_index = invert ? layer->getItems().indexOf(item) : layer->getItems().size();
+  in_scene = invert ? true : false;
+}
+
+gui::DesignPanel::CreateItem::~CreateItem()
+{
+  if (!in_scene) {
+    qDebug() << tr("Deleting item from QUndoStack");
+    delete item;
+  }
+}
+
+void gui::DesignPanel::CreateItem::undo()
+{
+  invert ? create() : destroy();
+}
+
+void gui::DesignPanel::CreateItem::redo()
+{
+  invert ? destroy() : create();
+}
+
+void gui::DesignPanel::CreateItem::create()
+{
+  if (!item)
+    qCritical() << tr("Item pointer is 0, cannot create new item");
+  dp->addItem(item, layer_index, item_index);
+  in_scene = true;
+}
+
+void gui::DesignPanel::CreateItem::destroy()
+{
+  // NOTE issues will arise if layers have been added/removed
+  item = dp->layman->getLayer(layer_index)->getItem(item_index);
+  prim::Item *item_copy = item->deepCopy();
+  dp->removeItem(item, dp->layman->getLayer(item->layer_id));
+  item = item_copy;
+  in_scene = false;
 }
 
 
@@ -2175,7 +2264,8 @@ void gui::DesignPanel::createAFMArea(QRect scene_rect)
 
   // create the AFM area
   undo_stack->beginMacro(tr("create AFM area with given corners"));
-  undo_stack->push(new CreateAFMArea(layer_index, this, point1, point2));
+  undo_stack->push(new CreateItem(layer_index, this,
+                                  new prim::AFMArea(layer_index, point1, point2)));
   undo_stack->endMacro();
 }
 
@@ -2201,6 +2291,28 @@ void gui::DesignPanel::createAFMNode()
   int afm_path_index = afm_layer->getItemIndex(afm_panel->focusedPath());
   undo_stack->push(new CreateAFMNode(layer_index, this, scene_pos, afm_layer->zOffset(),
                                         afm_path_index));
+  undo_stack->endMacro();
+}
+
+void gui::DesignPanel::createTextLabel(const QRect &scene_rect)
+{
+  bool ok;
+  QString text = prim::TextLabel::textPrompt("", &ok);
+  if (!ok)
+    return;
+  int layer_index = layman->indexOf(layman->activeLayer());
+  undo_stack->beginMacro(tr("Create Label"));
+  undo_stack->push(new CreateItem(layer_index, this,
+                                  new prim::TextLabel(scene_rect, layer_index, text)));
+  undo_stack->endMacro();
+}
+
+void gui::DesignPanel::editTextLabel(prim::TextLabel *text_lab,
+                                     const QString &new_text)
+{
+  int layer_index = text_lab->layer_id;
+  undo_stack->beginMacro(tr("Edit Text Label"));
+  undo_stack->push(new EditTextLabel(layer_index, this, new_text, text_lab));
   undo_stack->endMacro();
 }
 
@@ -2294,8 +2406,7 @@ void gui::DesignPanel::deleteSelection()
       case prim::Item::AFMArea:
         {
         prim::AFMArea *afm_area = static_cast<prim::AFMArea*>(item);
-        undo_stack->push(new CreateAFMArea(afm_area->layer_id, this,
-            afm_area->topLeft(), afm_area->bottomRight(), afm_area, true));
+        undo_stack->push(new CreateItem(afm_area->layer_id, this, afm_area, true));
         break;
         }
       case prim::Item::AFMPath:
@@ -2506,8 +2617,10 @@ void gui::DesignPanel::pasteAFMArea(prim::Ghost *ghost, int n, prim::AFMArea *af
 {
   undo_stack->beginMacro(tr("create AFMArea with given afm_area params"));
   // TODO copy AFM tip attributes
-  undo_stack->push(new CreateAFMArea(afm_area->layer_id, this,
-      ghost->pos()+afm_area->topLeft(), ghost->pos()+afm_area->bottomRight()));
+  undo_stack->push(new CreateItem(afm_area->layer_id, this,
+                                  new prim::AFMArea(afm_area->layer_id,
+                                                    ghost->pos()+afm_area->topLeft(),
+                                                    ghost->pos()+afm_area->bottomRight())));
   undo_stack->endMacro();
 }
 

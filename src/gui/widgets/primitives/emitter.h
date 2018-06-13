@@ -51,6 +51,9 @@ namespace prim{
     //! set lattice visibility
     void setLatticeVisibility(bool visible) {emit sig_setLatticeVisibility(visible);}
 
+    //! tell design panel to prompt user for new text label content
+    void editTextLabel(Item *, const QString &);
+
   signals:
 
     void sig_selectClicked(Item *);
@@ -70,6 +73,8 @@ namespace prim{
     void sig_resizeFinalize(Item *, QRectF orig_rect, QRectF final_rect);
 
     void sig_setLatticeVisibility(bool);
+
+    void sig_editTextLabel(Item *, const QString &);
 
   private:
 
