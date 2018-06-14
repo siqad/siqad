@@ -1643,42 +1643,6 @@ void gui::DesignPanel::CreateDB::destroy()
 }
 
 
-// CreateElectrode class
-
-gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignPanel *dp, QPointF point1, QPointF point2, prim::Electrode *elec, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), dp(dp), layer_index(layer_index), point1(point1), point2(point2), invert(invert)
-{  //if called to destroy, *elec points to selected electrode. if called to create, *elec = 0
-  prim::Layer *layer = dp->layman->getLayer(layer_index);
-  index = invert ? layer->getItems().indexOf(elec) : layer->getItems().size();
-}
-
-void gui::DesignPanel::CreateElectrode::undo()
-{
-  invert ? create() : destroy();
-}
-
-void gui::DesignPanel::CreateElectrode::redo()
-{
-  invert ? destroy() : create();
-}
-
-
-void gui::DesignPanel::CreateElectrode::create()
-{
-  dp->addItem(new prim::Electrode(layer_index, point1, point2), layer_index, index);
-}
-
-void gui::DesignPanel::CreateElectrode::destroy()
-{
-  prim::Electrode *electrode = static_cast<prim::Electrode*>(dp->layman->getLayer(layer_index)->getItem(index));
-  if(electrode != 0){
-    // destroy electrode
-    dp->removeItem(electrode, dp->layman->getLayer(electrode->layer_id));  // deletes electrode
-    electrode = 0;
-  }
-}
-
-
 // CreatePotPlot class
 gui::DesignPanel::CreatePotPlot::CreatePotPlot(gui::DesignPanel *dp, QImage potential_plot, QRectF graph_container, prim::PotPlot *pp, bool invert, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), potential_plot(potential_plot), graph_container(graph_container), pp(pp), invert(invert)
@@ -2244,7 +2208,8 @@ void gui::DesignPanel::createElectrodes(QRect scene_rect)
   int layer_index = layman->indexOf(layman->activeLayer());
   //only ever create one electrode at a time
   undo_stack->beginMacro(tr("create electrode with given corners"));
-  undo_stack->push(new CreateElectrode(layer_index, this, point1, point2));
+  undo_stack->push(new CreateItem(layer_index, this,
+                                  new prim::Electrode(layer_index, point1, point2)));
   undo_stack->endMacro();
 }
 
@@ -2397,18 +2362,6 @@ void gui::DesignPanel::deleteSelection()
       case prim::Item::Aggregate:
         destroyAggregate(static_cast<prim::Aggregate*>(item));
         break;
-      case prim::Item::Electrode:
-        undo_stack->push(new CreateElectrode( item->layer_id, this, QPointF(item->x(), item->y()),
-                        QPointF(item->x() + static_cast<prim::Electrode*>(item)->getWidth(),
-                        item->y() + static_cast<prim::Electrode*>(item)->getHeight()),
-                        static_cast<prim::Electrode*>(item), true));
-        break;
-      case prim::Item::AFMArea:
-        {
-        prim::AFMArea *afm_area = static_cast<prim::AFMArea*>(item);
-        undo_stack->push(new CreateItem(afm_area->layer_id, this, afm_area, true));
-        break;
-        }
       case prim::Item::AFMPath:
         destroyAFMPath(static_cast<prim::AFMPath*>(item));
         break;
@@ -2432,6 +2385,8 @@ void gui::DesignPanel::deleteSelection()
         break;
         }
       default:
+        // generic item removal
+        undo_stack->push(new CreateItem(item->layer_id, this, item, true));
         break;
     }
   }
@@ -2608,8 +2563,10 @@ void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, int n, prim::Aggregate
 void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, int n, prim::Electrode *elec)
 {
   undo_stack->beginMacro(tr("create electrode with given corners"));
-  undo_stack->push(new CreateElectrode(elec->layer_id, this, ghost->pos()+elec->pos(),
-              ghost->pos()+elec->pos()+QPointF(elec->getWidth(), elec->getHeight())));
+  undo_stack->push(new CreateItem(elec->layer_id, this,
+                                  new prim::Electrode(elec->layer_id,
+                                                      ghost->pos()+elec->getTopLeft(),
+                                                      ghost->pos()+elec->getBotRight())));
   undo_stack->endMacro();
 }
 

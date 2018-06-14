@@ -406,7 +406,6 @@ namespace gui{
 
     class MoveItem;         // move a single Item
 
-    class CreateElectrode;  // create an electrode at the given points
     class ResizeElectrode;    // resize an electrode
 
     class CreatePotPlot;  // create an electrode at the given points
@@ -419,7 +418,7 @@ namespace gui{
     class CreateTextLabel;  // create a text label
     class EditTextLabel;
 
-    class CreateItem;
+    class CreateItem;       // create any prim::Item that doesn't require extra checks
 
     // functions including undo/redo behaviour
 
