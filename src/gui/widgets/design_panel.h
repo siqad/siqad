@@ -419,6 +419,7 @@ namespace gui{
     class EditTextLabel;
 
     class CreateItem;       // create any prim::Item that doesn't require extra checks
+    class ResizeItem;       // resize a ResizableRect
 
     // functions including undo/redo behaviour
 
@@ -590,36 +591,6 @@ namespace gui{
     int item_index;   // index of item in Layer imte stack
   };
 
-
-  class DesignPanel::CreateElectrode : public QUndoCommand
-  {
-  public:
-    // create an electrode at the given points
-    CreateElectrode(int layer_index, gui::DesignPanel *dp, QPointF point1,
-                    QPointF point2, prim::Electrode *elec = 0, bool invert=false,
-                    QUndoCommand *parent=0);
-
-  private:
-
-    // destroy the dangling bond and update the lattice dot
-    virtual void undo();
-    // re-create the dangling bond
-    virtual void redo();
-
-    void create();  // create the dangling bond
-    void destroy(); // destroy the dangling bond
-
-    DesignPanel *dp;  // DesignPanel pointer
-    int layer_index;  // index of layer in dp->layers stack
-
-    QPointF point1;
-    QPointF point2;
-    bool invert;
-
-    // internals
-    int index;              // index of electrode item in the layer item stack
-
-  };
 
   class DesignPanel::CreatePotPlot : public QUndoCommand
   {
@@ -818,6 +789,31 @@ namespace gui{
     int layer_index;  // index of layer in layer manager
     int item_index;   // index of item in layer
     prim::Item *item; // pointer to item, this pointer should always be valid for recreation
+  };
+
+  //! Resize a ResizableRect
+  class DesignPanel::ResizeItem : public QUndoCommand
+  {
+  public:
+    //! Set manual to true if the resize was done manually, which means the rect
+    //! already has the correct dimensions.
+    ResizeItem(int layer_index, DesignPanel *dp, int item_index,
+               const QRectF &orig_rect, const QRectF &new_rect,
+               bool manual=false, bool invert=false, QUndoCommand *parent=0);
+
+    virtual void undo();
+    virtual void redo();
+
+  private:
+    DesignPanel *dp;
+    bool invert;
+    bool manual;
+    int layer_index;
+    int item_index;
+    QRectF orig_rect;
+    QRectF new_rect;
+    QPointF top_left_delta;
+    QPointF bottom_right_delta;
   };
 
 

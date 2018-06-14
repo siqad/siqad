@@ -17,7 +17,57 @@ QList<ResizeFrame::HandlePosition> ResizeFrame::handle_positions;
 qreal ResizeHandle::handle_dim = -1;
 prim::Item::StateColors handle_col;
 
-// Constructor
+
+// Resizable Rectangle base class
+ResizableRect::ResizableRect(QRectF scene_rect, ItemType type, int lay_id,
+                             QGraphicsItem *parent)
+  : Item(type, lay_id, parent), scene_rect(scene_rect)
+{
+  setResizable(true);
+}
+
+void ResizableRect::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2, bool update_handles)
+{
+  prepareGeometryChange();
+
+  // update dimensions
+  QPointF delta_top_left(dx1, dy1);
+  QPointF delta_bottom_right(dx2, dy2);
+  delta_bottom_right -= delta_top_left;
+  setPos(pos()+delta_top_left);
+  scene_rect.setBottomRight(scene_rect.bottomRight()+delta_bottom_right);
+  update();
+
+  // update the frame
+  if (update_handles && resize_frame)
+    resize_frame->updateHandlePositions();
+}
+
+void ResizableRect::preResize()
+{
+  scene_rect_cache = scene_rect;
+  pos_cache = pos();
+}
+
+QVariant ResizableRect::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+  if (change == QGraphicsItem::ItemSelectedChange) {
+    if (value == true) {
+      if (!resize_frame) {
+        resize_frame = new prim::ResizeFrame(this);
+      }
+      resize_frame->setVisible(true);
+    } else {
+      if (resize_frame) {
+        resize_frame->setVisible(false);
+      }
+    }
+  }
+
+  return QGraphicsItem::itemChange(change, value);
+}
+
+// Resize Frame base class
 ResizeFrame::ResizeFrame(prim::Item *resize_target)
   : Item(prim::Item::ResizeFrame), resize_target(resize_target)
 {
@@ -259,7 +309,7 @@ void ResizeHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent *)
 void ResizeHandle::prepareStatics()
 {
   // TODO settings.cc
-  handle_dim = 10;
+  handle_dim = 100;
 }
 
 } // end of prim namespace

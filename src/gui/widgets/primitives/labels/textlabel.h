@@ -10,11 +10,11 @@
 #ifndef _GUI_PR_TEXTLABEL_H_
 #define _GUI_PR_TEXTLABEL_H_
 
-#include "../item.h"
+#include "../resize_frame.h"
 
 namespace prim{
 
-  class TextLabel: public Item
+  class TextLabel: public ResizableRect
   {
   public:
     //! Constructor that takes the text, position, and layer id.

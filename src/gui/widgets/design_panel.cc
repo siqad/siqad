@@ -1963,6 +1963,43 @@ void gui::DesignPanel::CreateItem::destroy()
 }
 
 
+// ResizeItem class
+gui::DesignPanel::ResizeItem::ResizeItem(int layer_index, DesignPanel *dp,
+                                         int item_index, const QRectF &orig_rect,
+                                         const QRectF &new_rect, bool manual,
+                                         bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), invert(invert), manual(manual),
+    layer_index(layer_index), item_index(item_index), orig_rect(orig_rect),
+    new_rect(new_rect)
+{
+  top_left_delta = new_rect.topLeft() - orig_rect.topLeft();
+  bottom_right_delta = new_rect.bottomRight() - orig_rect.bottomRight();
+}
+
+void gui::DesignPanel::ResizeItem::undo()
+{
+  prim::ResizableRect *item = reinterpret_cast<prim::ResizableRect*>
+    (dp->layman->getLayer(layer_index)->getItem(item_index));
+
+  item->resize(-top_left_delta.x(), -top_left_delta.y(),
+               -bottom_right_delta.x(), -bottom_right_delta.y(), true);
+}
+
+void gui::DesignPanel::ResizeItem::redo()
+{
+  prim::ResizableRect *item = reinterpret_cast<prim::ResizableRect*>
+    (dp->layman->getLayer(layer_index)->getItem(item_index));
+
+  // if the user resized manually, then the area is already the right size
+  if (manual) {
+    manual = false;
+    return;
+  }
+
+  item->resize(top_left_delta.x(), top_left_delta.y(),
+               bottom_right_delta.x(), bottom_right_delta.y(), true);
+}
+
 // FromAggregate class
 gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
                                             DesignPanel *dp, QUndoCommand *parent)
@@ -2293,7 +2330,16 @@ void gui::DesignPanel::resizeItem(prim::Item *item,
       resizeElectrode(static_cast<prim::Electrode*>(item), orig_rect, new_rect);
       break;
     default:
-      break;
+      {
+        if (item->isResizable()) {
+          int item_index = layman->getLayer(item->layer_id)->getItemIndex(item);
+          undo_stack->beginMacro(tr("Resize Item"));
+          undo_stack->push(new ResizeItem(item->layer_id, this, item_index,
+                                          orig_rect, new_rect, true));
+          undo_stack->endMacro();
+        }
+        break;
+      }
   }
 }
 

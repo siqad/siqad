@@ -13,8 +13,39 @@
 
 namespace prim{
 
-  // Forward declaration of ResizeHandle class
+  // Forward declarations
+  class ResizeFrame;
   class ResizeHandle;
+
+  //! A prim::Item that inherits this class will get resizing abilities.
+  class ResizableRect : public Item
+  {
+  public:
+    //! Constructor that takes in the rectangle dimensions in scene coordinates.
+    ResizableRect(QRectF scene_rect, ItemType type, int lay_id=-1,
+                  QGraphicsItem *parent=0);
+
+    //! Move the top left and bottom right corners of the rectangle by the given
+    //! deltas.
+    virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2, bool update_handles=false) override;
+
+    //! Pre-resize actions - save the original position and dimensions.
+    void preResize();
+
+    // Public variables
+    QRectF scene_rect;        // the rectangle dimensions in scene coordinates
+
+  protected:
+
+    //! Show resize frame when focused
+    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
+  private:
+    // Variables
+    prim::ResizeFrame *resize_frame=0;  // the resize frame for this resizble rect
+    QRectF scene_rect_cache;            // the rectangle dimensions before resize
+    QPointF pos_cache;                  // the top left point before resize
+  };
 
   //! A rectangular frame containing a few square handles for users to drag to
   //! resize graphics items. The frame sees the target item as its parent item.
