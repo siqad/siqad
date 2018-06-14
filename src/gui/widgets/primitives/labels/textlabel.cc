@@ -80,7 +80,6 @@ void TextLabel::initTextLabel(const QRectF &rect, const QString &text)
   block_rect = rect;
   setPos(block_rect.topLeft());
   setFlag(QGraphicsItem::ItemIsSelectable, true);
-  setResizable(true);
 }
 
 } // end of prim namespace
