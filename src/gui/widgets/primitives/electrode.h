@@ -11,7 +11,6 @@
 #define _GUI_PR_ELECTRODE_H_
 
 #include <QtWidgets>
-#include "item.h"
 #include "resize_frame.h"
 
 namespace prim{
@@ -19,30 +18,37 @@ namespace prim{
   // forward declarations
   class Layer;
 
-  class Electrode: public prim::Item
+  class Electrode: public ResizableRect
   {
   public:
-    //! constructor, creates an electrode given two points.
-    Electrode(int lay_id, QPointF point1, QPointF point2);
-    //! constructor, creates an electrode from the design file.
-    Electrode(QXmlStreamReader *ls, QGraphicsScene *scene);
-    //! destructor
-    ~Electrode(){}
     //! Clock types will vary over time. Fix types are static.
     enum ElectrodeType{Fix, Clock};
+
+    //! constructor, creates an electrode given two points.
+    Electrode(int lay_id, const QRectF &scene_rect);
+
+    //! constructor, creates an electrode from the design file.
+    Electrode(QXmlStreamReader *ls, QGraphicsScene *scene);
+
+    //! destructor
+    ~Electrode(){}
+
     // Initializer for initial attribute values.
-    void initElectrode(int lay_id, QPointF point1_in, QPointF point2_in);
+    void initElectrode(int lay_id, const QRectF &scene_rect);
+
     //! Resize according to given coordinates.
-    virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
-        bool update_handles=false) override;
+    /*virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
+        bool update_handles=false) override;*/
 
     // accessors
-    QPointF getTopLeft(void){return top_left;}
-    QPointF getBotRight(void){return bot_right;}
+    /*QPointF getTopLeft(void){return top_left;}
+    QPointF getBotRight(void){return bot_right;}*/
     qreal getTopDepth(void){return top_depth;}
-    qreal getWidth(void) const {return bot_right.x() - top_left.x();}
-    qreal getHeight(void) const {return bot_right.y() - top_left.y();}
-    qreal getDepth(void){return elec_depth;}
+    /*qreal getWidth(void) const {return bot_right.x() - top_left.x();}
+    qreal getHeight(void) const {return bot_right.y() - top_left.y();}*/
+    /*qreal getWidth() const {return sceneRect().width();}
+    qreal getHeight() const {return sceneRect().height();}*/
+    qreal getDepth(){return elec_depth;}
 
     //! Updates the electrode with its new location. Call this after moving the electrode.
     void updatePoints(QPointF);
@@ -63,8 +69,8 @@ namespace prim{
   protected:
 
     // Mouse events
-    virtual QVariant itemChange(GraphicsItemChange change,
-        const QVariant &value) Q_DECL_OVERRIDE;
+    /*virtual QVariant itemChange(GraphicsItemChange change,
+        const QVariant &value) Q_DECL_OVERRIDE;*/
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
     // virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;

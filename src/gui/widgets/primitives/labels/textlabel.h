@@ -48,12 +48,12 @@ namespace prim{
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
 
     //! Return a copy of this text label.
-    virtual Item *deepCopy() const;
+    virtual Item *deepCopy() const override;
 
   protected:
 
     //! show text editor on double click
-    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e) override;
+    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *) override;
 
   private:
     //! Initialize the text label

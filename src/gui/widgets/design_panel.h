@@ -581,8 +581,6 @@ namespace gui{
 
     // move an Aggregate by the given amount
     void moveAggregate(prim::Aggregate *agg, const QPointF &delta);
-    void moveElectrode(prim::Electrode *electrode, const QPointF &delta);
-    void moveAFMArea(prim::AFMArea *afm_area, const QPointF &delta);
 
     DesignPanel *dp;
 

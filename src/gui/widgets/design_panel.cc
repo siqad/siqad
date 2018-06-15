@@ -1410,7 +1410,8 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, prim::LatticeCoord &offset)
   // check if holding any non-floating objects
   for (prim::Item *item : pasting ? clipboard : selectedItems()) {
     if (item->item_type != prim::Item::Electrode &&
-        item->item_type != prim::Item::AFMArea) {
+        item->item_type != prim::Item::AFMArea &&
+        item->item_type != prim::Item::TextLabel) {
       is_all_floating = false;
       break;
     }
@@ -1421,8 +1422,8 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, prim::LatticeCoord &offset)
     if (pasting) { //offset is in the first electrode item
       ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos()))
           - clipboard[0]->pos()
-          - QPointF(static_cast<prim::Electrode*>(clipboard[0])->getWidth()/2.0,
-              static_cast<prim::Electrode*>(clipboard[0])->getHeight()/2.0)
+          - QPointF(static_cast<prim::Electrode*>(clipboard[0])->sceneRect().width()/2.0,
+              static_cast<prim::Electrode*>(clipboard[0])->sceneRect().height()/2.0)
       );
     } else {
       ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos())));
@@ -2169,14 +2170,8 @@ void gui::DesignPanel::MoveItem::moveItem(prim::Item *item, const QPointF &delta
     case prim::Item::Aggregate:
       moveAggregate(static_cast<prim::Aggregate*>(item), delta);
       break;
-    case prim::Item::Electrode:
-      moveElectrode(static_cast<prim::Electrode*>(item), delta);
-      break;
-    case prim::Item::AFMArea:
-      moveAFMArea(static_cast<prim::AFMArea*>(item), delta);
-      break;
     default:
-      item->moveBy(delta.x(), delta.y());
+      item->moveItemBy(delta.x(), delta.y());
       break;
   }
 }
@@ -2211,19 +2206,6 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
   agg->setPos(agg->scenePos()+QPointF(-1,0));
 }
 
-void gui::DesignPanel::MoveItem::moveElectrode(prim::Electrode *electrode, const QPointF &delta)
-{
-  electrode->setPos( electrode->pos() + delta );
-  electrode->updatePoints(delta);
-}
-
-void gui::DesignPanel::MoveItem::moveAFMArea(prim::AFMArea *afm_area,
-    const QPointF &delta)
-{
-  afm_area->setPos(afm_area->pos() + delta);
-  afm_area->updatePoints(delta);
-}
-
 // Undo/Redo Methods
 
 void gui::DesignPanel::createDBs()
@@ -2240,13 +2222,13 @@ void gui::DesignPanel::createDBs()
 
 void gui::DesignPanel::createElectrodes(QRect scene_rect)
 {
-  QPoint point1 = scene_rect.topLeft();
-  QPoint point2 = scene_rect.bottomRight();
+  /*QPoint point1 = scene_rect.topLeft();
+  QPoint point2 = scene_rect.bottomRight();*/
   int layer_index = layman->indexOf(layman->activeLayer());
   //only ever create one electrode at a time
   undo_stack->beginMacro(tr("create electrode with given corners"));
   undo_stack->push(new CreateItem(layer_index, this,
-                                  new prim::Electrode(layer_index, point1, point2)));
+                                  new prim::Electrode(layer_index, scene_rect)));
   undo_stack->endMacro();
 }
 
@@ -2260,14 +2242,12 @@ void gui::DesignPanel::createPotPlot(QImage potential_plot, QRectF graph_contain
 
 void gui::DesignPanel::createAFMArea(QRect scene_rect)
 {
-  QPoint point1 = scene_rect.topLeft();
-  QPoint point2 = scene_rect.bottomRight();
   int layer_index = layman->indexOf(layman->activeLayer());
 
   // create the AFM area
   undo_stack->beginMacro(tr("create AFM area with given corners"));
   undo_stack->push(new CreateItem(layer_index, this,
-                                  new prim::AFMArea(layer_index, point1, point2)));
+                                  new prim::AFMArea(layer_index, scene_rect)));
   undo_stack->endMacro();
 }
 
@@ -2528,7 +2508,8 @@ bool gui::DesignPanel::pasteAtGhost()
   bool is_all_floating = true;
   for(QGraphicsItem *gitem : clipboard){
     if (static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode &&
-        static_cast<prim::Item*>(gitem)->item_type != prim::Item::AFMArea){
+        static_cast<prim::Item*>(gitem)->item_type != prim::Item::AFMArea &&
+        reinterpret_cast<prim::TextLabel*>(gitem)->item_type != prim::Item::TextLabel){
       is_all_floating = false;
       break;
     }
@@ -2608,22 +2589,22 @@ void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, int n, prim::Aggregate
 
 void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, int n, prim::Electrode *elec)
 {
+  QRectF rect = elec->sceneRect();
+  rect.moveTopLeft(ghost->pos()+rect.topLeft());
   undo_stack->beginMacro(tr("create electrode with given corners"));
   undo_stack->push(new CreateItem(elec->layer_id, this,
-                                  new prim::Electrode(elec->layer_id,
-                                                      ghost->pos()+elec->getTopLeft(),
-                                                      ghost->pos()+elec->getBotRight())));
+                                  new prim::Electrode(elec->layer_id, rect)));
   undo_stack->endMacro();
 }
 
 void gui::DesignPanel::pasteAFMArea(prim::Ghost *ghost, int n, prim::AFMArea *afm_area)
 {
+  QRectF rect = afm_area->sceneRect();
+  rect.moveTopLeft(ghost->pos()+rect.topLeft());
   undo_stack->beginMacro(tr("create AFMArea with given afm_area params"));
   // TODO copy AFM tip attributes
   undo_stack->push(new CreateItem(afm_area->layer_id, this,
-                                  new prim::AFMArea(afm_area->layer_id,
-                                                    ghost->pos()+afm_area->topLeft(),
-                                                    ghost->pos()+afm_area->bottomRight())));
+                                  new prim::AFMArea(afm_area->layer_id, rect)));
   undo_stack->endMacro();
 }
 
@@ -2644,7 +2625,8 @@ bool gui::DesignPanel::moveToGhost(bool kill)
     // reset the original lattice dot selectability and return false
     for (prim::Item *item : selectedItems()) {
       if (item->item_type != prim::Item::Electrode &&
-          item->item_type != prim::Item::AFMArea) {
+          item->item_type != prim::Item::AFMArea &&
+          item->item_type != prim::Item::TextLabel) {
         is_all_floating = false;
       }
       setLatticeSiteOccupancy(item, true);

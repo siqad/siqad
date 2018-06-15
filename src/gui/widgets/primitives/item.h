@@ -73,6 +73,10 @@ namespace prim{
     void setResizable(bool flag) {resizable = flag;}
     bool isResizable() {return resizable;}
 
+    //! Move the item by given delta. Normally just calls Qt's moveBy function but certain
+    //! classes may override this for custom behavior.
+    virtual void moveItemBy(qreal dx, qreal dy) {moveBy(dx, dy);}
+
     //! If the item is resizable, implement the resize function. The first two
     //! parameters (dx1, dy1) correspond to the delta for the top left corner,
     //! the next two parameters (dx2, dy2) correspond to the bottom right.

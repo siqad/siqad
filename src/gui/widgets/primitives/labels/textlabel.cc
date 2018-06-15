@@ -15,13 +15,13 @@
 namespace prim {
 
 TextLabel::TextLabel(const QRectF &rect, int lay_id, const QString &text)
-  : prim::ResizableRect(rect, prim::Item::TextLabel, lay_id)
+  : prim::ResizableRect(prim::Item::TextLabel, rect, lay_id)
 {
   initTextLabel(rect, text);
 }
 
 TextLabel::TextLabel(const QRectF &rect, int lay_id)
-  : prim::ResizableRect(rect, prim::Item::TextLabel, lay_id)
+  : prim::ResizableRect(prim::Item::TextLabel, rect, lay_id)
 {
   initTextLabel(rect, textPrompt());
 }
@@ -40,7 +40,7 @@ QString TextLabel::textPrompt(const QString &default_text, bool *ok)
 
 QRectF TextLabel::boundingRect() const
 {
-  QPointF diag = scene_rect.bottomRight() - scene_rect.topLeft();
+  QPointF diag = sceneRect().bottomRight() - sceneRect().topLeft();
   return QRectF(0, 0, diag.x(), diag.y());
 }
 
@@ -62,10 +62,10 @@ void TextLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
 
 prim::Item *TextLabel::deepCopy() const
 {
-  return new TextLabel(scene_rect, layer_id, block_text);
+  return new TextLabel(sceneRect(), layer_id, block_text);
 }
 
-void TextLabel::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e)
+void TextLabel::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
 {
   //setText(textPrompt(text()));
   bool ok;

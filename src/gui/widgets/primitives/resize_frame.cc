@@ -19,11 +19,12 @@ prim::Item::StateColors handle_col;
 
 
 // Resizable Rectangle base class
-ResizableRect::ResizableRect(QRectF scene_rect, ItemType type, int lay_id,
+ResizableRect::ResizableRect(ItemType type, const QRectF &scene_rect, int lay_id,
                              QGraphicsItem *parent)
-  : Item(type, lay_id, parent), scene_rect(scene_rect)
+  : Item(type, lay_id, parent)
 {
   setResizable(true);
+  setSceneRect(scene_rect);
 }
 
 void ResizableRect::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2, bool update_handles)
@@ -31,11 +32,9 @@ void ResizableRect::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2, bool upda
   prepareGeometryChange();
 
   // update dimensions
-  QPointF delta_top_left(dx1, dy1);
-  QPointF delta_bottom_right(dx2, dy2);
-  delta_bottom_right -= delta_top_left;
-  setPos(pos()+delta_top_left);
-  scene_rect.setBottomRight(scene_rect.bottomRight()+delta_bottom_right);
+  scene_rect.setTopLeft(scene_rect.topLeft()+QPointF(dx1,dy1));
+  scene_rect.setBottomRight(scene_rect.bottomRight()+QPointF(dx2,dy2));
+  setPos(scene_rect.topLeft());
   update();
 
   // update the frame
@@ -47,6 +46,19 @@ void ResizableRect::preResize()
 {
   scene_rect_cache = scene_rect;
   pos_cache = pos();
+}
+
+void ResizableRect::moveItemBy(qreal dx, qreal dy)
+{
+  QRectF rect = scene_rect;
+  rect.moveTopLeft(rect.topLeft()+QPointF(dx,dy));
+  setSceneRect(rect);
+}
+
+void ResizableRect::setSceneRect(const QRectF &rect) {
+  scene_rect = rect;
+  setPos(scene_rect.topLeft());
+  update();
 }
 
 QVariant ResizableRect::itemChange(GraphicsItemChange change, const QVariant &value)

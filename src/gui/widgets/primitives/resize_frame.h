@@ -22,7 +22,7 @@ namespace prim{
   {
   public:
     //! Constructor that takes in the rectangle dimensions in scene coordinates.
-    ResizableRect(QRectF scene_rect, ItemType type, int lay_id=-1,
+    ResizableRect(ItemType type, const QRectF &scene_rect=QRectF(), int lay_id=-1,
                   QGraphicsItem *parent=0);
 
     //! Move the top left and bottom right corners of the rectangle by the given
@@ -32,8 +32,14 @@ namespace prim{
     //! Pre-resize actions - save the original position and dimensions.
     void preResize();
 
-    // Public variables
-    QRectF scene_rect;        // the rectangle dimensions in scene coordinates
+    //! Move the top left of the rectangle by the given delta.
+    virtual void moveItemBy(qreal dx, qreal dy) override;
+
+    //! Set rectangle that defines this item's dimensions in scene coordinates.
+    void setSceneRect(const QRectF &rect);
+
+    //! Return the rectangle that defines this item's dimensions in scene coordinates.
+    QRectF sceneRect() const {return scene_rect;}
 
   protected:
 
@@ -42,6 +48,7 @@ namespace prim{
 
   private:
     // Variables
+    QRectF scene_rect;        // the rectangle dimensions in scene coordinates
     prim::ResizeFrame *resize_frame=0;  // the resize frame for this resizble rect
     QRectF scene_rect_cache;            // the rectangle dimensions before resize
     QPointF pos_cache;                  // the top left point before resize
