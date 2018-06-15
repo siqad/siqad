@@ -80,7 +80,7 @@ QVariant ResizableRect::itemChange(GraphicsItemChange change, const QVariant &va
 }
 
 // Resize Frame base class
-ResizeFrame::ResizeFrame(prim::Item *resize_target)
+ResizeFrame::ResizeFrame(prim::ResizableRect *resize_target)
   : Item(prim::Item::ResizeFrame), resize_target(resize_target)
 {
   if (border_width == -1)
@@ -100,7 +100,7 @@ ResizeFrame::ResizeFrame(prim::Item *resize_target)
 }
 
 
-void ResizeFrame::setResizeTarget(prim::Item *new_target)
+void ResizeFrame::setResizeTarget(prim::ResizableRect *new_target)
 {
   resize_target = new_target;
   setParentItem(resize_target);
@@ -273,10 +273,10 @@ void ResizeHandle::mousePressEvent(QGraphicsSceneMouseEvent *e)
   switch(e->buttons()) {
     case Qt::LeftButton:
     {
-      prim::Item *target = static_cast<prim::ResizeFrame*>(parentItem())->
+      prim::ResizableRect *target = static_cast<prim::ResizeFrame*>(parentItem())->
           resizeTarget();
       if (target) {
-        target->setBoundingRectPreResize(target->boundingRect());
+        target->preResize();
 
         clicked = true;
         step_pos = e->scenePos();
@@ -310,10 +310,10 @@ void ResizeHandle::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
 void ResizeHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent *)
 {
   if (clicked) {
-    prim::Item *target = static_cast<prim::ResizeFrame*>(parentItem())->
+    prim::ResizableRect *target = static_cast<prim::ResizeFrame*>(parentItem())->
         resizeTarget();
     emit prim::Emitter::instance()->sig_resizeFinalize(target,
-        target->boundingRectPreResize(), target->boundingRect());
+        target->sceneRectCached(), target->sceneRect());
   }
   clicked = false;
 }

@@ -41,6 +41,9 @@ namespace prim{
     //! Return the rectangle that defines this item's dimensions in scene coordinates.
     QRectF sceneRect() const {return scene_rect;}
 
+    //! Return the item's dimensions before resizing in scene coordinates.
+    QRectF sceneRectCached() const {return scene_rect_cache;}
+
   protected:
 
     //! Show resize frame when focused
@@ -67,14 +70,14 @@ namespace prim{
 
     //! Constructor which takes the pointer to the target item that this frame
     //! will resize.
-    ResizeFrame(prim::Item *resize_target=0);
+    ResizeFrame(prim::ResizableRect *resize_target=0);
 
     //! Empty destructor.
     ~ResizeFrame() {};
 
     //! Set the target resize item.
-    void setResizeTarget(prim::Item *new_target);
-    prim::Item *resizeTarget() const {return resize_target;}
+    void setResizeTarget(prim::ResizableRect *new_target);
+    prim::ResizableRect *resizeTarget() const {return resize_target;}
 
     //! Retrieve the handle at the indicated location
     prim::ResizeHandle *handle(HandlePosition pos) {return resize_handles.at(pos);}
@@ -103,7 +106,7 @@ namespace prim{
     void prepareStatics();
 
     // resize frame variables
-    prim::Item *resize_target=0;
+    prim::ResizableRect *resize_target=0;
 
     //! Static list of handle positions for easy iteration through all positions
     static QList<HandlePosition> handle_positions;
