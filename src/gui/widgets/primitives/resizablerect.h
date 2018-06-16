@@ -1,4 +1,4 @@
-// @file:     resize_frame.h
+// @file:     resizablerect.h
 // @author:   Samuel
 // @created:  2018-03-18
 // @editted:  2018-03-18 - Samuel

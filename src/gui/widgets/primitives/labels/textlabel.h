@@ -10,7 +10,7 @@
 #ifndef _GUI_PR_TEXTLABEL_H_
 #define _GUI_PR_TEXTLABEL_H_
 
-#include "../resize_frame.h"
+#include "../resizablerect.h"
 
 namespace prim{
 

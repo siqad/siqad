@@ -9,7 +9,7 @@
 #ifndef _PRIM_AFMAREA_H_
 #define _PRIM_AFMAREA_H_
 
-#include "resize_frame.h"
+#include "resizablerect.h"
 
 namespace prim{
 

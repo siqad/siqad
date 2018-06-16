@@ -11,7 +11,7 @@
 #define _GUI_PR_ELECTRODE_H_
 
 #include <QtWidgets>
-#include "resize_frame.h"
+#include "resizablerect.h"
 
 namespace prim{
 

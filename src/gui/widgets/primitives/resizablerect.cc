@@ -1,4 +1,4 @@
-// @file:     resize_frame.cc
+// @file:     resizablerect.cc
 // @author:   Samuel
 // @created:  2018-03-19
 // @editted:  2018-03-19 - Samuel
@@ -6,7 +6,7 @@
 //
 // @desc:     Resize handles for resizable objects
 
-#include "resize_frame.h"
+#include "resizablerect.h"
 #include "afmarea.h"
 
 namespace prim{
