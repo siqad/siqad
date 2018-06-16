@@ -36,22 +36,9 @@ namespace prim{
     // Initializer for initial attribute values.
     void initElectrode(int lay_id, const QRectF &scene_rect);
 
-    //! Resize according to given coordinates.
-    /*virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
-        bool update_handles=false) override;*/
-
     // accessors
-    /*QPointF getTopLeft(void){return top_left;}
-    QPointF getBotRight(void){return bot_right;}*/
     qreal getTopDepth(void){return top_depth;}
-    /*qreal getWidth(void) const {return bot_right.x() - top_left.x();}
-    qreal getHeight(void) const {return bot_right.y() - top_left.y();}*/
-    /*qreal getWidth() const {return sceneRect().width();}
-    qreal getHeight() const {return sceneRect().height();}*/
     qreal getDepth(){return elec_depth;}
-
-    //! Updates the electrode with its new location. Call this after moving the electrode.
-    void updatePoints(QPointF);
 
     // inherited abstract method implementations
     QRectF boundingRect() const Q_DECL_OVERRIDE;
@@ -60,6 +47,7 @@ namespace prim{
 
     // saving to design
     virtual void saveItems(QXmlStreamWriter *) const override;
+
     //! Return the class default property map
     virtual gui::PropertyMap *classPropertyMap() override {return &default_class_properties;}
     virtual gui::PropertyMap *classPropertyMap() const override {return &default_class_properties;}
@@ -80,11 +68,11 @@ namespace prim{
     void constructStatics();
     void createActions();
     void showProps();
+
     // properties of this item class
     static gui::PropertyMap default_class_properties; //! Default properties for this class
+
     // VARIABLES
-    QPointF top_left; //top left point, since the two points given could be any two opposite points
-    QPointF bot_right; //bottom right point, since the two points given could be any two opposite points
     qreal elec_depth;
     qreal top_depth;
 
@@ -94,8 +82,6 @@ namespace prim{
     static QColor selected_col; // edge colour, selected
 
     // Resize
-    prim::ResizeFrame *resize_frame=0;
-    QRectF orig_rect;
     QList<QAction*> actions_list;
     QAction* action_show_prop;
     QAction* action_something_else;

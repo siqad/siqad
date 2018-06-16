@@ -96,46 +96,6 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
   scene->addItem(this);
 }
 
-// Resize according to given coordinates
-/*void prim::Electrode::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
-    bool update_handles)
-{
-  prepareGeometryChange();
-  top_left += QPointF(dx1, dy1);
-  bot_right += QPointF(dx2, dy2);
-
-  // reverse change if user resizes past the other edge
-  if (top_left.x() > bot_right.x() ||
-      top_left.y() > bot_right.y()) {
-    top_left -= QPointF(dx1, dy1);
-    bot_right -= QPointF(dx2, dy2);
-  }
-
-  setPos(getTopLeft());
-  update();
-
-  if (update_handles && resize_frame)
-    resize_frame->updateHandlePositions();
-}*/
-
-/*QVariant prim::Electrode::itemChange(GraphicsItemChange change, const QVariant &value)
-{
-  if (change == QGraphicsItem::ItemSelectedChange) {
-    if (value == true) {
-      if (!resize_frame) {
-        resize_frame = new prim::ResizeFrame(this);
-      }
-      resize_frame->setVisible(true);
-    } else {
-      if (resize_frame) {
-        resize_frame->setVisible(false);
-      }
-    }
-  }
-
-  return QGraphicsItem::itemChange(change, value);
-}*/
-
 void prim::Electrode::showProps()
 {
   prim::Emitter::instance()->sig_showProperty(this);
@@ -164,18 +124,10 @@ void prim::Electrode::createActions()
 void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)
 {
   layer_id = lay_id;
-  /*QPointF point1 = point1_in;
-  QPointF point2 = point2_in;
-  qDebug() << QObject::tr("%1 %2").arg(getWidth()).arg(getHeight());*/
   if(edge_width == -1){
     constructStatics();
   }
   createActions();
-  /*top_left.setX(std::min(point1.x(), point2.x()));
-  top_left.setY(std::min(point1.y(), point2.y()));
-  bot_right.setX(std::max(point1.x(), point2.x()));
-  bot_right.setY(std::max(point1.y(), point2.y()));
-  setPos(mapToScene(top_left).toPoint());*/
   setSceneRect(scene_rect);
   setZValue(-1);
   // flags
@@ -186,8 +138,6 @@ void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)
 
 QRectF prim::Electrode::boundingRect() const
 {
-  /*qreal width = getWidth()+edge_width;
-  qreal height = getHeight()+edge_width;*/
   qreal width = sceneRect().width()+edge_width;
   qreal height = sceneRect().height()+edge_width;
   return QRectF(0, 0, width, height);
@@ -223,7 +173,6 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 prim::Item *prim::Electrode::deepCopy() const
 {
   prim::Electrode *elec = new Electrode(layer_id, sceneRect());
-  //elec->setPos(pos());
   return elec;
 }
 
@@ -261,13 +210,6 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
       prim::Item::mousePressEvent(e);
       break;
   }
-}
-
-void prim::Electrode::updatePoints(QPointF offset)
-{
-  //use after moving electrode with mouse. Graphic in correct place, but points need updating.
-  /*top_left += offset;
-  bot_right += offset;*/
 }
 
 void prim::Electrode::constructStatics() //needs to be changed to look at electrode settings instead.

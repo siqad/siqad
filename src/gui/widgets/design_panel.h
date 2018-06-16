@@ -398,6 +398,9 @@ namespace gui{
 
     // fundamental undo/redo command classes, keep memory requirement small
 
+    class CreateItem;       // create any prim::Item that doesn't require extra checks
+    class ResizeItem;       // resize a ResizableRect
+
     class CreateDB;         // create a dangling bond at a given lattice dot
     class FormAggregate;    // form an aggregate from a list of Items
 
@@ -406,20 +409,13 @@ namespace gui{
 
     class MoveItem;         // move a single Item
 
-    class ResizeElectrode;    // resize an electrode
-
     class CreatePotPlot;  // create an electrode at the given points
 
     class CreateAFMPath;    // create an empty AFMPath that should later contain AFMNodes
     class CreateAFMNode;    // create AFMNodes that should be children of AFMPath
 
-    class ResizeAFMArea;    // resize an AFM Area
-
     class CreateTextLabel;  // create a text label
     class EditTextLabel;
-
-    class CreateItem;       // create any prim::Item that doesn't require extra checks
-    class ResizeItem;       // resize a ResizableRect
 
     // functions including undo/redo behaviour
 
@@ -447,14 +443,6 @@ namespace gui{
     void editTextLabel(prim::TextLabel *text_lab, const QString &new_text);
 
     void resizeItem(prim::Item *item, const QRectF &orig_rect,
-        const QRectF &new_rect);
-
-    // resize AFM Area
-    void resizeAFMArea(prim::AFMArea *afm_area, const QRectF &orig_rect,
-        const QRectF &new_rect);
-
-    // resize electrode
-    void resizeElectrode(prim::Electrode *electrode, const QRectF &orig_rect,
         const QRectF &new_rect);
 
     // destroy AFM path and included nodes
@@ -670,57 +658,6 @@ namespace gui{
     float z_offset;
   };
 
-  class DesignPanel::ResizeAFMArea : public QUndoCommand
-  {
-  public:
-    // resize the AFM area from the original positions to the new positions
-    ResizeAFMArea(int layer_index, DesignPanel *dp,
-        const QRectF &orig_rect, const QRectF &new_rect,
-        int afm_area_index, bool invert=false, QUndoCommand *parent=0);
-
-    // resize from new to original positions
-    virtual void undo();
-
-    // resize from original to new positions
-    virtual void redo();
-
-  private:
-    bool invert;
-
-    int layer_index;
-    DesignPanel *dp;
-    int afm_area_index; // the AFM Area's index in its layer
-    QPointF top_left_delta;
-    QPointF bot_right_delta;
-    QRectF orig_rect;
-    QRectF new_rect;
-  };
-
-  class DesignPanel::ResizeElectrode : public QUndoCommand
-  {
-  public:
-    // resize the electrode from the original positions to the new positions
-    ResizeElectrode(int layer_index, DesignPanel *dp,
-        const QRectF &orig_rect, const QRectF &new_rect,
-        int electrode_index, bool invert=false, QUndoCommand *parent=0);
-
-    // resize from new to original positions
-    virtual void undo();
-
-    // resize from original to new positions
-    virtual void redo();
-
-  private:
-    bool invert;
-
-    int layer_index;
-    DesignPanel *dp;
-    int electrode_index; // the electrode's index in its layer
-    QPointF top_left_delta;
-    QPointF bot_right_delta;
-    QRectF orig_rect;
-    QRectF new_rect;
-  };
 
   class DesignPanel::CreateTextLabel : public QUndoCommand
   {

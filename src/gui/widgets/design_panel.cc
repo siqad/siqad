@@ -1761,86 +1761,6 @@ void gui::DesignPanel::CreateAFMNode::destroy()
 }
 
 
-// ResizeAFMArea class
-gui::DesignPanel::ResizeAFMArea::ResizeAFMArea(int layer_index, DesignPanel *dp,
-    const QRectF &orig_rect, const QRectF &new_rect, int afm_area_index,
-    bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(invert), layer_index(layer_index), dp(dp),
-        afm_area_index(afm_area_index), orig_rect(orig_rect), new_rect(new_rect)
-{
-  top_left_delta = new_rect.topLeft() - orig_rect.topLeft();
-  bot_right_delta = new_rect.bottomRight() - orig_rect.bottomRight();
-}
-
-void gui::DesignPanel::ResizeAFMArea::undo()
-{
-  prim::AFMArea *afm_area = static_cast<prim::AFMArea*>(
-      dp->layman->getLayer(layer_index)->getItem(afm_area_index));
-
-  if (afm_area->boundingRect().topLeft() == orig_rect.topLeft() &&
-      afm_area->boundingRect().bottomRight() == orig_rect.bottomRight())
-    return;
-
-  afm_area->resize(-top_left_delta.x(), -top_left_delta.y(),
-      -bot_right_delta.x(), -bot_right_delta.y(), true);
-}
-
-void gui::DesignPanel::ResizeAFMArea::redo()
-{
-  prim::AFMArea *afm_area = static_cast<prim::AFMArea*>(
-      dp->layman->getLayer(layer_index)->getItem(afm_area_index));
-
-  // if the user resized the afm area with the cursor, then the area might
-  // already be the right size, in which case do nothing
-  if (afm_area->boundingRect().topLeft() == new_rect.topLeft() &&
-      afm_area->boundingRect().bottomRight() == new_rect.bottomRight())
-    return;
-
-  afm_area->resize(top_left_delta.x(), top_left_delta.y(),
-      bot_right_delta.x(), bot_right_delta.y(), true);
-}
-
-
-// ResizeElectrode class
-gui::DesignPanel::ResizeElectrode::ResizeElectrode(int layer_index, DesignPanel *dp,
-    const QRectF &orig_rect, const QRectF &new_rect, int electrode_index,
-    bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(invert), layer_index(layer_index), dp(dp),
-        electrode_index(electrode_index), orig_rect(orig_rect), new_rect(new_rect)
-{
-  top_left_delta = new_rect.topLeft() - orig_rect.topLeft();
-  bot_right_delta = new_rect.bottomRight() - orig_rect.bottomRight();
-}
-
-void gui::DesignPanel::ResizeElectrode::undo()
-{
-  prim::Electrode *electrode = static_cast<prim::Electrode*>(
-      dp->layman->getLayer(layer_index)->getItem(electrode_index));
-
-  if (electrode->boundingRect().topLeft() == orig_rect.topLeft() &&
-      electrode->boundingRect().bottomRight() == orig_rect.bottomRight())
-    return;
-
-  electrode->resize(-top_left_delta.x(), -top_left_delta.y(),
-      -bot_right_delta.x(), -bot_right_delta.y(), true);
-}
-
-void gui::DesignPanel::ResizeElectrode::redo()
-{
-  prim::Electrode *electrode = static_cast<prim::Electrode*>(
-      dp->layman->getLayer(layer_index)->getItem(electrode_index));
-
-  // if the user resized the afm area with the cursor, then the area might
-  // already be the right size, in which case do nothing
-  if (electrode->boundingRect().topLeft() == new_rect.topLeft() &&
-      electrode->boundingRect().bottomRight() == new_rect.bottomRight())
-    return;
-
-  electrode->resize(top_left_delta.x(), top_left_delta.y(),
-      bot_right_delta.x(), bot_right_delta.y(), true);
-}
-
-
 // Create Text Label class
 gui::DesignPanel::CreateTextLabel::CreateTextLabel(int layer_index,
     DesignPanel *dp, const QRectF &scene_rect, const QString &text,
@@ -2302,45 +2222,16 @@ void gui::DesignPanel::resizeItem(prim::Item *item,
     const QRectF &orig_rect, const QRectF &new_rect)
 {
   resizing = false;
-  switch (item->item_type) {
-    case prim::Item::AFMArea:
-      resizeAFMArea(static_cast<prim::AFMArea*>(item), orig_rect, new_rect);
-      break;
-    case prim::Item::Electrode:
-      resizeElectrode(static_cast<prim::Electrode*>(item), orig_rect, new_rect);
-      break;
-    default:
-      {
-        if (item->isResizable()) {
-          int item_index = layman->getLayer(item->layer_id)->getItemIndex(item);
-          undo_stack->beginMacro(tr("Resize Item"));
-          undo_stack->push(new ResizeItem(item->layer_id, this, item_index,
-                                          orig_rect, new_rect, true));
-          undo_stack->endMacro();
-        }
-        break;
-      }
+
+  // assume all resizable items are simply ResizableRects right now, need 
+  // special implementation otherwise
+  if (item->isResizable()) {
+    int item_index = layman->getLayer(item->layer_id)->getItemIndex(item);
+    undo_stack->beginMacro(tr("Resize Item"));
+    undo_stack->push(new ResizeItem(item->layer_id, this, item_index,
+          orig_rect, new_rect, true));
+    undo_stack->endMacro();
   }
-}
-
-void gui::DesignPanel::resizeAFMArea(prim::AFMArea *afm_area,
-    const QRectF &orig_rect, const QRectF &new_rect)
-{
-  undo_stack->beginMacro(tr("Resize AFM Area"));
-  int ind_in_layer = layman->getLayer(afm_area->layer_id)->getItemIndex(afm_area);
-  undo_stack->push(new ResizeAFMArea(afm_area->layer_id, this, orig_rect,
-      new_rect, ind_in_layer));
-  undo_stack->endMacro();
-}
-
-void gui::DesignPanel::resizeElectrode(prim::Electrode *electrode,
-    const QRectF &orig_rect, const QRectF &new_rect)
-{
-  undo_stack->beginMacro(tr("Resize Electrode"));
-  int ind_in_layer = layman->getLayer(electrode->layer_id)->getItemIndex(electrode);
-  undo_stack->push(new ResizeElectrode(electrode->layer_id, this, orig_rect,
-      new_rect, ind_in_layer));
-  undo_stack->endMacro();
 }
 
 void gui::DesignPanel::destroyAFMPath(prim::AFMPath *afm_path)

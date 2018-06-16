@@ -26,8 +26,8 @@ namespace prim{
                   QGraphicsItem *parent=0);
 
     //! Move the top left and bottom right corners of the rectangle by the given
-    //! deltas.
-    virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2, bool update_handles=false) override;
+    //! deltas. Override this function if a custom resize behavior is needed.
+    virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2, bool update_handles=false);
 
     //! Pre-resize actions - save the original position and dimensions.
     void preResize();

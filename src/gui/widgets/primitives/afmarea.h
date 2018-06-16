@@ -34,18 +34,6 @@ namespace prim{
 
     // Accessors
 
-    //! Resize according to given coordinates.
-    /*virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
-        bool update_handles=false) override;*/
-
-
-    /*//! Return the top left point of the AFM area.
-    QPointF topLeft() const {return point_top_left;}
-    //! Return the bottom right point of the AFM area.
-    QPointF bottomRight() const {return point_bot_right;}
-    //! Return the center point of the AFM area
-    QPointF center() const;*/
-
     //! Set the orientation of the scan. "Horizontal" refers to the x-axis if
     //! orientation is set to true, y-axis if false.
     void setOrientation(bool x_oriented) {h_orientation = x_oriented;}
@@ -79,9 +67,6 @@ namespace prim{
 
     // Graphics
 
-    //! Move the AFM area by the given delta.
-    void updatePoints(const QPointF &offset);
-
     //! Bounding rect for graphics calculations.
     virtual QRectF boundingRect() const override;
 
@@ -96,9 +81,6 @@ namespace prim{
 
     //! Show AFM area config dialog when selected.
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) Q_DECL_OVERRIDE;
-
-    /*virtual QVariant itemChange(GraphicsItemChange change,
-        const QVariant &value) Q_DECL_OVERRIDE;*/
 
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *) Q_DECL_OVERRIDE;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *) Q_DECL_OVERRIDE;
@@ -134,8 +116,6 @@ namespace prim{
     static prim::Item::StateColors scan_path_fill_col; //! AFM scan path preview fill color.
 
     // Resize
-    prim::ResizeFrame *resize_frame=0;
-    QRectF orig_rect;
     QList<QAction*> actions_list;
     QAction* action_show_prop;
     QAction* action_something_else;
