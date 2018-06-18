@@ -1173,10 +1173,6 @@ void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
   }
   QMenu *menu = new QMenu(this);
   if (itemAt(e->pos())) {
-  // if (QGraphicsItem *gitem = itemAt(e->pos())) {
-    // qDebug() << tr("Item clicked was at: (%1 , %2)").arg(gitem->x()).arg(gitem->y());
-    // qDebug() << tr("item_type: %1").arg(static_cast<prim::Item*>(gitem)->item_type);
-    // qDebug() << tr("zValue: %1").arg(static_cast<prim::Item*>(gitem)->zValue());
     QList<QGraphicsItem*> gitems = items(e->pos());
     //keep track of inserted types, so as to not double insert.
     QList<int> inserted_types = QList<int>();
@@ -1252,8 +1248,6 @@ void gui::DesignPanel::dummyAction()
     for (auto gitem: gitems) {
       //make sure the item type is correct.
       if (static_cast<prim::Item*>(gitem)->item_type == sender()->property("item_type").toInt()) {
-        // QString item_type = static_cast<prim::Item*>(gitem)->getQStringItemType();
-        // qDebug() << tr("%1, %2").arg(item_type).arg(static_cast<QAction*>(sender())->text());
         static_cast<prim::Item*>(gitem)->performAction(static_cast<QAction*>(sender()));
       }
     }
@@ -2127,21 +2121,41 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
 }
 
 
-bool gui::DesignPanel::commandCreateItem(QString item_type, QString layer_id, QStringList item_args)
+bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QStringList item_args)
 {
-  if (item_type == "electrode") {
-    int xmin = std::min(item_args[0].toInt(), item_args[2].toInt());
-    int xmax = std::max(item_args[0].toInt(), item_args[2].toInt());
-    int ymin = std::min(item_args[1].toInt(), item_args[3].toInt());
-    int ymax = std::max(item_args[1].toInt(), item_args[3].toInt());
-    QRect scene_rect = QRect(QPoint(xmin, ymin), QPoint(xmax,ymax));
-    setTool(gui::ToolType::ElectrodeTool);
-    emit sig_toolChangeRequest(gui::ToolType::ElectrodeTool);
-    createElectrode(scene_rect);
+  prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
+  if (item_type == prim::Item::Electrode) {
+    if (item_args.size() >= 4) {
+      int xmin = std::min(item_args[0].toInt(), item_args[2].toInt());
+      int xmax = std::max(item_args[0].toInt(), item_args[2].toInt());
+      int ymin = std::min(item_args[1].toInt(), item_args[3].toInt());
+      int ymax = std::max(item_args[1].toInt(), item_args[3].toInt());
+      QRect scene_rect = QRect(QPoint(xmin, ymin), QPoint(xmax,ymax));
+      setTool(gui::ToolType::ElectrodeTool);
+      emit sig_toolChangeRequest(gui::ToolType::ElectrodeTool);
+      createElectrode(scene_rect);
+      return true;
+    }
+  }
+  return false;
+}
+
+bool gui::DesignPanel::commandRemoveItem(QString type, QStringList item_args)
+{
+  prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
+  QPoint pos = QPoint(item_args[0].toInt(), item_args[1].toInt());
+  if (itemAt(mapFromScene(pos))) {
+    QList<QGraphicsItem*> gitems = items(mapFromScene(pos));
+    for (QGraphicsItem* item: gitems){
+      if (static_cast<prim::Item*>(item)->item_type == item_type) {
+        removeItem(static_cast<prim::Item*>(item), static_cast<prim::Item*>(item)->layer_id);
+      }
+    }
     return true;
   }
   return false;
 }
+
 
 // Undo/Redo Methods
 

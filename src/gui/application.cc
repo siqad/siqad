@@ -480,11 +480,6 @@ void gui::ApplicationGUI::commandAddItem(QStringList args)
     QString item_type = args.takeFirst();
     QString layer_id = args.takeFirst();
     QStringList item_args = args;
-    dialog_pan->echo(item_type);
-    dialog_pan->echo(layer_id);
-    for (QString item_arg: item_args){
-      dialog_pan->echo(item_arg);
-    }
     if (!design_pan->commandCreateItem(item_type, layer_id, item_args)) {
       dialog_pan->echo(tr("Item creation failed."));
     }
@@ -496,7 +491,15 @@ void gui::ApplicationGUI::commandAddItem(QStringList args)
 
 void gui::ApplicationGUI::commandRemoveItem(QStringList args)
 {
-
+  if (args.size() >= 3) {
+    QString item_type = args.takeFirst();
+    QStringList item_args = args;
+    if (!design_pan->commandRemoveItem(item_type, args)) {
+      dialog_pan->echo(tr("Item removal failed."));
+    }
+  } else {
+    dialog_pan->echo(tr("remove_item takes at least 3 arguments, %1 provided.").arg(args.size()));
+  }
 }
 
 void gui::ApplicationGUI::commandEcho(QStringList args)
@@ -734,8 +737,6 @@ void gui::ApplicationGUI::parseInputField()
     if(settings::AppSettings::instance()->value("log/override").toBool()){
       dialog_pan->echo(input);
       QStringList inputs = input.split(" ", QString::SkipEmptyParts);
-      // first element assumed to be program call, ignored by parser.
-      // add in a dummy element that the parser will ignore
       if (input_kws.contains(inputs.first())) {
         // keyword detected
         if (!performCommand(inputs)) {
@@ -747,17 +748,13 @@ void gui::ApplicationGUI::parseInputField()
                               .arg(inputs.first()));
       }
     }
-    //print to external terminal regardless
-    // qDebug() << tr("INPUTFIELD::%1").arg(input);
   }
 }
-
 
 void gui::ApplicationGUI::designPanelReset()
 {
   initState();
 }
-
 
 void gui::ApplicationGUI::simulationSetup()
 {

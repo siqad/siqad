@@ -52,6 +52,23 @@ QString prim::Item::getQStringItemType()
   }
 }
 
+prim::Item::ItemType prim::Item::getEnumItemType(QString type)
+{
+  if (type == "Aggregate") return prim::Item::Aggregate;
+  else if (type == "DBDot") return prim::Item::DBDot;
+  else if (type == "LatticeDot") return prim::Item::LatticeDot;
+  else if (type == "Ghost") return prim::Item::Ghost;
+  else if (type == "GhostDot") return prim::Item::GhostDot;
+  else if (type == "Electrode") return prim::Item::Electrode;
+  else if (type == "GhostBox") return prim::Item::GhostBox;
+  else if (type == "AFMArea") return prim::Item::AFMArea;
+  else if (type == "AFMPath") return prim::Item::AFMPath;
+  else if (type == "AFMNode") return prim::Item::AFMNode;
+  else if (type == "AFMSeg") return prim::Item::AFMSeg;
+  else if (type == "PotPlot") return prim::Item::PotPlot;
+  else if (type == "ResizeFrame") return prim::Item::ResizeFrame;
+  else if (type == "ResizeHandle") return prim::Item::ResizeHandle;
+}
 
 bool prim::Item::upSelected()
 {

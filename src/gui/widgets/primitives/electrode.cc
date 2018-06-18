@@ -108,6 +108,7 @@ void prim::Electrode::performAction(QAction *action)
     showProps();
   } else if (action->text() == action_something_else->text()) {
     qDebug() << QObject::tr("action_something_else");
+    qDebug() << pos();
   } else {
     qDebug() << QObject::tr("Matched no action.");
   }
