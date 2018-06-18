@@ -151,6 +151,7 @@ namespace gui{
     void initDialogDock();        // initialise the bottom dialog dock
     void initSimVisualizeDock();  // initialise the side sim visualize dock
     void initLayerDock();         // initialise the side layer dock
+    void initParser();            // initialise the input field parser
     void setLayerManagerWidget(QWidget *widget);
 
     // prepare any extra actions not attched to an icon or meny
@@ -162,6 +163,9 @@ namespace gui{
     // application settings
     void loadSettings();  // load mainwindow settings from the settings instance
     void saveSettings();  // save mainwindow settings to the settings instance
+
+    // performing commands
+    bool performCommand(QStringList cmds);
 
     // VARIABLES
 
@@ -219,6 +223,7 @@ namespace gui{
 
     QString working_path;         // path currently in use
     QCommandLineParser *parser;
+    QStringList input_kws;
   };
 
 } // end gui namespace

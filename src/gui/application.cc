@@ -95,7 +95,7 @@ void gui::ApplicationGUI::initGUI()
   initSideBar();
 
   // initialise parser
-  parser = new QCommandLineParser();
+  initParser();
 
   // inter-widget signals
   connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene,
@@ -444,6 +444,37 @@ void gui::ApplicationGUI::initLayerDock()
 }
 
 
+void gui::ApplicationGUI::initParser()
+{
+  parser = new QCommandLineParser();
+  input_kws.clear();
+  input_kws.append(tr("add_item"));
+  input_kws.append(tr("remove_item"));
+  input_kws.append(tr("echo"));
+}
+
+
+bool gui::ApplicationGUI::performCommand(QStringList cmds)
+{
+  if (!cmds.isEmpty()){
+    QString main = cmds.takeFirst();
+    if (main == tr("add_item")) {
+      qDebug() << tr("Adding item.");
+    } else if (main == tr("remove_item")) {
+      qDebug() << tr("Removing item.");
+    } else if (main == tr("echo")) {
+      qDebug() << tr("Echoing.");
+    } else {
+      return false;
+    }
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+
 void gui::ApplicationGUI::setLayerManagerWidget(QWidget *widget)
 {
   qDebug() << "Making layer manager widget";
@@ -655,17 +686,32 @@ void gui::ApplicationGUI::parseInputField()
 {
   // get input from input_field, remove leading/trailing whitespace
   QString input = input_field->pop();
-
   // if input string is not empty, do something
   if(!input.isEmpty()){
     //check the current setting for sending to terminal
     if(settings::AppSettings::instance()->value("log/override").toBool()){
       dialog_pan->echo(input);
+      QStringList args = input.split(" ", QString::SkipEmptyParts);
+      // first element assumed to be program call, ignored by parser.
+      // add in a dummy element that the parser will ignore
+      args.prepend(tr("siqad"));
+      parser->process(args);
+      if (input_kws.contains(parser->positionalArguments().first())){
+        // keyword detected
+        if(!performCommand(parser->positionalArguments())){
+          dialog_pan->echo(tr("Error occured with command '%1'")
+                              .arg(parser->positionalArguments().first()));
+        }
+      } else {
+        dialog_pan->echo(tr("Command '%1' not recognised.")
+                              .arg(parser->positionalArguments().first()));
+      }
     }
     //print to external terminal regardless
-    qDebug() << input;
+    // qDebug() << tr("INPUTFIELD::%1").arg(input);
   }
 }
+
 
 void gui::ApplicationGUI::designPanelReset()
 {
