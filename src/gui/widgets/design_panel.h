@@ -59,6 +59,9 @@ namespace gui{
 
     QWidget *layerManagerSideWidget() {return layman->sideWidget();}
 
+    //! add a new Item using a command from the dialog panel.
+    bool commandCreateItem(QString item_type, QString layer_id, QStringList item_args);
+
     //! add a new Item to the Layer at the given index of the stack. If layer_index==-1,
     //! add the new item to the top_layer. If ind != -1, inserts the Item into the given
     //! location of the Layer Item stack.
@@ -424,7 +427,7 @@ namespace gui{
 
     //! Create electrode with rubberband area, assumes the given rect is already
     //! in scene coordinates.
-    void createElectrodes(QRect scene_rect);
+    void createElectrode(QRect scene_rect);
 
     //create potential plot on panel
     void createPotPlot(QImage potential_plot, QRectF graph_container);
@@ -472,7 +475,6 @@ namespace gui{
 
     // move the selected items to the current Ghost, returns True if successful
     bool moveToGhost(bool kill=false);
-
   };
 
 

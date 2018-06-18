@@ -879,7 +879,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
           case gui::ToolType::ElectrodeTool:
             // get start and end locations, and create the electrode.
             filterSelection(false);
-            createElectrodes(rb_scene_rect);
+            createElectrode(rb_scene_rect);
             break;
           case gui::ToolType::AFMAreaTool:
             filterSelection(false);
@@ -1281,7 +1281,7 @@ void gui::DesignPanel::initActions()
   action_form_agg->setShortcut(tr("CTRL+G"));
   action_split_agg->setShortcut(tr("CTRL+SHIFT+G"));
   action_dup->setShortcut(tr("D"));
-  
+
   connect(action_undo, &QAction::triggered, this, &gui::DesignPanel::undoAction);
   connect(action_redo, &QAction::triggered, this, &gui::DesignPanel::redoAction);
   connect(action_cut, &QAction::triggered, this, &gui::DesignPanel::cutAction);
@@ -2126,6 +2126,23 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
   agg->setPos(agg->scenePos()+QPointF(-1,0));
 }
 
+
+bool gui::DesignPanel::commandCreateItem(QString item_type, QString layer_id, QStringList item_args)
+{
+  if (item_type == "electrode") {
+    int xmin = std::min(item_args[0].toInt(), item_args[2].toInt());
+    int xmax = std::max(item_args[0].toInt(), item_args[2].toInt());
+    int ymin = std::min(item_args[1].toInt(), item_args[3].toInt());
+    int ymax = std::max(item_args[1].toInt(), item_args[3].toInt());
+    QRect scene_rect = QRect(QPoint(xmin, ymin), QPoint(xmax,ymax));
+    setTool(gui::ToolType::ElectrodeTool);
+    emit sig_toolChangeRequest(gui::ToolType::ElectrodeTool);
+    createElectrode(scene_rect);
+    return true;
+  }
+  return false;
+}
+
 // Undo/Redo Methods
 
 void gui::DesignPanel::createDBs()
@@ -2140,10 +2157,8 @@ void gui::DesignPanel::createDBs()
   destroyDBPreviews();
 }
 
-void gui::DesignPanel::createElectrodes(QRect scene_rect)
+void gui::DesignPanel::createElectrode(QRect scene_rect)
 {
-  /*QPoint point1 = scene_rect.topLeft();
-  QPoint point2 = scene_rect.bottomRight();*/
   int layer_index = layman->indexOf(layman->activeLayer());
   //only ever create one electrode at a time
   undo_stack->beginMacro(tr("create electrode with given corners"));
@@ -2223,7 +2238,7 @@ void gui::DesignPanel::resizeItem(prim::Item *item,
 {
   resizing = false;
 
-  // assume all resizable items are simply ResizableRects right now, need 
+  // assume all resizable items are simply ResizableRects right now, need
   // special implementation otherwise
   if (item->isResizable()) {
     int item_index = layman->getLayer(item->layer_id)->getItemIndex(item);

@@ -95,7 +95,7 @@ void gui::ApplicationGUI::initGUI()
   initSideBar();
 
   // initialise parser
-  initParser();
+  initKeywords();
 
   // inter-widget signals
   connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene,
@@ -445,9 +445,8 @@ void gui::ApplicationGUI::initLayerDock()
 }
 
 
-void gui::ApplicationGUI::initParser()
+void gui::ApplicationGUI::initKeywords()
 {
-  parser = new QCommandLineParser();
   input_kws.clear();
   input_kws.append(tr("add_item"));
   input_kws.append(tr("remove_item"));
@@ -484,7 +483,10 @@ void gui::ApplicationGUI::commandAddItem(QStringList args)
     dialog_pan->echo(item_type);
     dialog_pan->echo(layer_id);
     for (QString item_arg: item_args){
-      dialog_pan->echo(item_arg);      
+      dialog_pan->echo(item_arg);
+    }
+    if (!design_pan->commandCreateItem(item_type, layer_id, item_args)) {
+      dialog_pan->echo(tr("Item creation failed."));
     }
   } else {
     dialog_pan->echo(tr("add_item takes at least 3 arguments, %1 provided.").arg(args.size()));
@@ -731,20 +733,18 @@ void gui::ApplicationGUI::parseInputField()
     //check the current setting for sending to terminal
     if(settings::AppSettings::instance()->value("log/override").toBool()){
       dialog_pan->echo(input);
-      QStringList args = input.split(" ", QString::SkipEmptyParts);
+      QStringList inputs = input.split(" ", QString::SkipEmptyParts);
       // first element assumed to be program call, ignored by parser.
       // add in a dummy element that the parser will ignore
-      args.prepend(tr("siqad"));
-      parser->process(args);
-      if (input_kws.contains(parser->positionalArguments().first())){
+      if (input_kws.contains(inputs.first())) {
         // keyword detected
-        if(!performCommand(parser->positionalArguments())){
+        if (!performCommand(inputs)) {
           dialog_pan->echo(tr("Error occured with command '%1'")
-                              .arg(parser->positionalArguments().first()));
+                              .arg(inputs.first()));
         }
       } else {
         dialog_pan->echo(tr("Command '%1' not recognised.")
-                              .arg(parser->positionalArguments().first()));
+                              .arg(inputs.first()));
       }
     }
     //print to external terminal regardless

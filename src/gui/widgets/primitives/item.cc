@@ -50,8 +50,8 @@ QString prim::Item::getQStringItemType()
     case prim::Item::ResizeHandle: return "ResizeHandle";
     default: return "Erroneous Item";
   }
-
 }
+
 
 bool prim::Item::upSelected()
 {
