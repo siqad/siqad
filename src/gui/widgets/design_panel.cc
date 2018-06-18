@@ -2120,16 +2120,30 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
   agg->setPos(agg->scenePos()+QPointF(-1,0));
 }
 
+QList<QStringList> gui::DesignPanel::cleanItemArgs(QStringList item_args)
+{
+  QList<QStringList> clean_args = QList<QStringList>();
+  for (QString arg: item_args){
+    //strip parentheses
+    arg.remove("(");
+    arg.remove(")");
+    clean_args.append(arg.split(",", QString::SkipEmptyParts));
+  }
+  return clean_args;
+}
+
 
 bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QStringList item_args)
 {
   prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
+  QList<QStringList> clean_args = cleanItemArgs(item_args);
+  qDebug() << clean_args;
   if (item_type == prim::Item::Electrode) {
-    if (item_args.size() >= 4) {
-      int xmin = std::min(item_args[0].toInt(), item_args[2].toInt());
-      int xmax = std::max(item_args[0].toInt(), item_args[2].toInt());
-      int ymin = std::min(item_args[1].toInt(), item_args[3].toInt());
-      int ymax = std::max(item_args[1].toInt(), item_args[3].toInt());
+    if (item_args.size() >= 2) {
+      int xmin = std::min(clean_args[0][0].toInt(), clean_args[1][0].toInt());
+      int xmax = std::max(clean_args[0][0].toInt(), clean_args[1][0].toInt());
+      int ymin = std::min(clean_args[0][1].toInt(), clean_args[1][1].toInt());
+      int ymax = std::max(clean_args[0][1].toInt(), clean_args[1][1].toInt());
       QRect scene_rect = QRect(QPoint(xmin, ymin), QPoint(xmax,ymax));
       setTool(gui::ToolType::ElectrodeTool);
       emit sig_toolChangeRequest(gui::ToolType::ElectrodeTool);
@@ -2143,7 +2157,8 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
 bool gui::DesignPanel::commandRemoveItem(QString type, QStringList item_args)
 {
   prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
-  QPoint pos = QPoint(item_args[0].toInt(), item_args[1].toInt());
+  QList<QStringList> clean_args = cleanItemArgs(item_args);
+  QPoint pos = QPoint(clean_args[0][0].toInt(), clean_args[0][1].toInt());
   if (itemAt(mapFromScene(pos))) {
     QList<QGraphicsItem*> gitems = items(mapFromScene(pos));
     for (QGraphicsItem* item: gitems){
