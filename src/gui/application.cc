@@ -457,13 +457,13 @@ void gui::ApplicationGUI::initParser()
 bool gui::ApplicationGUI::performCommand(QStringList cmds)
 {
   if (!cmds.isEmpty()){
-    QString main = cmds.takeFirst();
-    if (main == tr("add_item")) {
-      qDebug() << tr("Adding item.");
-    } else if (main == tr("remove_item")) {
-      qDebug() << tr("Removing item.");
-    } else if (main == tr("echo")) {
-      qDebug() << tr("Echoing.");
+    QString command = cmds.takeFirst();
+    if (command == tr("add_item")) {
+      commandAddItem(cmds);
+    } else if (command == tr("remove_item")) {
+      commandRemoveItem(cmds);
+    } else if (command == tr("echo")) {
+      commandEcho(cmds);
     } else {
       return false;
     }
@@ -474,6 +474,34 @@ bool gui::ApplicationGUI::performCommand(QStringList cmds)
 }
 
 
+void gui::ApplicationGUI::commandAddItem(QStringList args)
+{
+  if (args.size() >= 3) {
+    QString item_type = args.takeFirst();
+    QString layer_id = args.takeFirst();
+    QStringList item_args = args;
+    dialog_pan->echo(item_type);
+    dialog_pan->echo(layer_id);
+    for (QString item_arg: item_args){
+      dialog_pan->echo(item_arg);      
+    }
+  } else {
+    dialog_pan->echo(tr("add_item takes at least 3 arguments, %1 provided.").arg(args.size()));
+  }
+}
+
+
+void gui::ApplicationGUI::commandRemoveItem(QStringList args)
+{
+
+}
+
+void gui::ApplicationGUI::commandEcho(QStringList args)
+{
+  for (QString arg: args){
+    dialog_pan->echo(arg);
+  }
+}
 
 void gui::ApplicationGUI::setLayerManagerWidget(QWidget *widget)
 {

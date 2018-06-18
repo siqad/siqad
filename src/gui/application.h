@@ -166,6 +166,9 @@ namespace gui{
 
     // performing commands
     bool performCommand(QStringList cmds);
+    void commandAddItem(QStringList args);
+    void commandRemoveItem(QStringList args);
+    void commandEcho(QStringList args);
 
     // VARIABLES
 
