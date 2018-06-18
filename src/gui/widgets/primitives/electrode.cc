@@ -20,17 +20,17 @@ QColor prim::Electrode::fill_col;
 QColor prim::Electrode::selected_col; // edge colour, selected
 
 // Draw on layer 0 for now.
-prim::Electrode::Electrode(int lay_id, QPointF point1, QPointF point2):
-  prim::Item(prim::Item::Electrode)
+prim::Electrode::Electrode(int lay_id, const QRectF &scene_rect)
+  : prim::ResizableRect(prim::Item::Electrode)
 {
-  if(edge_width == -1){
+  if (edge_width == -1){
     constructStatics();
   }
-  initElectrode(lay_id, point1, point2);
+  initElectrode(lay_id, scene_rect);
 }
 
 prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
-  prim::Item(prim::Item::Electrode)
+  prim::ResizableRect(prim::Item::Electrode)
 {
   if(edge_width == -1){
     constructStatics();
@@ -91,48 +91,9 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
     qWarning() << "ld_point2 is null";
   }
   //load all read data into init_electrode
-  initElectrode(lay_id, ld_point1, ld_point2);
+  QRectF rect(ld_point1, ld_point2);
+  initElectrode(lay_id, rect.normalized());
   scene->addItem(this);
-}
-
-// Resize according to given coordinates
-void prim::Electrode::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
-    bool update_handles)
-{
-  prepareGeometryChange();
-  top_left += QPointF(dx1, dy1);
-  bot_right += QPointF(dx2, dy2);
-
-  // reverse change if user resizes past the other edge
-  if (top_left.x() > bot_right.x() ||
-      top_left.y() > bot_right.y()) {
-    top_left -= QPointF(dx1, dy1);
-    bot_right -= QPointF(dx2, dy2);
-  }
-
-  setPos(getTopLeft());
-  update();
-
-  if (update_handles && resize_frame)
-    resize_frame->updateHandlePositions();
-}
-
-QVariant prim::Electrode::itemChange(GraphicsItemChange change, const QVariant &value)
-{
-  if (change == QGraphicsItem::ItemSelectedChange) {
-    if (value == true) {
-      if (!resize_frame) {
-        resize_frame = new prim::ResizeFrame(this);
-      }
-      resize_frame->setVisible(true);
-    } else {
-      if (resize_frame) {
-        resize_frame->setVisible(false);
-      }
-    }
-  }
-
-  return QGraphicsItem::itemChange(change, value);
 }
 
 void prim::Electrode::showProps()
@@ -160,22 +121,15 @@ void prim::Electrode::createActions()
   actions_list.append(action_something_else);
 }
 
-void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point2_in)
+void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)
 {
   layer_id = lay_id;
-  QPointF point1 = point1_in;
-  QPointF point2 = point2_in;
-  qDebug() << QObject::tr("%1 %2").arg(getWidth()).arg(getHeight());
   if(edge_width == -1){
     constructStatics();
   }
   createActions();
-  top_left.setX(std::min(point1.x(), point2.x()));
-  top_left.setY(std::min(point1.y(), point2.y()));
-  bot_right.setX(std::max(point1.x(), point2.x()));
-  bot_right.setY(std::max(point1.y(), point2.y()));
+  setSceneRect(scene_rect);
   setZValue(-1);
-  setPos(mapToScene(top_left).toPoint());
   // flags
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemIsFocusable, true);
@@ -184,8 +138,8 @@ void prim::Electrode::initElectrode(int lay_id, QPointF point1_in, QPointF point
 
 QRectF prim::Electrode::boundingRect() const
 {
-  qreal width = getWidth()+edge_width;
-  qreal height = getHeight()+edge_width;
+  qreal width = sceneRect().width()+edge_width;
+  qreal height = sceneRect().height()+edge_width;
   return QRectF(0, 0, width, height);
 }
 
@@ -205,7 +159,7 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
     setPos(pos());
     QPointF center = rect.center();
-    QSizeF size(getWidth()+edge_width, getHeight()+edge_width);
+    QSizeF size(sceneRect().width()+edge_width, sceneRect().height()+edge_width);
     rect.setSize(size);
     rect.moveCenter(center);
 
@@ -218,8 +172,7 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
 prim::Item *prim::Electrode::deepCopy() const
 {
-  prim::Electrode *elec = new Electrode(layer_id, top_left, bot_right);
-  elec->setPos(pos());
+  prim::Electrode *elec = new Electrode(layer_id, sceneRect());
   return elec;
 }
 
@@ -231,10 +184,10 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
 
   // top left and bottom right locations
   ss->writeEmptyElement("dim");
-  ss->writeAttribute("x1", QString::number(top_left.x()/scale_factor)); //convert to angstrom
-  ss->writeAttribute("y1", QString::number(top_left.y()/scale_factor));
-  ss->writeAttribute("x2", QString::number(bot_right.x()/scale_factor));
-  ss->writeAttribute("y2", QString::number(bot_right.y()/scale_factor));
+  ss->writeAttribute("x1", QString::number(sceneRect().topLeft().x()/scale_factor)); //convert to angstrom
+  ss->writeAttribute("y1", QString::number(sceneRect().topLeft().y()/scale_factor));
+  ss->writeAttribute("x2", QString::number(sceneRect().bottomRight().x()/scale_factor));
+  ss->writeAttribute("y2", QString::number(sceneRect().bottomRight().y()/scale_factor));
   ss->writeTextElement("pixel_per_angstrom", QString::number(scale_factor));
   ss->writeStartElement("property_map");
   gui::PropertyMap::writeValuesToXMLStream(properties(), ss);
@@ -257,13 +210,6 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
       prim::Item::mousePressEvent(e);
       break;
   }
-}
-
-void prim::Electrode::updatePoints(QPointF offset)
-{
-  //use after moving electrode with mouse. Graphic in correct place, but points need updating.
-  top_left += offset;
-  bot_right += offset;
 }
 
 void prim::Electrode::constructStatics() //needs to be changed to look at electrode settings instead.

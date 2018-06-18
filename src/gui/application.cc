@@ -161,10 +161,11 @@ void gui::ApplicationGUI::initMenuBar()
   // file menu actions
   QAction *new_file = new QAction(tr("&New"), this);
   QAction *save = new QAction(tr("&Save"), this);
-  QAction *save_as = new QAction(tr("Save As..."), this);
+  QAction *save_as = new QAction(tr("Save &As..."), this);
   QAction *open_save = new QAction(tr("&Open..."), this);
   QAction *export_lvm = new QAction(tr("&Export to QSi LV"), this);
   QAction *quit = new QAction(tr("&Quit"), this);
+  new_file->setShortcut(tr("CTRL+N"));
   save->setShortcut(tr("CTRL+S"));
   save_as->setShortcut(tr("CTRL+SHIFT+S"));
   open_save->setShortcut(tr("CTRL+O"));
@@ -327,8 +328,8 @@ void gui::ApplicationGUI::initSideBar()
       tr("AFM Area tool"));
   action_afmpath_tool = side_bar->addAction(QIcon(":/ico/drawafmpath.svg"),
       tr("AFM Path tool"));
-  //TODO action_label_tool = side_bar->addAction(QIcon(":/ico/drawlabel.svg"),
-  //    tr("Label tool"));
+  action_label_tool = side_bar->addAction(QIcon(":/ico/drawlabel.svg"),
+      tr("Label tool"));
 
   action_group->addAction(action_screenshot_tool);
   action_group->addAction(action_select_tool);
@@ -337,7 +338,7 @@ void gui::ApplicationGUI::initSideBar()
   action_group->addAction(action_electrode_tool);
   action_group->addAction(action_afmarea_tool);
   action_group->addAction(action_afmpath_tool);
-  //action_group->addAction(action_label_tool);
+  action_group->addAction(action_label_tool);
 
   action_screenshot_tool->setVisible(false);  // only shown in ScreenshotMode
 
@@ -348,7 +349,7 @@ void gui::ApplicationGUI::initSideBar()
   action_electrode_tool->setCheckable(true);
   action_afmarea_tool->setCheckable(true);
   action_afmpath_tool->setCheckable(true);
-  //action_label_tool->setCheckable(true);
+  action_label_tool->setCheckable(true);
 
   action_select_tool->setChecked(true);
 
@@ -366,8 +367,8 @@ void gui::ApplicationGUI::initSideBar()
           this, &gui::ApplicationGUI::setToolAFMArea);
   connect(action_afmpath_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolAFMPath);
-  //connect(action_label_tool, &QAction::triggered,
-  //        this, &gui::ApplicationGUI::setToolLabel);
+  connect(action_label_tool, &QAction::triggered,
+          this, &gui::ApplicationGUI::setToolLabel);
 
   addToolBar(area, side_bar);
 }
@@ -647,6 +648,11 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
     case gui::ToolType::ScreenshotAreaTool:
       action_screenshot_tool->setChecked(true);
       setToolScreenshotArea();
+      break;
+    case gui::ToolType::LabelTool:
+      action_label_tool->setChecked(true);
+      setToolLabel();
+      break;
     default:
       break;
   }
@@ -696,6 +702,12 @@ void gui::ApplicationGUI::setToolScreenshotArea()
 {
   qDebug() << tr("selecting screenshot area tool");
   design_pan->setTool(gui::ToolType::ScreenshotAreaTool);
+}
+
+void gui::ApplicationGUI::setToolLabel()
+{
+  qDebug() << tr("selecting label tool");
+  design_pan->setTool(gui::ToolType::LabelTool);
 }
 
 

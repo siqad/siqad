@@ -33,9 +33,9 @@ namespace prim{
     //! to distinguish them in functions which accept Item objects. Derived
     //! classes can be declared and implemented elsewhere as long as they are
     //! defined before use
-    enum ItemType{Aggregate, DBDot, DBDotPreview, LatticeDot, Ghost, GhostDot, Text,
-        Electrode, GhostBox, AFMArea, AFMPath, AFMNode, AFMSeg, PotPlot,
-        ResizeFrame, ResizeHandle};
+    enum ItemType{Aggregate, DBDot, DBDotPreview, LatticeDot, Ghost, GhostDot,
+                  Text, Electrode, GhostBox, AFMArea, AFMPath, AFMNode, AFMSeg,
+                  PotPlot, ResizeFrame, ResizeHandle, TextLabel};
 
     //! constructor, layer = 0 should indicate temporary objects that do not
     //! belong to any particular layer
@@ -73,24 +73,9 @@ namespace prim{
     void setResizable(bool flag) {resizable = flag;}
     bool isResizable() {return resizable;}
 
-    //! If the item is resizable, implement the resize function. The first two
-    //! parameters (dx1, dy1) correspond to the delta for the top left corner,
-    //! the next two parameters (dx2, dy2) correspond to the bottom right.
-    //! Don't forget update the item position with setPos. update_handles
-    //! indicate whether the resize frame handle positions should be updated,
-    //! set to true if calling from QUndoStack.
-    virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2,
-        bool update_handles=false)
-      {Q_UNUSED(dx1); Q_UNUSED(dy1); Q_UNUSED(dx2); Q_UNUSED(dy2);
-        Q_UNUSED(update_handles);}
-
-    //! Note down the bounding rect of the item before resize.
-    void setBoundingRectPreResize(const QRectF &rect)
-      {bounding_rect_pre_resize = rect;}
-
-    //! The bounding rect of the item before the resize.
-    QRectF boundingRectPreResize() {return bounding_rect_pre_resize;}
-
+    //! Move the item by given delta. Normally just calls Qt's moveBy function but certain
+    //! classes may override this for custom behavior.
+    virtual void moveItemBy(qreal dx, qreal dy) {moveBy(dx, dy);}
 
     //! Retreve the class default property map of this item
     virtual gui::PropertyMap *classPropertyMap() {return 0;}
@@ -152,7 +137,6 @@ namespace prim{
 
 
     bool resizable=false;
-    QRectF bounding_rect_pre_resize;  // used for resizable items
 
     // properties of this item
     // Default properties of each class are static variables of each class

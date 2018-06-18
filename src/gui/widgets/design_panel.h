@@ -190,6 +190,9 @@ namespace gui{
     //! Set the visibility of the lattice in the background
     void setLatticeVisibility(bool);
 
+    //! Edit text label
+    void editTextLabel(prim::Item *text_lab, const QString &new_text);
+
   signals:
     void sig_toolChangeRequest(gui::ToolType tool);  // request ApplicationGUI to change tool
     void sig_toolChanged(gui::ToolType tool); // notify other components of the
@@ -255,12 +258,16 @@ namespace gui{
     static QColor background_col_publish; // background color in publishing mode
 
     // Common actions used in the design panel
-    QAction *action_undo;
-    QAction *action_redo;
-    QAction *action_cut;
-    QAction *action_copy;
-    QAction *action_paste;
-    QAction *action_delete;
+    QAction *action_undo;       // reverse in the undo stack
+    QAction *action_redo;       // advance in the undo stack
+    QAction *action_cut;        // cut selected items
+    QAction *action_copy;       // copy selected items
+    QAction *action_paste;      // paste items in clipboard
+    QAction *action_delete;     // delete selected items
+
+    QAction *action_form_agg;   // form DBDot aggregates
+    QAction *action_split_agg;  // splite selected aggregate
+    QAction *action_dup;        // duplicate selected objects
 
     // children panels
     AFMPanel *afm_panel;
@@ -293,9 +300,8 @@ namespace gui{
     prim::AFMSeg *ghost_afm_seg=0;
 
     // mouse functionality
-    QPointF press_scene_pos;   // the scene position at the last mouse press event
-    QPoint mouse_pos_old;     // old mouse position in pixels on click
-    QPoint mouse_pos_cached;  // parameter for caching relevant mouse positions on click, in pixels
+    QPoint press_scene_pos;   // mouse position on click (view coord)
+    QPoint prev_pan_pos;      // mouse position on last panning update (view coord)
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
 
     // screenshot
@@ -334,9 +340,10 @@ namespace gui{
 
     // RUBBER BAND
 
-    QRubberBand *rb=0;  // rubber band object
-    QPoint rb_start; // starting point of rubber band (scene)
-    QPoint rb_cache; // cached to compare mouse movement (view)
+    QRubberBand *rb=0;    // rubber band object
+    QPoint rb_start;      // starting point of rubber band (scene)
+    QPoint rb_cache;      // cached to compare mouse movement (view)
+    QRect rb_scene_rect;  // rubberband selection area in scene coordinates
     QList<QGraphicsItem*> rb_shift_selected; // list of previously selected items, for shift select
 
     // update rubberband during mouse movement
@@ -391,6 +398,9 @@ namespace gui{
 
     // fundamental undo/redo command classes, keep memory requirement small
 
+    class CreateItem;       // create any prim::Item that doesn't require extra checks
+    class ResizeItem;       // resize a ResizableRect
+
     class CreateDB;         // create a dangling bond at a given lattice dot
     class FormAggregate;    // form an aggregate from a list of Items
 
@@ -399,43 +409,40 @@ namespace gui{
 
     class MoveItem;         // move a single Item
 
-    class CreateElectrode;  // create an electrode at the given points
-    class ResizeElectrode;    // resize an electrode
-
     class CreatePotPlot;  // create an electrode at the given points
-
-    class CreateAFMArea;    // create an AFM area
 
     class CreateAFMPath;    // create an empty AFMPath that should later contain AFMNodes
     class CreateAFMNode;    // create AFMNodes that should be children of AFMPath
 
-    class ResizeAFMArea;    // resize an AFM Area
+    class CreateTextLabel;  // create a text label
+    class EditTextLabel;
 
     // functions including undo/redo behaviour
 
     // Create DBs at DB preview locations stored in db_previews list.
     void createDBs();
 
-    void createElectrodes(QPoint point1);
+    //! Create electrode with rubberband area, assumes the given rect is already
+    //! in scene coordinates.
+    void createElectrodes(QRect scene_rect);
 
     //create potential plot on panel
     void createPotPlot(QImage potential_plot, QRectF graph_container);
 
-    // create AFM area with rubberband selected area
-    void createAFMArea(QPoint point1);
+    //! Create AFM area with rubberband selected area, assumes the given rect is
+    //! already in scene coordinates.
+    void createAFMArea(QRect scene_rect);
 
     // create AFM node in focused path after focused node
     void createAFMNode();
 
+    //! Create a text label
+    void createTextLabel(const QRect &scene_rect);
+
+    //! Edit a text label
+    void editTextLabel(prim::TextLabel *text_lab, const QString &new_text);
+
     void resizeItem(prim::Item *item, const QRectF &orig_rect,
-        const QRectF &new_rect);
-
-    // resize AFM Area
-    void resizeAFMArea(prim::AFMArea *afm_area, const QRectF &orig_rect,
-        const QRectF &new_rect);
-
-    // resize electrode
-    void resizeElectrode(prim::Electrode *electrode, const QRectF &orig_rect,
         const QRectF &new_rect);
 
     // destroy AFM path and included nodes
@@ -562,8 +569,6 @@ namespace gui{
 
     // move an Aggregate by the given amount
     void moveAggregate(prim::Aggregate *agg, const QPointF &delta);
-    void moveElectrode(prim::Electrode *electrode, const QPointF &delta);
-    void moveAFMArea(prim::AFMArea *afm_area, const QPointF &delta);
 
     DesignPanel *dp;
 
@@ -572,34 +577,6 @@ namespace gui{
     int item_index;   // index of item in Layer imte stack
   };
 
-
-  class DesignPanel::CreateElectrode : public QUndoCommand
-  {
-  public:
-    // create an electrode at the given points
-    CreateElectrode(int layer_index, gui::DesignPanel *dp, QPointF point1, QPointF point2, prim::Electrode *elec = 0, bool invert=false, QUndoCommand *parent=0);
-
-  private:
-
-    // destroy the dangling bond and update the lattice dot
-    virtual void undo();
-    // re-create the dangling bond
-    virtual void redo();
-
-    void create();  // create the dangling bond
-    void destroy(); // destroy the dangling bond
-
-    DesignPanel *dp;  // DesignPanel pointer
-    int layer_index;  // index of layer in dp->layers stack
-
-    QPointF point1;
-    QPointF point2;
-    bool invert;
-
-    // internals
-    int index;              // index of electrode item in the layer item stack
-
-  };
 
   class DesignPanel::CreatePotPlot : public QUndoCommand
   {
@@ -624,35 +601,6 @@ namespace gui{
     prim::PotPlot* pp;
 
     bool invert;
-  };
-
-
-  class DesignPanel::CreateAFMArea : public QUndoCommand
-  {
-  public:
-    //! Create an AFMArea at the given points
-    CreateAFMArea(int layer_index, gui::DesignPanel *dp, QPointF point1,
-        QPointF point2, prim::AFMArea *afm_area=0, bool invert=false,
-        QUndoCommand *parent=0);
-
-  private:
-    //! Destroy the AFMArea
-    virtual void undo();
-    //! Re-create the AFMArea
-    virtual void redo();
-
-    void create();    //! Create the AFMArea.
-    void destroy();   //! Destroy the AFMArea.
-
-    DesignPanel *dp;  //! Pointer to the DesignPanel
-    int layer_index;  //! Index of layer in dp->layers stack
-
-    QPointF point1;
-    QPointF point2;
-
-    bool invert;
-
-    int index;        //! Index of this item in the layer item stack.
   };
 
 
@@ -710,56 +658,97 @@ namespace gui{
     float z_offset;
   };
 
-  class DesignPanel::ResizeAFMArea : public QUndoCommand
+
+  class DesignPanel::CreateTextLabel : public QUndoCommand
   {
   public:
-    // resize the AFM area from the original positions to the new positions
-    ResizeAFMArea(int layer_index, DesignPanel *dp,
-        const QRectF &orig_rect, const QRectF &new_rect,
-        int afm_area_index, bool invert=false, QUndoCommand *parent=0);
+    //! Create a text label
+    CreateTextLabel(int layer_index, DesignPanel *dp, const QRectF &scene_rect,
+                    const QString &text, prim::TextLabel *text_lab=0,
+                    bool invert=false, QUndoCommand *parent=0);
 
-    // resize from new to original positions
     virtual void undo();
-
-    // resize from original to new positions
     virtual void redo();
 
   private:
-    bool invert;
+    void create();
+    void destroy();
 
-    int layer_index;
     DesignPanel *dp;
-    int afm_area_index; // the AFM Area's index in its layer
-    QPointF top_left_delta;
-    QPointF bot_right_delta;
-    QRectF orig_rect;
-    QRectF new_rect;
+    bool invert;
+    int layer_index;    // index of layer in layer manager
+    int item_index;     // index of item in layer
+    QRectF scene_rect;  // rectangle that the label takes up in scene coords
+    QString text;       // text contained in the label
   };
 
-  class DesignPanel::ResizeElectrode : public QUndoCommand
+  class DesignPanel::EditTextLabel : public QUndoCommand
   {
   public:
-    // resize the electrode from the original positions to the new positions
-    ResizeElectrode(int layer_index, DesignPanel *dp,
-        const QRectF &orig_rect, const QRectF &new_rect,
-        int electrode_index, bool invert=false, QUndoCommand *parent=0);
+    //! Specify text label to edit
+    EditTextLabel(int layer_index, DesignPanel *dp, const QString &new_text,
+                  prim::TextLabel *text_lab, bool invert=false,
+                  QUndoCommand *parent=0);
 
-    // resize from new to original positions
     virtual void undo();
-
-    // resize from original to new positions
     virtual void redo();
 
   private:
-    bool invert;
-
-    int layer_index;
     DesignPanel *dp;
-    int electrode_index; // the electrode's index in its layer
-    QPointF top_left_delta;
-    QPointF bot_right_delta;
+    bool invert;
+    int layer_index;    // index of layer in layer manager
+    int item_index;     // index of item in layer
+    QString text_orig;  // original text
+    QString text_new;   // new text
+  };
+
+  //! Generic undoable item creation
+  class DesignPanel::CreateItem : public QUndoCommand
+  {
+  public:
+    CreateItem(int layer_index, DesignPanel *dp, prim::Item *item,
+               bool invert=false, QUndoCommand *parent=0);
+
+    ~CreateItem();
+
+    virtual void undo();
+    virtual void redo();
+
+  private:
+    void create();
+    void destroy();
+
+    DesignPanel *dp;
+    bool invert;
+    bool in_scene;
+    int layer_index;  // index of layer in layer manager
+    int item_index;   // index of item in layer
+    prim::Item *item; // pointer to item, this pointer should always be valid for recreation
+  };
+
+  //! Resize a ResizableRect
+  class DesignPanel::ResizeItem : public QUndoCommand
+  {
+  public:
+    //! Set manual to true if the resize was done manually, which means the rect
+    //! already has the correct dimensions.
+    ResizeItem(int layer_index, DesignPanel *dp, int item_index,
+               const QRectF &orig_rect, const QRectF &new_rect,
+               bool manual=false, bool invert=false, QUndoCommand *parent=0);
+
+    virtual void undo();
+    virtual void redo();
+
+  private:
+    DesignPanel *dp;
+    bool invert;
+    bool manual;
+    int layer_index;
+    int item_index;
     QRectF orig_rect;
     QRectF new_rect;
+    QPointF top_left_delta;
+    QPointF bottom_right_delta;
   };
 
 

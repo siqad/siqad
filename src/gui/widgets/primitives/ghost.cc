@@ -55,16 +55,29 @@ prim::GhostBox::GhostBox(prim::Item *item, prim::Item *parent)
 {
   constructStatics();
 
-  if (item->item_type == prim::Item::Electrode) {
-    width = static_cast<prim::Electrode*>(item)->getWidth();
-    height = static_cast<prim::Electrode*>(item)->getHeight();
+  if (item->item_type == prim::Item::Electrode ||
+      item->item_type == prim::Item::AFMArea ||
+      item->item_type == prim::Item::TextLabel) {
+    width = reinterpret_cast<prim::ResizableRect*>(item)->sceneRect().width();
+    height = reinterpret_cast<prim::ResizableRect*>(item)->sceneRect().height();
+  } else {
+    qFatal("Trying to make a GhostBox out of unsupported item type");
+  }
+
+  /*if (item->item_type == prim::Item::Electrode) {
+    width = static_cast<prim::Electrode*>(item)->sceneRect().width();
+    height = static_cast<prim::Electrode*>(item)->sceneRect().height();
   } else if (item->item_type == prim::Item::AFMArea) {
     prim::AFMArea *afm_area = static_cast<prim::AFMArea*>(item);
     width = afm_area->bottomRight().x()-afm_area->topLeft().x();
     height = afm_area->bottomRight().y()-afm_area->topLeft().y();
+  } else if (item->item_type == prim::Item::TextLabel) {
+    prim::TextLabel *text_lab = reinterpret_cast<prim::TextLabel*>(item);
+    width = text_lab->sceneRect().width();
+    height = text_lab->sceneRect().height();
   } else {
     qFatal("Trying to make a GhostBox out of unsupported item type");
-  }
+  }*/
 
   setZValue(-1);
   setPos(item->pos());
@@ -333,6 +346,11 @@ void prim::Ghost::prepareItem(prim::Item *item, prim::AggNode *node)
     new_node->source_type = prim::AggNode::AFMArea;
     node->nodes.append(new_node);
     createGhostBox(item);
+  } else if (item->item_type == prim::Item::TextLabel) {
+    new_node = new prim::AggNode(box_sources.count());
+    new_node->source_type = prim::AggNode::TextLabel;
+    node->nodes.append(new_node);
+    createGhostBox(item);
   }
 }
 
@@ -405,7 +423,8 @@ prim::Item *prim::Ghost::getNodeItem(prim::AggNode *node) const
   else if(node->source_type == prim::AggNode::DBDot)
     return sources.at(node->index);
   else if(node->source_type == prim::AggNode::Electrode ||
-          node->source_type == prim::AggNode::AFMArea)
+          node->source_type == prim::AggNode::AFMArea ||
+          node->source_type == prim::AggNode::TextLabel)
     return box_sources.at(node->index);
   else
     return 0;

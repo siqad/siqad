@@ -46,6 +46,8 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
           this, &gui::DesignPanel::physLoc2LatticeCoord);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_setLatticeVisibility,
           this, &gui::DesignPanel::setLatticeVisibility);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_editTextLabel,
+          this, QOverload<prim::Item*, const QString &>::of(&gui::DesignPanel::editTextLabel));
 }
 
 // destructor
@@ -347,6 +349,9 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
       setInteractive(true);
       break;
     case gui::ToolType::ScreenshotAreaTool:
+      setInteractive(true);
+      break;
+    case gui::ToolType::LabelTool:
       setInteractive(true);
       break;
     default:
@@ -699,6 +704,12 @@ void gui::DesignPanel::setLatticeVisibility(bool visible)
     scene->setBackgroundBrush(QBrush(col));
 }
 
+void gui::DesignPanel::editTextLabel(prim::Item *text_lab,
+                                     const QString &new_text)
+{
+  editTextLabel(reinterpret_cast<prim::TextLabel*>(text_lab), new_text);
+}
+
 // INTERRUPTS
 
 // most behaviour will be connected to mouse move/release. However, when
@@ -709,15 +720,14 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
   Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
 
   // set clicked flag and store current mouse position for move behaviour
-  mouse_pos_old = e->pos();
-  mouse_pos_cached = e->pos(); // this might be a referencing clash, check.
-  press_scene_pos = mapToScene(e->pos()); // the scene position of the click event
+  clicked = true;
+  press_scene_pos = mapToScene(e->pos()).toPoint();
+  prev_pan_pos = e->pos();
 
   // if other buttons are clicked during rubber band selection, end selection
   if(rb)
     rubberBandEnd();
 
-  clicked = true;
   switch(e->button()){
     case Qt::LeftButton:
       if (tool_type == ScreenshotAreaTool) {
@@ -726,7 +736,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
         rb_cache = e->pos();
 
       } else if (tool_type == SelectTool || tool_type == ElectrodeTool ||
-          tool_type == AFMAreaTool) {
+          tool_type == AFMAreaTool || tool_type == LabelTool) {
         // rubber band variables
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
@@ -805,7 +815,8 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     switch(e->buttons()){
       case Qt::LeftButton:
         if (tool_type == SelectTool || tool_type == ElectrodeTool ||
-            tool_type == AFMAreaTool || tool_type == ScreenshotAreaTool) {
+            tool_type == AFMAreaTool || tool_type == ScreenshotAreaTool ||
+            tool_type == LabelTool) {
           rubberBandUpdate(e->pos());
         } else if (tool_type == DBGenTool) {
           createDBPreviews(lattice->enclosedSites(coord_start, lattice->nearestSite(mapToScene(e->pos()))));
@@ -815,12 +826,12 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
         break;
       case Qt::MidButton:
         // middle button always pans
-        mouse_pos_del = e->pos()-mouse_pos_old;
+        mouse_pos_del = e->pos()-prev_pan_pos;
         dx = mouse_pos_del.x();
         dy = mouse_pos_del.y();
         verticalScrollBar()->setValue(verticalScrollBar()->value()-dy);
         horizontalScrollBar()->setValue(horizontalScrollBar()->value()-dx);
-        mouse_pos_old = e->pos();
+        prev_pan_pos = e->pos();
         break;
       case Qt::RightButton:
         // right button will be for context menus in future
@@ -842,10 +853,6 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
   QGraphicsView::mouseReleaseEvent(e);
   // QPointF scene_pos = mapToScene(e->pos());
   QTransform trans = transform();
-
-  // end rubber band if active
-  if (rb)
-    rubberBandEnd();
 
   // case specific behaviour
   if (ghosting) {
@@ -872,11 +879,11 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
           case gui::ToolType::ElectrodeTool:
             // get start and end locations, and create the electrode.
             filterSelection(false);
-            createElectrodes(e->pos());
+            createElectrodes(rb_scene_rect);
             break;
           case gui::ToolType::AFMAreaTool:
             filterSelection(false);
-            createAFMArea(e->pos());
+            createAFMArea(rb_scene_rect);
             break;
           case gui::ToolType::AFMPathTool:
             // Make node at the ghost position
@@ -885,14 +892,18 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
           case gui::ToolType::ScreenshotAreaTool:
             // take a screenshot of the rubberband area
             filterSelection(false);
-            sig_screenshot(QRect(press_scene_pos.toPoint(), mapToScene(e->pos()).toPoint()));
+            sig_screenshot(rb_scene_rect);
+            break;
+          case gui::ToolType::LabelTool:
+            // create a label with the rubberband area
+            createTextLabel(rb_scene_rect);
             break;
           case gui::ToolType::DragTool:
             // pan ends
             break;
           case gui::ToolType::MeasureTool:{
             // display measurement from start to finish
-            QPointF delta = e->pos()-mouse_pos_cached;
+            QPointF delta = mapToScene(e->pos())-press_scene_pos;
             qreal dx = delta.x()*trans.m11()*prim::Item::scale_factor;
             qreal dy = delta.y()*trans.m22()*prim::Item::scale_factor;
             qDebug() << tr("Measure: x: %1 :: y: %2").arg(dx).arg(dy);
@@ -906,6 +917,11 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
         break;
     }
   }
+
+  // end rubber band if active
+  if (rb)
+    rubberBandEnd();
+
   clicked=false;
 }
 
@@ -986,19 +1002,6 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
           // emit signal to be picked up by application.cc
           emit sig_toolChangeRequest(gui::ToolType::SelectTool);
         }
-        break;
-      case Qt::Key_G:
-        if(display_mode == DesignMode){
-          // grouping behaviour for selecting surface dangling bonds
-          if(keymods == (Qt::ControlModifier | Qt::ShiftModifier))
-            splitAggregates();
-          else if(keymods == Qt::ControlModifier)
-            formAggregate();
-        }
-        break;
-      case Qt::Key_D:
-        if(display_mode == DesignMode)
-          duplicateSelection();
         break;
       case Qt::Key_S:
         if (display_mode == ScreenshotMode) {
@@ -1265,6 +1268,9 @@ void gui::DesignPanel::initActions()
   action_copy = new QAction(tr("&Copy"), this);
   action_paste = new QAction(tr("&Paste"), this);
   action_delete = new QAction(tr("&Delete"), this);
+  action_form_agg = new QAction(tr("Form A&ggregate"), this);
+  action_split_agg = new QAction(tr("Split Aggregate"), this);
+  action_dup = new QAction(tr("Duplicate"), this);
 
   action_undo->setShortcut(tr("CTRL+Z"));
   action_redo->setShortcuts({ tr("CTRL+Y"), tr("CTRL+SHIFT+Z") });
@@ -1272,20 +1278,23 @@ void gui::DesignPanel::initActions()
   action_copy->setShortcut(tr("CTRL+C"));
   action_paste->setShortcut(tr("CTRL+V"));
   action_delete->setShortcuts({ tr("DELETE"), tr("BACKSPACE") });
-
-  addAction(action_undo);
-  addAction(action_redo);
-  addAction(action_cut);
-  addAction(action_copy);
-  addAction(action_paste);
-  addAction(action_delete);
-
+  action_form_agg->setShortcut(tr("CTRL+G"));
+  action_split_agg->setShortcut(tr("CTRL+SHIFT+G"));
+  action_dup->setShortcut(tr("D"));
+  
   connect(action_undo, &QAction::triggered, this, &gui::DesignPanel::undoAction);
   connect(action_redo, &QAction::triggered, this, &gui::DesignPanel::redoAction);
   connect(action_cut, &QAction::triggered, this, &gui::DesignPanel::cutAction);
   connect(action_copy, &QAction::triggered, this, &gui::DesignPanel::copyAction);
   connect(action_paste, &QAction::triggered, this, &gui::DesignPanel::pasteAction);
   connect(action_delete, &QAction::triggered, this, &gui::DesignPanel::deleteAction);
+  connect(action_form_agg, &QAction::triggered, this, &gui::DesignPanel::formAggregate);
+  connect(action_split_agg, &QAction::triggered, this, &gui::DesignPanel::splitAggregates);
+  connect(action_dup, &QAction::triggered, this, &gui::DesignPanel::duplicateSelection);
+
+  // add the actions to design panel so they're activated
+  addActions({action_undo, action_redo, action_cut, action_copy, action_paste,
+              action_delete, action_form_agg, action_split_agg, action_dup});
 }
 
 
@@ -1333,22 +1342,19 @@ void gui::DesignPanel::rubberBandUpdate(QPoint pos){
   else{
     // update rubberband rectangle
     rb->setGeometry(QRect(mapFromScene(rb_start), pos).normalized());
-    QRect rb_rect_scene;
-    rb_rect_scene.setTopLeft(mapFromScene(rb_start));
-    rb_rect_scene.setBottomRight(pos);
-    rb_rect_scene = rb_rect_scene.normalized();
+    rb_scene_rect = QRect(rb_start, mapToScene(pos).toPoint()).normalized();
 
-    // deselect items that are no longer contained
+    // deselect all items
     QList<QGraphicsItem*> selected_items = scene->selectedItems();
     for(QGraphicsItem* selected_item : selected_items)
       selected_item->setSelected(false);
 
-    // select the new items
-    QList<QGraphicsItem*> rb_items = scene->items(QRect(rb_start,mapToScene(pos).toPoint()).normalized());
+    // select items that are now enclosed by the rubberband
+    QList<QGraphicsItem*> rb_items = scene->items(rb_scene_rect);
     for(QGraphicsItem* rb_item : rb_items)
       rb_item->setSelected(true);
 
-    // select shift list items
+    // append shift-selected items
     for(QGraphicsItem* shift_selected_item : rb_shift_selected)
       shift_selected_item->setSelected(true);
   }
@@ -1404,7 +1410,8 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, prim::LatticeCoord &offset)
   // check if holding any non-floating objects
   for (prim::Item *item : pasting ? clipboard : selectedItems()) {
     if (item->item_type != prim::Item::Electrode &&
-        item->item_type != prim::Item::AFMArea) {
+        item->item_type != prim::Item::AFMArea &&
+        item->item_type != prim::Item::TextLabel) {
       is_all_floating = false;
       break;
     }
@@ -1415,8 +1422,8 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, prim::LatticeCoord &offset)
     if (pasting) { //offset is in the first electrode item
       ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos()))
           - clipboard[0]->pos()
-          - QPointF(static_cast<prim::Electrode*>(clipboard[0])->getWidth()/2.0,
-              static_cast<prim::Electrode*>(clipboard[0])->getHeight()/2.0)
+          - QPointF(static_cast<prim::Electrode*>(clipboard[0])->sceneRect().width()/2.0,
+              static_cast<prim::Electrode*>(clipboard[0])->sceneRect().height()/2.0)
       );
     } else {
       ghost->moveTo(mapToScene(mapFromGlobal(QCursor::pos())));
@@ -1637,42 +1644,6 @@ void gui::DesignPanel::CreateDB::destroy()
 }
 
 
-// CreateElectrode class
-
-gui::DesignPanel::CreateElectrode::CreateElectrode(int layer_index, gui::DesignPanel *dp, QPointF point1, QPointF point2, prim::Electrode *elec, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), dp(dp), layer_index(layer_index), point1(point1), point2(point2), invert(invert)
-{  //if called to destroy, *elec points to selected electrode. if called to create, *elec = 0
-  prim::Layer *layer = dp->layman->getLayer(layer_index);
-  index = invert ? layer->getItems().indexOf(elec) : layer->getItems().size();
-}
-
-void gui::DesignPanel::CreateElectrode::undo()
-{
-  invert ? create() : destroy();
-}
-
-void gui::DesignPanel::CreateElectrode::redo()
-{
-  invert ? destroy() : create();
-}
-
-
-void gui::DesignPanel::CreateElectrode::create()
-{
-  dp->addItem(new prim::Electrode(layer_index, point1, point2), layer_index, index);
-}
-
-void gui::DesignPanel::CreateElectrode::destroy()
-{
-  prim::Electrode *electrode = static_cast<prim::Electrode*>(dp->layman->getLayer(layer_index)->getItem(index));
-  if(electrode != 0){
-    // destroy electrode
-    dp->removeItem(electrode, dp->layman->getLayer(electrode->layer_id));  // deletes electrode
-    electrode = 0;
-  }
-}
-
-
 // CreatePotPlot class
 gui::DesignPanel::CreatePotPlot::CreatePotPlot(gui::DesignPanel *dp, QImage potential_plot, QRectF graph_container, prim::PotPlot *pp, bool invert, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), potential_plot(potential_plot), graph_container(graph_container), pp(pp), invert(invert)
@@ -1701,44 +1672,6 @@ void gui::DesignPanel::CreatePotPlot::destroy()
   if(pp != 0){
     dp->removeItemFromScene(static_cast<prim::Item*>(pp));  // deletes PotPlot
     pp = 0;
-  }
-}
-
-
-// CreateAFMArea class
-
-gui::DesignPanel::CreateAFMArea::CreateAFMArea(int layer_index,
-    gui::DesignPanel *dp, QPointF point1, QPointF point2,
-    prim::AFMArea *afm_area, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), dp(dp), layer_index(layer_index),
-    point1(point1), point2(point2), invert(invert)
-{
-  prim::Layer *layer = dp->layman->getLayer(layer_index);
-  index = invert ? layer->getItems().indexOf(afm_area) : layer->getItems().size();
-}
-
-void gui::DesignPanel::CreateAFMArea::undo()
-{
-  invert ? create() : destroy();
-}
-
-void gui::DesignPanel::CreateAFMArea::redo()
-{
-  invert ? destroy() : create();
-}
-
-void gui::DesignPanel::CreateAFMArea::create()
-{
-  dp->addItem(new prim::AFMArea(layer_index, point1, point2), layer_index, index);
-}
-
-void gui::DesignPanel::CreateAFMArea::destroy()
-{
-  prim::AFMArea *afmarea = static_cast<prim::AFMArea*>(
-      dp->layman->getLayer(layer_index)->getItem(index));
-  if (afmarea != 0) {
-    // destroy AFMArea
-    dp->removeItem(afmarea, dp->layman->getLayer(afmarea->layer_id));
   }
 }
 
@@ -1828,85 +1761,165 @@ void gui::DesignPanel::CreateAFMNode::destroy()
 }
 
 
-// ResizeAFMArea class
-gui::DesignPanel::ResizeAFMArea::ResizeAFMArea(int layer_index, DesignPanel *dp,
-    const QRectF &orig_rect, const QRectF &new_rect, int afm_area_index,
-    bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(invert), layer_index(layer_index), dp(dp),
-        afm_area_index(afm_area_index), orig_rect(orig_rect), new_rect(new_rect)
+// Create Text Label class
+gui::DesignPanel::CreateTextLabel::CreateTextLabel(int layer_index,
+    DesignPanel *dp, const QRectF &scene_rect, const QString &text,
+    prim::TextLabel *text_lab, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), invert(invert), layer_index(layer_index),
+    scene_rect(scene_rect), text(text)
+{
+  prim::Layer *layer = dp->layman->getLayer(layer_index);
+  item_index = invert ? layer->getItems().indexOf(text_lab) : layer->getItems().size();
+}
+
+void gui::DesignPanel::CreateTextLabel::undo()
+{
+  invert ? create() : destroy();
+}
+
+void gui::DesignPanel::CreateTextLabel::redo()
+{
+  invert ? destroy() : create();
+}
+
+void gui::DesignPanel::CreateTextLabel::create()
+{
+  dp->addItem(new prim::TextLabel(scene_rect, layer_index, text), layer_index,
+              item_index);
+}
+
+void gui::DesignPanel::CreateTextLabel::destroy()
+{
+  prim::TextLabel *text_lab = reinterpret_cast<prim::TextLabel*>
+    (dp->layman->getLayer(layer_index)->getItem(item_index));
+  if (text_lab != 0) {
+    dp->removeItem(text_lab, dp->layman->getLayer(text_lab->layer_id));
+    text_lab = 0;
+  } else {
+    qCritical() << tr("Trying to delete non-existent text label");
+  }
+}
+
+
+// EditTextLabel class
+gui::DesignPanel::EditTextLabel::EditTextLabel(int layer_index, DesignPanel *dp,
+                                               const QString &new_text,
+                                               prim::TextLabel *text_lab,
+                                               bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), invert(invert), layer_index(layer_index),
+    text_new(new_text)
+{
+  prim::Layer *layer= dp->layman->getLayer(layer_index);
+  item_index = layer->getItems().indexOf(text_lab);
+  text_orig = text_lab->text();
+}
+
+void gui::DesignPanel::EditTextLabel::undo()
+{
+  prim::TextLabel *text_lab = reinterpret_cast<prim::TextLabel*>
+    (dp->layman->getLayer(layer_index)->getItem(item_index));
+  if (!invert)
+    text_lab->setText(text_orig);
+  else
+    text_lab->setText(text_new);
+}
+
+void gui::DesignPanel::EditTextLabel::redo()
+{
+  prim::TextLabel *text_lab = reinterpret_cast<prim::TextLabel*>
+    (dp->layman->getLayer(layer_index)->getItem(item_index));
+  if (!invert)
+    text_lab->setText(text_new);
+  else
+    text_lab->setText(text_orig);
+}
+
+
+// CreateItem class
+gui::DesignPanel::CreateItem::CreateItem(int layer_index, DesignPanel *dp,
+                                         prim::Item *item, bool invert,
+                                         QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), invert(invert), layer_index(layer_index),
+    item(item)
+{
+  prim::Layer *layer = dp->layman->getLayer(layer_index);
+  item_index = invert ? layer->getItems().indexOf(item) : layer->getItems().size();
+  in_scene = invert ? true : false;
+}
+
+gui::DesignPanel::CreateItem::~CreateItem()
+{
+  if (!in_scene) {
+    qDebug() << tr("Deleting item from QUndoStack");
+    delete item;
+  }
+}
+
+void gui::DesignPanel::CreateItem::undo()
+{
+  invert ? create() : destroy();
+}
+
+void gui::DesignPanel::CreateItem::redo()
+{
+  invert ? destroy() : create();
+}
+
+void gui::DesignPanel::CreateItem::create()
+{
+  if (!item)
+    qCritical() << tr("Item pointer is 0, cannot create new item");
+  dp->addItem(item, layer_index, item_index);
+  in_scene = true;
+}
+
+void gui::DesignPanel::CreateItem::destroy()
+{
+  // NOTE issues will arise if layers have been added/removed
+  item = dp->layman->getLayer(layer_index)->getItem(item_index);
+  prim::Item *item_copy = item->deepCopy();
+  dp->removeItem(item, dp->layman->getLayer(item->layer_id));
+  item = item_copy;
+  in_scene = false;
+}
+
+
+// ResizeItem class
+gui::DesignPanel::ResizeItem::ResizeItem(int layer_index, DesignPanel *dp,
+                                         int item_index, const QRectF &orig_rect,
+                                         const QRectF &new_rect, bool manual,
+                                         bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), invert(invert), manual(manual),
+    layer_index(layer_index), item_index(item_index), orig_rect(orig_rect),
+    new_rect(new_rect)
 {
   top_left_delta = new_rect.topLeft() - orig_rect.topLeft();
-  bot_right_delta = new_rect.bottomRight() - orig_rect.bottomRight();
+  bottom_right_delta = new_rect.bottomRight() - orig_rect.bottomRight();
 }
 
-void gui::DesignPanel::ResizeAFMArea::undo()
+void gui::DesignPanel::ResizeItem::undo()
 {
-  prim::AFMArea *afm_area = static_cast<prim::AFMArea*>(
-      dp->layman->getLayer(layer_index)->getItem(afm_area_index));
+  prim::ResizableRect *item = reinterpret_cast<prim::ResizableRect*>
+    (dp->layman->getLayer(layer_index)->getItem(item_index));
 
-  if (afm_area->boundingRect().topLeft() == orig_rect.topLeft() &&
-      afm_area->boundingRect().bottomRight() == orig_rect.bottomRight())
+  item->resize(-top_left_delta.x(), -top_left_delta.y(),
+               -bottom_right_delta.x(), -bottom_right_delta.y(), true);
+}
+
+void gui::DesignPanel::ResizeItem::redo()
+{
+  prim::ResizableRect *item = reinterpret_cast<prim::ResizableRect*>
+    (dp->layman->getLayer(layer_index)->getItem(item_index));
+
+  // if the user resized manually, then the area is already the right size
+  if (manual) {
+    manual = false;
     return;
+  }
 
-  afm_area->resize(-top_left_delta.x(), -top_left_delta.y(),
-      -bot_right_delta.x(), -bot_right_delta.y(), true);
+  item->resize(top_left_delta.x(), top_left_delta.y(),
+               bottom_right_delta.x(), bottom_right_delta.y(), true);
 }
-
-void gui::DesignPanel::ResizeAFMArea::redo()
-{
-  prim::AFMArea *afm_area = static_cast<prim::AFMArea*>(
-      dp->layman->getLayer(layer_index)->getItem(afm_area_index));
-
-  // if the user resized the afm area with the cursor, then the area might
-  // already be the right size, in which case do nothing
-  if (afm_area->boundingRect().topLeft() == new_rect.topLeft() &&
-      afm_area->boundingRect().bottomRight() == new_rect.bottomRight())
-    return;
-
-  afm_area->resize(top_left_delta.x(), top_left_delta.y(),
-      bot_right_delta.x(), bot_right_delta.y(), true);
-}
-
-
-// ResizeElectrode class
-gui::DesignPanel::ResizeElectrode::ResizeElectrode(int layer_index, DesignPanel *dp,
-    const QRectF &orig_rect, const QRectF &new_rect, int electrode_index,
-    bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(invert), layer_index(layer_index), dp(dp),
-        electrode_index(electrode_index), orig_rect(orig_rect), new_rect(new_rect)
-{
-  top_left_delta = new_rect.topLeft() - orig_rect.topLeft();
-  bot_right_delta = new_rect.bottomRight() - orig_rect.bottomRight();
-}
-
-void gui::DesignPanel::ResizeElectrode::undo()
-{
-  prim::Electrode *electrode = static_cast<prim::Electrode*>(
-      dp->layman->getLayer(layer_index)->getItem(electrode_index));
-
-  if (electrode->boundingRect().topLeft() == orig_rect.topLeft() &&
-      electrode->boundingRect().bottomRight() == orig_rect.bottomRight())
-    return;
-
-  electrode->resize(-top_left_delta.x(), -top_left_delta.y(),
-      -bot_right_delta.x(), -bot_right_delta.y(), true);
-}
-
-void gui::DesignPanel::ResizeElectrode::redo()
-{
-  prim::Electrode *electrode = static_cast<prim::Electrode*>(
-      dp->layman->getLayer(layer_index)->getItem(electrode_index));
-
-  // if the user resized the afm area with the cursor, then the area might
-  // already be the right size, in which case do nothing
-  if (electrode->boundingRect().topLeft() == new_rect.topLeft() &&
-      electrode->boundingRect().bottomRight() == new_rect.bottomRight())
-    return;
-
-  electrode->resize(top_left_delta.x(), top_left_delta.y(),
-      bot_right_delta.x(), bot_right_delta.y(), true);
-}
-
 
 // FromAggregate class
 gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
@@ -2077,14 +2090,8 @@ void gui::DesignPanel::MoveItem::moveItem(prim::Item *item, const QPointF &delta
     case prim::Item::Aggregate:
       moveAggregate(static_cast<prim::Aggregate*>(item), delta);
       break;
-    case prim::Item::Electrode:
-      moveElectrode(static_cast<prim::Electrode*>(item), delta);
-      break;
-    case prim::Item::AFMArea:
-      moveAFMArea(static_cast<prim::AFMArea*>(item), delta);
-      break;
     default:
-      item->moveBy(delta.x(), delta.y());
+      item->moveItemBy(delta.x(), delta.y());
       break;
   }
 }
@@ -2119,19 +2126,6 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
   agg->setPos(agg->scenePos()+QPointF(-1,0));
 }
 
-void gui::DesignPanel::MoveItem::moveElectrode(prim::Electrode *electrode, const QPointF &delta)
-{
-  electrode->setPos( electrode->pos() + delta );
-  electrode->updatePoints(delta);
-}
-
-void gui::DesignPanel::MoveItem::moveAFMArea(prim::AFMArea *afm_area,
-    const QPointF &delta)
-{
-  afm_area->setPos(afm_area->pos() + delta);
-  afm_area->updatePoints(delta);
-}
-
 // Undo/Redo Methods
 
 void gui::DesignPanel::createDBs()
@@ -2146,13 +2140,15 @@ void gui::DesignPanel::createDBs()
   destroyDBPreviews();
 }
 
-void gui::DesignPanel::createElectrodes(QPoint point1)
+void gui::DesignPanel::createElectrodes(QRect scene_rect)
 {
-  QPoint point2 = mapToScene(mouse_pos_cached).toPoint(); //get coordinates relative to top-left
+  /*QPoint point1 = scene_rect.topLeft();
+  QPoint point2 = scene_rect.bottomRight();*/
   int layer_index = layman->indexOf(layman->activeLayer());
   //only ever create one electrode at a time
   undo_stack->beginMacro(tr("create electrode with given corners"));
-  undo_stack->push(new CreateElectrode(layer_index, this, mapToScene(point1).toPoint(), point2));
+  undo_stack->push(new CreateItem(layer_index, this,
+                                  new prim::Electrode(layer_index, scene_rect)));
   undo_stack->endMacro();
 }
 
@@ -2164,15 +2160,14 @@ void gui::DesignPanel::createPotPlot(QImage potential_plot, QRectF graph_contain
   undo_stack->endMacro();
 }
 
-void gui::DesignPanel::createAFMArea(QPoint point1)
+void gui::DesignPanel::createAFMArea(QRect scene_rect)
 {
-  point1 = mapToScene(point1).toPoint();
-  QPoint point2 = mapToScene(mouse_pos_cached).toPoint();
   int layer_index = layman->indexOf(layman->activeLayer());
 
   // create the AFM area
   undo_stack->beginMacro(tr("create AFM area with given corners"));
-  undo_stack->push(new CreateAFMArea(layer_index, this, point1, point2));
+  undo_stack->push(new CreateItem(layer_index, this,
+                                  new prim::AFMArea(layer_index, scene_rect)));
   undo_stack->endMacro();
 }
 
@@ -2184,7 +2179,7 @@ void gui::DesignPanel::createAFMNode()
   if (afm_panel->ghostNode())
     scene_pos = afm_panel->ghostNode()->scenePos();
   else
-    scene_pos = mapToScene(mouse_pos_cached);
+    scene_pos = press_scene_pos;
 
   // TODO UNDOable version
   undo_stack->beginMacro(tr("create AFMNode in the focused AFMPath after the focused AFMNode"));
@@ -2201,40 +2196,42 @@ void gui::DesignPanel::createAFMNode()
   undo_stack->endMacro();
 }
 
+void gui::DesignPanel::createTextLabel(const QRect &scene_rect)
+{
+  bool ok;
+  QString text = prim::TextLabel::textPrompt("", &ok);
+  if (!ok)
+    return;
+  int layer_index = layman->indexOf(layman->activeLayer());
+  undo_stack->beginMacro(tr("Create Label"));
+  undo_stack->push(new CreateItem(layer_index, this,
+                                  new prim::TextLabel(scene_rect, layer_index, text)));
+  undo_stack->endMacro();
+}
+
+void gui::DesignPanel::editTextLabel(prim::TextLabel *text_lab,
+                                     const QString &new_text)
+{
+  int layer_index = text_lab->layer_id;
+  undo_stack->beginMacro(tr("Edit Text Label"));
+  undo_stack->push(new EditTextLabel(layer_index, this, new_text, text_lab));
+  undo_stack->endMacro();
+}
+
 void gui::DesignPanel::resizeItem(prim::Item *item,
     const QRectF &orig_rect, const QRectF &new_rect)
 {
   resizing = false;
-  switch (item->item_type) {
-    case prim::Item::AFMArea:
-      resizeAFMArea(static_cast<prim::AFMArea*>(item), orig_rect, new_rect);
-      break;
-    case prim::Item::Electrode:
-      resizeElectrode(static_cast<prim::Electrode*>(item), orig_rect, new_rect);
-      break;
-    default:
-      break;
+
+  // assume all resizable items are simply ResizableRects right now, need 
+  // special implementation otherwise
+  if (item->isResizable()) {
+    int item_index = layman->getLayer(item->layer_id)->getItemIndex(item);
+    undo_stack->beginMacro(tr("Resize Item"));
+    undo_stack->push(new ResizeItem(item->layer_id, this, item_index,
+          orig_rect, new_rect, true));
+    undo_stack->endMacro();
   }
-}
-
-void gui::DesignPanel::resizeAFMArea(prim::AFMArea *afm_area,
-    const QRectF &orig_rect, const QRectF &new_rect)
-{
-  undo_stack->beginMacro(tr("Resize AFM Area"));
-  int ind_in_layer = layman->getLayer(afm_area->layer_id)->getItemIndex(afm_area);
-  undo_stack->push(new ResizeAFMArea(afm_area->layer_id, this, orig_rect,
-      new_rect, ind_in_layer));
-  undo_stack->endMacro();
-}
-
-void gui::DesignPanel::resizeElectrode(prim::Electrode *electrode,
-    const QRectF &orig_rect, const QRectF &new_rect)
-{
-  undo_stack->beginMacro(tr("Resize Electrode"));
-  int ind_in_layer = layman->getLayer(electrode->layer_id)->getItemIndex(electrode);
-  undo_stack->push(new ResizeElectrode(electrode->layer_id, this, orig_rect,
-      new_rect, ind_in_layer));
-  undo_stack->endMacro();
 }
 
 void gui::DesignPanel::destroyAFMPath(prim::AFMPath *afm_path)
@@ -2282,19 +2279,6 @@ void gui::DesignPanel::deleteSelection()
       case prim::Item::Aggregate:
         destroyAggregate(static_cast<prim::Aggregate*>(item));
         break;
-      case prim::Item::Electrode:
-        undo_stack->push(new CreateElectrode( item->layer_id, this, QPointF(item->x(), item->y()),
-                        QPointF(item->x() + static_cast<prim::Electrode*>(item)->getWidth(),
-                        item->y() + static_cast<prim::Electrode*>(item)->getHeight()),
-                        static_cast<prim::Electrode*>(item), true));
-        break;
-      case prim::Item::AFMArea:
-        {
-        prim::AFMArea *afm_area = static_cast<prim::AFMArea*>(item);
-        undo_stack->push(new CreateAFMArea(afm_area->layer_id, this,
-            afm_area->topLeft(), afm_area->bottomRight(), afm_area, true));
-        break;
-        }
       case prim::Item::AFMPath:
         destroyAFMPath(static_cast<prim::AFMPath*>(item));
         break;
@@ -2318,6 +2302,8 @@ void gui::DesignPanel::deleteSelection()
         break;
         }
       default:
+        // generic item removal
+        undo_stack->push(new CreateItem(item->layer_id, this, item, true));
         break;
     }
   }
@@ -2413,7 +2399,8 @@ bool gui::DesignPanel::pasteAtGhost()
   bool is_all_floating = true;
   for(QGraphicsItem *gitem : clipboard){
     if (static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode &&
-        static_cast<prim::Item*>(gitem)->item_type != prim::Item::AFMArea){
+        static_cast<prim::Item*>(gitem)->item_type != prim::Item::AFMArea &&
+        reinterpret_cast<prim::TextLabel*>(gitem)->item_type != prim::Item::TextLabel){
       is_all_floating = false;
       break;
     }
@@ -2493,18 +2480,22 @@ void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, int n, prim::Aggregate
 
 void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, int n, prim::Electrode *elec)
 {
+  QRectF rect = elec->sceneRect();
+  rect.moveTopLeft(ghost->pos()+rect.topLeft());
   undo_stack->beginMacro(tr("create electrode with given corners"));
-  undo_stack->push(new CreateElectrode(elec->layer_id, this, ghost->pos()+elec->pos(),
-              ghost->pos()+elec->pos()+QPointF(elec->getWidth(), elec->getHeight())));
+  undo_stack->push(new CreateItem(elec->layer_id, this,
+                                  new prim::Electrode(elec->layer_id, rect)));
   undo_stack->endMacro();
 }
 
 void gui::DesignPanel::pasteAFMArea(prim::Ghost *ghost, int n, prim::AFMArea *afm_area)
 {
+  QRectF rect = afm_area->sceneRect();
+  rect.moveTopLeft(ghost->pos()+rect.topLeft());
   undo_stack->beginMacro(tr("create AFMArea with given afm_area params"));
   // TODO copy AFM tip attributes
-  undo_stack->push(new CreateAFMArea(afm_area->layer_id, this,
-      ghost->pos()+afm_area->topLeft(), ghost->pos()+afm_area->bottomRight()));
+  undo_stack->push(new CreateItem(afm_area->layer_id, this,
+                                  new prim::AFMArea(afm_area->layer_id, rect)));
   undo_stack->endMacro();
 }
 
@@ -2525,7 +2516,8 @@ bool gui::DesignPanel::moveToGhost(bool kill)
     // reset the original lattice dot selectability and return false
     for (prim::Item *item : selectedItems()) {
       if (item->item_type != prim::Item::Electrode &&
-          item->item_type != prim::Item::AFMArea) {
+          item->item_type != prim::Item::AFMArea &&
+          item->item_type != prim::Item::TextLabel) {
         is_all_floating = false;
       }
       setLatticeSiteOccupancy(item, true);

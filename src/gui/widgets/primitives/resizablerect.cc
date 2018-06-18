@@ -1,4 +1,4 @@
-// @file:     resize_frame.cc
+// @file:     resizablerect.cc
 // @author:   Samuel
 // @created:  2018-03-19
 // @editted:  2018-03-19 - Samuel
@@ -6,7 +6,7 @@
 //
 // @desc:     Resize handles for resizable objects
 
-#include "resize_frame.h"
+#include "resizablerect.h"
 #include "afmarea.h"
 
 namespace prim{
@@ -17,8 +17,70 @@ QList<ResizeFrame::HandlePosition> ResizeFrame::handle_positions;
 qreal ResizeHandle::handle_dim = -1;
 prim::Item::StateColors handle_col;
 
-// Constructor
-ResizeFrame::ResizeFrame(prim::Item *resize_target)
+
+// Resizable Rectangle base class
+ResizableRect::ResizableRect(ItemType type, const QRectF &scene_rect, int lay_id,
+                             QGraphicsItem *parent)
+  : Item(type, lay_id, parent)
+{
+  setResizable(true);
+  setSceneRect(scene_rect);
+}
+
+void ResizableRect::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2, bool update_handles)
+{
+  prepareGeometryChange();
+
+  // update dimensions
+  scene_rect.setTopLeft(scene_rect.topLeft()+QPointF(dx1,dy1));
+  scene_rect.setBottomRight(scene_rect.bottomRight()+QPointF(dx2,dy2));
+  setPos(scene_rect.topLeft());
+  update();
+
+  // update the frame
+  if (update_handles && resize_frame)
+    resize_frame->updateHandlePositions();
+}
+
+void ResizableRect::preResize()
+{
+  scene_rect_cache = scene_rect;
+  pos_cache = pos();
+}
+
+void ResizableRect::moveItemBy(qreal dx, qreal dy)
+{
+  QRectF rect = scene_rect;
+  rect.moveTopLeft(rect.topLeft()+QPointF(dx,dy));
+  setSceneRect(rect);
+}
+
+void ResizableRect::setSceneRect(const QRectF &rect) {
+  scene_rect = rect;
+  setPos(scene_rect.topLeft());
+  update();
+}
+
+QVariant ResizableRect::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+  if (change == QGraphicsItem::ItemSelectedChange) {
+    if (value == true) {
+      if (!resize_frame) {
+        resize_frame = new prim::ResizeFrame(this);
+      }
+      resize_frame->setVisible(true);
+    } else {
+      if (resize_frame) {
+        resize_frame->setVisible(false);
+      }
+    }
+  }
+
+  return QGraphicsItem::itemChange(change, value);
+}
+
+// Resize Frame base class
+ResizeFrame::ResizeFrame(prim::ResizableRect *resize_target)
   : Item(prim::Item::ResizeFrame), resize_target(resize_target)
 {
   if (border_width == -1)
@@ -38,7 +100,7 @@ ResizeFrame::ResizeFrame(prim::Item *resize_target)
 }
 
 
-void ResizeFrame::setResizeTarget(prim::Item *new_target)
+void ResizeFrame::setResizeTarget(prim::ResizableRect *new_target)
 {
   resize_target = new_target;
   setParentItem(resize_target);
@@ -211,10 +273,10 @@ void ResizeHandle::mousePressEvent(QGraphicsSceneMouseEvent *e)
   switch(e->buttons()) {
     case Qt::LeftButton:
     {
-      prim::Item *target = static_cast<prim::ResizeFrame*>(parentItem())->
+      prim::ResizableRect *target = static_cast<prim::ResizeFrame*>(parentItem())->
           resizeTarget();
       if (target) {
-        target->setBoundingRectPreResize(target->boundingRect());
+        target->preResize();
 
         clicked = true;
         step_pos = e->scenePos();
@@ -248,10 +310,10 @@ void ResizeHandle::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
 void ResizeHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent *)
 {
   if (clicked) {
-    prim::Item *target = static_cast<prim::ResizeFrame*>(parentItem())->
+    prim::ResizableRect *target = static_cast<prim::ResizeFrame*>(parentItem())->
         resizeTarget();
     emit prim::Emitter::instance()->sig_resizeFinalize(target,
-        target->boundingRectPreResize(), target->boundingRect());
+        target->sceneRectCached(), target->sceneRect());
   }
   clicked = false;
 }
@@ -259,7 +321,7 @@ void ResizeHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent *)
 void ResizeHandle::prepareStatics()
 {
   // TODO settings.cc
-  handle_dim = 10;
+  handle_dim = 100;
 }
 
 } // end of prim namespace

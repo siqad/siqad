@@ -1,4 +1,4 @@
-// @file:     resize_frame.h
+// @file:     resizablerect.h
 // @author:   Samuel
 // @created:  2018-03-18
 // @editted:  2018-03-18 - Samuel
@@ -13,8 +13,49 @@
 
 namespace prim{
 
-  // Forward declaration of ResizeHandle class
+  // Forward declarations
+  class ResizeFrame;
   class ResizeHandle;
+
+  //! A prim::Item that inherits this class will get resizing abilities.
+  class ResizableRect : public Item
+  {
+  public:
+    //! Constructor that takes in the rectangle dimensions in scene coordinates.
+    ResizableRect(ItemType type, const QRectF &scene_rect=QRectF(), int lay_id=-1,
+                  QGraphicsItem *parent=0);
+
+    //! Move the top left and bottom right corners of the rectangle by the given
+    //! deltas. Override this function if a custom resize behavior is needed.
+    virtual void resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2, bool update_handles=false);
+
+    //! Pre-resize actions - save the original position and dimensions.
+    void preResize();
+
+    //! Move the top left of the rectangle by the given delta.
+    virtual void moveItemBy(qreal dx, qreal dy) override;
+
+    //! Set rectangle that defines this item's dimensions in scene coordinates.
+    void setSceneRect(const QRectF &rect);
+
+    //! Return the rectangle that defines this item's dimensions in scene coordinates.
+    QRectF sceneRect() const {return scene_rect;}
+
+    //! Return the item's dimensions before resizing in scene coordinates.
+    QRectF sceneRectCached() const {return scene_rect_cache;}
+
+  protected:
+
+    //! Show resize frame when focused
+    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
+  private:
+    // Variables
+    QRectF scene_rect;        // the rectangle dimensions in scene coordinates
+    prim::ResizeFrame *resize_frame=0;  // the resize frame for this resizble rect
+    QRectF scene_rect_cache;            // the rectangle dimensions before resize
+    QPointF pos_cache;                  // the top left point before resize
+  };
 
   //! A rectangular frame containing a few square handles for users to drag to
   //! resize graphics items. The frame sees the target item as its parent item.
@@ -29,14 +70,14 @@ namespace prim{
 
     //! Constructor which takes the pointer to the target item that this frame
     //! will resize.
-    ResizeFrame(prim::Item *resize_target=0);
+    ResizeFrame(prim::ResizableRect *resize_target=0);
 
     //! Empty destructor.
     ~ResizeFrame() {};
 
     //! Set the target resize item.
-    void setResizeTarget(prim::Item *new_target);
-    prim::Item *resizeTarget() const {return resize_target;}
+    void setResizeTarget(prim::ResizableRect *new_target);
+    prim::ResizableRect *resizeTarget() const {return resize_target;}
 
     //! Retrieve the handle at the indicated location
     prim::ResizeHandle *handle(HandlePosition pos) {return resize_handles.at(pos);}
@@ -65,7 +106,7 @@ namespace prim{
     void prepareStatics();
 
     // resize frame variables
-    prim::Item *resize_target=0;
+    prim::ResizableRect *resize_target=0;
 
     //! Static list of handle positions for easy iteration through all positions
     static QList<HandlePosition> handle_positions;
