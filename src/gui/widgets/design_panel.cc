@@ -1262,12 +1262,12 @@ void gui::DesignPanel::dummyAction()
 
 void gui::DesignPanel::initActions()
 {
-  action_undo = new QAction(tr("&Undo"), this);
-  action_redo = new QAction(tr("&Redo"), this);
-  action_cut = new QAction(tr("Cut"), this);
-  action_copy = new QAction(tr("&Copy"), this);
-  action_paste = new QAction(tr("&Paste"), this);
-  action_delete = new QAction(tr("&Delete"), this);
+  action_undo = new QAction(QIcon::fromTheme("edit-undo"), tr("&Undo"), this);
+  action_redo = new QAction(QIcon::fromTheme("edit-redo"), tr("&Redo"), this);
+  action_cut = new QAction(QIcon::fromTheme("edit-cut"), tr("Cut"), this);
+  action_copy = new QAction(QIcon::fromTheme("edit-copy"), tr("&Copy"), this);
+  action_paste = new QAction(QIcon::fromTheme("edit-paste"), tr("&Paste"), this);
+  action_delete = new QAction(QIcon::fromTheme("edit-delete"), tr("&Delete"), this);
   action_form_agg = new QAction(tr("Form A&ggregate"), this);
   action_split_agg = new QAction(tr("Split Aggregate"), this);
   action_dup = new QAction(tr("Duplicate"), this);
