@@ -2127,6 +2127,7 @@ QList<QStringList> gui::DesignPanel::cleanItemArgs(QStringList item_args)
     //strip parentheses
     arg.remove("(");
     arg.remove(")");
+    // return arguments enclosed in parentheses in sets.
     clean_args.append(arg.split(",", QString::SkipEmptyParts));
   }
   return clean_args;
@@ -2137,9 +2138,8 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
 {
   prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
   QList<QStringList> clean_args = cleanItemArgs(item_args);
-  qDebug() << clean_args;
   if (item_type == prim::Item::Electrode) {
-    if (item_args.size() >= 2) {
+    if ((clean_args[0].size() == 2) && (clean_args[1].size()) == 2) {
       int xmin = std::min(clean_args[0][0].toInt(), clean_args[1][0].toInt());
       int xmax = std::max(clean_args[0][0].toInt(), clean_args[1][0].toInt());
       int ymin = std::min(clean_args[0][1].toInt(), clean_args[1][1].toInt());
@@ -2150,6 +2150,28 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
       createElectrode(scene_rect);
       return true;
     }
+  } else if (item_type == prim::Item::DBDot) {
+    if (clean_args[0].size() == 3) {
+      int n = clean_args[0][0].toInt();
+      int m = clean_args[0][1].toInt();
+      int l = clean_args[0][2].toInt();
+      if ((l < 0) || (l > 1)) {  // Check for invalid
+        return false;
+      } else {
+        setTool(gui::ToolType::DBGenTool);
+        emit sig_toolChangeRequest(gui::ToolType::DBGenTool);
+        createDBs(prim::LatticeCoord(n, m, l));
+        for (prim::Layer* layer: layman->getLayers(prim::Layer::DB)){
+          qDebug() << layman->indexOf(layer);
+          QStack<prim::Item*> items = layer->getItems();
+          for (prim::Item* item: items){
+            qDebug() << item->layer_id;
+          }
+        }
+
+        return true;
+      }
+    }
   }
   return false;
 }
@@ -2158,14 +2180,24 @@ bool gui::DesignPanel::commandRemoveItem(QString type, QStringList item_args)
 {
   prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
   QList<QStringList> clean_args = cleanItemArgs(item_args);
-  QPoint pos = QPoint(clean_args[0][0].toInt(), clean_args[0][1].toInt());
-  if (itemAt(mapFromScene(pos))) {
-    QList<QGraphicsItem*> gitems = items(mapFromScene(pos));
-    for (QGraphicsItem* item: gitems){
-      if (static_cast<prim::Item*>(item)->item_type == item_type) {
-        removeItem(static_cast<prim::Item*>(item), static_cast<prim::Item*>(item)->layer_id);
+  if (clean_args[0].size() == 2) {
+    int x = clean_args[0][0].toInt();
+    int y = clean_args[0][1].toInt();
+    QPoint pos = QPoint(x,y);
+    if (itemAt(mapFromScene(pos))) {
+      QList<QGraphicsItem*> gitems = items(mapFromScene(pos));
+      for (QGraphicsItem* item: gitems){
+        if (static_cast<prim::Item*>(item)->item_type == item_type) {
+          removeItem(static_cast<prim::Item*>(item), static_cast<prim::Item*>(item)->layer_id);
+        }
       }
+      return true;
     }
+  } else if ((clean_args[0].size() == 1) && (clean_args[1].size() == 1)) {
+    int lay_id = clean_args[0][0].toInt();
+    int item_id = clean_args[0][1].toInt();
+    prim::Item *item = layman->getLayer(lay_id)->getItem(item_id);
+    removeItem(item, lay_id);
     return true;
   }
   return false;
@@ -2174,16 +2206,23 @@ bool gui::DesignPanel::commandRemoveItem(QString type, QStringList item_args)
 
 // Undo/Redo Methods
 
-void gui::DesignPanel::createDBs()
+void gui::DesignPanel::createDBs(prim::LatticeCoord lat_coord)
 {
-  // create DBs at preview DB locations
   int layer_index = layman->indexOf(layman->activeLayer());
-  undo_stack->beginMacro(tr("create dangling bonds at DB preview locations"));
-  for (prim::DBDotPreview *db_prev : db_previews)
-    undo_stack->push(new CreateDB(db_prev->latticeCoord(), layer_index, this));
-  undo_stack->endMacro();
-
-  destroyDBPreviews();
+  // since l = -1 is invalid, default is set to n = m = l = -1
+  if (lat_coord == prim::LatticeCoord(-1,-1,-1)) {
+    // create DBs at preview DB locations
+    undo_stack->beginMacro(tr("create dangling bonds at DB preview locations"));
+    for (prim::DBDotPreview *db_prev : db_previews)
+      undo_stack->push(new CreateDB(db_prev->latticeCoord(), layer_index, this));
+    undo_stack->endMacro();
+    destroyDBPreviews();
+  } else {
+    //create DBs at give lat_coord
+    undo_stack->beginMacro(tr("create dangling bonds at DB preview locations"));
+    undo_stack->push(new CreateDB(lat_coord, layer_index, this));
+    undo_stack->endMacro();
+  }
 }
 
 void gui::DesignPanel::createElectrode(QRect scene_rect)

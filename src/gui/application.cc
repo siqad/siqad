@@ -477,6 +477,7 @@ bool gui::ApplicationGUI::performCommand(QStringList cmds)
 void gui::ApplicationGUI::commandAddItem(QStringList args)
 {
   if (args.size() >= 3) {
+    //item_type, layer_id, one set of arguments guaranteed present
     QString item_type = args.takeFirst();
     QString layer_id = args.takeFirst();
     QStringList item_args = args;
@@ -491,14 +492,15 @@ void gui::ApplicationGUI::commandAddItem(QStringList args)
 
 void gui::ApplicationGUI::commandRemoveItem(QStringList args)
 {
-  if (args.size() >= 3) {
+  if (args.size() >= 2) {
+    //item_type, one set of arguments guaranteed present
     QString item_type = args.takeFirst();
     QStringList item_args = args;
     if (!design_pan->commandRemoveItem(item_type, args)) {
       dialog_pan->echo(tr("Item removal failed."));
     }
   } else {
-    dialog_pan->echo(tr("remove_item takes at least 3 arguments, %1 provided.").arg(args.size()));
+    dialog_pan->echo(tr("remove_item takes at least 2 arguments, %1 provided.").arg(args.size()));
   }
 }
 

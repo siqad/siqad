@@ -428,7 +428,7 @@ namespace gui{
     // functions including undo/redo behaviour
 
     // Create DBs at DB preview locations stored in db_previews list.
-    void createDBs();
+    void createDBs(prim::LatticeCoord lat_coord = prim::LatticeCoord(-1,-1,-1));
 
     //! Create electrode with rubberband area, assumes the given rect is already
     //! in scene coordinates.
