@@ -152,7 +152,7 @@ namespace gui{
     void initDialogDock();        // initialise the bottom dialog dock
     void initSimVisualizeDock();  // initialise the side sim visualize dock
     void initLayerDock();         // initialise the side layer dock
-    void initKeywords();            // initialise the input field parser
+    void initParser();            // initialise the input field parser
     void setLayerManagerWidget(QWidget *widget);
 
     // prepare any extra actions not attched to an icon or meny
@@ -227,6 +227,7 @@ namespace gui{
 
     QString working_path;         // path currently in use
     QStringList input_kws;
+    QCommandLineParser* parser;
   };
 
 } // end gui namespace
