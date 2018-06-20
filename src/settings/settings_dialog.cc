@@ -50,7 +50,7 @@ void SettingsDialog::addPendingBoolUpdate(bool new_state)
     PendingChange(SettingsCategory::App, sender->objectName(),
         QVariant(new_state))
   );*/
-  //app_settings->setValue(sender->objectName(), QVariant(new_state));
+  // app_settings->setValue(sender->objectName(), QVariant(new_state));
   qDebug() << "Changed setting!";
 }
 
@@ -58,7 +58,6 @@ void SettingsDialog::addPendingBoolUpdate(bool new_state)
 void SettingsDialog::applyPendingChanges()
 {
   // TODO deduplicate
-
   for (PendingChange pending_change : pending_changes) {
     settings::Settings *category_setting = settingsCategoryPointer(
         pending_change.category);

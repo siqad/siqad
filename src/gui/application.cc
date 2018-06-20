@@ -94,6 +94,9 @@ void gui::ApplicationGUI::initGUI()
   initTopBar();
   initSideBar();
 
+  // initialise parser
+  initKeywords();
+
   // inter-widget signals
   connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene,
           design_pan, &gui::DesignPanel::displaySimResults);
@@ -442,6 +445,72 @@ void gui::ApplicationGUI::initLayerDock()
 }
 
 
+void gui::ApplicationGUI::initKeywords()
+{
+  input_kws.clear();
+  input_kws.append(tr("add_item"));
+  input_kws.append(tr("remove_item"));
+  input_kws.append(tr("echo"));
+}
+
+
+bool gui::ApplicationGUI::performCommand(QStringList cmds)
+{
+  if (!cmds.isEmpty()){
+    QString command = cmds.takeFirst();
+    if (command == tr("add_item")) {
+      commandAddItem(cmds);
+    } else if (command == tr("remove_item")) {
+      commandRemoveItem(cmds);
+    } else if (command == tr("echo")) {
+      commandEcho(cmds);
+    } else {
+      return false;
+    }
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+void gui::ApplicationGUI::commandAddItem(QStringList args)
+{
+  if (args.size() >= 3) {
+    //item_type, layer_id, one set of arguments guaranteed present
+    QString item_type = args.takeFirst();
+    QString layer_id = args.takeFirst();
+    QStringList item_args = args;
+    if (!design_pan->commandCreateItem(item_type, layer_id, item_args)) {
+      dialog_pan->echo(tr("Item creation failed."));
+    }
+  } else {
+    dialog_pan->echo(tr("add_item takes at least 3 arguments, %1 provided.").arg(args.size()));
+  }
+}
+
+
+void gui::ApplicationGUI::commandRemoveItem(QStringList args)
+{
+  if (args.size() >= 2) {
+    //item_type, one set of arguments guaranteed present
+    QString item_type = args.takeFirst();
+    QStringList item_args = args;
+    if (!design_pan->commandRemoveItem(item_type, args)) {
+      dialog_pan->echo(tr("Item removal failed."));
+    }
+  } else {
+    dialog_pan->echo(tr("remove_item takes at least 2 arguments, %1 provided.").arg(args.size()));
+  }
+}
+
+void gui::ApplicationGUI::commandEcho(QStringList args)
+{
+  for (QString arg: args){
+    dialog_pan->echo(arg);
+  }
+}
+
 void gui::ApplicationGUI::setLayerManagerWidget(QWidget *widget)
 {
   qDebug() << "Making layer manager widget";
@@ -664,11 +733,23 @@ void gui::ApplicationGUI::parseInputField()
 {
   // get input from input_field, remove leading/trailing whitespace
   QString input = input_field->pop();
-
   // if input string is not empty, do something
   if(!input.isEmpty()){
-    // for now, just echo input to stdout
-    qDebug() << input;
+    //check the current setting for sending to terminal
+    if(settings::AppSettings::instance()->value("log/override").toBool()){
+      dialog_pan->echo(input);
+      QStringList inputs = input.split(" ", QString::SkipEmptyParts);
+      if (input_kws.contains(inputs.first())) {
+        // keyword detected
+        if (!performCommand(inputs)) {
+          dialog_pan->echo(tr("Error occured with command '%1'")
+                              .arg(inputs.first()));
+        }
+      } else {
+        dialog_pan->echo(tr("Command '%1' not recognised.")
+                              .arg(inputs.first()));
+      }
+    }
   }
 }
 
@@ -676,7 +757,6 @@ void gui::ApplicationGUI::designPanelReset()
 {
   initState();
 }
-
 
 void gui::ApplicationGUI::simulationSetup()
 {

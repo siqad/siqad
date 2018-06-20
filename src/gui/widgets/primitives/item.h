@@ -62,6 +62,8 @@ namespace prim{
     //! returns the item type as a QString
     QString getQStringItemType();
 
+    static ItemType getEnumItemType(QString type); 
+
     //! set hovered state
     void setHovered(bool flag) {hovered = flag;}
     //! get hovered state

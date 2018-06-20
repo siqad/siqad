@@ -879,7 +879,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
           case gui::ToolType::ElectrodeTool:
             // get start and end locations, and create the electrode.
             filterSelection(false);
-            createElectrodes(rb_scene_rect);
+            createElectrode(rb_scene_rect);
             break;
           case gui::ToolType::AFMAreaTool:
             filterSelection(false);
@@ -1173,10 +1173,6 @@ void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
   }
   QMenu *menu = new QMenu(this);
   if (itemAt(e->pos())) {
-  // if (QGraphicsItem *gitem = itemAt(e->pos())) {
-    // qDebug() << tr("Item clicked was at: (%1 , %2)").arg(gitem->x()).arg(gitem->y());
-    // qDebug() << tr("item_type: %1").arg(static_cast<prim::Item*>(gitem)->item_type);
-    // qDebug() << tr("zValue: %1").arg(static_cast<prim::Item*>(gitem)->zValue());
     QList<QGraphicsItem*> gitems = items(e->pos());
     //keep track of inserted types, so as to not double insert.
     QList<int> inserted_types = QList<int>();
@@ -1252,8 +1248,6 @@ void gui::DesignPanel::dummyAction()
     for (auto gitem: gitems) {
       //make sure the item type is correct.
       if (static_cast<prim::Item*>(gitem)->item_type == sender()->property("item_type").toInt()) {
-        // QString item_type = static_cast<prim::Item*>(gitem)->getQStringItemType();
-        // qDebug() << tr("%1, %2").arg(item_type).arg(static_cast<QAction*>(sender())->text());
         static_cast<prim::Item*>(gitem)->performAction(static_cast<QAction*>(sender()));
       }
     }
@@ -1281,7 +1275,7 @@ void gui::DesignPanel::initActions()
   action_form_agg->setShortcut(tr("CTRL+G"));
   action_split_agg->setShortcut(tr("CTRL+SHIFT+G"));
   action_dup->setShortcut(tr("D"));
-  
+
   connect(action_undo, &QAction::triggered, this, &gui::DesignPanel::undoAction);
   connect(action_redo, &QAction::triggered, this, &gui::DesignPanel::redoAction);
   connect(action_cut, &QAction::triggered, this, &gui::DesignPanel::cutAction);
@@ -2126,24 +2120,126 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
   agg->setPos(agg->scenePos()+QPointF(-1,0));
 }
 
-// Undo/Redo Methods
-
-void gui::DesignPanel::createDBs()
+QList<QStringList> gui::DesignPanel::cleanItemArgs(QStringList item_args)
 {
-  // create DBs at preview DB locations
-  int layer_index = layman->indexOf(layman->activeLayer());
-  undo_stack->beginMacro(tr("create dangling bonds at DB preview locations"));
-  for (prim::DBDotPreview *db_prev : db_previews)
-    undo_stack->push(new CreateDB(db_prev->latticeCoord(), layer_index, this));
-  undo_stack->endMacro();
-
-  destroyDBPreviews();
+  QList<QStringList> clean_args = QList<QStringList>();
+  for (QString arg: item_args){
+    //strip parentheses
+    arg.remove("(");
+    arg.remove(")");
+    // return arguments enclosed in parentheses in sets.
+    clean_args.append(arg.split(",", QString::SkipEmptyParts));
+  }
+  return clean_args;
 }
 
-void gui::DesignPanel::createElectrodes(QRect scene_rect)
+
+bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QStringList item_args)
 {
-  /*QPoint point1 = scene_rect.topLeft();
-  QPoint point2 = scene_rect.bottomRight();*/
+  prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
+  QList<QStringList> clean_args = cleanItemArgs(item_args);
+  if (item_type == prim::Item::Electrode) {
+    if ((clean_args[0].size() == 2) && (clean_args[1].size()) == 2) {
+      int xmin = std::min(clean_args[0][0].toInt(), clean_args[1][0].toInt());
+      int xmax = std::max(clean_args[0][0].toInt(), clean_args[1][0].toInt());
+      int ymin = std::min(clean_args[0][1].toInt(), clean_args[1][1].toInt());
+      int ymax = std::max(clean_args[0][1].toInt(), clean_args[1][1].toInt());
+      QRect scene_rect = QRect(QPoint(xmin, ymin), QPoint(xmax,ymax));
+      setTool(gui::ToolType::ElectrodeTool);
+      emit sig_toolChangeRequest(gui::ToolType::ElectrodeTool);
+      createElectrode(scene_rect);
+      return true;
+    }
+  } else if (item_type == prim::Item::DBDot) {
+    if (clean_args[0].size() == 3) {
+      int n = clean_args[0][0].toInt();
+      int m = clean_args[0][1].toInt();
+      int l = clean_args[0][2].toInt();
+      if ((l < 0) || (l > 1)) {  // Check for invalid
+        return false;
+      } else {
+        setTool(gui::ToolType::DBGenTool);
+        emit sig_toolChangeRequest(gui::ToolType::DBGenTool);
+        createDBs(prim::LatticeCoord(n, m, l));
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool gui::DesignPanel::commandRemoveItem(QString type, QStringList item_args)
+{
+  prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
+  QList<QStringList> clean_args = cleanItemArgs(item_args);
+  if (clean_args[0].size() == 2) {
+    // Remove items by location
+    int x = clean_args[0][0].toInt();
+    int y = clean_args[0][1].toInt();
+    QPoint pos = QPoint(x,y);
+    if (itemAt(mapFromScene(pos))) {
+      QList<QGraphicsItem*> gitems = items(mapFromScene(pos));
+      for (QGraphicsItem* item: gitems){
+        if (static_cast<prim::Item*>(item)->item_type == item_type) {
+          commandRemoveHandler(static_cast<prim::Item*>(item));
+        }
+      }
+      return true;
+    }
+  } else if ((clean_args[0].size() == 1) && (clean_args[1].size() == 1)) {
+    // Remove items by indices
+    int lay_id = clean_args[0][0].toInt();
+    int item_id = clean_args[1][0].toInt();
+    prim::Layer *layer = layman->getLayer(lay_id);
+    if (layer) {
+      prim::Item *item = layer->getItem(item_id);
+      if (item) {
+        commandRemoveHandler(item);
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+
+void gui::DesignPanel::commandRemoveHandler(prim::Item *item)
+{
+  switch (item->item_type) {
+    case prim::Item::DBDot:
+      undo_stack->beginMacro(tr("Deleting DBs"));
+      undo_stack->push(new CreateDB(static_cast<prim::DBDot*>(item)->latticeCoord(),
+                                  item->layer_id, this, 0, true));
+      undo_stack->endMacro();
+      break;
+    default:
+      undo_stack->push(new CreateItem(item->layer_id, this, item, true));
+  }
+}
+
+// Undo/Redo Methods
+
+void gui::DesignPanel::createDBs(prim::LatticeCoord lat_coord)
+{
+  int layer_index = layman->indexOf(layman->activeLayer());
+  // since l = -1 is invalid, default is set to n = m = l = -1
+  if (lat_coord == prim::LatticeCoord(-1,-1,-1)) {
+    // create DBs at preview DB locations
+    undo_stack->beginMacro(tr("create dangling bonds at DB preview locations"));
+    for (prim::DBDotPreview *db_prev : db_previews)
+      undo_stack->push(new CreateDB(db_prev->latticeCoord(), layer_index, this));
+    undo_stack->endMacro();
+    destroyDBPreviews();
+  } else {
+    //create DBs at give lat_coord
+    undo_stack->beginMacro(tr("create dangling bonds at DB preview locations"));
+    undo_stack->push(new CreateDB(lat_coord, layer_index, this));
+    undo_stack->endMacro();
+  }
+}
+
+void gui::DesignPanel::createElectrode(QRect scene_rect)
+{
   int layer_index = layman->indexOf(layman->activeLayer());
   //only ever create one electrode at a time
   undo_stack->beginMacro(tr("create electrode with given corners"));
@@ -2223,7 +2319,7 @@ void gui::DesignPanel::resizeItem(prim::Item *item,
 {
   resizing = false;
 
-  // assume all resizable items are simply ResizableRects right now, need 
+  // assume all resizable items are simply ResizableRects right now, need
   // special implementation otherwise
   if (item->isResizable()) {
     int item_index = layman->getLayer(item->layer_id)->getItemIndex(item);
