@@ -2148,7 +2148,15 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
       QRect scene_rect = QRect(QPoint(xmin, ymin), QPoint(xmax,ymax));
       setTool(gui::ToolType::ElectrodeTool);
       emit sig_toolChangeRequest(gui::ToolType::ElectrodeTool);
-      createElectrode(scene_rect);
+      if (layer_id == "auto"){
+        createElectrode(scene_rect);
+      } else {
+        int layer_index = layer_id.toInt();
+        undo_stack->beginMacro(tr("create electrode with given corners"));
+        undo_stack->push(new CreateItem(layer_index, this,
+                                        new prim::Electrode(layer_index, scene_rect)));
+        undo_stack->endMacro();
+      }
       return true;
     }
   } else if (item_type == prim::Item::DBDot) {
@@ -2223,20 +2231,21 @@ void gui::DesignPanel::commandRemoveHandler(prim::Item *item)
 void gui::DesignPanel::createDBs(prim::LatticeCoord lat_coord)
 {
   int layer_index = layman->indexOf(layman->activeLayer());
+  QList<prim::LatticeCoord> lat_list = QList<prim::LatticeCoord>();
   // since l = -1 is invalid, default is set to n = m = l = -1
   if (lat_coord == prim::LatticeCoord(-1,-1,-1)) {
-    // create DBs at preview DB locations
-    undo_stack->beginMacro(tr("create dangling bonds at DB preview locations"));
+    // multiple creation, from using tool
     for (prim::DBDotPreview *db_prev : db_previews)
-      undo_stack->push(new CreateDB(db_prev->latticeCoord(), layer_index, this));
-    undo_stack->endMacro();
+      lat_list.append(db_prev->latticeCoord());
     destroyDBPreviews();
   } else {
-    //create DBs at give lat_coord
-    undo_stack->beginMacro(tr("create dangling bonds at DB preview locations"));
-    undo_stack->push(new CreateDB(lat_coord, layer_index, this));
-    undo_stack->endMacro();
+    //single creation, using command
+    lat_list.append(lat_coord);
   }
+  undo_stack->beginMacro(tr("create dangling bonds"));
+  for (prim::LatticeCoord lc: lat_list)
+    undo_stack->push(new CreateDB(lc, layer_index, this));
+  undo_stack->endMacro();
 }
 
 void gui::DesignPanel::createElectrode(QRect scene_rect)
