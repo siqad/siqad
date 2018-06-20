@@ -12,6 +12,8 @@
 #include <QObject>
 #include <QWidget>
 #include <QString>
+#include <QDebug>
+#include <QKeyEvent>
 
 #include <QRegExpValidator>
 #include <QLineEdit>
@@ -59,9 +61,14 @@ public:
   // get the text and clear
   QString pop();
 
+protected:
+  virtual void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
+
 private:
   Validator *validator;
-
+  QStringList *cmd_history;
+  int max_history;
+  int position;
 };
 
 } // end gui namespace

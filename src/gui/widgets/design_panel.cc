@@ -2128,7 +2128,7 @@ QList<QStringList> gui::DesignPanel::cleanItemArgs(QStringList item_args)
     arg.remove("(");
     arg.remove(")");
     // return arguments enclosed in parentheses in sets.
-    clean_args.append(arg.split(",", QString::SkipEmptyParts));
+    clean_args.append(arg.split(" ", QString::SkipEmptyParts));
   }
   return clean_args;
 }
@@ -2138,6 +2138,7 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
 {
   prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
   QList<QStringList> clean_args = cleanItemArgs(item_args);
+  qDebug() << clean_args;
   if (item_type == prim::Item::Electrode) {
     if ((clean_args[0].size() == 2) && (clean_args[1].size()) == 2) {
       int xmin = std::min(clean_args[0][0].toInt(), clean_args[1][0].toInt());

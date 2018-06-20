@@ -95,7 +95,7 @@ void gui::ApplicationGUI::initGUI()
   initSideBar();
 
   // initialise parser
-  initKeywords();
+  initParser();
 
   // inter-widget signals
   connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene,
@@ -445,8 +445,10 @@ void gui::ApplicationGUI::initLayerDock()
 }
 
 
-void gui::ApplicationGUI::initKeywords()
+void gui::ApplicationGUI::initParser()
 {
+  parser = new QCommandLineParser();
+  parser->setOptionsAfterPositionalArgumentsMode(QCommandLineParser::ParseAsPositionalArguments);
   input_kws.clear();
   input_kws.append(tr("add_item"));
   input_kws.append(tr("remove_item"));
@@ -457,7 +459,7 @@ void gui::ApplicationGUI::initKeywords()
 bool gui::ApplicationGUI::performCommand(QStringList cmds)
 {
   if (!cmds.isEmpty()){
-    QString command = cmds.takeFirst();
+    QString command = cmds.takeFirst().remove(" ");
     if (command == tr("add_item")) {
       commandAddItem(cmds);
     } else if (command == tr("remove_item")) {
@@ -478,8 +480,8 @@ void gui::ApplicationGUI::commandAddItem(QStringList args)
 {
   if (args.size() >= 3) {
     //item_type, layer_id, one set of arguments guaranteed present
-    QString item_type = args.takeFirst();
-    QString layer_id = args.takeFirst();
+    QString item_type = args.takeFirst().remove(" ");
+    QString layer_id = args.takeFirst().remove(" ");
     QStringList item_args = args;
     if (!design_pan->commandCreateItem(item_type, layer_id, item_args)) {
       dialog_pan->echo(tr("Item creation failed."));
@@ -494,7 +496,7 @@ void gui::ApplicationGUI::commandRemoveItem(QStringList args)
 {
   if (args.size() >= 2) {
     //item_type, one set of arguments guaranteed present
-    QString item_type = args.takeFirst();
+    QString item_type = args.takeFirst().remove(" ");
     QStringList item_args = args;
     if (!design_pan->commandRemoveItem(item_type, args)) {
       dialog_pan->echo(tr("Item removal failed."));
@@ -738,16 +740,19 @@ void gui::ApplicationGUI::parseInputField()
     //check the current setting for sending to terminal
     if(settings::AppSettings::instance()->value("log/override").toBool()){
       dialog_pan->echo(input);
-      QStringList inputs = input.split(" ", QString::SkipEmptyParts);
-      if (input_kws.contains(inputs.first())) {
+      QStringList inputs = input.split(",", QString::SkipEmptyParts);
+      // insert dummy in front, assumed to be program call.
+      inputs.prepend(tr("siqad"));
+      parser->process(inputs);
+      if (input_kws.contains(parser->positionalArguments().first())) {
         // keyword detected
-        if (!performCommand(inputs)) {
+        if (!performCommand(parser->positionalArguments())) {
           dialog_pan->echo(tr("Error occured with command '%1'")
-                              .arg(inputs.first()));
+                              .arg(parser->positionalArguments().first()));
         }
       } else {
         dialog_pan->echo(tr("Command '%1' not recognised.")
-                              .arg(inputs.first()));
+                              .arg(parser->positionalArguments().first()));
       }
     }
   }
