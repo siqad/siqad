@@ -29,6 +29,20 @@ prim::Electrode::Electrode(int lay_id, const QRectF &scene_rect)
   initElectrode(lay_id, scene_rect);
 }
 
+prim::Electrode::Electrode(int lay_id, QList<QStringList> points)
+  : prim::ResizableRect(prim::Item::Electrode)
+{
+  if (edge_width == -1){
+    constructStatics();
+  }
+  float xmin = std::min(points[0][0].toFloat(), points[1][0].toFloat());
+  float xmax = std::max(points[0][0].toFloat(), points[1][0].toFloat());
+  float ymin = std::min(points[0][1].toFloat(), points[1][1].toFloat());
+  float ymax = std::max(points[0][1].toFloat(), points[1][1].toFloat());
+  QRectF scene_rect = QRectF(QPointF(xmin, ymin), QPointF(xmax,ymax));
+  initElectrode(lay_id, scene_rect);
+}
+
 prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
   prim::ResizableRect(prim::Item::Electrode)
 {

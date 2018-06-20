@@ -2138,25 +2138,13 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
 {
   prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
   QList<QStringList> clean_args = cleanItemArgs(item_args);
-  qDebug() << clean_args;
   if (item_type == prim::Item::Electrode) {
     if ((clean_args[0].size() == 2) && (clean_args[1].size()) == 2) {
-      int xmin = std::min(clean_args[0][0].toInt(), clean_args[1][0].toInt());
-      int xmax = std::max(clean_args[0][0].toInt(), clean_args[1][0].toInt());
-      int ymin = std::min(clean_args[0][1].toInt(), clean_args[1][1].toInt());
-      int ymax = std::max(clean_args[0][1].toInt(), clean_args[1][1].toInt());
-      QRect scene_rect = QRect(QPoint(xmin, ymin), QPoint(xmax,ymax));
       setTool(gui::ToolType::ElectrodeTool);
       emit sig_toolChangeRequest(gui::ToolType::ElectrodeTool);
-      if (layer_id == "auto"){
-        createElectrode(scene_rect);
-      } else {
-        int layer_index = layer_id.toInt();
-        undo_stack->beginMacro(tr("create electrode with given corners"));
-        undo_stack->push(new CreateItem(layer_index, this,
-                                        new prim::Electrode(layer_index, scene_rect)));
-        undo_stack->endMacro();
-      }
+      int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
+      prim::Electrode* elec = new prim::Electrode(layer_index, clean_args);
+      undo_stack->push(new CreateItem(layer_index, this, elec));
       return true;
     }
   } else if (item_type == prim::Item::DBDot) {

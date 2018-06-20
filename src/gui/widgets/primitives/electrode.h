@@ -24,8 +24,11 @@ namespace prim{
     //! Clock types will vary over time. Fix types are static.
     enum ElectrodeType{Fix, Clock};
 
-    //! constructor, creates an electrode given two points.
+    //! constructor, creates an electrode given a QRectF.
     Electrode(int lay_id, const QRectF &scene_rect);
+
+    //! constructor, creates an electrode given two x and two y values.
+    Electrode(int lay_id, QList<QStringList> points);
 
     //! constructor, creates an electrode from the design file.
     Electrode(QXmlStreamReader *ls, QGraphicsScene *scene);
