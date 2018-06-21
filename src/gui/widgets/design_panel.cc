@@ -825,14 +825,26 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
         QGraphicsView::mouseMoveEvent(e);
         break;
       case Qt::MidButton:
+        {
         // middle button always pans
         mouse_pos_del = e->pos()-prev_pan_pos;
         dx = mouse_pos_del.x();
         dy = mouse_pos_del.y();
+        qreal xf = horizontalScrollBar()->value() - dx;
+        qreal yf = verticalScrollBar()->value() - dy;
+        if (xf > horizontalScrollBar()->maximum())
+          horizontalScrollBar()->setMaximum(xf);
+        else if (xf < horizontalScrollBar()->minimum())
+          horizontalScrollBar()->setMinimum(xf);
+        else if (yf > verticalScrollBar()->maximum())
+          verticalScrollBar()->setMaximum(yf);
+        else if (yf < verticalScrollBar()->minimum())
+          verticalScrollBar()->setMinimum(yf);
         verticalScrollBar()->setValue(verticalScrollBar()->value()-dy);
         horizontalScrollBar()->setValue(horizontalScrollBar()->value()-dx);
         prev_pan_pos = e->pos();
         break;
+        }
       case Qt::RightButton:
         // right button will be for context menus in future
         break;
