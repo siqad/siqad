@@ -164,6 +164,8 @@ namespace prim{
     static qreal pub_scale;
     static QColor lat_edge_col;
     static QColor lat_edge_col_pb;
+    static QColor lat_fill_col;
+    static QColor lat_fill_col_pb;
   };
 
   inline uint qHash(const prim::LatticeCoord &l_coord, uint seed=0)

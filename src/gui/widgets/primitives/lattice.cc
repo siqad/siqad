@@ -23,6 +23,8 @@ qreal prim::Lattice::lat_edge_width;
 qreal prim::Lattice::pub_scale;
 QColor prim::Lattice::lat_edge_col;
 QColor prim::Lattice::lat_edge_col_pb;
+QColor prim::Lattice::lat_fill_col;
+QColor prim::Lattice::lat_fill_col_pb;
 
 prim::Lattice::Lattice(const QString &fname, int lay_id)
   : Layer(tr("Lattice"),Layer::Lattice,0)
@@ -217,19 +219,36 @@ QImage prim::Lattice::tileableLatticeImage(QColor bkg_col, bool publish)
   qreal lat_diam_paint = lat_diam;
   qreal lat_edge_width_paint = lat_edge_width;
   QColor lat_edge_col_paint = publish ? lat_edge_col_pb : lat_edge_col;
+  QColor lat_fill_col_paint = publish ? lat_fill_col_pb : lat_fill_col;
   if (publish) {
     lat_diam_paint *= pub_scale;
     lat_edge_width_paint *= pub_scale;
   }
 
+  // First generate a bitmap background with latdots drawn with their top left
+  // coordinate at the site coord, rather than their centers. This is to 
+  // prevent dots at the edge from having cut-off parts when tiled.
   QPixmap bkg_pixmap(QSize(a_scene[0].x(), a_scene[1].y()));
   bkg_pixmap.fill(bkg_col);
   QPainter painter(&bkg_pixmap);
-  painter.setBrush(Qt::NoBrush);
-  painter.setPen(QPen(lat_edge_col_paint, lat_edge_width_paint));
-  painter.setRenderHint(QPainter::Antialiasing);
-  for (QPoint site : b_scene)
-    painter.drawEllipse(site.x()+lat_edge_width_paint, site.y()+lat_edge_width_paint, lat_diam_paint, lat_diam_paint);
+  //painter.setRenderHint(QPainter::Antialiasing);
+  painter.setRenderHint(QPainter::HighQualityAntialiasing);
+  for (QPoint site : b_scene) {
+    QRect circ(site.x()+lat_edge_width_paint,site.y()+lat_edge_width_paint,
+               lat_diam_paint, lat_diam_paint);
+
+    // outer edge
+    painter.setBrush(Qt::NoBrush);
+    painter.setPen(QPen(lat_edge_col_paint, lat_edge_width_paint));
+    painter.drawEllipse(circ);
+
+    // inner fill
+    circ.adjust(lat_edge_width_paint/2, lat_edge_width_paint/2, 
+                -lat_edge_width_paint/2, -lat_edge_width_paint/2);
+    painter.setBrush(lat_fill_col_paint);
+    painter.setPen(Qt::NoPen);
+    painter.drawEllipse(circ);
+  }
   painter.end();
 
   // then generate a single tile with properly offset circles
@@ -306,5 +325,7 @@ void prim::Lattice::constructStatics()
   lat_edge_width = gui_settings->get<qreal>("latdot/edge_width") * lat_diam;
   lat_edge_col = gui_settings->get<QColor>("latdot/edge_col");
   lat_edge_col_pb = gui_settings->get<QColor>("latdot/edge_col_pb");
+  lat_fill_col = gui_settings->get<QColor>("latdot/fill_col");
+  lat_fill_col_pb = gui_settings->get<QColor>("latdot/fill_col_pb");
   pub_scale = gui_settings->get<qreal>("latdot/publish_scale");
 }

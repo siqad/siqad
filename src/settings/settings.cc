@@ -192,12 +192,13 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("dbdotprev/fill_col", QColor(255,255,0));
 
   // lattice dot parameters
-  S->setValue("latdot/diameter", 1.0);                    // dot diameter
+  S->setValue("latdot/diameter", 0.8);                    // dot diameter
   S->setValue("latdot/edge_width", .15);                  // edge width rel. to diameter
+  S->setValue("latdot/zoom_vis_threshold", 0.03);         // the zoom threshold (m11 transform) below which the lattice stops being shown
   S->setValue("latdot/publish_scale", 1.8);                 // scaling for publish mode
-  S->setValue("latdot/edge_col", QColor(255,255,255,60)); // edge color
+  S->setValue("latdot/edge_col", QColor(0,0,0,0)); // edge color
   S->setValue("latdot/edge_col_pb", QColor(0,0,0,70));    // edge color (publish mode)
-  S->setValue("latdot/fill_col", QColor(0,0,0,0));        // fill color
+  S->setValue("latdot/fill_col", QColor(255,255,255,60));        // fill color
   S->setValue("latdot/fill_col_pb", QColor(0,0,0,0));     // fill color (publish mode)
   S->setValue("latdot/inner_fill", .5);                   // inner fill factor
   S->setValue("latdot/inner_fill_col", QColor(255, 255, 0));  // inner colour

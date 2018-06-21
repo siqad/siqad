@@ -28,6 +28,9 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   // initialize design panel
   initDesignPanel();
 
+  // initialize actions
+  initActions();
+
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
           this, &gui::DesignPanel::selectClicked);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_showProperty,
@@ -97,9 +100,6 @@ void gui::DesignPanel::initDesignPanel() {
   setFrameShadow(QFrame::Raised);
 
   setCacheMode(QGraphicsView::CacheBackground);
-
-  // initialize actions, some bound to keyboard shortcuts
-  initActions();
 
   // make lattice and surface layer
   buildLattice();
@@ -1095,6 +1095,13 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
   wheel_deg.setX(0);
   wheel_deg.setY(0);
 
+  // if the zoom level crosses a certain threshold, hide the lattice dots in the
+  // background
+  if (transform().m11() > gui_settings->get<qreal>("latdot/zoom_vis_threshold"))
+    setLatticeVisibility(true);
+  else
+    setLatticeVisibility(false);
+  
   //qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
 }
 
