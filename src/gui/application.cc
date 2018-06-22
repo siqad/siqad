@@ -63,6 +63,7 @@ gui::ApplicationGUI::~ApplicationGUI()
   delete settings::GUISettings::instance();
   delete settings::LatticeSettings::instance();
   delete prim::Emitter::instance();
+  delete parser;
 }
 
 

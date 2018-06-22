@@ -149,7 +149,19 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
 
   delete undo_stack;
 
+  //all the actions
+  delete action_undo;
+  delete action_redo;
+  delete action_cut;
+  delete action_copy;
+  delete action_paste;
+  delete action_delete;
+  delete action_form_agg;
+  delete action_split_agg;
+  delete action_dup;
+
   qDebug() << tr("Finished clearing design panel");
+
 }
 
 // reset

@@ -39,6 +39,7 @@ gui::InputField::InputField(QWidget *parent)
 gui::InputField::~InputField()
 {
   delete validator;
+  delete cmd_history;
 }
 
 

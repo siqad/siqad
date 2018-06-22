@@ -29,7 +29,6 @@ prim::DBDot::DBDot(prim::LatticeCoord l_coord, int lay_id, bool cp)
   initDBDot(l_coord, lay_id, cp);
 }
 
-
 prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *)
   : prim::Item(prim::Item::DBDot)
 {
