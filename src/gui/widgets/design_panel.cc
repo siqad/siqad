@@ -377,8 +377,28 @@ void gui::DesignPanel::setFills(float *fills)
 
 void gui::DesignPanel::screenshot(QPainter *painter, const QRect &region)
 {
+  // add lattice dot previews (vector graphics) instead of using the bitmap
+  // lattice background
+  QList<prim::LatticeCoord> coords = lattice->enclosedSites(region);
+  QList<prim::LatticeDotPreview*> latdot_previews;
+  for (prim::LatticeCoord coord : coords) {
+    prim::LatticeDotPreview *ldp = new prim::LatticeDotPreview(coord);
+    ldp->setPos(lattice->latticeCoord2ScenePos(coord));
+    ldp->setZValue(INT_MIN);
+    latdot_previews.append(ldp);
+    scene->addItem(ldp);
+  }
+
+  // render scene onto painter
   prev_screenshot_area = region;
   scene->render(painter, region, region);
+
+  // remove lattice dot previews
+  while (!latdot_previews.isEmpty()) {
+    prim::LatticeDotPreview *ldp = latdot_previews.takeLast();
+    scene->removeItem(ldp);
+    delete ldp;
+  }
 }
 
 
