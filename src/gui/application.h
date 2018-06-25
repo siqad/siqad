@@ -12,7 +12,6 @@
 // Qt includes
 #include <QtWidgets>
 #include <QDialog>
-#include <QCommandLineParser>
 
 // Global
 #include "../global.h"
@@ -152,7 +151,7 @@ namespace gui{
     void initDialogDock();        // initialise the bottom dialog dock
     void initSimVisualizeDock();  // initialise the side sim visualize dock
     void initLayerDock();         // initialise the side layer dock
-    void initParser();            // initialise the input field parser
+    void initKeywords();          // initialise the input field whitelist
     void setLayerManagerWidget(QWidget *widget);
 
     // prepare any extra actions not attched to an icon or meny
@@ -170,6 +169,8 @@ namespace gui{
     void commandAddItem(QStringList args);
     void commandRemoveItem(QStringList args);
     void commandEcho(QStringList args);
+    void commandHelp(QStringList args);
+    void commandRun(QStringList args);
 
     // VARIABLES
 
@@ -227,7 +228,6 @@ namespace gui{
 
     QString working_path;         // path currently in use
     QStringList input_kws;
-    QCommandLineParser* parser;
   };
 
 } // end gui namespace

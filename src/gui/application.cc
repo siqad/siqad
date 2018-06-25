@@ -63,7 +63,6 @@ gui::ApplicationGUI::~ApplicationGUI()
   delete settings::GUISettings::instance();
   delete settings::LatticeSettings::instance();
   delete prim::Emitter::instance();
-  delete parser;
 }
 
 
@@ -96,7 +95,7 @@ void gui::ApplicationGUI::initGUI()
   initSideBar();
 
   // initialise parser
-  initParser();
+  initKeywords();
 
   // inter-widget signals
   connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene,
@@ -446,16 +445,14 @@ void gui::ApplicationGUI::initLayerDock()
 }
 
 
-void gui::ApplicationGUI::initParser()
+void gui::ApplicationGUI::initKeywords()
 {
-  parser = new QCommandLineParser();
-  parser->setOptionsAfterPositionalArgumentsMode(QCommandLineParser::ParseAsPositionalArguments);
-  parser->setApplicationDescription("Helper");
-  parser->addHelpOption();
   input_kws.clear();
   input_kws.append(tr("add_item"));
   input_kws.append(tr("remove_item"));
   input_kws.append(tr("echo"));
+  input_kws.append(tr("help"));
+  input_kws.append(tr("run"));
 }
 
 
@@ -469,6 +466,10 @@ bool gui::ApplicationGUI::performCommand(QStringList cmds)
       commandRemoveItem(cmds);
     } else if (command == tr("echo")) {
       commandEcho(cmds);
+    } else if (command == tr("help")) {
+      commandHelp(cmds);
+    } else if (command == tr("run")) {
+      commandRun(cmds);
     } else {
       return false;
     }
@@ -509,11 +510,25 @@ void gui::ApplicationGUI::commandRemoveItem(QStringList args)
   }
 }
 
+
 void gui::ApplicationGUI::commandEcho(QStringList args)
 {
-  for (QString arg: args){
+  for (QString arg: args) {
     dialog_pan->echo(arg);
   }
+}
+
+
+void gui::ApplicationGUI::commandHelp(QStringList args)
+{
+  if (args.isEmpty()) {
+    dialog_pan->echo("Helping!");
+  }
+}
+
+void gui::ApplicationGUI::commandRun(QStringList args)
+{
+  dialog_pan->echo("RUNNING");
 }
 
 void gui::ApplicationGUI::setLayerManagerWidget(QWidget *widget)
@@ -745,17 +760,17 @@ void gui::ApplicationGUI::parseInputField()
       dialog_pan->echo(input);
       QStringList inputs = input.split(",", QString::SkipEmptyParts);
       // insert dummy in front, assumed to be program call.
-      inputs.prepend(tr("siqad"));
-      parser->process(inputs);
-      if (input_kws.contains(parser->positionalArguments().first())) {
+      // inputs.prepend(tr("siqad"));
+      // parser->process(inputs);
+      if (input_kws.contains(inputs.first())) {
         // keyword detected
-        if (!performCommand(parser->positionalArguments())) {
+        if (!performCommand(inputs)) {
           dialog_pan->echo(tr("Error occured with command '%1'")
-                              .arg(parser->positionalArguments().first()));
+                              .arg(inputs.first()));
         }
       } else {
         dialog_pan->echo(tr("Command '%1' not recognised.")
-                              .arg(parser->positionalArguments().first()));
+                              .arg(inputs.first()));
       }
     }
   }
