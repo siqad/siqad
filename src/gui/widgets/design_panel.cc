@@ -382,6 +382,8 @@ void gui::DesignPanel::screenshot(QPainter *painter, const QRect &region)
   QList<prim::LatticeCoord> coords = lattice->enclosedSites(region);
   QList<prim::LatticeDotPreview*> latdot_previews;
   for (prim::LatticeCoord coord : coords) {
+    if (lattice->isOccupied(coord))
+      continue;
     prim::LatticeDotPreview *ldp = new prim::LatticeDotPreview(coord);
     ldp->setPos(lattice->latticeCoord2ScenePos(coord));
     ldp->setZValue(INT_MIN);

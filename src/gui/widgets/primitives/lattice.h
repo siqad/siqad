@@ -164,8 +164,9 @@ namespace prim{
 
     // GUI statics
     static qreal lat_diam;
+    static qreal lat_diam_pb;
     static qreal lat_edge_width;
-    static qreal pub_scale;
+    static qreal lat_edge_width_pb;
     static QColor lat_edge_col;
     static QColor lat_edge_col_pb;
     static QColor lat_fill_col;
@@ -204,9 +205,9 @@ namespace prim{
     static QColor edge_col_pb;
 
     static qreal diameter;
+    static qreal diameter_pb;
     static qreal edge_width;
-    static qreal fill_fact;
-    static qreal pub_scale;
+    static qreal edge_width_pb;
   };  // end of LatticeDotPreview class
 
   //! Hash function for lattice coordinates

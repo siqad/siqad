@@ -19,8 +19,9 @@ qreal prim::Lattice::rtn_acc = 1e-3;
 int prim::Lattice::rtn_iters = 1;
 
 qreal prim::Lattice::lat_diam = -1;
+qreal prim::Lattice::lat_diam_pb;
 qreal prim::Lattice::lat_edge_width;
-qreal prim::Lattice::pub_scale;
+qreal prim::Lattice::lat_edge_width_pb;
 QColor prim::Lattice::lat_edge_col;
 QColor prim::Lattice::lat_edge_col_pb;
 QColor prim::Lattice::lat_fill_col;
@@ -224,14 +225,10 @@ QRectF prim::Lattice::tileApprox()
 
 QImage prim::Lattice::tileableLatticeImage(QColor bkg_col, bool publish)
 {
-  qreal lat_diam_paint = lat_diam;
-  qreal lat_edge_width_paint = lat_edge_width;
+  qreal lat_diam_paint = publish ? lat_diam_pb : lat_diam;
+  qreal lat_edge_width_paint = publish ? lat_edge_width_pb : lat_edge_width;
   QColor lat_edge_col_paint = publish ? lat_edge_col_pb : lat_edge_col;
   QColor lat_fill_col_paint = publish ? lat_fill_col_pb : lat_fill_col;
-  if (publish) {
-    lat_diam_paint *= pub_scale;
-    lat_edge_width_paint *= pub_scale;
-  }
 
   // First generate a bitmap background with latdots drawn with their top left
   // coordinate at the site coord, rather than their centers. This is to 
@@ -330,12 +327,13 @@ void prim::Lattice::constructStatics()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   lat_diam = gui_settings->get<qreal>("latdot/diameter") * prim::Item::scale_factor;
+  lat_diam_pb = gui_settings->get<qreal>("latdot/diameter_pb") * prim::Item::scale_factor;
   lat_edge_width = gui_settings->get<qreal>("latdot/edge_width") * lat_diam;
+  lat_edge_width_pb = gui_settings->get<qreal>("latdot/edge_width_pb") * lat_diam;
   lat_edge_col = gui_settings->get<QColor>("latdot/edge_col");
   lat_edge_col_pb = gui_settings->get<QColor>("latdot/edge_col_pb");
   lat_fill_col = gui_settings->get<QColor>("latdot/fill_col");
   lat_fill_col_pb = gui_settings->get<QColor>("latdot/fill_col_pb");
-  pub_scale = gui_settings->get<qreal>("latdot/publish_scale");
 }
 
 
@@ -348,9 +346,9 @@ QColor prim::LatticeDotPreview::edge_col;
 QColor prim::LatticeDotPreview::edge_col_pb;
 
 qreal prim::LatticeDotPreview::diameter=-1;
+qreal prim::LatticeDotPreview::diameter_pb;
 qreal prim::LatticeDotPreview::edge_width;
-qreal prim::LatticeDotPreview::fill_fact;
-qreal prim::LatticeDotPreview::pub_scale;
+qreal prim::LatticeDotPreview::edge_width_pb;
 
 prim::LatticeDotPreview::LatticeDotPreview(prim::LatticeCoord l_coord)
   : prim::Item(prim::Item::LatticeDotPreview), lat_coord(l_coord)
@@ -367,14 +365,10 @@ QRectF prim::LatticeDotPreview::boundingRect() const
 
 void prim::LatticeDotPreview::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget*)
 {
-  qreal diam_paint = diameter;
-  qreal edge_width_paint = edge_width;
+  qreal diam_paint = display_mode == gui::ScreenshotMode ? diameter_pb : diameter;
+  qreal edge_width_paint = display_mode == gui::ScreenshotMode ? edge_width_pb : edge_width;
   QColor edge_col_paint = display_mode == gui::ScreenshotMode ? edge_col_pb : edge_col;
   QColor fill_col_paint = display_mode == gui::ScreenshotMode ? fill_col_pb : fill_col;
-  if (display_mode == gui::ScreenshotMode) {
-    diam_paint *= pub_scale;
-    edge_width_paint *= pub_scale;
-  }
 
   //QRectF rect = boundingRect();
   QRectF rect(0,0,diam_paint,diam_paint);
@@ -402,8 +396,9 @@ void prim::LatticeDotPreview::constructStatics()
   edge_col_pb = gui_settings->get<QColor>("latdot/edge_col_pb");
 
   diameter = gui_settings->get<qreal>("latdot/diameter")*prim::Item::scale_factor;
+  diameter_pb = gui_settings->get<qreal>("latdot/diameter_pb")*prim::Item::scale_factor;
   edge_width = gui_settings->get<qreal>("latdot/edge_width")*diameter;
-  pub_scale = gui_settings->get<qreal>("latdot/publish_scale");
+  edge_width_pb = gui_settings->get<qreal>("latdot/edge_width_pb")*diameter;
 
   // TODO add publish version
 }
