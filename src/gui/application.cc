@@ -527,15 +527,32 @@ void gui::ApplicationGUI::commandHelp(QStringList args)
         .arg(file.errorString()).toLatin1().constData(), 0);
     return;
   }
-  QXmlStreamReader rs(&file);
-  rs.readNextStartElement();
-  dialog_pan->echo(rs.readElementText());
-  while (!rs.atEnd()) {
-    dialog_pan->echo(rs.readElementText());
-    rs.readNext();
+  QStringList clean_args = QStringList();
+  for (QString arg: args) {
+    clean_args.append(arg.remove(" "));
   }
-  if (args.isEmpty()) {
-    dialog_pan->echo("Helping!");
+  QString command, description, usage;
+  QXmlStreamReader rs(&file);
+  rs.readNext();
+  while (!rs.atEnd()) {
+    if (rs.isStartElement()) {
+      if (rs.name().toString() == "command") {
+        command = rs.readElementText();
+      } else if (rs.name().toString() == "text") {
+        description = rs.readElementText();
+      } else if (rs.name().toString() == "usage") {
+        usage = rs.readElementText();
+      }
+    } else if (rs.isEndElement()) {
+      if (rs.name().toString() == "entry") {
+        if ((clean_args.isEmpty()) || clean_args.contains(command)) {
+          dialog_pan->echo(QString("\nCommand:  ")+command);
+          dialog_pan->echo(QString("  Description:  ")+description);
+          dialog_pan->echo(QString("  Usage:  ")+usage);
+        }
+      }
+    }
+    rs.readNext();
   }
   file.close();
 }

@@ -1,21 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<help_text>
-  <general>
-    <text>General</text>
-  </general>
-  <add_item>
-    <text>Add Item</text>
-  </add_item>
-  <remove_item>
-    <text>Remove Item</text>
-  </remove_item>
-  <echo>
-    <text>Echo</text>
-  </echo>
-  <help>
-    <text>Help</text>
-  </help>
-  <run>
-    <text>Run</text>
-  </run>
-</help_text>
+  <help_text>
+    <entry>
+      <command>help</command>
+      <text>Shows help text for all commands. If a specific command or commands are given as arguments, only help for those commands will be shown.</text>
+      <usage>"help" or "help, [command], [command2], ..."</usage>
+    </entry>
+    <entry>
+      <command>add_item</command>
+      <text>Adds an item to the scene. Currently, only Electrodes and DBDots are supported for creation through the console. Generally, an item will require a layer index (or "auto"), and specific item arguments. For example, an Electrode requires an item index and two points in the form "(x1 y1), (x2 y2)", while a DBDot requires an item index and the lattice coordinate in the form (n,m,l).</text>
+      <usage>"add_item, [item_type], [layer_id], [item_arguments]" e.g. "add_item, Electrode, auto, (0 0), (1000 1000)"</usage>
+    </entry>
+    <entry>
+      <command>remove_item</command>
+      <text>Removes an item from the scene. Items can be removed via location specification (all items of given type at that location are removed) or by specifying an item index and layer.</text>
+      <usage>"remove_item, [item_type], [location]" or "remove_item, [item_type], [layer_id], [item_id]" e.g. "remove_item, Electrode, (0 0)" or "remove_item, DBDot, 1, 1"</usage>
+    </entry>
+    <entry>
+      <command>echo</command>
+      <text>Echoes the given string</text>
+      <usage>"echo Example"</usage>
+    </entry>
+    <entry>
+      <command>run</command>
+      <text>Run</text>
+      <usage>TBA</usage>
+    </entry>
+  </help_text>
