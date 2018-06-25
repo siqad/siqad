@@ -521,9 +521,23 @@ void gui::ApplicationGUI::commandEcho(QStringList args)
 
 void gui::ApplicationGUI::commandHelp(QStringList args)
 {
+  QFile file(":/help_text.xml");
+  if (!file.open(QFile::ReadOnly | QFile::Text)) {
+    qFatal(QObject::tr("Error when opening properties file to read: %1")
+        .arg(file.errorString()).toLatin1().constData(), 0);
+    return;
+  }
+  QXmlStreamReader rs(&file);
+  rs.readNextStartElement();
+  dialog_pan->echo(rs.readElementText());
+  while (!rs.atEnd()) {
+    dialog_pan->echo(rs.readElementText());
+    rs.readNext();
+  }
   if (args.isEmpty()) {
     dialog_pan->echo("Helping!");
   }
+  file.close();
 }
 
 void gui::ApplicationGUI::commandRun(QStringList args)

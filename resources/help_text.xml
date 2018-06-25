@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<help_text>
+  <general>
+    <text>General</text>
+  </general>
+  <add_item>
+    <text>Add Item</text>
+  </add_item>
+  <remove_item>
+    <text>Remove Item</text>
+  </remove_item>
+  <echo>
+    <text>Echo</text>
+  </echo>
+  <help>
+    <text>Help</text>
+  </help>
+  <run>
+    <text>Run</text>
+  </run>
+</help_text>

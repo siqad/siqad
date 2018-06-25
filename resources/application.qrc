@@ -20,5 +20,6 @@
   <file>ico/lattice.svg</file>
   <file>ico/unknown.svg</file>
   <file>ico/screenshotarea.svg</file>
+	<file>help_text.xml</file>
 </qresource>
 </RCC>
