@@ -76,6 +76,10 @@ namespace prim{
     //! it in lattice coordinates and updates the reference QPointF site_pos.
     LatticeCoord nearestSite(const QPointF &scene_pos, QPointF &nearest_site_pos) const;
 
+    //! Return a QList of lattice site coordinates enclosed in a given QRectF 
+    //! in scene coordinates. WARNING this won't work with rotated lattices!
+    QList<LatticeCoord> enclosedSites(const QRectF &scene_rect) const;
+
     //! Return all sites enclosed in given lattice coordinates. WARNING this won't
     //! work with rotated lattices!
     QList<prim::LatticeCoord> enclosedSites(const prim::LatticeCoord &coord1,
@@ -160,23 +164,58 @@ namespace prim{
 
     // GUI statics
     static qreal lat_diam;
+    static qreal lat_diam_pb;
     static qreal lat_edge_width;
-    static qreal pub_scale;
+    static qreal lat_edge_width_pb;
     static QColor lat_edge_col;
     static QColor lat_edge_col_pb;
-  };
+    static QColor lat_fill_col;
+    static QColor lat_fill_col_pb;
+  };  // end of Lattice class
 
+  class LatticeDotPreview : public Item
+  {
+  public:
+    //! Construct a lattice dot preview at the given lattice coordinate.
+    LatticeDotPreview(prim::LatticeCoord l_coord);
+
+    //! Destructor.
+    ~LatticeDotPreview() {}
+
+    // Accessors
+
+    //! Get the lattice coordinates of the lattice dot preview.
+    prim::LatticeCoord latticeCoord() {return lat_coord;}
+
+    // Graphics
+    virtual QRectF boundingRect() const override;
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
+
+  private: 
+    //! Construct static variables on first creation.
+    void constructStatics();
+
+    // Variables
+    prim::LatticeCoord lat_coord; // lattice coordinates of the lattice dot preview.
+
+    // Static class variables
+    static QColor fill_col;
+    static QColor fill_col_pb;
+    static QColor edge_col;
+    static QColor edge_col_pb;
+
+    static qreal diameter;
+    static qreal diameter_pb;
+    static qreal edge_width;
+    static qreal edge_width_pb;
+  };  // end of LatticeDotPreview class
+
+  //! Hash function for lattice coordinates
   inline uint qHash(const prim::LatticeCoord &l_coord, uint seed=0)
   {
     return ::qHash(l_coord.n, seed) + ::qHash(l_coord.m, seed) + ::qHash(l_coord.l, seed);
   }
 
-/*inline bool operator==(const prim::LatticeCoord coord1, const prim::LatticeCoord coord2)
-{
-  if (coord1.n == coord2.n && coord1.m == coord2.m && coord1.l == coord2.l)
-    return true;
-  return false;
-}*/
 } // end prim namespace
 
 

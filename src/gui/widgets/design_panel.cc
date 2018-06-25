@@ -28,6 +28,9 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   // initialize design panel
   initDesignPanel();
 
+  // initialize actions
+  initActions();
+
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
           this, &gui::DesignPanel::selectClicked);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_showProperty,
@@ -97,9 +100,6 @@ void gui::DesignPanel::initDesignPanel() {
   setFrameShadow(QFrame::Raised);
 
   setCacheMode(QGraphicsView::CacheBackground);
-
-  // initialize actions, some bound to keyboard shortcuts
-  initActions();
 
   // make lattice and surface layer
   buildLattice();
@@ -389,8 +389,30 @@ void gui::DesignPanel::setFills(float *fills)
 
 void gui::DesignPanel::screenshot(QPainter *painter, const QRect &region)
 {
+  // add lattice dot previews (vector graphics) instead of using the bitmap
+  // lattice background
+  QList<prim::LatticeCoord> coords = lattice->enclosedSites(region);
+  QList<prim::LatticeDotPreview*> latdot_previews;
+  for (prim::LatticeCoord coord : coords) {
+    if (lattice->isOccupied(coord))
+      continue;
+    prim::LatticeDotPreview *ldp = new prim::LatticeDotPreview(coord);
+    ldp->setPos(lattice->latticeCoord2ScenePos(coord));
+    ldp->setZValue(INT_MIN);
+    latdot_previews.append(ldp);
+    scene->addItem(ldp);
+  }
+
+  // render scene onto painter
   prev_screenshot_area = region;
   scene->render(painter, region, region);
+
+  // remove lattice dot previews
+  while (!latdot_previews.isEmpty()) {
+    prim::LatticeDotPreview *ldp = latdot_previews.takeLast();
+    scene->removeItem(ldp);
+    delete ldp;
+  }
 }
 
 
@@ -837,14 +859,26 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
         QGraphicsView::mouseMoveEvent(e);
         break;
       case Qt::MidButton:
+        {
         // middle button always pans
         mouse_pos_del = e->pos()-prev_pan_pos;
         dx = mouse_pos_del.x();
         dy = mouse_pos_del.y();
+        qreal xf = horizontalScrollBar()->value() - dx;
+        qreal yf = verticalScrollBar()->value() - dy;
+        if (xf > horizontalScrollBar()->maximum())
+          horizontalScrollBar()->setMaximum(xf);
+        else if (xf < horizontalScrollBar()->minimum())
+          horizontalScrollBar()->setMinimum(xf);
+        else if (yf > verticalScrollBar()->maximum())
+          verticalScrollBar()->setMaximum(yf);
+        else if (yf < verticalScrollBar()->minimum())
+          verticalScrollBar()->setMinimum(yf);
         verticalScrollBar()->setValue(verticalScrollBar()->value()-dy);
         horizontalScrollBar()->setValue(horizontalScrollBar()->value()-dx);
         prev_pan_pos = e->pos();
         break;
+        }
       case Qt::RightButton:
         // right button will be for context menus in future
         break;
@@ -1095,6 +1129,13 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
   wheel_deg.setX(0);
   wheel_deg.setY(0);
 
+  // if the zoom level crosses a certain threshold, hide the lattice dots in the
+  // background
+  if (transform().m11() > gui_settings->get<qreal>("latdot/zoom_vis_threshold"))
+    setLatticeVisibility(true);
+  else
+    setLatticeVisibility(false);
+  
   //qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
 }
 

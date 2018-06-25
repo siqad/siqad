@@ -36,7 +36,6 @@ QString prim::Item::getQStringItemType()
   switch (item_type) {
     case prim::Item::Aggregate: return "Aggregate";
     case prim::Item::DBDot: return "DBDot";
-    case prim::Item::LatticeDot: return "LatticeDot";
     case prim::Item::Ghost: return "Ghost";
     case prim::Item::GhostDot: return "GhostDot";
     case prim::Item::Electrode: return "Electrode";
@@ -56,7 +55,6 @@ prim::Item::ItemType prim::Item::getEnumItemType(QString type)
 {
   if (type == "Aggregate") return prim::Item::Aggregate;
   else if (type == "DBDot") return prim::Item::DBDot;
-  else if (type == "LatticeDot") return prim::Item::LatticeDot;
   else if (type == "Ghost") return prim::Item::Ghost;
   else if (type == "GhostDot") return prim::Item::GhostDot;
   else if (type == "Electrode") return prim::Item::Electrode;

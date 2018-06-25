@@ -185,26 +185,28 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("dbdot/fill_col_elec_hovered", QColor(255,90,90));  // dot fill color for dot showing electron
   S->setValue("dbdot/fill_col_elec_pb", QColor(255,90,90));  // dot fill color for dot showing electron
 
-  S->setValue("dbdotprev/diameter", 1.0);
+  S->setValue("dbdotprev/diameter", 2.0);
   S->setValue("dbdotprev/edge_width", .15);
   S->setValue("dbdotprev/fill_fact", .5);
   S->setValue("dbdotprev/edge_col", QColor(0,0,0,0));
   S->setValue("dbdotprev/fill_col", QColor(255,255,0));
 
   // lattice dot parameters
-  S->setValue("latdot/diameter", 1.0);                    // dot diameter
+  S->setValue("latdot/diameter", 0.8);                    // dot diameter
+  S->setValue("latdot/diameter_pb", 2.0);
   S->setValue("latdot/edge_width", .15);                  // edge width rel. to diameter
-  S->setValue("latdot/publish_scale", 1.8);                 // scaling for publish mode
-  S->setValue("latdot/edge_col", QColor(255,255,255,60)); // edge color
-  S->setValue("latdot/edge_col_pb", QColor(0,0,0,70));    // edge color (publish mode)
-  S->setValue("latdot/fill_col", QColor(0,0,0,0));        // fill color
+  S->setValue("latdot/edge_width_pb", .2);
+  S->setValue("latdot/zoom_vis_threshold", 0.03);         // the zoom threshold (m11 transform) below which the lattice stops being shown
+  S->setValue("latdot/edge_col", QColor(0,0,0,0)); // edge color
+  S->setValue("latdot/edge_col_pb", QColor("#BABABA"));    // edge color (publish mode)
+  S->setValue("latdot/fill_col", QColor(255,255,255,60));        // fill color
   S->setValue("latdot/fill_col_pb", QColor(0,0,0,0));     // fill color (publish mode)
   S->setValue("latdot/inner_fill", .5);                   // inner fill factor
   S->setValue("latdot/inner_fill_col", QColor(255, 255, 0));  // inner colour
   S->setValue("latdot/inner_fill_col_pb", QColor(255, 255, 0));  // inner colour (publish mode)
 
   // ghost parameters
-  S->setValue("ghost/dot_diameter", .6);                    // ghost dot diameter
+  S->setValue("ghost/dot_diameter", 1.0);                    // ghost dot diameter
   S->setValue("ghost/valid_col", QColor(0, 255, 0, 255));   // color for valid placements
   S->setValue("ghost/invalid_col", QColor(255, 0, 0, 255)); // color for invalid placements
 

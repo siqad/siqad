@@ -19,10 +19,13 @@ qreal prim::Lattice::rtn_acc = 1e-3;
 int prim::Lattice::rtn_iters = 1;
 
 qreal prim::Lattice::lat_diam = -1;
+qreal prim::Lattice::lat_diam_pb;
 qreal prim::Lattice::lat_edge_width;
-qreal prim::Lattice::pub_scale;
+qreal prim::Lattice::lat_edge_width_pb;
 QColor prim::Lattice::lat_edge_col;
 QColor prim::Lattice::lat_edge_col_pb;
+QColor prim::Lattice::lat_fill_col;
+QColor prim::Lattice::lat_fill_col_pb;
 
 prim::Lattice::Lattice(const QString &fname, int lay_id)
   : Layer(tr("Lattice"),Layer::Lattice,0)
@@ -124,6 +127,14 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos, QPointF 
 }
 
 
+QList<prim::LatticeCoord> prim::Lattice::enclosedSites(const QRectF &scene_rect) const
+{
+  LatticeCoord coord1 = nearestSite(scene_rect.topLeft());
+  LatticeCoord coord2 = nearestSite(scene_rect.bottomRight());
+  return enclosedSites(coord1, coord2);
+}
+
+
 QList<prim::LatticeCoord> prim::Lattice::enclosedSites(const prim::LatticeCoord &coord1,
     const prim::LatticeCoord &coord2) const
 {
@@ -214,22 +225,35 @@ QRectF prim::Lattice::tileApprox()
 
 QImage prim::Lattice::tileableLatticeImage(QColor bkg_col, bool publish)
 {
-  qreal lat_diam_paint = lat_diam;
-  qreal lat_edge_width_paint = lat_edge_width;
+  qreal lat_diam_paint = publish ? lat_diam_pb : lat_diam;
+  qreal lat_edge_width_paint = publish ? lat_edge_width_pb : lat_edge_width;
   QColor lat_edge_col_paint = publish ? lat_edge_col_pb : lat_edge_col;
-  if (publish) {
-    lat_diam_paint *= pub_scale;
-    lat_edge_width_paint *= pub_scale;
-  }
+  QColor lat_fill_col_paint = publish ? lat_fill_col_pb : lat_fill_col;
 
+  // First generate a bitmap background with latdots drawn with their top left
+  // coordinate at the site coord, rather than their centers. This is to 
+  // prevent dots at the edge from having cut-off parts when tiled.
   QPixmap bkg_pixmap(QSize(a_scene[0].x(), a_scene[1].y()));
   bkg_pixmap.fill(bkg_col);
   QPainter painter(&bkg_pixmap);
-  painter.setBrush(Qt::NoBrush);
-  painter.setPen(QPen(lat_edge_col_paint, lat_edge_width_paint));
-  painter.setRenderHint(QPainter::Antialiasing);
-  for (QPoint site : b_scene)
-    painter.drawEllipse(site.x()+lat_edge_width_paint, site.y()+lat_edge_width_paint, lat_diam_paint, lat_diam_paint);
+  //painter.setRenderHint(QPainter::Antialiasing);
+  painter.setRenderHint(QPainter::HighQualityAntialiasing);
+  for (QPoint site : b_scene) {
+    QRect circ(site.x()+lat_edge_width_paint,site.y()+lat_edge_width_paint,
+               lat_diam_paint, lat_diam_paint);
+
+    // outer edge
+    painter.setBrush(Qt::NoBrush);
+    painter.setPen(QPen(lat_edge_col_paint, lat_edge_width_paint));
+    painter.drawEllipse(circ);
+
+    // inner fill
+    circ.adjust(lat_edge_width_paint/2, lat_edge_width_paint/2, 
+                -lat_edge_width_paint/2, -lat_edge_width_paint/2);
+    painter.setBrush(lat_fill_col_paint);
+    painter.setPen(Qt::NoPen);
+    painter.drawEllipse(circ);
+  }
   painter.end();
 
   // then generate a single tile with properly offset circles
@@ -303,8 +327,78 @@ void prim::Lattice::constructStatics()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   lat_diam = gui_settings->get<qreal>("latdot/diameter") * prim::Item::scale_factor;
+  lat_diam_pb = gui_settings->get<qreal>("latdot/diameter_pb") * prim::Item::scale_factor;
   lat_edge_width = gui_settings->get<qreal>("latdot/edge_width") * lat_diam;
+  lat_edge_width_pb = gui_settings->get<qreal>("latdot/edge_width_pb") * lat_diam;
   lat_edge_col = gui_settings->get<QColor>("latdot/edge_col");
   lat_edge_col_pb = gui_settings->get<QColor>("latdot/edge_col_pb");
-  pub_scale = gui_settings->get<qreal>("latdot/publish_scale");
+  lat_fill_col = gui_settings->get<QColor>("latdot/fill_col");
+  lat_fill_col_pb = gui_settings->get<QColor>("latdot/fill_col_pb");
+}
+
+
+
+// LatticeDotPreview Class
+// Static variables
+QColor prim::LatticeDotPreview::fill_col;
+QColor prim::LatticeDotPreview::fill_col_pb;
+QColor prim::LatticeDotPreview::edge_col;
+QColor prim::LatticeDotPreview::edge_col_pb;
+
+qreal prim::LatticeDotPreview::diameter=-1;
+qreal prim::LatticeDotPreview::diameter_pb;
+qreal prim::LatticeDotPreview::edge_width;
+qreal prim::LatticeDotPreview::edge_width_pb;
+
+prim::LatticeDotPreview::LatticeDotPreview(prim::LatticeCoord l_coord)
+  : prim::Item(prim::Item::LatticeDotPreview), lat_coord(l_coord)
+{
+  if (diameter == -1)
+    constructStatics();
+}
+
+QRectF prim::LatticeDotPreview::boundingRect() const
+{
+  qreal width = diameter + edge_width;
+  return QRectF(-.5*width, -.5*width, width, width);
+}
+
+void prim::LatticeDotPreview::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget*)
+{
+  qreal diam_paint = display_mode == gui::ScreenshotMode ? diameter_pb : diameter;
+  qreal edge_width_paint = display_mode == gui::ScreenshotMode ? edge_width_pb : edge_width;
+  QColor edge_col_paint = display_mode == gui::ScreenshotMode ? edge_col_pb : edge_col;
+  QColor fill_col_paint = display_mode == gui::ScreenshotMode ? fill_col_pb : fill_col;
+
+  //QRectF rect = boundingRect();
+  QRectF rect(0,0,diam_paint,diam_paint);
+  rect.moveCenter(boundingRect().center());
+
+  // outer edge
+  painter->setBrush(Qt::NoBrush);
+  painter->setPen(QPen(edge_col_paint, edge_width_paint));
+  painter->drawEllipse(rect);
+
+  // inner fill
+  rect.adjust(edge_width/2, edge_width/2, -edge_width/2, -edge_width/2);
+  painter->setBrush(fill_col_paint);
+  painter->setPen(Qt::NoPen);
+  painter->drawEllipse(rect);
+}
+
+void prim::LatticeDotPreview::constructStatics()
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+
+  fill_col = gui_settings->get<QColor>("latdot/fill_col");
+  fill_col_pb = gui_settings->get<QColor>("latdot/fill_col_pb");
+  edge_col = gui_settings->get<QColor>("latdot/edge_col");
+  edge_col_pb = gui_settings->get<QColor>("latdot/edge_col_pb");
+
+  diameter = gui_settings->get<qreal>("latdot/diameter")*prim::Item::scale_factor;
+  diameter_pb = gui_settings->get<qreal>("latdot/diameter_pb")*prim::Item::scale_factor;
+  edge_width = gui_settings->get<qreal>("latdot/edge_width")*diameter;
+  edge_width_pb = gui_settings->get<qreal>("latdot/edge_width_pb")*diameter;
+
+  // TODO add publish version
 }
