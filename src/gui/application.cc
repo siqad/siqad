@@ -450,6 +450,8 @@ void gui::ApplicationGUI::initParser()
 {
   parser = new QCommandLineParser();
   parser->setOptionsAfterPositionalArgumentsMode(QCommandLineParser::ParseAsPositionalArguments);
+  parser->setApplicationDescription("Helper");
+  parser->addHelpOption();
   input_kws.clear();
   input_kws.append(tr("add_item"));
   input_kws.append(tr("remove_item"));

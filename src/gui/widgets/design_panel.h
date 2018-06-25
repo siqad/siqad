@@ -320,6 +320,7 @@ namespace gui{
 
     // sim visualization
     QList<prim::DBDot*> db_dots_result;
+    QList<prim::Item*> sim_results_items;  // holding temporary items
 
     // INTERNAL METHODS
 

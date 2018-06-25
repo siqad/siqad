@@ -31,7 +31,7 @@ void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container
   setZValue(-1);
   setPos(graph_container.topLeft());
   // flags
-  setFlag(QGraphicsItem::ItemIsSelectable, true);
+  setFlag(QGraphicsItem::ItemIsSelectable, false);
 }
 
 QRectF prim::PotPlot::boundingRect() const

@@ -86,6 +86,8 @@ void gui::DesignPanel::initDesignPanel() {
 
   tool_type = gui::ToolType::NoneTool;     // now setTool will update the tool
 
+  sim_results_items.clear();
+
   // set view behaviour
   setTransformationAnchor(QGraphicsView::NoAnchor);
   setResizeAnchor(QGraphicsView::AnchorViewCenter);
@@ -661,6 +663,11 @@ void gui::DesignPanel::clearSimResults()
       db->setShowElec(0);
     db_dots_result.clear();
   }
+  while(!sim_results_items.isEmpty()){
+    prim::Item* temp_item = sim_results_items.takeFirst();
+    removeItemFromScene(temp_item);
+    temp_item = 0;
+  }
 }
 
 void gui::DesignPanel::displayPotentialPlot(QImage potential_plot, QRectF graph_container)
@@ -668,6 +675,7 @@ void gui::DesignPanel::displayPotentialPlot(QImage potential_plot, QRectF graph_
   qDebug() << tr("graph_container height: ") << graph_container.height();
   qDebug() << tr("graph_container width: ") << graph_container.width();
   qDebug() << tr("graph_container topLeft: ") << graph_container.topLeft().x() << tr(", ") << graph_container.topLeft().y();
+  setDisplayMode(SimDisplayMode);
   createPotPlot(potential_plot, graph_container);
 }
 
@@ -1135,7 +1143,7 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
     setLatticeVisibility(true);
   else
     setLatticeVisibility(false);
-  
+
   //qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
 }
 
@@ -1712,12 +1720,14 @@ void gui::DesignPanel::CreatePotPlot::create()
 {
   pp = new prim::PotPlot(potential_plot, graph_container);
   dp->addItemToScene(static_cast<prim::Item*>(pp));
+  dp->sim_results_items.append(static_cast<prim::Item*>(pp));
 }
 
 void gui::DesignPanel::CreatePotPlot::destroy()
 {
   if(pp != 0){
     dp->removeItemFromScene(static_cast<prim::Item*>(pp));  // deletes PotPlot
+    dp->sim_results_items.removeOne(static_cast<prim::Item*>(pp));
     pp = 0;
   }
 }
