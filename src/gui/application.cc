@@ -58,7 +58,7 @@ gui::ApplicationGUI::~ApplicationGUI()
 
   // free memory, parent delete child Widgets so Graphical Items are already
   // handled. Still need to free Settings
-
+  delete commander;
   delete settings::AppSettings::instance();
   delete settings::GUISettings::instance();
   delete settings::LatticeSettings::instance();
@@ -95,7 +95,7 @@ void gui::ApplicationGUI::initGUI()
   initSideBar();
 
   // initialise parser
-  initKeywords();
+  initCommander();
 
   // inter-widget signals
   connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene,
@@ -445,121 +445,16 @@ void gui::ApplicationGUI::initLayerDock()
 }
 
 
-void gui::ApplicationGUI::initKeywords()
+void gui::ApplicationGUI::initCommander()
 {
-  input_kws.clear();
-  input_kws.append(tr("add_item"));
-  input_kws.append(tr("remove_item"));
-  input_kws.append(tr("echo"));
-  input_kws.append(tr("help"));
-  input_kws.append(tr("run"));
-}
-
-
-bool gui::ApplicationGUI::performCommand(QStringList cmds)
-{
-  if (!cmds.isEmpty()){
-    QString command = cmds.takeFirst().remove(" ");
-    if (command == tr("add_item")) {
-      commandAddItem(cmds);
-    } else if (command == tr("remove_item")) {
-      commandRemoveItem(cmds);
-    } else if (command == tr("echo")) {
-      commandEcho(cmds);
-    } else if (command == tr("help")) {
-      commandHelp(cmds);
-    } else if (command == tr("run")) {
-      commandRun(cmds);
-    } else {
-      return false;
-    }
-    return true;
-  } else {
-    return false;
-  }
-}
-
-
-void gui::ApplicationGUI::commandAddItem(QStringList args)
-{
-  if (args.size() >= 3) {
-    //item_type, layer_id, one set of arguments guaranteed present
-    QString item_type = args.takeFirst().remove(" ");
-    QString layer_id = args.takeFirst().remove(" ");
-    QStringList item_args = args;
-    if (!design_pan->commandCreateItem(item_type, layer_id, item_args)) {
-      dialog_pan->echo(tr("Item creation failed."));
-    }
-  } else {
-    dialog_pan->echo(tr("add_item takes at least 3 arguments, %1 provided.").arg(args.size()));
-  }
-}
-
-
-void gui::ApplicationGUI::commandRemoveItem(QStringList args)
-{
-  if (args.size() >= 2) {
-    //item_type, one set of arguments guaranteed present
-    QString item_type = args.takeFirst().remove(" ");
-    QStringList item_args = args;
-    if (!design_pan->commandRemoveItem(item_type, args)) {
-      dialog_pan->echo(tr("Item removal failed."));
-    }
-  } else {
-    dialog_pan->echo(tr("remove_item takes at least 2 arguments, %1 provided.").arg(args.size()));
-  }
-}
-
-
-void gui::ApplicationGUI::commandEcho(QStringList args)
-{
-  for (QString arg: args) {
-    dialog_pan->echo(arg);
-  }
-}
-
-
-void gui::ApplicationGUI::commandHelp(QStringList args)
-{
-  QFile file(":/help_text.xml");
-  if (!file.open(QFile::ReadOnly | QFile::Text)) {
-    qFatal(QObject::tr("Error when opening properties file to read: %1")
-        .arg(file.errorString()).toLatin1().constData(), 0);
-    return;
-  }
-  QStringList clean_args = QStringList();
-  for (QString arg: args) {
-    clean_args.append(arg.remove(" "));
-  }
-  QString command, description, usage;
-  QXmlStreamReader rs(&file);
-  rs.readNext();
-  while (!rs.atEnd()) {
-    if (rs.isStartElement()) {
-      if (rs.name().toString() == "command") {
-        command = rs.readElementText();
-      } else if (rs.name().toString() == "text") {
-        description = rs.readElementText();
-      } else if (rs.name().toString() == "usage") {
-        usage = rs.readElementText();
-      }
-    } else if (rs.isEndElement()) {
-      if (rs.name().toString() == "entry") {
-        if ((clean_args.isEmpty()) || clean_args.contains(command)) {
-          dialog_pan->echo(QString("\nCommand:  ")+command);
-          dialog_pan->echo(QString("  Description:  ")+description);
-          dialog_pan->echo(QString("  Usage:  ")+usage);
-        }
-      }
-    }
-    rs.readNext();
-  }
-  file.close();
-}
-
-void gui::ApplicationGUI::commandRun(QStringList args)
-{
-  dialog_pan->echo("RUNNING");
+  commander = new Commander();
+  commander->setDesignPanel(design_pan);
+  commander->setDialogPanel(dialog_pan);
+  commander->addKeyword(tr("add_item"));
+  commander->addKeyword(tr("remove_item"));
+  commander->addKeyword(tr("echo"));
+  commander->addKeyword(tr("help"));
+  commander->addKeyword(tr("run"));
 }
 
 void gui::ApplicationGUI::setLayerManagerWidget(QWidget *widget)
@@ -784,26 +679,9 @@ void gui::ApplicationGUI::parseInputField()
 {
   // get input from input_field, remove leading/trailing whitespace
   QString input = input_field->pop();
-  // if input string is not empty, do something
+  // if input string is not empty, send it to commander to do the rest.
   if(!input.isEmpty()){
-    //check the current setting for sending to terminal
-    if(settings::AppSettings::instance()->value("log/override").toBool()){
-      dialog_pan->echo(input);
-      QStringList inputs = input.split(",", QString::SkipEmptyParts);
-      // insert dummy in front, assumed to be program call.
-      // inputs.prepend(tr("siqad"));
-      // parser->process(inputs);
-      if (input_kws.contains(inputs.first())) {
-        // keyword detected
-        if (!performCommand(inputs)) {
-          dialog_pan->echo(tr("Error occured with command '%1'")
-                              .arg(inputs.first()));
-        }
-      } else {
-        dialog_pan->echo(tr("Command '%1' not recognised.")
-                              .arg(inputs.first()));
-      }
-    }
+    commander->parseInputs(input);
   }
 }
 

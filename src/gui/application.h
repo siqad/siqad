@@ -27,6 +27,7 @@
 #include "widgets/sim_manager.h"
 #include "widgets/sim_visualize_panel.h"
 #include "widgets/primitives/sim_job.h" // TODO move these stuff to SimManager later
+#include "commander.h"
 
 
 // declare Application GUI in Ui namespace
@@ -151,7 +152,7 @@ namespace gui{
     void initDialogDock();        // initialise the bottom dialog dock
     void initSimVisualizeDock();  // initialise the side sim visualize dock
     void initLayerDock();         // initialise the side layer dock
-    void initKeywords();          // initialise the input field whitelist
+    void initCommander();         // initialise the input field whitelist
     void setLayerManagerWidget(QWidget *widget);
 
     // prepare any extra actions not attched to an icon or meny
@@ -163,14 +164,6 @@ namespace gui{
     // application settings
     void loadSettings();  // load mainwindow settings from the settings instance
     void saveSettings();  // save mainwindow settings to the settings instance
-
-    // performing commands
-    bool performCommand(QStringList cmds);
-    void commandAddItem(QStringList args);
-    void commandRemoveItem(QStringList args);
-    void commandEcho(QStringList args);
-    void commandHelp(QStringList args);
-    void commandRun(QStringList args);
 
     // VARIABLES
 
@@ -226,8 +219,9 @@ namespace gui{
     int autosave_ind=0;        // current autosave file index
     int autosave_num;          // number of autosaves to keep
 
-    QString working_path;         // path currently in use
-    QStringList input_kws;
+    QString working_path;      // path currently in use
+    Commander* commander;      // Handles commands
+
   };
 
 } // end gui namespace

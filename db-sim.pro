@@ -119,7 +119,9 @@ HEADERS += \
   src/gui/widgets/layer_manager.h \
   src/gui/widgets/sim_manager.h \
   src/gui/widgets/sim_visualize_panel.h \
-  src/gui/widgets/afm_panel.h
+  src/gui/widgets/afm_panel.h \
+	src/gui/commander.h
+
 
 
 SOURCES += \
@@ -134,7 +136,8 @@ SOURCES += \
   src/gui/widgets/layer_manager.cc \
   src/gui/widgets/sim_manager.cc \
   src/gui/widgets/sim_visualize_panel.cc \
-  src/gui/widgets/afm_panel.cc
+	src/gui/widgets/afm_panel.cc \
+	src/gui/commander.cc
 
 
 #####################
