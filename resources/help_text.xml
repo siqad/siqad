@@ -18,11 +18,11 @@
     <entry>
       <command>echo</command>
       <text>Echoes the given string</text>
-      <usage>"echo Example"</usage>
+      <usage>"echo, Example"</usage>
     </entry>
     <entry>
       <command>run</command>
-      <text>Runs one or more scripts inside the console in sequence. See other help text entries for supported commands and their usage.</text>
-      <usage>"run [absolute file path]"</usage>
+      <text>Runs one or more scripts inside the console in sequence. Please do not use spaces in the file paths. See other help text entries for supported commands and their usage.</text>
+      <usage>"run, [absolute file path]"</usage>
     </entry>
   </help_text>
