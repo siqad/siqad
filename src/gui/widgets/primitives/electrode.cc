@@ -35,10 +35,10 @@ prim::Electrode::Electrode(int lay_id, QList<QStringList> points)
   if (edge_width == -1){
     constructStatics();
   }
-  float xmin = std::min(points[0][0].toFloat(), points[1][0].toFloat());
-  float xmax = std::max(points[0][0].toFloat(), points[1][0].toFloat());
-  float ymin = std::min(points[0][1].toFloat(), points[1][1].toFloat());
-  float ymax = std::max(points[0][1].toFloat(), points[1][1].toFloat());
+  float xmin = std::min(points[0][0].toFloat(), points[1][0].toFloat())*scale_factor;
+  float xmax = std::max(points[0][0].toFloat(), points[1][0].toFloat())*scale_factor;
+  float ymin = std::min(points[0][1].toFloat(), points[1][1].toFloat())*scale_factor;
+  float ymax = std::max(points[0][1].toFloat(), points[1][1].toFloat())*scale_factor;
   QRectF scene_rect = QRectF(QPointF(xmin, ymin), QPointF(xmax,ymax));
   initElectrode(lay_id, scene_rect);
 }
