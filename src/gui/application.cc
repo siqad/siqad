@@ -57,7 +57,7 @@ gui::ApplicationGUI::~ApplicationGUI()
   layer_dock->setParent(0);
 
   // free memory, parent delete child Widgets so Graphical Items are already
-  // handled. Still need to free Settings
+  // handled. Still need to free Settings and commander
   delete commander;
   delete settings::AppSettings::instance();
   delete settings::GUISettings::instance();

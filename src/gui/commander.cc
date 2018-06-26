@@ -15,11 +15,6 @@ gui::Commander::Commander()
   clearKeywords();
 }
 
-void gui::Commander::doStuff()
-{
-  dialog_pan->echo(QString("Commander says hello"));
-}
-
 void gui::Commander::addKeyword(QString keyword)
 {
   keyword.remove(" ");

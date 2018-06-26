@@ -23,14 +23,11 @@ namespace gui{
 
     //! constructor
     Commander();
-    // Commander(gui::DesignPanel *design_pan, gui::DialogPanel *dialog_pan);
 
     //! destructor
     ~Commander(){};
 
     // public methods
-    void doStuff();
-
     //! Set design panel
     void setDesignPanel(DesignPanel *des_pan){design_pan = des_pan;}
     //! Set dialog panel
