@@ -1065,7 +1065,7 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   } else if (working_path.isEmpty() || flag==SaveAs) {
     save_dialog.setDefaultSuffix("sqd");
     write_path = save_dialog.getSaveFileName(this, tr("Save File"),
-                  save_dir.filePath("new-db-layout.sqd"), tr("SQD (*.sqd);;QAD (*.qad);;XML (*.xml);;All files (*)"));
+                  save_dir.filePath("new-db-layout.sqd"), tr("SQD (*.sqd);;All files (*)"));
     if (write_path.isEmpty())
       return false;
   } else {
@@ -1185,7 +1185,7 @@ void gui::ApplicationGUI::openFromFile()
   QFileDialog load_dialog;
   load_dialog.setDefaultSuffix("qad");
   QString prompt_path = load_dialog.getOpenFileName(this, tr("Open File"),
-      save_dir.absolutePath(), tr("QAD (*.qad);;XML (*.xml);;All files (*.*)"));
+      save_dir.absolutePath(), tr("SQD (*.sqd);;All files (*.*)"));
 
   if(prompt_path.isEmpty())
     return;
