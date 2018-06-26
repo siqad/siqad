@@ -22,7 +22,7 @@
     </entry>
     <entry>
       <command>run</command>
-      <text>Run</text>
-      <usage>TBA</usage>
+      <text>Runs one or more scripts inside the console in sequence. See other help text entries for supported commands and their usage.</text>
+      <usage>"run [absolute file path]"</usage>
     </entry>
   </help_text>

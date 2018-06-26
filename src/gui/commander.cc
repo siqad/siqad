@@ -12,13 +12,7 @@
 
 gui::Commander::Commander()
 {
-  qDebug() << "COMMANDER";
   clearKeywords();
-}
-
-gui::Commander::~Commander()
-{
-  qDebug() << "~COMMANDER";
 }
 
 void gui::Commander::doStuff()
@@ -153,5 +147,26 @@ void gui::Commander::commandHelp(QStringList args)
 
 void gui::Commander::commandRun(QStringList args)
 {
-  dialog_pan->echo("RUNNING");
+  for (QString arg: args) {
+    arg.remove(" ");
+    QFile file(arg);
+    QFileInfo qfi(file);
+    if ((file.exists()) && (qfi.suffix()=="sqs")) {
+      dialog_pan->echo(QObject::tr("Running file %1.").arg(file.fileName()));
+      if (file.open(QIODevice::ReadOnly))
+      {
+         QTextStream in(&file);
+         while (!in.atEnd())
+         {
+            QString line = in.readLine();
+            if (!line.isEmpty()){
+              parseInputs(line);
+            }
+         }
+         file.close();
+      }
+    } else {
+      dialog_pan->echo(QObject::tr("Error opening '%1'. Check that file exists and that the extension is '.sqs'.").arg(file.fileName()));
+    }
+  }
 }

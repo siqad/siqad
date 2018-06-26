@@ -10,8 +10,8 @@
 #ifndef _GUI_COMMANDER_H_
 #define _GUI_COMMANDER_H_
 
-
 #include <QtWidgets>
+#include <QDir>
 #include "widgets/design_panel.h"
 #include "widgets/dialog_panel.h"
 
@@ -26,7 +26,7 @@ namespace gui{
     // Commander(gui::DesignPanel *design_pan, gui::DialogPanel *dialog_pan);
 
     //! destructor
-    ~Commander();
+    ~Commander(){};
 
     // public methods
     void doStuff();
