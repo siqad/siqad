@@ -118,7 +118,6 @@ namespace prim{
     // Resize
     QList<QAction*> actions_list;
     QAction* action_show_prop;
-    QAction* action_something_else;
   };
 }
 

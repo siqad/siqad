@@ -120,9 +120,6 @@ void prim::Electrode::performAction(QAction *action)
   //switch case doesnt work on non-ints, use if else.
   if (action->text() == action_show_prop->text()) {
     showProps();
-  } else if (action->text() == action_something_else->text()) {
-    qDebug() << QObject::tr("action_something_else");
-    qDebug() << pos();
   } else {
     qDebug() << QObject::tr("Matched no action.");
   }
@@ -131,9 +128,7 @@ void prim::Electrode::performAction(QAction *action)
 void prim::Electrode::createActions()
 {
   action_show_prop = new QAction(QObject::tr("Show properties"));
-  action_something_else = new QAction(QObject::tr("Something else"));
   actions_list.append(action_show_prop);
-  actions_list.append(action_something_else);
 }
 
 void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)
