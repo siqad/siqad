@@ -2236,8 +2236,8 @@ bool gui::DesignPanel::commandRemoveItem(QString type, QStringList item_args)
   if ((clean_args.size() == 1) && (clean_args.first().size() == 2)) {
     QStringList point = clean_args.first();
     // Remove items by location
-    float x = point.first().toFloat();
-    float y = point.last().toFloat();
+    float x = point.first().toFloat()*prim::Item::scale_factor;
+    float y = point.last().toFloat()*prim::Item::scale_factor;
     QPointF pos = QPointF(x,y);
     if (itemAt(mapFromScene(pos))) {
       QList<QGraphicsItem*> gitems = items(mapFromScene(pos));
@@ -2286,7 +2286,7 @@ bool gui::DesignPanel::commandMoveItem(QString type, QStringList item_args)
   QList<QStringList> clean_args = cleanItemArgs(item_args);
   if ((clean_args.size() == 2) && (clean_args.first().size() == 2) && (clean_args.last().size() == 2)) {
     QStringList point = clean_args.takeFirst();
-    QPointF pos = QPointF(point.first().toFloat(), point.last().toFloat());
+    QPointF pos = QPointF(point.first().toFloat()*prim::Item::scale_factor, point.last().toFloat()*prim::Item::scale_factor);
     point = clean_args.takeFirst();
     QPointF offset = QPointF(point.first().toFloat()*prim::Item::scale_factor, point.last().toFloat()*prim::Item::scale_factor);
     if (itemAt(mapFromScene(pos))) {
