@@ -2219,6 +2219,7 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
       int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
       prim::Electrode* elec = new prim::Electrode(layer_index, clean_args);
       undo_stack->push(new CreateItem(layer_index, this, elec));
+      emit sig_toolChangeRequest(gui::ToolType::SelectTool);
       return true;
     }
   } else if (item_type == prim::Item::DBDot) {
@@ -2233,6 +2234,7 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
         int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
         emit sig_toolChangeRequest(gui::ToolType::DBGenTool);
         createDBs(prim::LatticeCoord(n, m, l));
+        emit sig_toolChangeRequest(gui::ToolType::SelectTool);
         return true;
       }
     }
