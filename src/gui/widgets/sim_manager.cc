@@ -234,6 +234,7 @@ void SimManager::updateSimParams()
 
 void SimManager::quickRun()
 {
+  updateJobNameDateTime();
   submitSimSetup();
 }
 
