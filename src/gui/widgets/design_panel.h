@@ -68,6 +68,9 @@ namespace gui{
     //! switch statement to properly delete items
     void commandRemoveHandler(prim::Item *item);
 
+    //! Move an item on the design panel using a command from the dialog panel.
+    bool commandMoveItem(QString item_type, QStringList item_args);
+
     QList<QStringList> cleanItemArgs(QStringList item_args);
 
     //! add a new Item to the Layer at the given index of the stack. If layer_index==-1,

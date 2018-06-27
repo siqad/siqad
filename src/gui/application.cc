@@ -455,6 +455,7 @@ void gui::ApplicationGUI::initCommander()
   commander->addKeyword(tr("echo"));
   commander->addKeyword(tr("help"));
   commander->addKeyword(tr("run"));
+  commander->addKeyword(tr("move_item"));
 }
 
 void gui::ApplicationGUI::setLayerManagerWidget(QWidget *widget)

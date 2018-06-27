@@ -47,7 +47,7 @@ namespace gui{
     void commandEcho(QStringList args);
     void commandHelp(QStringList args);
     void commandRun(QStringList args);
-    void commandMove(QStringList args);
+    void commandMoveItem(QStringList args);
 
     DesignPanel *design_pan;
     DialogPanel *dialog_pan;

@@ -2202,7 +2202,7 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
   prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
   QList<QStringList> clean_args = cleanItemArgs(item_args);
   if (item_type == prim::Item::Electrode) {
-    if ((clean_args[0].size() == 2) && (clean_args[1].size()) == 2) {
+    if ((clean_args.size() == 2) && (clean_args.first().size() == 2) && (clean_args.last().size()) == 2) {
       setTool(gui::ToolType::ElectrodeTool);
       emit sig_toolChangeRequest(gui::ToolType::ElectrodeTool);
       int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
@@ -2211,14 +2211,15 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
       return true;
     }
   } else if (item_type == prim::Item::DBDot) {
-    if (clean_args[0].size() == 3) {
-      int n = clean_args[0][0].toInt();
-      int m = clean_args[0][1].toInt();
-      int l = clean_args[0][2].toInt();
+    if ((clean_args.size() == 1) && (clean_args[0].size() == 3)) {
+      int n = clean_args.first()[0].toInt();
+      int m = clean_args.first()[1].toInt();
+      int l = clean_args.first()[2].toInt();
       if ((l < 0) || (l > 1)) {  // Check for invalid
         return false;
       } else {
         setTool(gui::ToolType::DBGenTool);
+        int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
         emit sig_toolChangeRequest(gui::ToolType::DBGenTool);
         createDBs(prim::LatticeCoord(n, m, l));
         return true;
@@ -2232,11 +2233,12 @@ bool gui::DesignPanel::commandRemoveItem(QString type, QStringList item_args)
 {
   prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
   QList<QStringList> clean_args = cleanItemArgs(item_args);
-  if (clean_args[0].size() == 2) {
+  if ((clean_args.size() == 1) && (clean_args.first().size() == 2)) {
+    QStringList point = clean_args.first();
     // Remove items by location
-    int x = clean_args[0][0].toInt();
-    int y = clean_args[0][1].toInt();
-    QPoint pos = QPoint(x,y);
+    float x = point.first().toFloat();
+    float y = point.last().toFloat();
+    QPointF pos = QPointF(x,y);
     if (itemAt(mapFromScene(pos))) {
       QList<QGraphicsItem*> gitems = items(mapFromScene(pos));
       for (QGraphicsItem* item: gitems){
@@ -2246,10 +2248,10 @@ bool gui::DesignPanel::commandRemoveItem(QString type, QStringList item_args)
       }
       return true;
     }
-  } else if ((clean_args[0].size() == 1) && (clean_args[1].size() == 1)) {
+  } else if ((clean_args.size() == 2) && (clean_args[0].size() == 1) && (clean_args[1].size() == 1)) {
     // Remove items by indices
-    int lay_id = clean_args[0][0].toInt();
-    int item_id = clean_args[1][0].toInt();
+    int lay_id = clean_args.first().first().toInt();
+    int item_id = clean_args.last().first().toInt();
     prim::Layer *layer = layman->getLayer(lay_id);
     if (layer) {
       prim::Item *item = layer->getItem(item_id);
@@ -2276,6 +2278,47 @@ void gui::DesignPanel::commandRemoveHandler(prim::Item *item)
       undo_stack->push(new CreateItem(item->layer_id, this, item, true));
   }
 }
+
+
+bool gui::DesignPanel::commandMoveItem(QString type, QStringList item_args)
+{
+  prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
+  QList<QStringList> clean_args = cleanItemArgs(item_args);
+  if ((clean_args.size() == 2) && (clean_args.first().size() == 2) && (clean_args.last().size() == 2)) {
+    QStringList point = clean_args.takeFirst();
+    QPointF pos = QPointF(point.first().toFloat(), point.last().toFloat());
+    point = clean_args.takeFirst();
+    QPointF offset = QPointF(point.first().toFloat()*prim::Item::scale_factor, point.last().toFloat()*prim::Item::scale_factor);
+    if (itemAt(mapFromScene(pos))) {
+      QList<QGraphicsItem*> gitems = items(mapFromScene(pos));
+      for (QGraphicsItem* item: gitems){
+        undo_stack->beginMacro(tr("create potential plot with given corners"));
+        if (static_cast<prim::Item*>(item)->item_type == item_type) {
+          undo_stack->push(new MoveItem(static_cast<prim::Item*>(item), offset, this));
+        }
+        undo_stack->endMacro();
+      }
+      return true;
+    }
+  }
+  else if ((clean_args.size() == 3) && (clean_args[0].size() == 1)
+        && (clean_args[1].size() == 1) && (clean_args[2].size() == 2)) {
+    int lay_id = clean_args.takeFirst().first().toInt();
+    int item_id = clean_args.takeFirst().first().toInt();
+    prim::Layer *layer = layman->getLayer(lay_id);
+    if (layer) {
+      prim::Item *item = layer->getItem(item_id);
+      if (item) {
+        QStringList point = clean_args.takeFirst();
+        QPoint offset = QPoint(point.first().toFloat()*prim::Item::scale_factor, point.last().toFloat()*prim::Item::scale_factor);
+        undo_stack->push(new MoveItem(static_cast<prim::Item*>(item), offset, this));
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 
 // Undo/Redo Methods
 
