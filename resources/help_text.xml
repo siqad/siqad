@@ -25,4 +25,9 @@
       <text>Runs one or more scripts inside the console in sequence. Please do not use spaces in the file paths. See other help text entries for supported commands and their usage.</text>
       <usage>"run, [absolute file path]"</usage>
     </entry>
+    <entry>
+      <command>move</command>
+      <text>Moves an existing item by an offset.</text>
+      <usage>"move, [item_type], [current_location], [offsets]"</usage>
+    </entry>
   </help_text>

@@ -54,6 +54,8 @@ bool gui::Commander::performCommand(QStringList cmds)
       commandHelp(cmds);
     } else if (command == QObject::tr("run")) {
       commandRun(cmds);
+    } else if (command == QObject::tr("move")) {
+      commandMove(cmds);
     } else {
       return false;
     }
@@ -146,7 +148,7 @@ void gui::Commander::commandRun(QStringList args)
     arg.remove(" ");
     QFile file(arg);
     QFileInfo qfi(file);
-    if ((file.exists()) && (qfi.suffix()=="sqs")) {
+    if ((file.exists()) && (qfi.suffix()=="sqs")) { //check for extension
       dialog_pan->echo(QObject::tr("Running file %1.").arg(file.fileName()));
       if (file.open(QIODevice::ReadOnly))
       {
@@ -163,5 +165,19 @@ void gui::Commander::commandRun(QStringList args)
     } else {
       dialog_pan->echo(QObject::tr("Error opening '%1'. Check that file exists and that the extension is '.sqs'.").arg(file.fileName()));
     }
+  }
+}
+
+void gui::Commander::commandMoveItem(QStringList args)
+{
+  if (args.size() >= 2) {
+    //item_type, one set of arguments guaranteed present
+    QString item_type = args.takeFirst().remove(" ");
+    QStringList item_args = args;
+    // if (!design_pan->commandRemoveItem(item_type, args)) {
+    //   dialog_pan->echo(QObject::tr("Item removal failed."));
+    // }
+  } else {
+    dialog_pan->echo(QObject::tr("remove_item takes at least 2 arguments, %1 provided.").arg(args.size()));
   }
 }
