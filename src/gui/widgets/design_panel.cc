@@ -670,6 +670,17 @@ void gui::DesignPanel::clearSimResults()
   }
 }
 
+void gui::DesignPanel::clearPlots()
+{
+  setDisplayMode(DesignMode);
+  for (prim::Item* temp_item: sim_results_items) {
+    if (temp_item->item_type == prim::Item::PotPlot) {
+      removeItemFromScene(temp_item);
+      temp_item = 0;
+    }
+  }
+}
+
 void gui::DesignPanel::displayPotentialPlot(QImage potential_plot, QRectF graph_container)
 {
   qDebug() << tr("graph_container height: ") << graph_container.height();

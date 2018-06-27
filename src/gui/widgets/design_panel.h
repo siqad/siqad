@@ -169,6 +169,8 @@ namespace gui{
     //! Clear the simulation result from SimAnneal
     void clearSimResults();
 
+    void clearPlots();
+
     //! Display the simulation result from PoisSolver
     void displayPotentialPlot(QImage potential_plot, QRectF graph_container);
 

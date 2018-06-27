@@ -102,6 +102,8 @@ void gui::ApplicationGUI::initGUI()
           design_pan, &gui::DesignPanel::displaySimResults);
   connect(sim_visualize, &gui::SimVisualize::showPotPlotOnScene,
           design_pan, &gui::DesignPanel::displayPotentialPlot);
+  connect(sim_visualize, &gui::SimVisualize::clearPotPlots,
+          design_pan, &gui::DesignPanel::clearPlots);
   connect(design_pan, &gui::DesignPanel::sig_quickRunSimulation,
           sim_manager, &gui::SimManager::quickRun);
 
