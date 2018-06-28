@@ -2219,6 +2219,7 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
       int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
       prim::Electrode* elec = new prim::Electrode(layer_index, clean_args);
       undo_stack->push(new CreateItem(layer_index, this, elec));
+      emit sig_toolChangeRequest(gui::ToolType::SelectTool);
       return true;
     }
   } else if (item_type == prim::Item::DBDot) {
@@ -2233,6 +2234,7 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
         int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
         emit sig_toolChangeRequest(gui::ToolType::DBGenTool);
         createDBs(prim::LatticeCoord(n, m, l));
+        emit sig_toolChangeRequest(gui::ToolType::SelectTool);
         return true;
       }
     }
@@ -2295,34 +2297,36 @@ bool gui::DesignPanel::commandMoveItem(QString type, QStringList item_args)
 {
   prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
   QList<QStringList> clean_args = cleanItemArgs(item_args);
-  if ((clean_args.size() == 2) && (clean_args.first().size() == 2) && (clean_args.last().size() == 2)) {
+  if ((clean_args.size() == 2) && (clean_args.first().size() == 2)) {
     QStringList point = clean_args.takeFirst();
     QPointF pos = QPointF(point.first().toFloat()*prim::Item::scale_factor, point.last().toFloat()*prim::Item::scale_factor);
-    point = clean_args.takeFirst();
-    QPointF offset = QPointF(point.first().toFloat()*prim::Item::scale_factor, point.last().toFloat()*prim::Item::scale_factor);
-    if (itemAt(mapFromScene(pos))) {
+    QPointF offset = findMoveOffset(clean_args.first());
+    if (offset.isNull())
+      return false;
+    else if (itemAt(mapFromScene(pos))) {
       QList<QGraphicsItem*> gitems = items(mapFromScene(pos));
+      undo_stack->beginMacro(tr("moving item"));
       for (QGraphicsItem* item: gitems){
-        undo_stack->beginMacro(tr("create potential plot with given corners"));
-        if (static_cast<prim::Item*>(item)->item_type == item_type) {
+        if (static_cast<prim::Item*>(item)->item_type == item_type)
           undo_stack->push(new MoveItem(static_cast<prim::Item*>(item), offset, this));
-        }
-        undo_stack->endMacro();
       }
+      undo_stack->endMacro();
       return true;
     }
   }
   else if ((clean_args.size() == 3) && (clean_args[0].size() == 1)
-        && (clean_args[1].size() == 1) && (clean_args[2].size() == 2)) {
+        && (clean_args[1].size() == 1)) {
     int lay_id = clean_args.takeFirst().first().toInt();
     int item_id = clean_args.takeFirst().first().toInt();
     prim::Layer *layer = layman->getLayer(lay_id);
     if (layer) {
       prim::Item *item = layer->getItem(item_id);
       if (item) {
-        QStringList point = clean_args.takeFirst();
-        QPoint offset = QPoint(point.first().toFloat()*prim::Item::scale_factor, point.last().toFloat()*prim::Item::scale_factor);
-        undo_stack->push(new MoveItem(static_cast<prim::Item*>(item), offset, this));
+        QPointF offset = findMoveOffset(clean_args.first());
+        if (offset.isNull())
+          return false;
+        else
+          undo_stack->push(new MoveItem(static_cast<prim::Item*>(item), offset, this));
         return true;
       }
     }
@@ -2330,6 +2334,29 @@ bool gui::DesignPanel::commandMoveItem(QString type, QStringList item_args)
   return false;
 }
 
+QPointF gui::DesignPanel::findMoveOffset(QStringList clean_args)
+{
+  QPointF offset;
+  if (clean_args.size() == 2) {
+    offset = QPointF(clean_args.first().toFloat(), clean_args.last().toFloat());
+  } else if (clean_args.size() == 3) {
+    int n = clean_args[0].toInt();
+    int m = clean_args[1].toInt();
+    int l = clean_args[2].toInt();
+    if ((qAbs(l) > 1)) {  //can be -1, 0, or 1. If anything else, default to 0.
+      l = 0;
+    }
+    QPointF offset_n_m = lattice->latticeCoord2PhysLoc(prim::LatticeCoord(n,m,0));
+    // account for negative l movement
+    QPointF offset_l = lattice->latticeCoord2PhysLoc(prim::LatticeCoord(0,0,qAbs(l)));
+    offset_l = (l >= 0) ? offset_l : -offset_l;
+    offset = offset_n_m + offset_l;
+  } else {
+    return QPointF(0.0,0.0);
+  }
+  offset *= prim::Item::scale_factor;
+  return offset;
+}
 
 // Undo/Redo Methods
 
