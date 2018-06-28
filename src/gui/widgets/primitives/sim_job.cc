@@ -164,27 +164,29 @@ bool SimJob::readResults()
           if(rs.name() == "dist"){
             // read dist, convert each character to bool and store to a temp map
             float energy = -1;
+            int config_count = 1;
             for (QXmlStreamAttribute &attr : rs.attributes()) {
               if (attr.name().toString() == QLatin1String("energy")) {
                 energy = attr.value().toFloat();
+              } else if (attr.name().toString() == QLatin1String("count")) {
+                config_count = attr.value().toInt();
               }
             }
 
             // convert distribution to array of int
             QString dist = rs.readElementText();
-            if (elec_dists_map.contains(dist)) {
-              elec_dists_map[dist].count++;
-              continue;
-            }
 
             elecDist read_dist;
             read_dist.energy = energy;
+            read_dist.config_count = config_count;
 
-            for (QString charge_str : dist)
+            for (QString charge_str : dist) {
               read_dist.dist.append(charge_str.toInt());
+              read_dist.elec_count += read_dist.dist.back();
+            }
 
             elec_dists_map[dist] = read_dist;
-            //qDebug() << tr("Distribution: %1, Energy: %2").arg(dist).arg(read_dist.energy);
+            //qDebug() << tr("Distribution: %1, Energy: %2, Count: %3").arg(dist).arg(read_dist.energy).arg(config_count);
           }
         }
         rs.readNext();
@@ -277,6 +279,8 @@ bool SimJob::readResults()
 void SimJob::processElecDists(QMap<QString, elecDist> elec_dists_map)
 {
   // sort
+  // TODO it is unecessary to start with a QMap for elec_dists now, stream line
+  // the code.
   elec_dists.append(elec_dists_map.values());
   std::sort(elec_dists.begin(), elec_dists.end());
 
@@ -287,11 +291,54 @@ void SimJob::processElecDists(QMap<QString, elecDist> elec_dists_map)
   for (int db_ind=0; db_ind<db_count; db_ind++) {
     elec_dists_avg.push_back(0);
     for (int result_ind=0; result_ind<result_count; result_ind++) {
-      elec_dists_avg[db_ind] += elec_dists[result_ind].dist[db_ind] * elec_dists[result_ind].count;
-      if (db_ind == 0) dist_count += elec_dists[result_ind].count;
+      elec_dists_avg[db_ind] += elec_dists[result_ind].dist[db_ind] * 
+                                elec_dists[result_ind].config_count;
+      if (db_ind == 0) dist_count += elec_dists[result_ind].config_count;
     }
     elec_dists_avg[db_ind] /= dist_count;
   }
+
+  // save available electron counts
+  QList<int> elec_counts_occurances;  // accumulation of #config for each #elec_count
+  for (elecDist dist : elec_dists) {
+    int ind = elec_counts.indexOf(dist.elec_count);
+    if (ind >= 0) {
+      elec_counts_occurances[ind] += dist.config_count;
+    } else {
+      elec_counts.append(dist.elec_count);
+      elec_counts_occurances.append(dist.config_count);
+    }
+  }
+
+  // save the electron count with the most number of occurances, the default
+  // dist selection will be the lowest energy state with this number of electrons
+  preferred_elec_count = elec_counts.at(std::max_element(elec_counts_occurances.begin(), 
+        elec_counts_occurances.end()) - elec_counts_occurances.begin());
+  std::sort(elec_counts.begin(), elec_counts.end());
+
+  // find the default index of electron distribution to show
+  for (int i=0; i<elec_dists.size(); i++) {
+    if (elec_dists[i].elec_count == preferred_elec_count) {
+      default_elec_dist_ind = i;
+      break;
+    }
+  }
+
+  applyElecDistsFilter();
+}
+
+
+void SimJob::applyElecDistsFilter(int elec_count)
+{
+  if (elec_count == -1) {
+    elec_dists_filtered = elec_dists;
+    return;
+  }
+
+  elec_dists_filtered.clear();
+  for (elecDist dist : elec_dists)
+    if (dist.elec_count == elec_count)
+      elec_dists_filtered.append(dist);
 }
 
 

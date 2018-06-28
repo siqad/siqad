@@ -210,14 +210,14 @@ QRectF prim::Lattice::tileApprox()
   qreal r = QPointF::dotProduct(a[0], a[1])/QPointF::dotProduct(a[0], a[0]);
   QPair<int,int> frac = rationalize(r);
 
-  qDebug() << tr("Lattice skew: %1 :: ( %2 / %3 )").arg(r).arg(frac.first).arg(frac.second);
+  //qDebug() << tr("Lattice skew: %1 :: ( %2 / %3 )").arg(r).arg(frac.first).arg(frac.second);
   qreal width = qSqrt(QPointF::dotProduct(a[0], a[0]));
   QPointF v = frac.first*a[0] - frac.second*a[1];
   qreal height = qSqrt(QPointF::dotProduct(v,v));
 
   QRectF rect(0,0,width,height);
 
-  qDebug() << tr("Width: %1 :: Height: %2").arg(width).arg(height);
+  //qDebug() << tr("Width: %1 :: Height: %2").arg(width).arg(height);
 
   return rect;
 }
@@ -306,7 +306,7 @@ QPair<int,int> prim::Lattice::rationalize(qreal x, int k)
   int n = qFloor(x);
   qreal r = x - n;
 
-  qDebug() << tr("%1 :: %2 :: %3").arg(x).arg(n).arg(r);
+  //qDebug() << tr("%1 :: %2 :: %3").arg(x).arg(n).arg(r);
   QPair<int,int> pair;
 
   if ( r < rtn_acc || k == rtn_iters ){
