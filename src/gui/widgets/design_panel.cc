@@ -151,19 +151,7 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
 
   delete undo_stack;
 
-  // //all the actions
-  // delete action_undo;
-  // delete action_redo;
-  // delete action_cut;
-  // delete action_copy;
-  // delete action_paste;
-  // delete action_delete;
-  // delete action_form_agg;
-  // delete action_split_agg;
-  // delete action_dup;
-
   qDebug() << tr("Finished clearing design panel");
-
 }
 
 // reset
@@ -2212,34 +2200,36 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
 {
   prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
   QList<QStringList> clean_args = cleanItemArgs(item_args);
-  if (item_type == prim::Item::Electrode) {
-    if ((clean_args.size() == 2) && (clean_args.first().size() == 2) && (clean_args.last().size()) == 2) {
-      setTool(gui::ToolType::ElectrodeTool);
-      emit sig_toolChangeRequest(gui::ToolType::ElectrodeTool);
-      int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
-      prim::Electrode* elec = new prim::Electrode(layer_index, clean_args);
-      undo_stack->push(new CreateItem(layer_index, this, elec));
-      emit sig_toolChangeRequest(gui::ToolType::SelectTool);
-      return true;
-    }
-  } else if (item_type == prim::Item::DBDot) {
-    if ((clean_args.size() == 1) && (clean_args[0].size() == 3)) {
-      int n = clean_args.first()[0].toInt();
-      int m = clean_args.first()[1].toInt();
-      int l = clean_args.first()[2].toInt();
-      if ((l < 0) || (l > 1)) {  // Check for invalid
-        return false;
-      } else {
-        setTool(gui::ToolType::DBGenTool);
+  switch(item_type){
+    case prim::Item::Electrode:
+      if ((clean_args.size() == 2) && (clean_args.first().size() == 2) && (clean_args.last().size()) == 2) {
+        setTool(gui::ToolType::ElectrodeTool);
+        emit sig_toolChangeRequest(gui::ToolType::ElectrodeTool);
         int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
-        emit sig_toolChangeRequest(gui::ToolType::DBGenTool);
-        createDBs(prim::LatticeCoord(n, m, l));
+        prim::Electrode* elec = new prim::Electrode(layer_index, clean_args);
+        undo_stack->push(new CreateItem(layer_index, this, elec));
         emit sig_toolChangeRequest(gui::ToolType::SelectTool);
         return true;
       }
-    }
+      break;
+    case prim::Item::DBDot:
+      if ((clean_args.size() == 1) && (clean_args[0].size() == 3)) {
+        int n = clean_args.first()[0].toInt();
+        int m = clean_args.first()[1].toInt();
+        int l = clean_args.first()[2].toInt();
+        if ((l == 0) || (l == 1)) {  // Check for valid
+          setTool(gui::ToolType::DBGenTool);
+          int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
+          emit sig_toolChangeRequest(gui::ToolType::DBGenTool);
+          createDBs(prim::LatticeCoord(n, m, l));
+          emit sig_toolChangeRequest(gui::ToolType::SelectTool);
+          return true;
+        }
+      }
+      break;
+    default:
+      return false;
   }
-  return false;
 }
 
 bool gui::DesignPanel::commandRemoveItem(QString type, QStringList item_args)
@@ -2249,9 +2239,9 @@ bool gui::DesignPanel::commandRemoveItem(QString type, QStringList item_args)
   if ((clean_args.size() == 1) && (clean_args.first().size() == 2)) {
     QStringList point = clean_args.first();
     // Remove items by location
-    float x = point.first().toFloat()*prim::Item::scale_factor;
-    float y = point.last().toFloat()*prim::Item::scale_factor;
-    QPointF pos = QPointF(x,y);
+    float x = point.first().toFloat();
+    float y = point.last().toFloat();
+    QPointF pos = QPointF(x,y)*prim::Item::scale_factor;
     if (itemAt(mapFromScene(pos))) {
       QList<QGraphicsItem*> gitems = items(mapFromScene(pos));
       for (QGraphicsItem* item: gitems){
