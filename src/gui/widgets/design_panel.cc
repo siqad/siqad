@@ -2212,6 +2212,17 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
         return true;
       }
       break;
+    case prim::Item::AFMArea:
+      if ((clean_args.size() == 2) && (clean_args.first().size() == 2) && (clean_args.last().size()) == 2) {
+        setTool(gui::ToolType::AFMAreaTool);
+        emit sig_toolChangeRequest(gui::ToolType::AFMAreaTool);
+        int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
+        prim::AFMArea* afm_area = new prim::AFMArea(layer_index, clean_args);
+        undo_stack->push(new CreateItem(layer_index, this, afm_area));
+        emit sig_toolChangeRequest(gui::ToolType::SelectTool);
+        return true;
+      }
+      break;
     case prim::Item::DBDot:
       if ((clean_args.size() == 1) && (clean_args[0].size() == 3)) {
         int n = clean_args.first()[0].toInt();
