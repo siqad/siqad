@@ -1,7 +1,7 @@
 // @file:     siqadconn.cc
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2018.06.03 - Samuel
+// @editted:  2018.06.28 - Samuel
 // @license:  GNU LGPL v3
 //
 // @desc:     Convenient functions for interacting with SiQAD
@@ -35,8 +35,6 @@ void SiQADConnector::setExport(std::string type, std::vector< std::pair< std::st
 {
   if (type == "db_loc")
     dbl_data = data_in;
-  else if (type == "db_charge")
-    db_charge_data = data_in;
   else
     throw std::invalid_argument(std::string("No candidate for export type '") +
         type + std::string("' with class std::vector<std::pair<std::string, std::string>>"));
@@ -50,6 +48,8 @@ void SiQADConnector::setExport(std::string type, std::vector< std::vector< std::
     elec_data = data_in;
   else if (type == "db_pot")
     db_pot_data = data_in;
+  else if (type == "db_charge")
+    db_charge_data = data_in;
   else
     throw std::invalid_argument(std::string("No candidate for export type '") +
         type + std::string("' with class std::vector<std::vector<std::string>>"));
@@ -295,8 +295,9 @@ bpt::ptree SiQADConnector::dbChargePropertyTree()
   bpt::ptree node_elec_dist;
   for (unsigned int i = 0; i < db_charge_data.size(); i++){
     bpt::ptree node_dist;
-    node_dist.put("", db_charge_data[i].first);
-    node_dist.put("<xmlattr>.energy", db_charge_data[i].second);
+    node_dist.put("", db_charge_data[i][0]);
+    node_dist.put("<xmlattr>.energy", db_charge_data[i][1]);
+    node_dist.put("<xmlattr>.count", db_charge_data[i][2]);
     node_elec_dist.add_child("dist", node_dist);
   }
   return node_elec_dist;

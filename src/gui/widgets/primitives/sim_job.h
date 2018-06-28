@@ -72,15 +72,39 @@ namespace prim{
     //! elec_dists struct for showing where electrons are
     struct elecDist{
       QList<int> dist;
-      float energy;     // energy of this distribution
-      int count=0;        // how many times does this distribution occur
+      float energy=0;     // energy of this distribution
+      int config_count=0; // how many times does this distribution occur
+      int elec_count=0;   // number of electrons in this configuration
 
       bool operator < (const elecDist &other) const {
         return (energy < other.energy);
       }
+
+      bool operator == (const elecDist &other) const {
+        if (dist.size() != other.dist.size() ||
+            energy != other.energy || 
+            config_count != other.config_count ||
+            elec_count != other.elec_count)
+          return false;
+        for (int i=0; i<dist.size(); i++)
+          if (dist.at(i) != other.dist.at(i))
+            return false;
+        return true;
+      }
     };
 
+    //! Process electron distributions after reading from XML.
     void processElecDists(QMap<QString, elecDist> elec_dists_map);
+
+    //! Apply a filter to the electron distributions. If elec_count == -1, the
+    //! filter would be cancelled.
+    void applyElecDistsFilter(int elec_count=-1);
+
+    //! Return list of electron distributions with the applied filter, or the 
+    //! entire list if no filters have been applied.
+    QList<elecDist> filteredElecDists() {return elec_dists_filtered;}
+
+    //! Find degenerate average occupation.
     float elecDistAvgDegenOfDB(int dist_ind, int db_ind);
 
 
@@ -118,8 +142,12 @@ namespace prim{
     QList<QPair<float,float>> physlocs;   //!< physlocs[dot_ind].first or .second
 
     // electron distribution
+    int preferred_elec_count=0;           //! the default dist selection will be of this electron count
+    int default_elec_dist_ind=0;
+    QList<int> elec_counts;               //! available electron counts
     QList<elecDist> elec_dists;           //! electron distributions
-    QList<float> elec_dists_avg;            //! the average charge across all dots
+    QList<elecDist> elec_dists_filtered;  //! filtered electron distribution
+    QList<float> elec_dists_avg;          //! the average charge across all dots
 
     QList<LineScanPath> line_scan_paths;  //!< line scan path props and results
   private:

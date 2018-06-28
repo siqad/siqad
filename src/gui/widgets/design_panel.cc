@@ -627,14 +627,14 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind, bool a
     if (dist_ind == -1) {
       // show average distribution if distribution index is -1
       db_dots_result[i]->setShowElec(job->elec_dists_avg[i]);
-      qDebug() << tr("Setting electron %1 to %2").arg(i).arg(job->elec_dists_avg[i]);
+      //qDebug() << tr("Setting electron %1 to %2").arg(i).arg(job->elec_dists_avg[i]);
     } else if(db_dots_result[i]) {
       // show the distribution of the selected index
       if (avg_degen) {
         db_dots_result[i]->setShowElec(job->elecDistAvgDegenOfDB(dist_ind, i));
-        qDebug() << tr("Setting electron %1 to %2, averaged").arg(i).arg(job->elecDistAvgDegenOfDB(dist_ind,i));
+        //qDebug() << tr("Setting electron %1 to %2, averaged").arg(i).arg(job->elecDistAvgDegenOfDB(dist_ind,i));
       } else {
-        db_dots_result[i]->setShowElec(job->elec_dists[dist_ind].dist[i]);
+        db_dots_result[i]->setShowElec(job->filteredElecDists().at(dist_ind).dist[i]);
       }
     }
   }

@@ -40,6 +40,7 @@ namespace gui{
 
     void updateJobSelCombo();
     bool showElecDist(int dist_ind);  // show elec charges on design panel
+    void showElecCountFilter(int);    // show or hide electron count filter
     void showAverageElecDist();       // average the elec charges when showing
     void showAverageElecDistDegen();  // average the elec charges of degenerate states
     void updateElecDistOptions();
@@ -55,9 +56,26 @@ namespace gui{
 
   private:
     void initSimVisualize();
+
+    //! Job selection update function.
     void jobSelUpdate();
+
+    //! Electron count filter update.
+    void elecCountFilterUpdate(bool apply_filter);
+
+    //! Choose previous electron count.
+    void elecCountPrev();
+
+    //! Choose next electron count.
+    void elecCountNext();
+
+    //! Electron distribution update.
     void distSelUpdate();
+
+    //! Choose previous electron distribution.
     void distPrev();
+
+    //! Choose next electron distribution.
     void distNext();
 
     SimManager *sim_manager;
@@ -73,9 +91,12 @@ namespace gui{
 
     // electron distribution
     QGroupBox *dist_group;
+    QSlider *slider_elec_count_sel;
     QSlider *slider_dist_sel;
+    QLabel *text_elec_count;
     QLabel *text_dist_selected;
     QLabel *text_dist_energy;
+    QGroupBox *elec_count_filter_group;
 
     // potential viewer
     QGroupBox *view_potential_group;

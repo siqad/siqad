@@ -1,7 +1,7 @@
 // @file:     siqadconn.h
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2018.06.03 - Samuel
+// @editted:  2018.06.28 - Samuel
 // @license:  GNU LGPL v3
 //
 // @desc:     Convenient functions for interacting with SiQAD including
@@ -140,7 +140,7 @@ namespace phys{
     std::vector<std::vector<std::string>> db_pot_data;
     std::vector<std::vector<std::string>> elec_data;
     std::vector<std::pair<std::string, std::string>> dbl_data;        // pair of location x and y
-    std::vector<std::pair<std::string, std::string>> db_charge_data;  // pair of elec dist and energy
+    std::vector<std::vector<std::string>> db_charge_data;  // pair of elec dist and energy
 
     // Runtime information
     int return_code=0;
