@@ -2300,32 +2300,17 @@ bool gui::DesignPanel::commandMoveItem(QString type, QStringList item_args)
   if ((clean_args.size() == 2) && (clean_args.first().size() == 2)) {
     QStringList point = clean_args.takeFirst();
     QPointF pos = QPointF(point.first().toFloat()*prim::Item::scale_factor, point.last().toFloat()*prim::Item::scale_factor);
-    QPointF offset;
-    if (clean_args.last().size() == 2) {
-      point = clean_args.takeFirst();
-      QPointF offset = QPointF(point.first().toFloat()*prim::Item::scale_factor, point.last().toFloat()*prim::Item::scale_factor);
-    } else if (clean_args.last().size() == 3) {
-      int n = clean_args.last()[0].toInt();
-      int m = clean_args.last()[1].toInt();
-      int l = clean_args.last()[2].toInt();
-      if ((l < 0) || (l > 1)) {  // Check for invalid
-        return false;
-      }
-      offset = lattice->latticeCoord2PhysLoc(prim::LatticeCoord(n,m,l))*prim::Item::scale_factor;
-      qDebug() << offset;
-    } else {
+    QPointF offset = findMoveOffset(clean_args.first());
+    if (offset.isNull())
       return false;
-    }
-
-    if (itemAt(mapFromScene(pos))) {
+    else if (itemAt(mapFromScene(pos))) {
       QList<QGraphicsItem*> gitems = items(mapFromScene(pos));
+      undo_stack->beginMacro(tr("moving item"));
       for (QGraphicsItem* item: gitems){
-        undo_stack->beginMacro(tr("moving item"));
-        if (static_cast<prim::Item*>(item)->item_type == item_type) {
+        if (static_cast<prim::Item*>(item)->item_type == item_type)
           undo_stack->push(new MoveItem(static_cast<prim::Item*>(item), offset, this));
-        }
-        undo_stack->endMacro();
       }
+      undo_stack->endMacro();
       return true;
     }
   }
@@ -2337,33 +2322,41 @@ bool gui::DesignPanel::commandMoveItem(QString type, QStringList item_args)
     if (layer) {
       prim::Item *item = layer->getItem(item_id);
       if (item) {
-        if (clean_args.first().size() == 2) {
-          QStringList point = clean_args.takeFirst();
-          QPointF offset = QPointF(point.first().toFloat()*prim::Item::scale_factor, point.last().toFloat()*prim::Item::scale_factor);
-          undo_stack->push(new MoveItem(static_cast<prim::Item*>(item), offset, this));
-          return true;
-        } else if (clean_args.first().size() == 3) {
-          int n = clean_args.first()[0].toInt();
-          int m = clean_args.first()[1].toInt();
-          int l = clean_args.first()[2].toInt();
-          if ((qAbs(l) < 0) || (qAbs(l) > 1)) {  // Check for invalid
-            return false;
-          }
-          QPointF offset_n_m = lattice->latticeCoord2PhysLoc(prim::LatticeCoord(n,m,0))*prim::Item::scale_factor;
-          QPointF offset_l = lattice->latticeCoord2PhysLoc(prim::LatticeCoord(0,0,qAbs(l)))*prim::Item::scale_factor;
-          offset_l = (l >= 0) ? offset_l : -offset_l;
-          QPointF offset = offset_n_m + offset_l;
-          undo_stack->push(new MoveItem(static_cast<prim::Item*>(item), offset, this));
-          return true;
-        } else {
+        QPointF offset = findMoveOffset(clean_args.first());
+        if (offset.isNull())
           return false;
-        }
+        else
+          undo_stack->push(new MoveItem(static_cast<prim::Item*>(item), offset, this));
+        return true;
       }
     }
   }
   return false;
 }
 
+QPointF gui::DesignPanel::findMoveOffset(QStringList clean_args)
+{
+  QPointF offset;
+  if (clean_args.size() == 2) {
+    offset = QPointF(clean_args.first().toFloat(), clean_args.last().toFloat());
+  } else if (clean_args.size() == 3) {
+    int n = clean_args[0].toInt();
+    int m = clean_args[1].toInt();
+    int l = clean_args[2].toInt();
+    if ((qAbs(l) > 1)) {  //can be -1, 0, or 1. If anything else, default to 0.
+      l = 0;
+    }
+    QPointF offset_n_m = lattice->latticeCoord2PhysLoc(prim::LatticeCoord(n,m,0));
+    // account for negative l movement
+    QPointF offset_l = lattice->latticeCoord2PhysLoc(prim::LatticeCoord(0,0,qAbs(l)));
+    offset_l = (l >= 0) ? offset_l : -offset_l;
+    offset = offset_n_m + offset_l;
+  } else {
+    return QPointF(0.0,0.0);
+  }
+  offset *= prim::Item::scale_factor;
+  return offset;
+}
 
 // Undo/Redo Methods
 
