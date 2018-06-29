@@ -279,7 +279,7 @@ bool SimJob::readResults()
 void SimJob::processElecDists(QMap<QString, elecDist> elec_dists_map)
 {
   // sort
-  // TODO it is unecessary to start with a QMap for elec_dists now, stream line
+  // TODO it is unecessary to start with a QMap for elec_dists now, streamline
   // the code.
   elec_dists.append(elec_dists_map.values());
   std::sort(elec_dists.begin(), elec_dists.end());
@@ -324,7 +324,8 @@ void SimJob::processElecDists(QMap<QString, elecDist> elec_dists_map)
     }
   }
 
-  applyElecDistsFilter();
+  // disable any filters by default
+  applyElecDistsFilter(-1);
 }
 
 
@@ -344,10 +345,10 @@ void SimJob::applyElecDistsFilter(int elec_count)
 
 float SimJob::elecDistAvgDegenOfDB(int dist_ind, int db_ind)
 {
-  float target_energy = elec_dists[dist_ind].energy;
+  float target_energy = elec_dists_filtered[dist_ind].energy;
   int degen_count = 0;
   float degen_db_accum = 0;
-  for (elecDist dist : elec_dists) {
+  for (elecDist dist : elec_dists_filtered) {
     if (dist.energy < target_energy)
       continue;
     else if (dist.energy > target_energy)

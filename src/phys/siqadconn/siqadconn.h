@@ -1,7 +1,7 @@
 // @file:     siqadconn.h
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2018.06.28 - Samuel
+// @editted:  2018.06.29 - Nathan
 // @license:  GNU LGPL v3
 //
 // @desc:     Convenient functions for interacting with SiQAD including
@@ -71,6 +71,9 @@ namespace phys{
 
     // Get the parameter with the given key.
     std::string getParameter(const std::string &key) {return sim_params.find(key) != sim_params.end() ? sim_params.at(key) : "";}
+
+    std::vector<Layer> getLayers(void){return layers;}
+    std::map<std::string, std::string> getAllParameters(void){return sim_params;}
 
 
     // ITERABLE COLLECTIONS
