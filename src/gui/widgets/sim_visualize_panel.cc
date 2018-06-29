@@ -175,7 +175,7 @@ void SimVisualize::showAverageElecDist()
 
 void SimVisualize::showAverageElecDistDegen()
 {
-  emit showElecDistOnScene(show_job, combo_job_sel->currentIndex(), true);
+  emit showElecDistOnScene(show_job, combo_job_sel->currentIndex()-1, true);
 }
 
 
@@ -186,34 +186,38 @@ void SimVisualize::updateElecDistOptions()
     return;
 
   if (!show_job->isComplete() || show_job->elec_dists.isEmpty()) {
-    dist_group->setVisible(false);
+    // reset electron count filter options
     slider_elec_count_sel->setMinimum(0);
     slider_elec_count_sel->setMaximum(0);
     slider_elec_count_sel->setValue(0);
     text_elec_count->setText("0");
 
+    // reset electron distribution options
     slider_dist_sel->setMinimum(0);
     slider_dist_sel->setMaximum(0);
     slider_dist_sel->setValue(0);
     text_dist_selected->setText("0/0");
+
+    // hide this group
+    dist_group->setVisible(false);
   } else {
+    // control visibility of relevant groups
     dist_group->setVisible(true);
     elec_count_filter_group->setVisible(false);
+
+    // update electron count filter options
     int elec_counts_size = show_job->elec_counts.size();
     int min_elec_count_sel = elec_counts_size > 0;
-    qDebug() << tr("elec_counts_size=%1, min_elec_count_sel=%2").arg(elec_counts_size).arg(min_elec_count_sel);
     slider_elec_count_sel->setMinimum(min_elec_count_sel);
     slider_elec_count_sel->setMaximum(elec_counts_size);
     slider_elec_count_sel->setValue(min_elec_count_sel);
     text_elec_count->setText(tr("%1").arg(elec_counts_size > 0 ? 
         show_job->elec_counts[min_elec_count_sel-1] : min_elec_count_sel));
+    cb_elec_count_filter->setCheckState(Qt::Unchecked); // disable the filter by default
+    showElecCountFilter(Qt::Unchecked);                 // force no filter workaround
 
-    int dist_count = show_job->filteredElecDists().size();
-    int min_sel = dist_count > 0;
-    slider_dist_sel->setMinimum(min_sel);
-    slider_dist_sel->setMaximum(dist_count);
+    // update electron distribution options
     slider_dist_sel->setValue(show_job->default_elec_dist_ind+1);
-    text_dist_selected->setText(tr("%1/%2").arg(show_job->default_elec_dist_ind+1).arg(dist_count));
     distSelUpdate();
   }
 }
@@ -336,7 +340,7 @@ void SimVisualize::initSimVisualize()
   // show the electron count and option to filter
   QLabel *label_elec_count_filter = new QLabel(tr("Electron Count:"));
   text_elec_count = new QLabel("0");
-  QCheckBox *cb_elec_count_filter = new QCheckBox("Filter");
+  cb_elec_count_filter = new QCheckBox("Filter");
   elec_count_filter_group = new QGroupBox(tr("Electron Count Filter"));
   QPushButton *button_elec_count_prev = new QPushButton(tr("<"));
   QPushButton *button_elec_count_next = new QPushButton(tr(">"));
@@ -453,7 +457,6 @@ void SimVisualize::elecCountFilterUpdate(bool apply_filter)
     return;
 
   int elec_counts_ind = slider_elec_count_sel->sliderPosition() - 1;
-  //qDebug() << tr("About to activate elec count index %1").arg(elec_counts_ind);
   text_elec_count->setText(tr("%1").arg(show_job->elec_counts[elec_counts_ind]));
 
   // save the current distribution being shown so it can be reselected later

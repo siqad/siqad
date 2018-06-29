@@ -604,7 +604,7 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind, bool a
   if(!job){
     qDebug() << tr("DisplayPanel: Job pointer invalid");
     return;
-  } else if (dist_ind > job->elec_dists.size() || job->elec_dists.size() == 0) {
+  } else if (dist_ind > job->filteredElecDists().size() || job->filteredElecDists().size() == 0) {
     qDebug() << tr("DesignPanel: dist_ind out of range when attempting to display sim results: %1").arg(dist_ind);
     return;
   }

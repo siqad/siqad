@@ -97,6 +97,7 @@ namespace gui{
     QLabel *text_dist_selected;
     QLabel *text_dist_energy;
     QGroupBox *elec_count_filter_group;
+    QCheckBox *cb_elec_count_filter;
 
     // potential viewer
     QGroupBox *view_potential_group;
