@@ -650,7 +650,8 @@ void gui::DesignPanel::clearSimResults()
   while(!sim_results_items.isEmpty()){
     prim::Item* temp_item = sim_results_items.takeFirst();
     removeItemFromScene(temp_item);
-    temp_item = 0;
+    delete temp_item;
+    // temp_item = 0;
   }
 }
 
@@ -660,7 +661,8 @@ void gui::DesignPanel::clearPlots()
   for (prim::Item* temp_item: sim_results_items) {
     if (temp_item->item_type == prim::Item::PotPlot) {
       removeItemFromScene(temp_item);
-      temp_item = 0;
+      delete temp_item;
+      // temp_item = 0;
     }
   }
 }
