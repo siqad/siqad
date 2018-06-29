@@ -331,7 +331,6 @@ void SimJob::processElecDists(QMap<QString, elecDist> elec_dists_map)
 
 void SimJob::applyElecDistsFilter(int elec_count)
 {
-  qDebug() << tr("Applying elec dist filter with count %1").arg(elec_count);
   if (elec_count == -1) {
     elec_dists_filtered = elec_dists;
     return;

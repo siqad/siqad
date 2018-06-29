@@ -185,18 +185,18 @@ void SimVisualize::updateElecDistOptions()
   if(!text_dist_selected || !slider_dist_sel || !show_job)
     return;
 
+  // reset electron distribution options
+  slider_dist_sel->setMinimum(0);
+  slider_dist_sel->setMaximum(0);
+  slider_dist_sel->setValue(0);
+  text_dist_selected->setText("0/0");
+
   if (!show_job->isComplete() || show_job->elec_dists.isEmpty()) {
     // reset electron count filter options
     slider_elec_count_sel->setMinimum(0);
     slider_elec_count_sel->setMaximum(0);
     slider_elec_count_sel->setValue(0);
     text_elec_count->setText("0");
-
-    // reset electron distribution options
-    slider_dist_sel->setMinimum(0);
-    slider_dist_sel->setMaximum(0);
-    slider_dist_sel->setValue(0);
-    text_dist_selected->setText("0/0");
 
     // hide this group
     dist_group->setVisible(false);
