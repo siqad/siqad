@@ -208,8 +208,8 @@ namespace gui{
     //! Emitted when the undo stack clean stage has changed.
     void emitUndoStackCleanChanged(bool c) {emit sig_undoStackCleanChanged(c);}
 
-    //! Set the visibility of the lattice in the background
-    void setLatticeVisibility(bool);
+    //! Update background to match current display mode and zoom level.
+    void updateBackground();
 
     //! Edit text label
     void editTextLabel(prim::Item *text_lab, const QString &new_text);
@@ -277,6 +277,7 @@ namespace gui{
     // background color presets
     static QColor background_col;         // normal background color
     static QColor background_col_publish; // background color in publishing mode
+    static qreal zoom_visibility_threshold;
 
     // Common actions used in the design panel
     QAction *action_undo;       // reverse in the undo stack

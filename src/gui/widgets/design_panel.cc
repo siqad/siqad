@@ -13,6 +13,7 @@
 
 QColor gui::DesignPanel::background_col;
 QColor gui::DesignPanel::background_col_publish;
+qreal gui::DesignPanel::zoom_visibility_threshold;
 
 // constructor
 gui::DesignPanel::DesignPanel(QWidget *parent)
@@ -48,7 +49,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   connect(prim::Emitter::instance(), &prim::Emitter::sig_physLoc2LatticeCoord,
           this, &gui::DesignPanel::physLoc2LatticeCoord);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_setLatticeVisibility,
-          this, &gui::DesignPanel::setLatticeVisibility);
+          this, &gui::DesignPanel::updateBackground);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_editTextLabel,
           this, QOverload<prim::Item*, const QString &>::of(&gui::DesignPanel::editTextLabel));
 }
@@ -56,7 +57,6 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 // destructor
 gui::DesignPanel::~DesignPanel()
 {
-  clearSimResults();        // clear simulation results first if they're being shown
   clearDesignPanel(false);
 }
 
@@ -281,7 +281,7 @@ void gui::DesignPanel::buildLattice(const QString &fname)
 
   // build the new lattice
   lattice = new prim::Lattice(fname, layman->layerCount());
-  scene->setBackgroundBrush(QBrush(lattice->tileableLatticeImage(background_col)));
+  updateBackground();
 
   // add the lattice dots to the scene
   for(prim::Item *const item : lattice->getItems())
@@ -422,11 +422,7 @@ void gui::DesignPanel::setDisplayMode(DisplayMode mode)
 {
   display_mode = mode;
   prim::Item::display_mode = mode;
-
-  if (mode == gui::ScreenshotMode)
-    scene->setBackgroundBrush(QBrush(lattice->tileableLatticeImage(background_col_publish, true)));
-  else
-    scene->setBackgroundBrush(QBrush(lattice->tileableLatticeImage(background_col, false)));
+  updateBackground();
 }
 
 
@@ -604,7 +600,7 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind, bool a
   if(!job){
     qDebug() << tr("DisplayPanel: Job pointer invalid");
     return;
-  } else if (dist_ind > job->elec_dists.size() || job->elec_dists.size() == 0) {
+  } else if (dist_ind > job->filteredElecDists().size() || job->filteredElecDists().size() == 0) {
     qDebug() << tr("DesignPanel: dist_ind out of range when attempting to display sim results: %1").arg(dist_ind);
     return;
   }
@@ -747,12 +743,17 @@ void gui::DesignPanel::physLoc2LatticeCoord(QPointF physloc, int &n, int &m, int
   l = coord.l;
 }
 
-void gui::DesignPanel::setLatticeVisibility(bool visible)
+void gui::DesignPanel::updateBackground()
 {
   QColor col = (display_mode == gui::ScreenshotMode) ? background_col_publish : background_col;
-  bool publish = display_mode == gui::ScreenshotMode;
-  if (visible)
-    scene->setBackgroundBrush(QBrush(lattice->tileableLatticeImage(col, publish)));
+  bool lattice_visible = true;
+
+  if (transform().m11() < zoom_visibility_threshold
+      || !lattice->isVisible())
+    lattice_visible = false;
+
+  if (lattice_visible)
+    scene->setBackgroundBrush(QBrush(lattice->tileableLatticeImage(col, display_mode == gui::ScreenshotMode)));
   else
     scene->setBackgroundBrush(QBrush(col));
 }
@@ -833,8 +834,6 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 // the middle mouse button to always pan and right click for context menus.
 void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
-  // Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers(); // uncomment if keymods are needed
-
   QPoint mouse_pos_del;
   qreal dx, dy;
 
@@ -1030,8 +1029,6 @@ void gui::DesignPanel::keyPressEvent(QKeyEvent *e)
 // use by higher level widgets
 void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
 {
-  Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
-
   if(ghosting){
     // only allowed actions are for manipulating the ghost
     switch(e->key()){
@@ -1087,6 +1084,7 @@ void gui::DesignPanel::constructStatics()
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   background_col = gui_settings->get<QColor>("view/bg_col");
   background_col_publish = gui_settings->get<QColor>("view/bg_col_pb");
+  zoom_visibility_threshold = gui_settings->get<qreal>("latdot/zoom_vis_threshold");
 }
 
 
@@ -1148,12 +1146,7 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
   wheel_deg.setX(0);
   wheel_deg.setY(0);
 
-  // if the zoom level crosses a certain threshold, hide the lattice dots in the
-  // background
-  if (transform().m11() > gui_settings->get<qreal>("latdot/zoom_vis_threshold"))
-    setLatticeVisibility(true);
-  else
-    setLatticeVisibility(false);
+  updateBackground();
 
   //qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
 }
