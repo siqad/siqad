@@ -665,13 +665,20 @@ void gui::DesignPanel::clearPlots()
   }
 }
 
-void gui::DesignPanel::displayPotentialPlot(QImage potential_plot, QRectF graph_container)
+void gui::DesignPanel::displayPotentialPlot(QImage potential_plot, QRectF graph_container, QMovie *potential_animation)
 {
   qDebug() << tr("graph_container height: ") << graph_container.height();
   qDebug() << tr("graph_container width: ") << graph_container.width();
   qDebug() << tr("graph_container topLeft: ") << graph_container.topLeft().x() << tr(", ") << graph_container.topLeft().y();
+  clearPlots();
   setDisplayMode(SimDisplayMode);
-  createPotPlot(potential_plot, graph_container);
+  createPotPlot(potential_plot, graph_container, potential_animation);
+
+  // QLabel *gif_anim = new QLabel();
+  // QMovie *movie = new QMovie("/home/nathan/test.gif");
+  // gif_anim->setMovie(movie);
+  // movie->start();
+  // QGraphicsProxyWidget *proxy = scene->addWidget(gif_anim);
 }
 
 // SLOTS
@@ -1692,8 +1699,8 @@ void gui::DesignPanel::CreateDB::destroy()
 
 
 // CreatePotPlot class
-gui::DesignPanel::CreatePotPlot::CreatePotPlot(gui::DesignPanel *dp, QImage potential_plot, QRectF graph_container, prim::PotPlot *pp, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), dp(dp), potential_plot(potential_plot), graph_container(graph_container), pp(pp), invert(invert)
+gui::DesignPanel::CreatePotPlot::CreatePotPlot(gui::DesignPanel *dp, QImage potential_plot, QRectF graph_container, QMovie *potential_animation, prim::PotPlot *pp, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), potential_plot(potential_plot), graph_container(graph_container), potential_animation(potential_animation), pp(pp), invert(invert)
 {  //if called to destroy, *elec points to selected electrode. if called to create, *elec = 0
 }
 
@@ -2384,11 +2391,11 @@ void gui::DesignPanel::createElectrode(QRect scene_rect)
   undo_stack->endMacro();
 }
 
-void gui::DesignPanel::createPotPlot(QImage potential_plot, QRectF graph_container)
+void gui::DesignPanel::createPotPlot(QImage potential_plot, QRectF graph_container, QMovie *potential_animation)
 {
   // int layer_index = layman->indexOf(layman->getMRULayer(prim::Layer::Plot));
   undo_stack->beginMacro(tr("create potential plot with given corners"));
-  undo_stack->push(new CreatePotPlot(this, potential_plot, graph_container));
+  undo_stack->push(new CreatePotPlot(this, potential_plot, graph_container, potential_animation));
   undo_stack->endMacro();
 }
 
@@ -2529,7 +2536,7 @@ void gui::DesignPanel::deleteSelection()
         {
         prim::PotPlot *pp = static_cast<prim::PotPlot*>(item);
         undo_stack->push(new CreatePotPlot(this,
-            pp->getPotentialPlot(), pp->getGraphContainer(),
+            pp->getPotentialPlot(), pp->getGraphContainer(), pp->getPotentialAnimation(),
             static_cast<prim::PotPlot*>(item), true));
         break;
         }

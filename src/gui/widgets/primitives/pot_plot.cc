@@ -23,6 +23,11 @@ prim::PotPlot::PotPlot(QImage potential_plot, QRectF graph_container):
   initPotPlot(potential_plot, graph_container);
 }
 
+prim::PotPlot::~PotPlot()
+{
+  delete potential_animation;
+}
+
 void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container_in)
 {
   potential_plot = potential_plot_in;

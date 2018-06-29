@@ -25,11 +25,12 @@ namespace prim{
     PotPlot(QImage potential_plot, QRectF graph_container);
 
     //! destructor
-    ~PotPlot(){}
+    ~PotPlot();
 
     //initializer
     void initPotPlot(QImage potential_plot, QRectF graph_container);
     QImage getPotentialPlot(void){return potential_plot;}
+    QMovie *getPotentialAnimation(void){return potential_animation;}
     QRectF getGraphContainer(void){return graph_container;}
     // inherited abstract method implementations
     QRectF boundingRect() const override;
@@ -47,6 +48,7 @@ namespace prim{
     // VARIABLES
     QImage potential_plot;
     QRectF graph_container;
+    QMovie *potential_animation;
     static qreal edge_width;  // proportional width of dot boundary edge
     static QColor fill_col;   // dot fill color (same for all lattice dots)
     static QColor edge_col;     // edge colour, unselected
