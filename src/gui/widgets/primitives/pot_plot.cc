@@ -17,10 +17,10 @@ QColor prim::PotPlot::edge_col;
 QColor prim::PotPlot::fill_col;
 QColor prim::PotPlot::selected_col; // edge colour, selected
 
-prim::PotPlot::PotPlot(QImage potential_plot, QRectF graph_container, QMovie *potential_animation):
+prim::PotPlot::PotPlot(QImage potential_plot, QRectF graph_container, QString pot_anim_path):
   prim::Item(prim::Item::PotPlot)
 {
-  initPotPlot(potential_plot, graph_container, potential_animation);
+  initPotPlot(potential_plot, graph_container, pot_anim_path);
 }
 
 prim::PotPlot::~PotPlot()
@@ -30,16 +30,22 @@ prim::PotPlot::~PotPlot()
   // delete proxy;
 }
 
-void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container_in, QMovie *potential_animation_in)
+void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container_in, QString pot_anim_path)
 {
+  qDebug() << pot_anim_path;
+  potential_animation = new QMovie(pot_anim_path);
+  if (potential_animation->isValid()) {
+    qDebug() << "VALID ANIMATION";
+    potential_animation->setSpeed(5);
+    potential_animation->start();
+    gif_anim.setMovie(potential_animation);
+    gif_anim.setScaledContents(true);
+    gif.anim.setAttribute( Qt::WA_TranslucentBackground, true );
+  } else {
+    qDebug() << "INVALID ANIMATION";
+  }
   potential_plot = potential_plot_in;
   graph_container = graph_container_in;
-  potential_animation = potential_animation_in;
-  potential_animation->setScaledSize(graph_container.size().toSize()/5.0);
-  potential_animation->setSpeed(10);
-  potential_animation->start();
-  // gif_anim = new QLabel();
-  gif_anim.setMovie(potential_animation);
   constructStatics();
   setZValue(-1);
   setPos(graph_container.topLeft());
@@ -50,7 +56,8 @@ void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container
 void prim::PotPlot::setProxy(QGraphicsProxyWidget *proxy_in)
 {
   proxy = proxy_in;
-  proxy->resize(graph_container.size()/5.0);
+  proxy->resize(graph_container.size()/4.0);
+  proxy->setPos(graph_container.topLeft());
 }
 
 
@@ -67,13 +74,12 @@ void prim::PotPlot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
   painter->setOpacity(0.5);
   QRectF graph_container_draw = QRectF(qreal(0),qreal(0),graph_container.width(), graph_container.height());
   painter->drawImage(graph_container_draw, potential_plot);
-  // painter->drawPixmap(graph_container_draw, potential_plot.scaled(graph_container.width(), graph_container.height()), graph_container_draw);
   painter->setOpacity(1);
 }
 
 prim::Item *prim::PotPlot::deepCopy() const
 {
-  prim::PotPlot *pp = new PotPlot(potential_plot, graph_container, potential_animation);
+  prim::PotPlot *pp = new PotPlot(potential_plot, graph_container, pot_anim_path);
   return pp;
 }
 

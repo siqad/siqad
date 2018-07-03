@@ -178,7 +178,7 @@ namespace gui{
     void clearPlots();
 
     //! Display the simulation result from PoisSolver
-    void displayPotentialPlot(QImage potential_plot, QRectF graph_container, QMovie *potential_animation);
+    void displayPotentialPlot(QImage potential_plot, QRectF graph_container, QString pot_anim_path);
 
 
   public slots:
@@ -451,7 +451,7 @@ namespace gui{
     void createElectrode(QRect scene_rect);
 
     //create potential plot on panel
-    void createPotPlot(QImage potential_plot, QRectF graph_container, QMovie *potential_animation);
+    void createPotPlot(QImage potential_plot, QRectF graph_container, QString pot_anim_path);
 
     //! Create AFM area with rubberband selected area, assumes the given rect is
     //! already in scene coordinates.
@@ -605,7 +605,7 @@ namespace gui{
   {
   public:
     // create an plot at the given points
-    CreatePotPlot(gui::DesignPanel *dp, QImage potential_plot, QRectF graph_container, QMovie *potential_animation,
+    CreatePotPlot(gui::DesignPanel *dp, QImage potential_plot, QRectF graph_container, QString pot_anim_path,
       prim::PotPlot *pp = 0, bool invert=false, QUndoCommand *parent=0);
 
   private:
@@ -621,9 +621,8 @@ namespace gui{
     DesignPanel *dp;  // DesignPanel pointer
     QImage potential_plot;
     QRectF graph_container;
+    QString pot_anim_path;
     prim::PotPlot* pp;
-    QMovie *potential_animation;
-
     bool invert;
   };
 

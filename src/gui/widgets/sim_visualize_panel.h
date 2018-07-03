@@ -51,7 +51,7 @@ namespace gui{
 
   signals:
     void showElecDistOnScene(prim::SimJob *job, int dist_ind, bool avg_degen=false);
-    void showPotPlotOnScene(QImage potential_plot, QRectF graph_container, QMovie *potential_animation);
+    void showPotPlotOnScene(QImage potential_plot, QRectF graph_container, QString pot_anim_plot);
     void clearPotPlots();
 
   private:
