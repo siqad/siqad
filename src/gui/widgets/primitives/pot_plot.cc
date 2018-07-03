@@ -17,27 +17,42 @@ QColor prim::PotPlot::edge_col;
 QColor prim::PotPlot::fill_col;
 QColor prim::PotPlot::selected_col; // edge colour, selected
 
-prim::PotPlot::PotPlot(QImage potential_plot, QRectF graph_container):
+prim::PotPlot::PotPlot(QImage potential_plot, QRectF graph_container, QMovie *potential_animation):
   prim::Item(prim::Item::PotPlot)
 {
-  initPotPlot(potential_plot, graph_container);
+  initPotPlot(potential_plot, graph_container, potential_animation);
 }
 
 prim::PotPlot::~PotPlot()
 {
-  delete potential_animation;
+  // delete potential_animation;
+  // delete gif_anim;
+  // delete proxy;
 }
 
-void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container_in)
+void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container_in, QMovie *potential_animation_in)
 {
   potential_plot = potential_plot_in;
   graph_container = graph_container_in;
+  potential_animation = potential_animation_in;
+  potential_animation->setScaledSize(graph_container.size().toSize()/5.0);
+  potential_animation->setSpeed(10);
+  potential_animation->start();
+  // gif_anim = new QLabel();
+  gif_anim.setMovie(potential_animation);
   constructStatics();
   setZValue(-1);
   setPos(graph_container.topLeft());
   // flags
   setFlag(QGraphicsItem::ItemIsSelectable, false);
 }
+
+void prim::PotPlot::setProxy(QGraphicsProxyWidget *proxy_in)
+{
+  proxy = proxy_in;
+  proxy->resize(graph_container.size()/5.0);
+}
+
 
 QRectF prim::PotPlot::boundingRect() const
 {
@@ -58,7 +73,7 @@ void prim::PotPlot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
 
 prim::Item *prim::PotPlot::deepCopy() const
 {
-  prim::PotPlot *pp = new PotPlot(potential_plot, graph_container);
+  prim::PotPlot *pp = new PotPlot(potential_plot, graph_container, potential_animation);
   return pp;
 }
 

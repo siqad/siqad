@@ -651,7 +651,6 @@ void gui::DesignPanel::clearSimResults()
     prim::Item* temp_item = sim_results_items.takeFirst();
     removeItemFromScene(temp_item);
     delete temp_item;
-    // temp_item = 0;
   }
 }
 
@@ -660,9 +659,12 @@ void gui::DesignPanel::clearPlots()
   setDisplayMode(DesignMode);
   for (prim::Item* temp_item: sim_results_items) {
     if (temp_item->item_type == prim::Item::PotPlot) {
+      prim::PotPlot *pp = static_cast<prim::PotPlot*>(temp_item);
+      undo_stack->push(new CreatePotPlot(this,
+          pp->getPotentialPlot(), pp->getGraphContainer(), pp->getPotentialAnimation(),
+          static_cast<prim::PotPlot*>(temp_item), true));
       removeItemFromScene(temp_item);
       delete temp_item;
-      // temp_item = 0;
     }
   }
 }
@@ -674,6 +676,7 @@ void gui::DesignPanel::displayPotentialPlot(QImage potential_plot, QRectF graph_
   qDebug() << tr("graph_container topLeft: ") << graph_container.topLeft().x() << tr(", ") << graph_container.topLeft().y();
   clearPlots();
   setDisplayMode(SimDisplayMode);
+  qDebug() << tr("Calling createPotPlot");
   createPotPlot(potential_plot, graph_container, potential_animation);
 
   // QLabel *gif_anim = new QLabel();
@@ -1719,14 +1722,17 @@ void gui::DesignPanel::CreatePotPlot::redo()
 
 void gui::DesignPanel::CreatePotPlot::create()
 {
-  pp = new prim::PotPlot(potential_plot, graph_container);
+  pp = new prim::PotPlot(potential_plot, graph_container, potential_animation);
   dp->addItemToScene(static_cast<prim::Item*>(pp));
   dp->sim_results_items.append(static_cast<prim::Item*>(pp));
+  pp->setProxy(dp->scene->addWidget(pp->getLabel()));
 }
 
 void gui::DesignPanel::CreatePotPlot::destroy()
 {
   if(pp != 0){
+    dp->scene->removeItem(pp->getProxy());
+    // pp->setProxy(0);
     dp->removeItemFromScene(static_cast<prim::Item*>(pp));  // deletes PotPlot
     dp->sim_results_items.removeOne(static_cast<prim::Item*>(pp));
     pp = 0;
