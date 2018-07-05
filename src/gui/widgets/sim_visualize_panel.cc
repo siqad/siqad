@@ -186,18 +186,18 @@ void SimVisualize::updateElecDistOptions()
   if(!text_dist_selected || !slider_dist_sel || !show_job)
     return;
 
-  // reset electron distribution options
-  slider_dist_sel->setMinimum(0);
-  slider_dist_sel->setMaximum(0);
-  slider_dist_sel->setValue(0);
-  text_dist_selected->setText("0/0");
-
   if (!show_job->isComplete() || show_job->elec_dists.isEmpty()) {
     // reset electron count filter options
     slider_elec_count_sel->setMinimum(0);
     slider_elec_count_sel->setMaximum(0);
     slider_elec_count_sel->setValue(0);
     text_elec_count->setText("0");
+
+    // reset electron distribution options
+    slider_dist_sel->setMinimum(0);
+    slider_dist_sel->setMaximum(0);
+    slider_dist_sel->setValue(0);
+    text_dist_selected->setText("0/0");
 
     // hide this group
     dist_group->setVisible(false);
@@ -462,7 +462,8 @@ void SimVisualize::elecCountFilterUpdate(bool apply_filter)
 
   // save the current distribution being shown so it can be reselected later
   prim::SimJob::elecDist show_dist;
-  if (slider_dist_sel->sliderPosition() > 0)
+  int slider_pos = slider_dist_sel->sliderPosition(); // slider pos = dist_ind + 1
+  if (slider_pos > 0 && slider_pos <= show_job->filteredElecDists().size())
     show_dist = show_job->filteredElecDists().at(slider_dist_sel->sliderPosition()-1);
 
   if (apply_filter)

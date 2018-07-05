@@ -1112,6 +1112,9 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
   // assert scale limitations
   boundZoom(ds);
 
+  // save old zoom level
+  qreal old_zoom = transform().m11();
+
   if(ds!=0){
     // zoom under mouse, should be indep of transformationAnchor
     QPointF old_pos = mapToScene(e->pos());
@@ -1139,7 +1142,11 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
   wheel_deg.setX(0);
   wheel_deg.setY(0);
 
-  updateBackground();
+  // update background if lattice visibility threshold has been crossed
+  qreal new_zoom = transform().m11();
+  if ((old_zoom < zoom_visibility_threshold && zoom_visibility_threshold <= new_zoom)
+      || (new_zoom < zoom_visibility_threshold && zoom_visibility_threshold <= old_zoom))
+    updateBackground();
 
   //qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
 }
