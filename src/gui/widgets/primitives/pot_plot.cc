@@ -25,8 +25,7 @@ prim::PotPlot::PotPlot(QImage potential_plot, QRectF graph_container, QString po
 
 prim::PotPlot::~PotPlot()
 {
-  // delete potential_animation;
-  // delete gif_anim;
+  delete potential_animation;
 }
 
 void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container_in, QString pot_anim_path)
@@ -34,14 +33,11 @@ void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container
   qDebug() << pot_anim_path;
   potential_animation = new QMovie(pot_anim_path);
   if (potential_animation->isValid()) {
-    qDebug() << "VALID ANIMATION";
+    qDebug() << "Showing animation";
     potential_animation->setSpeed(100);
     potential_animation->start();
-    gif_anim.setMovie(potential_animation);
-    gif_anim.setScaledContents(true);
-    gif_anim.setAttribute( Qt::WA_TranslucentBackground, true );
   } else {
-    qDebug() << "INVALID ANIMATION";
+    qDebug() << "Showing still image";
   }
   potential_plot = potential_plot_in;
   graph_container = graph_container_in;
@@ -54,7 +50,6 @@ void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container
 
 void prim::PotPlot::updateSimMovie()
 {
-  qDebug() << "POTPLOT::UPDATESIMMOVIE";
   update();
 }
 

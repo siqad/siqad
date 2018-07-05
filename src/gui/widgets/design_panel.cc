@@ -57,6 +57,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 // destructor
 gui::DesignPanel::~DesignPanel()
 {
+  clearPlots();
   clearDesignPanel(false);
 }
 

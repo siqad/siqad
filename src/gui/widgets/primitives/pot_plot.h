@@ -31,14 +31,13 @@ namespace prim{
     void initPotPlot(QImage potential_plot_in, QRectF graph_container_in, QString pot_anim_path);
     QImage getPotentialPlot(void){return potential_plot;}
     QMovie *getPotentialAnimation(void){return potential_animation;}
-    QLabel *getLabel(void){return &gif_anim;}
     QRectF getGraphContainer(void){return graph_container;}
     QString getAnimPath(void){return pot_anim_path;}
+    void updateSimMovie();
     // inherited abstract method implementations
     QRectF boundingRect() const override;
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
     Item *deepCopy() const override;
-    void updateSimMovie();
 
   // protected:
   //   virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
@@ -52,7 +51,6 @@ namespace prim{
     QImage potential_plot;
     QRectF graph_container;
     QMovie *potential_animation;
-    QLabel gif_anim;
     QString pot_anim_path;
     static qreal edge_width;  // proportional width of dot boundary edge
     static QColor fill_col;   // dot fill color (same for all lattice dots)
