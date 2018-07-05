@@ -33,13 +33,12 @@ namespace prim{
     QMovie *getPotentialAnimation(void){return potential_animation;}
     QLabel *getLabel(void){return &gif_anim;}
     QRectF getGraphContainer(void){return graph_container;}
-    QGraphicsProxyWidget *getProxy(void){return proxy;}
-    void setProxy(QGraphicsProxyWidget *proxy_in);
     QString getAnimPath(void){return pot_anim_path;}
     // inherited abstract method implementations
     QRectF boundingRect() const override;
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
     Item *deepCopy() const override;
+    void updateSimMovie();
 
   // protected:
   //   virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
@@ -54,7 +53,6 @@ namespace prim{
     QRectF graph_container;
     QMovie *potential_animation;
     QLabel gif_anim;
-    QGraphicsProxyWidget *proxy;
     QString pot_anim_path;
     static qreal edge_width;  // proportional width of dot boundary edge
     static QColor fill_col;   // dot fill color (same for all lattice dots)

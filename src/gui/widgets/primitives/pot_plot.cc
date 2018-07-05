@@ -27,7 +27,6 @@ prim::PotPlot::~PotPlot()
 {
   // delete potential_animation;
   // delete gif_anim;
-  // delete proxy;
 }
 
 void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container_in, QString pot_anim_path)
@@ -36,11 +35,11 @@ void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container
   potential_animation = new QMovie(pot_anim_path);
   if (potential_animation->isValid()) {
     qDebug() << "VALID ANIMATION";
-    potential_animation->setSpeed(5);
+    potential_animation->setSpeed(100);
     potential_animation->start();
     gif_anim.setMovie(potential_animation);
     gif_anim.setScaledContents(true);
-    gif.anim.setAttribute( Qt::WA_TranslucentBackground, true );
+    gif_anim.setAttribute( Qt::WA_TranslucentBackground, true );
   } else {
     qDebug() << "INVALID ANIMATION";
   }
@@ -53,11 +52,10 @@ void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container
   setFlag(QGraphicsItem::ItemIsSelectable, false);
 }
 
-void prim::PotPlot::setProxy(QGraphicsProxyWidget *proxy_in)
+void prim::PotPlot::updateSimMovie()
 {
-  proxy = proxy_in;
-  proxy->resize(graph_container.size()/4.0);
-  proxy->setPos(graph_container.topLeft());
+  qDebug() << "POTPLOT::UPDATESIMMOVIE";
+  update();
 }
 
 
@@ -73,7 +71,11 @@ void prim::PotPlot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
 {
   painter->setOpacity(0.5);
   QRectF graph_container_draw = QRectF(qreal(0),qreal(0),graph_container.width(), graph_container.height());
-  painter->drawImage(graph_container_draw, potential_plot);
+  if (potential_animation->isValid()) {
+    painter->drawImage(graph_container_draw, potential_animation->currentPixmap().toImage());
+  } else {
+    painter->drawImage(graph_container_draw, potential_plot);
+  }
   painter->setOpacity(1);
 }
 

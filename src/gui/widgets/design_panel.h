@@ -215,6 +215,9 @@ namespace gui{
     //! Edit text label
     void editTextLabel(prim::Item *text_lab, const QString &new_text);
 
+    //! update movie
+    void updateSimMovie();
+
   signals:
     void sig_toolChangeRequest(gui::ToolType tool);  // request ApplicationGUI to change tool
     void sig_toolChanged(gui::ToolType tool); // notify other components of the

@@ -1718,13 +1718,13 @@ void gui::DesignPanel::CreatePotPlot::create()
   pp = new prim::PotPlot(potential_plot, graph_container, pot_anim_path);
   dp->addItemToScene(static_cast<prim::Item*>(pp));
   dp->sim_results_items.append(static_cast<prim::Item*>(pp));
-  pp->setProxy(dp->scene->addWidget(pp->getLabel()));
+  connect(pp->getPotentialAnimation(), &QMovie::frameChanged, dp, &gui::DesignPanel::updateSimMovie);
+
 }
 
 void gui::DesignPanel::CreatePotPlot::destroy()
 {
   if(pp != 0){
-    dp->scene->removeItem(pp->getProxy());
     dp->removeItemFromScene(static_cast<prim::Item*>(pp));  // deletes PotPlot
     dp->sim_results_items.removeOne(static_cast<prim::Item*>(pp));
     pp = 0;
@@ -2455,6 +2455,16 @@ void gui::DesignPanel::editTextLabel(prim::TextLabel *text_lab,
   undo_stack->beginMacro(tr("Edit Text Label"));
   undo_stack->push(new EditTextLabel(layer_index, this, new_text, text_lab));
   undo_stack->endMacro();
+}
+
+
+void gui::DesignPanel::updateSimMovie()
+{
+  for (prim::Item* item: sim_results_items) {
+    if (item->item_type == prim::Item::PotPlot) {
+      static_cast<prim::PotPlot*>(item)->updateSimMovie();
+    }
+  }
 }
 
 void gui::DesignPanel::resizeItem(prim::Item *item,
