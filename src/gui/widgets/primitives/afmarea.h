@@ -22,6 +22,10 @@ namespace prim{
     AFMArea(int lay_id, const QRectF &scene_rect, bool orientation=true,
         float z_spd=-1, float h_spd=-1, float v_spd=-1, float v_disp=-1);
 
+    //! The order of points 1 and 2 doesn't matter.
+    AFMArea(int lay_id, QList<QStringList> points, bool orientation=true,
+        float z_spd=-1, float h_spd=-1, float v_spd=-1, float v_disp=-1);
+
     //! Constructor that creates an AFMArea from a loaded design file.
     AFMArea(QXmlStreamReader *, QGraphicsScene *);
 
