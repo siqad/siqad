@@ -16,5 +16,9 @@ ItemManager::ItemManager(QWidget *parent)
   qDebug() << "ITEM MANAGER WOOOOO";
 }
 
+ItemManager::~ItemManager()
+{
+  qDebug() << "@@Destructor for ItemManager@@";
+}
 
 }

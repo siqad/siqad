@@ -136,12 +136,10 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   // delete child widgets
   delete afm_panel;
   delete property_editor;
-
   // delete layers and contained items
   delete layman;
   if(reset) prim::Layer::resetLayers(); // reset layer counter
 
-  delete itman;
 
   // delete all graphical items from the scene
   scene->clear();

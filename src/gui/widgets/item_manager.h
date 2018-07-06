@@ -20,9 +20,8 @@ namespace gui{
 
   public:
     ItemManager(QWidget *parent);
+    ~ItemManager();
   };
 }
-
-
 
 #endif

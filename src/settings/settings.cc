@@ -146,6 +146,8 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("DDOCK/loc", 8);      // dialog dock default to bottom
   S->setValue("LAYDOCK/mw", 120);   // layer dock minimum width
   S->setValue("LAYDOCK/loc", 2);    // layer dock default to bottom
+  S->setValue("ITEMDOCK/mw", 120);  // item dock minimum width
+  S->setValue("ITEMDOCK/loc", 2);   // item dock default to bottom
   S->setValue("Panel/logw", 400);
 
   S->setValue("lattice/fname", QString("src/settings/lattices/si_100_2x1.ini"));

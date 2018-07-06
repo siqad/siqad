@@ -88,6 +88,7 @@ void gui::ApplicationGUI::initGUI()
   initSimVisualizeDock();
   initDialogDock();
   initLayerDock();
+  initItemDock();
 
   // initialise bars
   initMenuBar(); // must run before initTopBar
@@ -444,6 +445,25 @@ void gui::ApplicationGUI::initLayerDock()
   layer_dock->setWidget(design_pan->layerManagerSideWidget());
   layer_dock->show();
   addDockWidget(area, layer_dock);
+}
+
+
+void gui::ApplicationGUI::initItemDock()
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+
+  item_dock = new QDockWidget("Item Manager");
+
+  Qt::DockWidgetArea area;
+  area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("ITEMDOCK/loc"));
+
+  item_dock->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea|Qt::BottomDockWidgetArea);
+
+  item_dock->setMinimumWidth(gui_settings->get<int>("ITEMDOCK/mw"));
+
+  item_dock->setWidget(design_pan->itemManagerWidget());
+  item_dock->show();
+  addDockWidget(area, item_dock);
 }
 
 
