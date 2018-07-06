@@ -22,16 +22,19 @@ namespace prim{
   public:
     //! constructor, create a PotPlot given a QPixmap of the plot,
     //! and a QRectF to contain it.
-    PotPlot(QImage potential_plot, QRectF graph_container, QString pot_anim_path);
+    PotPlot(QString pot_plot_path, QRectF graph_container, QString pot_anim_path);
 
     //! destructor
     ~PotPlot();
 
     //initializer
-    void initPotPlot(QImage potential_plot_in, QRectF graph_container_in, QString pot_anim_path);
+    void initPotPlot(QString pot_plot_path, QRectF graph_container_in, QString pot_anim_path);
+
+
     QImage getPotentialPlot(void){return potential_plot;}
     QMovie *getPotentialAnimation(void){return potential_animation;}
     QRectF getGraphContainer(void){return graph_container;}
+    QString getPotPlotPath(void){return pot_plot_path;}
     QString getAnimPath(void){return pot_anim_path;}
     void updateSimMovie();
     // inherited abstract method implementations
@@ -51,6 +54,7 @@ namespace prim{
     QImage potential_plot;
     QRectF graph_container;
     QMovie *potential_animation;
+    QString pot_plot_path;
     QString pot_anim_path;
     static qreal edge_width;  // proportional width of dot boundary edge
     static QColor fill_col;   // dot fill color (same for all lattice dots)

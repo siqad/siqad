@@ -662,7 +662,7 @@ void gui::DesignPanel::clearPlots()
     if (temp_item->item_type == prim::Item::PotPlot) {
       prim::PotPlot *pp = static_cast<prim::PotPlot*>(temp_item);
       undo_stack->push(new CreatePotPlot(this,
-          pp->getPotentialPlot(), pp->getGraphContainer(), pp->getAnimPath(),
+          pp->getPotPlotPath(), pp->getGraphContainer(), pp->getAnimPath(),
           static_cast<prim::PotPlot*>(temp_item), true));
       removeItemFromScene(temp_item);
       delete temp_item;
@@ -670,14 +670,14 @@ void gui::DesignPanel::clearPlots()
   }
 }
 
-void gui::DesignPanel::displayPotentialPlot(QImage potential_plot, QRectF graph_container, QString pot_plot_anim)
+void gui::DesignPanel::displayPotentialPlot(QString pot_plot_path, QRectF graph_container, QString pot_plot_anim)
 {
   qDebug() << tr("graph_container height: ") << graph_container.height();
   qDebug() << tr("graph_container width: ") << graph_container.width();
   qDebug() << tr("graph_container topLeft: ") << graph_container.topLeft().x() << tr(", ") << graph_container.topLeft().y();
   clearPlots();
   setDisplayMode(SimDisplayMode);
-  createPotPlot(potential_plot, graph_container, pot_plot_anim);
+  createPotPlot(pot_plot_path, graph_container, pot_plot_anim);
 }
 
 // SLOTS
@@ -1705,8 +1705,8 @@ void gui::DesignPanel::CreateDB::destroy()
 
 
 // CreatePotPlot class
-gui::DesignPanel::CreatePotPlot::CreatePotPlot(gui::DesignPanel *dp, QImage potential_plot, QRectF graph_container, QString pot_anim_path, prim::PotPlot *pp, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), dp(dp), potential_plot(potential_plot), graph_container(graph_container), pot_anim_path(pot_anim_path), pp(pp), invert(invert)
+gui::DesignPanel::CreatePotPlot::CreatePotPlot(gui::DesignPanel *dp, QString pot_plot_path, QRectF graph_container, QString pot_anim_path, prim::PotPlot *pp, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), pot_plot_path(pot_plot_path), graph_container(graph_container), pot_anim_path(pot_anim_path), pp(pp), invert(invert)
 {  //if called to destroy, *elec points to selected electrode. if called to create, *elec = 0
 }
 
@@ -1723,7 +1723,7 @@ void gui::DesignPanel::CreatePotPlot::redo()
 
 void gui::DesignPanel::CreatePotPlot::create()
 {
-  pp = new prim::PotPlot(potential_plot, graph_container, pot_anim_path);
+  pp = new prim::PotPlot(pot_plot_path, graph_container, pot_anim_path);
   dp->addItemToScene(static_cast<prim::Item*>(pp));
   dp->sim_results_items.append(static_cast<prim::Item*>(pp));
   connect(pp->getPotentialAnimation(), &QMovie::frameChanged, dp, &gui::DesignPanel::updateSimMovie);
@@ -2399,11 +2399,11 @@ void gui::DesignPanel::createElectrode(QRect scene_rect)
   undo_stack->endMacro();
 }
 
-void gui::DesignPanel::createPotPlot(QImage potential_plot, QRectF graph_container, QString pot_plot_anim)
+void gui::DesignPanel::createPotPlot(QString pot_plot_path, QRectF graph_container, QString pot_plot_anim)
 {
   // int layer_index = layman->indexOf(layman->getMRULayer(prim::Layer::Plot));
   undo_stack->beginMacro(tr("create potential plot with given corners"));
-  undo_stack->push(new CreatePotPlot(this, potential_plot, graph_container, pot_plot_anim));
+  undo_stack->push(new CreatePotPlot(this, pot_plot_path, graph_container, pot_plot_anim));
   undo_stack->endMacro();
 }
 
@@ -2554,7 +2554,7 @@ void gui::DesignPanel::deleteSelection()
         {
         prim::PotPlot *pp = static_cast<prim::PotPlot*>(item);
         undo_stack->push(new CreatePotPlot(this,
-            pp->getPotentialPlot(), pp->getGraphContainer(), pp->getAnimPath(),
+            pp->getPotPlotPath(), pp->getGraphContainer(), pp->getAnimPath(),
             static_cast<prim::PotPlot*>(item), true));
         break;
         }

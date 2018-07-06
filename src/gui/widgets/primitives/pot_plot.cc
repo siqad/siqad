@@ -17,10 +17,10 @@ QColor prim::PotPlot::edge_col;
 QColor prim::PotPlot::fill_col;
 QColor prim::PotPlot::selected_col; // edge colour, selected
 
-prim::PotPlot::PotPlot(QImage potential_plot, QRectF graph_container, QString pot_anim_path):
+prim::PotPlot::PotPlot(QString pot_plot_path, QRectF graph_container, QString pot_anim_path):
   prim::Item(prim::Item::PotPlot)
 {
-  initPotPlot(potential_plot, graph_container, pot_anim_path);
+  initPotPlot(pot_plot_path, graph_container, pot_anim_path);
 }
 
 prim::PotPlot::~PotPlot()
@@ -28,7 +28,7 @@ prim::PotPlot::~PotPlot()
   delete potential_animation;
 }
 
-void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container_in, QString pot_anim_path)
+void prim::PotPlot::initPotPlot(QString pot_plot_path_in, QRectF graph_container_in, QString pot_anim_path)
 {
   qDebug() << pot_anim_path;
   potential_animation = new QMovie(pot_anim_path);
@@ -39,7 +39,8 @@ void prim::PotPlot::initPotPlot(QImage potential_plot_in, QRectF graph_container
   } else {
     qDebug() << "Showing still image";
   }
-  potential_plot = potential_plot_in;
+  pot_plot_path = pot_plot_path_in;
+  potential_plot = QImage(pot_plot_path);
   graph_container = graph_container_in;
   constructStatics();
   setZValue(-1);
@@ -76,7 +77,7 @@ void prim::PotPlot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
 
 prim::Item *prim::PotPlot::deepCopy() const
 {
-  prim::PotPlot *pp = new PotPlot(potential_plot, graph_container, pot_anim_path);
+  prim::PotPlot *pp = new PotPlot(pot_plot_path, graph_container, pot_anim_path);
   return pp;
 }
 
