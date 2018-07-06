@@ -279,10 +279,6 @@ void LayerManager::initSideWidget()
 
 }
 
-void LayerManager::alert()
-{
-  qDebug() << "Hello";
-}
 
 void LayerManager::initLayerTableHeaders()
 {

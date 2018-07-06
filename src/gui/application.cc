@@ -89,6 +89,7 @@ void gui::ApplicationGUI::initGUI()
   initDialogDock();
   initLayerDock();
   initItemDock();
+  tabifyDockWidget(item_dock, layer_dock);
 
   // initialise bars
   initMenuBar(); // must run before initTopBar

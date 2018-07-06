@@ -120,7 +120,6 @@ namespace gui{
 
   public slots:
     void updateLayerPropFromTable(int row, int column);
-    void alert(void);
 
   private:
     void initLayerTableHeaders();
