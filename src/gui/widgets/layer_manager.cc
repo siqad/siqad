@@ -273,8 +273,15 @@ void LayerManager::initSideWidget()
 
   side_widget = new QWidget(0, Qt::Dialog);
   side_widget->setLayout(layers_vl);
+
+  close_shortcut_return = new QShortcut(QKeySequence(Qt::Key_Return), this, SLOT(hide()));
+  close_shortcut_esc = new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(hide()));
 }
 
+void LayerManager::alert()
+{
+  qDebug() << "Hello";
+}
 
 void LayerManager::initLayerTableHeaders()
 {

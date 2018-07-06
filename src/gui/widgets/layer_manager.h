@@ -85,7 +85,6 @@ namespace gui{
     //! Returns 0 if none is found.
     prim::Layer *getMRULayer(prim::Layer::LayerType);
 
-
     // SAVE / LOAD
 
     //! Save properties of all layers to XML stream. TODO improve structure
@@ -121,6 +120,7 @@ namespace gui{
 
   public slots:
     void updateLayerPropFromTable(int row, int column);
+    void alert(void);
 
   private:
     void initLayerTableHeaders();
@@ -147,6 +147,8 @@ namespace gui{
 
     QVBoxLayout *layer_list_vl;
     QTableWidget *layer_table;
+    QShortcut* close_shortcut_return;
+    QShortcut* close_shortcut_esc;
   };
 
 }
