@@ -70,6 +70,7 @@ void gui::DesignPanel::initDesignPanel() {
   // initialize contained widgets
   layman = new LayerManager(this);
   property_editor = new PropertyEditor(this);
+  itman = new ItemManager(this);
 
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 
@@ -139,6 +140,8 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   // delete layers and contained items
   delete layman;
   if(reset) prim::Layer::resetLayers(); // reset layer counter
+
+  delete itman;
 
   // delete all graphical items from the scene
   scene->clear();

@@ -22,6 +22,7 @@
 #include "afm_panel.h"
 #include "layer_manager.h"
 #include "property_editor.h"
+#include "item_manager.h"
 
 #include "primitives/layer.h"
 #include "primitives/lattice.h"
@@ -277,6 +278,7 @@ namespace gui{
     // contained widgets
     gui::LayerManager *layman;
     gui::PropertyEditor *property_editor;
+    gui::ItemManager *itman;
 
     // background color presets
     static QColor background_col;         // normal background color
