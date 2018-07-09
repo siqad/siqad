@@ -75,7 +75,7 @@ void gui::DesignPanel::initDesignPanel() {
   // initialize contained widgets
   layman = new LayerManager(this);
   property_editor = new PropertyEditor(this);
-  itman = new ItemManager(this);
+  itman = new ItemManager(this, layman);
 
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 

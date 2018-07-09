@@ -10,9 +10,10 @@
 
 namespace gui{
 
-ItemManager::ItemManager(QWidget *parent)
+ItemManager::ItemManager(QWidget *parent, LayerManager* layman_in)
   : QWidget(parent, Qt::Dialog)
 {
+  layman = layman_in;
   initItemManager();
 }
 
@@ -63,6 +64,11 @@ void ItemManager::initItemTableHeaders()
 void ItemManager::updateTable()
 {
   qDebug() << "UPDATING TABLE";
+  qDebug() << layman->layerCount();
+  for(int i=0;i < layman->layerCount(); i++){
+    prim::Layer* layer = layman->getLayer(i);
+    qDebug() << layer->getName();
+  }
 }
 
 

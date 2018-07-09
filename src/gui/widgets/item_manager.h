@@ -12,6 +12,7 @@
 #include <QtWidgets>
 
 #include "primitives/items.h"
+#include "layer_manager.h"
 
 namespace gui{
   class ItemManager : public QWidget
@@ -24,8 +25,17 @@ namespace gui{
     Q_ENUM(ItemManagerColumn)
 
 
-    ItemManager(QWidget *parent);
+    ItemManager(QWidget *parent, LayerManager* layman_in);
     ~ItemManager();
+
+    struct ItemTableRowContent
+    {
+      prim::Item *item;
+      QTableWidgetItem *type;
+      QTableWidgetItem *layer;
+      QTableWidgetItem *index;
+      QPushButton *bt_show_properties;
+    };
 
   public slots:
     void updateTable();
@@ -33,7 +43,9 @@ namespace gui{
   private:
     void initItemManager();
     void initItemTableHeaders();
+    void addItemRow();
 
+    LayerManager *layman;
     QTableWidget *item_table;
   };
 }
