@@ -13,13 +13,11 @@ namespace gui{
 ItemManager::ItemManager(QWidget *parent)
   : QWidget(parent, Qt::Dialog)
 {
-  qDebug() << "ITEM MANAGER WOOOOO";
   initItemManager();
 }
 
 ItemManager::~ItemManager()
 {
-  qDebug() << "@@Destructor for ItemManager@@";
 }
 
 void ItemManager::initItemManager()
@@ -50,9 +48,6 @@ void ItemManager::initItemTableHeaders()
   item_table->resizeColumnToContents(static_cast<int>(Layer)); // reduce width of visibility column
   item_table->resizeColumnToContents(static_cast<int>(Index)); // reduce width of visibility column
   item_table->resizeColumnToContents(static_cast<int>(Properties)); // reduce width of visibility column
-  // item_table->setColumnHidden(static_cast<int>(ID), true);
-  // item_table->resizeColumnToContents(static_cast<int>(Visibility)); // reduce width of visibility column
-  // item_table->resizeColumnToContents(static_cast<int>(Editability)); // reduce width of visibility column
 
   // header tooltips
   item_table->horizontalHeaderItem(static_cast<int>(Type))->
@@ -65,6 +60,10 @@ void ItemManager::initItemTableHeaders()
       setToolTip("Show properties");
 }
 
+void ItemManager::updateTable()
+{
+  qDebug() << "UPDATING TABLE";
+}
 
 
 

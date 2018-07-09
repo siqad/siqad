@@ -26,12 +26,13 @@ namespace gui{
 
     ItemManager(QWidget *parent);
     ~ItemManager();
-    void initItemTableHeaders();
 
+  public slots:
+    void updateTable();
 
   private:
     void initItemManager();
-
+    void initItemTableHeaders();
 
     QTableWidget *item_table;
   };

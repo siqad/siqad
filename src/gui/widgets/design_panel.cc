@@ -32,6 +32,11 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   // initialize actions
   initActions();
 
+
+  connect(this, SIGNAL(sig_itemAdded()),
+            itman, SLOT(updateTable()));
+  connect(this, SIGNAL(sig_itemRemoved()),
+            itman, SLOT(updateTable()));
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
           this, &gui::DesignPanel::selectClicked);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_showProperty,
@@ -195,6 +200,8 @@ void gui::DesignPanel::addItem(prim::Item *item, int layer_index, int ind)
   QRectF vp = mapToScene(viewport()->rect()).boundingRect();
   setSceneRect(min_scene_rect | sbr | vp);
   scene->setSceneRect(min_scene_rect | sbr);
+  emit sig_itemAdded();
+
 }
 
 void gui::DesignPanel::removeItem(prim::Item *item, int layer_index)
@@ -213,6 +220,7 @@ void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
     QRectF vp = mapToScene(viewport()->rect()).boundingRect();
     setSceneRect(min_scene_rect | sbr | vp);
     scene->setSceneRect(min_scene_rect | sbr);
+    emit sig_itemRemoved();
   }
 }
 
