@@ -19,8 +19,21 @@ namespace gui{
     Q_OBJECT
 
   public:
+
+    enum ItemManagerColumn{Type, Layer, Index, Properties};
+    Q_ENUM(ItemManagerColumn)
+
+
     ItemManager(QWidget *parent);
     ~ItemManager();
+    void initItemTableHeaders();
+
+
+  private:
+    void initItemManager();
+
+
+    QTableWidget *item_table;
   };
 }
 

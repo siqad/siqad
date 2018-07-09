@@ -60,7 +60,7 @@ namespace gui{
     // ACCESSORS
 
     QWidget *layerManagerSideWidget() {return layman->sideWidget();}
-    QWidget *itemManagerWidget() {return itman;}
+    QWidget *itemManagerWidget() {return itman;} //ItemManager fits the side bar at the moment.
 
     //! add a new Item using a command from the dialog panel.
     bool commandCreateItem(QString item_type, QString layer_id, QStringList item_args);

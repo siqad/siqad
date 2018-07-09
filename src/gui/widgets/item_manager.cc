@@ -14,11 +14,58 @@ ItemManager::ItemManager(QWidget *parent)
   : QWidget(parent, Qt::Dialog)
 {
   qDebug() << "ITEM MANAGER WOOOOO";
+  initItemManager();
 }
 
 ItemManager::~ItemManager()
 {
   qDebug() << "@@Destructor for ItemManager@@";
 }
+
+void ItemManager::initItemManager()
+{
+  item_table = new QTableWidget(this);
+  QVBoxLayout *main_vl = new QVBoxLayout;
+  main_vl->addWidget(item_table);
+  initItemTableHeaders();
+  setLayout(main_vl);
+}
+
+
+void ItemManager::initItemTableHeaders()
+{
+  qDebug() << "Initializing item table headers";
+  QStringList table_headers;
+
+  // TODO take enum type instead of this stringlist
+  table_headers <<
+    "Type" <<       // item_type QString
+    "Layer" <<      // owning layer's index
+    "Index" <<      // item's index within the layer
+    "Properties"; // button to show properties
+
+  item_table->setColumnCount(table_headers.length());
+  item_table->setHorizontalHeaderLabels(table_headers);
+  item_table->resizeColumnToContents(static_cast<int>(Type)); // reduce width of visibility column
+  item_table->resizeColumnToContents(static_cast<int>(Layer)); // reduce width of visibility column
+  item_table->resizeColumnToContents(static_cast<int>(Index)); // reduce width of visibility column
+  item_table->resizeColumnToContents(static_cast<int>(Properties)); // reduce width of visibility column
+  // item_table->setColumnHidden(static_cast<int>(ID), true);
+  // item_table->resizeColumnToContents(static_cast<int>(Visibility)); // reduce width of visibility column
+  // item_table->resizeColumnToContents(static_cast<int>(Editability)); // reduce width of visibility column
+
+  // header tooltips
+  item_table->horizontalHeaderItem(static_cast<int>(Type))->
+      setToolTip("Item type: DBDot, Electrode, etc.");
+  item_table->horizontalHeaderItem(static_cast<int>(Layer))->
+      setToolTip("Layer ID");
+  item_table->horizontalHeaderItem(static_cast<int>(Index))->
+      setToolTip("Item index");
+  item_table->horizontalHeaderItem(static_cast<int>(Properties))->
+      setToolTip("Show properties");
+}
+
+
+
 
 }
