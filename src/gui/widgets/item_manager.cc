@@ -61,16 +61,42 @@ void ItemManager::initItemTableHeaders()
       setToolTip("Show properties");
 }
 
-void ItemManager::updateTable()
+void ItemManager::updateTableAdd()
 {
-  qDebug() << "UPDATING TABLE";
-  qDebug() << layman->layerCount();
-  for(int i=0;i < layman->layerCount(); i++){
+  for (int i=0;i < layman->layerCount(); i++) {
     prim::Layer* layer = layman->getLayer(i);
-    qDebug() << layer->getName();
+    for (prim::Item* item : layer->getItems()) {
+      addItemRow(item, layer);
+    }
   }
 }
 
+void ItemManager::addItemRow(prim::Item *item, prim::Layer *layer)
+{
+  for (ItemTableRowContent* row_content: table_row_contents) {
+    if (row_content->item == item) {
+      return;
+    }
+  }
+  ItemTableRowContent *new_content = new ItemTableRowContent();
+  new_content->item = item;
+  new_content->type = new QTableWidgetItem(QString::number(item->item_type));
+  new_content->layer = new QTableWidgetItem(QString::number(item->layer_id));
+  new_content->index = new QTableWidgetItem(QString::number(layer->getItemIndex(item)));
+  new_content->bt_show_properties = new QPushButton(QString("Show properties"), this);
+  table_row_contents.append(new_content);
+  int curr_row = item_table->rowCount();
+  item_table->insertRow(curr_row);
+  item_table->setItem(curr_row, static_cast<int>(Type), new_content->type);
+  item_table->setItem(curr_row, static_cast<int>(Layer), new_content->layer);
+  item_table->setItem(curr_row, static_cast<int>(Index), new_content->index);
+  item_table->setCellWidget(curr_row, static_cast<int>(Properties), new_content->bt_show_properties);
+}
+
+void ItemManager::updateTableRemove(prim::Item *item)
+{
+  qDebug() << "REMOVE";
+}
 
 
 }

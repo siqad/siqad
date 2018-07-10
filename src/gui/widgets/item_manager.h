@@ -38,15 +38,18 @@ namespace gui{
     };
 
   public slots:
-    void updateTable();
+    void updateTableAdd();
+    void updateTableRemove(prim::Item* item);
 
   private:
     void initItemManager();
     void initItemTableHeaders();
-    void addItemRow();
+    void addItemRow(prim::Item *item, prim::Layer *layer);
 
     LayerManager *layman;
     QTableWidget *item_table;
+    QList<ItemTableRowContent*> table_row_contents;
+
   };
 }
 

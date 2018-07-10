@@ -222,7 +222,7 @@ namespace gui{
 
   signals:
     void sig_itemAdded(); //notify ItemManager that item was added.
-    void sig_itemRemoved(); //notify ItemManager that item was removed.
+    void sig_itemRemoved(prim::Item* item); //notify ItemManager that item was removed.
     void sig_toolChangeRequest(gui::ToolType tool);  // request ApplicationGUI to change tool
     void sig_toolChanged(gui::ToolType tool); // notify other components of the
                                               // change in tool

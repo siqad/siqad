@@ -34,9 +34,9 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
 
 
   connect(this, SIGNAL(sig_itemAdded()),
-            itman, SLOT(updateTable()));
-  connect(this, SIGNAL(sig_itemRemoved()),
-            itman, SLOT(updateTable()));
+            itman, SLOT(updateTableAdd()));
+  connect(this, SIGNAL(sig_itemRemoved(prim::Item*)),
+            itman, SLOT(updateTableRemove(prim::Item*)));
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
           this, &gui::DesignPanel::selectClicked);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_showProperty,
@@ -166,7 +166,6 @@ void gui::DesignPanel::resetDesignPanel()
 {
   clearDesignPanel(true);
   initDesignPanel();
-
   // REBUILD
 
   //let application know that design panel has been reset.
@@ -220,7 +219,7 @@ void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
     QRectF vp = mapToScene(viewport()->rect()).boundingRect();
     setSceneRect(min_scene_rect | sbr | vp);
     scene->setSceneRect(min_scene_rect | sbr);
-    emit sig_itemRemoved();
+    emit sig_itemRemoved(item);
   }
 }
 
