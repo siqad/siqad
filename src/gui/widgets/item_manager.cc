@@ -95,7 +95,13 @@ void ItemManager::addItemRow(prim::Item *item, prim::Layer *layer)
 
 void ItemManager::updateTableRemove(prim::Item *item)
 {
-  qDebug() << "REMOVE";
+  for (ItemTableRowContent* row_content: table_row_contents) {
+    if (row_content->item == item) {
+      table_row_contents.removeAt(table_row_contents.indexOf(row_content));
+      item_table->removeRow(item_table->row(row_content->type));
+      return;
+    }
+  }
 }
 
 
