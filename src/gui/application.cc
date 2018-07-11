@@ -173,13 +173,13 @@ void gui::ApplicationGUI::initMenuBar()
   save->setShortcut(tr("CTRL+S"));
   save_as->setShortcut(tr("CTRL+SHIFT+S"));
   open_save->setShortcut(tr("CTRL+O"));
-  export_lvm->setShortcut(tr("CTRL+E"));
+  //export_lvm->setShortcut(tr("CTRL+E"));
   quit->setShortcut(tr("CTRL+Q"));
   file->addAction(new_file);
   file->addAction(open_save);
   file->addAction(save);
   file->addAction(save_as);
-  file->addAction(export_lvm);
+  //file->addAction(export_lvm);
   file->addAction(quit);
 
   // view menu actions
@@ -213,7 +213,7 @@ void gui::ApplicationGUI::initMenuBar()
   tools->addAction(design_screenshot);
   tools->addAction(screenshot);
   tools->addSeparator();
-  tools->addAction(action_settings_dialog);
+  //tools->addAction(action_settings_dialog);
 
   // help menu actions
   QAction *about_version = new QAction(tr("About"), this);
@@ -328,21 +328,25 @@ void gui::ApplicationGUI::initSideBar()
       tr("DB tool"));
   action_electrode_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"),
       tr("Electrode tool"));
+  /*
   action_afmarea_tool = side_bar->addAction(QIcon(":/ico/drawafmarea.svg"),
       tr("AFM Area tool"));
   action_afmpath_tool = side_bar->addAction(QIcon(":/ico/drawafmpath.svg"),
       tr("AFM Path tool"));
   action_label_tool = side_bar->addAction(QIcon(":/ico/drawlabel.svg"),
       tr("Label tool"));
+      */
 
   action_group->addAction(action_screenshot_tool);
   action_group->addAction(action_select_tool);
   action_group->addAction(action_drag_tool);
   action_group->addAction(action_dbgen_tool);
   action_group->addAction(action_electrode_tool);
+  /*
   action_group->addAction(action_afmarea_tool);
   action_group->addAction(action_afmpath_tool);
   action_group->addAction(action_label_tool);
+  */
 
   action_screenshot_tool->setVisible(false);  // only shown in ScreenshotMode
 
@@ -351,9 +355,11 @@ void gui::ApplicationGUI::initSideBar()
   action_drag_tool->setCheckable(true);
   action_dbgen_tool->setCheckable(true);
   action_electrode_tool->setCheckable(true);
+  /*
   action_afmarea_tool->setCheckable(true);
   action_afmpath_tool->setCheckable(true);
   action_label_tool->setCheckable(true);
+  */
 
   action_select_tool->setChecked(true);
 
@@ -367,12 +373,14 @@ void gui::ApplicationGUI::initSideBar()
           this, &gui::ApplicationGUI::setToolDBGen);
   connect(action_electrode_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolElectrode);
+  /*
   connect(action_afmarea_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolAFMArea);
   connect(action_afmpath_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolAFMPath);
   connect(action_label_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolLabel);
+          */
 
   addToolBar(area, side_bar);
 }
@@ -614,6 +622,7 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
       action_electrode_tool->setChecked(true);
       setToolElectrode();
       break;
+      /*
     case gui::ToolType::AFMAreaTool:
       action_afmarea_tool->setChecked(true);
       setToolAFMArea();
@@ -622,14 +631,17 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
       action_afmpath_tool->setChecked(true);
       setToolAFMPath();
       break;
+      */
     case gui::ToolType::ScreenshotAreaTool:
       action_screenshot_tool->setChecked(true);
       setToolScreenshotArea();
       break;
+      /*
     case gui::ToolType::LabelTool:
       action_label_tool->setChecked(true);
       setToolLabel();
       break;
+      */
     default:
       break;
   }

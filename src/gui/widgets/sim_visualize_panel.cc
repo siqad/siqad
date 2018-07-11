@@ -517,7 +517,12 @@ void SimVisualize::distSelUpdate()
       slider_dist_sel->value()).arg(show_job->filteredElecDists().size()));
   showElecDist(elec_ind);
 
-  text_dist_energy->setText(QString::number(show_job->filteredElecDists().at(elec_ind).energy));
+  QString energy_text;
+  if (elec_ind >= 0 && elec_ind < show_job->filteredElecDists().size())
+    energy_text = QString::number(show_job->filteredElecDists().at(elec_ind).energy);
+  else
+    energy_text = "--";
+  text_dist_energy->setText(energy_text);
 }
 
 void SimVisualize::distPrev()

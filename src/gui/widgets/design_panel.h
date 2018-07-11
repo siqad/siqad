@@ -275,7 +275,7 @@ namespace gui{
     QGraphicsScene *scene;    // scene for the QGraphicsView
     QRectF min_scene_rect;    // minimum size of the scene rect
     gui::ToolType tool_type;       // current cursor tool type
-    gui::DisplayMode display_mode; // current display mode
+    gui::DisplayMode display_mode=DesignMode; // current display mode
     QUndoStack *undo_stack;   // undo stack
 
     // contained widgets
