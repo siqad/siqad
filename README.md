@@ -35,7 +35,7 @@ git clone --recurse-submodules https://github.com/retallickj/qsi-sim.git
 Next, run the `make_everything` script from the project root:
 ```
 chmod +x make_everything
-./make_everything
+./make_everything -swig
 ```
 
 If the `make_everything` script returns errors, please jump to the "Detailed Compilation" section and try again. Otherwise, you should be able to run the binary by running `./build/debug/db-sim` from the project root.
@@ -57,6 +57,9 @@ Next, compile SimAnneal:
 cd siqad/src/phys/simanneal
 make
 ```
+
+Compile SWIG wrappers for AFM-Sim and PoisSolver:
+TODO
 
 Traverse make to the project root and build:
 ```
