@@ -14,7 +14,7 @@ Binary builds for Windows are available [here !TODO](todo). For now, Linux and m
 This tutorial is based on Ubuntu 17.10, and should also work on Ubuntu 18.04 LTS. Install all dependencies on Ubuntu systems:
 ```
 # gui, simanneal and hoppingdynamics dependencies
-sudo apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5* qttools5-dev qttools5-dev-tools libboost-dev libboost-filesystem-dev libboost-system-dev pkg-config
+sudo apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5* qttools5-dev qttools5-dev-tools libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev pkg-config
 # poissolver dependencies
 sudo apt install python3-dolfin gmsh
 # hoppingdynamics python dependencies
