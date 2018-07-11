@@ -91,7 +91,7 @@ CONFIG += release
 
 From the root directory of siqad, create a `win64` directory. From that directory, run:
 ```
-FOR_OS=win64 ../make_everything
+FOR_OS=win64 ../make_everything -swig
 ```
 
 The `FOR_OS` flag informs the `make_everything` script which platform to cross-compile for, currently supported options are: `FOR_OS=<win32|win64>`. Leave blank if not cross-compiling.
