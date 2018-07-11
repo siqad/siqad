@@ -62,7 +62,7 @@ namespace prim{
     //! returns the item type as a QString
     QString getQStringItemType();
 
-    static ItemType getEnumItemType(QString type); 
+    static ItemType getEnumItemType(QString type);
 
     //! set hovered state
     void setHovered(bool flag) {hovered = flag;}
@@ -123,7 +123,6 @@ namespace prim{
 
     //! Get the color corresponding to the current state of the item.
     QColor getCurrentStateColor(const StateColors &state_colors);
-    // void showProps();
     virtual void performAction(QAction*){};
     virtual QList<QAction*> contextMenuActions(){return QList<QAction*>();}
 

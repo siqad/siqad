@@ -40,11 +40,12 @@ namespace gui{
   public slots:
     void updateTableAdd();
     void updateTableRemove(prim::Item* item);
-
+    void showProperties();
+    
   private:
     void initItemManager();
     void initItemTableHeaders();
-    void addItemRow(prim::Item *item, prim::Layer *layer);
+    void addItemRow(prim::Item *item);
 
     LayerManager *layman;
     QTableWidget *item_table;

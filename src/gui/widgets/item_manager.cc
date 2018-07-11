@@ -66,12 +66,12 @@ void ItemManager::updateTableAdd()
   for (int i=0;i < layman->layerCount(); i++) {
     prim::Layer* layer = layman->getLayer(i);
     for (prim::Item* item : layer->getItems()) {
-      addItemRow(item, layer);
+      addItemRow(item);
     }
   }
 }
 
-void ItemManager::addItemRow(prim::Item *item, prim::Layer *layer)
+void ItemManager::addItemRow(prim::Item *item)
 {
   for (ItemTableRowContent* row_content: table_row_contents) {
     if (row_content->item == item) {
@@ -80,10 +80,13 @@ void ItemManager::addItemRow(prim::Item *item, prim::Layer *layer)
   }
   ItemTableRowContent *new_content = new ItemTableRowContent();
   new_content->item = item;
-  new_content->type = new QTableWidgetItem(QString::number(item->item_type));
-  new_content->layer = new QTableWidgetItem(QString::number(item->layer_id));
-  new_content->index = new QTableWidgetItem(QString::number(layer->getItemIndex(item)));
+  new_content->type = new QTableWidgetItem(item->getQStringItemType());
+  new_content->layer = new QTableWidgetItem(layman->getLayer(item->layer_id)->getName());
+  new_content->index = new QTableWidgetItem(QString::number(layman->getLayer(item->layer_id)->getItemIndex(item)));
+  //the QString in buttons must be exactly "Show properties" in order to trigger showProps() from items
   new_content->bt_show_properties = new QPushButton(QString("Show properties"), this);
+  connect(new_content->bt_show_properties, &QAbstractButton::clicked, this, &ItemManager::showProperties);
+
   table_row_contents.append(new_content);
   int curr_row = item_table->rowCount();
   item_table->insertRow(curr_row);
@@ -93,12 +96,27 @@ void ItemManager::addItemRow(prim::Item *item, prim::Layer *layer)
   item_table->setCellWidget(curr_row, static_cast<int>(Properties), new_content->bt_show_properties);
 }
 
+
+void ItemManager::showProperties()
+{
+  for (ItemTableRowContent* row_content: table_row_contents) {
+    if (row_content->bt_show_properties == static_cast<QPushButton *>(sender())) {
+      QAction temp_action;
+      temp_action.setText(row_content->bt_show_properties->text());
+      row_content->item->performAction(&temp_action);
+      return;
+    }
+  }
+}
+
+
 void ItemManager::updateTableRemove(prim::Item *item)
 {
   for (ItemTableRowContent* row_content: table_row_contents) {
     if (row_content->item == item) {
       table_row_contents.removeAt(table_row_contents.indexOf(row_content));
       item_table->removeRow(item_table->row(row_content->type));
+      row_content->bt_show_properties->disconnect();
       return;
     }
   }
