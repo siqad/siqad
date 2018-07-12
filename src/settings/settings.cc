@@ -90,7 +90,6 @@ void settings::LatticeSettings::updateLattice(const QString &fname)
 QSettings *settings::AppSettings::m_defs()
 {
   qDebug("Loading default application settings...");
-  // TODO remove QSettings *S = new QSettings("src/settings/defaults/app_settings.ini", QSettings::IniFormat);
   QString the_path = pathReplacement("<CONFIG>/defaults/app_settings.ini");
   qDebug() << QObject::tr("app settings path: %1").arg(the_path);
   QSettings *S = new QSettings(
@@ -131,7 +130,6 @@ QSettings *settings::AppSettings::m_defs()
 QSettings* settings::GUISettings::m_defs()
 {
   qDebug("Loading default gui settings...");
-  // TODO remove QSettings *S = new QSettings("src/settings/defaults/gui_settings.ini", QSettings::IniFormat);
   QSettings *S = new QSettings(
       pathReplacement("<CONFIG>/defaults/gui_settings.ini"),
       QSettings::IniFormat
@@ -265,7 +263,6 @@ QSettings* settings::GUISettings::m_defs()
 QSettings* settings::LatticeSettings::m_defs()
 {
   qDebug("Loading default lattice settings...");
-  // TODO remove QSettings *S = new QSettings("src/settings/defaults/lattices/si_100_2x1.ini", QSettings::IniFormat);
   QSettings *S = new QSettings(
       pathReplacement(QString("<CONFIG>/defaults/lattices/si_100_2x1.ini")),
       QSettings::IniFormat

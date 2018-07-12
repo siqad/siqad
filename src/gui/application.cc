@@ -213,7 +213,7 @@ void gui::ApplicationGUI::initMenuBar()
   tools->addAction(design_screenshot);
   tools->addAction(screenshot);
   tools->addSeparator();
-  //tools->addAction(action_settings_dialog);
+  tools->addAction(action_settings_dialog);
 
   // help menu actions
   QAction *about_version = new QAction(tr("About"), this);

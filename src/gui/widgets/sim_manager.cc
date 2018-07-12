@@ -73,6 +73,7 @@ void SimManager::initPythonPath()
 
   if (!s_py.isEmpty()) {
     gui::python_path = s_py;
+    qDebug() << tr("Python path retrieved from settings: %1").arg(gui::python_path);
   } else {
     if (!findWorkingPythonPath())
       qWarning() << "No Python 3 interpreter found. Please set it in the settings dialog.";

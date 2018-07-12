@@ -16,11 +16,11 @@
 #include <QtCore>
 #include <QRegExp>
 
-//#ifdef QT_NO_DEBUG
-//#define DEFAULT_OVERRIDE false  // use user settings for release compilation
-//#else
+#ifdef QT_NO_DEBUG
+#define DEFAULT_OVERRIDE false  // use user settings for release compilation
+#else
 #define DEFAULT_OVERRIDE true   // use default settings for debug compilation
-//#endif
+#endif
 
 namespace settings{
 
@@ -59,7 +59,7 @@ public:
       }
 
       // save default value to current local settings
-      this->setValue(key, val);
+      //this->setValue(key, val);
     } else if (defaults==0) {   // terminate if no defaults
       qFatal(tr("No default settings available... terminating").toLatin1().constData(),0);
     } else if (var.isValid()) {

@@ -89,7 +89,8 @@ bool SimJob::invokeBinary()
 
   // temperary solution: just wait till completion
   qDebug() << tr("SimJob: Process started, waiting for completion...");
-  while(!sim_process->waitForStarted());
+  if (!sim_process->waitForStarted())
+    return false;
 
   while(sim_process->waitForReadyRead(-1))
     terminal_output.append(QString::fromStdString(sim_process->readAll().toStdString())); // dump output TODO might not have to do it in while

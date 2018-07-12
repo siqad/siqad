@@ -40,6 +40,7 @@ namespace settings{
 
   public slots:
     void addPendingBoolUpdate(bool new_state);
+    void addPendingStringUpdate(QString new_text);
 
     void applyPendingChanges();
     void applyAndClose();
