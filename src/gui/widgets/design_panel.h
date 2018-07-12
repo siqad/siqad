@@ -232,6 +232,9 @@ namespace gui{
     //! Request ApplicationGUI to update the layer manager widget being used.
     void sig_setLayerManagerWidget(QWidget*);
 
+    //! Request ApplicationGUI to update the item manager widget being used.
+    void sig_setItemManagerWidget(QWidget*);
+
     //! Request ApplicationGUI to show simulation setup dialog.
     void sig_showSimulationSetup();
 
