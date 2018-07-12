@@ -116,6 +116,8 @@ void gui::ApplicationGUI::initGUI()
           this, &gui::ApplicationGUI::designPanelReset);
   connect(design_pan, &gui::DesignPanel::sig_setLayerManagerWidget,
           this, &gui::ApplicationGUI::setLayerManagerWidget);
+  connect(design_pan, &gui::DesignPanel::sig_setItemManagerWidget,
+          this, &gui::ApplicationGUI::setItemManagerWidget);
   connect(design_pan, &gui::DesignPanel::sig_undoStackCleanChanged,
           this, &gui::ApplicationGUI::updateWindowTitle);
   connect(design_pan, &gui::DesignPanel::sig_screenshot,
@@ -492,13 +494,13 @@ void gui::ApplicationGUI::initCommander()
 void gui::ApplicationGUI::setLayerManagerWidget(QWidget *widget)
 {
   qDebug() << "Making layer manager widget";
-  settings::GUISettings *gui_settings = settings::GUISettings::instance();
-
-  // recall or initialise layer dock location
-  Qt::DockWidgetArea area;
-  area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("LAYDOCK/loc"));
-
   layer_dock->setWidget(widget);
+}
+
+void gui::ApplicationGUI::setItemManagerWidget(QWidget *widget)
+{
+  qDebug() << "Re-setting item manager widget";
+  item_dock->setWidget(widget);
 }
 
 

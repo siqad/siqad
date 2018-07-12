@@ -33,10 +33,6 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   initActions();
 
 
-  connect(this, SIGNAL(sig_itemAdded()),
-            itman, SLOT(updateTableAdd()));
-  connect(this, SIGNAL(sig_itemRemoved(prim::Item*)),
-            itman, SLOT(updateTableRemove(prim::Item*)));
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
           this, &gui::DesignPanel::selectClicked);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_showProperty,
@@ -133,6 +129,8 @@ void gui::DesignPanel::initDesignPanel() {
   scene->addItem(afm_panel->ghostSegment());
   connect(this, &gui::DesignPanel::sig_toolChanged,
             afm_panel, &gui::AFMPanel::toolChangeResponse);
+
+  emit sig_setItemManagerWidget(itman);
 }
 
 // clear design panel
@@ -142,6 +140,7 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   delete afm_panel;
   delete property_editor;
   // delete layers and contained items
+  delete itman;
   delete layman;
   if(reset) prim::Layer::resetLayers(); // reset layer counter
 
@@ -199,8 +198,9 @@ void gui::DesignPanel::addItem(prim::Item *item, int layer_index, int ind)
   QRectF vp = mapToScene(viewport()->rect()).boundingRect();
   setSceneRect(min_scene_rect | sbr | vp);
   scene->setSceneRect(min_scene_rect | sbr);
-  emit sig_itemAdded();
 
+  // update item manager
+  itman->updateTableAdd();
 }
 
 void gui::DesignPanel::removeItem(prim::Item *item, int layer_index)
@@ -221,6 +221,9 @@ void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
     scene->setSceneRect(min_scene_rect | sbr);
     emit sig_itemRemoved(item);
   }
+
+  // update item manager
+  itman->updateTableRemove(item);
 }
 
 void gui::DesignPanel::addItemToScene(prim::Item *item)
@@ -585,6 +588,8 @@ void gui::DesignPanel::loadDesign(QXmlStreamReader *rs)
       rs->skipCurrentElement();
     }
   }
+
+  itman->updateTableAdd();
 }
 
 

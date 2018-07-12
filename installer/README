@@ -3,5 +3,3 @@ Add the required files for installation to the @packages\COMPONENT\data@ directo
 Generate installer with
 
 binarycreator --offline-only -c config/config.xml -p packages installer
-
-For help, contact Robert Lupoiu: robert.lupoiu@alumni.ubc.ca

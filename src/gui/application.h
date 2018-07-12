@@ -155,6 +155,7 @@ namespace gui{
     void initCommander();         // initialise the input field whitelist
     void initItemDock();          // initialise the side item dock
     void setLayerManagerWidget(QWidget *widget);
+    void setItemManagerWidget(QWidget *widget);
 
     // prepare any extra actions not attched to an icon or meny
     void initActions();
