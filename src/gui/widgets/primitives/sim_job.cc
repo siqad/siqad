@@ -64,6 +64,7 @@ bool SimJob::invokeBinary()
 
       sim_process->setProgram(splitted_path.at(0));
       cml_arguments << splitted_path.mid(1);
+      cml_arguments << engine->binaryPath();
     } else {
       qCritical() << tr("Runtime interpreter %1 not recognized, ceasing binary invocation").arg(engine->runtimeInterpreter());
       return false;
