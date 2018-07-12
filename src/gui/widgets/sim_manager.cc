@@ -82,18 +82,17 @@ void SimManager::initPythonPath()
 
 bool SimManager::findWorkingPythonPath()
 {
+  // TODO update to support arguments
   QStringList test_py_paths;
 #ifdef Q_OS_LINUX
-  test_py_paths << "test"
-    << "doesntexist"
-    << "python3"
+  test_py_paths << "python3"
     << "/usr/bin/python3"
     << "/bin/python3"
     << "python";
 #elif defined(Q_OS_WIN32)
-  test_py_paths << "py -3"
+  test_py_paths << "py,-3"
     << "python"
-    << "C:\\Windows\\py.exe -3";
+    << "C:\\Windows\\py.exe,-3";
 #elif defined(Q_OS_DARWIN)
   test_py_paths << "python3"
     << "python";
@@ -109,9 +108,19 @@ bool SimManager::findWorkingPythonPath()
 
 
   for (QString test_py_path : test_py_paths) {
+    QStringList splitted_path = test_py_path.split(',');
+    if (splitted_path.size() == 0)
+      continue;
+
+    // set up command and arguments
+    QString command = splitted_path.at(0);
+    QStringList args = splitted_path.mid(1);
+    args << test_script;
+
     QString output;
     QProcess *py_process = new QProcess(this);
-    py_process->start(test_py_path, {test_script});
+    //py_process->start(test_py_path, {test_script});
+    py_process->start(command, args);
     py_process->waitForStarted(1000);
 
     // run the test script

@@ -179,7 +179,7 @@ QWidget *SettingsDialog::appSettingsPane()
 
   QLabel *label_hidpi = new QLabel(QObject::tr("HiDPI Mode*"));
   QLabel *label_show_debug_output = new QLabel(QObject::tr("Show debug messages*"));
-  QLabel *label_python_path = new QLabel(QObject::tr("Python path*"));
+  QLabel *label_python_path = new QLabel(QObject::tr("Python path*\n(Arguments are comma-separated.\ne.g. C:\\Windows\\py.exe,-3 )"));
   QLabel *label_req_restart = new QLabel(QObject::tr("Settings with the * indicator only take effect after restart."));
 
   QCheckBox *cb_hidpi = new QCheckBox(QObject::tr("Enabled"));

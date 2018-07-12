@@ -58,8 +58,12 @@ bool SimJob::invokeBinary()
     if (engine->runtimeInterpreter() == "python" && !gui::python_path.isEmpty()) {
       // using an interpreter, e.g. Python
       // template: `python /path/to/script.py /path/to/problem/file /path/to/result/file`
-      sim_process->setProgram(gui::python_path);
-      cml_arguments << engine->binaryPath();
+      QStringList splitted_path = gui::python_path.split(',');
+      if (splitted_path.size() == 0)
+        return false;
+
+      sim_process->setProgram(splitted_path.at(0));
+      cml_arguments << splitted_path.mid(1);
     } else {
       qCritical() << tr("Runtime interpreter %1 not recognized, ceasing binary invocation").arg(engine->runtimeInterpreter());
       return false;
