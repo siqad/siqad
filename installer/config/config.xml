@@ -6,6 +6,6 @@
     <Publisher>Qt-Project</Publisher>
     <!-- Directory name is used in component.xml -->
    <StartMenuDir>SiQAD</StartMenuDir>
-    <TargetDir>C:/Program Files (x86)/SiQAD</TargetDir>
+    <TargetDir>C:/Program Files/SiQAD</TargetDir>
 	<ControlScript>controllScript.qs</ControlScript>
 </Installer>

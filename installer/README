@@ -1,5 +1,7 @@
 Add the required files for installation to the @packages\COMPONENT\data@ directory.
 
-Generate installer with
+From this directory, from the Windows Command Prompt of Powershell, generate installer with
 
 binarycreator --offline-only -c config/config.xml -p packages installer
+
+An installer.exe file will be created in this directory. It can be renamed and moved as needed.
