@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<physeng>
+    <name>HoppingDynamics Animator</name>
+    <version>0.1</version>
+    <interpreter>python</interpreter> <!-- used for calling a script with python, java, etc. Leave blank otherwise -->
+    <bin_path>db-sim-connector.py</bin_path> <!-- path to binary (standalone) or script (read by interpreter), relative to the directory containing this file -->
+    <gui_dialog_path>hopping_animator.ui</gui_dialog_path>
+    <sim_params preserve_order="true">
+      <simulation_type>
+        <T>string</T>
+        <val>animation</val>
+        <label>Simulation Type</label>
+        <tip>The type of simulation to run. TODO just get rid of this option...</tip>
+        <value_selection type="ComboBox">
+          <animation>Animation</animation>
+        </value_selection>
+      </simulation_type>
+      <hopping_model>
+        <T>string</T>
+        <val>marcus</val>
+        <label>Hopping Model</label>
+        <tip>The hopping model for determining tunneling rates.</tip>
+        <value_selection type="ComboBox">
+          <marcus>Marcus</marcus>
+          <VRH>VRH</VRH>
+        </value_selection>
+      </hopping_model>
+      <num_electrons>
+        <T>int</T>
+        <val>-1</val>
+        <label>Number of electrons</label>
+        <tip>The number of electrons to use for the simulation, set to -1 for the simulator to automatically determine.</tip>
+      </num_electrons>
+    </sim_params>
+</physeng>
