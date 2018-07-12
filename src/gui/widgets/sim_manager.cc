@@ -89,11 +89,11 @@ bool SimManager::findWorkingPythonPath()
     << "/usr/bin/python3"
     << "/bin/python3"
     << "python";
-#elif Q_OS_WIN32
+#elif defined(Q_OS_WIN32)
   test_py_paths << "py -3"
     << "python"
     << "C:\\Windows\\py.exe -3";
-#elif Q_OS_DARWIN
+#elif defined(Q_OS_DARWIN)
   test_py_paths << "python3"
     << "python";
 #else
