@@ -1,11 +1,13 @@
 # SiQAD
 
-SiQAD (Silicon Quantum Atomic Designer) is a next-generation CAD tool that enables the design and simulation of silicon dangling bond (Si-DB) circuits through an intuitive graphical user interface (GUI) and a modular simulation back-end. The tool currently offers simulators that predict ground-state and dynamic electron configuration of given Si-DB configurations, and electrostatics simulation given electrode layouts. Please visit the [Walus Lab website](https://waluslab.ece.ubc.ca/siqad/) for information about us and other projects that Walus Lab works on!
+SiQAD (Silicon Quantum Atomic Designer) is a next-generation CAD tool that enables the design and simulation of silicon dangling bond (Si-DB) circuits through an intuitive graphical user interface (GUI) and a modular simulation back-end. The tool currently offers simulators that predict ground-state and dynamic electron configuration of given Si-DB configurations, and electrostatics simulation given electrode layouts. Please read the [arXiv paper TODO!](todo) for a detailed introduction to the tool and simulators, and visit the [Walus Lab website](https://waluslab.ece.ubc.ca/siqad/) for information about us and other projects that Walus Lab works on!
 
 
 ## Binary releases
 
-Binary builds for Windows are available [here !TODO](todo). For now, Linux and macOS binaries are not distributed and requires the user to build from source.
+Binary builds for Windows are available [here !TODO](todo). Note that one of the first-party simulators, PoisSolver, is not available on Windows builds due to the lack Windows support of a dependent module, FEniCS. Future support for the Docker or Windows Subsystem for Linux (WSL) versions of FEniCS [has been planned](https://github.com/retallickj/siqad/issues/33).
+
+For now, Linux and macOS binaries are not distributed and requires the user to build from source.
 
 ## Building from source on Linux
 
