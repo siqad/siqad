@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<physeng>
+    <name>SimAnneal</name>
+    <version>0.1</version>
+    <interpreter></interpreter> <!-- used for calling a script with python, java, etc. Leave blank otherwise -->
+    <bin_path>simanneal.exe</bin_path> <!-- path to binary or script, relative to the folder containing engine_description.xml -->
+    <sim_params preserve_order="true">
+        <num_threads>
+          <T>int</T>
+          <val>-1</val>
+          <label>Number of threads</label>
+          <tip>The number of threads used in multithreading. If left at -1, a number is automatically selected based on the DB layout.</tip>
+        </num_threads>
+        <result_queue_size>
+          <T>int</T>
+          <val>1000</val>
+          <label>Result queue size</label>
+          <tip>The number of results to retrieve from SimAnneal.</tip>
+        </result_queue_size>
+        <anneal_cycles>
+          <T>int</T>
+          <val>10000</val>
+          <label>Anneal cycles</label>
+          <tip>The number of simulated annealing cycles.</tip>
+        </anneal_cycles>
+        <min_T>
+          <T>float</T>
+          <val>4</val>
+          <label>Minimum annealing temperature (K)</label>
+          <tip>The minimum temperature at the end of the annealing schedule.</tip>
+        </min_T>
+        <global_v0>
+          <T>float</T>
+          <val>0.25</val>
+          <label>Fermi level V0</label>
+          <tip>The global Fermi level on the surface, higher value brings more electrons to the surface.</tip>
+        </global_v0>
+        <debye_length>
+          <T>float</T>
+          <val>5</val>
+          <label>Debye length (nm)</label>
+          <tip>Debye length for screening.</tip>
+        </debye_length>
+    </sim_params>
+</physeng>
