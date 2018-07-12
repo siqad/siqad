@@ -52,8 +52,8 @@ public:
 
 
   // variables
-  QList<prim::SimEngine*>  sim_engines;  // stack of all simulators
-  QList<prim::SimJob*>     sim_jobs;     // stack of all jobs
+  QList<prim::SimEngine*>  sim_engines;   // stack of all simulators
+  QList<prim::SimJob*>     sim_jobs;      // stack of all jobs
 
 
 signals:
@@ -70,6 +70,10 @@ private slots:
   void submitSimSetup();
 
 private:
+  // initialize python path
+  void initPythonPath();
+  bool findWorkingPythonPath();
+
   // sim manager related (like showing all jobs, all engines, etc.)
   void initSimManager();
   void initMenu() {};

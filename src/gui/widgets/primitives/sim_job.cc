@@ -11,6 +11,9 @@
 #include <iostream>
 #include <algorithm>
 #include "sim_job.h"
+#include "../../../global.h"
+
+extern QString gui::python_path;
 
 namespace prim{
 
@@ -52,10 +55,15 @@ bool SimJob::invokeBinary()
 
   sim_process = new QProcess();
   if (!engine->runtimeInterpreter().isEmpty()) {
-    // using an interpreter, e.g. Python
-    // template: `python /path/to/script.py /path/to/problem/file /path/to/result/file`
-    sim_process->setProgram(engine->runtimeInterpreter());
-    cml_arguments << engine->binaryPath();
+    if (engine->runtimeInterpreter() == "python" && !gui::python_path.isEmpty()) {
+      // using an interpreter, e.g. Python
+      // template: `python /path/to/script.py /path/to/problem/file /path/to/result/file`
+      sim_process->setProgram(gui::python_path);
+      cml_arguments << engine->binaryPath();
+    } else {
+      qCritical() << tr("Runtime interpreter %1 not recognized, ceasing binary invocation").arg(engine->runtimeInterpreter());
+      return false;
+    }
   } else {
     // calling a binary
     // template: `/path/to/binary /path/to/problem/file /path/to/result/file`

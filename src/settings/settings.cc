@@ -109,6 +109,8 @@ QSettings *settings::AppSettings::m_defs()
 
   S->setValue("dir/lattice", QString("<BINPATH>/src/settings/lattices"));
 
+  S->setValue("python_path", QString(""));
+
   S->setValue("phys/debye_length", 50);
   S->setValue("phys/epsr", 10);
 

@@ -18,6 +18,8 @@ namespace gui{
                 AFMAreaTool, AFMPathTool, ScreenshotAreaTool, LabelTool};
   enum DisplayMode{DesignMode, SimDisplayMode, ScreenshotMode};
 
+  extern QString python_path;
+
 } // end global namespace
 
 struct QPairFirstComparer

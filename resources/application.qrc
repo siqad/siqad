@@ -21,5 +21,6 @@
   <file>ico/unknown.svg</file>
   <file>ico/screenshotarea.svg</file>
 	<file>help_text.xml</file>
+    <file>python_paths.xml</file>
 </qresource>
 </RCC>

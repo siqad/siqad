@@ -8,14 +8,19 @@
 //            as well as manage ongoing or completed simulations.
 
 #include "sim_manager.h"
+#include "../../global.h"
 
 
 namespace gui{
+
+QString python_path;
 
 // Qt::Dialog makes the main window unclickable. Use Qt::Window if this behavior should be changed.
 SimManager::SimManager(QWidget *parent)
   : QWidget(parent, Qt::Dialog)
 {
+  if (gui::python_path.isEmpty())
+    initPythonPath();
   initEngines();
   initSimManager();
   initSimSetupDialog();
@@ -61,6 +66,68 @@ prim::SimEngine *SimManager::getEngine(const QString &name)
 
 
 // PRIVATE
+
+void SimManager::initPythonPath()
+{
+  QString s_py = settings::AppSettings::instance()->get<QString>("python_path");
+
+  if (!s_py.isEmpty()) {
+    gui::python_path = s_py;
+  } else {
+    if (!findWorkingPythonPath())
+      qWarning() << "No Python 3 interpreter found. Please set it in the settings dialog.";
+  }
+}
+
+bool SimManager::findWorkingPythonPath()
+{
+  QStringList test_py_paths;
+#ifdef Q_OS_LINUX
+  test_py_paths << "test"
+    << "doesntexist"
+    << "python3"
+    << "/usr/bin/python3"
+    << "/bin/python3"
+    << "python";
+#elif Q_OS_WIN32
+  test_py_paths << "py -3"
+    << "python"
+    << "C:\\Windows\\py.exe -3";
+#elif Q_OS_DARWIN
+  test_py_paths << "python3"
+    << "python";
+#else
+  return false;
+#endif
+
+  QString test_script = QDir(QCoreApplication::applicationDirPath()).filePath("src/phys/is_python3.py");
+  if (!QFile::exists(test_script)) {
+    qDebug() << tr("Python version test script %1 not found").arg(test_script);
+    return false;
+  }
+
+
+  for (QString test_py_path : test_py_paths) {
+    QString output;
+    QProcess *py_process = new QProcess(this);
+    py_process->start(test_py_path, {test_script});
+    py_process->waitForStarted(1000);
+
+    // run the test script
+    while(py_process->waitForReadyRead(1000))
+      output.append(QString::fromStdString(py_process->readAll().toStdString()));
+    
+    if (output.contains("Python3 Interpretor Found")) {
+      gui::python_path = test_py_path;
+      qDebug() << tr("Python path found: %1").arg(gui::python_path);
+      return true;
+    } else {
+      qDebug() << tr("Python path %1 is invalid. Output: %2").arg(test_py_path).arg(output);
+    }
+  }
+
+  return false;
+}
 
 void SimManager::initSimManager()
 {

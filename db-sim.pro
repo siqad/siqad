@@ -68,11 +68,11 @@ HEADERS += \
 	src/gui/widgets/primitives/sim_engine.h \
 	src/gui/widgets/primitives/sim_job.h \
 	src/gui/widgets/primitives/electrode.h \
-  src/gui/widgets/primitives/afmarea.h \
-  src/gui/widgets/primitives/afmpath.h \
-  src/gui/widgets/primitives/afmnode.h \
-  src/gui/widgets/primitives/afmseg.h \
-  src/gui/widgets/primitives/pot_plot.h \
+    src/gui/widgets/primitives/afmarea.h \
+    src/gui/widgets/primitives/afmpath.h \
+    src/gui/widgets/primitives/afmnode.h \
+    src/gui/widgets/primitives/afmseg.h \
+    src/gui/widgets/primitives/pot_plot.h \
 	src/gui/widgets/primitives/resizablerect.h \
 	src/gui/widgets/primitives/hull/hull.h \
 	src/gui/widgets/primitives/hull/convex.h \
@@ -97,7 +97,7 @@ SOURCES += \
 	src/gui/widgets/primitives/afmpath.cc \
 	src/gui/widgets/primitives/afmnode.cc \
 	src/gui/widgets/primitives/afmseg.cc \
-  src/gui/widgets/primitives/pot_plot.cc \
+    src/gui/widgets/primitives/pot_plot.cc \
 	src/gui/widgets/primitives/resizablerect.cc \
 	src/gui/widgets/primitives/hull/hull.cc \
 	src/gui/widgets/primitives/hull/convex.cc \
@@ -134,9 +134,9 @@ SOURCES += \
 	src/gui/widgets/dialog_panel.cc \
 	src/gui/widgets/input_field.cc \
 	src/gui/widgets/info_panel.cc \
-  src/gui/widgets/layer_manager.cc \
-  src/gui/widgets/sim_manager.cc \
-  src/gui/widgets/sim_visualize_panel.cc \
+    src/gui/widgets/layer_manager.cc \
+    src/gui/widgets/sim_manager.cc \
+    src/gui/widgets/sim_visualize_panel.cc \
 	src/gui/widgets/afm_panel.cc \
 	src/gui/commander.cc \
 	src/gui/widgets/item_manager.cc
@@ -172,7 +172,8 @@ macx:   EXEC_DIR = $${DESTDIR}/$${TARGET}.app/Contents/MacOS
 
 sim_common.path = $$EXEC_DIR/src/phys
 sim_common.files = \
-    $$PHYS_DIR/installing-new-engines.txt
+    $$PHYS_DIR/installing-new-engines.txt \
+    $$PHYS_DIR/is_python3.py
 INSTALLS += sim_common
 
 # SimAnneal

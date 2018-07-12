@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<linux>
+    <path>python3</path>                    <!-- PATH -->
+    <path>/usr/bin/python3</path>           <!-- Ubuntu -->
+    <path>/bin/python3</path>               <!-- Arch Linux -->
+    <path>python</path>                     <!-- PATH -->
+</linux>
+<win32>
+    <path>py -3</path>                      <!-- PATH -->
+    <path>python</path>                     <!-- PATH -->
+    <path>C:\\Windows\\py.exe -3</path>     <!-- Installation -->
+</win32>
