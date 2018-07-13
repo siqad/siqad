@@ -113,7 +113,7 @@ Controller.prototype.FinishedPageCallback = function()
 	//Triggers Python installation if the Python component was installed.
 	var component = installer.componentByName('siqad.python');
     if ( component.isInstalled() ) {
-        installer.performOperation("Execute", "@TargetDir@/python-3.6.5.exe");
+        installer.performOperation("Execute", "@TargetDir@/python-3.7.0-amd64-webinstall.exe");
     }
 
 }
