@@ -68,6 +68,7 @@ HEADERS += \
 	src/gui/widgets/primitives/sim_engine.h \
 	src/gui/widgets/primitives/sim_job.h \
 	src/gui/widgets/primitives/electrode.h \
+	src/gui/widgets/primitives/electrode_poly.h \
     src/gui/widgets/primitives/afmarea.h \
     src/gui/widgets/primitives/afmpath.h \
     src/gui/widgets/primitives/afmnode.h \
@@ -93,6 +94,7 @@ SOURCES += \
 	src/gui/widgets/primitives/sim_engine.cc \
 	src/gui/widgets/primitives/sim_job.cc \
 	src/gui/widgets/primitives/electrode.cc \
+	src/gui/widgets/primitives/electrode_poly.cc \
 	src/gui/widgets/primitives/afmarea.cc \
 	src/gui/widgets/primitives/afmpath.cc \
 	src/gui/widgets/primitives/afmnode.cc \

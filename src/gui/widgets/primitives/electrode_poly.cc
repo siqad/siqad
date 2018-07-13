@@ -9,3 +9,12 @@
 #include <algorithm>
 #include "electrode_poly.h"
 #include "src/settings/settings.h"
+
+
+prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly)
+{
+  qDebug() << "hello";
+  for(QPointF point: poly){
+    qDebug() << point;
+  }
+}

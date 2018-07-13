@@ -17,7 +17,7 @@ namespace prim{
   class ElectrodePoly: public QPolygonF
   {
   public:
-    ElectrodePoly(int lay_id, const QPolygonF);
-  }
+    ElectrodePoly(const QPolygonF);
+  };
 
 } //end prim namespace
