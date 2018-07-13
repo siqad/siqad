@@ -16,7 +16,7 @@ QT += core gui widgets svg printsupport uitools
 greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 
 TEMPLATE = app
-TARGET = db-sim
+TARGET = siqad
 INCLUDEPATH += .
 
 ###########################
