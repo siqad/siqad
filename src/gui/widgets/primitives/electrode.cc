@@ -136,7 +136,7 @@ void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)
 {
   QPolygonF poly;
   poly << QPointF(0,0) << QPointF(100,0) << QPointF(0,100);
-  ElectrodePoly e_poly = ElectrodePoly(poly);
+  prim::ElectrodePoly e_poly = prim::ElectrodePoly(poly);
   layer_id = lay_id;
   if(edge_width == -1){
     constructStatics();
