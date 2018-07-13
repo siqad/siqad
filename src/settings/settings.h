@@ -110,9 +110,9 @@ private:
     }
     path_map["<HOME>"] = QDir::homePath();
     path_map["<ROOT>"] = QDir::rootPath();
-    path_map["<SYSTMP>"] = QDir::tempPath() + "/db-sim";
+    path_map["<SYSTMP>"] = QDir::tempPath() + "/siqad";
     path_map["<CONFIG>"] = QStandardPaths::writableLocation(
-        QStandardPaths::ConfigLocation) + "/db-sim";
+        QStandardPaths::ConfigLocation) + "/siqad";
   }
   static QMap<QString, QString> path_map;
 };
