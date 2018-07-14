@@ -41,16 +41,17 @@ namespace gui{
     void updateTableAdd();
     void updateTableRemove(prim::Item* item);
     void showProperties();
-    
+
   private:
     void initItemManager();
     void initItemTableHeaders();
     void addItemRow(prim::Item *item);
+    void clearItemTable();
 
     LayerManager *layman;
     QTableWidget *item_table;
     QList<ItemTableRowContent*> table_row_contents;
-
+    QVBoxLayout *main_vl;
   };
 }
 

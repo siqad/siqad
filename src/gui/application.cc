@@ -55,7 +55,8 @@ gui::ApplicationGUI::~ApplicationGUI()
 
   // disown the layer dock widget so it can be properly destructed by design panel
   layer_dock->setParent(0);
-
+  item_dock->setParent(0);
+  
   // free memory, parent delete child Widgets so Graphical Items are already
   // handled. Still need to free Settings and commander
   delete commander;

@@ -1,0 +1,19 @@
+QMenuBar{
+  background-color: #aaaaaa;
+}
+
+QMenuBar::item:selected{
+  background-color: #888888;
+}
+
+QMenu{
+  background-color: #aaaaaa;
+}
+
+QMenuBar::item:selected{
+  background-color: #888888;
+}
+
+DockWidget, DockWidget * {
+  background-color: darkgray;
+}

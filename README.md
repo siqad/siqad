@@ -19,6 +19,7 @@ This tutorial is based on Ubuntu 17.10, and should also work on Ubuntu 18.04 LTS
 sudo apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5* qttools5-dev qttools5-dev-tools libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev pkg-config
 # poissolver dependencies
 sudo apt install python3-dolfin gmsh
+sudo pip3 install pillow
 # hoppingdynamics python dependencies
 sudo pip3 install matplotlib numpy scipy pyqt5
 ```

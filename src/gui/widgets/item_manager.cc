@@ -19,17 +19,30 @@ ItemManager::ItemManager(QWidget *parent, LayerManager* layman_in)
 
 ItemManager::~ItemManager()
 {
+  clearItemTable();
+  layman = 0;
+  delete item_table;
+  delete main_vl;
 }
 
 void ItemManager::initItemManager()
 {
   item_table = new QTableWidget(this);
-  QVBoxLayout *main_vl = new QVBoxLayout;
+  main_vl = new QVBoxLayout;
   main_vl->addWidget(item_table);
   initItemTableHeaders();
   setLayout(main_vl);
 }
 
+void ItemManager::clearItemTable()
+{
+  while (!table_row_contents.isEmpty()) {
+    ItemTableRowContent *row_content = table_row_contents.takeLast();
+    row_content->bt_show_properties->disconnect();
+    delete row_content;
+  }
+  item_table->setRowCount(0);  // delete all rows from layer table
+}
 
 void ItemManager::initItemTableHeaders()
 {

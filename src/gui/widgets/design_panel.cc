@@ -140,8 +140,10 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   delete afm_panel;
   delete property_editor;
   // delete layers and contained items
-  delete itman;
   delete layman;
+  delete itman;
+
+
   if(reset) prim::Layer::resetLayers(); // reset layer counter
 
 
