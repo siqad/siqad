@@ -113,7 +113,9 @@ QSettings *settings::AppSettings::m_defs()
   S->setValue("phys/debye_length", 50);
   S->setValue("phys/epsr", 10);
 
-  S->setValue("phys/eng_lib_dir", QString("<BINPATH>/src/phys/"));
+  S->setValue("phys/eng_lib_dirs", QString("<APPLOCALDATA>/phys/;<BINPATH>/src/phys/"));
+  //S->setValue("phys/eng_lib_dirs", QString("<APPLOCALDATA>/phys"));
+  //S->setValue("phys/eng_lib_dirs", QString("<BINPATH>/src/phys/"));
   S->setValue("phys/eng_usr_cfg_dir", QString("<CONFIG>/phys/"));
   S->setValue("phys/runtime_temp_dir", QString("<SYSTMP>/phys/"));
 

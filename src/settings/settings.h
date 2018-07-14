@@ -71,24 +71,54 @@ public:
     return val;
   }
 
+  // returns a QString with each of the included replaceable paths replaced by 
+  // a writable path (whatever QStandardPaths::writableLocation provides)
   QString getPath(const QString &key)
   {
     return pathReplacement(get<QString>(key));
   }
 
+  // returns a QStringList with each of the included replaceable paths replaced
+  // by all possible paths given by QStandardPaths::standardLocations
+  QStringList getAllPossiblePaths(const QString &key)
+  {
+    QStringList val_split = get<QString>(key).split(';', QString::SkipEmptyParts);
+    QStringList paths_return;
+
+    // perform replacement
+    QRegExp regex("<(.*)?>");
+    regex.setMinimal(true);
+
+    for (QString val : val_split) {
+      // TODO continue working here
+    }
+
+    while (path.indexOf(regex) != -1) {
+      QString found_path = regex.capturedTexts().first();
+      if (!path_map.contains(found_path)) {
+        qFatal(tr("Path replacement failed, key '%1' not found.")
+            .arg(found_path).toLatin1().constData(),0);
+      }
+      path.replace(path.indexOf(regex), found_path.length(), path_map[found_path]);
+    }
+    return path;
+  }
+
   static QString pathReplacement(QString path)
   {
-    if (!path_map.contains("<BINPATH>"))
+    if (!path_map.contains("BINPATH"))
       constructPathMap();
 
     // perform replacement
     QRegExp regex("<(.*)?>");
+    regex.setMinimal(true);
     while (path.indexOf(regex) != -1) {
-      if(!path_map.contains(regex.capturedTexts().first())) {
+      QString found_path = regex.capturedTexts().first();
+      if (!path_map.contains(found_path)) {
         qFatal(tr("Path replacement failed, key '%1' not found.")
-            .arg(regex.capturedTexts().first()).toLatin1().constData(),0);
+            .arg(found_path).toLatin1().constData(),0);
       }
-      path.replace(regex, path_map[regex.capturedTexts().first()]);
+      path.replace(path.indexOf(regex), found_path.length(), path_map[found_path]);
     }
     return path;
   }
@@ -107,13 +137,45 @@ private:
       // WARNING <BINPATH> can only be accessed after the core application has
       // been instantiated in main!
       path_map["<BINPATH>"] = QCoreApplication::applicationDirPath();
+      path_map["<APPLOCALDATA>"] = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
     }
     path_map["<HOME>"] = QDir::homePath();
     path_map["<ROOT>"] = QDir::rootPath();
-    path_map["<SYSTMP>"] = QDir::tempPath() + "/db-sim";
-    path_map["<CONFIG>"] = QStandardPaths::writableLocation(
-        QStandardPaths::ConfigLocation) + "/db-sim";
+    path_map["<SYSTMP>"] = QDir::tempPath() + "/siqad";
+    path_map["<CONFIG>"] = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/siqad";
   }
+
+  static QStringList standardLocations(const QString &type)
+  {
+    // NOTE very messy implementation, improve in the future
+    if (type == "<HOME>") {
+      return {QDir::homePath()};
+    } else if (type == "<ROOT>") {
+      return {QDir::rootPath()};
+    } else if (type == "<SYSTMP>") {
+      return {QDir::tempPath() + "/siqad"};
+    } else if (type == "<CONFIG>") {
+      QStringList locs =  QStandardPaths::standardLocations(QStandardPaths::ConfigLocation);
+      QStringList locs_return;
+      for (QString loc : locs)
+        locs_return.append(loc + "/siqad");
+      return locs_return;
+    } else if (type == "<BINPATH>") {
+      if (!QCoreApplication::startingUp())
+        return {QCoreApplication::applicationDirPath()};
+      else
+        qFatal("Trying to access <BINPATH> before QApplication has been launched");
+    } else if (type == "<APPLOCALDATA>") {
+      if (!QCoreApplication::startingUp())
+        return QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);
+      else
+        qFatal("Trying to access <APPLOCALDATA> before QApplication has been launched");
+    }
+
+    return {};
+  }
+
+
   static QMap<QString, QString> path_map;
 };
 
