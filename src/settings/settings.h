@@ -90,18 +90,23 @@ public:
     regex.setMinimal(true);
 
     for (QString val : val_split) {
-      // TODO continue working here
+      qDebug() << tr("val: %1").arg(val);
+      // assumes that there is only one replacement per splitted value
+      if (val.indexOf(regex) != -1) {
+        QString found_tag = regex.capturedTexts().first();
+        for (QString loc : standardLocations(found_tag)) {
+          QString new_val = val;
+          new_val.replace(val.indexOf(regex), found_tag.length(), loc);
+          paths_return.append(new_val);
+          qDebug() << tr("Standard path added: %1").arg(new_val);
+        }
+      } else {
+        // no tag to replace, add without modification
+        paths_return.append(val);
+      }
     }
 
-    while (path.indexOf(regex) != -1) {
-      QString found_path = regex.capturedTexts().first();
-      if (!path_map.contains(found_path)) {
-        qFatal(tr("Path replacement failed, key '%1' not found.")
-            .arg(found_path).toLatin1().constData(),0);
-      }
-      path.replace(path.indexOf(regex), found_path.length(), path_map[found_path]);
-    }
-    return path;
+    return paths_return;
   }
 
   static QString pathReplacement(QString path)
@@ -170,6 +175,8 @@ private:
         return QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);
       else
         qFatal("Trying to access <APPLOCALDATA> before QApplication has been launched");
+    } else {
+      qFatal("Provided standard location type not known");
     }
 
     return {};

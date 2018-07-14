@@ -413,8 +413,9 @@ void SimManager::resetToEngineDefault()
 
 void SimManager::initEngines()
 {
-  QString engine_lib_dirs = settings::AppSettings::instance()->getPath("phys/eng_lib_dirs");
-  QStringList engine_lib_dir_paths = engine_lib_dirs.split(';', QString::SkipEmptyParts);
+  //QString engine_lib_dirs = settings::AppSettings::instance()->getPath("phys/eng_lib_dirs");
+  //QStringList engine_lib_dir_paths = engine_lib_dirs.split(';', QString::SkipEmptyParts);
+  QStringList engine_lib_dir_paths = settings::AppSettings::instance()->getAllPossiblePaths("phys/eng_lib_dirs");
 
   for (QString engine_lib_dir_path : engine_lib_dir_paths) {
     QDir engine_lib_dir(engine_lib_dir_path);
