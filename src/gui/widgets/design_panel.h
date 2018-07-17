@@ -20,6 +20,7 @@
 #include "../../global.h"
 
 #include "afm_panel.h"
+#include "electrode_poly_helper.h"
 #include "layer_manager.h"
 #include "property_editor.h"
 #include "item_manager.h"
@@ -305,6 +306,7 @@ namespace gui{
 
     // children panels
     AFMPanel *afm_panel;
+    ElectrodePolyHelper *eph;
     // TODO layer manager
 
     // copy/paste

@@ -130,6 +130,8 @@ void gui::DesignPanel::initDesignPanel() {
   connect(this, &gui::DesignPanel::sig_toolChanged,
             afm_panel, &gui::AFMPanel::toolChangeResponse);
 
+  eph = new ElectrodePolyHelper(this);
+
   emit sig_setItemManagerWidget(itman);
 }
 
@@ -2425,6 +2427,7 @@ void gui::DesignPanel::createElectrode(QRect scene_rect)
 
 void gui::DesignPanel::createElectrodePolyNode(QPointF point)
 {
+  eph->addPoint(point);
   qDebug() << point;
   // int layer_index = layman->indexOf(layman->activeLayer());
   // //only ever create one electrode at a time
