@@ -13,7 +13,6 @@
 
 prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly)
 {
-  qDebug() << "hello";
   for(QPointF point: poly){
     qDebug() << point;
   }

@@ -56,7 +56,7 @@ gui::ApplicationGUI::~ApplicationGUI()
   // disown the layer dock widget so it can be properly destructed by design panel
   layer_dock->setParent(0);
   item_dock->setParent(0);
-  
+
   // free memory, parent delete child Widgets so Graphical Items are already
   // handled. Still need to free Settings and commander
   delete commander;
@@ -331,6 +331,8 @@ void gui::ApplicationGUI::initSideBar()
       tr("DB tool"));
   action_electrode_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"),
       tr("Electrode tool"));
+  action_electrode_poly_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"),
+      tr("Electrode polygon tool"));
   /*
   action_afmarea_tool = side_bar->addAction(QIcon(":/ico/drawafmarea.svg"),
       tr("AFM Area tool"));
@@ -345,6 +347,7 @@ void gui::ApplicationGUI::initSideBar()
   action_group->addAction(action_drag_tool);
   action_group->addAction(action_dbgen_tool);
   action_group->addAction(action_electrode_tool);
+  action_group->addAction(action_electrode_poly_tool);
   /*
   action_group->addAction(action_afmarea_tool);
   action_group->addAction(action_afmpath_tool);
@@ -358,6 +361,7 @@ void gui::ApplicationGUI::initSideBar()
   action_drag_tool->setCheckable(true);
   action_dbgen_tool->setCheckable(true);
   action_electrode_tool->setCheckable(true);
+  action_electrode_poly_tool->setCheckable(true);
   /*
   action_afmarea_tool->setCheckable(true);
   action_afmpath_tool->setCheckable(true);
@@ -376,6 +380,8 @@ void gui::ApplicationGUI::initSideBar()
           this, &gui::ApplicationGUI::setToolDBGen);
   connect(action_electrode_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolElectrode);
+  connect(action_electrode_poly_tool, &QAction::triggered,
+          this, &gui::ApplicationGUI::setToolElectrodePoly);
   /*
   connect(action_afmarea_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolAFMArea);
@@ -625,6 +631,10 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
       action_electrode_tool->setChecked(true);
       setToolElectrode();
       break;
+    case gui::ToolType::ElectrodePolyTool:
+      action_electrode_poly_tool->setChecked(true);
+      setToolElectrodePoly();
+      break;
       /*
     case gui::ToolType::AFMAreaTool:
       action_afmarea_tool->setChecked(true);
@@ -702,6 +712,11 @@ void gui::ApplicationGUI::setToolLabel()
   design_pan->setTool(gui::ToolType::LabelTool);
 }
 
+void gui::ApplicationGUI::setToolElectrodePoly()
+{
+  qDebug() << tr("selecting electrode polygon tool");
+  design_pan->setTool(gui::ToolType::ElectrodePolyTool);
+}
 
 void gui::ApplicationGUI::changeLattice()
 {

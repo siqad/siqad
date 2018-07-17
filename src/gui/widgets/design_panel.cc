@@ -356,6 +356,11 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
       setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
       break;
+    case gui::ToolType::ElectrodePolyTool:
+      layman->setActiveLayer(layman->getMRULayer(prim::Layer::Electrode));
+      setDragMode(QGraphicsView::NoDrag);
+      setInteractive(true);
+      break;
     case gui::ToolType::AFMAreaTool:
       layman->setActiveLayer(layman->getMRULayer(prim::Layer::AFMTip));
       setInteractive(true);
@@ -961,6 +966,10 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
           case gui::ToolType::AFMPathTool:
             // Make node at the ghost position
             createAFMNode();
+            break;
+          case gui::ToolType::ElectrodePolyTool:
+            createElectrodePolyNode(mapToScene(e->pos()));
+            qDebug() << "ELECTRODE POLY";
             break;
           case gui::ToolType::ScreenshotAreaTool:
             // take a screenshot of the rubberband area
@@ -2412,6 +2421,17 @@ void gui::DesignPanel::createElectrode(QRect scene_rect)
   undo_stack->push(new CreateItem(layer_index, this,
                                   new prim::Electrode(layer_index, scene_rect)));
   undo_stack->endMacro();
+}
+
+void gui::DesignPanel::createElectrodePolyNode(QPointF point)
+{
+  qDebug() << point;
+  // int layer_index = layman->indexOf(layman->activeLayer());
+  // //only ever create one electrode at a time
+  // undo_stack->beginMacro(tr("create electrode with given corners"));
+  // undo_stack->push(new CreateItem(layer_index, this,
+  //                                 new prim::Electrode(layer_index, scene_rect)));
+  // undo_stack->endMacro();
 }
 
 void gui::DesignPanel::createPotPlot(QString pot_plot_path, QRectF graph_container, QString pot_plot_anim)

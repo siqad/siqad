@@ -15,7 +15,7 @@
 namespace gui{
 
   enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool, ElectrodeTool,
-                AFMAreaTool, AFMPathTool, ScreenshotAreaTool, LabelTool};
+                AFMAreaTool, AFMPathTool, ScreenshotAreaTool, LabelTool, ElectrodePolyTool};
   enum DisplayMode{DesignMode, SimDisplayMode, ScreenshotMode};
 
   extern QString python_path;

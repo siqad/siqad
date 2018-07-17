@@ -461,6 +461,7 @@ namespace gui{
     //! in scene coordinates.
     void createElectrode(QRect scene_rect);
 
+    void createElectrodePolyNode(QPointF point);
     //create potential plot on panel
     void createPotPlot(QString pot_plot_path, QRectF graph_container, QString pot_anim_path);
 

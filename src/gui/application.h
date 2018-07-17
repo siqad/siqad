@@ -70,6 +70,7 @@ namespace gui{
     void setToolAFMPath();
     void setToolScreenshotArea();
     void setToolLabel();
+    void setToolElectrodePoly();
 
     // change lattice
     void changeLattice();
@@ -203,6 +204,7 @@ namespace gui{
     QAction *action_drag_tool;    // change cursor tool to drag
     QAction *action_dbgen_tool;   // change cursor tool to gen
     QAction *action_electrode_tool;   // change cursor tool to electrode
+    QAction *action_electrode_poly_tool;   // change cursor tool to electrode
     QAction *action_afmarea_tool; // change cursor tool to AFM Area tool
     QAction *action_afmpath_tool; // change cursor tool to AFM Path tool
     QAction *action_label_tool;   // change cursor tool to label
