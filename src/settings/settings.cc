@@ -207,6 +207,9 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("latdot/inner_fill_col", QColor(255, 255, 0));  // inner colour
   S->setValue("latdot/inner_fill_col_pb", QColor(255, 255, 0));  // inner colour (publish mode)
 
+  //resizable rect params
+  S->setValue("resizablerect/handle_dim", 100);            // size of resize handle
+
   // ghost parameters
   S->setValue("ghost/dot_diameter", 1.0);                    // ghost dot diameter
   S->setValue("ghost/valid_col", QColor(0, 255, 0, 255));   // color for valid placements

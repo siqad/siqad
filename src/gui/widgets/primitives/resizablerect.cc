@@ -320,8 +320,8 @@ void ResizeHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent *)
 
 void ResizeHandle::prepareStatics()
 {
-  // TODO settings.cc
-  handle_dim = 100;
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  handle_dim = gui_settings->get<qreal>("resizablerect/handle_dim");
 }
 
 } // end of prim namespace
