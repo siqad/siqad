@@ -18,6 +18,7 @@ namespace prim{
   {
   public:
     ElectrodePoly(const QPolygonF);
+    void test();
   };
 
 } //end prim namespace

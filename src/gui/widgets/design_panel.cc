@@ -1085,6 +1085,12 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
           emit sig_toolChangeRequest(gui::ToolType::SelectTool);
         }
         break;
+      case Qt::Key_Return:
+        if (tool_type == gui::ToolType::ElectrodePolyTool) {
+          qDebug() << "RETURN WITH ELECTRODEPOLY";
+          createElectrodePoly();
+        }
+        break;
       case Qt::Key_S:
         if (display_mode == ScreenshotMode) {
           sig_screenshot(prev_screenshot_area);
@@ -2428,14 +2434,15 @@ void gui::DesignPanel::createElectrode(QRect scene_rect)
 void gui::DesignPanel::createElectrodePolyNode(QPointF point)
 {
   eph->addPoint(point);
-  qDebug() << point;
-  // int layer_index = layman->indexOf(layman->activeLayer());
-  // //only ever create one electrode at a time
-  // undo_stack->beginMacro(tr("create electrode with given corners"));
-  // undo_stack->push(new CreateItem(layer_index, this,
-  //                                 new prim::Electrode(layer_index, scene_rect)));
-  // undo_stack->endMacro();
 }
+
+void gui::DesignPanel::createElectrodePoly()
+{
+  QPolygonF poly = QPolygonF(eph->getPoints().toVector());
+  prim::ElectrodePoly e_poly = prim::ElectrodePoly(poly);
+  e_poly.test();
+}
+
 
 void gui::DesignPanel::createPotPlot(QString pot_plot_path, QRectF graph_container, QString pot_plot_anim)
 {

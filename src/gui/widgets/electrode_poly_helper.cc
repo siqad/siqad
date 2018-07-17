@@ -45,6 +45,7 @@ void ElectrodePolyHelper::clearPoint()
   points.clear();
 }
 
+
 // void AFMPanel::setFocusedPath(prim::AFMPath *path_fo)
 // {
 //   path_focused = path_fo;

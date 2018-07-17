@@ -12,8 +12,14 @@
 
 
 prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly)
+  : QPolygonF(poly)
 {
-  for(QPointF point: poly){
+  qDebug() << "ElectrodePoly created";
+}
+
+void prim::ElectrodePoly::test()
+{
+  for (QPointF point: *this){
     qDebug() << point;
   }
 }

@@ -30,6 +30,7 @@ namespace gui{
 
     void addPoint(QPointF point);
     void clearPoint();
+    QList<QPointF> getPoints(){return points;}
 
     // focused path (either showing properties or editing)
     // prim::AFMPath *focusedPath() {return path_focused;}
