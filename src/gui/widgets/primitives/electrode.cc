@@ -163,16 +163,12 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
   painter->setPen(QPen(edge_col, edge_width));
   painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
   painter->drawRect(rect);
-
-  // draw inner circle
   if(tool_type == gui::SelectTool && isSelected()){
-
     setPos(pos());
     QPointF center = rect.center();
     QSizeF size(sceneRect().width()+edge_width, sceneRect().height()+edge_width);
     rect.setSize(size);
     rect.moveCenter(center);
-
     painter->setPen(Qt::NoPen);
     painter->setBrush(selected_col);
     painter->drawRect(rect);

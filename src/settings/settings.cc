@@ -226,6 +226,12 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("electrode/fill_col", QColor("#aad2be74"));     // fill color
   S->setValue("electrode/selected_col", QColor(0, 100, 255)); // edge color, selected
 
+  // electrodepoly parameters
+  S->setValue("electrodepoly/edge_width", .05);                   // edge width of box lines
+  S->setValue("electrodepoly/edge_col", QColor(60,60,60));        // edge color
+  S->setValue("electrodepoly/fill_col", QColor("#aad2be74"));     // fill color
+  S->setValue("electrodepoly/selected_col", QColor(0, 100, 255)); // edge color, selected
+
   // potplot parameters
   S->setValue("potplot/edge_width", .05);                   // edge width of box lines
   S->setValue("potplot/edge_col", QColor(60,60,60));        // edge color

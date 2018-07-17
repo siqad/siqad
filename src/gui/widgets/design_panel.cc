@@ -971,7 +971,6 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             break;
           case gui::ToolType::ElectrodePolyTool:
             createElectrodePolyNode(mapToScene(e->pos()));
-            qDebug() << "ELECTRODE POLY";
             break;
           case gui::ToolType::ScreenshotAreaTool:
             // take a screenshot of the rubberband area
@@ -1087,7 +1086,6 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
         break;
       case Qt::Key_Return:
         if (tool_type == gui::ToolType::ElectrodePolyTool) {
-          qDebug() << "RETURN WITH ELECTRODEPOLY";
           createElectrodePoly();
         }
         break;
@@ -1772,6 +1770,43 @@ void gui::DesignPanel::CreatePotPlot::destroy()
 }
 
 
+
+// CreateElectrodePoly class
+gui::DesignPanel::CreateElectrodePoly::CreateElectrodePoly(gui::DesignPanel *dp, QPolygonF poly, prim::ElectrodePoly *ep, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), poly(poly), ep(ep), invert(invert)
+{  //if called to destroy, *elec points to selected electrode. if called to create, *elec = 0
+}
+
+void gui::DesignPanel::CreateElectrodePoly::undo()
+{
+  invert ? create() : destroy();
+}
+
+void gui::DesignPanel::CreateElectrodePoly::redo()
+{
+  invert ? destroy() : create();
+}
+
+
+void gui::DesignPanel::CreateElectrodePoly::create()
+{
+  ep = new prim::ElectrodePoly(poly);
+  dp->addItemToScene(static_cast<prim::Item*>(ep));
+
+}
+
+void gui::DesignPanel::CreateElectrodePoly::destroy()
+{
+  dp->removeItemFromScene(static_cast<prim::Item*>(ep));  // deletes PotPlot
+  ep = 0;
+  // contained nodes and segments should be deleted automatically when deleting the path
+  // since they're children items to the path.
+  // dp->removeItem(afm_path, dp->layman->getLayer(afm_path->layer_id));
+  // dp->afmPanel()->setFocusedPath(0);
+}
+
+
+
 // CreateAFMPath class
 
 gui::DesignPanel::CreateAFMPath::CreateAFMPath(int layer_index, gui::DesignPanel *dp,
@@ -2439,8 +2474,11 @@ void gui::DesignPanel::createElectrodePolyNode(QPointF point)
 void gui::DesignPanel::createElectrodePoly()
 {
   QPolygonF poly = QPolygonF(eph->getPoints().toVector());
-  prim::ElectrodePoly e_poly = prim::ElectrodePoly(poly);
-  e_poly.test();
+  eph->clearPoints();
+  prim::ElectrodePoly* e_poly = new prim::ElectrodePoly(poly);
+  undo_stack->beginMacro(tr("Create electrode polygon with given points"));
+  undo_stack->push(new CreateElectrodePoly(this, poly));
+  undo_stack->endMacro();
 }
 
 
@@ -2601,6 +2639,13 @@ void gui::DesignPanel::deleteSelection()
         undo_stack->push(new CreatePotPlot(this,
             pp->getPotPlotPath(), pp->getGraphContainer(), pp->getAnimPath(),
             static_cast<prim::PotPlot*>(item), true));
+        break;
+        }
+      case prim::Item::ElectrodePoly:
+        {
+        prim::ElectrodePoly *ep = static_cast<prim::ElectrodePoly*>(item);
+        undo_stack->push(new CreateElectrodePoly(this, ep->getPolygon(),
+            static_cast<prim::ElectrodePoly*>(item), true));
         break;
         }
       default:

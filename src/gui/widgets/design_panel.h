@@ -447,6 +447,7 @@ namespace gui{
     class MoveItem;         // move a single Item
 
     class CreatePotPlot;  // create an electrode at the given points
+    class CreateElectrodePoly;  // create an electrode at the given points
 
     class CreateAFMPath;    // create an empty AFMPath that should later contain AFMNodes
     class CreateAFMNode;    // create AFMNodes that should be children of AFMPath
@@ -643,6 +644,31 @@ namespace gui{
     prim::PotPlot* pp;
     bool invert;
   };
+
+
+  class DesignPanel::CreateElectrodePoly : public QUndoCommand
+  {
+  public:
+    // create an plot at the given points
+    CreateElectrodePoly(gui::DesignPanel *dp, QPolygonF poly,
+      prim::ElectrodePoly *ep = 0, bool invert=false, QUndoCommand *parent=0);
+
+  private:
+
+    // destroy the dangling bond and update the lattice dot
+    virtual void undo();
+    // re-create the dangling bond
+    virtual void redo();
+
+    void create();  // create the dangling bond
+    void destroy(); // destroy the dangling bond
+
+    DesignPanel *dp;  // DesignPanel pointer
+    QPolygonF poly;
+    prim::ElectrodePoly* ep;
+    bool invert;
+  };
+
 
 
   class DesignPanel::CreateAFMPath : public QUndoCommand

@@ -29,7 +29,7 @@ namespace gui{
     ~ElectrodePolyHelper() {};
 
     void addPoint(QPointF point);
-    void clearPoint();
+    void clearPoints();
     QList<QPointF> getPoints(){return points;}
 
     // focused path (either showing properties or editing)

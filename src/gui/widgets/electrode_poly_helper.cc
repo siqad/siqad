@@ -40,7 +40,7 @@ void ElectrodePolyHelper::addPoint(QPointF point)
   points.append(point);
 }
 
-void ElectrodePolyHelper::clearPoint()
+void ElectrodePolyHelper::clearPoints()
 {
   points.clear();
 }
