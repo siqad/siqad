@@ -2475,7 +2475,6 @@ void gui::DesignPanel::createElectrodePoly()
 {
   QPolygonF poly = QPolygonF(eph->getPoints().toVector());
   eph->clearPoints();
-  prim::ElectrodePoly* e_poly = new prim::ElectrodePoly(poly);
   undo_stack->beginMacro(tr("Create electrode polygon with given points"));
   undo_stack->push(new CreateElectrodePoly(this, poly));
   undo_stack->endMacro();

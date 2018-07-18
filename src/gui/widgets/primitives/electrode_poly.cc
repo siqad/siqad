@@ -25,6 +25,7 @@ prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly)
 
 void prim::ElectrodePoly::initElectrodePoly()
 {
+  qDebug() << "HELLO";
   constructStatics();
   setZValue(-1);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
