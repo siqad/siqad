@@ -15,7 +15,7 @@ namespace prim{
   class ElectrodePoly: public Item
   {
   public:
-    ElectrodePoly(const QPolygonF);
+    ElectrodePoly(const QPolygonF, const QRectF);
     void test();
     QPolygonF getPolygon(){return poly;}
     virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
@@ -25,7 +25,7 @@ namespace prim{
     void constructStatics();
     void initElectrodePoly();
 
-
+    QRectF scene_rect;
     QPolygonF poly;
     static qreal edge_width;  // proportional width of dot boundary edge
     static QColor fill_col;   // dot fill color (same for all lattice dots)

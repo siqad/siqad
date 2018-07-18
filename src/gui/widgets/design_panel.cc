@@ -1790,9 +1790,11 @@ void gui::DesignPanel::CreateElectrodePoly::redo()
 
 void gui::DesignPanel::CreateElectrodePoly::create()
 {
-  ep = new prim::ElectrodePoly(poly);
+  QRectF scene_rect = poly.boundingRect();
+  ep = new prim::ElectrodePoly(poly, scene_rect);
   dp->addItemToScene(static_cast<prim::Item*>(ep));
-
+  qDebug() << ep->pos();
+  qDebug() << poly.boundingRect().topLeft();
 }
 
 void gui::DesignPanel::CreateElectrodePoly::destroy()
@@ -2002,6 +2004,8 @@ void gui::DesignPanel::CreateItem::create()
     qCritical() << tr("Item pointer is 0, cannot create new item");
   dp->addItem(item, layer_index, item_index);
   in_scene = true;
+
+  qDebug() << item->pos();
 }
 
 void gui::DesignPanel::CreateItem::destroy()
