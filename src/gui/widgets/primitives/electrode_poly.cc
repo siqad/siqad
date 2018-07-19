@@ -60,11 +60,10 @@ void prim::ElectrodePoly::paint(QPainter *painter, const QStyleOptionGraphicsIte
 
 void prim::ElectrodePoly::constructStatics() //needs to be changed to look at electrode settings instead.
 {
-
   // default_class_properties.readPropertiesFromXML(":/properties/electrode.xml");
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
-  edge_width = gui_settings->get<qreal>("electrode/edge_width");
-  edge_col= gui_settings->get<QColor>("electrode/edge_col");
-  fill_col= gui_settings->get<QColor>("electrode/fill_col");
-  selected_col= gui_settings->get<QColor>("electrode/selected_col");
+  edge_width = gui_settings->get<qreal>("electrodepoly/edge_width");
+  edge_col= gui_settings->get<QColor>("electrodepoly/edge_col");
+  fill_col= gui_settings->get<QColor>("electrodepoly/fill_col");
+  selected_col= gui_settings->get<QColor>("electrodepoly/selected_col");
 }

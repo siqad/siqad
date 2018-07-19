@@ -1771,7 +1771,6 @@ void gui::DesignPanel::CreatePotPlot::destroy()
 }
 
 
-
 // CreateElectrodePoly class
 gui::DesignPanel::CreateElectrodePoly::CreateElectrodePoly(gui::DesignPanel *dp, QPolygonF poly, int layer_index, prim::ElectrodePoly *ep, bool invert, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), poly(poly), ep(ep), layer_index(layer_index), invert(invert)
@@ -1795,13 +1794,11 @@ void gui::DesignPanel::CreateElectrodePoly::create()
   QRectF scene_rect = poly.boundingRect();
   ep = new prim::ElectrodePoly(poly, scene_rect, layer_index);
   dp->addItem(ep, layer_index, index);
-  // dp->addItemToScene(static_cast<prim::Item*>(ep));
 }
 
 void gui::DesignPanel::CreateElectrodePoly::destroy()
 {
   dp->removeItem(ep, dp->layman->getLayer(ep->layer_id));
-  // dp->removeItemFromScene(static_cast<prim::Item*>(ep));  // deletes PotPlot
   ep = 0;
 }
 
@@ -2466,6 +2463,7 @@ void gui::DesignPanel::createElectrode(QRect scene_rect)
 void gui::DesignPanel::createElectrodePolyNode(QPointF point)
 {
   eph->addPoint(point);
+
 }
 
 void gui::DesignPanel::createElectrodePoly()
