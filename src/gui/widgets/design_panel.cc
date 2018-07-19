@@ -131,6 +131,8 @@ void gui::DesignPanel::initDesignPanel() {
             afm_panel, &gui::AFMPanel::toolChangeResponse);
 
   eph = new ElectrodePolyHelper(this);
+  connect(this, &gui::DesignPanel::sig_toolChanged,
+            eph, &gui::ElectrodePolyHelper::toolChangeResponse);
 
   emit sig_setItemManagerWidget(itman);
 }
