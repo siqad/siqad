@@ -115,11 +115,9 @@ namespace prim{
 
   private:
     QPolygonF poly;
-    qreal width; //width of electrode that was passed
-    qreal height; //height of electrode that was passed
     void constructStatics();
 
-    QColor ghost_box_color;
+    QColor ghost_poly_color;
   };
 
 

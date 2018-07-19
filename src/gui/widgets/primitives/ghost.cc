@@ -108,8 +108,6 @@ prim::GhostPolygon::GhostPolygon(prim::Item *item, prim::Item *parent)
   constructStatics();
 
   if (item->item_type == prim::Item::ElectrodePoly) {
-    width = reinterpret_cast<prim::ResizableRect*>(item)->sceneRect().width();
-    height = reinterpret_cast<prim::ResizableRect*>(item)->sceneRect().height();
     poly = static_cast<prim::ElectrodePoly*>(item)->getPolygon();
     qDebug() << item->getQStringItemType();
   } else {
@@ -121,13 +119,13 @@ prim::GhostPolygon::GhostPolygon(prim::Item *item, prim::Item *parent)
 
 QRectF prim::GhostPolygon::boundingRect() const
 {
-  return QRectF(0, 0, width, height);
+  return QRectF(0, 0, poly.boundingRect().width(), poly.boundingRect().height());
 }
 
 void prim::GhostPolygon::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
   painter->setPen(Qt::NoPen);
-  painter->setBrush(ghost_box_color);
+  painter->setBrush(ghost_poly_color);
   // painter->drawRect(boundingRect());
   painter->drawPolygon(poly);
 }
@@ -135,7 +133,7 @@ void prim::GhostPolygon::paint(QPainter *painter, const QStyleOptionGraphicsItem
 void prim::GhostPolygon::constructStatics()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
-  ghost_box_color = gui_settings->get<QColor>("ghostbox/valid_col");
+  ghost_poly_color = gui_settings->get<QColor>("ghostpoly/valid_col");
 }
 
 
@@ -476,6 +474,8 @@ prim::Item *prim::Ghost::getNodeItem(prim::AggNode *node) const
           node->source_type == prim::AggNode::AFMArea ||
           node->source_type == prim::AggNode::TextLabel)
     return box_sources.at(node->index);
+  else if(node->source_type == prim::AggNode::ElectrodePoly)
+    return poly_sources.at(node->index);
   else
     return 0;
 
