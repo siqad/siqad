@@ -57,7 +57,6 @@ prim::GhostBox::GhostBox(prim::Item *item, prim::Item *parent)
 
   if (item->item_type == prim::Item::Electrode ||
       item->item_type == prim::Item::AFMArea ||
-      item->item_type == prim::Item::ElectrodePoly ||
       item->item_type == prim::Item::TextLabel) {
     width = reinterpret_cast<prim::ResizableRect*>(item)->sceneRect().width();
     height = reinterpret_cast<prim::ResizableRect*>(item)->sceneRect().height();
@@ -103,6 +102,41 @@ void prim::GhostBox::constructStatics()
 }
 
 
+prim::GhostPolygon::GhostPolygon(prim::Item *item, prim::Item *parent)
+  : Item(prim::Item::GhostPolygon, 0, parent)
+{
+  constructStatics();
+
+  if (item->item_type == prim::Item::ElectrodePoly) {
+    width = reinterpret_cast<prim::ResizableRect*>(item)->sceneRect().width();
+    height = reinterpret_cast<prim::ResizableRect*>(item)->sceneRect().height();
+    poly = static_cast<prim::ElectrodePoly*>(item)->getPolygon();
+    qDebug() << item->getQStringItemType();
+  } else {
+    qFatal("Trying to make a GhostBox out of unsupported item type");
+  }
+  setZValue(-1);
+  setPos(item->pos());
+}
+
+QRectF prim::GhostPolygon::boundingRect() const
+{
+  return QRectF(0, 0, width, height);
+}
+
+void prim::GhostPolygon::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
+{
+  painter->setPen(Qt::NoPen);
+  painter->setBrush(ghost_box_color);
+  // painter->drawRect(boundingRect());
+  painter->drawPolygon(poly);
+}
+
+void prim::GhostPolygon::constructStatics()
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  ghost_box_color = gui_settings->get<QColor>("ghostbox/valid_col");
+}
 
 
 
@@ -138,6 +172,11 @@ void prim::Ghost::cleanGhost()
   for(prim::GhostBox *box : boxes)
     delete box;
   boxes.clear();
+
+  poly_sources.clear();
+  for(prim::GhostPolygon *poly : polygons)
+    delete poly;
+  polygons.clear();
 
   setPos(0,0);
   setValid(true);
@@ -308,13 +347,18 @@ void prim::Ghost::createGhostDot(prim::Item *item)
 void prim::Ghost::createGhostBox(prim::Item *item)
 {
   qDebug() << QObject::tr("Creating Ghost Box");
-  // prim::GhostDot *dot = new prim::GhostDot(item, this, &col);
   prim::GhostBox *box = new prim::GhostBox(item, this);
-  //
   boxes.append(box);
   box_sources.append(item);
 }
 
+void prim::Ghost::createGhostPolygon(prim::Item *item)
+{
+  qDebug() << QObject::tr("Creating Ghost Polygon");
+  prim::GhostPolygon *poly = new prim::GhostPolygon(item, this);
+  polygons.append(poly);
+  poly_sources.append(item);
+}
 
 void prim::Ghost::prepareItem(prim::Item *item, prim::AggNode *node)
 {
@@ -353,10 +397,10 @@ void prim::Ghost::prepareItem(prim::Item *item, prim::AggNode *node)
     node->nodes.append(new_node);
     createGhostBox(item);
   } else if (item->item_type == prim::Item::ElectrodePoly) {
-    new_node = new prim::AggNode(box_sources.count());
+    new_node = new prim::AggNode(poly_sources.count());
     new_node->source_type = prim::AggNode::ElectrodePoly;
     node->nodes.append(new_node);
-    createGhostBox(item);
+    createGhostPolygon(item);
   }
 }
 

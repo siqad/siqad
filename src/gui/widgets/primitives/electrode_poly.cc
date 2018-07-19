@@ -20,14 +20,12 @@ QColor prim::ElectrodePoly::selected_col; // edge colour, selected
 prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly, const QRectF scene_rect)
   : prim::Item(prim::Item::ElectrodePoly), poly(poly), scene_rect(scene_rect)
 {
-  qDebug() << poly;
   initElectrodePoly();
 }
 
 void prim::ElectrodePoly::initElectrodePoly()
 {
   constructStatics();
-  qDebug() << poly;
   setPos(scene_rect.topLeft());
   poly.translate(-scene_rect.topLeft());
   update();

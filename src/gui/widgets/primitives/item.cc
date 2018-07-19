@@ -47,6 +47,7 @@ QString prim::Item::getQStringItemType()
     case prim::Item::PotPlot: return "PotPlot";
     case prim::Item::ResizeFrame: return "ResizeFrame";
     case prim::Item::ResizeHandle: return "ResizeHandle";
+    case prim::Item::ElectrodePoly: return "ElectrodePoly";
     default: return "Erroneous Item";
   }
 }

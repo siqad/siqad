@@ -20,6 +20,6 @@
 #include "resizablerect.h"
 #include "labels/labelgroup.h"
 #include "labels/textlabel.h"
-// #include "electrode_poly.h"
+#include "electrode_poly.h"
 
 #endif

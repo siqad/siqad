@@ -7,6 +7,10 @@
  *  @brief:     Function prototypes for the ElectrodePoly object.
  */
 
+#ifndef _GUI_PR_ELECTRODE_POLY_H_
+#define _GUI_PR_ELECTRODE_POLY_H_
+
+
 #include <QtWidgets>
 #include "resizablerect.h"
 
@@ -36,3 +40,5 @@ namespace prim{
   };
 
 } //end prim namespace
+
+#endif

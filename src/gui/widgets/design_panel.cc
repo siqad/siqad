@@ -1787,11 +1787,9 @@ void gui::DesignPanel::CreateElectrodePoly::redo()
   invert ? destroy() : create();
 }
 
-
 void gui::DesignPanel::CreateElectrodePoly::create()
 {
   QRectF scene_rect = poly.boundingRect();
-  qDebug() << poly;
   ep = new prim::ElectrodePoly(poly, scene_rect);
   dp->addItemToScene(static_cast<prim::Item*>(ep));
 }
@@ -1800,13 +1798,7 @@ void gui::DesignPanel::CreateElectrodePoly::destroy()
 {
   dp->removeItemFromScene(static_cast<prim::Item*>(ep));  // deletes PotPlot
   ep = 0;
-  // contained nodes and segments should be deleted automatically when deleting the path
-  // since they're children items to the path.
-  // dp->removeItem(afm_path, dp->layman->getLayer(afm_path->layer_id));
-  // dp->afmPanel()->setFocusedPath(0);
 }
-
-
 
 // CreateAFMPath class
 

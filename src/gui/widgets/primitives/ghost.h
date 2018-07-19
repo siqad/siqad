@@ -70,7 +70,7 @@ namespace prim{
     QColor *pcol;           // pointer to the GhostDot color
   };
 
-  //! The ghost associated with Electrodes. Used during move and previews.
+  //! The ghost associated with boxes. Used during move and previews.
   class GhostBox : public Item
   {
   public:
@@ -95,6 +95,33 @@ namespace prim{
 
     QColor ghost_box_color;
   };
+
+  //! The ghost associated with polygons. Used during move and previews.
+  class GhostPolygon : public Item
+  {
+  public:
+
+    //! constructor
+    GhostPolygon(Item *item, Item *parent);
+
+    //! destructor
+    ~GhostPolygon(){}
+
+    // virtual methods
+    QRectF boundingRect() const Q_DECL_OVERRIDE;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*) Q_DECL_OVERRIDE;
+
+    Item* deepCopy() const override {return 0;}
+
+  private:
+    QPolygonF poly;
+    qreal width; //width of electrode that was passed
+    qreal height; //height of electrode that was passed
+    void constructStatics();
+
+    QColor ghost_box_color;
+  };
+
 
   //! collection of GhostDot and GhostBox objects for moving Items or copy/paste, singleton
   class Ghost : public Item
@@ -204,9 +231,8 @@ namespace prim{
     // create and add a ghost dot for the given non-Aggregate Item. Possibly add
     // ItemType-specific GhostDots in future... for now just circles
     void createGhostDot(Item *item);
-
-
     void createGhostBox(Item *item); //box for electrodes.
+    void createGhostPolygon(Item *item); //box for electrodes.
 
     // prepare a single item. If item is an Aggregate, recursively prepare children
     void prepareItem(Item *item, prim::AggNode *node);
@@ -235,6 +261,10 @@ namespace prim{
 
     QList<Item*> box_sources; // list of Item objects for each GhostBox
     QList<prim::GhostBox*> boxes; // list of GhostBoxes
+
+    QList<Item*> poly_sources; // list of Item objects for each GhostBox
+    QList<prim::GhostPolygon*> polygons; // list of GhostBoxes
+
 
     QColor col;             // current dot color
     bool valid;             // current placement is valid
