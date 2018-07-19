@@ -19,17 +19,18 @@ namespace prim{
   class ElectrodePoly: public Item
   {
   public:
-    ElectrodePoly(const QPolygonF, const QRectF);
+    ElectrodePoly(const QPolygonF, const QRectF, int lay_id);
     void test();
     QPolygonF getPolygon(){return poly;}
-    virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
-    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
-    QRectF sceneRect(){return scene_rect;}
     void setSceneRect(QRectF scene_rect_in){scene_rect = scene_rect_in;}
+    QRectF sceneRect(){return scene_rect;}
+
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
+    virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
 
   private:
     void constructStatics();
-    void initElectrodePoly();
+    void initElectrodePoly(int lay_id);
 
     QRectF scene_rect;
     QPolygonF poly;

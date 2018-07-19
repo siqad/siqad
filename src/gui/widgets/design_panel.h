@@ -651,7 +651,7 @@ namespace gui{
   public:
     // create an plot at the given points
     CreateElectrodePoly(gui::DesignPanel *dp, QPolygonF poly,
-      prim::ElectrodePoly *ep = 0, bool invert=false, QUndoCommand *parent=0);
+      int layer_index, prim::ElectrodePoly *ep = 0, bool invert=false, QUndoCommand *parent=0);
 
   private:
 
@@ -662,7 +662,8 @@ namespace gui{
 
     void create();  // create the dangling bond
     void destroy(); // destroy the dangling bond
-
+    int layer_index;
+    int index;
     DesignPanel *dp;  // DesignPanel pointer
     QPolygonF poly;
     prim::ElectrodePoly* ep;

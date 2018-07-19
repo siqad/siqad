@@ -17,14 +17,15 @@ QColor prim::ElectrodePoly::edge_col;
 QColor prim::ElectrodePoly::fill_col;
 QColor prim::ElectrodePoly::selected_col; // edge colour, selected
 
-prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly, const QRectF scene_rect)
+prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly, const QRectF scene_rect, int lay_id)
   : prim::Item(prim::Item::ElectrodePoly), poly(poly), scene_rect(scene_rect)
 {
-  initElectrodePoly();
+  initElectrodePoly(lay_id);
 }
 
-void prim::ElectrodePoly::initElectrodePoly()
+void prim::ElectrodePoly::initElectrodePoly(int lay_id)
 {
+  layer_id = lay_id;
   constructStatics();
   setPos(scene_rect.topLeft());
   poly.translate(-scene_rect.topLeft());

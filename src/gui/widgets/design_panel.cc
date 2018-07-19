@@ -1501,6 +1501,7 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, prim::LatticeCoord &offset)
   for (prim::Item *item : pasting ? clipboard : selectedItems()) {
     if (item->item_type != prim::Item::Electrode &&
         item->item_type != prim::Item::AFMArea &&
+        item->item_type != prim::Item::ElectrodePoly &&
         item->item_type != prim::Item::TextLabel) {
       is_all_floating = false;
       break;
@@ -1772,9 +1773,11 @@ void gui::DesignPanel::CreatePotPlot::destroy()
 
 
 // CreateElectrodePoly class
-gui::DesignPanel::CreateElectrodePoly::CreateElectrodePoly(gui::DesignPanel *dp, QPolygonF poly, prim::ElectrodePoly *ep, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), dp(dp), poly(poly), ep(ep), invert(invert)
+gui::DesignPanel::CreateElectrodePoly::CreateElectrodePoly(gui::DesignPanel *dp, QPolygonF poly, int layer_index, prim::ElectrodePoly *ep, bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), poly(poly), ep(ep), layer_index(layer_index), invert(invert)
 {  //if called to destroy, *elec points to selected electrode. if called to create, *elec = 0
+  prim::Layer *layer = dp->layman->getLayer(layer_index);
+  index = invert ? layer->getItemIndex(ep) : layer->getItems().size();
 }
 
 void gui::DesignPanel::CreateElectrodePoly::undo()
@@ -1790,13 +1793,15 @@ void gui::DesignPanel::CreateElectrodePoly::redo()
 void gui::DesignPanel::CreateElectrodePoly::create()
 {
   QRectF scene_rect = poly.boundingRect();
-  ep = new prim::ElectrodePoly(poly, scene_rect);
-  dp->addItemToScene(static_cast<prim::Item*>(ep));
+  ep = new prim::ElectrodePoly(poly, scene_rect, layer_index);
+  dp->addItem(ep, layer_index, index);
+  // dp->addItemToScene(static_cast<prim::Item*>(ep));
 }
 
 void gui::DesignPanel::CreateElectrodePoly::destroy()
 {
-  dp->removeItemFromScene(static_cast<prim::Item*>(ep));  // deletes PotPlot
+  dp->removeItem(ep, dp->layman->getLayer(ep->layer_id));
+  // dp->removeItemFromScene(static_cast<prim::Item*>(ep));  // deletes PotPlot
   ep = 0;
 }
 
@@ -2195,7 +2200,6 @@ void gui::DesignPanel::MoveItem::move(bool invert)
 
   // should update original boundingRect after move to handle residual artifacts
   QRectF old_rect = item->boundingRect();
-
   // move the item
   moveItem(item, delta);
 
@@ -2466,10 +2470,11 @@ void gui::DesignPanel::createElectrodePolyNode(QPointF point)
 
 void gui::DesignPanel::createElectrodePoly()
 {
+  int layer_index = layman->indexOf(layman->activeLayer());
   QPolygonF poly = QPolygonF(eph->getPoints().toVector());
   eph->clearPoints();
   undo_stack->beginMacro(tr("Create electrode polygon with given points"));
-  undo_stack->push(new CreateElectrodePoly(this, poly));
+  undo_stack->push(new CreateElectrodePoly(this, poly, layer_index));
   undo_stack->endMacro();
 }
 
@@ -2636,7 +2641,7 @@ void gui::DesignPanel::deleteSelection()
       case prim::Item::ElectrodePoly:
         {
         prim::ElectrodePoly *ep = static_cast<prim::ElectrodePoly*>(item);
-        undo_stack->push(new CreateElectrodePoly(this, ep->getPolygon(),
+        undo_stack->push(new CreateElectrodePoly(this, ep->getPolygon(), ep->layer_id,
             static_cast<prim::ElectrodePoly*>(item), true));
         break;
         }
@@ -2856,6 +2861,7 @@ bool gui::DesignPanel::moveToGhost(bool kill)
     for (prim::Item *item : selectedItems()) {
       if (item->item_type != prim::Item::Electrode &&
           item->item_type != prim::Item::AFMArea &&
+          item->item_type != prim::Item::ElectrodePoly &&
           item->item_type != prim::Item::TextLabel) {
         is_all_floating = false;
       }
