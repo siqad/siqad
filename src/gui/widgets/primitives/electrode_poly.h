@@ -20,6 +20,8 @@ namespace prim{
     QPolygonF getPolygon(){return poly;}
     virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
+    QRectF sceneRect(){return scene_rect;}
+    void setSceneRect(QRectF scene_rect_in){scene_rect = scene_rect_in;}
 
   private:
     void constructStatics();

@@ -21,7 +21,7 @@ namespace prim{
   struct AggNode{
     int index;              //!< index of source if not an Aggregate
     QList<AggNode*> nodes;  //!< children of the Aggregate if any
-    enum SourceType{DBDot, Aggregate, Electrode, AFMArea, TextLabel};
+    enum SourceType{DBDot, Aggregate, Electrode, AFMArea, TextLabel, ElectrodePoly};
 
     SourceType source_type;
 

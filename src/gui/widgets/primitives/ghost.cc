@@ -57,6 +57,7 @@ prim::GhostBox::GhostBox(prim::Item *item, prim::Item *parent)
 
   if (item->item_type == prim::Item::Electrode ||
       item->item_type == prim::Item::AFMArea ||
+      item->item_type == prim::Item::ElectrodePoly ||
       item->item_type == prim::Item::TextLabel) {
     width = reinterpret_cast<prim::ResizableRect*>(item)->sceneRect().width();
     height = reinterpret_cast<prim::ResizableRect*>(item)->sceneRect().height();
@@ -349,6 +350,11 @@ void prim::Ghost::prepareItem(prim::Item *item, prim::AggNode *node)
   } else if (item->item_type == prim::Item::TextLabel) {
     new_node = new prim::AggNode(box_sources.count());
     new_node->source_type = prim::AggNode::TextLabel;
+    node->nodes.append(new_node);
+    createGhostBox(item);
+  } else if (item->item_type == prim::Item::ElectrodePoly) {
+    new_node = new prim::AggNode(box_sources.count());
+    new_node->source_type = prim::AggNode::ElectrodePoly;
     node->nodes.append(new_node);
     createGhostBox(item);
   }
