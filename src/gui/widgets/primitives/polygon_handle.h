@@ -16,7 +16,16 @@ namespace prim{
   class PolygonHandle : public Item
   {
   public:
-    PolygonHandle();
+    PolygonHandle(QPointF point, QGraphicsItem *parent);
+
+    virtual QRectF boundingRect() const override;
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem*, QWidget*) override;
+
+  private:
+    void initPolygonHandle(QPointF point);
+
+    QRectF scene_rect;
+    QPointF center;
   };
 
 

@@ -12,7 +12,7 @@
 
 
 #include <QtWidgets>
-#include "resizablerect.h"
+#include "polygon_handle.h"
 
 namespace prim{
 
@@ -24,6 +24,8 @@ namespace prim{
     QPolygonF getPolygon() const {return poly;}
     void setSceneRect(const QRectF &scene_rect_in){scene_rect = scene_rect_in;}
     QRectF sceneRect() const {return scene_rect;}
+    void createHandles();
+
 
     virtual void moveItemBy(qreal dx, qreal dy) override;
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
@@ -40,6 +42,7 @@ namespace prim{
     static QColor fill_col;   // dot fill color (same for all lattice dots)
     static QColor edge_col;     // edge colour, unselected
     static QColor selected_col; // edge colour, selected
+    QList<prim::PolygonHandle*> poly_handles;
   };
 
 } //end prim namespace

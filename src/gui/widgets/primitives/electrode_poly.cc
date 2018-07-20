@@ -34,12 +34,21 @@ void prim::ElectrodePoly::initElectrodePoly(int lay_id)
   update();
   setZValue(-1);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
+  createHandles();
 }
 
 void prim::ElectrodePoly::moveItemBy(qreal dx, qreal dy)
 {
   scene_rect.moveTopLeft(QPointF(dx, dy)+scene_rect.topLeft());
   moveBy(dx, dy);
+}
+
+void prim::ElectrodePoly::createHandles()
+{
+  for (QPointF point: poly) {
+    prim::PolygonHandle *handle = new prim::PolygonHandle(point, this);
+    poly_handles.append(handle);
+  }
 }
 
 void prim::ElectrodePoly::test()

@@ -35,7 +35,8 @@ namespace prim{
     //! defined before use
     enum ItemType{Aggregate, DBDot, DBDotPreview, LatticeDotPreview, Ghost, GhostDot,
                   Text, Electrode, GhostBox, AFMArea, AFMPath, AFMNode, AFMSeg,
-                  PotPlot, ResizeFrame, ResizeHandle, TextLabel, ElectrodePoly, GhostPolygon, PolygonHandle};
+                  PotPlot, ResizeFrame, ResizeHandle, TextLabel, ElectrodePoly,
+                  GhostPolygon, PolygonHandle};
 
     //! constructor, layer = 0 should indicate temporary objects that do not
     //! belong to any particular layer
