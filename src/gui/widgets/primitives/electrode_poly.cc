@@ -23,6 +23,14 @@ prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly, const QRectF scene_rect
   initElectrodePoly(lay_id);
 }
 
+prim::ElectrodePoly::~ElectrodePoly()
+{
+  for (prim::PolygonHandle* handle: poly_handles) {
+    delete handle;
+    handle = 0;
+  }
+}
+
 void prim::ElectrodePoly::initElectrodePoly(int lay_id)
 {
   layer_id = lay_id;

@@ -22,10 +22,12 @@ namespace prim{
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem*, QWidget*) override;
 
   private:
+    void constructStatics();
     void initPolygonHandle(QPointF point);
 
     QRectF scene_rect;
     QPointF center;
+    qreal handle_dim;
   };
 
 

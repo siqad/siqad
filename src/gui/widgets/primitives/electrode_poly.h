@@ -20,6 +20,7 @@ namespace prim{
   {
   public:
     ElectrodePoly(const QPolygonF, const QRectF, int lay_id);
+    ~ElectrodePoly();
     void test();
     QPolygonF getPolygon() const {return poly;}
     void setSceneRect(const QRectF &scene_rect_in){scene_rect = scene_rect_in;}

@@ -210,6 +210,9 @@ QSettings* settings::GUISettings::m_defs()
   //resizable rect params
   S->setValue("resizablerect/handle_dim", 100);            // size of resize handle
 
+  //polygon handle params
+  S->setValue("polygonhandle/handle_dim", 100);            // size of polygon handle
+
   // ghost parameters
   S->setValue("ghost/dot_diameter", 1.0);                    // ghost dot diameter
   S->setValue("ghost/valid_col", QColor(0, 255, 0, 255));   // color for valid placements
