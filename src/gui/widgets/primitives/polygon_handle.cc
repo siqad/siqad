@@ -16,6 +16,7 @@ prim::PolygonHandle::PolygonHandle(QPointF point, QGraphicsItem* parent)
 
 void prim::PolygonHandle::initPolygonHandle(QPointF point)
 {
+  constructStatics();
   center = point;
 }
 

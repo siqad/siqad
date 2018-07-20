@@ -30,13 +30,17 @@ namespace gui{
 
     void addPoint(QPointF point);
     void clearPoints();
+    void clearTrail();
     QList<QPointF> getPoints(){return points;}
+    QList<prim::PolygonHandle*> getTrail(){return poly_trail;}
+    prim::PolygonHandle* getLastHandle(){return poly_trail.last();}
 
     // tool change actions
     void toolChangeResponse(gui::ToolType tool_type);
 
   private:
     // VAR
+    QList<prim::PolygonHandle*> poly_trail;
     QList<QPointF> points;
 
   };

@@ -2465,7 +2465,7 @@ void gui::DesignPanel::createElectrode(QRect scene_rect)
 void gui::DesignPanel::createElectrodePolyNode(QPointF point)
 {
   eph->addPoint(point);
-
+  addItemToScene(eph->getLastHandle());
 }
 
 void gui::DesignPanel::createElectrodePoly()
@@ -2473,6 +2473,9 @@ void gui::DesignPanel::createElectrodePoly()
   int layer_index = layman->indexOf(layman->activeLayer());
   QPolygonF poly = QPolygonF(eph->getPoints().toVector());
   eph->clearPoints();
+  for (prim::PolygonHandle* handle: eph->getTrail()) {
+    removeItemFromScene(handle);
+  }
   undo_stack->beginMacro(tr("Create electrode polygon with given points"));
   undo_stack->push(new CreateElectrodePoly(this, poly, layer_index));
   undo_stack->endMacro();

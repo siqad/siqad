@@ -19,11 +19,20 @@ ElectrodePolyHelper::ElectrodePolyHelper(QWidget *parent)
 void ElectrodePolyHelper::addPoint(QPointF point)
 {
   points.append(point);
+  poly_trail.append(new prim::PolygonHandle(point));
 }
 
 void ElectrodePolyHelper::clearPoints()
 {
   points.clear();
+}
+
+void ElectrodePolyHelper::clearTrail()
+{
+  for (prim::PolygonHandle* handle: poly_trail){
+    delete handle;
+  }
+  poly_trail.clear();
 }
 
 void ElectrodePolyHelper::toolChangeResponse(gui::ToolType tool_type)
