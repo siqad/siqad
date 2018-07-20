@@ -12,7 +12,6 @@
 // TODO includes
 #include "../../global.h"
 #include "primitives/electrode_poly.h"
-#include "primitives/resizablerect.h"
 
 namespace gui{
 

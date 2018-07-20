@@ -75,6 +75,7 @@ HEADERS += \
   src/gui/widgets/primitives/afmseg.h \
   src/gui/widgets/primitives/pot_plot.h \
 	src/gui/widgets/primitives/resizablerect.h \
+	src/gui/widgets/primitives/polygon_handle.h \
 	src/gui/widgets/primitives/hull/hull.h \
 	src/gui/widgets/primitives/hull/convex.h \
 	src/gui/widgets/primitives/hull/hulls.h \
@@ -101,6 +102,7 @@ SOURCES += \
 	src/gui/widgets/primitives/afmseg.cc \
   src/gui/widgets/primitives/pot_plot.cc \
 	src/gui/widgets/primitives/resizablerect.cc \
+	src/gui/widgets/primitives/polygon_handle.cc \
 	src/gui/widgets/primitives/hull/hull.cc \
 	src/gui/widgets/primitives/hull/convex.cc \
   src/gui/widgets/primitives/labels/labelgroup.cc \

@@ -5,3 +5,21 @@
 // @license:  GNU LGPL v3
 //
 // @desc:     Handles for polygons, similar to ResizeHandle
+
+#ifndef _PRIM_POLYGON_HANDLE_H_
+#define _PRIM_POLYGON_HANDLE_H_
+
+#include "item.h"
+
+namespace prim{
+
+  class PolygonHandle : public Item
+  {
+  public:
+    PolygonHandle();
+  };
+
+
+}
+
+#endif

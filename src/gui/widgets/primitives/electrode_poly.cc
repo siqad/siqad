@@ -58,6 +58,14 @@ void prim::ElectrodePoly::paint(QPainter *painter, const QStyleOptionGraphicsIte
   }
 }
 
+prim::Item *prim::ElectrodePoly::deepCopy() const
+{
+  QPolygonF new_poly = getPolygon();
+  new_poly.translate(sceneRect().topLeft());
+  prim::ElectrodePoly *ep = new ElectrodePoly(new_poly, sceneRect(), layer_id);
+  return ep;
+}
+
 void prim::ElectrodePoly::constructStatics() //needs to be changed to look at electrode settings instead.
 {
   // default_class_properties.readPropertiesFromXML(":/properties/electrode.xml");

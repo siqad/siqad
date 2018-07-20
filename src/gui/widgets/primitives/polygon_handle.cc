@@ -5,3 +5,16 @@
 // @license:  GNU LGPL v3
 //
 // @desc:     Handles for polygons, similar to ResizeHandle
+
+#include "polygon_handle.h"
+
+namespace prim{
+
+PolygonHandle::PolygonHandle()
+  : prim::Item(prim::Item::ElectrodePoly)
+{
+  qDebug() << "POLYGON HANDLE";
+}
+
+
+}

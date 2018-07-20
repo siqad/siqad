@@ -21,12 +21,13 @@ namespace prim{
   public:
     ElectrodePoly(const QPolygonF, const QRectF, int lay_id);
     void test();
-    QPolygonF getPolygon(){return poly;}
-    void setSceneRect(QRectF scene_rect_in){scene_rect = scene_rect_in;}
-    QRectF sceneRect(){return scene_rect;}
+    QPolygonF getPolygon() const {return poly;}
+    void setSceneRect(const QRectF &scene_rect_in){scene_rect = scene_rect_in;}
+    QRectF sceneRect() const {return scene_rect;}
 
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
     virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
+    virtual Item *deepCopy() const override;
 
   private:
     void constructStatics();
