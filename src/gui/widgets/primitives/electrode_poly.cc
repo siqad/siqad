@@ -34,6 +34,12 @@ void prim::ElectrodePoly::initElectrodePoly(int lay_id)
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
 
+void prim::ElectrodePoly::moveItemBy(qreal dx, qreal dy)
+{
+  scene_rect.moveTopLeft(QPointF(dx, dy)+scene_rect.topLeft());
+  moveBy(dx, dy);
+}
+
 void prim::ElectrodePoly::test()
 {
   for (QPointF point: poly){

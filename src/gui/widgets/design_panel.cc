@@ -2743,6 +2743,7 @@ bool gui::DesignPanel::pasteAtGhost()
   bool is_all_floating = true;
   for(QGraphicsItem *gitem : clipboard){
     if (static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode &&
+        static_cast<prim::Item*>(gitem)->item_type != prim::Item::ElectrodePoly &&
         static_cast<prim::Item*>(gitem)->item_type != prim::Item::AFMArea &&
         reinterpret_cast<prim::TextLabel*>(gitem)->item_type != prim::Item::TextLabel){
       is_all_floating = false;
@@ -2776,6 +2777,7 @@ bool gui::DesignPanel::pasteAtGhost()
 
 void gui::DesignPanel::pasteItem(prim::Ghost *ghost, int n, prim::Item *item)
 {
+  qDebug() << "pasteItem()";
   switch(item->item_type){
     case prim::Item::DBDot:
       pasteDBDot(ghost, n, static_cast<prim::DBDot*>(item));
@@ -2785,6 +2787,9 @@ void gui::DesignPanel::pasteItem(prim::Ghost *ghost, int n, prim::Item *item)
       break;
     case prim::Item::Electrode:
       pasteElectrode(ghost, n, static_cast<prim::Electrode*>(item));
+      break;
+    case prim::Item::ElectrodePoly:
+      pasteElectrodePoly(ghost, n, static_cast<prim::ElectrodePoly*>(item));
       break;
     case prim::Item::AFMArea:
       pasteAFMArea(ghost, n, static_cast<prim::AFMArea*>(item));
@@ -2831,6 +2836,19 @@ void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, int n, prim::Electrode
                                   new prim::Electrode(elec->layer_id, rect)));
   undo_stack->endMacro();
 }
+
+void gui::DesignPanel::pasteElectrodePoly(prim::Ghost *ghost, int n, prim::ElectrodePoly *ep)
+{
+  qDebug() << "PASTEELECTRODEPOLY";
+  QRectF rect = ep->sceneRect();
+  rect.moveTopLeft(ghost->pos()+rect.topLeft());
+  QPolygonF poly = ep->getPolygon();
+  poly.translate(rect.topLeft());
+  undo_stack->beginMacro(tr("create electrode with given corners"));
+  undo_stack->push(new CreateElectrodePoly(this, poly, ep->layer_id));
+  undo_stack->endMacro();
+}
+
 
 void gui::DesignPanel::pasteAFMArea(prim::Ghost *ghost, int n, prim::AFMArea *afm_area)
 {

@@ -25,6 +25,7 @@ namespace prim{
     void setSceneRect(const QRectF &scene_rect_in){scene_rect = scene_rect_in;}
     QRectF sceneRect() const {return scene_rect;}
 
+    virtual void moveItemBy(qreal dx, qreal dy) override;
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
     virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
     virtual Item *deepCopy() const override;

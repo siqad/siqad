@@ -510,6 +510,7 @@ namespace gui{
     void pasteDBDot(prim::Ghost *ghost, int n, prim::DBDot *db);
     void pasteAggregate(prim::Ghost *ghost, int n, prim::Aggregate *agg);
     void pasteElectrode(prim::Ghost *ghost, int n, prim::Electrode *elec);
+    void pasteElectrodePoly(prim::Ghost *ghost, int n, prim::ElectrodePoly *ep);
     void pasteAFMArea(prim::Ghost *ghost, int n, prim::AFMArea *afm_area);
 
     // move the selected items to the current Ghost, returns True if successful
