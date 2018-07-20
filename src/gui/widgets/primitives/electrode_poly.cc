@@ -28,6 +28,8 @@ void prim::ElectrodePoly::initElectrodePoly(int lay_id)
   layer_id = lay_id;
   constructStatics();
   setPos(scene_rect.topLeft());
+  //the polygon has points relative to the item's origin.
+  //changing the origin with setPos() means we have to readjust the polygon coords.
   poly.translate(-scene_rect.topLeft());
   update();
   setZValue(-1);
@@ -67,6 +69,7 @@ void prim::ElectrodePoly::paint(QPainter *painter, const QStyleOptionGraphicsIte
 prim::Item *prim::ElectrodePoly::deepCopy() const
 {
   QPolygonF new_poly = getPolygon();
+  //return fresh polygon with unshifted coordinates.
   new_poly.translate(sceneRect().topLeft());
   prim::ElectrodePoly *ep = new ElectrodePoly(new_poly, sceneRect(), layer_id);
   return ep;
