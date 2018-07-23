@@ -36,7 +36,6 @@ namespace gui{
     QList<QPointF> getPoints(){return points;}
     QList<prim::PolygonHandle*> getTrail(){return poly_trail;}
     prim::PolygonHandle* getLastHandle(){return poly_trail.last();}
-
     // tool change actions
     void toolChangeResponse(gui::ToolType tool_type);
 
@@ -45,7 +44,6 @@ namespace gui{
     QList<prim::PolygonHandle*> poly_trail;
     QList<QPointF> points;
     prim::PolygonHandle* ghost_handle;
-
   };
 
 } // end of gui namespace
