@@ -26,11 +26,13 @@ namespace gui{
     ElectrodePolyHelper(QWidget *parent = 0);
 
     // destructor
-    ~ElectrodePolyHelper() {};
+    ~ElectrodePolyHelper();
 
     void addPoint(QPointF point);
     void clearPoints();
     void clearTrail();
+    void showGhost(bool show);
+    prim::PolygonHandle* ghostHandle(){return ghost_handle;}
     QList<QPointF> getPoints(){return points;}
     QList<prim::PolygonHandle*> getTrail(){return poly_trail;}
     prim::PolygonHandle* getLastHandle(){return poly_trail.last();}
@@ -42,6 +44,7 @@ namespace gui{
     // VAR
     QList<prim::PolygonHandle*> poly_trail;
     QList<QPointF> points;
+    prim::PolygonHandle* ghost_handle;
 
   };
 

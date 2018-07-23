@@ -131,6 +131,7 @@ void gui::DesignPanel::initDesignPanel() {
             afm_panel, &gui::AFMPanel::toolChangeResponse);
 
   eph = new ElectrodePolyHelper(this);
+  scene->addItem(eph->ghostHandle());
   connect(this, &gui::DesignPanel::sig_toolChanged,
             eph, &gui::ElectrodePolyHelper::toolChangeResponse);
 
@@ -143,6 +144,7 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   // delete child widgets
   delete afm_panel;
   delete property_editor;
+  delete eph;
   // delete layers and contained items
   delete layman;
   delete itman;
@@ -861,7 +863,9 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     prim::LatticeCoord offset;
     if (snapGhost(scene_pos, offset)) // if there are db dots
       prim::Ghost::instance()->moveByCoord(offset, lattice);
-
+  } else if (tool_type == ElectrodePolyTool) {
+    eph->showGhost(true);
+    eph->ghostHandle()->setPos(mapToScene(e->pos()));
   } else if (tool_type == AFMPathTool) {
     // update ghost node and ghost segment if there is a focused node, only update
     // ghost node if there's none.
@@ -2476,6 +2480,7 @@ void gui::DesignPanel::createElectrodePoly()
   for (prim::PolygonHandle* handle: eph->getTrail()) {
     removeItemFromScene(handle);
   }
+  eph->clearTrail();
   undo_stack->beginMacro(tr("Create electrode polygon with given points"));
   undo_stack->push(new CreateElectrodePoly(this, poly, layer_index));
   undo_stack->endMacro();

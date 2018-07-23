@@ -13,7 +13,14 @@ namespace gui{
 ElectrodePolyHelper::ElectrodePolyHelper(QWidget *parent)
   : QWidget(parent)
 {
+  ghost_handle = new prim::PolygonHandle(QPointF(0,0));
+  showGhost(false);
   qDebug() << "EPH created";
+}
+
+ElectrodePolyHelper::~ElectrodePolyHelper()
+{
+  delete ghost_handle;
 }
 
 void ElectrodePolyHelper::addPoint(QPointF point)
@@ -27,6 +34,13 @@ void ElectrodePolyHelper::clearPoints()
   points.clear();
 }
 
+void ElectrodePolyHelper::showGhost(bool show)
+{
+  ghost_handle->setVisible(show);
+  return;
+}
+
+
 void ElectrodePolyHelper::clearTrail()
 {
   for (prim::PolygonHandle* handle: poly_trail){
@@ -39,6 +53,7 @@ void ElectrodePolyHelper::toolChangeResponse(gui::ToolType tool_type)
 {
   if (tool_type != ElectrodePolyTool)
     clearPoints();
+    showGhost(false);
 }
 
 } // end of gui namespace
