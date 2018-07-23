@@ -22,5 +22,6 @@
 #include "labels/textlabel.h"
 #include "electrode_poly.h"
 #include "polygon_handle.h"
+#include "polygon_segment.h"
 
 #endif

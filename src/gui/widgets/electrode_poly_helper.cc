@@ -23,10 +23,20 @@ ElectrodePolyHelper::~ElectrodePolyHelper()
   delete ghost_handle;
 }
 
-void ElectrodePolyHelper::addPoint(QPointF point)
+bool ElectrodePolyHelper::addPoint(QPointF point)
 {
   points.append(point);
-  poly_trail.append(new prim::PolygonHandle(point));
+  poly_point_trail.append(new prim::PolygonHandle(point));
+  if (points.size() > 1) {
+    addSegment(points[points.size()-2], points[points.size()-1]);
+    return true;
+  }
+  return false;
+}
+
+void ElectrodePolyHelper::addSegment(QPointF start, QPointF end)
+{
+  poly_segment_trail.append(new prim::PolygonSegment(start, end));
 }
 
 void ElectrodePolyHelper::clearPoints()
@@ -43,16 +53,21 @@ void ElectrodePolyHelper::showGhost(bool show)
 
 void ElectrodePolyHelper::clearTrail()
 {
-  for (prim::PolygonHandle* handle: poly_trail){
+  for (prim::PolygonHandle* handle: poly_point_trail){
     delete handle;
   }
-  poly_trail.clear();
+  poly_point_trail.clear();
+  for (prim::PolygonSegment* segment: poly_segment_trail){
+    delete segment;
+  }
+  poly_segment_trail.clear();
 }
 
 void ElectrodePolyHelper::toolChangeResponse(gui::ToolType tool_type)
 {
-  if (tool_type != ElectrodePolyTool) {    
+  if (tool_type != ElectrodePolyTool) {
     clearPoints();
+    clearTrail();
     showGhost(false);
   }
 

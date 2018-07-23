@@ -12,6 +12,9 @@
 // TODO includes
 #include "../../global.h"
 #include "primitives/electrode_poly.h"
+#include "primitives/polygon_handle.h"
+#include "primitives/polygon_segment.h"
+
 
 namespace gui{
 
@@ -28,22 +31,28 @@ namespace gui{
     // destructor
     ~ElectrodePolyHelper();
 
-    void addPoint(QPointF point);
+    //Adds apoint to the polygon plan. Returns true if a new segment is
+    //available after addition of the new point.
+    bool addPoint(QPointF point);
+    void addSegment(QPointF start, QPointF end);
     void clearPoints();
     void clearTrail();
     void showGhost(bool show);
     prim::PolygonHandle* ghostHandle(){return ghost_handle;}
     QList<QPointF> getPoints(){return points;}
-    QList<prim::PolygonHandle*> getTrail(){return poly_trail;}
-    prim::PolygonHandle* getLastHandle(){return poly_trail.last();}
+    QList<prim::PolygonHandle*> getTrail(){return poly_point_trail;}
+    QList<prim::PolygonSegment*> getSegments(){return poly_segment_trail;}
+    prim::PolygonHandle* getLastHandle(){return poly_point_trail.last();}
+    prim::PolygonSegment* getLastSegment(){return poly_segment_trail.last();}
     // tool change actions
     void toolChangeResponse(gui::ToolType tool_type);
 
   private:
     // VAR
-    QList<prim::PolygonHandle*> poly_trail;
+    QList<prim::PolygonHandle*> poly_point_trail;
     QList<QPointF> points;
     prim::PolygonHandle* ghost_handle;
+    QList<prim::PolygonSegment*> poly_segment_trail;
   };
 
 } // end of gui namespace
