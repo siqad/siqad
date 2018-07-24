@@ -490,12 +490,12 @@ void gui::ApplicationGUI::initCommander()
   commander = new Commander();
   commander->setDesignPanel(design_pan);
   commander->setDialogPanel(dialog_pan);
-  commander->addKeyword(tr("add_item"));
-  commander->addKeyword(tr("remove_item"));
+  commander->addKeyword(tr("add"));
+  commander->addKeyword(tr("remove"));
   commander->addKeyword(tr("echo"));
   commander->addKeyword(tr("help"));
   commander->addKeyword(tr("run"));
-  commander->addKeyword(tr("move_item"));
+  commander->addKeyword(tr("move"));
 }
 
 void gui::ApplicationGUI::setLayerManagerWidget(QWidget *widget)

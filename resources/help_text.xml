@@ -6,14 +6,14 @@
       <usage>"help" or "help, [command], [command2], ..."</usage>
     </entry>
     <entry>
-      <command>add_item</command>
+      <command>add</command>
       <text>Adds an item to the scene. Currently, only Electrodes and DBDots are supported for creation through the console. Generally, an item will require a layer index (or "auto"), and specific item arguments. For example, an Electrode requires an item index and two points in the form "(x1 y1), (x2 y2)", while a DBDot requires an item index and the lattice coordinate in the form (n,m,l).</text>
-      <usage>"add_item, [item_type], [layer_id], [item_arguments]" e.g. "add_item, Electrode, auto, (0 0), (1000 1000)"</usage>
+      <usage>"add, [item_type], [layer_id], [item_arguments]" e.g. "add, Electrode, auto, (0 0), (1000 1000)"</usage>
     </entry>
     <entry>
-      <command>remove_item</command>
+      <command>remove</command>
       <text>Removes an item from the scene. Items can be removed via location specification (all items of given type at that location are removed) or by specifying an item index and layer.</text>
-      <usage>"remove_item, [item_type], [location]" or "remove_item, [item_type], [layer_id], [item_id]" e.g. "remove_item, Electrode, (0 0)" or "remove_item, DBDot, 1, 1"</usage>
+      <usage>"remove, [item_type], [location]" or "remove, [item_type], [layer_id], [item_id]" e.g. "remove, Electrode, (0 0)" or "remove, DBDot, 1, 1"</usage>
     </entry>
     <entry>
       <command>echo</command>
@@ -28,6 +28,6 @@
     <entry>
       <command>move</command>
       <text>Moves an existing item by an offset, specifying either the item (by its layer and item indices) or the items (by location) to be moved.</text>
-      <usage>"move_item, [item_type], [current_location], [offsets]" or "move_item, [item_type], [layer_id], [item_id]"</usage>
+      <usage>"move, [item_type], [current_location], [offsets]" or "move, [item_type], [layer_id], [item_id]"</usage>
     </entry>
   </help_text>

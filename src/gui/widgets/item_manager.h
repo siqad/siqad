@@ -21,7 +21,7 @@ namespace gui{
 
   public:
 
-    enum ItemManagerColumn{Type, Layer, Index, Properties};
+    enum ItemManagerColumn{Type, LayerName, LayerID, Index, Properties};
     Q_ENUM(ItemManagerColumn)
 
 
@@ -32,7 +32,8 @@ namespace gui{
     {
       prim::Item *item;
       QTableWidgetItem *type;
-      QTableWidgetItem *layer;
+      QTableWidgetItem *layer_name;
+      QTableWidgetItem *layer_id;
       QTableWidgetItem *index;
       QPushButton *bt_show_properties;
     };

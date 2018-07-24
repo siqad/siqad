@@ -44,9 +44,9 @@ bool gui::Commander::performCommand(QStringList cmds)
 {
   if (!cmds.isEmpty()){
     QString command = cmds.takeFirst().remove(" ");
-    if (command == QObject::tr("add_item")) {
+    if (command == QObject::tr("add")) {
       commandAddItem(cmds);
-    } else if (command == QObject::tr("remove_item")) {
+    } else if (command == QObject::tr("remove")) {
       commandRemoveItem(cmds);
     } else if (command == QObject::tr("echo")) {
       commandEcho(cmds);
@@ -54,7 +54,7 @@ bool gui::Commander::performCommand(QStringList cmds)
       commandHelp(cmds);
     } else if (command == QObject::tr("run")) {
       commandRun(cmds);
-    } else if (command == QObject::tr("move_item")) {
+    } else if (command == QObject::tr("move")) {
       commandMoveItem(cmds);
     } else {
       return false;
@@ -76,7 +76,7 @@ void gui::Commander::commandAddItem(QStringList args)
       dialog_pan->echo(QObject::tr("Item creation failed."));
     }
   } else {
-    dialog_pan->echo(QObject::tr("add_item takes 3 or 4 arguments, %1 provided.").arg(args.size()));
+    dialog_pan->echo(QObject::tr("add takes 3 or 4 arguments, %1 provided.").arg(args.size()));
   }
 }
 
@@ -91,7 +91,7 @@ void gui::Commander::commandRemoveItem(QStringList args)
       dialog_pan->echo(QObject::tr("Item removal failed."));
     }
   } else {
-    dialog_pan->echo(QObject::tr("remove_item takes 2 or 3 arguments, %1 provided.").arg(args.size()));
+    dialog_pan->echo(QObject::tr("remove takes 2 or 3 arguments, %1 provided.").arg(args.size()));
   }
 }
 
@@ -179,6 +179,6 @@ void gui::Commander::commandMoveItem(QStringList args)
       dialog_pan->echo(QObject::tr("Item move unsuccessful."));
     }
   } else {
-    dialog_pan->echo(QObject::tr("move_item takes at least 3 arguments, %1 provided.").arg(args.size()));
+    dialog_pan->echo(QObject::tr("move takes at least 3 arguments, %1 provided.").arg(args.size()));
   }
 }
