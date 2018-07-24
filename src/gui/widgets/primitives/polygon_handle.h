@@ -17,7 +17,7 @@ namespace prim{
   {
   public:
     PolygonHandle(QPointF point, QGraphicsItem *parent=0);
-
+    QPointF getPoint(){return center;}
     virtual QRectF boundingRect() const override;
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem*, QWidget*) override;
 

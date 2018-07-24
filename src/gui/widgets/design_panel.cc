@@ -132,6 +132,8 @@ void gui::DesignPanel::initDesignPanel() {
 
   eph = new ElectrodePolyHelper(this);
   scene->addItem(eph->ghostHandle());
+  scene->addItem(eph->ghostSegment().first());
+  scene->addItem(eph->ghostSegment().last());
   connect(this, &gui::DesignPanel::sig_toolChanged,
             eph, &gui::ElectrodePolyHelper::toolChangeResponse);
 

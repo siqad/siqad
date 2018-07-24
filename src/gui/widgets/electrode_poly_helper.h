@@ -39,6 +39,7 @@ namespace gui{
     void clearTrail();
     void showGhost(bool show);
     prim::PolygonHandle* ghostHandle(){return ghost_handle;}
+    QList<prim::PolygonSegment*> ghostSegment(){return ghost_segment;}
     QList<QPointF> getPoints(){return points;}
     QList<prim::PolygonHandle*> getTrail(){return poly_point_trail;}
     QList<prim::PolygonSegment*> getSegments(){return poly_segment_trail;}
@@ -52,6 +53,8 @@ namespace gui{
     QList<prim::PolygonHandle*> poly_point_trail;
     QList<QPointF> points;
     prim::PolygonHandle* ghost_handle;
+    QList<prim::PolygonSegment*> ghost_segment;
+    // prim::PolygonSegment* ghost_segment;
     QList<prim::PolygonSegment*> poly_segment_trail;
   };
 

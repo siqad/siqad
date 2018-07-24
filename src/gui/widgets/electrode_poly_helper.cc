@@ -14,6 +14,8 @@ ElectrodePolyHelper::ElectrodePolyHelper(QWidget *parent)
   : QWidget(parent)
 {
   ghost_handle = new prim::PolygonHandle(QPointF(0,0));
+  ghost_segment.append(new prim::PolygonSegment(QPointF(0,0), QPointF(0,0)));
+  ghost_segment.append(new prim::PolygonSegment(QPointF(0,0), QPointF(0,0)));
   showGhost(false);
   qDebug() << "EPH created";
 }
@@ -47,6 +49,20 @@ void ElectrodePolyHelper::clearPoints()
 void ElectrodePolyHelper::showGhost(bool show)
 {
   ghost_handle->setVisible(show);
+
+  if (points.size() > 1) {
+    ghost_segment.first()->setPoints(ghost_handle->pos(), points.first());
+    ghost_segment.first()->setVisible(show);
+    ghost_segment.last()->setPoints(ghost_handle->pos(), points.last());
+    ghost_segment.last()->setVisible(show);
+  } else if (points.size() > 0) {
+    qDebug() << ghost_handle->pos() << points.first();
+    ghost_segment.first()->setPoints(ghost_handle->pos(), points.first());
+    ghost_segment.first()->setVisible(show);
+  } else {
+    ghost_segment.first()->setVisible(false);
+    ghost_segment.last()->setVisible(false);
+  }
   return;
 }
 

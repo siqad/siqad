@@ -23,12 +23,22 @@ void prim::PolygonSegment::initPolygonSegment(QPointF start_in, QPointF end_in)
   constructStatics();
 }
 
+void prim::PolygonSegment::setPoints(QPointF start_in, QPointF end_in)
+{
+  setVisible(false);
+  start = start_in;
+  end = end_in;
+  setVisible(true);
+  update();
+}
+
+
 QRectF prim::PolygonSegment::boundingRect() const
 {
   qreal x_min = qMin(start.x(), end.x()) - line_width*0.5;
   qreal y_min = qMin(start.y(), end.y()) - line_width*0.5;
-  qreal dx = qMax(start.x(), end.x()) - x_min + line_width;
-  qreal dy = qMax(start.y(), end.y()) - y_min + line_width;
+  qreal dx = qMax(start.x(), end.x()) - x_min + 2*line_width;
+  qreal dy = qMax(start.y(), end.y()) - y_min + 2*line_width;
   return QRectF(x_min, y_min, dx, dy);
 }
 
