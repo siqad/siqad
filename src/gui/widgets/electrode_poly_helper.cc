@@ -23,6 +23,8 @@ ElectrodePolyHelper::ElectrodePolyHelper(QWidget *parent)
 ElectrodePolyHelper::~ElectrodePolyHelper()
 {
   delete ghost_handle;
+  delete ghost_segment.first();
+  delete ghost_segment.last();
 }
 
 bool ElectrodePolyHelper::addPoint(QPointF point)
@@ -51,19 +53,16 @@ void ElectrodePolyHelper::showGhost(bool show)
   ghost_handle->setVisible(show);
 
   if (points.size() > 1) {
-    ghost_segment.first()->setPoints(ghost_handle->pos(), points.first());
-    ghost_segment.first()->setVisible(show);
     ghost_segment.last()->setPoints(ghost_handle->pos(), points.last());
     ghost_segment.last()->setVisible(show);
-  } else if (points.size() > 0) {
-    qDebug() << ghost_handle->pos() << points.first();
+  }
+  if (points.size() > 0) {
     ghost_segment.first()->setPoints(ghost_handle->pos(), points.first());
     ghost_segment.first()->setVisible(show);
-  } else {
-    ghost_segment.first()->setVisible(false);
-    ghost_segment.last()->setVisible(false);
+    return;
   }
-  return;
+  ghost_segment.first()->setVisible(false);
+  ghost_segment.last()->setVisible(false);
 }
 
 
