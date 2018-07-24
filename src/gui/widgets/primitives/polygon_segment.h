@@ -19,6 +19,7 @@ namespace prim{
     PolygonSegment(QPointF start_in, QPointF end_in, QGraphicsItem *parent=0);
     virtual QRectF boundingRect() const override;
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem*, QWidget*) override;
+
   private:
     void constructStatics();
     void initPolygonSegment(QPointF start_in, QPointF end_in);

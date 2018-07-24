@@ -31,6 +31,9 @@ namespace prim{
     virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
     virtual Item *deepCopy() const override;
 
+  protected:
+    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
   private:
     void constructStatics();
     void initElectrodePoly(int lay_id);

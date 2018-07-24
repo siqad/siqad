@@ -2853,12 +2853,11 @@ void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, int n, prim::Electrode
 
 void gui::DesignPanel::pasteElectrodePoly(prim::Ghost *ghost, int n, prim::ElectrodePoly *ep)
 {
-  qDebug() << "PASTEELECTRODEPOLY";
   QRectF rect = ep->sceneRect();
   rect.moveTopLeft(ghost->pos()+rect.topLeft());
   QPolygonF poly = ep->getPolygon();
   poly.translate(rect.topLeft());
-  undo_stack->beginMacro(tr("create electrode with given corners"));
+  undo_stack->beginMacro(tr("create electrode with given vertices"));
   undo_stack->push(new CreateElectrodePoly(this, poly, ep->layer_id));
   undo_stack->endMacro();
 }

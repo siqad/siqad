@@ -31,6 +31,22 @@ prim::ElectrodePoly::~ElectrodePoly()
   }
 }
 
+QVariant prim::ElectrodePoly::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+  if (change == QGraphicsItem::ItemSelectedChange) {
+    if (value == true) {
+      for (prim::PolygonHandle* handle : poly_handles) {
+        handle->setVisible(true);
+      }
+    } else {
+      for (prim::PolygonHandle* handle : poly_handles) {
+        handle->setVisible(false);
+      }
+    }
+  }
+  return QGraphicsItem::itemChange(change, value);
+}
+
 void prim::ElectrodePoly::initElectrodePoly(int lay_id)
 {
   layer_id = lay_id;
@@ -56,6 +72,7 @@ void prim::ElectrodePoly::createHandles()
   for (QPointF point: poly) {
     prim::PolygonHandle *handle = new prim::PolygonHandle(point, this);
     poly_handles.append(handle);
+    handle->setVisible(false);
   }
 }
 
