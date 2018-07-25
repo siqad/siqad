@@ -47,8 +47,9 @@ Controller.prototype.ComponentSelectionPageCallback = function()
 	for(pyCount_3 = pyVerCount_3; pyCount_3 >= 0; pyCount_3--){
 		if( installer.fileExists(installer.value("UserStartMenuProgramsPath") + pyStem_3 + pyCount_3.toString())
 			|| installer.fileExists(installer.value("AllUsersStartMenuProgramsPath") + pyStem_3 + pyCount_3.toString())
-			|| installer.fileExists(installer.value("HomeDir") + "/AppData/Local/Programs/Python/Python3" + pyCount_3.toString() + "-32")
-			|| installer.fileExists(installer.value("HomeDir") + "/AppData/Local/Programs/Python/Python3" + pyCount_3.toString() + "-64")
+			|| installer.fileExists(installer.value("HomeDir") + "/AppData/Local/Programs/Python/Python3" + pyCount_3.toString() + "-32" + "/python.exe")
+			|| installer.fileExists(installer.value("HomeDir") + "/AppData/Local/Programs/Python/Python3" + pyCount_3.toString() + "-64" + "/python.exe")
+			|| installer.fileExists(installer.value("HomeDir") + "/AppData/Local/Programs/Python/Python3" + pyCount_3.toString() + "/python.exe")
 			|| installer.fileExists(installer.value("HomeDir") + pyCount_3.toString() + "-32") || installer.fileExists(installer.value("HomeDir") + pyCount_3.toString() + "-64")
 			|| installer.fileExists(installer.value("C:/") + pyCount_3.toString() + "-32") || installer.fileExists(installer.value("C:/") + pyCount_3.toString() + "-64")
 			|| installer.fileExists(installer.value("C:/Program Files (x86)") + pyCount_3.toString() + "-32") || installer.fileExists(installer.value("C:/Program Files (x86)") + pyCount_3.toString() + "-64")
@@ -82,8 +83,9 @@ Controller.prototype.ComponentSelectionPageCallback = function()
 		for(pyCount_2 = pyVerCount_2; pyCount_2 >= 0; pyCount_2--){
 			if( installer.fileExists(installer.value("UserStartMenuProgramsPath") + pyStem_2 + pyCount_2.toString())
 				|| installer.fileExists(installer.value("AllUsersStartMenuProgramsPath") + pyStem_2 + pyCount_2.toString())
-				|| installer.fileExists(installer.value("HomeDir") + "/AppData/Local/Programs/Python/Python2" + pyCount_2.toString() + "-32")
-				|| installer.fileExists(installer.value("HomeDir") + "/AppData/Local/Programs/Python/Python2" + pyCount_2.toString() + "-64")
+				|| installer.fileExists(installer.value("HomeDir") + "/AppData/Local/Programs/Python/Python2" + pyCount_2.toString() + "-32" + "/python.exe")
+				|| installer.fileExists(installer.value("HomeDir") + "/AppData/Local/Programs/Python/Python2" + pyCount_2.toString() + "-64" + "/python.exe")
+				|| installer.fileExists(installer.value("HomeDir") + "/AppData/Local/Programs/Python/Python2" + pyCount_2.toString() + "/python.exe")
 				|| installer.fileExists(installer.value("HomeDir") + pyCount_2.toString() + "-32") || installer.fileExists(installer.value("HomeDir") + pyCount_2.toString() + "-64")
 				|| installer.fileExists(installer.value("C:/") + pyCount_2.toString() + "-32") || installer.fileExists(installer.value("C:/") + pyCount_2.toString() + "-64")
 				|| installer.fileExists(installer.value("C:/Program Files (x86)") + pyCount_2.toString() + "-32") || installer.fileExists(installer.value("C:/Program Files (x86)") + pyCount_2.toString() + "-64")
@@ -111,7 +113,7 @@ Controller.prototype.FinishedPageCallback = function()
 	//Triggers Python installation if the Python component was installed.
 	var component = installer.componentByName('siqad.python');
     if ( component.isInstalled() ) {
-        installer.performOperation("Execute", "@TargetDir@/python-3.6.5.exe");
+        installer.performOperation("Execute", "@TargetDir@/python-3.7.0-amd64-webinstall.exe");
     }
 
 }
