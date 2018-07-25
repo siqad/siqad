@@ -331,8 +331,8 @@ void gui::ApplicationGUI::initSideBar()
       tr("DB tool"));
   action_electrode_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"),
       tr("Electrode tool"));
-  action_electrode_poly_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"),
-      tr("Electrode polygon tool"));
+  // action_electrode_poly_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"),
+  //     tr("Electrode polygon tool"));
   /*
   action_afmarea_tool = side_bar->addAction(QIcon(":/ico/drawafmarea.svg"),
       tr("AFM Area tool"));
@@ -347,7 +347,7 @@ void gui::ApplicationGUI::initSideBar()
   action_group->addAction(action_drag_tool);
   action_group->addAction(action_dbgen_tool);
   action_group->addAction(action_electrode_tool);
-  action_group->addAction(action_electrode_poly_tool);
+  // action_group->addAction(action_electrode_poly_tool);
   /*
   action_group->addAction(action_afmarea_tool);
   action_group->addAction(action_afmpath_tool);
@@ -361,7 +361,7 @@ void gui::ApplicationGUI::initSideBar()
   action_drag_tool->setCheckable(true);
   action_dbgen_tool->setCheckable(true);
   action_electrode_tool->setCheckable(true);
-  action_electrode_poly_tool->setCheckable(true);
+  // action_electrode_poly_tool->setCheckable(true);
   /*
   action_afmarea_tool->setCheckable(true);
   action_afmpath_tool->setCheckable(true);
@@ -380,8 +380,8 @@ void gui::ApplicationGUI::initSideBar()
           this, &gui::ApplicationGUI::setToolDBGen);
   connect(action_electrode_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolElectrode);
-  connect(action_electrode_poly_tool, &QAction::triggered,
-          this, &gui::ApplicationGUI::setToolElectrodePoly);
+  // connect(action_electrode_poly_tool, &QAction::triggered,
+  //         this, &gui::ApplicationGUI::setToolElectrodePoly);
   /*
   connect(action_afmarea_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolAFMArea);
