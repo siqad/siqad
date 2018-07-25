@@ -331,7 +331,7 @@ void gui::ApplicationGUI::initSideBar()
       tr("DB tool"));
   action_electrode_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"),
       tr("Electrode tool"));
-  action_electrode_poly_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"),
+  action_electrode_poly_tool = side_bar->addAction(QIcon(":/ico/drawelectrodepoly.svg"),
       tr("Electrode polygon tool"));
   /*
   action_afmarea_tool = side_bar->addAction(QIcon(":/ico/drawafmarea.svg"),
