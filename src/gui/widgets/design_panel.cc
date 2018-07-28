@@ -453,7 +453,7 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *ws, bool for_sim)
   ws->writeStartElement("gui");
 
   // save zoom and scroll bar position
-  ws->writeTextElement("zoom", QString::number(transform().m11())); // m11 of qtransform
+  ws->writeTextElement("zoom", QString::number(transform().m11() + transform().m12())); // m11 of qtransform
   ws->writeEmptyElement("scroll");
   ws->writeAttribute("x", QString::number(verticalScrollBar()->value()));
   ws->writeAttribute("y", QString::number(horizontalScrollBar()->value()));
@@ -770,7 +770,7 @@ void gui::DesignPanel::updateBackground()
   QColor col = (display_mode == gui::ScreenshotMode) ? background_col_publish : background_col;
   bool lattice_visible = true;
 
-  if (transform().m11() < zoom_visibility_threshold
+  if (qAbs(transform().m11() + transform().m12()) < zoom_visibility_threshold
       || !lattice->isVisible())
     lattice_visible = false;
 
@@ -1152,7 +1152,7 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
   boundZoom(ds);
 
   // save old zoom level
-  qreal old_zoom = transform().m11();
+  qreal old_zoom = qAbs(transform().m11() + transform().m12());
 
   if(ds!=0){
     // zoom under mouse, should be indep of transformationAnchor
@@ -1182,7 +1182,7 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
   wheel_deg.setY(0);
 
   // update background if lattice visibility threshold has been crossed
-  qreal new_zoom = transform().m11();
+  qreal new_zoom = qAbs(transform().m11() + transform().m12());
   if ((old_zoom < zoom_visibility_threshold && zoom_visibility_threshold <= new_zoom)
       || (new_zoom < zoom_visibility_threshold && zoom_visibility_threshold <= old_zoom))
     updateBackground();
