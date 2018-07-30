@@ -41,7 +41,7 @@ chmod +x make_everything
 ./make_everything -swig
 ```
 
-If the `make_everything` script returns errors, please jump to the "Detailed Compilation" section and try again. Otherwise, you should be able to run the binary by running `./build/debug/db-sim` from the project root.
+If the `make_everything` script returns errors, please jump to the "Detailed Compilation" section and try again. Otherwise, you should be able to run the binary by running `./build/debug/siqad` from the project root.
 
 We don't have a Linux installation process in place yet as the tool is still under active development, but we welcome ideas and contributions on that regard.
 
@@ -74,7 +74,7 @@ make install
 
 Don't be alarmed by `make install`, this won't install the simulator to your system. All it does is compile the binaries and copy the physics simulation files over to the compiled folders. We don't have a Linux installation process in place yet as the tool is still under active development, but we welcome ideas and contributions on that regard.
 
-Finally, run `./build/debug/db-sim` from the project root to invoke the GUI. In order to run a hopping animation, create a DB layout, click on the play button on the top bar, choose the "Hopping Animator" engine and run.
+Finally, run `./build/debug/siqad` from the project root to invoke the GUI. In order to run a hopping animation, create a DB layout, click on the play button on the top bar, choose the "Hopping Animator" engine and run.
 
 
 
