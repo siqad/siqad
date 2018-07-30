@@ -98,7 +98,50 @@ void gui::Commander::parseInputs(QString input)
 
 bool gui::Commander::performCommand()
 {
+  QString command = alphas.takeFirst().remove(" ");
+  if (command == QObject::tr("add"))
+    commandAddItem();
+  else if (command == QObject::tr("remove"))
+    commandRemoveItem();
+  else if (command == QObject::tr("echo"))
+    commandEcho();
+  else if (command == QObject::tr("help"))
+    commandHelp();
+  else if (command == QObject::tr("run"))
+    commandRun();
+  else if (command == QObject::tr("move"))
+    commandMoveItem();
   return false;
+}
+
+void gui::Commander::commandAddItem()
+{
+  qDebug() << "ADD ITEM";
+}
+
+void gui::Commander::commandRemoveItem()
+{
+  qDebug() << "REMOVE ITEM";
+}
+
+void gui::Commander::commandEcho()
+{
+  qDebug() << "ECHO";
+}
+
+void gui::Commander::commandHelp()
+{
+  qDebug() << "HELP";
+}
+
+void gui::Commander::commandRun()
+{
+  qDebug() << "RUN";
+}
+
+void gui::Commander::commandMoveItem()
+{
+  qDebug() << "MOVE ITEM";
 }
 
 void gui::Commander::commandAddItem(QStringList args)

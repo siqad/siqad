@@ -54,6 +54,13 @@ namespace gui{
     void commandRun(QStringList args);
     void commandMoveItem(QStringList args);
 
+    void commandAddItem();
+    void commandRemoveItem();
+    void commandEcho();
+    void commandHelp();
+    void commandRun();
+    void commandMoveItem();
+
     DesignPanel *design_pan;
     DialogPanel *dialog_pan;
     QStringList brackets;      // number inputs enclosed in brackets
