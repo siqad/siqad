@@ -39,9 +39,14 @@ namespace gui{
     //! Further parses input after application determines that input is non-empty.
     void parseInputs(QString input);
 
+    QStringList cleanNumbers(QString* input);
+    QStringList cleanAlphas(QString* input);
+    QStringList cleanBrackets(QString* input);
+
   private:
 
-    bool performCommand(QStringList cmds);
+    bool performCommand();
+    // bool performCommand(QStringList cmds);
     void commandAddItem(QStringList args);
     void commandRemoveItem(QStringList args);
     void commandEcho(QStringList args);
@@ -51,6 +56,9 @@ namespace gui{
 
     DesignPanel *design_pan;
     DialogPanel *dialog_pan;
+    QStringList brackets;      // number inputs enclosed in brackets
+    QStringList numericals;    // number inputs without bracket enclosure
+    QStringList alphas;        // alphabetical inputs
     QStringList input_kws;     // white-listed keywords
   };
 

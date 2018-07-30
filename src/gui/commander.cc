@@ -26,43 +26,79 @@ void gui::Commander::clearKeywords()
   input_kws.clear();
 }
 
+QStringList gui::Commander::cleanBrackets(QString* input)
+{
+  QString p_l = "(";
+  QString p_r = ")";
+  int count_l = input->count(p_l);
+  int count_r = input->count(p_r);
+  QStringList list = QStringList();
+  if (count_l != count_r) {
+    qDebug() << "Parentheses mismatch";
+  } else {
+    QString temp;
+    int ind_l;
+    int ind_r;
+    for (int i = 0; i < count_l; i++) {
+      ind_l = input->indexOf(p_l);
+      ind_r = input->indexOf(p_r);
+      temp.append(input->mid(ind_l, ind_r-ind_l+1));
+      input->remove(ind_l, ind_r-ind_l+1);
+    }
+    list = cleanNumbers(&temp);
+  }
+  return list;
+}
+
+QStringList gui::Commander::cleanNumbers(QString* input)
+{
+  QRegExp rx("(\\d+)");
+  QStringList list;
+  int pos = 0;
+  while ((pos = rx.indexIn(*input, pos)) != -1) {
+    list << rx.cap(1);
+    pos += rx.matchedLength();
+  }
+  return list;
+}
+
+QStringList gui::Commander::cleanAlphas(QString* input)
+{
+  QRegExp rx("([a-zA-Z]+)");
+  QStringList list;
+  int pos = 0;
+  while ((pos = rx.indexIn(*input, pos)) != -1) {
+    list << rx.cap(1);
+    pos += rx.matchedLength();
+  }
+  return list;
+}
+
+
 void gui::Commander::parseInputs(QString input)
 {
-  dialog_pan->echo(input);
-  QStringList inputs = input.split(",", QString::SkipEmptyParts);
-  if (input_kws.contains(inputs.first())) {
-    // keyword detected
-    if (!performCommand(inputs)) {
-      dialog_pan->echo(QObject::tr("Error occured with command '%1'").arg(inputs.first()));
+  QString input_orig = input;
+  brackets = cleanBrackets(&input);
+  qDebug() << brackets;
+  numericals = cleanNumbers(&input);
+  qDebug() << numericals;
+  alphas = cleanAlphas(&input);
+  qDebug() << alphas;
+
+  if (!alphas.isEmpty()) {
+    if (input_kws.contains(alphas.first())) {
+      if (!performCommand()) {
+        dialog_pan->echo(QObject::tr("Error occured with command '%1'").arg(input_orig));
+      }
+    } else {
+      dialog_pan->echo(QObject::tr("Command '%1' not recognised.").arg(input_orig));
     }
-  } else {
-    dialog_pan->echo(QObject::tr("Command '%1' not recognised.").arg(inputs.first()));
   }
 }
 
-bool gui::Commander::performCommand(QStringList cmds)
+bool gui::Commander::performCommand()
 {
-  if (!cmds.isEmpty()){
-    QString command = cmds.takeFirst().remove(" ");
-    if (command == QObject::tr("add")) {
-      commandAddItem(cmds);
-    } else if (command == QObject::tr("remove")) {
-      commandRemoveItem(cmds);
-    } else if (command == QObject::tr("echo")) {
-      commandEcho(cmds);
-    } else if (command == QObject::tr("help")) {
-      commandHelp(cmds);
-    } else if (command == QObject::tr("run")) {
-      commandRun(cmds);
-    } else if (command == QObject::tr("move")) {
-      commandMoveItem(cmds);
-    } else {
-      return false;
-    }
-    return true;
-  } else {
-    return false;
-  }
+  return false;
 }
 
 void gui::Commander::commandAddItem(QStringList args)
