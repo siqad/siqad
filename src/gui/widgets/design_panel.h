@@ -67,7 +67,7 @@ namespace gui{
     bool commandCreateItem(QString item_type, QString layer_id, QStringList item_args);
 
     //! remove an Item using a command from the dialog panel.
-    bool commandRemoveItem(QString item_type, QStringList item_args);
+    bool commandRemoveItem(QString item_type, QStringList brackets, QStringList numericals);
 
     //! switch statement to properly delete items
     void commandRemoveHandler(prim::Item *item);

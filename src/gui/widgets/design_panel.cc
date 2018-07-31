@@ -2318,16 +2318,13 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
   }
 }
 
-
-bool gui::DesignPanel::commandRemoveItem(QString type, QStringList item_args)
+bool gui::DesignPanel::commandRemoveItem(QString type, QStringList brackets, QStringList numericals)
 {
   prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
-  QList<QStringList> clean_args = cleanItemArgs(item_args);
-  if ((clean_args.size() == 1) && (clean_args.first().size() == 2)) {
-    QStringList point = clean_args.first();
+  if (brackets.size()==2) {
     // Remove items by location
-    float x = point.first().toFloat();
-    float y = point.last().toFloat();
+    float x = brackets.first().toFloat();
+    float y = brackets.last().toFloat();
     QPointF pos = QPointF(x,y)*prim::Item::scale_factor;
     if (itemAt(mapFromScene(pos))) {
       QList<QGraphicsItem*> gitems = items(mapFromScene(pos));
@@ -2338,10 +2335,10 @@ bool gui::DesignPanel::commandRemoveItem(QString type, QStringList item_args)
       }
       return true;
     }
-  } else if ((clean_args.size() == 2) && (clean_args[0].size() == 1) && (clean_args[1].size() == 1)) {
+  } else if (numericals.size()==2) {
     // Remove items by indices
-    int lay_id = clean_args.first().first().toInt();
-    int item_id = clean_args.last().first().toInt();
+    int lay_id = numericals.first().toInt();
+    int item_id = numericals.last().toInt();
     prim::Layer *layer = layman->getLayer(lay_id);
     if (layer) {
       prim::Item *item = layer->getItem(item_id);
@@ -2353,7 +2350,6 @@ bool gui::DesignPanel::commandRemoveItem(QString type, QStringList item_args)
   }
   return false;
 }
-
 
 void gui::DesignPanel::commandRemoveHandler(prim::Item *item)
 {

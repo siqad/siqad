@@ -102,7 +102,7 @@ bool gui::Commander::performCommand()
   if (command == QObject::tr("add"))
     return commandAddItem();
   else if (command == QObject::tr("remove"))
-    commandRemoveItem();
+    return commandRemoveItem();
   else if (command == QObject::tr("echo"))
     commandEcho();
   else if (command == QObject::tr("help"))
@@ -139,26 +139,12 @@ bool gui::Commander::commandAddItem()
 }
 
 
-void gui::Commander::commandRemoveItem(QStringList args)
-{
-  if ((args.size() == 2) || (args.size() == 3)) {
-    //item_type, one set of arguments guaranteed present
-    QString item_type = args.takeFirst().remove(" ");
-    // QStringList item_args = args;
-    if (!design_pan->commandRemoveItem(item_type, args)) {
-      dialog_pan->echo(QObject::tr("Item removal failed."));
-    }
-  } else {
-    dialog_pan->echo(QObject::tr("remove takes 2 or 3 arguments, %1 provided.").arg(args.size()));
-  }
-}
-
-void gui::Commander::commandRemoveItem()
+bool gui::Commander::commandRemoveItem()
 {
   qDebug() << "REMOVE ITEM";
   if (!alphas.isEmpty()) {
     QString item_type = alphas.takeFirst();
-    if (!design_pan->commandRemoveItem(item_type, args)) {
+    if (!design_pan->commandRemoveItem(item_type, brackets, numericals)) {
       dialog_pan->echo(QObject::tr("Item removal failed."));
     }
   } else {
