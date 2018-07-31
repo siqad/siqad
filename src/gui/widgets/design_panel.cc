@@ -2366,14 +2366,15 @@ void gui::DesignPanel::commandRemoveHandler(prim::Item *item)
 }
 
 
-bool gui::DesignPanel::commandMoveItem(QString type, QStringList item_args)
+bool gui::DesignPanel::commandMoveItem(QString type, QStringList brackets, QStringList numericals)
 {
   prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
-  QList<QStringList> clean_args = cleanItemArgs(item_args);
-  if ((clean_args.size() == 2) && (clean_args.first().size() == 2)) {
-    QStringList point = clean_args.takeFirst();
-    QPointF pos = QPointF(point.first().toFloat()*prim::Item::scale_factor, point.last().toFloat()*prim::Item::scale_factor);
-    QPointF offset = findMoveOffset(clean_args.first());
+  if (brackets.size()>=4) {
+    //4 items in brackets means a location and an offset.
+    //5 items means a location and a lattice coord offset
+    QPointF pos = QPointF(brackets.takeFirst().toFloat(), brackets.takeFirst().toFloat());
+    pos *= prim::Item::scale_factor;
+    QPointF offset = findMoveOffset(brackets);
     if (offset.isNull())
       return false;
     else if (itemAt(mapFromScene(pos))) {
@@ -2387,15 +2388,14 @@ bool gui::DesignPanel::commandMoveItem(QString type, QStringList item_args)
       return true;
     }
   }
-  else if ((clean_args.size() == 3) && (clean_args[0].size() == 1)
-        && (clean_args[1].size() == 1)) {
-    int lay_id = clean_args.takeFirst().first().toInt();
-    int item_id = clean_args.takeFirst().first().toInt();
+  else if ((numericals.size()==2) && brackets.size()>=2)  {
+    int lay_id = numericals.takeFirst().toInt();
+    int item_id = numericals.takeFirst().toInt();
     prim::Layer *layer = layman->getLayer(lay_id);
     if (layer) {
       prim::Item *item = layer->getItem(item_id);
       if (item) {
-        QPointF offset = findMoveOffset(clean_args.first());
+        QPointF offset = findMoveOffset(brackets);
         if (offset.isNull())
           return false;
         else
@@ -2407,15 +2407,15 @@ bool gui::DesignPanel::commandMoveItem(QString type, QStringList item_args)
   return false;
 }
 
-QPointF gui::DesignPanel::findMoveOffset(QStringList clean_args)
+QPointF gui::DesignPanel::findMoveOffset(QStringList args)
 {
   QPointF offset;
-  if (clean_args.size() == 2) {
-    offset = QPointF(clean_args.first().toFloat(), clean_args.last().toFloat());
-  } else if (clean_args.size() == 3) {
-    int n = clean_args[0].toInt();
-    int m = clean_args[1].toInt();
-    int l = clean_args[2].toInt();
+  if (args.size() == 2) {
+    offset = QPointF(args.first().toFloat(), args.last().toFloat());
+  } else if (args.size() == 3) {
+    int n = args[0].toInt();
+    int m = args[1].toInt();
+    int l = args[2].toInt();
     if ((qAbs(l) > 1)) {  //can be -1, 0, or 1. If anything else, default to 0.
       l = 0;
     }

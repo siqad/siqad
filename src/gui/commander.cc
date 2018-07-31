@@ -52,19 +52,25 @@ QStringList gui::Commander::cleanBrackets(QString* input)
 
 QStringList gui::Commander::cleanNumbers(QString* input)
 {
-  QRegExp rx("(\\d+)");
+  // Captures ONLY numerical sequences not immediate
+  // preceded or succeeded by letters.
+  QRegExp rx("[^a-zA-Z0-9./](-?[\\d.]+)(?![a-zA-Z])(?![0-9])");
   QStringList list;
   int pos = 0;
   while ((pos = rx.indexIn(*input, pos)) != -1) {
     list << rx.cap(1);
     pos += rx.matchedLength();
   }
+  for (QString item : list) {
+    input->remove(item);
+  }
+
   return list;
 }
 
 QStringList gui::Commander::cleanAlphas(QString* input)
 {
-  QRegExp rx("([a-zA-Z/.]+)");
+  QRegExp rx("([a-zA-Z0-9./]+)");
   QStringList list;
   int pos = 0;
   while ((pos = rx.indexIn(*input, pos)) != -1) {
@@ -139,7 +145,6 @@ bool gui::Commander::commandAddItem()
 
 bool gui::Commander::commandRemoveItem()
 {
-  qDebug() << "REMOVE ITEM";
   if (!alphas.isEmpty()) {
     QString item_type = alphas.takeFirst();
     if (!design_pan->commandRemoveItem(item_type, brackets, numericals)) {
@@ -151,6 +156,35 @@ bool gui::Commander::commandRemoveItem()
   }
   return true;
 }
+
+void gui::Commander::commandMoveItem()
+{
+  if (!alphas.isEmpty()) {
+    QString item_type = alphas.takeFirst();
+    if (!design_pan->commandMoveItem(item_type, brackets, numericals)) {
+      dialog_pan->echo(QObject::tr("Item move unsuccessful."));
+    }
+  } else {
+    dialog_pan->echo(QObject::tr("Item type not specified"));
+  }
+  qDebug() << "MOVE ITEM";
+}
+
+// void gui::Commander::commandMoveItem(QStringList args)
+// {
+//   if ((args.size() == 3) || (args.size() == 4)) {
+//     //item_type, one set of arguments guaranteed present
+//     QString item_type = args.takeFirst().remove(" ");
+//     // QStringList item_args = args;
+//     if (!design_pan->commandMoveItem(item_type, args)) {
+//     //   dialog_pan->echo(QObject::tr("Item removal failed."));
+//       dialog_pan->echo(QObject::tr("Item move unsuccessful."));
+//     }
+//   } else {
+//     dialog_pan->echo(QObject::tr("move takes at least 3 arguments, %1 provided.").arg(args.size()));
+//   }
+// }
+//
 
 bool gui::Commander::commandEcho()
 {
@@ -216,54 +250,4 @@ bool gui::Commander::commandRun()
     }
   }
   return true;
-}
-
-// void gui::Commander::commandRun(QStringList args)
-// {
-//   for (QString arg: args) {
-//     arg.remove(" ");
-//     QFile file(arg);
-//     QFileInfo qfi(file);
-//     if ((file.exists()) && (qfi.suffix()=="sqs")) { //check for extension
-//       dialog_pan->echo(QObject::tr("Running file %1.").arg(file.fileName()));
-//       if (file.open(QIODevice::ReadOnly))
-//       {
-//          QTextStream in(&file);
-//          while (!in.atEnd())
-//          {
-//             QString line = in.readLine();
-//             if (!line.isEmpty()){
-//               parseInputs(line);
-//             }
-//          }
-//          file.close();
-//       }
-//     } else {
-//       dialog_pan->echo(QObject::tr("Error opening '%1'. Check that file exists and that the extension is '.sqs'.").arg(file.fileName()));
-//     }
-//   }
-// }
-
-
-void gui::Commander::commandMoveItem()
-{
-  qDebug() << "MOVE ITEM";
-}
-
-
-
-
-void gui::Commander::commandMoveItem(QStringList args)
-{
-  if ((args.size() == 3) || (args.size() == 4)) {
-    //item_type, one set of arguments guaranteed present
-    QString item_type = args.takeFirst().remove(" ");
-    // QStringList item_args = args;
-    if (!design_pan->commandMoveItem(item_type, args)) {
-    //   dialog_pan->echo(QObject::tr("Item removal failed."));
-      dialog_pan->echo(QObject::tr("Item move unsuccessful."));
-    }
-  } else {
-    dialog_pan->echo(QObject::tr("move takes at least 3 arguments, %1 provided.").arg(args.size()));
-  }
 }

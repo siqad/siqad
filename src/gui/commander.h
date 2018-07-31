@@ -52,7 +52,7 @@ namespace gui{
     // void commandEcho(QStringList args);
     // void commandHelp(QStringList args);
     // void commandRun(QStringList args);
-    void commandMoveItem(QStringList args);
+    // void commandMoveItem(QStringList args);
 
     bool commandAddItem();
     bool commandRemoveItem();
