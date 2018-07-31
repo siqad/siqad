@@ -77,7 +77,7 @@ QStringList gui::Commander::cleanAlphas(QString* input)
 
 void gui::Commander::parseInputs(QString input)
 {
-  QString input_orig = input;
+  input_orig = input;
   brackets = cleanBrackets(&input);
   qDebug() << brackets;
   numericals = cleanNumbers(&input);
@@ -104,7 +104,7 @@ bool gui::Commander::performCommand()
   else if (command == QObject::tr("remove"))
     return commandRemoveItem();
   else if (command == QObject::tr("echo"))
-    commandEcho();
+    return commandEcho();
   else if (command == QObject::tr("help"))
     commandHelp();
   else if (command == QObject::tr("run"))
@@ -154,9 +154,13 @@ bool gui::Commander::commandRemoveItem()
   return true;
 }
 
-void gui::Commander::commandEcho()
+bool gui::Commander::commandEcho()
 {
-  qDebug() << "ECHO";
+  QString input_copy = input_orig;
+  QString target = QString("echo ");
+  input_copy.remove(input_copy.indexOf(target), target.size());
+  dialog_pan->echo(input_copy);
+  return true;
 }
 
 void gui::Commander::commandHelp()
@@ -178,12 +182,6 @@ void gui::Commander::commandMoveItem()
 
 
 
-void gui::Commander::commandEcho(QStringList args)
-{
-  for (QString arg: args) {
-    dialog_pan->echo(arg);
-  }
-}
 
 
 void gui::Commander::commandHelp(QStringList args)

@@ -49,14 +49,14 @@ namespace gui{
     // bool performCommand(QStringList cmds);
     // void commandAddItem(QStringList args);
     // void commandRemoveItem(QStringList args);
-    void commandEcho(QStringList args);
+    // void commandEcho(QStringList args);
     void commandHelp(QStringList args);
     void commandRun(QStringList args);
     void commandMoveItem(QStringList args);
 
     bool commandAddItem();
     bool commandRemoveItem();
-    void commandEcho();
+    bool commandEcho();
     void commandHelp();
     void commandRun();
     void commandMoveItem();
@@ -67,6 +67,7 @@ namespace gui{
     QStringList brackets;      // number inputs enclosed in brackets
     QStringList numericals;    // number inputs without bracket enclosure
     QStringList input_kws;     // white-listed keywords
+    QString input_orig;
   };
 
 } // end gui namespace
