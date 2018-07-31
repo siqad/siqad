@@ -51,14 +51,14 @@ namespace gui{
     // void commandRemoveItem(QStringList args);
     // void commandEcho(QStringList args);
     // void commandHelp(QStringList args);
-    void commandRun(QStringList args);
+    // void commandRun(QStringList args);
     void commandMoveItem(QStringList args);
 
     bool commandAddItem();
     bool commandRemoveItem();
     bool commandEcho();
     bool commandHelp();
-    void commandRun();
+    bool commandRun();
     void commandMoveItem();
 
     DesignPanel *design_pan;

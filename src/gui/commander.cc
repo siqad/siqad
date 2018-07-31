@@ -64,7 +64,7 @@ QStringList gui::Commander::cleanNumbers(QString* input)
 
 QStringList gui::Commander::cleanAlphas(QString* input)
 {
-  QRegExp rx("([a-zA-Z]+)");
+  QRegExp rx("([a-zA-Z/.]+)");
   QStringList list;
   int pos = 0;
   while ((pos = rx.indexIn(*input, pos)) != -1) {
@@ -107,7 +107,7 @@ bool gui::Commander::performCommand()
   else if (command == QObject::tr("help"))
     return commandHelp();
   else if (command == QObject::tr("run"))
-    commandRun();
+    return commandRun();
   else if (command == QObject::tr("move"))
     commandMoveItem();
   return false;
@@ -195,10 +195,55 @@ bool gui::Commander::commandHelp()
   return true;
 }
 
-void gui::Commander::commandRun()
+bool gui::Commander::commandRun()
 {
-  qDebug() << "RUN";
+  for (QString path: alphas) {
+    QFile file(path);
+    QFileInfo qfi(file);
+    if ((file.exists()) && (qfi.suffix()=="sqs")) { //check for extension
+      dialog_pan->echo(QObject::tr("Running file %1.").arg(file.fileName()));
+      if (file.open(QIODevice::ReadOnly)) {
+         QTextStream in(&file);
+         while (!in.atEnd()) {
+            QString line = in.readLine();
+            if (!line.isEmpty())
+              parseInputs(line);
+         }
+         file.close();
+      }
+    } else {
+      dialog_pan->echo(QObject::tr("Error opening '%1'. Check that file exists and that the extension is '.sqs'.").arg(file.fileName()));
+    }
+  }
+  return true;
 }
+
+// void gui::Commander::commandRun(QStringList args)
+// {
+//   for (QString arg: args) {
+//     arg.remove(" ");
+//     QFile file(arg);
+//     QFileInfo qfi(file);
+//     if ((file.exists()) && (qfi.suffix()=="sqs")) { //check for extension
+//       dialog_pan->echo(QObject::tr("Running file %1.").arg(file.fileName()));
+//       if (file.open(QIODevice::ReadOnly))
+//       {
+//          QTextStream in(&file);
+//          while (!in.atEnd())
+//          {
+//             QString line = in.readLine();
+//             if (!line.isEmpty()){
+//               parseInputs(line);
+//             }
+//          }
+//          file.close();
+//       }
+//     } else {
+//       dialog_pan->echo(QObject::tr("Error opening '%1'. Check that file exists and that the extension is '.sqs'.").arg(file.fileName()));
+//     }
+//   }
+// }
+
 
 void gui::Commander::commandMoveItem()
 {
@@ -207,31 +252,6 @@ void gui::Commander::commandMoveItem()
 
 
 
-void gui::Commander::commandRun(QStringList args)
-{
-  for (QString arg: args) {
-    arg.remove(" ");
-    QFile file(arg);
-    QFileInfo qfi(file);
-    if ((file.exists()) && (qfi.suffix()=="sqs")) { //check for extension
-      dialog_pan->echo(QObject::tr("Running file %1.").arg(file.fileName()));
-      if (file.open(QIODevice::ReadOnly))
-      {
-         QTextStream in(&file);
-         while (!in.atEnd())
-         {
-            QString line = in.readLine();
-            if (!line.isEmpty()){
-              parseInputs(line);
-            }
-         }
-         file.close();
-      }
-    } else {
-      dialog_pan->echo(QObject::tr("Error opening '%1'. Check that file exists and that the extension is '.sqs'.").arg(file.fileName()));
-    }
-  }
-}
 
 void gui::Commander::commandMoveItem(QStringList args)
 {
