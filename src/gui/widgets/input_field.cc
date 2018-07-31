@@ -33,6 +33,16 @@ gui::InputField::InputField(QWidget *parent)
   this->cmd_history = new QStringList();
   max_history = 100;
   position = 0;
+  QStringList temp = QStringList();
+  // temp.append("add");
+  // temp.append("move");
+  completer = new QCompleter();
+  completer->setCaseSensitivity(Qt::CaseInsensitive);
+  completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+  fsm = new QFileSystemModel(completer);
+  fsm->setRootPath("");
+  completer->setModel(fsm);
+  setCompleter(completer);
 }
 
 

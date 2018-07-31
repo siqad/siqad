@@ -75,12 +75,8 @@ namespace gui{
     //! Move an item on the design panel using a command from the dialog panel.
     bool commandMoveItem(QString item_type, QStringList brackets, QStringList numericals);
 
-    //! Clean up the item args, and move them into sets of arguments.
-    QList<QStringList> cleanItemArgs(QStringList item_args);
-
     //! Find the appropriate offset for commandMove, given the cleaned item arguments.
     QPointF findMoveOffset(QStringList args);
-
 
     //! add a new Item to the Layer at the given index of the stack. If layer_index==-1,
     //! add the new item to the top_layer. If ind != -1, inserts the Item into the given

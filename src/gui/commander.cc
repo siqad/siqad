@@ -34,7 +34,7 @@ QStringList gui::Commander::cleanBrackets(QString* input)
   int count_r = input->count(p_r);
   QStringList list = QStringList();
   if (count_l != count_r) {
-    qDebug() << "Parentheses mismatch";
+    dialog_pan->echo("Parentheses mismatch");
   } else {
     QString temp;
     int ind_l;
@@ -64,7 +64,6 @@ QStringList gui::Commander::cleanNumbers(QString* input)
   for (QString item : list) {
     input->remove(item);
   }
-
   return list;
 }
 
@@ -80,17 +79,12 @@ QStringList gui::Commander::cleanAlphas(QString* input)
   return list;
 }
 
-
 void gui::Commander::parseInputs(QString input)
 {
   input_orig = input;
   brackets = cleanBrackets(&input);
-  qDebug() << brackets;
   numericals = cleanNumbers(&input);
-  qDebug() << numericals;
   alphas = cleanAlphas(&input);
-  qDebug() << alphas;
-
   if (!alphas.isEmpty()) {
     if (input_kws.contains(alphas.first())) {
       if (!performCommand())

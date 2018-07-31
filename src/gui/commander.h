@@ -20,14 +20,11 @@ namespace gui{
   class Commander
   {
   public:
-
     //! constructor
     Commander();
-
     //! destructor
     ~Commander(){};
-
-    // public methods
+    
     //! Set design panel
     void setDesignPanel(DesignPanel *des_pan){design_pan = des_pan;}
     //! Set dialog panel
@@ -38,22 +35,15 @@ namespace gui{
     void clearKeywords();
     //! Further parses input after application determines that input is non-empty.
     void parseInputs(QString input);
-
+    //! Returns unenclosed numbers found in input's QString.
     QStringList cleanNumbers(QString* input);
+    //! Returns non-numbers found in input's QString.
     QStringList cleanAlphas(QString* input);
+    //! Returns ()-enclosed numbers found in input's QString.
     QStringList cleanBrackets(QString* input);
 
   private:
-
     bool performCommand();
-    // bool performCommand(QStringList cmds);
-    // void commandAddItem(QStringList args);
-    // void commandRemoveItem(QStringList args);
-    // void commandEcho(QStringList args);
-    // void commandHelp(QStringList args);
-    // void commandRun(QStringList args);
-    // void commandMoveItem(QStringList args);
-
     bool commandAddItem();
     bool commandRemoveItem();
     bool commandEcho();
@@ -67,7 +57,7 @@ namespace gui{
     QStringList brackets;      // number inputs enclosed in brackets
     QStringList numericals;    // number inputs without bracket enclosure
     QStringList input_kws;     // white-listed keywords
-    QString input_orig;
+    QString input_orig;        // original input before processing
   };
 
 } // end gui namespace

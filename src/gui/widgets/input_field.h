@@ -17,6 +17,8 @@
 
 #include <QRegExpValidator>
 #include <QLineEdit>
+#include <QCompleter>
+#include <QFileSystemModel>
 
 
 // NOTE:
@@ -69,6 +71,8 @@ private:
   QStringList *cmd_history;
   int max_history;
   int position;
+  QCompleter* completer;
+  QFileSystemModel* fsm;
 };
 
 } // end gui namespace

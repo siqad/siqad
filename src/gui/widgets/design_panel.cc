@@ -2259,19 +2259,6 @@ void gui::DesignPanel::MoveItem::moveAggregate(prim::Aggregate *agg, const QPoin
   agg->setPos(agg->scenePos()+QPointF(-1,0));
 }
 
-QList<QStringList> gui::DesignPanel::cleanItemArgs(QStringList item_args)
-{
-  QList<QStringList> clean_args = QList<QStringList>();
-  for (QString arg: item_args){
-    //strip parentheses
-    arg.remove("(");
-    arg.remove(")");
-    // return arguments enclosed in parentheses in sets.
-    clean_args.append(arg.split(" ", QString::SkipEmptyParts));
-  }
-  return clean_args;
-}
-
 bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QStringList item_args)
 {
   prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
