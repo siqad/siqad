@@ -115,7 +115,7 @@ bool gui::Commander::performCommand()
   else if (command == QObject::tr("run"))
     return commandRun();
   else if (command == QObject::tr("move"))
-    commandMoveItem();
+    return commandMoveItem();
   return false;
 }
 
@@ -149,6 +149,7 @@ bool gui::Commander::commandRemoveItem()
     QString item_type = alphas.takeFirst();
     if (!design_pan->commandRemoveItem(item_type, brackets, numericals)) {
       dialog_pan->echo(QObject::tr("Item removal failed."));
+      return false;
     }
   } else {
     dialog_pan->echo(QObject::tr("Item type not specified"));
@@ -157,34 +158,20 @@ bool gui::Commander::commandRemoveItem()
   return true;
 }
 
-void gui::Commander::commandMoveItem()
+bool gui::Commander::commandMoveItem()
 {
   if (!alphas.isEmpty()) {
     QString item_type = alphas.takeFirst();
     if (!design_pan->commandMoveItem(item_type, brackets, numericals)) {
       dialog_pan->echo(QObject::tr("Item move unsuccessful."));
+      return false;
     }
   } else {
     dialog_pan->echo(QObject::tr("Item type not specified"));
+    return false;
   }
-  qDebug() << "MOVE ITEM";
+  return true;
 }
-
-// void gui::Commander::commandMoveItem(QStringList args)
-// {
-//   if ((args.size() == 3) || (args.size() == 4)) {
-//     //item_type, one set of arguments guaranteed present
-//     QString item_type = args.takeFirst().remove(" ");
-//     // QStringList item_args = args;
-//     if (!design_pan->commandMoveItem(item_type, args)) {
-//     //   dialog_pan->echo(QObject::tr("Item removal failed."));
-//       dialog_pan->echo(QObject::tr("Item move unsuccessful."));
-//     }
-//   } else {
-//     dialog_pan->echo(QObject::tr("move takes at least 3 arguments, %1 provided.").arg(args.size()));
-//   }
-// }
-//
 
 bool gui::Commander::commandEcho()
 {

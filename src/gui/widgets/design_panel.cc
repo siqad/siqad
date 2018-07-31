@@ -2328,10 +2328,9 @@ bool gui::DesignPanel::commandRemoveItem(QString type, QStringList brackets, QSt
     QPointF pos = QPointF(x,y)*prim::Item::scale_factor;
     if (itemAt(mapFromScene(pos))) {
       QList<QGraphicsItem*> gitems = items(mapFromScene(pos));
-      for (QGraphicsItem* item: gitems){
-        if (static_cast<prim::Item*>(item)->item_type == item_type) {
+      for (QGraphicsItem* item: gitems) {
+        if (static_cast<prim::Item*>(item)->item_type == item_type)
           commandRemoveHandler(static_cast<prim::Item*>(item));
-        }
       }
       return true;
     }

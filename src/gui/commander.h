@@ -59,7 +59,7 @@ namespace gui{
     bool commandEcho();
     bool commandHelp();
     bool commandRun();
-    void commandMoveItem();
+    bool commandMoveItem();
 
     DesignPanel *design_pan;
     DialogPanel *dialog_pan;
