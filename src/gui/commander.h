@@ -47,14 +47,14 @@ namespace gui{
 
     bool performCommand();
     // bool performCommand(QStringList cmds);
-    void commandAddItem(QStringList args);
+    // void commandAddItem(QStringList args);
     void commandRemoveItem(QStringList args);
     void commandEcho(QStringList args);
     void commandHelp(QStringList args);
     void commandRun(QStringList args);
     void commandMoveItem(QStringList args);
 
-    void commandAddItem();
+    bool commandAddItem();
     void commandRemoveItem();
     void commandEcho();
     void commandHelp();
@@ -63,9 +63,9 @@ namespace gui{
 
     DesignPanel *design_pan;
     DialogPanel *dialog_pan;
+    QStringList alphas;        // alphabetical inputs
     QStringList brackets;      // number inputs enclosed in brackets
     QStringList numericals;    // number inputs without bracket enclosure
-    QStringList alphas;        // alphabetical inputs
     QStringList input_kws;     // white-listed keywords
   };
 

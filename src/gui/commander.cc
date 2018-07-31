@@ -100,7 +100,7 @@ bool gui::Commander::performCommand()
 {
   QString command = alphas.takeFirst().remove(" ");
   if (command == QObject::tr("add"))
-    commandAddItem();
+    return commandAddItem();
   else if (command == QObject::tr("remove"))
     commandRemoveItem();
   else if (command == QObject::tr("echo"))
@@ -114,14 +114,58 @@ bool gui::Commander::performCommand()
   return false;
 }
 
-void gui::Commander::commandAddItem()
+bool gui::Commander::commandAddItem()
 {
-  qDebug() << "ADD ITEM";
+  if (!alphas.isEmpty()) {
+    QString item_type = alphas.takeFirst();
+    QString layer_id;
+    if (!alphas.isEmpty())
+      layer_id = alphas.takeFirst();
+    else if (!numericals.isEmpty())
+      layer_id = numericals.takeFirst();
+    else {
+      dialog_pan->echo(QObject::tr("Missing argument, quitting commandAddItem()"));
+      return false;
+    }
+    if (!design_pan->commandCreateItem(item_type, layer_id, brackets)) {
+      dialog_pan->echo(QObject::tr("Item creation failed."));
+      return false;
+    }
+  } else {
+    dialog_pan->echo(QObject::tr("Item type not specified"));
+    return false;
+  }
+  return true;
+}
+
+
+void gui::Commander::commandRemoveItem(QStringList args)
+{
+  if ((args.size() == 2) || (args.size() == 3)) {
+    //item_type, one set of arguments guaranteed present
+    QString item_type = args.takeFirst().remove(" ");
+    // QStringList item_args = args;
+    if (!design_pan->commandRemoveItem(item_type, args)) {
+      dialog_pan->echo(QObject::tr("Item removal failed."));
+    }
+  } else {
+    dialog_pan->echo(QObject::tr("remove takes 2 or 3 arguments, %1 provided.").arg(args.size()));
+  }
 }
 
 void gui::Commander::commandRemoveItem()
 {
   qDebug() << "REMOVE ITEM";
+  if (!alphas.isEmpty()) {
+    QString item_type = alphas.takeFirst();
+    if (!design_pan->commandRemoveItem(item_type, args)) {
+      dialog_pan->echo(QObject::tr("Item removal failed."));
+    }
+  } else {
+    dialog_pan->echo(QObject::tr("Item type not specified"));
+    return false;
+  }
+  return true;
 }
 
 void gui::Commander::commandEcho()
@@ -144,35 +188,8 @@ void gui::Commander::commandMoveItem()
   qDebug() << "MOVE ITEM";
 }
 
-void gui::Commander::commandAddItem(QStringList args)
-{
-  if ((args.size() == 3) || (args.size() == 4)) {
-    //item_type, layer_id, one set of arguments guaranteed present
-    QString item_type = args.takeFirst().remove(" ");
-    QString layer_id = args.takeFirst().remove(" ");
-    QStringList item_args = args; //Whatever is left
-    if (!design_pan->commandCreateItem(item_type, layer_id, item_args)) {
-      dialog_pan->echo(QObject::tr("Item creation failed."));
-    }
-  } else {
-    dialog_pan->echo(QObject::tr("add takes 3 or 4 arguments, %1 provided.").arg(args.size()));
-  }
-}
 
 
-void gui::Commander::commandRemoveItem(QStringList args)
-{
-  if ((args.size() == 2) || (args.size() == 3)) {
-    //item_type, one set of arguments guaranteed present
-    QString item_type = args.takeFirst().remove(" ");
-    // QStringList item_args = args;
-    if (!design_pan->commandRemoveItem(item_type, args)) {
-      dialog_pan->echo(QObject::tr("Item removal failed."));
-    }
-  } else {
-    dialog_pan->echo(QObject::tr("remove takes 2 or 3 arguments, %1 provided.").arg(args.size()));
-  }
-}
 
 
 void gui::Commander::commandEcho(QStringList args)

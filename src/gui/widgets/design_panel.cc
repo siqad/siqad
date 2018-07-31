@@ -2272,39 +2272,26 @@ QList<QStringList> gui::DesignPanel::cleanItemArgs(QStringList item_args)
   return clean_args;
 }
 
-
 bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QStringList item_args)
 {
   prim::Item::ItemType item_type = prim::Item::getEnumItemType(type);
-  QList<QStringList> clean_args = cleanItemArgs(item_args);
   switch(item_type){
     case prim::Item::Electrode:
-      if ((clean_args.size() == 2) && (clean_args.first().size() == 2) && (clean_args.last().size()) == 2) {
+      if (item_args.size()==4) {
         setTool(gui::ToolType::ElectrodeTool);
         emit sig_toolChangeRequest(gui::ToolType::ElectrodeTool);
         int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
-        prim::Electrode* elec = new prim::Electrode(layer_index, clean_args);
+        prim::Electrode* elec = new prim::Electrode(layer_index, item_args);
         undo_stack->push(new CreateItem(layer_index, this, elec));
         emit sig_toolChangeRequest(gui::ToolType::SelectTool);
         return true;
       }
       break;
-    case prim::Item::AFMArea:
-      if ((clean_args.size() == 2) && (clean_args.first().size() == 2) && (clean_args.last().size()) == 2) {
-        setTool(gui::ToolType::AFMAreaTool);
-        emit sig_toolChangeRequest(gui::ToolType::AFMAreaTool);
-        int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
-        prim::AFMArea* afm_area = new prim::AFMArea(layer_index, clean_args);
-        undo_stack->push(new CreateItem(layer_index, this, afm_area));
-        emit sig_toolChangeRequest(gui::ToolType::SelectTool);
-        return true;
-      }
-      break;
     case prim::Item::DBDot:
-      if ((clean_args.size() == 1) && (clean_args[0].size() == 3)) {
-        int n = clean_args.first()[0].toInt();
-        int m = clean_args.first()[1].toInt();
-        int l = clean_args.first()[2].toInt();
+      if (item_args.size()==3) {
+        int n = item_args.takeFirst().toInt();
+        int m = item_args.takeFirst().toInt();
+        int l = item_args.takeFirst().toInt();
         if ((l == 0) || (l == 1)) {  // Check for valid
           setTool(gui::ToolType::DBGenTool);
           int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
@@ -2315,10 +2302,22 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
         }
       }
       break;
+    case prim::Item::AFMArea:
+      if (item_args.size()==4) {
+        setTool(gui::ToolType::AFMAreaTool);
+        emit sig_toolChangeRequest(gui::ToolType::AFMAreaTool);
+        int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
+        prim::AFMArea* afm_area = new prim::AFMArea(layer_index, item_args);
+        undo_stack->push(new CreateItem(layer_index, this, afm_area));
+        emit sig_toolChangeRequest(gui::ToolType::SelectTool);
+        return true;
+      }
+      break;
     default:
       return false;
   }
 }
+
 
 bool gui::DesignPanel::commandRemoveItem(QString type, QStringList item_args)
 {
