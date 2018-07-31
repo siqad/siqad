@@ -2,32 +2,32 @@
   <help_text>
     <entry>
       <command>help</command>
-      <text>Shows help text for all commands. If a specific command or commands are given as arguments, only help for those commands will be shown.</text>
-      <usage>"help" or "help, [command], [command2], ..."</usage>
+      <text>Shows help text for all commands. If a specific command or commands are given as arguments only help for those commands will be shown.</text>
+      <usage>"help" or "help [command] [command2] ..."</usage>
     </entry>
     <entry>
       <command>add</command>
-      <text>Adds an item to the scene. Currently, only Electrodes and DBDots are supported for creation through the console. Generally, an item will require a layer index (or "auto"), and specific item arguments. For example, an Electrode requires an item index and two points in the form "(x1 y1), (x2 y2)", while a DBDot requires an item index and the lattice coordinate in the form (n,m,l).</text>
-      <usage>"add, [item_type], [layer_id], [item_arguments]" e.g. "add, Electrode, auto, (0 0), (1000 1000)"</usage>
+      <text>Adds an item to the scene. Currently only Electrodes and DBDots are supported for creation through the console. Generally an item will require a layer index (or "auto") and specific item arguments. For example an Electrode requires an item index and two points in the form "(x1 y1) (x2 y2)" while a DBDot requires an item index and the lattice coordinate in the form (nml).</text>
+      <usage>"add [item_type] [layer_id] [item_arguments]" e.g. "add Electrode auto (0 0) (1000 1000)"</usage>
     </entry>
     <entry>
       <command>remove</command>
       <text>Removes an item from the scene. Items can be removed via location specification (all items of given type at that location are removed) or by specifying an item index and layer.</text>
-      <usage>"remove, [item_type], [location]" or "remove, [item_type], [layer_id], [item_id]" e.g. "remove, Electrode, (0 0)" or "remove, DBDot, 1, 1"</usage>
+      <usage>"remove [item_type] [location]" or "remove [item_type] [layer_id] [item_id]" e.g. "remove Electrode (0 0)" or "remove DBDot 1 1"</usage>
     </entry>
     <entry>
       <command>echo</command>
       <text>Echoes the given string</text>
-      <usage>"echo, Example"</usage>
+      <usage>"echo Example"</usage>
     </entry>
     <entry>
       <command>run</command>
       <text>Runs one or more scripts inside the console in sequence. Please do not use spaces in the file paths. See other help text entries for supported commands and their usage.</text>
-      <usage>"run, [absolute file path]"</usage>
+      <usage>"run [absolute file path]"</usage>
     </entry>
     <entry>
       <command>move</command>
-      <text>Moves an existing item by an offset, specifying either the item (by its layer and item indices) or the items (by location) to be moved.</text>
-      <usage>"move, [item_type], [current_location], [offsets]" or "move, [item_type], [layer_id], [item_id] [offsets]"</usage>
+      <text>Moves an existing item by an offset specifying either the item (by its layer and item indices) or the items (by location) to be moved.</text>
+      <usage>"move [item_type] [current_location] [offsets]" or "move [item_type] [layer_id] [item_id] [offsets]"</usage>
     </entry>
   </help_text>
