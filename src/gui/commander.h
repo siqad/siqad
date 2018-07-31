@@ -50,14 +50,14 @@ namespace gui{
     // void commandAddItem(QStringList args);
     // void commandRemoveItem(QStringList args);
     // void commandEcho(QStringList args);
-    void commandHelp(QStringList args);
+    // void commandHelp(QStringList args);
     void commandRun(QStringList args);
     void commandMoveItem(QStringList args);
 
     bool commandAddItem();
     bool commandRemoveItem();
     bool commandEcho();
-    void commandHelp();
+    bool commandHelp();
     void commandRun();
     void commandMoveItem();
 

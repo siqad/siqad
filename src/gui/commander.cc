@@ -87,9 +87,8 @@ void gui::Commander::parseInputs(QString input)
 
   if (!alphas.isEmpty()) {
     if (input_kws.contains(alphas.first())) {
-      if (!performCommand()) {
+      if (!performCommand())
         dialog_pan->echo(QObject::tr("Error occured with command '%1'").arg(input_orig));
-      }
     } else {
       dialog_pan->echo(QObject::tr("Command '%1' not recognised.").arg(input_orig));
     }
@@ -106,7 +105,7 @@ bool gui::Commander::performCommand()
   else if (command == QObject::tr("echo"))
     return commandEcho();
   else if (command == QObject::tr("help"))
-    commandHelp();
+    return commandHelp();
   else if (command == QObject::tr("run"))
     commandRun();
   else if (command == QObject::tr("move"))
@@ -138,7 +137,6 @@ bool gui::Commander::commandAddItem()
   return true;
 }
 
-
 bool gui::Commander::commandRemoveItem()
 {
   qDebug() << "REMOVE ITEM";
@@ -163,9 +161,38 @@ bool gui::Commander::commandEcho()
   return true;
 }
 
-void gui::Commander::commandHelp()
+bool gui::Commander::commandHelp()
 {
-  qDebug() << "HELP";
+  QFile file(":/help_text.xml");
+  if (!file.open(QFile::ReadOnly | QFile::Text)) {
+    qFatal(QObject::tr("Error help text file to read: %1")
+        .arg(file.errorString()).toLatin1().constData(), 0);
+    return false;
+  }
+  QString command, description, usage;
+  QXmlStreamReader rs(&file);
+  rs.readNext();
+  while (!rs.atEnd()) {
+    if (rs.isStartElement()) {
+      if (rs.name().toString() == "command")
+        command = rs.readElementText();
+      else if (rs.name().toString() == "text")
+        description = rs.readElementText();
+      else if (rs.name().toString() == "usage")
+        usage = rs.readElementText();
+    } else if (rs.isEndElement()) {
+      if (rs.name().toString() == "entry") {
+        if ((alphas.isEmpty()) || alphas.contains(command)) {
+          dialog_pan->echo(QString("\nCommand:  ")+command);
+          dialog_pan->echo(QString("  Description:  ")+description);
+          dialog_pan->echo(QString("  Usage:  ")+usage);
+        }
+      }
+    }
+    rs.readNext();
+  }
+  file.close();
+  return true;
 }
 
 void gui::Commander::commandRun()
@@ -179,48 +206,6 @@ void gui::Commander::commandMoveItem()
 }
 
 
-
-
-
-
-
-void gui::Commander::commandHelp(QStringList args)
-{
-  QFile file(":/help_text.xml");
-  if (!file.open(QFile::ReadOnly | QFile::Text)) {
-    qFatal(QObject::tr("Error help text file to read: %1")
-        .arg(file.errorString()).toLatin1().constData(), 0);
-    return;
-  }
-  QStringList clean_args = QStringList();
-  for (QString arg: args) {
-    clean_args.append(arg.remove(" "));
-  }
-  QString command, description, usage;
-  QXmlStreamReader rs(&file);
-  rs.readNext();
-  while (!rs.atEnd()) {
-    if (rs.isStartElement()) {
-      if (rs.name().toString() == "command") {
-        command = rs.readElementText();
-      } else if (rs.name().toString() == "text") {
-        description = rs.readElementText();
-      } else if (rs.name().toString() == "usage") {
-        usage = rs.readElementText();
-      }
-    } else if (rs.isEndElement()) {
-      if (rs.name().toString() == "entry") {
-        if ((clean_args.isEmpty()) || clean_args.contains(command)) {
-          dialog_pan->echo(QString("\nCommand:  ")+command);
-          dialog_pan->echo(QString("  Description:  ")+description);
-          dialog_pan->echo(QString("  Usage:  ")+usage);
-        }
-      }
-    }
-    rs.readNext();
-  }
-  file.close();
-}
 
 void gui::Commander::commandRun(QStringList args)
 {
