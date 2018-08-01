@@ -21,9 +21,6 @@ gui::Validator::Validator(QObject *parent)
 gui::Validator::~Validator()
 {}
 
-
-
-
 // INPUTFIELD CLASS
 
 gui::InputField::InputField(QWidget *parent)
@@ -33,16 +30,15 @@ gui::InputField::InputField(QWidget *parent)
   this->cmd_history = new QStringList();
   max_history = 100;
   position = 0;
-  QStringList temp = QStringList();
-  // temp.append("add");
-  // temp.append("move");
-  completer = new QCompleter();
+  // completer = new QCompleter();
+  completer = new Completer();
   completer->setCaseSensitivity(Qt::CaseInsensitive);
   completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
   fsm = new QFileSystemModel(completer);
   fsm->setRootPath("");
   completer->setModel(fsm);
   setCompleter(completer);
+  installEventFilter(this);
 }
 
 
@@ -65,6 +61,30 @@ QString gui::InputField::pop()
   return input;
 }
 
+void gui::InputField::insertCompletion(QString completion)
+{
+  int extra = completion.length() - completer->completionPrefix().length();
+  insert(completion.right(extra));
+}
+
+void gui::InputField::test()
+{
+  qDebug() << "TEST";
+}
+
+bool gui::InputField::eventFilter(QObject *obj, QEvent *event)
+{
+  if (event->type() == QEvent::KeyPress) {
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+    if (keyEvent->key() == Qt::Key_Tab) {
+      qDebug() << "InputField: TAB PRESSED";
+      qDebug() << completer->currentCompletion();
+      return true;
+    }
+  }
+  return false;
+}
+
 void gui::InputField::keyPressEvent(QKeyEvent *e)
 {
   if (e->key() == Qt::Key_Up) {
@@ -84,4 +104,23 @@ void gui::InputField::keyPressEvent(QKeyEvent *e)
   } else {
     QLineEdit::keyPressEvent(e);
   }
+}
+
+gui::Completer::Completer(QWidget *parent)
+{
+  installEventFilter(this);
+}
+
+bool gui::Completer::eventFilter(QObject *obj, QEvent *event)
+{
+  if (event->type() == QEvent::KeyPress) {
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+    if (keyEvent->key() == Qt::Key_Tab) {
+      qDebug() << "Completer: TAB PRESSED";
+      static_cast<InputField *>(widget())->insertCompletion(currentCompletion());
+      return true;
+    }
+    return QCompleter::eventFilter(obj, event);
+  }
+  return QCompleter::eventFilter(obj, event);
 }

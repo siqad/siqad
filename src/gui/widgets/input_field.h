@@ -56,15 +56,16 @@ public:
 
   // constructor
   InputField(QWidget *parent=0);
-
   // destructor
   ~InputField();
-
   // get the text and clear
   QString pop();
 
+  void insertCompletion(QString completion);
+  void test();
 protected:
   virtual void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
+  bool eventFilter(QObject *obj, QEvent *event);
 
 private:
   Validator *validator;
@@ -75,7 +76,22 @@ private:
   QFileSystemModel* fsm;
 };
 
+// customized Completer object with an event filter.
+class Completer : public QCompleter
+{
+  Q_OBJECT
+public:
+  // constructor
+  Completer(QWidget *parent=0);
+
+  // destructor
+  ~Completer(){};
+protected:
+  bool eventFilter(QObject *obj, QEvent *event);
+};
+
 } // end gui namespace
+
 
 
 #endif
