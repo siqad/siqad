@@ -79,9 +79,18 @@ bool gui::InputField::eventFilter(QObject *obj, QEvent *event)
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
     if (keyEvent->key() == Qt::Key_Tab) {
-      insertCompletion(completer->currentCompletion());
-      completer->setCompletionPrefix(text());
-      return true;
+      // qDebug() << completer->currentCompletion();
+      if (completer->completionCount() == 1) {
+        insertCompletion(completer->currentCompletion());
+        if (fsm->isDir(fsm->index(text())))
+          insertCompletion(QDir::separator());
+        completer->setCompletionPrefix(text());
+        return true;
+      } else {
+        QDir dir = QDir(text());
+        dir.setSorting(QDir::DirsFirst);
+        qDebug() << dir.entryList();
+      }
     }
   }
   return false;
@@ -117,16 +126,15 @@ gui::Completer::Completer(QWidget *parent)
   installEventFilter(this);
 }
 
-// bool gui::Completer::eventFilter(QObject *obj, QEvent *event)
-// {
-//   if (event->type() == QEvent::KeyPress) {
-//     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-//     if (keyEvent->key() == Qt::Key_Tab) {
-//       qDebug() << "Completer: TAB PRESSED";
-//       static_cast<InputField *>(widget())->insertCompletion(currentCompletion());
-//       return true;
-//     }
-//     return QCompleter::eventFilter(obj, event);
-//   }
-//   return QCompleter::eventFilter(obj, event);
-// }
+//Only job is to eat the tab press so the the completer doesn't lose focus.
+bool gui::Completer::eventFilter(QObject *obj, QEvent *event)
+{
+  if (event->type() == QEvent::KeyPress) {
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+    if (keyEvent->key() == Qt::Key_Tab) {
+      return true;
+    }
+    return QCompleter::eventFilter(obj, event);
+  }
+  return QCompleter::eventFilter(obj, event);
+}

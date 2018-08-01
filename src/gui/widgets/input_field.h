@@ -88,7 +88,7 @@ public:
   // destructor
   ~Completer(){};
 protected:
-  // bool eventFilter(QObject *obj, QEvent *event);
+  bool eventFilter(QObject *obj, QEvent *event);
 };
 
 } // end gui namespace
