@@ -33,7 +33,8 @@ gui::InputField::InputField(QWidget *parent)
   // completer = new QCompleter();
   completer = new Completer();
   completer->setCaseSensitivity(Qt::CaseInsensitive);
-  completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+  // completer->setCompletionMode(QCompleter::PopupCompletion);
+  completer->setCompletionMode(QCompleter::InlineCompletion);
   fsm = new QFileSystemModel(completer);
   fsm->setRootPath("");
   completer->setModel(fsm);
@@ -65,6 +66,7 @@ void gui::InputField::insertCompletion(QString completion)
 {
   int extra = completion.length() - completer->completionPrefix().length();
   insert(completion.right(extra));
+  // deselect();
 }
 
 void gui::InputField::test()
@@ -78,6 +80,8 @@ bool gui::InputField::eventFilter(QObject *obj, QEvent *event)
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
     if (keyEvent->key() == Qt::Key_Tab) {
       qDebug() << "InputField: TAB PRESSED";
+      insertCompletion(completer->currentCompletion());
+      completer->setCompletionPrefix(text());
       qDebug() << completer->currentCompletion();
       return true;
     }
