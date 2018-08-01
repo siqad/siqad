@@ -74,6 +74,7 @@ private:
   int position;
   QCompleter* completer;
   QFileSystemModel* fsm;
+  QString current_cmd;
 };
 
 // customized Completer object with an event filter.
@@ -87,7 +88,7 @@ public:
   // destructor
   ~Completer(){};
 protected:
-  bool eventFilter(QObject *obj, QEvent *event);
+  // bool eventFilter(QObject *obj, QEvent *event);
 };
 
 } // end gui namespace

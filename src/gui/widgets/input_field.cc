@@ -79,10 +79,8 @@ bool gui::InputField::eventFilter(QObject *obj, QEvent *event)
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
     if (keyEvent->key() == Qt::Key_Tab) {
-      qDebug() << "InputField: TAB PRESSED";
       insertCompletion(completer->currentCompletion());
       completer->setCompletionPrefix(text());
-      qDebug() << completer->currentCompletion();
       return true;
     }
   }
@@ -93,38 +91,42 @@ void gui::InputField::keyPressEvent(QKeyEvent *e)
 {
   if (e->key() == Qt::Key_Up) {
     if (position > 0) {
+      if (position == cmd_history->size())
+        current_cmd = this->text();
       position--;
       this->setText(cmd_history->at(position));
-    } else {
-      this->setText(QString());
     }
   } else if (e->key() == Qt::Key_Down) {
-    if (position < cmd_history->size() - 1) {
+    if (position < cmd_history->size()) {
       position++;
-      this->setText(cmd_history->at(position));
-    } else {
-      this->setText(QString());
+      if (position == cmd_history->size())
+        this->setText(current_cmd);
+      else
+        this->setText(cmd_history->at(position));
     }
   } else {
     QLineEdit::keyPressEvent(e);
   }
 }
 
+
+
+
 gui::Completer::Completer(QWidget *parent)
 {
   installEventFilter(this);
 }
 
-bool gui::Completer::eventFilter(QObject *obj, QEvent *event)
-{
-  if (event->type() == QEvent::KeyPress) {
-    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-    if (keyEvent->key() == Qt::Key_Tab) {
-      qDebug() << "Completer: TAB PRESSED";
-      static_cast<InputField *>(widget())->insertCompletion(currentCompletion());
-      return true;
-    }
-    return QCompleter::eventFilter(obj, event);
-  }
-  return QCompleter::eventFilter(obj, event);
-}
+// bool gui::Completer::eventFilter(QObject *obj, QEvent *event)
+// {
+//   if (event->type() == QEvent::KeyPress) {
+//     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+//     if (keyEvent->key() == Qt::Key_Tab) {
+//       qDebug() << "Completer: TAB PRESSED";
+//       static_cast<InputField *>(widget())->insertCompletion(currentCompletion());
+//       return true;
+//     }
+//     return QCompleter::eventFilter(obj, event);
+//   }
+//   return QCompleter::eventFilter(obj, event);
+// }
