@@ -30,23 +30,66 @@ gui::InputField::InputField(QWidget *parent)
   this->cmd_history = new QStringList();
   max_history = 100;
   position = 0;
-  // completer = new QCompleter();
-  completer = new Completer();
-  completer->setCaseSensitivity(Qt::CaseInsensitive);
-  // completer->setCompletionMode(QCompleter::PopupCompletion);
-  completer->setCompletionMode(QCompleter::InlineCompletion);
-  fsm = new QFileSystemModel(completer);
-  fsm->setRootPath("");
-  completer->setModel(fsm);
-  setCompleter(completer);
   installEventFilter(this);
+  // connect(this, &gui::InputField::textChanged, this, &gui::InputField::manageCompleters);
+
+  initCompleters();
+  // setCompleter(cmd_comp);
+  completer = cmd_comp;
+  setCompleter(completer);
+
 }
 
+// void gui::InputField::setCompleter(QCompleter *c_in)
+// {
+//   completer = c_in;
+//   QLineEdit::setCompleter(completer);
+// }
+
+void gui::InputField::initCompleters()
+{
+  //dir_comp takes care of the filesystem completion
+  dir_comp = new Completer();
+  dir_comp->setCaseSensitivity(Qt::CaseInsensitive);
+  dir_comp->setCompletionMode(QCompleter::InlineCompletion);
+  fsm = new QFileSystemModel(dir_comp);
+  fsm->setRootPath("");
+  dir_comp->setModel(fsm);
+
+  //cmd_comp takes care of the command completion
+  cmd_str_list = commandStringList();
+  cmd_comp = new Completer(cmd_str_list);
+  cmd_comp->setCaseSensitivity(Qt::CaseInsensitive);
+  cmd_comp->setCompletionMode(QCompleter::InlineCompletion);
+}
+
+QStringList gui::InputField::commandStringList()
+{
+  QFile file(":/help_text.xml");
+  if (!file.open(QFile::ReadOnly | QFile::Text)) {
+    qFatal(QObject::tr("Error help text file to read: %1")
+        .arg(file.errorString()).toLatin1().constData(), 0);
+    return QStringList();
+  }
+  QStringList list;
+  QXmlStreamReader rs(&file);
+  rs.readNext();
+  while (!rs.atEnd()) {
+    if (rs.isStartElement()) {
+      if (rs.name().toString() == "command")
+        list.append(rs.readElementText());
+    }
+    rs.readNext();
+  }
+  file.close();
+  return list;
+}
 
 gui::InputField::~InputField()
 {
   delete validator;
   delete cmd_history;
+  this->disconnect();
 }
 
 
@@ -66,30 +109,63 @@ void gui::InputField::insertCompletion(QString completion)
 {
   int extra = completion.length() - completer->completionPrefix().length();
   insert(completion.right(extra));
-  // deselect();
 }
 
-void gui::InputField::test()
+void gui::InputField::manageCompleters()
 {
-  qDebug() << "TEST";
+  QStringList words = getWords();
+  if (words.count() <= 1) {
+    completer = cmd_comp;
+  } else {
+    completer = dir_comp;
+  }
+}
+
+QStringList gui::InputField::getSuggestions()
+{
+  QStringList words = getWords();
+  if (words.count() <= 1) {
+    //this must be the command.
+    return commandStringList();
+  } else {
+    if (words.first() == QString("run")) {
+      QDir dir(words.last());
+      dir.setSorting(QDir::DirsFirst);
+      return dir.entryList();
+    }
+  }
+  return QStringList();
+}
+
+QStringList gui::InputField::getWords()
+{
+  return text().split(QRegExp("(\\s|\\n|\\r)+"), QString::SkipEmptyParts);
 }
 
 bool gui::InputField::eventFilter(QObject *obj, QEvent *event)
 {
   if (event->type() == QEvent::KeyPress) {
+    QStringList candidates = getWords();
+    int word_count = candidates.count();
+    QString word;
+    if (candidates.isEmpty())
+      word = text();
+    else
+      word = candidates.last();
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
     if (keyEvent->key() == Qt::Key_Tab) {
-      // qDebug() << completer->currentCompletion();
+      manageCompleters();
+      completer->setCompletionPrefix(word);
       if (completer->completionCount() == 1) {
+        deselect();
         insertCompletion(completer->currentCompletion());
-        if (fsm->isDir(fsm->index(text())))
+        if (fsm->isDir(fsm->index(getWords().last())))
           insertCompletion(QDir::separator());
-        completer->setCompletionPrefix(text());
+        completer->setCompletionPrefix(getWords().last());
+        end(false);
         return true;
       } else {
-        QDir dir = QDir(text());
-        dir.setSorting(QDir::DirsFirst);
-        qDebug() << dir.entryList();
+        qDebug() << "suggestions:" << getSuggestions();
       }
     }
   }
@@ -122,6 +198,13 @@ void gui::InputField::keyPressEvent(QKeyEvent *e)
 
 
 gui::Completer::Completer(QWidget *parent)
+  : QCompleter(parent)
+{
+  installEventFilter(this);
+}
+
+gui::Completer::Completer(QStringList list, QWidget *parent)
+  : QCompleter(list, parent)
 {
   installEventFilter(this);
 }
@@ -132,6 +215,8 @@ bool gui::Completer::eventFilter(QObject *obj, QEvent *event)
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
     if (keyEvent->key() == Qt::Key_Tab) {
+      //throw the event to the widgets eventfilter to deal with.
+      widget()->eventFilter(obj, event);
       return true;
     }
     return QCompleter::eventFilter(obj, event);

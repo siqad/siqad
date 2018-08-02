@@ -14,7 +14,7 @@
 #include <QString>
 #include <QDebug>
 #include <QKeyEvent>
-
+#include <QtCore>
 #include <QRegExpValidator>
 #include <QLineEdit>
 #include <QCompleter>
@@ -60,21 +60,29 @@ public:
   ~InputField();
   // get the text and clear
   QString pop();
-
+  // void setCompleter(QCompleter *c_in);
   void insertCompletion(QString completion);
-  void test();
+  QStringList commandStringList();
+  QStringList getWords();
 protected:
+  void manageCompleters();
+  QStringList getSuggestions();
   virtual void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
   bool eventFilter(QObject *obj, QEvent *event);
 
 private:
+  void initCompleters();
   Validator *validator;
   QStringList *cmd_history;
   int max_history;
   int position;
   QCompleter* completer;
+  QCompleter* cmd_comp;
+  QCompleter* dir_comp;
   QFileSystemModel* fsm;
   QString current_cmd;
+  QStringList cmd_str_list;
+  QLineEdit *dummy_le;
 };
 
 // customized Completer object with an event filter.
@@ -84,6 +92,7 @@ class Completer : public QCompleter
 public:
   // constructor
   Completer(QWidget *parent=0);
+  Completer(QStringList list, QWidget *parent=0);
 
   // destructor
   ~Completer(){};
