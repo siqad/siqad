@@ -31,20 +31,11 @@ gui::InputField::InputField(QWidget *parent)
   max_history = 100;
   position = 0;
   installEventFilter(this);
-  // connect(this, &gui::InputField::textChanged, this, &gui::InputField::manageCompleters);
-
   initCompleters();
-  // setCompleter(cmd_comp);
   completer = cmd_comp;
   setCompleter(completer);
 
 }
-
-// void gui::InputField::setCompleter(QCompleter *c_in)
-// {
-//   completer = c_in;
-//   QLineEdit::setCompleter(completer);
-// }
 
 void gui::InputField::initCompleters()
 {
@@ -89,7 +80,9 @@ gui::InputField::~InputField()
 {
   delete validator;
   delete cmd_history;
-  this->disconnect();
+  delete fsm;
+  delete dir_comp;
+  delete cmd_comp;
 }
 
 
@@ -128,9 +121,20 @@ QStringList gui::InputField::getSuggestions()
     //this must be the command.
     return commandStringList();
   } else {
+    //check which command was issued
     if (words.first() == QString("run")) {
+      //run expects a path
       QDir dir(words.last());
       dir.setSorting(QDir::DirsFirst);
+      if (dir.entryList().isEmpty()) {
+        QString dir_string = words.last();
+        dir_string.truncate(dir_string.lastIndexOf(QDir::separator())+1);
+        dir.setPath(dir_string);
+        QString filter = words.last();
+        filter = filter.right(filter.size()-filter.lastIndexOf(QDir::separator())-1);
+        filter.append("*");
+        dir.setNameFilters(QStringList(filter));
+      }
       return dir.entryList();
     }
   }
@@ -144,9 +148,9 @@ QStringList gui::InputField::getWords()
 
 bool gui::InputField::eventFilter(QObject *obj, QEvent *event)
 {
+  (void)obj; //so compiler doesn't complain about unused object.
   if (event->type() == QEvent::KeyPress) {
     QStringList candidates = getWords();
-    int word_count = candidates.count();
     QString word;
     if (candidates.isEmpty())
       word = text();
@@ -159,8 +163,10 @@ bool gui::InputField::eventFilter(QObject *obj, QEvent *event)
       if (completer->completionCount() == 1) {
         deselect();
         insertCompletion(completer->currentCompletion());
-        if (fsm->isDir(fsm->index(getWords().last())))
-          insertCompletion(QDir::separator());
+        if (completer == dir_comp) {
+          if (fsm->isDir(fsm->index(getWords().last())))
+            insertCompletion(QDir::separator());
+        }
         completer->setCompletionPrefix(getWords().last());
         end(false);
         return true;
@@ -193,9 +199,6 @@ void gui::InputField::keyPressEvent(QKeyEvent *e)
     QLineEdit::keyPressEvent(e);
   }
 }
-
-
-
 
 gui::Completer::Completer(QWidget *parent)
   : QCompleter(parent)
