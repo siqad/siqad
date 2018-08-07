@@ -19,7 +19,7 @@
 #include <QLineEdit>
 #include <QCompleter>
 #include <QFileSystemModel>
-
+#include "primitives/item.h"
 
 // NOTE:
 //  Under NO circumstances should the user be allowed to execute arbitrary
@@ -46,6 +46,23 @@ public:
 
 };
 
+// customized Completer object with an event filter.
+class Completer : public QCompleter
+{
+  Q_OBJECT
+public:
+  // constructor
+  Completer(QWidget *parent=0);
+  Completer(QStringList list, QWidget *parent=0);
+
+  // destructor
+  ~Completer(){};
+protected:
+  bool eventFilter(QObject *obj, QEvent *event);
+};
+
+
+
 
 // customized QLineEdit object for handling command inputs
 class InputField : public QLineEdit
@@ -64,6 +81,7 @@ public:
   void insertCompletion(QString completion);
   QStringList commandStringList();
   QStringList getWords();
+  QStringList itemTypeList();
 protected:
   void manageCompleters();
   QStringList getSuggestions();
@@ -76,32 +94,18 @@ private:
   QStringList *cmd_history;
   int max_history;
   int position;
-  QCompleter* completer;
-  QCompleter* cmd_comp;
-  QCompleter* dir_comp;
+  Completer* completer;
+  Completer* cmd_comp;
+  Completer* dir_comp;
+  Completer* item_comp;
   QFileSystemModel* fsm;
   QString current_cmd;
-  QStringList cmd_str_list;
+  // QStringList cmd_str_list;
   QLineEdit *dummy_le;
 };
 
-// customized Completer object with an event filter.
-class Completer : public QCompleter
-{
-  Q_OBJECT
-public:
-  // constructor
-  Completer(QWidget *parent=0);
-  Completer(QStringList list, QWidget *parent=0);
-
-  // destructor
-  ~Completer(){};
-protected:
-  bool eventFilter(QObject *obj, QEvent *event);
-};
 
 } // end gui namespace
-
 
 
 #endif

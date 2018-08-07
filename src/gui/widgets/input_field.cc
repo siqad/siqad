@@ -48,10 +48,26 @@ void gui::InputField::initCompleters()
   dir_comp->setModel(fsm);
 
   //cmd_comp takes care of the command completion
-  cmd_str_list = commandStringList();
-  cmd_comp = new Completer(cmd_str_list);
+  cmd_comp = new Completer(commandStringList());
   cmd_comp->setCaseSensitivity(Qt::CaseInsensitive);
   cmd_comp->setCompletionMode(QCompleter::InlineCompletion);
+
+  item_comp = new Completer(itemTypeList());
+  item_comp->setCaseSensitivity(Qt::CaseInsensitive);
+  item_comp->setCompletionMode(QCompleter::InlineCompletion);
+  qDebug() << itemTypeList();
+}
+
+QStringList gui::InputField::itemTypeList()
+{
+  QStringList list;
+  for (int i = 0; i != int(prim::Item::LastItemType); ++i)
+  {
+    QString item = prim::Item::getQStringItemType(prim::Item::ItemType(i));
+    if (!list.contains(item))
+      list.append(item);
+  }
+  return list;
 }
 
 QStringList gui::InputField::commandStringList()
@@ -110,7 +126,13 @@ void gui::InputField::manageCompleters()
   if (words.count() <= 1) {
     completer = cmd_comp;
   } else {
-    completer = dir_comp;
+    if (words.first() == QString("run")) {
+      completer = dir_comp;
+    } else if ( words.first() == QString("add") ||
+                words.first() == QString("remove") ||
+                words.first() == QString("move")) {
+      completer = item_comp;
+    }
   }
 }
 
@@ -136,6 +158,12 @@ QStringList gui::InputField::getSuggestions()
         dir.setNameFilters(QStringList(filter));
       }
       return dir.entryList();
+    } else if ( words.first() == QString("add") ||
+                words.first() == QString("remove") ||
+                words.first() == QString("move")) {
+      QString pattern = QString("^") + words.last();
+      QRegExp rx(pattern);
+      return itemTypeList().filter(rx);
     }
   }
   return QStringList();

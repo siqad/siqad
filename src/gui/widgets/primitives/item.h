@@ -32,11 +32,12 @@ namespace prim{
     //! Every derived class should be assigned an enumerated label in order
     //! to distinguish them in functions which accept Item objects. Derived
     //! classes can be declared and implemented elsewhere as long as they are
-    //! defined before use
+    //! defined before use. Make sure that when adding more ItemTypes,
+    //! LastItemType stays at the end of the enum list.
     enum ItemType{Aggregate, DBDot, DBDotPreview, LatticeDotPreview, Ghost, GhostDot,
                   Text, Electrode, GhostBox, AFMArea, AFMPath, AFMNode, AFMSeg,
                   PotPlot, ResizeFrame, ResizeHandle, TextLabel, ElectrodePoly,
-                  GhostPolygon, PolygonHandle, PolygonSegment};
+                  GhostPolygon, PolygonHandle, PolygonSegment, LastItemType};
 
     //! constructor, layer = 0 should indicate temporary objects that do not
     //! belong to any particular layer
@@ -62,6 +63,7 @@ namespace prim{
 
     //! returns the item type as a QString
     QString getQStringItemType();
+    static QString getQStringItemType(ItemType);
 
     static ItemType getEnumItemType(QString type);
 
