@@ -1,7 +1,7 @@
 // @file:     item.cc
 // @author:   Jake
 // @created:  2016.11.21
-// @editted:  2017.06.07  - Jake
+// @editted:  2018.08.07  - Nathan
 // @license:  GNU LGPL v3
 //
 // @desc:     Definitions for Item classes
@@ -34,25 +34,6 @@ prim::Item::Item(ItemType type, int lay_id, QGraphicsItem *parent)
 QString prim::Item::getQStringItemType()
 {
   return getQStringItemType(item_type);
-  // switch (item_type) {
-  //   case prim::Item::Aggregate: return "Aggregate";
-  //   case prim::Item::DBDot: return "DBDot";
-  //   case prim::Item::Ghost: return "Ghost";
-  //   case prim::Item::GhostDot: return "GhostDot";
-  //   case prim::Item::Electrode: return "Electrode";
-  //   case prim::Item::GhostBox: return "GhostBox";
-  //   case prim::Item::AFMArea: return "AFMArea";
-  //   case prim::Item::AFMPath: return "AFMPath";
-  //   case prim::Item::AFMNode: return "AFMNode";
-  //   case prim::Item::AFMSeg: return "AFMSeg";
-  //   case prim::Item::PotPlot: return "PotPlot";
-  //   case prim::Item::ResizeFrame: return "ResizeFrame";
-  //   case prim::Item::ResizeHandle: return "ResizeHandle";
-  //   case prim::Item::ElectrodePoly: return "ElectrodePoly";
-  //   case prim::Item::PolygonHandle: return "PolygonHandle";
-  //   case prim::Item::PolygonSegment: return "PolygonSegment";
-  //   default: return "Erroneous Item";
-  // }
 }
 
 QString prim::Item::getQStringItemType(ItemType type_in)

@@ -127,6 +127,7 @@ HEADERS += \
   src/gui/widgets/sim_visualize_panel.h \
   src/gui/widgets/afm_panel.h \
 	src/gui/commander.h \
+	src/gui/widgets/completer.h \
 	src/gui/widgets/item_manager.h \
 	src/gui/widgets/electrode_poly_helper.h
 
@@ -146,6 +147,7 @@ SOURCES += \
   src/gui/widgets/sim_visualize_panel.cc \
 	src/gui/widgets/afm_panel.cc \
 	src/gui/commander.cc \
+	src/gui/widgets/completer.cc \
 	src/gui/widgets/item_manager.cc \
 	src/gui/widgets/electrode_poly_helper.cc
 

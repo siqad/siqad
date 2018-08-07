@@ -1,7 +1,7 @@
 // @file:     input_field.cc
 // @author:   Jake
 // @created:  2017.05.02
-// @editted:  2017.05.11  - Jake
+// @editted:  2018.08.07  - Nathan
 // @license:  GNU LGPL v3
 //
 // @desc:     InputField definitions
@@ -41,21 +41,13 @@ void gui::InputField::initCompleters()
 {
   //dir_comp takes care of the filesystem completion
   dir_comp = new Completer();
-  dir_comp->setCaseSensitivity(Qt::CaseInsensitive);
-  dir_comp->setCompletionMode(QCompleter::InlineCompletion);
   fsm = new QFileSystemModel(dir_comp);
   fsm->setRootPath("");
   dir_comp->setModel(fsm);
-
   //cmd_comp takes care of the command completion
   cmd_comp = new Completer(commandStringList());
-  cmd_comp->setCaseSensitivity(Qt::CaseInsensitive);
-  cmd_comp->setCompletionMode(QCompleter::InlineCompletion);
-
+  //item_comp takes care of item type completion
   item_comp = new Completer(itemTypeList());
-  item_comp->setCaseSensitivity(Qt::CaseInsensitive);
-  item_comp->setCompletionMode(QCompleter::InlineCompletion);
-  qDebug() << itemTypeList();
 }
 
 QStringList gui::InputField::itemTypeList()
@@ -99,6 +91,7 @@ gui::InputField::~InputField()
   delete fsm;
   delete dir_comp;
   delete cmd_comp;
+  delete item_comp;
 }
 
 
@@ -143,8 +136,8 @@ QStringList gui::InputField::getSuggestions()
     //this must be the command.
     return commandStringList();
   } else {
-    //check which command was issued
-    if (words.first() == QString("run")) {
+    //check which completer is set
+    if (completer == dir_comp) {
       //run expects a path
       QDir dir(words.last());
       dir.setSorting(QDir::DirsFirst);
@@ -158,9 +151,7 @@ QStringList gui::InputField::getSuggestions()
         dir.setNameFilters(QStringList(filter));
       }
       return dir.entryList();
-    } else if ( words.first() == QString("add") ||
-                words.first() == QString("remove") ||
-                words.first() == QString("move")) {
+    } else if (completer == item_comp) {
       QString pattern = QString("^") + words.last();
       QRegExp rx(pattern);
       return itemTypeList().filter(rx);
@@ -196,7 +187,7 @@ bool gui::InputField::eventFilter(QObject *obj, QEvent *event)
             insertCompletion(QDir::separator());
         }
         completer->setCompletionPrefix(getWords().last());
-        end(false);
+        end(false); //move cursor to end
         return true;
       } else {
         qDebug() << "suggestions:" << getSuggestions();
@@ -226,31 +217,4 @@ void gui::InputField::keyPressEvent(QKeyEvent *e)
   } else {
     QLineEdit::keyPressEvent(e);
   }
-}
-
-gui::Completer::Completer(QWidget *parent)
-  : QCompleter(parent)
-{
-  installEventFilter(this);
-}
-
-gui::Completer::Completer(QStringList list, QWidget *parent)
-  : QCompleter(list, parent)
-{
-  installEventFilter(this);
-}
-
-//Only job is to eat the tab press so the the completer doesn't lose focus.
-bool gui::Completer::eventFilter(QObject *obj, QEvent *event)
-{
-  if (event->type() == QEvent::KeyPress) {
-    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-    if (keyEvent->key() == Qt::Key_Tab) {
-      //throw the event to the widgets eventfilter to deal with.
-      widget()->eventFilter(obj, event);
-      return true;
-    }
-    return QCompleter::eventFilter(obj, event);
-  }
-  return QCompleter::eventFilter(obj, event);
 }
