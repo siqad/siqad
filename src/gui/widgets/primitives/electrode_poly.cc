@@ -6,7 +6,7 @@
 //
 // @desc:     ElectrodePoly class for the functionality of polygonal electrodes
 
-#include <algorithm>
+// #include <algorithm>
 #include "electrode_poly.h"
 #include "src/settings/settings.h"
 
@@ -18,85 +18,37 @@ QColor prim::ElectrodePoly::fill_col;
 QColor prim::ElectrodePoly::selected_col; // edge colour, selected
 
 prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly, const QRectF scene_rect, int lay_id)
-  : prim::Item(prim::Item::ElectrodePoly), poly(poly), scene_rect(scene_rect)
+  : prim::ResizablePoly(prim::Item::ElectrodePoly, poly, scene_rect, lay_id)
 {
   initElectrodePoly(lay_id);
+  qDebug() << "Creating ElectrodePoly";
 }
 
 prim::ElectrodePoly::~ElectrodePoly()
 {
-  for (prim::PolygonHandle* handle: poly_handles) {
-    delete handle;
-    handle = 0;
-  }
-}
-
-QVariant prim::ElectrodePoly::itemChange(GraphicsItemChange change, const QVariant &value)
-{
-  if (change == QGraphicsItem::ItemSelectedChange) {
-    if (value == true) {
-      for (prim::PolygonHandle* handle : poly_handles) {
-        handle->setVisible(true);
-      }
-    } else {
-      for (prim::PolygonHandle* handle : poly_handles) {
-        handle->setVisible(false);
-      }
-    }
-  }
-  return QGraphicsItem::itemChange(change, value);
 }
 
 void prim::ElectrodePoly::initElectrodePoly(int lay_id)
 {
-  layer_id = lay_id;
   constructStatics();
-  setPos(scene_rect.topLeft());
-  //the polygon has points relative to the item's origin.
-  //changing the origin with setPos() means we have to readjust the polygon coords.
-  poly.translate(-scene_rect.topLeft());
   update();
-  setZValue(-1);
-  setFlag(QGraphicsItem::ItemIsSelectable, true);
-  createHandles();
-}
-
-void prim::ElectrodePoly::moveItemBy(qreal dx, qreal dy)
-{
-  scene_rect.moveTopLeft(QPointF(dx, dy)+scene_rect.topLeft());
-  moveBy(dx, dy);
-}
-
-void prim::ElectrodePoly::createHandles()
-{
-  for (QPointF point: poly) {
-    prim::PolygonHandle *handle = new prim::PolygonHandle(point, this);
-    poly_handles.append(handle);
-    handle->setVisible(false);
-  }
-}
-
-void prim::ElectrodePoly::test()
-{
-  for (QPointF point: poly){
-    qDebug() << point;
-  }
+  // setZValue(-1);
 }
 
 QRectF prim::ElectrodePoly::boundingRect() const
 {
-  return QRectF(0,0, poly.boundingRect().width(), poly.boundingRect().height());
+  return QRectF(0,0, getPolygon().boundingRect().width(), getPolygon().boundingRect().height());
 }
 
 void prim::ElectrodePoly::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
   painter->setPen(QPen(edge_col, edge_width));
   painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
-  painter->drawPolygon(poly);
+  painter->drawPolygon(getPolygon());
   if(tool_type == gui::SelectTool && isSelected()){
     painter->setPen(Qt::NoPen);
     painter->setBrush(selected_col);
-    painter->drawPolygon(poly);
+    painter->drawPolygon(getPolygon());
   }
 }
 

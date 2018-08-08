@@ -635,8 +635,8 @@ namespace gui{
 
     DesignPanel *dp;  // DesignPanel pointer
     QImage potential_plot;
-    QRectF graph_container;
     QString pot_plot_path;
+    QRectF graph_container;
     QString pot_anim_path;
     prim::PotPlot* pp;
     bool invert;
@@ -659,11 +659,11 @@ namespace gui{
 
     void create();  // create the dangling bond
     void destroy(); // destroy the dangling bond
-    int layer_index;
-    int index;
     DesignPanel *dp;  // DesignPanel pointer
     QPolygonF poly;
     prim::ElectrodePoly* ep;
+    int layer_index;
+    int index;
     bool invert;
   };
 
