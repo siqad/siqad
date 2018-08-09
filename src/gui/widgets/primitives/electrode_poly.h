@@ -10,9 +10,7 @@
 #ifndef _GUI_PR_ELECTRODE_POLY_H_
 #define _GUI_PR_ELECTRODE_POLY_H_
 
-
 #include <QtWidgets>
-// #include "polygon_handle.h"
 #include "resizable_poly.h"
 
 namespace prim{
@@ -29,14 +27,10 @@ namespace prim{
 private:
     void constructStatics();
     void initElectrodePoly(int lay_id);
-  //
-  //   QRectF scene_rect;
-  //   QPolygonF poly;
     static qreal edge_width;  // proportional width of dot boundary edge
     static QColor fill_col;   // dot fill color (same for all lattice dots)
     static QColor edge_col;     // edge colour, unselected
     static QColor selected_col; // edge colour, selected
-  //   QList<prim::PolygonHandle*> poly_handles;
   };
 
 } //end prim namespace

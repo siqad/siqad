@@ -480,8 +480,10 @@ namespace gui{
     //! Edit a text label
     void editTextLabel(prim::TextLabel *text_lab, const QString &new_text);
 
-    void resizeItem(prim::Item *item, const QRectF &orig_rect,
+    void resizeItemRect(prim::Item *item, const QRectF &orig_rect,
         const QRectF &new_rect);
+
+    void resizeItemPoly(prim::Item *item);
 
     // destroy AFM path and included nodes
     void destroyAFMPath(prim::AFMPath *afm_path);

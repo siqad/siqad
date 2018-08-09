@@ -13,6 +13,7 @@
 prim::ResizablePoly::ResizablePoly(prim::Item::ItemType type, const QPolygonF &poly, const QRectF &scene_rect, int lay_id)
   : prim::Item(type)
 {
+  setResizable(true);
   initResizablePoly(lay_id, poly, scene_rect);
 }
 
@@ -44,16 +45,38 @@ void prim::ResizablePoly::initResizablePoly(int lay_id, QPolygonF poly_in, QRect
 {
   layer_id = lay_id;
   setPolygon(poly_in);
-  setSceneRect(scene_rect_in);
-  setPos(scene_rect.topLeft());
-  //the polygon has points relative to the item's origin.
-  //changing the origin with setPos() means we have to readjust the polygon coords.
-  poly.translate(-scene_rect.topLeft());
+  setRect(scene_rect_in, true);
+  // setPos(scene_rect.topLeft());
+  // poly.translate(-scene_rect.topLeft());
   update();
   setZValue(-1);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   createHandles();
 }
+
+void prim::ResizablePoly::setRect(QRectF scene_rect_in, bool translate)
+{
+  // qDebug() << "BEFORE" << scene_rect;
+  setSceneRect(scene_rect_in);
+  // qDebug() << "AFTER" << scene_rect;
+  //the polygon has points relative to the item's origin.
+  //changing the origin with setPos() means we have to readjust the polygon coords.
+  if (translate) {
+    setPos(scene_rect.topLeft());
+    poly.translate(-scene_rect.topLeft());
+  }
+}
+
+void prim::ResizablePoly::showStatus()
+{
+  qDebug() << "POLYGON:";
+  qDebug() << poly;
+  qDebug() << "HANDLES:";
+  for (prim::PolygonHandle* handle: getHandles()) {
+    qDebug() << handle->getPoint();
+  }
+}
+
 
 void prim::ResizablePoly::moveItemBy(qreal dx, qreal dy)
 {
@@ -61,8 +84,15 @@ void prim::ResizablePoly::moveItemBy(qreal dx, qreal dy)
   moveBy(dx, dy);
 }
 
-void prim::ResizablePoly::createHandles()
+void prim::ResizablePoly::createHandles(bool remake)
 {
+  if (remake) {
+    for (prim::PolygonHandle *handle: poly_handles) {
+      delete handle;
+      handle = 0;
+    }
+    poly_handles.clear();
+  }
   for (QPointF point: poly) {
     prim::PolygonHandle *handle = new prim::PolygonHandle(point, this);
     poly_handles.append(handle);

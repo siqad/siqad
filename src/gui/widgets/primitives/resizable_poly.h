@@ -26,10 +26,12 @@ namespace prim{
     QPolygonF getPolygon() const {return poly;}
     void setSceneRect(const QRectF &scene_rect_in){scene_rect = scene_rect_in;}
     QRectF sceneRect() const {return scene_rect;}
-    void createHandles();
+    void createHandles(bool remake = false);
     virtual void moveItemBy(qreal dx, qreal dy) override;
     virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
-
+    void setRect(QRectF scene_rect_in, bool translate = false);
+    void showStatus();
+    QList<prim::PolygonHandle*> getHandles(){return poly_handles;}
   protected:
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
