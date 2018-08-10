@@ -36,6 +36,28 @@ void prim::ElectrodePoly::initElectrodePoly(int lay_id)
 
 }
 
+void prim::ElectrodePoly::saveItems(QXmlStreamWriter *ss) const
+{
+  ss->writeStartElement("electrode_poly");
+  // layer id
+  ss->writeTextElement("layer_id", QString::number(layer_id));
+
+  QPolygonF poly_save = getTranslatedPolygon();
+
+  for (QPointF vertex: poly_save) {
+    ss->writeEmptyElement("vertex");
+    ss->writeAttribute("x", QString::number(vertex.x()/scale_factor)); //convert to angstrom
+    ss->writeAttribute("y", QString::number(vertex.y()/scale_factor));
+  }
+  ss->writeTextElement("pixel_per_angstrom", QString::number(scale_factor));
+  // ss->writeStartElement("property_map");
+  // gui::PropertyMap::writeValuesToXMLStream(properties(), ss);
+  // other attributes
+  // ......
+  // ss->writeEndElement();
+  ss->writeEndElement();
+}
+
 QRectF prim::ElectrodePoly::boundingRect() const
 {
   return QRectF(0,0, getPolygon().boundingRect().width(), getPolygon().boundingRect().height());

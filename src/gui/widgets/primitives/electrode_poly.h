@@ -23,6 +23,7 @@ namespace prim{
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
     virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
     virtual Item *deepCopy() const override;
+    void saveItems(QXmlStreamWriter *ss) const;
 
 private:
     void constructStatics();
