@@ -24,6 +24,7 @@ namespace prim{
     ~ResizablePoly();
     void setPolygon(QPolygonF poly_in){poly = poly_in;}
     QPolygonF getPolygon() const {return poly;}
+    QPolygonF getTranslatedPolygon();
     void setSceneRect(const QRectF &scene_rect_in){scene_rect = scene_rect_in;}
     QRectF sceneRect() const {return scene_rect;}
     void createHandles(bool remake = false);

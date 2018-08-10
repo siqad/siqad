@@ -77,6 +77,13 @@ void prim::ResizablePoly::showStatus()
   }
 }
 
+QPolygonF prim::ResizablePoly::getTranslatedPolygon()
+{
+  QPolygonF new_poly = poly;
+  new_poly.translate(sceneRect().topLeft());
+  return new_poly;
+}
+
 
 void prim::ResizablePoly::moveItemBy(qreal dx, qreal dy)
 {

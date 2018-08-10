@@ -663,6 +663,7 @@ namespace gui{
     void destroy(); // destroy the dangling bond
     DesignPanel *dp;  // DesignPanel pointer
     QPolygonF poly;
+    QPolygonF poly_cache;
     prim::ElectrodePoly* ep;
     int layer_index;
     int index;

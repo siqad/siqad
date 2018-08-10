@@ -1803,13 +1803,17 @@ void gui::DesignPanel::CreateElectrodePoly::redo()
 
 void gui::DesignPanel::CreateElectrodePoly::create()
 {
+  qDebug() << "create" << poly;
   QRectF scene_rect = poly.boundingRect();
+  qDebug() << scene_rect;
+  poly_cache = poly;
   ep = new prim::ElectrodePoly(poly, scene_rect, layer_index);
   dp->addItem(ep, layer_index, index);
 }
 
 void gui::DesignPanel::CreateElectrodePoly::destroy()
 {
+  qDebug() << "destroy:" << poly_cache;
   dp->removeItem(ep, dp->layman->getLayer(ep->layer_id));
   ep = 0;
 }
@@ -2658,7 +2662,7 @@ void gui::DesignPanel::deleteSelection()
       case prim::Item::ElectrodePoly:
         {
         prim::ElectrodePoly *ep = static_cast<prim::ElectrodePoly*>(item);
-        undo_stack->push(new CreateElectrodePoly(this, ep->getPolygon(), ep->layer_id,
+        undo_stack->push(new CreateElectrodePoly(this, ep->getTranslatedPolygon(), ep->layer_id,
             static_cast<prim::ElectrodePoly*>(item), true));
         break;
         }
