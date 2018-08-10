@@ -861,6 +861,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
   QPoint mouse_pos_del;
   qreal dx, dy;
+  // qDebug() << "DP::MOUSEMOVE";
 
   if (ghosting) {
     // update snap
@@ -2576,7 +2577,7 @@ void gui::DesignPanel::resizeItemPoly(prim::Item *item)
     QRectF old_rect = poly_item->sceneRect();
     QPolygonF new_poly;
     for (prim::PolygonHandle *handle: poly_item->getHandles())
-      new_poly.append(handle->getScenePoint());
+      new_poly.append(handle->scenePos());
     poly_item->setPolygon(new_poly);
     poly_item->setRect(new_poly.boundingRect(), true);
     poly_item->createHandles(true);

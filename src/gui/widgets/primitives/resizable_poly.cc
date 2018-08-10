@@ -73,7 +73,7 @@ void prim::ResizablePoly::showStatus()
   qDebug() << poly;
   qDebug() << "HANDLES:";
   for (prim::PolygonHandle* handle: getHandles()) {
-    qDebug() << handle->getPoint();
+    qDebug() << handle->pos();
   }
 }
 

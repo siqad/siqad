@@ -43,7 +43,6 @@ QRectF prim::ElectrodePoly::boundingRect() const
 
 void prim::ElectrodePoly::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-  // showStatus();
   painter->setPen(QPen(edge_col, edge_width));
   painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
   painter->drawPolygon(getPolygon());

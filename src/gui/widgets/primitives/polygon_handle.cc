@@ -11,7 +11,9 @@
 prim::PolygonHandle::PolygonHandle(QPointF point, QGraphicsItem* parent)
   : prim::Item(prim::Item::PolygonHandle, -1, parent)
 {
-  setParentItem(parent);
+  if (parent) {
+    setParentItem(parent);
+  }
   initPolygonHandle(point);
 }
 
@@ -22,8 +24,9 @@ prim::PolygonHandle::~PolygonHandle()
 
 void prim::PolygonHandle::initPolygonHandle(QPointF point)
 {
+  clicked = false;
   constructStatics();
-  center = point;
+  setPos(point);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemIsMovable, true);
 
@@ -31,7 +34,7 @@ void prim::PolygonHandle::initPolygonHandle(QPointF point)
 
 QRectF prim::PolygonHandle::boundingRect() const
 {
-  return QRectF(center.x()-0.5*handle_dim,center.y()-0.5*handle_dim,handle_dim,handle_dim);
+  return QRectF(-0.5*handle_dim,-0.5*handle_dim,handle_dim,handle_dim);
 }
 
 
@@ -46,11 +49,11 @@ void prim::PolygonHandle::paint(QPainter *painter, const QStyleOptionGraphicsIte
 
 void prim::PolygonHandle::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
-  update();
   switch(e->buttons()) {
     case Qt::LeftButton:
     {
       // if not attached to a parent item, then don't begin resizing.
+      qDebug() << parentItem();
       if (parentItem()) {
         clicked = true;
         emit prim::Emitter::instance()->sig_resizeBegin();
@@ -65,19 +68,18 @@ void prim::PolygonHandle::mousePressEvent(QGraphicsSceneMouseEvent *e)
   }
 }
 
-// void prim::PolygonHandle::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
-// {
-//   if (clicked) {
-//     setPoint(e->pos());
-//     update();
-//     e->accept();
-//   }
-// }
+void prim::PolygonHandle::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
+{
+  if (clicked) {
+    setPos(pos()+e->pos());
+    e->accept();
+  }
+}
 
 void prim::PolygonHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
 {
   if (clicked) {
-    update();
+    qDebug() << parentItem();
     if (parentItem())
       emit prim::Emitter::instance()->sig_resizeFinalizePoly(static_cast<prim::Item *>(parentItem()));
   }
