@@ -17,12 +17,93 @@ QColor prim::ElectrodePoly::edge_col;
 QColor prim::ElectrodePoly::fill_col;
 QColor prim::ElectrodePoly::selected_col; // edge colour, selected
 
-prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly, const QRectF scene_rect, int lay_id)
-  : prim::ResizablePoly(prim::Item::ElectrodePoly, poly, scene_rect, lay_id)
+prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly, int lay_id)
+  : prim::ResizablePoly(prim::Item::ElectrodePoly, poly, lay_id)
 {
   initElectrodePoly(lay_id);
-  qDebug() << "Creating ElectrodePoly";
 }
+
+
+
+
+prim::ElectrodePoly::ElectrodePoly(QXmlStreamReader *ls, QGraphicsScene *scene)
+  : prim::ResizablePoly(prim::Item::ElectrodePoly)
+{
+  // if(edge_width == -1){
+  //   constructStatics();
+  // }
+  int lay_id=-1;
+  QPointF ld_point;
+  QPolygonF points;
+  while(!ls->atEnd()){
+    if(ls->isStartElement()){
+      if(ls->name() == "electrode_poly")
+        ls->readNext();
+      else if(ls->name() == "layer_id"){
+        lay_id = ls->readElementText().toInt();
+        ls->readNext();
+      }
+      else if(ls->name() == "vertex"){
+        for(QXmlStreamAttribute &attr : ls->attributes()){
+          if(attr.name().toString() == QLatin1String("x"))
+            ld_point.setX(attr.value().toFloat()*scale_factor); //convert from angstrom to pixel
+          else if(attr.name().toString() == QLatin1String("y"))
+            ld_point.setY(attr.value().toFloat()*scale_factor);
+        }
+        points.append(ld_point);
+        ls->readNext();
+      }
+      // else if(ls->name() == "property_map"){
+      //   propMapFromXml(ls);
+      //   ls->readNext();
+      // }
+      // TODO the rest of the variables
+      else{
+        qDebug() << QObject::tr("ElectrodePoly: invalid element encountered on line %1 - %2").arg(ls->lineNumber()).arg(ls->name().toString());
+        ls->readNext();
+      }
+    }
+    else if(ls->isEndElement()){
+      // break out of ls if the end of this element has been reached
+      if(ls->name() == "electrode_poly"){
+        ls->readNext();
+        break;
+      }
+      ls->readNext();
+    }
+    else
+      ls->readNext();
+  }
+  if(ls->hasError())
+    qCritical() << QObject::tr("XML error: ") << ls->errorString().data();
+  if(lay_id != 2){
+    qWarning() << "ElectrodePoly lay_id is at" << lay_id << ", should be at 2.";
+  }
+  if(ld_point.isNull()){
+    qWarning() << "ld_point is null";
+  }
+  //load all read data into init_electrode
+  setPolygon(points);
+  qDebug() << points;
+
+  // setPolygon(poly_in);
+  QRectF rect = points.boundingRect();
+  setRect(rect, true);
+  update();
+  setZValue(-1);
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
+  createHandles();
+
+  // initResizablePoly(lay_id);
+  initElectrodePoly(lay_id);
+  qDebug() << lay_id;
+  scene->addItem(this);
+  qDebug() << "POLY MADE";
+}
+
+
+
+
 
 prim::ElectrodePoly::~ElectrodePoly()
 {
@@ -80,7 +161,7 @@ prim::Item *prim::ElectrodePoly::deepCopy() const
   QPolygonF new_poly = getPolygon();
   //return fresh polygon with unshifted coordinates.
   new_poly.translate(sceneRect().topLeft());
-  prim::ElectrodePoly *ep = new ElectrodePoly(new_poly, sceneRect(), layer_id);
+  prim::ElectrodePoly *ep = new ElectrodePoly(new_poly, layer_id);
   return ep;
 }
 

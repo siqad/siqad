@@ -18,7 +18,8 @@ namespace prim{
   class ElectrodePoly: public ResizablePoly
   {
   public:
-    ElectrodePoly(const QPolygonF, const QRectF, int lay_id);
+    ElectrodePoly(const QPolygonF, int lay_id);
+    ElectrodePoly(QXmlStreamReader *ls, QGraphicsScene *scene);
     ~ElectrodePoly();
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
     virtual QRectF boundingRect() const Q_DECL_OVERRIDE;

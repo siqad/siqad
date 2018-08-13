@@ -90,6 +90,8 @@ void ItemManager::updateTableAdd()
 
 void ItemManager::addItemRow(prim::Item *item)
 {
+  if (item == 0)
+    return;
   for (ItemTableRowContent* row_content: table_row_contents) {
     if (row_content->item == item) {
       return;

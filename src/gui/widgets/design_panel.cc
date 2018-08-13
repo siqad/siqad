@@ -606,7 +606,7 @@ void gui::DesignPanel::loadDesign(QXmlStreamReader *rs)
     }
   }
 
-  itman->updateTableAdd();
+  // itman->updateTableAdd();
 }
 
 
@@ -1803,17 +1803,12 @@ void gui::DesignPanel::CreateElectrodePoly::redo()
 
 void gui::DesignPanel::CreateElectrodePoly::create()
 {
-  qDebug() << "create" << poly;
-  QRectF scene_rect = poly.boundingRect();
-  qDebug() << scene_rect;
-  poly_cache = poly;
-  ep = new prim::ElectrodePoly(poly, scene_rect, layer_index);
+  ep = new prim::ElectrodePoly(poly, layer_index);
   dp->addItem(ep, layer_index, index);
 }
 
 void gui::DesignPanel::CreateElectrodePoly::destroy()
 {
-  qDebug() << "destroy:" << poly_cache;
   dp->removeItem(ep, dp->layman->getLayer(ep->layer_id));
   ep = 0;
 }
@@ -2188,6 +2183,7 @@ gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
                                       DesignPanel *dp, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), offset(offset)
 {
+  // qDebug() << item->layer_id;
   layer_index = item->layer_id;
   item_index = dp->layman->getLayer(layer_index)->getItems().indexOf(item);
 }

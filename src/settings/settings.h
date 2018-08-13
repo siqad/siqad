@@ -71,7 +71,7 @@ public:
     return val;
   }
 
-  // returns a QString with each of the included replaceable paths replaced by 
+  // returns a QString with each of the included replaceable paths replaced by
   // a writable path (whatever QStandardPaths::writableLocation provides)
   QString getPath(const QString &key)
   {

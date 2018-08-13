@@ -10,11 +10,11 @@
 #include "src/settings/settings.h"
 #include "resizable_poly.h"
 
-prim::ResizablePoly::ResizablePoly(prim::Item::ItemType type, const QPolygonF &poly, const QRectF &scene_rect, int lay_id)
+prim::ResizablePoly::ResizablePoly(prim::Item::ItemType type, const QPolygonF &poly, int lay_id)
   : prim::Item(type)
 {
   setResizable(true);
-  initResizablePoly(lay_id, poly, scene_rect);
+  initResizablePoly(lay_id, poly);
 }
 
 prim::ResizablePoly::~ResizablePoly()
@@ -41,13 +41,12 @@ QVariant prim::ResizablePoly::itemChange(GraphicsItemChange change, const QVaria
   return QGraphicsItem::itemChange(change, value);
 }
 
-void prim::ResizablePoly::initResizablePoly(int lay_id, QPolygonF poly_in, QRectF scene_rect_in)
+void prim::ResizablePoly::initResizablePoly(int lay_id, QPolygonF poly_in)
 {
   layer_id = lay_id;
   setPolygon(poly_in);
-  setRect(scene_rect_in, true);
-  // setPos(scene_rect.topLeft());
-  // poly.translate(-scene_rect.topLeft());
+  QRectF rect = poly_in.boundingRect();
+  setRect(rect, true);
   update();
   setZValue(-1);
   setFlag(QGraphicsItem::ItemIsSelectable, true);

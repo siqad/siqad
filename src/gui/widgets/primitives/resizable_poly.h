@@ -20,7 +20,7 @@ namespace prim{
   class ResizablePoly: public Item
   {
   public:
-    ResizablePoly(ItemType type, const QPolygonF &poly, const QRectF &scene_rect, int lay_id);
+    ResizablePoly(ItemType type, const QPolygonF &poly=QPolygonF(), int lay_id=-1);
     ~ResizablePoly();
     void setPolygon(QPolygonF poly_in){poly = poly_in;}
     QPolygonF getPolygon() const {return poly;}
@@ -33,12 +33,11 @@ namespace prim{
     void setRect(QRectF scene_rect_in, bool translate = false);
     void showStatus();
     QList<prim::PolygonHandle*> getHandles(){return poly_handles;}
+    void initResizablePoly(int lay_id, QPolygonF poly_in);
   protected:
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
   private:
-    void initResizablePoly(int lay_id, QPolygonF poly_in, QRectF scene_rect_in);
-
     QRectF scene_rect;
     QPolygonF poly;
     QList<prim::PolygonHandle*> poly_handles;
