@@ -2183,8 +2183,8 @@ gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
                                       DesignPanel *dp, QUndoCommand *parent)
   : QUndoCommand(parent), dp(dp), offset(offset)
 {
-  // qDebug() << item->layer_id;
   layer_index = item->layer_id;
+  // qDebug() << dp->layman->getLayer(layer_index)->getItemIndex(item);
   item_index = dp->layman->getLayer(layer_index)->getItems().indexOf(item);
 }
 

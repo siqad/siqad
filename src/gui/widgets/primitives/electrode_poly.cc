@@ -85,7 +85,7 @@ prim::ElectrodePoly::ElectrodePoly(QXmlStreamReader *ls, QGraphicsScene *scene)
   //load all read data into init_electrode
   setPolygon(points);
   qDebug() << points;
-
+  setLayerIndex(lay_id);
   // setPolygon(poly_in);
   QRectF rect = points.boundingRect();
   setRect(rect, true);
@@ -93,7 +93,6 @@ prim::ElectrodePoly::ElectrodePoly(QXmlStreamReader *ls, QGraphicsScene *scene)
   setZValue(-1);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   createHandles();
-
   // initResizablePoly(lay_id);
   initElectrodePoly(lay_id);
   qDebug() << lay_id;
