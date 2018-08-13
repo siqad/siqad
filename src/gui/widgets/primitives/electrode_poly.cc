@@ -20,7 +20,7 @@ QColor prim::ElectrodePoly::selected_col; // edge colour, selected
 prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly, int lay_id)
   : prim::ResizablePoly(prim::Item::ElectrodePoly, poly, lay_id)
 {
-  initElectrodePoly(lay_id);
+  initElectrodePoly(lay_id, poly);
 }
 
 
@@ -83,19 +83,20 @@ prim::ElectrodePoly::ElectrodePoly(QXmlStreamReader *ls, QGraphicsScene *scene)
     qWarning() << "ld_point is null";
   }
   //load all read data into init_electrode
-  setPolygon(points);
-  qDebug() << points;
-  setLayerIndex(lay_id);
+  // setPolygon(points);
+  // qDebug() << points;
+  // setLayerIndex(lay_id);
   // setPolygon(poly_in);
-  QRectF rect = points.boundingRect();
-  setRect(rect, true);
-  update();
-  setZValue(-1);
-  setFlag(QGraphicsItem::ItemIsSelectable, true);
-  createHandles();
+  // QRectF rect = points.boundingRect();
+  // setRect(rect, true);
+  // update();
+  // setZValue(-1);
+  // setFlag(QGraphicsItem::ItemIsSelectable, true);
+  // createHandles();
   // initResizablePoly(lay_id);
-  initElectrodePoly(lay_id);
-  qDebug() << lay_id;
+
+  // initResizablePoly(lay_id, points);
+  initElectrodePoly(lay_id, points);
   scene->addItem(this);
   qDebug() << "POLY MADE";
 }
@@ -108,8 +109,9 @@ prim::ElectrodePoly::~ElectrodePoly()
 {
 }
 
-void prim::ElectrodePoly::initElectrodePoly(int lay_id)
+void prim::ElectrodePoly::initElectrodePoly(int lay_id, QPolygonF poly_in)
 {
+  initResizablePoly(lay_id, poly_in);
   constructStatics();
   update();
   // setZValue(-1);

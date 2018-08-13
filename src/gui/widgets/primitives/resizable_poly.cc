@@ -90,15 +90,13 @@ void prim::ResizablePoly::moveItemBy(qreal dx, qreal dy)
   moveBy(dx, dy);
 }
 
-void prim::ResizablePoly::createHandles(bool remake)
+void prim::ResizablePoly::createHandles()
 {
-  if (remake) {
-    for (prim::PolygonHandle *handle: poly_handles) {
-      delete handle;
-      handle = 0;
-    }
-    poly_handles.clear();
+  for (prim::PolygonHandle *handle: poly_handles) {
+    delete handle;
+    handle = 0;
   }
+  poly_handles.clear();
   for (QPointF point: poly) {
     prim::PolygonHandle *handle = new prim::PolygonHandle(point, this);
     poly_handles.append(handle);

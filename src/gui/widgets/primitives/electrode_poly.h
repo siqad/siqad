@@ -28,7 +28,7 @@ namespace prim{
 
 private:
     void constructStatics();
-    void initElectrodePoly(int lay_id);
+    void initElectrodePoly(int lay_id, QPolygonF poly_in);
     static qreal edge_width;  // proportional width of dot boundary edge
     static QColor fill_col;   // dot fill color (same for all lattice dots)
     static QColor edge_col;     // edge colour, unselected

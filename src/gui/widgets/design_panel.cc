@@ -2580,7 +2580,7 @@ void gui::DesignPanel::resizeItemPoly(prim::Item *item)
       new_poly.append(handle->scenePos());
     poly_item->setPolygon(new_poly);
     poly_item->setRect(new_poly.boundingRect(), true);
-    poly_item->createHandles(true);
+    poly_item->createHandles();
     for (prim::PolygonHandle *handle: poly_item->getHandles())
       handle->setVisible(true);
     poly_item->update();

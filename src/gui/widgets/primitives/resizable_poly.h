@@ -27,7 +27,7 @@ namespace prim{
     QPolygonF getTranslatedPolygon() const;
     void setSceneRect(const QRectF &scene_rect_in){scene_rect = scene_rect_in;}
     QRectF sceneRect() const {return scene_rect;}
-    void createHandles(bool remake = false);
+    void createHandles();
     virtual void moveItemBy(qreal dx, qreal dy) override;
     virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
     void setRect(QRectF scene_rect_in, bool translate = false);
