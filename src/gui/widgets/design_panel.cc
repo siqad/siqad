@@ -606,7 +606,7 @@ void gui::DesignPanel::loadDesign(QXmlStreamReader *rs)
     }
   }
 
-  // itman->updateTableAdd();
+  itman->updateTableAdd();
 }
 
 
