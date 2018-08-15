@@ -20,6 +20,7 @@ QColor prim::ElectrodePoly::selected_col; // edge colour, selected
 prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly, int lay_id)
   : prim::ResizablePoly(prim::Item::ElectrodePoly, poly, lay_id)
 {
+  constructStatics();
   initElectrodePoly(lay_id, poly);
 }
 
@@ -29,9 +30,9 @@ prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly, int lay_id)
 prim::ElectrodePoly::ElectrodePoly(QXmlStreamReader *ls, QGraphicsScene *scene)
   : prim::ResizablePoly(prim::Item::ElectrodePoly)
 {
-  // if(edge_width == -1){
-  //   constructStatics();
-  // }
+  if(edge_width == -1){
+    constructStatics();
+  }
   int lay_id=-1;
   QPointF ld_point;
   QPolygonF points;
@@ -53,10 +54,10 @@ prim::ElectrodePoly::ElectrodePoly(QXmlStreamReader *ls, QGraphicsScene *scene)
         points.append(ld_point);
         ls->readNext();
       }
-      // else if(ls->name() == "property_map"){
-      //   propMapFromXml(ls);
-      //   ls->readNext();
-      // }
+      else if(ls->name() == "property_map"){
+        propMapFromXml(ls);
+        ls->readNext();
+      }
       // TODO the rest of the variables
       else{
         qDebug() << QObject::tr("ElectrodePoly: invalid element encountered on line %1 - %2").arg(ls->lineNumber()).arg(ls->name().toString());
@@ -113,7 +114,7 @@ void prim::ElectrodePoly::initElectrodePoly(int lay_id, QPolygonF poly_in)
 {
   initResizablePoly(lay_id, poly_in);
   createActions();
-  constructStatics();
+  // constructStatics();
   update();
   // setZValue(-1);
 
