@@ -20,7 +20,8 @@ QColor prim::ElectrodePoly::selected_col; // edge colour, selected
 prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly, int lay_id)
   : prim::ResizablePoly(prim::Item::ElectrodePoly, poly, lay_id)
 {
-  constructStatics();
+  if (edge_width == -1)
+    constructStatics();
   initElectrodePoly(lay_id, poly);
 }
 
