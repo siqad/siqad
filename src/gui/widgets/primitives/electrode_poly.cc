@@ -11,7 +11,7 @@
 #include "src/settings/settings.h"
 
 // Initialize statics
-// gui::PropertyMap prim::ElectrodePoly::default_class_properties;
+gui::PropertyMap prim::ElectrodePoly::default_class_properties;
 qreal prim::ElectrodePoly::edge_width = -1;
 QColor prim::ElectrodePoly::edge_col;
 QColor prim::ElectrodePoly::fill_col;
@@ -112,6 +112,7 @@ prim::ElectrodePoly::~ElectrodePoly()
 void prim::ElectrodePoly::initElectrodePoly(int lay_id, QPolygonF poly_in)
 {
   initResizablePoly(lay_id, poly_in);
+  createActions();
   constructStatics();
   update();
   // setZValue(-1);
@@ -132,11 +133,11 @@ void prim::ElectrodePoly::saveItems(QXmlStreamWriter *ss) const
     ss->writeAttribute("y", QString::number(vertex.y()/scale_factor));
   }
   ss->writeTextElement("pixel_per_angstrom", QString::number(scale_factor));
-  // ss->writeStartElement("property_map");
-  // gui::PropertyMap::writeValuesToXMLStream(properties(), ss);
+  ss->writeStartElement("property_map");
+  gui::PropertyMap::writeValuesToXMLStream(properties(), ss);
   // other attributes
   // ......
-  // ss->writeEndElement();
+  ss->writeEndElement();
   ss->writeEndElement();
 }
 
@@ -157,6 +158,28 @@ void prim::ElectrodePoly::paint(QPainter *painter, const QStyleOptionGraphicsIte
   }
 }
 
+void prim::ElectrodePoly::showProps()
+{
+  prim::Emitter::instance()->sig_showProperty(this);
+}
+
+void prim::ElectrodePoly::performAction(QAction *action)
+{
+  //switch case doesnt work on non-ints, use if else.
+  if (action->text() == action_show_prop->text()) {
+    showProps();
+  } else {
+    qDebug() << QObject::tr("Matched no action.");
+  }
+}
+
+void prim::ElectrodePoly::createActions()
+{
+  action_show_prop = new QAction(QObject::tr("Show properties"));
+  actions_list.append(action_show_prop);
+}
+
+
 prim::Item *prim::ElectrodePoly::deepCopy() const
 {
   QPolygonF new_poly = getPolygon();
@@ -168,7 +191,7 @@ prim::Item *prim::ElectrodePoly::deepCopy() const
 
 void prim::ElectrodePoly::constructStatics() //needs to be changed to look at electrode settings instead.
 {
-  // default_class_properties.readPropertiesFromXML(":/properties/electrode.xml");
+  default_class_properties.readPropertiesFromXML(":/properties/electrode.xml");
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   edge_width = gui_settings->get<qreal>("electrodepoly/edge_width");
   edge_col= gui_settings->get<QColor>("electrodepoly/edge_col");

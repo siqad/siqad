@@ -25,14 +25,26 @@ namespace prim{
     virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
     virtual Item *deepCopy() const override;
     void saveItems(QXmlStreamWriter *ss) const;
+    virtual gui::PropertyMap *classPropertyMap() override {return &default_class_properties;}
+    virtual gui::PropertyMap *classPropertyMap() const override {return &default_class_properties;}
+    virtual QList<QAction*> contextMenuActions() override {return actions_list;}
+    virtual void performAction(QAction *action) override;
 
-private:
+
+  private:
     void constructStatics();
+    void createActions();
+    void showProps();
+
     void initElectrodePoly(int lay_id, QPolygonF poly_in);
+    static gui::PropertyMap default_class_properties; //! Default properties for this class
     static qreal edge_width;  // proportional width of dot boundary edge
     static QColor fill_col;   // dot fill color (same for all lattice dots)
     static QColor edge_col;     // edge colour, unselected
     static QColor selected_col; // edge colour, selected
+    QList<QAction*> actions_list;
+    QAction* action_show_prop;
+
   };
 
 } //end prim namespace
