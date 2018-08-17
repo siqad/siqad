@@ -2,7 +2,7 @@
 // @author:   Samuel
 // @created:  2017.08.23
 // @editted:  2018.06.29 - Nathan
-// @license:  GNU LGPL v3
+// @license:  Apache License 2.0
 //
 // @desc:     Convenient functions for interacting with SiQAD
 
