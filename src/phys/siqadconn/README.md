@@ -1,6 +1,6 @@
 # SiQAD Connector
 
-SiQAD Connector is a class containing convenient functions for physics engines to interact with the SiQAD GUI. The use of the class is recommended, but ultimately optional as developers may want to implement their own I/O with SiQAD. A Python wrapper generated using [SWIG](http://www.swig.org/) has also been included.
+SiQAD Connector is a class containing convenient functions for physics engines to interact with the SiQAD GUI. The use of the class is recommended, but ultimately optional as developers may want to implement their own I/O with SiQAD. A Python wrapper generated using [SWIG](http://www.swig.org/) has also been included. Note that SiQAD Connector uses Apache License 2.0 as opposed to the GUI's LGPLv3 in order to allow physics engines to use any license compatible with APLv2.
 
 Please keep in mind that SiQAD is still undergoing rapid development, there are no guarantees that older versions of SiQAD Connector would be compatible with newer versions of the SiQAD GUI.
 
