@@ -204,30 +204,30 @@ sim_afmmarcus.files = \
     $$PHYS_DIR/afmmarcus/hopping_animator.physeng \
     $$PHYS_DIR/afmmarcus/marcus_and_pois.physeng \
 sim_afmmarcus.files += \
-    $$PHYS_DIR/afmmarcus/src/python/_siqadconn.cpython-36m-x86_64-linux-gnu.so
+    $$PHYS_DIR/afmmarcus/src/swig_siqadconn/_siqadconn.cpython-36m-x86_64-linux-gnu.so
 win32: sim_afmmarcus.files += \
-    $$PHYS_DIR/afmmarcus/src/python/_siqadconn.pyd
+    $$PHYS_DIR/afmmarcus/src/_siqadconn.pyd
 sim_afmmarcus.files += \
-    $$PHYS_DIR/afmmarcus/src/python/afm.py \
-    $$PHYS_DIR/afmmarcus/src/python/animator.py \
-    $$PHYS_DIR/afmmarcus/src/python/channel.py \
-    $$PHYS_DIR/afmmarcus/src/python/clocking.py \
-    $$PHYS_DIR/afmmarcus/src/python/db-sim-connector.py \
-    $$PHYS_DIR/afmmarcus/src/python/hopper.py \
-    $$PHYS_DIR/afmmarcus/src/python/lineview.py \
-    $$PHYS_DIR/afmmarcus/src/python/marcus.py \
-    $$PHYS_DIR/afmmarcus/src/python/model.py \
-    $$PHYS_DIR/afmmarcus/src/python/tip_model.py \
-    $$PHYS_DIR/afmmarcus/src/python/pyqt_import.py \
-		$$PHYS_DIR/afmmarcus/src/python/siqadconn.py
+    $$PHYS_DIR/afmmarcus/src/afm.py \
+    $$PHYS_DIR/afmmarcus/src/animator.py \
+    $$PHYS_DIR/afmmarcus/src/channel.py \
+    $$PHYS_DIR/afmmarcus/src/clocking.py \
+    $$PHYS_DIR/afmmarcus/src/db-sim-connector.py \
+    $$PHYS_DIR/afmmarcus/src/hopper.py \
+    $$PHYS_DIR/afmmarcus/src/lineview.py \
+    $$PHYS_DIR/afmmarcus/src/marcus.py \
+    $$PHYS_DIR/afmmarcus/src/model.py \
+    $$PHYS_DIR/afmmarcus/src/tip_model.py \
+    $$PHYS_DIR/afmmarcus/src/pyqt_import.py \
+		$$PHYS_DIR/afmmarcus/src/siqadconn.py
 sim_afmmarcus_stylesheets.path = $$EXEC_DIR/src/phys/afmmarcus/stylesheets
 sim_afmmarcus_stylesheets.files = \
-    $$PHYS_DIR/afmmarcus/src/python/stylesheets/animator.qss
+    $$PHYS_DIR/afmmarcus/src/stylesheets/animator.qss
 sim_afmmarcus_data.path = $$EXEC_DIR/src/phys/afmmarcus/data
 sim_afmmarcus_data.files = \
-		$$PHYS_DIR/afmmarcus/src/python/data/TIBB_vs_H.dat \
-		$$PHYS_DIR/afmmarcus/src/python/data/TIBB_vs_R_d200pm.dat \
-		$$PHYS_DIR/afmmarcus/src/python/data/tip_DB_system.py
+		$$PHYS_DIR/afmmarcus/src/data/TIBB_vs_H.dat \
+		$$PHYS_DIR/afmmarcus/src/data/TIBB_vs_R_d200pm.dat \
+		$$PHYS_DIR/afmmarcus/src/data/tip_DB_system.py
 INSTALLS += sim_afmmarcus
 INSTALLS += sim_afmmarcus_stylesheets
 INSTALLS += sim_afmmarcus_data
