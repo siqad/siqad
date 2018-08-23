@@ -75,6 +75,7 @@ HEADERS += \
   src/gui/widgets/primitives/afmseg.h \
   src/gui/widgets/primitives/pot_plot.h \
 	src/gui/widgets/primitives/resizablerect.h \
+	src/gui/widgets/primitives/resizable_poly.h \
 	src/gui/widgets/primitives/polygon_handle.h \
 	src/gui/widgets/primitives/polygon_segment.h \
 	src/gui/widgets/primitives/hull/hull.h \
@@ -103,6 +104,7 @@ SOURCES += \
 	src/gui/widgets/primitives/afmseg.cc \
   src/gui/widgets/primitives/pot_plot.cc \
 	src/gui/widgets/primitives/resizablerect.cc \
+	src/gui/widgets/primitives/resizable_poly.cc \
 	src/gui/widgets/primitives/polygon_handle.cc \
 	src/gui/widgets/primitives/polygon_segment.cc \
 	src/gui/widgets/primitives/hull/hull.cc \
@@ -239,7 +241,8 @@ sim_poissolver.files = $$PHYS_DIR/poissolver/poissolver.physeng
 linux: sim_poissolver.files += \
 		$$PHYS_DIR/poissolver/FEM/src/poissolver \
 		$$PHYS_DIR/poissolver/FEM/src/python/poisson3D.py \
-		$$PHYS_DIR/poissolver/FEM/src/python/mesh_writer_3D.py \
+		$$PHYS_DIR/poissolver/FEM/src/python/helpers/mesh_writer_3D.py \
+		$$PHYS_DIR/poissolver/FEM/src/python/helpers/helpers.py \
 		$$PHYS_DIR/poissolver/FEM/src/python/dolfin_convert.py \
 		$$PHYS_DIR/poissolver/FEM/src/python/siqadconn.py \
 		$$PHYS_DIR/poissolver/FEM/src/python/_siqadconn.cpython-36m-x86_64-linux-gnu.so

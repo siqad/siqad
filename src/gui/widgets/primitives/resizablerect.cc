@@ -312,7 +312,7 @@ void ResizeHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent *)
   if (clicked) {
     prim::ResizableRect *target = static_cast<prim::ResizeFrame*>(parentItem())->
         resizeTarget();
-    emit prim::Emitter::instance()->sig_resizeFinalize(target,
+    emit prim::Emitter::instance()->sig_resizeFinalizeRect(target,
         target->sceneRectCached(), target->sceneRect());
   }
   clicked = false;

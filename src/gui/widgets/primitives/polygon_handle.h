@@ -17,17 +17,23 @@ namespace prim{
   {
   public:
     PolygonHandle(QPointF point, QGraphicsItem *parent=0);
-    QPointF getPoint(){return center;}
+    ~PolygonHandle();
     virtual QRectF boundingRect() const override;
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem*, QWidget*) override;
+
+  protected:
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *) override;
 
   private:
     void constructStatics();
     void initPolygonHandle(QPointF point);
 
     QRectF scene_rect;
-    QPointF center;
     qreal handle_dim;
+    bool clicked;
+    QPointF step_pos;
   };
 
 

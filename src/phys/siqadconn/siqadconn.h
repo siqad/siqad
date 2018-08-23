@@ -1,7 +1,7 @@
 // @file:     siqadconn.h
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2018.06.29 - Nathan
+// @editted:  2018.08.23 - Nathan
 // @license:  Apache License 2.0
 //
 // @desc:     Convenient functions for interacting with SiQAD including
@@ -37,10 +37,14 @@ namespace phys{
   struct Electrode;
   class ElecIterator;
   class ElectrodeCollection;
+  struct ElectrodePoly;
+  class ElecPolyIterator;
+  class ElectrodePolyCollection;
   struct Aggregate;
 
   typedef std::vector<std::shared_ptr<DBDot>>::const_iterator DBIter;
   typedef std::vector<std::shared_ptr<Electrode>>::const_iterator ElecIter;
+  typedef std::vector<std::shared_ptr<ElectrodePoly>>::const_iterator ElecPolyIter;
   typedef std::vector<std::shared_ptr<Aggregate>>::const_iterator AggIter;
 
   // SiQAD connector class
@@ -86,6 +90,10 @@ namespace phys{
     // electrodes across all electrode layers.
     ElectrodeCollection* electrodeCollection() {return elec_col;}
 
+    // Return pointer to Electrode collection, which allows iteration through
+    // electrodes across all electrode layers.
+    ElectrodePolyCollection* electrodePolyCollection() {return elec_poly_col;}
+
 
     // Misc Accessors
     std::string inputPath(){return input_path;}
@@ -112,6 +120,7 @@ namespace phys{
     void readDesign(const bpt::ptree &, const std::shared_ptr<Aggregate> &);
     void readItemTree(const bpt::ptree &, const std::shared_ptr<Aggregate> &);
     void readElectrode(const bpt::ptree &, const std::shared_ptr<Aggregate> &);
+    void readElectrodePoly(const bpt::ptree &, const std::shared_ptr<Aggregate> &);
     void readDBDot(const bpt::ptree &, const std::shared_ptr<Aggregate> &);
 
     // Generate property trees for writing
@@ -120,6 +129,7 @@ namespace phys{
     bpt::ptree dbLocPropertyTree();
     bpt::ptree dbChargePropertyTree();
     bpt::ptree electrodePropertyTree();
+    // bpt::ptree electrodePolyPropertyTree();
     bpt::ptree potentialPropertyTree();
     bpt::ptree dbPotentialPropertyTree(); // TODO fix up this function, a lot of redundant information
 
@@ -131,6 +141,7 @@ namespace phys{
     // Iterable collections
     ElectrodeCollection* elec_col;
     DBCollection* db_col;
+    ElectrodePolyCollection* elec_poly_col;
 
     // Retrieved items and properties
     std::map<std::string, std::string> program_props; // SiQAD properties
@@ -207,6 +218,53 @@ namespace phys{
     std::shared_ptr<Aggregate> db_tree_inner;
   };
 
+
+  // electrode_poly
+  struct ElectrodePoly {
+    int layer_id;
+    std::vector<std::pair<double, double>> vertices;  // vertex points
+    double potential;
+    double phase;
+    int electrode_type;
+    double pixel_per_angstrom;
+    ElectrodePoly(int in_layer_id, std::vector<std::pair<double, double>> in_vertices, \
+              double in_potential, double in_phase, int in_electrode_type, double in_pixel_per_angstrom)
+      : layer_id(in_layer_id), vertices(in_vertices), \
+        potential(in_potential), phase(in_phase), electrode_type(in_electrode_type), \
+        pixel_per_angstrom(in_pixel_per_angstrom) {};
+  };
+
+  class ElecPolyIterator
+  {
+  public:
+    explicit ElecPolyIterator(std::shared_ptr<Aggregate> root, bool begin=true);
+    ElecPolyIterator& operator++(); // recursive part here
+    bool operator==(const ElecPolyIterator &other) {return other.elec_poly_iter == elec_poly_iter;}
+    bool operator!=(const ElecPolyIterator &other) {return other.elec_poly_iter != elec_poly_iter;}
+    std::shared_ptr<ElectrodePoly> operator*() const {return *elec_poly_iter;}
+
+    void setCollection(ElectrodePolyCollection *coll) {collection = coll;}
+    ElectrodePolyCollection *collection; // needed for python wrapper
+  private:
+    ElecPolyIter elec_poly_iter;               // points to the current electrode
+    std::shared_ptr<Aggregate> curr;  // current working Aggregate
+    std::stack<std::pair<std::shared_ptr<Aggregate>, AggIter>> agg_stack;
+    // add a new aggregate pair to the stack
+    void push(std::shared_ptr<Aggregate> agg);
+    // pop the aggregate stack
+    void pop();
+  };
+
+  class ElectrodePolyCollection
+  {
+  public:
+    ElectrodePolyCollection(std::shared_ptr<Aggregate> elec_poly_tree_in)
+      : elec_poly_tree_inner(elec_poly_tree_in) {};
+    ElecPolyIterator begin() {return ElecPolyIterator(elec_poly_tree_inner);}
+    ElecPolyIterator end() {return ElecPolyIterator(elec_poly_tree_inner, false);}
+    std::shared_ptr<Aggregate> elec_poly_tree_inner;
+  };
+
   // electrode
   struct Electrode {
     int layer_id;
@@ -260,6 +318,7 @@ namespace phys{
     std::vector<std::shared_ptr<Aggregate>> aggs;
     std::vector<std::shared_ptr<DBDot>> dbs;
     std::vector<std::shared_ptr<Electrode>> elecs;
+    std::vector<std::shared_ptr<ElectrodePoly>> elec_polys;
 
     // Properties
     int size(); // returns the number of contained elecs, including those in children aggs

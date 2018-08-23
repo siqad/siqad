@@ -480,8 +480,10 @@ namespace gui{
     //! Edit a text label
     void editTextLabel(prim::TextLabel *text_lab, const QString &new_text);
 
-    void resizeItem(prim::Item *item, const QRectF &orig_rect,
+    void resizeItemRect(prim::Item *item, const QRectF &orig_rect,
         const QRectF &new_rect);
+
+    void resizeItemPoly(prim::Item *item);
 
     // destroy AFM path and included nodes
     void destroyAFMPath(prim::AFMPath *afm_path);
@@ -635,8 +637,8 @@ namespace gui{
 
     DesignPanel *dp;  // DesignPanel pointer
     QImage potential_plot;
-    QRectF graph_container;
     QString pot_plot_path;
+    QRectF graph_container;
     QString pot_anim_path;
     prim::PotPlot* pp;
     bool invert;
@@ -659,11 +661,11 @@ namespace gui{
 
     void create();  // create the dangling bond
     void destroy(); // destroy the dangling bond
-    int layer_index;
-    int index;
     DesignPanel *dp;  // DesignPanel pointer
     QPolygonF poly;
     prim::ElectrodePoly* ep;
+    int layer_index;
+    int index;
     bool invert;
   };
 

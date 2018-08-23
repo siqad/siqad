@@ -43,8 +43,10 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
           this, &gui::DesignPanel::removeItemFromScene);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeBegin,
           this, &gui::DesignPanel::resizeBegin);
-  connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeFinalize,
-          this, &gui::DesignPanel::resizeItem);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeFinalizeRect,
+          this, &gui::DesignPanel::resizeItemRect);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeFinalizePoly,
+          this, &gui::DesignPanel::resizeItemPoly);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_moveDBToLatticeCoord,
           this, &gui::DesignPanel::moveDBToLatticeCoord);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_physLoc2LatticeCoord,
@@ -727,6 +729,7 @@ void gui::DesignPanel::simVisualizeDockVisibilityChanged(bool visible)
 
 void gui::DesignPanel::resizeBegin()
 {
+  qDebug() << "resizeBegin()";
   resizing = true;
 }
 
@@ -858,6 +861,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
   QPoint mouse_pos_del;
   qreal dx, dy;
+  // qDebug() << "DP::MOUSEMOVE";
 
   if (ghosting) {
     // update snap
@@ -1799,8 +1803,7 @@ void gui::DesignPanel::CreateElectrodePoly::redo()
 
 void gui::DesignPanel::CreateElectrodePoly::create()
 {
-  QRectF scene_rect = poly.boundingRect();
-  ep = new prim::ElectrodePoly(poly, scene_rect, layer_index);
+  ep = new prim::ElectrodePoly(poly, layer_index);
   dp->addItem(ep, layer_index, index);
 }
 
@@ -2181,6 +2184,7 @@ gui::DesignPanel::MoveItem::MoveItem(prim::Item *item, const QPointF &offset,
   : QUndoCommand(parent), dp(dp), offset(offset)
 {
   layer_index = item->layer_id;
+  // qDebug() << dp->layman->getLayer(layer_index)->getItemIndex(item);
   item_index = dp->layman->getLayer(layer_index)->getItems().indexOf(item);
 }
 
@@ -2552,19 +2556,35 @@ void gui::DesignPanel::updateSimMovie()
   }
 }
 
-void gui::DesignPanel::resizeItem(prim::Item *item,
+void gui::DesignPanel::resizeItemRect(prim::Item *item,
     const QRectF &orig_rect, const QRectF &new_rect)
 {
   resizing = false;
-
-  // assume all resizable items are simply ResizableRects right now, need
-  // special implementation otherwise
   if (item->isResizable()) {
     int item_index = layman->getLayer(item->layer_id)->getItemIndex(item);
     undo_stack->beginMacro(tr("Resize Item"));
     undo_stack->push(new ResizeItem(item->layer_id, this, item_index,
           orig_rect, new_rect, true));
     undo_stack->endMacro();
+  }
+}
+
+void gui::DesignPanel::resizeItemPoly(prim::Item *item)
+{
+  resizing = false;
+  if (item->isResizable()) {
+    prim::ResizablePoly *poly_item = static_cast<prim::ResizablePoly *>(item);
+    QRectF old_rect = poly_item->sceneRect();
+    QPolygonF new_poly;
+    for (prim::PolygonHandle *handle: poly_item->getHandles())
+      new_poly.append(handle->scenePos());
+    poly_item->setPolygon(new_poly);
+    poly_item->setRect(new_poly.boundingRect(), true);
+    poly_item->createHandles();
+    for (prim::PolygonHandle *handle: poly_item->getHandles())
+      handle->setVisible(true);
+    poly_item->update();
+    poly_item->scene()->update(old_rect);
   }
 }
 
@@ -2638,7 +2658,7 @@ void gui::DesignPanel::deleteSelection()
       case prim::Item::ElectrodePoly:
         {
         prim::ElectrodePoly *ep = static_cast<prim::ElectrodePoly*>(item);
-        undo_stack->push(new CreateElectrodePoly(this, ep->getPolygon(), ep->layer_id,
+        undo_stack->push(new CreateElectrodePoly(this, ep->getTranslatedPolygon(), ep->layer_id,
             static_cast<prim::ElectrodePoly*>(item), true));
         break;
         }

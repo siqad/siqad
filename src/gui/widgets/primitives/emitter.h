@@ -70,7 +70,9 @@ namespace prim{
 
     void sig_resizeBegin();
 
-    void sig_resizeFinalize(Item *, QRectF orig_rect, QRectF final_rect);
+    void sig_resizeFinalizeRect(Item *, QRectF orig_rect, QRectF final_rect);
+
+    void sig_resizeFinalizePoly(Item *);
 
     void sig_setLatticeVisibility(bool);
 
