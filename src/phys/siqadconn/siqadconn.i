@@ -1,7 +1,7 @@
 // @file:     siqadconn.i
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2018.06.29 - Nathan
+// @editted:  2018.08.23 - Nathan
 // @license:  Apache License 2.0
 //
 // @desc:     Convenient functions for interacting with SiQAD
@@ -20,6 +20,8 @@
 %include "siqadconn.h"
 
 namespace std {
+    %template(DoublePair) pair<double, double>;
+    %template(DoublePairVector) vector< pair <double, double> >;
     %template(IntVector) vector<int>;
     %template(StringPair) pair<string, string>;
     %template(StringPairVector) vector< pair<string, string> >;
@@ -51,6 +53,15 @@ namespace std {
       raise StopIteration
     else:
       return elec
+%}
+
+%feature("shadow") phys::ElecPolyIterator::__next__() %{
+  def __next__(self):
+    elec_poly = $action(self)
+    if elec_poly == None:
+      raise StopIteration
+    else:
+      return elec_poly
 %}
 
 %extend phys::SiQADConnector {
@@ -117,5 +128,31 @@ namespace std {
     phys::Electrode *elec = &***($self);
     $self->operator++();
     return elec;
+  }
+}
+
+%extend phys::ElectrodePolyCollection {
+  phys::ElecPolyIterator __iter__() {
+    phys::ElecPolyIterator iter = $self->begin();
+    iter.setCollection($self);
+    return iter;
+  }
+}
+
+%extend phys::ElecPolyIterator
+{
+  phys::ElectrodePoly *__iter__() {
+    return &***($self);
+  }
+
+  phys::ElectrodePoly *__next__() {
+    if (*($self) == $self->collection->end()) {
+      //PyErr_SetString(PyExc_StopIteration,"End of list");
+      //PyErr_SetNone(PyExc_StopIteration);
+      return NULL;
+    }
+    phys::ElectrodePoly *elec_poly = &***($self);
+    $self->operator++();
+    return elec_poly;
   }
 }

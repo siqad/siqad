@@ -1,7 +1,7 @@
 // @file:     siqadconn.cc
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2018.06.28 - Samuel
+// @editted:  2018.08.23 - Nathan
 // @license:  Apache License 2.0
 //
 // @desc:     Convenient functions for interacting with SiQAD
@@ -25,6 +25,7 @@ SiQADConnector::SiQADConnector(const std::string &eng_name,
   item_tree = std::make_shared<Aggregate>();
   start_time = std::chrono::system_clock::now();
   elec_col = new ElectrodeCollection(item_tree);
+  elec_poly_col = new ElectrodePolyCollection(item_tree);
   db_col = new DBCollection(item_tree);
 
   // read problem from input_path
@@ -153,6 +154,9 @@ void SiQADConnector::readItemTree(const bpt::ptree &subtree, const std::shared_p
     } else if (!item_name.compare("electrode")) {
       // add Electrode to tree
       readElectrode(item_tree.second, agg_parent);
+    } else if (!item_name.compare("electrode_poly")) {
+      // add Electrode to tree
+      readElectrodePoly(item_tree.second, agg_parent);
     } else {
       std::cout << "Encountered unknown item node: " << item_tree.first << std::endl;
     }
@@ -183,6 +187,38 @@ void SiQADConnector::readElectrode(const bpt::ptree &subtree, const std::shared_
   std::cout << "Electrode created with x1=" << agg_parent->elecs.back()->x1 << ", y1=" << agg_parent->elecs.back()->y1 <<
     ", x2=" << agg_parent->elecs.back()->x2 << ", y2=" << agg_parent->elecs.back()->y2 <<
     ", potential=" << agg_parent->elecs.back()->potential << std::endl;
+}
+
+void SiQADConnector::readElectrodePoly(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
+{
+  double pixel_per_angstrom, potential, phase;
+  std::vector<std::pair<double, double>> vertices;
+  int layer_id, electrode_type;
+  // read values from XML stream
+  layer_id = subtree.get<int>("layer_id");
+  potential = subtree.get<double>("property_map.potential.val");
+  phase = subtree.get<double>("property_map.phase.val");
+  std::string electrode_type_s = subtree.get<std::string>("property_map.type.val");
+  if (!electrode_type_s.compare("fixed")){
+    electrode_type = 0;
+  } else if (!electrode_type_s.compare("clocked")) {
+    electrode_type = 1;
+  }
+  pixel_per_angstrom = subtree.get<double>("pixel_per_angstrom");
+  //cycle through the vertices
+  std::pair<double, double> point;
+  for (auto val: subtree) {
+    if(val.first == "vertex") {
+      double x = std::stod(val.second.get_child("<xmlattr>.x").data());
+      double y = std::stod(val.second.get_child("<xmlattr>.y").data());
+      point = std::make_pair(x, y);
+      vertices.push_back(point);
+    }
+  }
+  agg_parent->elec_polys.push_back(std::make_shared<ElectrodePoly>(layer_id,vertices,potential,phase,electrode_type,pixel_per_angstrom));
+
+  std::cout << "ElectrodePoly created with " << agg_parent->elec_polys.back()->vertices.size() <<
+    " vertices, potential=" << agg_parent->elec_polys.back()->potential << std::endl;
 }
 
 void SiQADConnector::readDBDot(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
@@ -454,6 +490,56 @@ void ElecIterator::pop()
   }
 }
 
+// ELECPOLY ITERATOR
+ElecPolyIterator::ElecPolyIterator(std::shared_ptr<Aggregate> root, bool begin)
+{
+  if(begin){
+    // keep finding deeper aggregates until one that contains dbs is found
+    while(root->elec_polys.empty() && !root->aggs.empty()) {
+      push(root);
+      root = root->aggs.front();
+    }
+    push(root);
+  }
+  else{
+    elec_poly_iter = root->elec_polys.cend();
+  }
+}
+
+ElecPolyIterator& ElecPolyIterator::operator++()
+{
+  // exhaust the current Aggregate DBs first
+  if(elec_poly_iter != curr->elec_polys.cend())
+    return ++elec_poly_iter != curr->elec_polys.cend() ? *this : ++(*this);
+
+  // if available, push the next aggregate onto the stack
+  if(agg_stack.top().second != curr->aggs.cend()){
+    push(*agg_stack.top().second);
+    return elec_poly_iter != curr->elec_polys.cend() ? *this : ++(*this);
+  }
+
+  // aggregate is complete, pop off stack
+  pop();
+  return agg_stack.size() == 0 ? *this : ++(*this);
+}
+
+void ElecPolyIterator::push(std::shared_ptr<Aggregate> agg)
+{
+  if(!agg_stack.empty())
+    ++agg_stack.top().second;
+  agg_stack.push(std::make_pair(agg, agg->aggs.cbegin()));
+  elec_poly_iter = agg->elec_polys.cbegin();
+  curr = agg;
+}
+
+void ElecPolyIterator::pop()
+{
+  agg_stack.pop();              // pop complete aggregate off stack
+  if(agg_stack.size() > 0){
+    curr = agg_stack.top().first; // update current to new top
+    elec_poly_iter = curr->elec_polys.cend();   // don't reread dbs
+  }
+}
 
 // AGGREGATE
 int Aggregate::size()
