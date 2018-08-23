@@ -36,7 +36,7 @@ echo "Building AFMMarcus... $FOR_OS"
 if [[ "$@" == "-swig" ]]
 then
     echo "Building swig for AFMMarcus"
-    cd $qmake_dir/src/phys/afmmarcus/src/python/swig_siqadconn
+    cd $qmake_dir/src/phys/afmmarcus/src/swig_siqadconn
     ./swig_generate_and_compile FOR_OS=$FOR_OS
 fi
 #cd $qmake_dir/src/phys/afmmarcus/src
