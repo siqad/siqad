@@ -220,8 +220,8 @@ sim_afmmarcus.files += \
     $$PHYS_DIR/afmmarcus/src/marcus.py \
     $$PHYS_DIR/afmmarcus/src/model.py \
     $$PHYS_DIR/afmmarcus/src/tip_model.py \
-    $$PHYS_DIR/afmmarcus/src/pyqt_import.py \
-		$$PHYS_DIR/afmmarcus/src/siqadconn.py
+    $$PHYS_DIR/afmmarcus/src/qt_import.py \
+    $$PHYS_DIR/afmmarcus/src/siqadconn.py
 sim_afmmarcus_stylesheets.path = $$EXEC_DIR/src/phys/afmmarcus/stylesheets
 sim_afmmarcus_stylesheets.files = \
     $$PHYS_DIR/afmmarcus/src/stylesheets/animator.qss
