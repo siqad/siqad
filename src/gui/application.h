@@ -155,6 +155,7 @@ namespace gui{
     void initLayerDock();         // initialise the side layer dock
     void initCommander();         // initialise the input field whitelist
     void initItemDock();          // initialise the side item dock
+    void initInfoDock();          // initialise the bottom info dock
     void setLayerManagerWidget(QWidget *widget);
     void setItemManagerWidget(QWidget *widget);
 
@@ -196,7 +197,8 @@ namespace gui{
     QDockWidget *dialog_dock; // bottom panel for terminal dialog
     QDockWidget *sim_visualize_dock; // right side panel for sim visualization
     QDockWidget *layer_dock;  // right side panel for showing layers
-    QDockWidget *item_dock;  // right side panel for showing items
+    QDockWidget *item_dock;   // right side panel for showing items
+    QDockWidget *info_dock;   // bottom panel that shows information about items on screen
 
     // action pointers
     QAction *action_screenshot_tool;

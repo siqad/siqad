@@ -245,6 +245,21 @@ namespace gui{
     //! Tell ApplicationGUI to cancel the current screenshot.
     void sig_cancelScreenshot();
 
+    //! Emit the current cursor scene coordinates.
+    void sig_cursorSceneCoord(QPointF cursor_pos);
+
+    //! Emit the current zoom level.
+    void sig_zoom(float zoom);
+
+    //! Emit the current total DB count.
+    void sig_totalDBCount(int db_count);
+
+    //! Emit the selected DB count.
+    void sig_selDBCount(int db_count);
+
+    //! Emit the bounding rect of the currently selected items.
+    void sig_selBoundingRect(QRectF b_rect);
+
   protected:
 
     void contextMenuEvent(QContextMenuEvent *e) override;
@@ -274,7 +289,7 @@ namespace gui{
 
     QGraphicsScene *scene;    // scene for the QGraphicsView
     QRectF min_scene_rect;    // minimum size of the scene rect
-    gui::ToolType tool_type;       // current cursor tool type
+    gui::ToolType tool_type;  // current cursor tool type
     gui::DisplayMode display_mode=DesignMode; // current display mode
     QUndoStack *undo_stack;   // undo stack
 

@@ -8,10 +8,19 @@
 
 #include "info_panel.h"
 
+namespace gui{
 
-gui::InfoPanel::InfoPanel(QWidget *parent)
+InfoPanel::InfoPanel(QWidget *parent)
   : QWidget(parent)
 {}
 
-gui::InfoPanel::~InfoPanel()
+InfoPanel::~InfoPanel()
 {}
+
+void InfoPanel::initInfoPanel()
+{
+  QLabel l_cursor_coords = tr("Cursor coordinates");
+
+}
+
+}

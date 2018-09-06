@@ -861,6 +861,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
   QPoint mouse_pos_del;
   qreal dx, dy;
+  emit sig_cursorSceneCoord(mapToScene(e->pos()));
   // qDebug() << "DP::MOUSEMOVE";
 
   if (ghosting) {
