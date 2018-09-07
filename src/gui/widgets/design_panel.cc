@@ -861,8 +861,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
   QPoint mouse_pos_del;
   qreal dx, dy;
-  emit sig_cursorSceneCoord(mapToScene(e->pos()));
-  // qDebug() << "DP::MOUSEMOVE";
+  emit sig_cursorPhysLoc(mapToScene(e->pos()) / prim::Item::scale_factor_nm);
 
   if (ghosting) {
     // update snap
@@ -1192,6 +1191,7 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
       || (new_zoom < zoom_visibility_threshold && zoom_visibility_threshold <= old_zoom))
     updateBackground();
 
+  emit sig_zoom(new_zoom);
   //qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
 }
 

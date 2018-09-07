@@ -158,7 +158,8 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("lattice/minsize", 50);  // minimum lattice n, m size
 
   // QGraphicsView
-  S->setValue("view/scale_fact", 100);            // pixels/angstrom in the main view
+  S->setValue("view/scale_fact", 100);            // pixels/angstrom in the main view (this is the default value)
+  S->setValue("view/scale_fact_nm", 1000);        // pixels/nm in the main view
   S->setValue("view/bg_col", QColor(40,50,60));   // background color
   S->setValue("view/bg_col_pb", QColor(255,255,255)); // background color
   S->setValue("view/zoom_factor", 0.1);           // scaling factor for zoom operations

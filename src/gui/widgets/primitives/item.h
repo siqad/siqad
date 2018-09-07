@@ -106,6 +106,7 @@ namespace prim{
 
     // static class variables
     static qreal scale_factor;            // pixels/angstrom scaling factor
+    static qreal scale_factor_nm;         // pixels/nm scaling factor
     static gui::ToolType tool_type;       // current tool type of the GUI
     static gui::DisplayMode display_mode; // current display mode of the GUI
 

@@ -110,6 +110,10 @@ void gui::ApplicationGUI::initGUI()
           design_pan, &gui::DesignPanel::clearPlots);
   connect(design_pan, &gui::DesignPanel::sig_quickRunSimulation,
           sim_manager, &gui::SimManager::quickRun);
+  connect(design_pan, &gui::DesignPanel::sig_cursorPhysLoc,
+          info_pan, &gui::InfoPanel::updateCursorPhysLoc);
+  connect(design_pan, &gui::DesignPanel::sig_zoom,
+          info_pan, &gui::InfoPanel::updateZoom);
 
   // widget-app gui signals
   connect(sim_manager, &gui::SimManager::emitSimJob,

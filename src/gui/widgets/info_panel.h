@@ -30,11 +30,12 @@ namespace gui{
     public slots:
 
       //! Update scene coordinates of cursor on screen
-      void updateCursorSceneCoord(const QPointF curser_pos);
+      void updateCursorPhysLoc(const QPointF curser_pos);
 
       //! Update zoom level
       void updateZoom(float zoom);
 
+      /*
       //! Update the total DB count
       void updateTotalDBCount(int db_count);
 
@@ -43,6 +44,7 @@ namespace gui{
 
       //! Update bounding rect dimensions of selected items
       void updateSelBoundingRect(const QRectF b_rect);
+      */
 
     private:
 
@@ -53,7 +55,8 @@ namespace gui{
       // to show and what not to.
 
       // Variables to be shown in fields
-      
+      QLabel *disp_cursor_coords;       // Cursor physical coordinates in nm
+      QLabel *disp_zoom;                // Zoom level
   };
 
 

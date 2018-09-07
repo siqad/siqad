@@ -12,6 +12,7 @@
 
 
 qreal prim::Item::scale_factor = -1;
+qreal prim::Item::scale_factor_nm;
 
 gui::DisplayMode prim::Item::display_mode;
 gui::ToolType prim::Item::tool_type;
@@ -22,6 +23,7 @@ gui::ToolType prim::Item::tool_type;
 void prim::Item::init()
 {
   scale_factor = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
+  scale_factor_nm = settings::GUISettings::instance()->get<qreal>("view/scale_fact_nm");
 }
 
 prim::Item::Item(ItemType type, int lay_id, QGraphicsItem *parent)

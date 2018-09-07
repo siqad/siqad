@@ -246,7 +246,7 @@ namespace gui{
     void sig_cancelScreenshot();
 
     //! Emit the current cursor scene coordinates.
-    void sig_cursorSceneCoord(QPointF cursor_pos);
+    void sig_cursorPhysLoc(QPointF cursor_pos);
 
     //! Emit the current zoom level.
     void sig_zoom(float zoom);
