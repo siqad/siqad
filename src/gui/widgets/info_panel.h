@@ -13,6 +13,9 @@
 
 #include <QtWidgets>
 
+#include "primitives/items.h"
+
+
 namespace gui{
 
   class InfoPanel : public QWidget
@@ -38,10 +41,12 @@ namespace gui{
       /*
       //! Update the total DB count
       void updateTotalDBCount(int db_count);
+      */
 
-      //! Update the selected DB count
-      void updateSelDBCount(int db_count);
+      //! Update count of selected items
+      void updateSelItemCount(QList<prim::Item*> items);
 
+      /*
       //! Update bounding rect dimensions of selected items
       void updateSelBoundingRect(const QRectF b_rect);
       */
@@ -57,6 +62,7 @@ namespace gui{
       // Variables to be shown in fields
       QLabel *disp_cursor_coords;       // Cursor physical coordinates in nm
       QLabel *disp_zoom;                // Zoom level
+      QLabel *disp_sel_db_count;        // Number of selected DBs
   };
 
 

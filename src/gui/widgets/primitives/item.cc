@@ -33,12 +33,7 @@ prim::Item::Item(ItemType type, int lay_id, QGraphicsItem *parent)
     init();
 }
 
-QString prim::Item::getQStringItemType()
-{
-  return getQStringItemType(item_type);
-}
-
-QString prim::Item::getQStringItemType(ItemType type_in)
+const QString prim::Item::getQStringItemType(ItemType type_in)
 {
   switch (type_in) {
     case prim::Item::Aggregate: return "Aggregate";

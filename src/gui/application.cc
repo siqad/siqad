@@ -114,6 +114,8 @@ void gui::ApplicationGUI::initGUI()
           info_pan, &gui::InfoPanel::updateCursorPhysLoc);
   connect(design_pan, &gui::DesignPanel::sig_zoom,
           info_pan, &gui::InfoPanel::updateZoom);
+  connect(design_pan, &gui::DesignPanel::sig_selectedItems,
+          info_pan, &gui::InfoPanel::updateSelItemCount);
 
   // widget-app gui signals
   connect(sim_manager, &gui::SimManager::emitSimJob,

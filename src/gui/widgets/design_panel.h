@@ -254,11 +254,11 @@ namespace gui{
     //! Emit the current total DB count.
     void sig_totalDBCount(int db_count);
 
-    //! Emit the selected DB count.
-    void sig_selDBCount(int db_count);
-
     //! Emit the bounding rect of the currently selected items.
     void sig_selBoundingRect(QRectF b_rect);
+
+    //! Emit the currently selected items. Empty for no selected items.
+    void sig_selectedItems(QList<prim::Item*> items);
 
   protected:
 
@@ -382,9 +382,6 @@ namespace gui{
     // coordinates, taking the transformation (zoom and rotate) into account. Used
     // when rotating the view or anchoring during zoom.
     void scrollDelta(QPointF delta);
-
-    // filter selected items
-    void filterSelection(bool select_flag);
 
     // RUBBER BAND
 
