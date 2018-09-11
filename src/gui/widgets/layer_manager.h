@@ -37,7 +37,9 @@ namespace gui{
 
     //! Add a new layer with the given name. If no name is given, a default scheme
     //! is used. Checks if the layer already exists.
-    void addLayer(const QString &name = QString(), const prim::Layer::LayerType cnt_type=prim::Layer::DB, const float zoffset = 0, const float zheight = 0);
+    void addLayer(const QString &name = QString(),
+                  const prim::Layer::LayerType cnt_type=prim::Layer::DB, 
+                  const float zoffset = 0, const float zheight = 0);
 
     //! Attempt to remove a layer, by name.
     void removeLayer(const QString &name);

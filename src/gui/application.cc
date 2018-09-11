@@ -90,6 +90,7 @@ void gui::ApplicationGUI::initGUI()
   initDialogDock();
   initLayerDock();
   initItemDock();
+  initInfoDock();
   tabifyDockWidget(item_dock, layer_dock);
 
   // initialise bars
@@ -109,6 +110,12 @@ void gui::ApplicationGUI::initGUI()
           design_pan, &gui::DesignPanel::clearPlots);
   connect(design_pan, &gui::DesignPanel::sig_quickRunSimulation,
           sim_manager, &gui::SimManager::quickRun);
+  connect(design_pan, &gui::DesignPanel::sig_cursorPhysLoc,
+          info_pan, &gui::InfoPanel::updateCursorPhysLoc);
+  connect(design_pan, &gui::DesignPanel::sig_zoom,
+          info_pan, &gui::InfoPanel::updateZoom);
+  connect(design_pan, &gui::DesignPanel::sig_selectedItems,
+          info_pan, &gui::InfoPanel::updateSelItemCount);
 
   // widget-app gui signals
   connect(sim_manager, &gui::SimManager::emitSimJob,
@@ -484,6 +491,24 @@ void gui::ApplicationGUI::initItemDock()
   addDockWidget(area, item_dock);
 }
 
+
+void gui::ApplicationGUI::initInfoDock()
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+
+  info_dock = new QDockWidget("Information Panel");
+
+  Qt::DockWidgetArea area;
+  area = static_cast<Qt::DockWidgetArea>(gui_settings->get<int>("INFODOCK/loc"));
+
+  info_dock->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea|Qt::BottomDockWidgetArea);
+
+  info_dock->setMinimumWidth(gui_settings->get<int>("INFODOCK/mw"));
+
+  info_dock->setWidget(info_pan);
+  info_dock->show();
+  addDockWidget(area, info_dock);
+}
 
 void gui::ApplicationGUI::initCommander()
 {
