@@ -12,6 +12,8 @@
 
 #include <QtWidgets>
 #include <QtCore>
+#include <QMetaEnum>
+
 #include "emitter.h"
 #include "src/global.h"
 #include "src/settings/settings.h"
@@ -62,8 +64,8 @@ namespace prim{
     bool upSelected();
 
     //! returns the item type as a QString
-    QString getQStringItemType();
-    static QString getQStringItemType(ItemType);
+    const QString getQStringItemType() {return getQStringItemType(item_type);}
+    static const QString getQStringItemType(ItemType);
 
     static ItemType getEnumItemType(QString type);
 
@@ -106,6 +108,7 @@ namespace prim{
 
     // static class variables
     static qreal scale_factor;            // pixels/angstrom scaling factor
+    static qreal scale_factor_nm;         // pixels/nm scaling factor
     static gui::ToolType tool_type;       // current tool type of the GUI
     static gui::DisplayMode display_mode; // current display mode of the GUI
 

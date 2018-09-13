@@ -150,13 +150,16 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("LAYDOCK/loc", 2);    // layer dock default to bottom
   S->setValue("ITEMDOCK/mw", 120);  // item dock minimum width
   S->setValue("ITEMDOCK/loc", 2);   // item dock default to bottom
+  S->setValue("INFODOCK/mw", 120);  // item dock minimum width
+  S->setValue("INFODOCK/loc", 8);   // info dock default to bottom
   S->setValue("Panel/logw", 400);
 
   S->setValue("lattice/fname", QString("src/settings/lattices/si_100_2x1.ini"));
   S->setValue("lattice/minsize", 50);  // minimum lattice n, m size
 
   // QGraphicsView
-  S->setValue("view/scale_fact", 100);            // pixels/angstrom in the main view
+  S->setValue("view/scale_fact", 100);            // pixels/angstrom in the main view (this is the default value)
+  S->setValue("view/scale_fact_nm", 1000);        // pixels/nm in the main view
   S->setValue("view/bg_col", QColor(40,50,60));   // background color
   S->setValue("view/bg_col_pb", QColor(255,255,255)); // background color
   S->setValue("view/zoom_factor", 0.1);           // scaling factor for zoom operations

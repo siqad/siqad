@@ -13,22 +13,58 @@
 
 #include <QtWidgets>
 
+#include "primitives/items.h"
+
+
 namespace gui{
 
-class InfoPanel : public QWidget
-{
-  Q_OBJECT
+  class InfoPanel : public QWidget
+  {
+    Q_OBJECT
 
-public:
+    public:
 
-  // constructor
-  InfoPanel(QWidget *parent = 0);
+      // constructor
+      InfoPanel(QWidget *parent = 0);
 
-  // destructor
-  ~InfoPanel();
+      // destructor
+      ~InfoPanel();
 
-private:
-};
+    public slots:
+
+      //! Update scene coordinates of cursor on screen
+      void updateCursorPhysLoc(const QPointF curser_pos);
+
+      //! Update zoom level
+      void updateZoom(float zoom);
+
+      /*
+      //! Update the total DB count
+      void updateTotalDBCount(int db_count);
+      */
+
+      //! Update count of selected items
+      void updateSelItemCount(QList<prim::Item*> items);
+
+      /*
+      //! Update bounding rect dimensions of selected items
+      void updateSelBoundingRect(const QRectF b_rect);
+      */
+
+    private:
+
+      //! Initialize the info panel with blank fields
+      void initInfoPanel();
+
+      // TODO eventually would like to add options for users to pick what stats
+      // to show and what not to.
+
+      // Variables to be shown in fields
+      QLabel *disp_cursor_coords;       // Cursor physical coordinates in nm
+      QLabel *disp_zoom;                // Zoom level
+      QLabel *disp_sel_db_count;        // Number of selected DBs
+      QLabel *disp_sel_bounding_rect;   // Total bounding rect of selection
+  };
 
 
 } // end gui namespace

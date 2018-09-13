@@ -255,6 +255,7 @@ QList<prim::Item*> gui::DesignPanel::selectedItems()
   QList<prim::Item*> casted_list;
   for (QGraphicsItem *gitem : scene->selectedItems())
     casted_list.append(static_cast<prim::Item*>(gitem));
+  emit sig_selectedItems(casted_list);
   return casted_list;
 }
 
@@ -340,6 +341,9 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
 
   // reset selected items
   scene->clearSelection();
+
+  // emit empty selected items list
+  emit sig_selectedItems(QList<prim::Item*>());
 
   // destroy DB previews
   destroyDBPreviews();
@@ -861,7 +865,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
 {
   QPoint mouse_pos_del;
   qreal dx, dy;
-  // qDebug() << "DP::MOUSEMOVE";
+  emit sig_cursorPhysLoc(mapToScene(e->pos()) / prim::Item::scale_factor_nm);
 
   if (ghosting) {
     // update snap
@@ -961,8 +965,8 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
         // action based on chosen tool
         switch(tool_type){
           case gui::ToolType::SelectTool:
-            // filter out items in the lattice
-            filterSelection(true);
+            // call selected items so the updated item list is emited
+            selectedItems();
             break;
           case gui::ToolType::DBGenTool:
             // identify free lattice sites and create dangling bonds
@@ -970,11 +974,9 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             break;
           case gui::ToolType::ElectrodeTool:
             // get start and end locations, and create the electrode.
-            filterSelection(false);
             createElectrode(rb_scene_rect);
             break;
           case gui::ToolType::AFMAreaTool:
-            filterSelection(false);
             createAFMArea(rb_scene_rect);
             break;
           case gui::ToolType::AFMPathTool:
@@ -986,7 +988,6 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             break;
           case gui::ToolType::ScreenshotAreaTool:
             // take a screenshot of the rubberband area
-            filterSelection(false);
             sig_screenshot(rb_scene_rect);
             break;
           case gui::ToolType::LabelTool:
@@ -1191,6 +1192,7 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
       || (new_zoom < zoom_visibility_threshold && zoom_visibility_threshold <= old_zoom))
     updateBackground();
 
+  emit sig_zoom(new_zoom);
   //qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
 }
 
@@ -1400,48 +1402,25 @@ void gui::DesignPanel::initActions()
 }
 
 
-void gui::DesignPanel::filterSelection(bool select_flag)
-{
-  // should only be here if tool type is one of the following
-  if (tool_type != gui::ToolType::SelectTool &&
-      tool_type != gui::ToolType::DBGenTool &&
-      tool_type != gui::ToolType::ElectrodeTool &&
-      tool_type != gui::ToolType::AFMAreaTool &&
-      tool_type != gui::ToolType::ScreenshotAreaTool){
-    qCritical() << tr("Filtering selection with invalid tool type...");
-    return;
-  }
-
-  // NOTE need to make sure than only active layers are selectable
-
-  // if select_flag, deselect all items in the lattice. Otherwise, keep only items in the lattice
-  for(prim::Item *item : selectedItems()){
-    if( (item->layer_id == 0) == select_flag)
-      item->setSelected(false);
-  }
-}
-
-
 void gui::DesignPanel::rubberBandUpdate(QPoint pos){
   // stop rubber band if moving item
-  if(moving || resizing){
+  if (moving || resizing) {
     rubberBandEnd();
     return;
   }
 
   // do nothing if mouse hasn't moved much
   // TODO change snap_diameter to a separate variable
-  if((pos-rb_cache).manhattanLength()<.01*snap_diameter)
-    return;
+  //if((pos-rb_cache).manhattanLength()<.01*snap_diameter)
+    //return;
   rb_cache = pos;
 
-  if(!rb){
+  if (!rb) {
     // make rubber band
     rb = new QRubberBand(QRubberBand::Rectangle, this);
     rb->setGeometry(QRect(mapFromScene(rb_start), QSize()));
     rb->show();
-  }
-  else{
+  } else {
     // update rubberband rectangle
     rb->setGeometry(QRect(mapFromScene(rb_start), pos).normalized());
     rb_scene_rect = QRect(rb_start, mapToScene(pos).toPoint()).normalized();
@@ -1452,7 +1431,7 @@ void gui::DesignPanel::rubberBandUpdate(QPoint pos){
       selected_item->setSelected(false);
 
     // select items that are now enclosed by the rubberband
-    QList<QGraphicsItem*> rb_items = scene->items(rb_scene_rect);
+    QList<QGraphicsItem*> rb_items = scene->items(rb_scene_rect, Qt::ContainsItemShape);
     for(QGraphicsItem* rb_item : rb_items)
       rb_item->setSelected(true);
 
@@ -1490,7 +1469,6 @@ void gui::DesignPanel::createGhost(bool paste, int count)
   } else {
     QPointF scene_pos = mapToScene(mapFromGlobal(QCursor::pos()));
     //get QList of selected Item object
-    filterSelection(true);
     ghost->prepare(selectedItems(), 1, scene_pos);
   }
 }
