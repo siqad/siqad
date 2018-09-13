@@ -63,6 +63,7 @@ namespace gui{
       QLabel *disp_cursor_coords;       // Cursor physical coordinates in nm
       QLabel *disp_zoom;                // Zoom level
       QLabel *disp_sel_db_count;        // Number of selected DBs
+      QLabel *disp_sel_bounding_rect;   // Total bounding rect of selection
   };
 
 

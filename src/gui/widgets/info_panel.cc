@@ -37,11 +37,20 @@ void InfoPanel::updateZoom(float zoom)
 void InfoPanel::updateSelItemCount(QList<prim::Item*> items)
 {
   int db_count = 0;
+  QRectF bounding_rect;
   for (prim::Item *item : items) {
+    // accumulate DB count
     if (item->item_type == prim::Item::DBDot)
       db_count++;
+    // get total bounding rect
+    bounding_rect |= item->boundingRect().translated(item->pos());
   }
+
+  // update label content
   disp_sel_db_count->setText(QString::number(db_count));
+  disp_sel_bounding_rect->setText(tr("%1 nm x %2 nm")
+      .arg(bounding_rect.width() / prim::Item::scale_factor_nm,0,'f',2)
+      .arg(bounding_rect.height() / prim::Item::scale_factor_nm,0,'f',2));
 }
 
 
@@ -59,6 +68,10 @@ void InfoPanel::initInfoPanel()
   QLabel *l_sel_db_count = new QLabel(tr("Selected DBs"));
   disp_sel_db_count = new QLabel(tr("0"));
 
+  QLabel *l_sel_bounding_rect = new QLabel(tr("Selected rect"));
+  l_sel_bounding_rect->setToolTip(tr("Size of bounding rectangle containing all selected graphical items (WxH). The same selection might not result in the same dimensions at different zoom levels or viewing modes since graphical items may be at different sizes."));
+  disp_sel_bounding_rect = new QLabel(tr("0 nm x 0 nm"));
+
   QHBoxLayout *hl_cursor_coords = new QHBoxLayout;
   hl_cursor_coords->addWidget(l_cursor_coords);
   hl_cursor_coords->addWidget(disp_cursor_coords);
@@ -71,10 +84,15 @@ void InfoPanel::initInfoPanel()
   hl_sel_db_count->addWidget(l_sel_db_count);
   hl_sel_db_count->addWidget(disp_sel_db_count);
 
+  QHBoxLayout *hl_sel_bounding_rect = new QHBoxLayout;
+  hl_sel_bounding_rect->addWidget(l_sel_bounding_rect);
+  hl_sel_bounding_rect->addWidget(disp_sel_bounding_rect);
+
   QVBoxLayout *vl_infos = new QVBoxLayout;
   vl_infos->addLayout(hl_cursor_coords);
   vl_infos->addLayout(hl_zoom);
   vl_infos->addLayout(hl_sel_db_count);
+  vl_infos->addLayout(hl_sel_bounding_rect);
   vl_infos->addStretch();
 
   setLayout(vl_infos);

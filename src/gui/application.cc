@@ -445,7 +445,10 @@ void gui::ApplicationGUI::initSimVisualizeDock()
 
   connect(sim_visualize_dock, &QDockWidget::visibilityChanged, design_pan, &gui::DesignPanel::simVisualizeDockVisibilityChanged);
 
-  sim_visualize_dock->setWidget(sim_visualize);
+  QScrollArea *sa_sim_vis = new QScrollArea;
+  sa_sim_vis->setWidget(sim_visualize);
+
+  sim_visualize_dock->setWidget(sa_sim_vis);
   sim_visualize_dock->hide();
   addDockWidget(area, sim_visualize_dock);
 
