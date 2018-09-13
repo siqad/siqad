@@ -22,4 +22,10 @@
       <clocked>Clocked</clocked>
     </value_selection>
   </type>
+  <net>
+    <T>int</T>
+    <val>0</val>
+    <label>Net ID</label>
+    <tip>Net identifer. Used to calculate capacitances for entire nets instead of single conductors.</tip>
+  </net>
 </properties>
