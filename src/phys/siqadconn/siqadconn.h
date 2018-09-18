@@ -1,7 +1,7 @@
 // @file:     siqadconn.h
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2018.08.23 - Nathan
+// @editted:  2018.09.18 - Nathan
 // @license:  Apache License 2.0
 //
 // @desc:     Convenient functions for interacting with SiQAD including
@@ -226,12 +226,13 @@ namespace phys{
     double potential;
     double phase;
     int electrode_type;
+    int net;
     double pixel_per_angstrom;
     ElectrodePoly(int in_layer_id, std::vector<std::pair<double, double>> in_vertices, \
-              double in_potential, double in_phase, int in_electrode_type, double in_pixel_per_angstrom)
+              double in_potential, double in_phase, int in_electrode_type, double in_pixel_per_angstrom, int in_net)
       : layer_id(in_layer_id), vertices(in_vertices), \
         potential(in_potential), phase(in_phase), electrode_type(in_electrode_type), \
-        pixel_per_angstrom(in_pixel_per_angstrom) {};
+        pixel_per_angstrom(in_pixel_per_angstrom), net(in_net) {};
   };
 
   class ElecPolyIterator
@@ -272,12 +273,13 @@ namespace phys{
     double potential;  // voltage that the electrode is set to
     double phase;
     int electrode_type;
+    int net;
     double pixel_per_angstrom;
     Electrode(int in_layer_id, double in_x1, double in_x2, double in_y1, double in_y2, \
-              double in_potential, double in_phase, int in_electrode_type, double in_pixel_per_angstrom)
+              double in_potential, double in_phase, int in_electrode_type, double in_pixel_per_angstrom, int in_net)
       : layer_id(in_layer_id), x1(in_x1), x2(in_x2), y1(in_y1), y2(in_y2), \
         potential(in_potential), phase(in_phase), electrode_type(in_electrode_type), \
-        pixel_per_angstrom(in_pixel_per_angstrom) {};
+        pixel_per_angstrom(in_pixel_per_angstrom), net(in_net) {};
   };
 
   class ElecIterator

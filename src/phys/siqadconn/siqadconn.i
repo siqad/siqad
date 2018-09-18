@@ -1,7 +1,7 @@
 // @file:     siqadconn.i
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2018.08.23 - Nathan
+// @editted:  2018.09.18 - Nathan
 // @license:  Apache License 2.0
 //
 // @desc:     Convenient functions for interacting with SiQAD
