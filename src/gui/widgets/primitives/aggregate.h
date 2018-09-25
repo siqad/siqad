@@ -34,6 +34,9 @@ namespace prim{
     //! get all items of the aggregate
     QStack<prim::Item*> &getChildren() {return items;}
 
+    //! Get the number of DBs in this aggregate.
+    int dbCount() {return db_count;}
+
     // necessary derived class member functions
     virtual QRectF boundingRect() const override;
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
@@ -53,6 +56,8 @@ namespace prim{
     QPointF p0; // center position
 
     QStack<prim::Item*> items;
+
+    int db_count=0;   // number of DBs in the aggregate
 
     // initialise the static class variables
     void prepareStatics();

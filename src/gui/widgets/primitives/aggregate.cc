@@ -106,6 +106,12 @@ void prim::Aggregate::addChildren(QStack<Item*> &items)
   for(prim::Item *item : items){
     item->setParentItem(this);
     item->setFlag(QGraphicsItem::ItemIsSelectable, false);
+
+    // count DBs
+    if (item->item_type == prim::Item::DBDot)
+      db_count++;
+    else if (item->item_type == prim::Item::Aggregate)
+      db_count += static_cast<prim::Aggregate*>(item)->dbCount();
   }
 }
 

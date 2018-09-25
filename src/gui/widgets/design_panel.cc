@@ -535,6 +535,7 @@ void gui::DesignPanel::loadGUIFlags(QXmlStreamReader *rs)
   setTransform(QTransform(zoom,0,0,zoom,0,0));
   verticalScrollBar()->setValue(scroll_v);
   horizontalScrollBar()->setValue(scroll_h);
+  updateBackground();
   qDebug() << tr("Zoom set to %1, scroll v=%2, h=%3").arg(zoom).arg(scroll_v).arg(scroll_h);
 }
 

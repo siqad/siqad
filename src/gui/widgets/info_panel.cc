@@ -42,6 +42,9 @@ void InfoPanel::updateSelItemCount(QList<prim::Item*> items)
     // accumulate DB count
     if (item->item_type == prim::Item::DBDot)
       db_count++;
+    else if (item->item_type == prim::Item::Aggregate)
+      db_count += static_cast<prim::Aggregate*>(item)->dbCount();
+
     // get total bounding rect
     bounding_rect |= item->boundingRect().translated(item->pos());
   }
