@@ -5,7 +5,7 @@ SiQAD (Silicon Quantum Atomic Designer) is a next-generation CAD tool that enabl
 
 ## Binary releases
 
-Binary builds for Windows are available [here !TODO](todo). Note that one of the first-party simulators, PoisSolver, is not available on Windows builds due to the lack Windows support of a dependent module, FEniCS. Future support for the Docker or Windows Subsystem for Linux (WSL) versions of FEniCS [has been planned](https://github.com/retallickj/siqad/issues/33).
+Binary builds for Windows are available [here](https://github.com/retallickj/siqad/releases). Note that one of the first-party simulators, PoisSolver, is not available on Windows builds due to the lack Windows support of a dependent module, FEniCS. Future support for the Docker or Windows Subsystem for Linux (WSL) versions of FEniCS [has been planned](https://github.com/retallickj/siqad/issues/33).
 
 For now, Linux and macOS binaries are not distributed and requires the user to build from source.
 
