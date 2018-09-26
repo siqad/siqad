@@ -38,7 +38,7 @@ namespace gui{
   //! specified then it's a line edit by default.
   struct ValueSelection {
     ValueSelection(const ValueSelectionType type,
-      QList<ComboOption> combo_options=QList<ComboOption>())
+                   QList<ComboOption> combo_options=QList<ComboOption>())
       : type(type), combo_options(combo_options) {};
     ValueSelection() : type(LineEdit) {};
 
@@ -48,22 +48,30 @@ namespace gui{
 
   //! A struct that stores all information relevant to a property
   struct Property {
+    //! Property constructor with all content.
     Property(int index, const QVariant &val, const QString &f_label,
-      const QString &f_tip, const ValueSelection &v_sel)
+             const QString &f_tip, const ValueSelection &v_sel)
       : index(index), value(val), form_label(f_label), form_tip(f_tip),
         value_selection(v_sel) {};
+
+    //! Property constructor with unique value and the rest of the values filled
+    //! using the provided property map.
     Property(const QVariant &val, const Property &p)
       : index(p.index), value(val), form_label(p.form_label), form_tip(p.form_tip),
         value_selection(p.value_selection) {};
+
+    //! Property constructor with only a value.
     Property(const QVariant &val)
       : value(val) {};
+
+    //! Construct an empty peroperty.
     Property() {};
 
-    int index;          // original index when read from file
-    QVariant value;     // the value stored in this property
-    QString form_label; // descriptive label when showing this in a form
-    QString form_tip;   // tooltip when showing this in a form
-    ValueSelection value_selection; // value selection method and options
+    int index;          //! Original index when read from file.
+    QVariant value;     //! The value stored in this property.
+    QString form_label; //! Descriptive label when showing this in a form.
+    QString form_tip;   //! Tooltip when showing this in a form.
+    ValueSelection value_selection; // Value selection method and options.
   };
 
 

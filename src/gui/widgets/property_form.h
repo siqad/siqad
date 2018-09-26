@@ -26,20 +26,23 @@ namespace gui{
   public:
 
     //! Constructor
-    PropertyForm(PropertyMap map, QWidget *parent);
+    PropertyForm(PropertyMap pmap, QWidget *parent);
     //PropertyForm(prim::Item *target_item, QWidget *parent);
 
     //! Destructor
     ~PropertyForm() {}
 
-    //! Return a map of properties containing everything, changed or not.
+    //! Return a property map containing all properties in the form, changed or not.
     PropertyMap finalProperties();
+
+    //! Return a property map containing only the changed properties.
+    PropertyMap changedProperties();
 
   private:
     //! Initialize the form
     void initForm();
 
-    PropertyMap map;  //! the map where changes will be written to
+    PropertyMap pmap;  //! the map where changes will be written to
   };
 
 } // end of gui namespace

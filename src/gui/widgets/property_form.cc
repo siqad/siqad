@@ -12,43 +12,65 @@
 namespace gui{
 
 // Constructor
-PropertyForm::PropertyForm(PropertyMap map, QWidget *parent)
-  : QWidget(parent), map(map)
+PropertyForm::PropertyForm(PropertyMap pmap, QWidget *parent)
+  : QWidget(parent), pmap(pmap)
 {
   initForm();
 }
 
 
-// Return a map of properties containing everything, changed or not
 PropertyMap PropertyForm::finalProperties()
 {
-  for (const QString &key : map.keys()) {
+  for (const QString &key : pmap.keys()) {
     // save the property with the correct type
-    if (map[key].value_selection.type == Combo) {
+    if (pmap[key].value_selection.type == Combo) {
       QComboBox *prop_combo = QObject::findChild<QComboBox*>(key);
-      map[key].value = prop_combo->currentData();
-    } else {
+      pmap[key].value = prop_combo->currentData();
+    } else if (pmap[key].value_selection.type == LineEdit) {
       // the field is a line edit if no value selection has been set
       QLineEdit *prop_field = QObject::findChild<QLineEdit*>(key);
-      map[key].value = PropertyMap::string2Type2QVariant(prop_field->text(), map[key].value.type());
+      pmap[key].value = PropertyMap::string2Type2QVariant(prop_field->text(), 
+                                                          pmap[key].value.type());
     }
   }
-  return map;
+  return pmap;
 }
 
 
-// Initialize the form
+PropertyMap PropertyForm::changedProperties()
+{
+  PropertyMap props_changed;
+  for (const QString &key : pmap.keys()) {
+    // save updated property to props_changed if user has changed the value
+    if (pmap[key].value_selection.type == Combo) {
+      QVariant new_val = QObject::findChild<QComboBox*>(key)->currentData();
+
+      if (pmap[key].value != new_val)
+        props_changed.insert(key, Property(new_val, pmap[key]));
+    } else if (pmap[key].value_selection.type == LineEdit) {
+      // the field is a line edit if no value selection has been set
+      QLineEdit *prop_field = QObject::findChild<QLineEdit*>(key);
+      QVariant new_val = PropertyMap::string2Type2QVariant(prop_field->text(), 
+                                                           pmap[key].value.type());
+      if (pmap[key].value != new_val)
+        props_changed.insert(key, Property(new_val, pmap[key]));
+    }
+  }
+  return props_changed;
+}
+
+
 void PropertyForm::initForm()
 {
   setWindowTitle("Property Editor");
 
   // populate a form with the desired number of null widgets first
   QFormLayout *prop_fl = new QFormLayout;
-  for (int i=0; i<map.size(); i++)
+  for (int i=0; i<pmap.size(); i++)
     prop_fl->addRow(new QWidget, new QWidget);
 
   // generate form from map
-  for (PropertyMap::const_iterator it = map.cbegin(), end = map.cend(); it != end; ++it) {
+  for (PropertyMap::const_iterator it = pmap.cbegin(), end = pmap.cend(); it != end; ++it) {
     Property prop = it.value();
 
     QLabel *label_prop = new QLabel(prop.form_label);
