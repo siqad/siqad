@@ -23,7 +23,7 @@
 
 namespace gui{
 
-  enum ValueSelectionType{LineEdit, Combo};
+  enum ValueSelectionType{LineEdit, Combo, CheckBox};
 
   //! A struct that stores a ComboOption
   struct ComboOption {
@@ -71,7 +71,8 @@ namespace gui{
     QVariant value;     //! The value stored in this property.
     QString form_label; //! Descriptive label when showing this in a form.
     QString form_tip;   //! Tooltip when showing this in a form.
-    ValueSelection value_selection; // Value selection method and options.
+    ValueSelection value_selection; //! Value selection method and options.
+    QMap<QString,QString> meta;     //! Meta information of this property for programming use.
   };
 
 
@@ -103,8 +104,11 @@ namespace gui{
     //! Read one property node from XML file.
     void readProperty(const QString &node_name, QXmlStreamReader *rs);
 
-    //! Read combo_options for a combo box
+    //! Read combo_options for a combo box.
     void readComboOptions(Property *prop, int type_id, QXmlStreamReader *rs);
+
+    //! Read meta data.
+    void readMeta(Property *prop, QXmlStreamReader *rs);
 
     //! Update property values from provided XML file path. Keys that don't exist
     //! in this map are ignored.

@@ -13,6 +13,7 @@ namespace gui{
 
 // initialize static variables
 QMap<QString, int> PropertyMap::string2type(std::map<QString, int> {
+  {"bool", QMetaType::Bool},
   {"int", QMetaType::Int},
   {"float", QMetaType::Float},
   {"double", QMetaType::Double},
@@ -120,9 +121,14 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
       prop.form_tip = rs->readElementText();
       //qDebug() << QObject::tr("%1 tip=%2").arg(node_name).arg(prop.form_tip);
     } else if (rs->name() == "value_selection") {
-      if (rs->attributes().value("type") == "ComboBox") {
+      QStringRef sel_type = rs->attributes().value("type");
+      if (sel_type == "ComboBox") {
         readComboOptions(&prop, p_type_id, rs);
+      } else if (sel_type == "CheckBox") {
+        prop.value_selection.type = CheckBox;
       }
+    } else if (rs->name() == "meta") {
+      readMeta(&prop, rs);
     } else {
       // TODO error message
       rs->skipCurrentElement();
@@ -145,12 +151,19 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
 // read combo options
 void PropertyMap::readComboOptions(Property *prop, int type_id, QXmlStreamReader *rs)
 {
-  prop->value_selection = Combo;
+  prop->value_selection.type = Combo;
   while (rs->readNextStartElement()) {
     prop->value_selection.combo_options.append(
         ComboOption(string2Type2QVariant(rs->name().toString(), type_id),
                     rs->readElementText()));
   }
+}
+
+// read meta data
+void PropertyMap::readMeta(Property *prop, QXmlStreamReader *rs)
+{
+  while (rs->readNextStartElement())
+    prop->meta.insert(rs->name().toString(), rs->readElementText());
 }
 
 // read property values and update the current map

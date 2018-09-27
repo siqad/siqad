@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings label="General Settings">
+    <hidpi_mode>
+        <T>bool</T>
+        <val></val>
+        <label>Automatic HiDPI mode</label>
+        <tip>Allow Qt to automatically enable HiDPI mode when using a HiDPI monitor.</tip>
+        <value_selection type="CheckBox" />
+        <meta>
+            <category>app</category>
+            <key>view/hidpi_support</key>
+        </meta>
+    </hidpi_mode>
+    <debug_msg>
+        <T>bool</T>
+        <val></val>
+        <label>Show debug messages</label>
+        <tip>Show debug messages in the SiQAD terminal.</tip>
+        <value_selection type="CheckBox" />
+        <meta>
+            <category>app</category>
+            <key>log/override</key>
+        </meta>
+    </debug_msg>
+    <python_path>
+        <T>string</T>
+        <val></val>
+        <label>Python path</label>
+        <tip>Arguments are comma-separated. e.g. C:\Windows\py.exe,-3</tip>
+        <meta>
+            <category>app</category>
+            <key>python_path</key>
+        </meta>
+    </python_path>
+</settings>

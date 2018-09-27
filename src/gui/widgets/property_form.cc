@@ -21,18 +21,10 @@ PropertyForm::PropertyForm(PropertyMap pmap, QWidget *parent)
 
 PropertyMap PropertyForm::finalProperties()
 {
-  for (const QString &key : pmap.keys()) {
-    // save the property with the correct type
-    if (pmap[key].value_selection.type == Combo) {
-      QComboBox *prop_combo = QObject::findChild<QComboBox*>(key);
-      pmap[key].value = prop_combo->currentData();
-    } else if (pmap[key].value_selection.type == LineEdit) {
-      // the field is a line edit if no value selection has been set
-      QLineEdit *prop_field = QObject::findChild<QLineEdit*>(key);
-      pmap[key].value = PropertyMap::string2Type2QVariant(prop_field->text(), 
-                                                          pmap[key].value.type());
-    }
-  }
+  // save the newest values from the form to the property map
+  for (const QString &key : pmap.keys())
+    pmap[key].value = formContent(key);
+
   return pmap;
 }
 
@@ -41,22 +33,36 @@ PropertyMap PropertyForm::changedProperties()
 {
   PropertyMap props_changed;
   for (const QString &key : pmap.keys()) {
-    // save updated property to props_changed if user has changed the value
-    if (pmap[key].value_selection.type == Combo) {
-      QVariant new_val = QObject::findChild<QComboBox*>(key)->currentData();
-
-      if (pmap[key].value != new_val)
-        props_changed.insert(key, Property(new_val, pmap[key]));
-    } else if (pmap[key].value_selection.type == LineEdit) {
-      // the field is a line edit if no value selection has been set
-      QLineEdit *prop_field = QObject::findChild<QLineEdit*>(key);
-      QVariant new_val = PropertyMap::string2Type2QVariant(prop_field->text(), 
-                                                           pmap[key].value.type());
-      if (pmap[key].value != new_val)
-        props_changed.insert(key, Property(new_val, pmap[key]));
-    }
+    // save changed properties to props_changed
+    QVariant new_val = formContent(key);
+    if (pmap[key].value != new_val)
+      props_changed.insert(key, Property(new_val, pmap[key]));
   }
   return props_changed;
+}
+
+
+QVariant PropertyForm::formContent(const QString &key)
+{
+  QVariant new_val;
+  switch (pmap[key].value_selection.type) {
+    case CheckBox:
+      new_val = QObject::findChild<QCheckBox*>(key)->isChecked();
+      break;
+    case Combo:
+      new_val = QObject::findChild<QComboBox*>(key)->currentData();
+      break;
+    case LineEdit:
+    {
+      QLineEdit *prop_field = QObject::findChild<QLineEdit*>(key);
+      new_val = PropertyMap::string2Type2QVariant(prop_field->text(),
+                                                  pmap[key].value.type());
+      break;
+    }
+    default:
+      break;
+  }
+  return new_val;
 }
 
 

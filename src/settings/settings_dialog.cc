@@ -174,8 +174,17 @@ void SettingsDialog::initSettingsDialog()
 
 QWidget *SettingsDialog::appSettingsPane()
 {
+  // return the existing settings pane if available
   if (app_settings_pane)
     return app_settings_pane;
+
+  // initilize the settings pane
+  // TODO
+
+
+
+
+  // old form, TODO delete after implementing property map version
 
   QLabel *label_hidpi = new QLabel(QObject::tr("HiDPI Mode*"));
   QLabel *label_show_debug_output = new QLabel(QObject::tr("Show debug messages*"));
@@ -219,6 +228,7 @@ QWidget *SettingsDialog::appSettingsPane()
 
   app_settings_pane = new QWidget(this);
   app_settings_pane->setLayout(app_settings_pane_vl);
+
   return app_settings_pane;
 }
 

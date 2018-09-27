@@ -39,6 +39,10 @@ namespace gui{
     PropertyMap changedProperties();
 
   private:
+
+    //! Return the form field content for the specified key value.
+    QVariant formContent(const QString &key);
+
     //! Initialize the form
     void initForm();
 
