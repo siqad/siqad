@@ -6,10 +6,10 @@
 //
 // @desc:     Settings dialog for users to alter settings
 
+#include <algorithm>
+
 #include "settings_dialog.h"
 #include "../global.h"
-#include "../gui/property_map.h"
-#include "../gui/widgets/property_form.h"
 
 extern QString gui::python_path;
 
@@ -173,19 +173,31 @@ void SettingsDialog::initSettingsDialog()
   setLayout(main_layout);
 }
 
+void SettingsDialog::writeUserSettingToProperty(gui::Property &t_prop) {
+  if (!t_prop.meta.contains("category") || !t_prop.meta.contains("key"))
+    qFatal("'key' or 'category' not found in the meta member of the given property.");
+
+  SettingsCategory s_cat = static_cast<SettingsCategory>(
+      QMetaEnum::fromType<SettingsCategory>().keyToValue(t_prop
+      .meta["category"].toLatin1().data()));
+  QVariant s_val = settingsCategoryPointer(s_cat)->get(t_prop.meta["key"]);
+  int s_type = t_prop.value.type();
+  s_val.convert(s_type);
+  t_prop.value.setValue(s_val);
+}
+
 QWidget *SettingsDialog::appSettingsPane()
 {
   // return the existing settings pane if available
   if (app_settings_pane != nullptr)
     return app_settings_pane;
 
-  // initilize the settings pane
-  // TODO
-  qDebug() << "Creating appSettingsPane from property map";
+  // initilize the settings pane from property map
   gui::PropertyMap app_settings_map(":/settings/general.xml");
-  gui::PropertyForm *app_settings_form = new gui::PropertyForm(app_settings_map);
-  app_settings_form->show();
-  app_settings_pane = app_settings_form;
+  for (gui::Property &prop : app_settings_map)
+    writeUserSettingToProperty(prop);
+
+  app_settings_pane = new gui::PropertyForm(app_settings_map);
   return app_settings_pane;
 
 /*

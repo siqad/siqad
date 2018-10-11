@@ -101,6 +101,7 @@ void PropertyForm::initForm()
         break;
       case CheckBox:
         prop_val_widget = new QCheckBox();
+        static_cast<QCheckBox*>(prop_val_widget)->setChecked(prop.value.toBool());
         break;
       default:
         qFatal("Unrecognized property option.");

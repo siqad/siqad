@@ -8,7 +8,7 @@
         <tip>Allow Qt to automatically enable HiDPI mode when using a HiDPI monitor.</tip>
         <value_selection type="CheckBox"></value_selection>
         <meta>
-            <category>app</category>
+            <category>App</category>
             <key>view/hidpi_support</key>
         </meta>
     </hidpi_mode>
@@ -19,7 +19,7 @@
         <tip>Show debug messages in the SiQAD terminal.</tip>
         <value_selection type="CheckBox"></value_selection>
         <meta>
-            <category>app</category>
+            <category>App</category>
             <key>log/override</key>
         </meta>
     </debug_msg>
@@ -29,7 +29,7 @@
         <label>Python path</label>
         <tip>Arguments are comma-separated. e.g. C:\Windows\py.exe,-3</tip>
         <meta>
-            <category>app</category>
+            <category>App</category>
             <key>python_path</key>
         </meta>
     </python_path>

@@ -98,7 +98,7 @@ QSettings *settings::AppSettings::m_defs()
   );
 
   // overwrites existing default values with same keys... no check
-  S->setValue("view/hidpi_support", false);
+  S->setValue("view/hidpi_support", true);
 
   S->setValue("log/override", false);
   S->setValue("log/tofile", false);

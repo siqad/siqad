@@ -13,6 +13,8 @@
 #include <QtWidgets>
 
 #include "settings.h"
+#include "../gui/property_map.h"
+#include "../gui/widgets/property_form.h"
 
 namespace settings{
 
@@ -23,6 +25,7 @@ namespace settings{
   public:
 
     enum SettingsCategory{App, GUI, Lattice};
+    Q_ENUM(SettingsCategory)
 
     SettingsDialog(QWidget *parent=0);
     ~SettingsDialog() {};
@@ -47,13 +50,24 @@ namespace settings{
     void discardAndClose();
 
   private:
-    // initialise the dialog and panes
+    //! Initialise the settings dialog and panes of contained categories.
     void initSettingsDialog();
+
+    //! Write user setting to the provided property, with the setting entry
+    //! specified by the "category" and "key" entries in the property's "meta"
+    //! member.
+    void writeUserSettingToProperty(gui::Property &prop);
+
+    //! Return the application settings pane. Initilize the pane if first called.
     QWidget *appSettingsPane();
+
+    //! Return the application settings pane. Initilize the pane if first called.
     QWidget *guiSettingsPane();
+
+    //! Return the application settings pane. Initilize the pane if first called.
     QWidget *latticeSettingsPane();
 
-    // Return the Settings class pointer to the specified category
+    //! Return the Settings class pointer to the specified category
     settings::Settings *settingsCategoryPointer(SettingsCategory);
 
     // VARS

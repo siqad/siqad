@@ -44,8 +44,14 @@ public:
   template<typename T>
   T get(const QString &key)
   {
+    return get(key).value<T>();
+  }
+
+  //! Return the value of the specified key in QVariant type.
+  QVariant get(const QString &key)
+  {
     QVariant var = DEFAULT_OVERRIDE ? defaults->value(key) : this->value(key);
-    T val;
+
     // if key not found, get value from defaults
     if (!var.isValid() && defaults != 0) {
       var = defaults->value(key);
@@ -55,7 +61,7 @@ public:
         qDebug() << tr("Searching for key: %1").arg(key);
         qFatal(tr("Requested key missing in defaults... terminating").toLatin1().constData(),0);
       } else {
-        val = var.value<T>();
+        return var;
       }
 
       // save default value to current local settings
@@ -63,12 +69,12 @@ public:
     } else if (defaults==0) {   // terminate if no defaults
       qFatal(tr("No default settings available... terminating").toLatin1().constData(),0);
     } else if (var.isValid()) {
-      val = var.value<T>();
+      return var;
     } else {
       qFatal(tr("Unexpected key in Settings::get").toLatin1().constData(),0);
     }
 
-    return val;
+    return var;
   }
 
   // returns a QString with each of the included replaceable paths replaced by
