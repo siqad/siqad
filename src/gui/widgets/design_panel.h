@@ -391,11 +391,14 @@ namespace gui{
     QRect rb_scene_rect;  // rubberband selection area in scene coordinates
     QList<QGraphicsItem*> rb_shift_selected; // list of previously selected items, for shift select
 
-    // update rubberband during mouse movement
+    //! Update rubberband during mouse movement
     void rubberBandUpdate(QPoint);
 
-    // hide rubberband and reset flags
-    void rubberBandEnd();
+    //! Select objects contained in the rubberband.
+    void rubberBandSelect();
+
+    //! Clear rubberband content and reset flags.
+    void rubberBandClear();
 
     // SCREENSHOT
 

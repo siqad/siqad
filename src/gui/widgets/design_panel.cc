@@ -810,7 +810,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 
   // if other buttons are clicked during rubber band selection, end selection
   if(rb)
-    rubberBandEnd();
+    rubberBandClear();
 
   switch(e->button()){
     case Qt::LeftButton:
@@ -951,6 +951,9 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
   // QPointF scene_pos = mapToScene(e->pos());
   QTransform trans = transform();
 
+  if (rb)
+    rubberBandSelect();
+
   // case specific behaviour
   if (ghosting) {
     // plant ghost and end ghosting
@@ -1017,7 +1020,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
 
   // end rubber band if active
   if (rb)
-    rubberBandEnd();
+    rubberBandClear();
 
   clicked=false;
 }
@@ -1406,17 +1409,13 @@ void gui::DesignPanel::initActions()
 void gui::DesignPanel::rubberBandUpdate(QPoint pos){
   // stop rubber band if moving item
   if (moving || resizing) {
-    rubberBandEnd();
+    rubberBandClear();
     return;
   }
 
-  // do nothing if mouse hasn't moved much
-  // TODO change snap_diameter to a separate variable
-  //if((pos-rb_cache).manhattanLength()<.01*snap_diameter)
-    //return;
   rb_cache = pos;
 
-  if (!rb) {
+  if (rb == nullptr) {
     // make rubber band
     rb = new QRubberBand(QRubberBand::Rectangle, this);
     rb->setGeometry(QRect(mapFromScene(rb_start), QSize()));
@@ -1425,28 +1424,29 @@ void gui::DesignPanel::rubberBandUpdate(QPoint pos){
     // update rubberband rectangle
     rb->setGeometry(QRect(mapFromScene(rb_start), pos).normalized());
     rb_scene_rect = QRect(rb_start, mapToScene(pos).toPoint()).normalized();
-
-    // deselect all items
-    QList<QGraphicsItem*> selected_items = scene->selectedItems();
-    for(QGraphicsItem* selected_item : selected_items)
-      selected_item->setSelected(false);
-
-    // select items that are now enclosed by the rubberband
-    QList<QGraphicsItem*> rb_items = scene->items(rb_scene_rect, Qt::ContainsItemShape);
-    for(QGraphicsItem* rb_item : rb_items)
-      rb_item->setSelected(true);
-
-    // append shift-selected items
-    for(QGraphicsItem* shift_selected_item : rb_shift_selected)
-      shift_selected_item->setSelected(true);
   }
 }
 
 
-void gui::DesignPanel::rubberBandEnd(){
-  if(rb){
+void gui::DesignPanel::rubberBandSelect(){
+  if (rb == nullptr)
+    return;
+
+  // select items that are enclosed by the rubberband
+  QPainterPath painter_path;
+  painter_path.addRect(rb_scene_rect);
+  scene->setSelectionArea(painter_path, Qt::ContainsItemShape);
+
+  // append shift-selected items
+  for(QGraphicsItem* shift_selected_item : rb_shift_selected)
+    shift_selected_item->setSelected(true);
+}
+
+
+void gui::DesignPanel::rubberBandClear() {
+  if (rb != nullptr) {
     rb->hide();
-    rb = 0;
+    rb = nullptr;
     rb_shift_selected.clear();
   }
 }
