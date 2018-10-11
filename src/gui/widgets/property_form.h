@@ -26,7 +26,7 @@ namespace gui{
   public:
 
     //! Constructor
-    PropertyForm(PropertyMap pmap, QWidget *parent);
+    PropertyForm(PropertyMap pmap, QWidget *parent=nullptr);
     //PropertyForm(prim::Item *target_item, QWidget *parent);
 
     //! Destructor

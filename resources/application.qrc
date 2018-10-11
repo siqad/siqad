@@ -21,6 +21,7 @@
   <file>ico/lattice.svg</file>
   <file>ico/unknown.svg</file>
   <file>ico/screenshotarea.svg</file>
+    <file>settings/general.xml</file>
 	<file>help_text.xml</file>
     <file>python_paths.xml</file>
 </qresource>

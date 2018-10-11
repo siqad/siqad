@@ -82,18 +82,31 @@ void PropertyForm::initForm()
     QLabel *label_prop = new QLabel(prop.form_label);
 
     QWidget *prop_val_widget;
-    if (prop.value_selection.type == Combo) {
-      // if there are combo options, treat this as a combo box
-      prop_val_widget = new QComboBox;
-      for (ComboOption combo_option : prop.value_selection.combo_options) {
-        static_cast<QComboBox*>(prop_val_widget)->addItem(combo_option.label, combo_option.val);
+    switch (prop.value_selection.type) {
+      case Combo:
+      {
+        prop_val_widget = new QComboBox;
+        for (ComboOption combo_option : prop.value_selection.combo_options) {
+          static_cast<QComboBox*>(prop_val_widget)->addItem(combo_option.label, 
+                                                            combo_option.val);
+        }
+        int select_ind = static_cast<QComboBox*>(prop_val_widget)->findData(prop.value);
+        if (select_ind != -1) {
+          static_cast<QComboBox*>(prop_val_widget)->setCurrentIndex(select_ind);
+        }
+        break;
       }
-      int select_ind = static_cast<QComboBox*>(prop_val_widget)->findData(prop.value);
-      if (select_ind != -1)
-        static_cast<QComboBox*>(prop_val_widget)->setCurrentIndex(select_ind);
-    } else {
-      prop_val_widget = new QLineEdit(prop.value.value<QString>());
+      case LineEdit:
+        prop_val_widget = new QLineEdit(prop.value.value<QString>());
+        break;
+      case CheckBox:
+        prop_val_widget = new QCheckBox();
+        break;
+      default:
+        qFatal("Unrecognized property option.");
+        break;
     }
+
     prop_val_widget->setObjectName(it.key());
     prop_val_widget->setToolTip(prop.form_tip);
 

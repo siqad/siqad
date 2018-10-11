@@ -31,3 +31,4 @@ doxygen
 .qmake.stash
 tempfig.pdf
 .temp/
+.vscode/

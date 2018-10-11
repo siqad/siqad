@@ -8,6 +8,8 @@
 
 #include "settings_dialog.h"
 #include "../global.h"
+#include "../gui/property_map.h"
+#include "../gui/widgets/property_form.h"
 
 extern QString gui::python_path;
 
@@ -78,9 +80,7 @@ void SettingsDialog::addPendingStringUpdate(QString new_text)
 
   name = splitted_name.at(1);
 
-  pending_changes.append(
-    PendingChange(category, name, QVariant(new_text))
-  );
+  pending_changes.append(PendingChange(category, name, QVariant(new_text)));
 
   /*pending_changes.append(
     PendingChange(SettingsCategory::App, sender->objectName(),
@@ -121,15 +121,16 @@ void SettingsDialog::discardAndClose()
 // private
 void SettingsDialog::initSettingsDialog()
 {
-  // all settings panes in a stacked widget, only one is shown at a time
+  // all settings panes reside in a stacked widget, only one is shown at a time.
   QStackedWidget *stacked_settings_panes = new QStackedWidget(this);
-  if (appSettingsPane())
+
+  if (appSettingsPane() != nullptr)
     stacked_settings_panes->addWidget(appSettingsPane());
 
-  if (guiSettingsPane())
+  if (guiSettingsPane() != nullptr)
     stacked_settings_panes->addWidget(guiSettingsPane());
 
-  if (latticeSettingsPane())
+  if (latticeSettingsPane() != nullptr)
     stacked_settings_panes->addWidget(latticeSettingsPane());
 
   // list of all categories
@@ -175,15 +176,19 @@ void SettingsDialog::initSettingsDialog()
 QWidget *SettingsDialog::appSettingsPane()
 {
   // return the existing settings pane if available
-  if (app_settings_pane)
+  if (app_settings_pane != nullptr)
     return app_settings_pane;
 
   // initilize the settings pane
   // TODO
+  qDebug() << "Creating appSettingsPane from property map";
+  gui::PropertyMap app_settings_map(":/settings/general.xml");
+  gui::PropertyForm *app_settings_form = new gui::PropertyForm(app_settings_map);
+  app_settings_form->show();
+  app_settings_pane = app_settings_form;
+  return app_settings_pane;
 
-
-
-
+/*
   // old form, TODO delete after implementing property map version
 
   QLabel *label_hidpi = new QLabel(QObject::tr("HiDPI Mode*"));
@@ -230,24 +235,25 @@ QWidget *SettingsDialog::appSettingsPane()
   app_settings_pane->setLayout(app_settings_pane_vl);
 
   return app_settings_pane;
+  */
 }
 
 QWidget *SettingsDialog::guiSettingsPane()
 {
-  if (gui_settings_pane)
+  if (gui_settings_pane != nullptr)
     return gui_settings_pane;
 
   // TODO implement
-  return 0;
+  return nullptr;
 }
 
 QWidget *SettingsDialog::latticeSettingsPane()
 {
-  if (lattice_settings_pane)
+  if (lattice_settings_pane != nullptr)
     return lattice_settings_pane;
 
   // TODO implement
-  return 0;
+  return nullptr;
 }
 
 

@@ -57,13 +57,13 @@ namespace settings{
     settings::Settings *settingsCategoryPointer(SettingsCategory);
 
     // VARS
-    AppSettings *app_settings=0;
-    GUISettings *gui_settings=0;
-    LatticeSettings *lattice_settings=0;
+    AppSettings *app_settings=nullptr;
+    GUISettings *gui_settings=nullptr;
+    LatticeSettings *lattice_settings=nullptr;
 
-    QWidget *app_settings_pane=0;
-    QWidget *gui_settings_pane=0;
-    QWidget *lattice_settings_pane=0;
+    QWidget *app_settings_pane=nullptr;
+    QWidget *gui_settings_pane=nullptr;
+    QWidget *lattice_settings_pane=nullptr;
 
     QList<PendingChange> pending_changes;
   };

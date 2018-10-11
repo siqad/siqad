@@ -126,17 +126,18 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
         readComboOptions(&prop, p_type_id, rs);
       } else if (sel_type == "CheckBox") {
         prop.value_selection.type = CheckBox;
+        rs->skipCurrentElement();
       }
     } else if (rs->name() == "meta") {
       readMeta(&prop, rs);
     } else {
-      // TODO error message
+      qDebug() << QObject::tr("Unknown element '%1' when reading property map from XML").arg(rs->name());
       rs->skipCurrentElement();
     }
   }
 
   // convert the value to the intended type
-  if (p_type_id == -1)
+  if (p_type_id < 0)
     qFatal("Unable to read type id of a property");
 
   prop.value = string2Type2QVariant(p_val, p_type_id);
@@ -162,8 +163,10 @@ void PropertyMap::readComboOptions(Property *prop, int type_id, QXmlStreamReader
 // read meta data
 void PropertyMap::readMeta(Property *prop, QXmlStreamReader *rs)
 {
-  while (rs->readNextStartElement())
+  while (rs->readNextStartElement()) {
     prop->meta.insert(rs->name().toString(), rs->readElementText());
+    //qDebug() << QObject::tr("Added meta data '%1' with value '%2'").arg(rs->name().toString()).arg(prop->meta[rs->name().toString()]);
+  }
 }
 
 // read property values and update the current map
@@ -220,6 +223,9 @@ void PropertyMap::writeValuesToXMLStream(const PropertyMap &map, QXmlStreamWrite
 QVariant PropertyMap::string2Type2QVariant(const QString &val, int type_id)
 {
   switch (type_id) {
+    case QMetaType::Bool:
+      return QVariant(static_cast<bool>(val.toInt()));
+      break;
     case QMetaType::Int:
       return QVariant(val.toInt());
       break;

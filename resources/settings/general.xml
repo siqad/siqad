@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<settings label="General Settings">
+<!--Doesn't matter what the default values in the fields are, they will be overwritten during runtime-->
+<properties label="General Settings">
     <hidpi_mode>
         <T>bool</T>
-        <val></val>
+        <val>0</val>
         <label>Automatic HiDPI mode</label>
         <tip>Allow Qt to automatically enable HiDPI mode when using a HiDPI monitor.</tip>
-        <value_selection type="CheckBox" />
+        <value_selection type="CheckBox"></value_selection>
         <meta>
             <category>app</category>
             <key>view/hidpi_support</key>
@@ -13,10 +14,10 @@
     </hidpi_mode>
     <debug_msg>
         <T>bool</T>
-        <val></val>
+        <val>0</val>
         <label>Show debug messages</label>
         <tip>Show debug messages in the SiQAD terminal.</tip>
-        <value_selection type="CheckBox" />
+        <value_selection type="CheckBox"></value_selection>
         <meta>
             <category>app</category>
             <key>log/override</key>
@@ -32,4 +33,4 @@
             <key>python_path</key>
         </meta>
     </python_path>
-</settings>
+</properties>
