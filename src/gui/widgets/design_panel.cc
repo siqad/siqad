@@ -312,6 +312,10 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   // add in the AFM layer for AFM tip travel paths
   layman->addLayer("AFM", prim::Layer::AFMTip,500E-12,50E-12);
 
+
+  // add in the metal layer for electrodes
+  layman->addLayer("Metal2", prim::Layer::Electrode,100E-9,10E-9);
+
   layman->populateLayerTable();
   layman->initSideWidget();
   emit sig_setLayerManagerWidget(layman->sideWidget());

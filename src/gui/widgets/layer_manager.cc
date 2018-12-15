@@ -269,16 +269,20 @@ void LayerManager::initSideWidget()
 
   QPushButton *pb_adv = new QPushButton("Advanced");
   connect(pb_adv, &QAbstractButton::clicked, this, &QWidget::show);
+  QPushButton *pb_add = new QPushButton("Add Layer");
+  connect(pb_add, SIGNAL(clicked()),
+            this, SLOT(addLayerRow()));
+
   QHBoxLayout *btn_hl = new QHBoxLayout;
   btn_hl->addStretch();
   btn_hl->addWidget(pb_adv);
+  btn_hl->addWidget(pb_add);
   layers_vl->addLayout(btn_hl);
 
   side_widget = new QWidget(0, Qt::Dialog);
   side_widget->setLayout(layers_vl);
 
 }
-
 
 void LayerManager::initLayerTableHeaders()
 {
@@ -392,6 +396,14 @@ void LayerManager::updateLayerPropFromTable(int row, int column)
   // TODO edit layer property
 }
 
+
+void LayerManager::addLayerRow()
+{
+  //create new engine wizard
+  new_layer_dialog = new QWidget(this, Qt::Dialog);
+  new_layer_dialog->show();
+  return;
+}
 
 // update widget
 void LayerManager::addLayerRow(prim::Layer *layer)

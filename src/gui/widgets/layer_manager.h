@@ -38,7 +38,7 @@ namespace gui{
     //! Add a new layer with the given name. If no name is given, a default scheme
     //! is used. Checks if the layer already exists.
     void addLayer(const QString &name = QString(),
-                  const prim::Layer::LayerType cnt_type=prim::Layer::DB, 
+                  const prim::Layer::LayerType cnt_type=prim::Layer::DB,
                   const float zoffset = 0, const float zheight = 0);
 
     //! Attempt to remove a layer, by name.
@@ -122,12 +122,13 @@ namespace gui{
 
   public slots:
     void updateLayerPropFromTable(int row, int column);
+    void addLayerRow(); // wrapper, prompt user for new layer info and add to layer table
 
   private:
     void initLayerTableHeaders();
 
     // functions for adding / removing layers
-    void addLayerRow(); // wrapper, prompt user for new layer info and add to layer table
+    // void addLayerRow(); // wrapper, prompt user for new layer info and add to layer table
     void addLayerRow(prim::Layer *layer); // wrapper, add a row to layer table with layer pointer
     void addLayerRow(LayerTableRowContent *row_content); // actually adds the layer
     void removeLayerRow(prim::Layer *layer);
@@ -144,6 +145,7 @@ namespace gui{
 
     // GUI
     QWidget *side_widget=0;
+    QWidget *new_layer_dialog=0;
     QList<LayerTableRowContent*> table_row_contents;
 
     QVBoxLayout *layer_list_vl;
