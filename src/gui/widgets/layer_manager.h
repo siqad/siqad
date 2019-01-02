@@ -126,6 +126,7 @@ namespace gui{
 
   private:
     void initLayerTableHeaders();
+    void initWizard();
 
     // functions for adding / removing layers
     // void addLayerRow(); // wrapper, prompt user for new layer info and add to layer table
@@ -145,13 +146,16 @@ namespace gui{
 
     // GUI
     QWidget *side_widget=0;
-    QWidget *new_layer_dialog=0;
+    QWidget *add_layer_dialog=0;
     QList<LayerTableRowContent*> table_row_contents;
 
     QVBoxLayout *layer_list_vl;
     QTableWidget *layer_table;
     QShortcut* close_shortcut_return;
     QShortcut* close_shortcut_esc;
+
+    //new layer wizard
+    QVBoxLayout *add_layer_vl;
   };
 
 }

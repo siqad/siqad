@@ -200,7 +200,7 @@ void LayerManager::initLayerManager()
 
   // Main layout
   QVBoxLayout *main_vl = new QVBoxLayout;
-  //main_vl->addLayout(top_buttons_hl); TODO add this back when add function is implemented
+  // main_vl->addLayout(top_buttons_hl); TODO add this back when add function is implemented
   main_vl->addWidget(layer_table);
 
   setLayout(main_vl);
@@ -209,8 +209,40 @@ void LayerManager::initLayerManager()
   close_shortcut_esc = new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(hide()));
 
   // TODO change add/remove to signal based
+
+  initWizard();
 }
 
+void LayerManager::initWizard()
+{
+  //create new engine wizard
+  add_layer_dialog = new QWidget(this, Qt::Dialog);
+
+  // layouts
+  add_layer_vl = new QVBoxLayout;
+  QHBoxLayout *add_layer_name_hl = new QHBoxLayout;
+  QHBoxLayout *add_layer_content_hl = new QHBoxLayout;
+  add_layer_name_hl->addStretch(1);
+  add_layer_content_hl->addStretch(1);
+
+  QLabel *label_layer_name = new QLabel(tr("Layer Name:"));
+  QLabel *label_layer_content = new QLabel(tr("Layer Content:"));
+  QLineEdit *le_layer_name = new QLineEdit();
+  QLineEdit *le_layer_content = new QLineEdit();
+
+  add_layer_name_hl->addWidget(label_layer_name);
+  add_layer_name_hl->addWidget(le_layer_name);
+
+  add_layer_content_hl->addWidget(label_layer_content);
+  add_layer_content_hl->addWidget(le_layer_content);
+
+  add_layer_vl->addLayout(add_layer_name_hl);
+  add_layer_vl->addLayout(add_layer_content_hl);
+
+  add_layer_dialog->setLayout(add_layer_vl);
+
+  add_layer_dialog->setWindowTitle(tr("Add new layer"));
+}
 
 void LayerManager::initSideWidget()
 {
@@ -400,8 +432,23 @@ void LayerManager::updateLayerPropFromTable(int row, int column)
 void LayerManager::addLayerRow()
 {
   //create new engine wizard
-  new_layer_dialog = new QWidget(this, Qt::Dialog);
-  new_layer_dialog->show();
+  // add_layer_dialog = new QWidget(this, Qt::Dialog);
+  add_layer_dialog->show();
+
+  // // layouts
+  // bottom_buttons_hl = new QHBoxLayout;
+  // bottom_buttons_hl->addStretch(1);
+  // bottom_buttons_hl->addWidget(button_run);
+  // bottom_buttons_hl->addWidget(button_cancel);
+  // bottom_buttons_hl->addWidget(tb_more);
+  //
+  // // Combine into one dialog
+  // new_setup_dialog_l = new QVBoxLayout;
+  // new_setup_dialog_l->addWidget(engine_sel_group);
+  // new_setup_dialog_l->addWidget(sim_params_group);
+  // new_setup_dialog_l->addLayout(bottom_buttons_hl);
+
+
   return;
 }
 
