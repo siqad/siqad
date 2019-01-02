@@ -222,26 +222,73 @@ void LayerManager::initWizard()
   add_layer_vl = new QVBoxLayout;
   QHBoxLayout *add_layer_name_hl = new QHBoxLayout;
   QHBoxLayout *add_layer_content_hl = new QHBoxLayout;
+  QHBoxLayout *add_layer_offset_hl = new QHBoxLayout;
+  QHBoxLayout *add_layer_height_hl = new QHBoxLayout;
+  QHBoxLayout *add_layer_button_hl = new QHBoxLayout;
   add_layer_name_hl->addStretch(1);
   add_layer_content_hl->addStretch(1);
+  add_layer_offset_hl->addStretch(1);
+  add_layer_height_hl->addStretch(1);
+  add_layer_button_hl->addStretch(1);
 
   QLabel *label_layer_name = new QLabel(tr("Layer Name:"));
   QLabel *label_layer_content = new QLabel(tr("Layer Content:"));
-  QLineEdit *le_layer_name = new QLineEdit();
-  QLineEdit *le_layer_content = new QLineEdit();
+  QLabel *label_layer_offset = new QLabel(tr("Layer Offset:"));
+  QLabel *label_layer_height = new QLabel(tr("Layer Height:"));
+  le_layer_name = new QLineEdit();
+  cb_layer_content = new QComboBox();
+  le_layer_offset = new QLineEdit();
+  le_layer_height = new QLineEdit();
+  QPushButton *pb_add_layer = new QPushButton(tr("Add"));
+  QPushButton *pb_cancel = new QPushButton(tr("Cancel"));
 
   add_layer_name_hl->addWidget(label_layer_name);
   add_layer_name_hl->addWidget(le_layer_name);
-
   add_layer_content_hl->addWidget(label_layer_content);
-  add_layer_content_hl->addWidget(le_layer_content);
+  add_layer_content_hl->addWidget(cb_layer_content);
+  add_layer_offset_hl->addWidget(label_layer_offset);
+  add_layer_offset_hl->addWidget(le_layer_offset);
+  add_layer_height_hl->addWidget(label_layer_height);
+  add_layer_height_hl->addWidget(le_layer_height);
+  add_layer_button_hl->addWidget(pb_add_layer);
+  add_layer_button_hl->addWidget(pb_cancel);
 
   add_layer_vl->addLayout(add_layer_name_hl);
   add_layer_vl->addLayout(add_layer_content_hl);
+  add_layer_vl->addLayout(add_layer_offset_hl);
+  add_layer_vl->addLayout(add_layer_height_hl);
+  add_layer_vl->addLayout(add_layer_button_hl);
 
   add_layer_dialog->setLayout(add_layer_vl);
 
+  //Getting the enum names for layer content
+  QMetaObject layer_mojb = prim::Layer::staticMetaObject;
+  QMetaEnum layer_types = layer_mojb.enumerator(layer_mojb.indexOfEnumerator("LayerType"));
+
+  //populating the layer content combobox
+  for( int i = 0; i < layer_types.keyCount(); i++){
+    cb_layer_content->addItem(layer_types.key(i));
+  }
+
+  //taking care of buttons
+  connect(pb_add_layer, &QAbstractButton::clicked, this, &LayerManager::addByWizard);
+  connect(pb_cancel, &QAbstractButton::clicked, add_layer_dialog, &QWidget::hide);
+
   add_layer_dialog->setWindowTitle(tr("Add new layer"));
+}
+
+void LayerManager::addByWizard(){
+  QMetaObject layer_mojb = prim::Layer::staticMetaObject;
+  QMetaEnum layer_types = layer_mojb.enumerator(layer_mojb.indexOfEnumerator("LayerType"));
+  //grab the data from the dialog
+  QString layer_name = le_layer_name->text();
+  prim::Layer::LayerType content_type = static_cast<prim::Layer::LayerType>(cb_layer_content->currentIndex());
+  float offset = le_layer_offset->text().toFloat();
+  float height = le_layer_height->text().toFloat();
+  //create a new layer
+  addLayer(layer_name, content_type, offset, height);
+  prim::Layer* layer = getLayer(layerCount()-1);
+  addLayerRow(layer);
 }
 
 void LayerManager::initSideWidget()
@@ -431,24 +478,7 @@ void LayerManager::updateLayerPropFromTable(int row, int column)
 
 void LayerManager::addLayerRow()
 {
-  //create new engine wizard
-  // add_layer_dialog = new QWidget(this, Qt::Dialog);
   add_layer_dialog->show();
-
-  // // layouts
-  // bottom_buttons_hl = new QHBoxLayout;
-  // bottom_buttons_hl->addStretch(1);
-  // bottom_buttons_hl->addWidget(button_run);
-  // bottom_buttons_hl->addWidget(button_cancel);
-  // bottom_buttons_hl->addWidget(tb_more);
-  //
-  // // Combine into one dialog
-  // new_setup_dialog_l = new QVBoxLayout;
-  // new_setup_dialog_l->addWidget(engine_sel_group);
-  // new_setup_dialog_l->addWidget(sim_params_group);
-  // new_setup_dialog_l->addLayout(bottom_buttons_hl);
-
-
   return;
 }
 

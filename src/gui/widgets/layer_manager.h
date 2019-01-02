@@ -127,6 +127,7 @@ namespace gui{
   private:
     void initLayerTableHeaders();
     void initWizard();
+    void addByWizard();
 
     // functions for adding / removing layers
     // void addLayerRow(); // wrapper, prompt user for new layer info and add to layer table
@@ -155,7 +156,13 @@ namespace gui{
     QShortcut* close_shortcut_esc;
 
     //new layer wizard
+
     QVBoxLayout *add_layer_vl;
+    QLineEdit *le_layer_name;
+    QComboBox *cb_layer_content;
+    QLineEdit *le_layer_offset;
+    QLineEdit *le_layer_height;
+
   };
 
 }

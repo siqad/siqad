@@ -587,6 +587,7 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs)
   // TODO rethink this layer loading method
   prim::Layer* load_layer = layman->getLayer(layer_nm);
   if (!load_layer) {
+    qDebug() << tr("Created layer %1 instead").arg(layer_nm);
     layman->addLayer(layer_nm);
     load_layer = layman->getLayer(layman->layerCount()-1);
   }
