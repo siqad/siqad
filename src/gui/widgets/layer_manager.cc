@@ -148,6 +148,8 @@ void LayerManager::setActiveLayer(prim::Layer *layer)
 {
   active_layer = layer;
   // TODO GUI stuff
+  //update active layer indicator
+  label_active_layer->setText(tr("Active layer: %1").arg(activeLayer()->getName()));
 }
 
 int LayerManager::indexOf(prim::Layer *layer) const
@@ -317,10 +319,16 @@ void LayerManager::initSideWidget()
     sorted_layers.append(qMakePair(layer->zOffset(), layer));
   qSort(sorted_layers.begin(), sorted_layers.end(), QPairFirstReverseComparer());
 
+  //create label to show user the current active layer
+  label_active_layer = new QLabel(tr("Active layer: "));
+  QHBoxLayout *active_layer_hl = new QHBoxLayout;
+  active_layer_hl->addWidget(label_active_layer);
+
   // construct layer widgets row by row
   QVBoxLayout *layers_vl = new QVBoxLayout;
   layers_vl->setAlignment(Qt::AlignTop);
   QHBoxLayout *row_hl = new QHBoxLayout;
+  layers_vl->addLayout(active_layer_hl);
   for (int i=0; i<sorted_layers.size(); i++) {
     prim::Layer *layer = sorted_layers[i].second;
     QLabel *lb_layer_nm = new QLabel(layer->getName());

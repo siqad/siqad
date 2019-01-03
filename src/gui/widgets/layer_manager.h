@@ -163,6 +163,7 @@ namespace gui{
     QComboBox *cb_layer_content;
     QLineEdit *le_layer_offset;
     QLineEdit *le_layer_height;
+    QLabel *label_active_layer;
 
   };
 
