@@ -183,6 +183,13 @@ void LayerManager::saveLayerItems(QXmlStreamWriter *ws) const
   }
 }
 
+void LayerManager::tableSelectionChanged(int row)
+{
+  //table selection was changed, change the active layer to the one selected.
+  setActiveLayer(row);
+  qDebug() << "Active layer changed to layer " << row;
+}
+
 // PRIVATE
 
 // initialize widget
@@ -197,6 +204,10 @@ void LayerManager::initLayerManager()
   // grid layout that show all layers
   layer_table = new QTableWidget(this);
   initLayerTableHeaders();
+
+  //trigger a slot whenever a cell is clicked, or when a row is selected.
+  connect(layer_table->verticalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(tableSelectionChanged(int)));
+  connect(layer_table, SIGNAL(cellClicked(int, int)), this, SLOT(tableSelectionChanged(int)));
 
   // Main layout
   QVBoxLayout *main_vl = new QVBoxLayout;
@@ -287,8 +298,16 @@ void LayerManager::addByWizard(){
   float height = le_layer_height->text().toFloat();
   //create a new layer
   addLayer(layer_name, content_type, offset, height);
+  //get the newly created layer
   prim::Layer* layer = getLayer(layerCount()-1);
+  //add it to the layer table
   addLayerRow(layer);
+  //clear the dialog
+  le_layer_name->clear();
+  le_layer_offset->clear();
+  le_layer_height->clear();
+  //hide the dialog
+  add_layer_dialog->hide();
 }
 
 void LayerManager::initSideWidget()

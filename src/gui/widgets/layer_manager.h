@@ -123,6 +123,7 @@ namespace gui{
   public slots:
     void updateLayerPropFromTable(int row, int column);
     void addLayerRow(); // wrapper, prompt user for new layer info and add to layer table
+    void tableSelectionChanged(int row);
 
   private:
     void initLayerTableHeaders();
