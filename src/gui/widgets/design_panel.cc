@@ -661,11 +661,12 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind, bool a
       db_dots_result[i]->setShowElec(job->elec_dists_avg[i]);
       //qDebug() << tr("Setting electron %1 to %2").arg(i).arg(job->elec_dists_avg[i]);
     } else if(db_dots_result[i]) {
-      // show the distribution of the selected index
       if (avg_degen) {
+        // show the average distribution of degenerate states
         db_dots_result[i]->setShowElec(job->elecDistAvgDegenOfDB(dist_ind, i));
         //qDebug() << tr("Setting electron %1 to %2, averaged").arg(i).arg(job->elecDistAvgDegenOfDB(dist_ind,i));
       } else {
+        // show the average distribution of the selected index
         db_dots_result[i]->setShowElec(job->filteredElecDists().at(dist_ind).dist[i]);
       }
     }
