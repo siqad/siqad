@@ -93,14 +93,24 @@ void SettingsDialog::addPendingStringUpdate(QString new_text)
 
 void SettingsDialog::applyPendingChanges()
 {
+  // TODO specific implementation for app settings pane for now, make generic later
+  gui::PropertyMap changed_settings = app_settings_pane->changedProperties();
+
+  for (gui::Property changed_prop : changed_settings) {
+    settings::Settings *s_cat = settingsCategory(changed_prop.meta["category"]);
+    s_cat->setValue(changed_prop.meta["key"], changed_prop.value);
+  }
+
+  /*
   // TODO deduplicate
   for (PendingChange pending_change : pending_changes) {
-    settings::Settings *category_setting = settingsCategoryPointer(
+    settings::Settings *category_setting = settingsCategory(
         pending_change.category);
     category_setting->setValue(pending_change.name, pending_change.value);
   }
 
   pending_changes.clear();
+  */
 }
 
 
@@ -177,16 +187,14 @@ void SettingsDialog::writeUserSettingToProperty(gui::Property &t_prop) {
   if (!t_prop.meta.contains("category") || !t_prop.meta.contains("key"))
     qFatal("'key' or 'category' not found in the meta member of the given property.");
 
-  SettingsCategory s_cat = static_cast<SettingsCategory>(
-      QMetaEnum::fromType<SettingsCategory>().keyToValue(t_prop
-      .meta["category"].toLatin1().data()));
-  QVariant s_val = settingsCategoryPointer(s_cat)->get(t_prop.meta["key"]);
+  settings::Settings *s_cat = settingsCategory(t_prop.meta["category"]);
+  QVariant s_val = s_cat->get(t_prop.meta["key"]);
   int s_type = t_prop.value.type();
   s_val.convert(s_type);
   t_prop.value.setValue(s_val);
 }
 
-QWidget *SettingsDialog::appSettingsPane()
+gui::PropertyForm *SettingsDialog::appSettingsPane()
 {
   // return the existing settings pane if available
   if (app_settings_pane != nullptr)
@@ -199,58 +207,9 @@ QWidget *SettingsDialog::appSettingsPane()
 
   app_settings_pane = new gui::PropertyForm(app_settings_map);
   return app_settings_pane;
-
-/*
-  // old form, TODO delete after implementing property map version
-
-  QLabel *label_hidpi = new QLabel(QObject::tr("HiDPI Mode*"));
-  QLabel *label_show_debug_output = new QLabel(QObject::tr("Show debug messages*"));
-  QLabel *label_python_path = new QLabel(QObject::tr("Python path*\n(Arguments are comma-separated.\ne.g. C:\\Windows\\py.exe,-3 )"));
-  QLabel *label_req_restart = new QLabel(QObject::tr("Settings with the * indicator only take effect after restart."));
-
-  QCheckBox *cb_hidpi = new QCheckBox(QObject::tr("Enabled"));
-  QCheckBox *cb_show_debug_output = new QCheckBox(QObject::tr("Enabled"));
-  QLineEdit *le_python_path = new QLineEdit(gui::python_path);
-
-  cb_hidpi->setObjectName("app:view/hidpi_support");
-  cb_hidpi->setChecked(app_settings->get<bool>("view/hidpi_support"));
-  cb_show_debug_output->setObjectName("app:log/override");
-  cb_show_debug_output->setChecked(app_settings->get<bool>("log/override"));
-  le_python_path->setObjectName("app:python_path");
-
-  connect(cb_hidpi, SIGNAL(toggled(bool)),
-          this, SLOT(addPendingBoolUpdate(bool)));
-  connect(cb_show_debug_output, SIGNAL(toggled(bool)),
-          this, SLOT(addPendingBoolUpdate(bool)));
-  connect(le_python_path, &QLineEdit::textEdited,
-          this, &settings::SettingsDialog::addPendingStringUpdate);
-
-  QHBoxLayout *hidpi_hl = new QHBoxLayout;
-  hidpi_hl->addWidget(label_hidpi);
-  hidpi_hl->addWidget(cb_hidpi);
-
-  QHBoxLayout *show_debug_output_hl = new QHBoxLayout;
-  show_debug_output_hl->addWidget(label_show_debug_output);
-  show_debug_output_hl->addWidget(cb_show_debug_output);
-
-  QHBoxLayout *python_path_hl = new QHBoxLayout;
-  python_path_hl->addWidget(label_python_path);
-  python_path_hl->addWidget(le_python_path);
-
-  QVBoxLayout *app_settings_pane_vl = new QVBoxLayout;
-  app_settings_pane_vl->addLayout(hidpi_hl);
-  app_settings_pane_vl->addLayout(show_debug_output_hl);
-  app_settings_pane_vl->addLayout(python_path_hl);
-  app_settings_pane_vl->addWidget(label_req_restart);
-
-  app_settings_pane = new QWidget(this);
-  app_settings_pane->setLayout(app_settings_pane_vl);
-
-  return app_settings_pane;
-  */
 }
 
-QWidget *SettingsDialog::guiSettingsPane()
+gui::PropertyForm *SettingsDialog::guiSettingsPane()
 {
   if (gui_settings_pane != nullptr)
     return gui_settings_pane;
@@ -259,7 +218,7 @@ QWidget *SettingsDialog::guiSettingsPane()
   return nullptr;
 }
 
-QWidget *SettingsDialog::latticeSettingsPane()
+gui::PropertyForm *SettingsDialog::latticeSettingsPane()
 {
   if (lattice_settings_pane != nullptr)
     return lattice_settings_pane;
@@ -269,7 +228,15 @@ QWidget *SettingsDialog::latticeSettingsPane()
 }
 
 
-settings::Settings *SettingsDialog::settingsCategoryPointer(SettingsCategory cat)
+settings::Settings *SettingsDialog::settingsCategory(const QString &t_cat) 
+{
+  int cat_int = QMetaEnum::fromType<SettingsCategory>().keyToValue(
+    t_cat.toLatin1().data());
+  SettingsCategory s_cat = static_cast<SettingsCategory>(cat_int);
+  return settingsCategory(s_cat);
+}
+
+settings::Settings *SettingsDialog::settingsCategory(SettingsCategory cat)
 {
   switch (cat) {
     case App:

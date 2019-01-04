@@ -59,25 +59,28 @@ namespace settings{
     void writeUserSettingToProperty(gui::Property &prop);
 
     //! Return the application settings pane. Initilize the pane if first called.
-    QWidget *appSettingsPane();
+    gui::PropertyForm *appSettingsPane();
 
     //! Return the application settings pane. Initilize the pane if first called.
-    QWidget *guiSettingsPane();
+    gui::PropertyForm *guiSettingsPane();
 
     //! Return the application settings pane. Initilize the pane if first called.
-    QWidget *latticeSettingsPane();
+    gui::PropertyForm *latticeSettingsPane();
 
-    //! Return the Settings class pointer to the specified category
-    settings::Settings *settingsCategoryPointer(SettingsCategory);
+    //! Return the Settings class pointer to the specified category QString.
+    settings::Settings *settingsCategory(const QString &t_cat);
+
+    //! Return the Settings class pointer to the specified category.
+    settings::Settings *settingsCategory(SettingsCategory);
 
     // VARS
     AppSettings *app_settings=nullptr;
     GUISettings *gui_settings=nullptr;
     LatticeSettings *lattice_settings=nullptr;
 
-    QWidget *app_settings_pane=nullptr;
-    QWidget *gui_settings_pane=nullptr;
-    QWidget *lattice_settings_pane=nullptr;
+    gui::PropertyForm *app_settings_pane=nullptr;
+    gui::PropertyForm *gui_settings_pane=nullptr;
+    gui::PropertyForm *lattice_settings_pane=nullptr;
 
     QList<PendingChange> pending_changes;
   };

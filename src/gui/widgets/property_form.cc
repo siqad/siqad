@@ -12,8 +12,8 @@
 namespace gui{
 
 // Constructor
-PropertyForm::PropertyForm(PropertyMap pmap, QWidget *parent)
-  : QWidget(parent), pmap(pmap)
+PropertyForm::PropertyForm(PropertyMap t_map, QWidget *parent)
+  : QWidget(parent), orig_map(t_map)
 {
   initForm();
 }
@@ -21,31 +21,35 @@ PropertyForm::PropertyForm(PropertyMap pmap, QWidget *parent)
 
 PropertyMap PropertyForm::finalProperties()
 {
-  // save the newest values from the form to the property map
-  for (const QString &key : pmap.keys())
-    pmap[key].value = formContent(key);
+  PropertyMap final_map(orig_map);
+  PropertyMap::iterator it;
 
-  return pmap;
+  // save the values in the form (edited or not) to the final property map
+  for (it = final_map.begin(); it != final_map.end(); ++it)
+    it.value().value.setValue(formValue(it.key()));
+
+  return final_map;
 }
 
 
 PropertyMap PropertyForm::changedProperties()
 {
-  PropertyMap props_changed;
-  for (const QString &key : pmap.keys()) {
+  PropertyMap map_changed;
+
+  for (const QString &key : orig_map.keys()) {
     // save changed properties to props_changed
-    QVariant new_val = formContent(key);
-    if (pmap[key].value != new_val)
-      props_changed.insert(key, Property(new_val, pmap[key]));
+    QVariant form_val = formValue(key);
+    if (orig_map[key].value != form_val)
+      map_changed.insert(key, Property(form_val, orig_map[key]));
   }
-  return props_changed;
+  return map_changed;
 }
 
 
-QVariant PropertyForm::formContent(const QString &key)
+QVariant PropertyForm::formValue(const QString &key)
 {
   QVariant new_val;
-  switch (pmap[key].value_selection.type) {
+  switch (orig_map[key].value_selection.type) {
     case CheckBox:
       new_val = QObject::findChild<QCheckBox*>(key)->isChecked();
       break;
@@ -56,7 +60,7 @@ QVariant PropertyForm::formContent(const QString &key)
     {
       QLineEdit *prop_field = QObject::findChild<QLineEdit*>(key);
       new_val = PropertyMap::string2Type2QVariant(prop_field->text(),
-                                                  pmap[key].value.type());
+                                                  orig_map[key].value.type());
       break;
     }
     default:
@@ -72,11 +76,12 @@ void PropertyForm::initForm()
 
   // populate a form with the desired number of null widgets first
   QFormLayout *prop_fl = new QFormLayout;
-  for (int i=0; i<pmap.size(); i++)
+  for (int i=0; i<orig_map.size(); i++)
     prop_fl->addRow(new QWidget, new QWidget);
 
   // generate form from map
-  for (PropertyMap::const_iterator it = pmap.cbegin(), end = pmap.cend(); it != end; ++it) {
+  PropertyMap::const_iterator it, end;
+  for (it = orig_map.cbegin(); it != orig_map.cend(); ++it) {
     Property prop = it.value();
 
     QLabel *label_prop = new QLabel(prop.form_label);

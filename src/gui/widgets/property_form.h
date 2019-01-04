@@ -26,7 +26,7 @@ namespace gui{
   public:
 
     //! Constructor
-    PropertyForm(PropertyMap pmap, QWidget *parent=nullptr);
+    PropertyForm(PropertyMap t_map, QWidget *parent=nullptr);
     //PropertyForm(prim::Item *target_item, QWidget *parent);
 
     //! Destructor
@@ -41,12 +41,12 @@ namespace gui{
   private:
 
     //! Return the form field content for the specified key value.
-    QVariant formContent(const QString &key);
+    QVariant formValue(const QString &key);
 
     //! Initialize the form
     void initForm();
 
-    PropertyMap pmap;  //! the map where changes will be written to
+    PropertyMap orig_map;  //! the original property map
   };
 
 } // end of gui namespace

@@ -85,8 +85,12 @@ namespace gui{
 
   public:
 
-    //! Constructor
+    //! Empty constructor.
     PropertyMap() {};
+
+    //! Construct a new property map identical to the provided one.
+    PropertyMap(const PropertyMap &other)
+      : QMap(other), preserve_order(other.preserve_order), xml_path(other.xml_path) {}
 
     //! Constructor taking in XML file name to load properties from.
     PropertyMap(const QString &fname);
