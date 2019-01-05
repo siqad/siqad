@@ -90,7 +90,7 @@ void SimVisualize::showPotPlot()
   QVector<qreal> x_vec;
   QVector<qreal> y_vec;
   qreal pixels_per_angstrom = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
-  qreal angstrom_per_meter = 1.0E10;
+  qreal angstrom_per_meter = 1;
   QList<QVector<float>>::iterator iter = show_job->potentials.begin();
   // first entry will be topLeft
   x_vec.append((*iter)[0]*angstrom_per_meter*pixels_per_angstrom);
