@@ -74,6 +74,7 @@ void gui::DesignPanel::initDesignPanel() {
   layman = new LayerManager(this);
   property_editor = new PropertyEditor(this);
   itman = new ItemManager(this, layman);
+  screenman = new ScreenshotManager(this);
 
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 
@@ -149,11 +150,18 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   delete afm_panel;
   delete property_editor;
   delete eph;
-  // delete layers and contained items
   delete layman;
   delete itman;
+  delete screenman;
 
+  afm_panel=nullptr;
+  property_editor=nullptr;
+  eph=nullptr;
+  layman=nullptr;
+  itman=nullptr;
+  screenman=nullptr;
 
+  // delete layers and contained items
   if(reset) prim::Layer::resetLayers(); // reset layer counter
 
 

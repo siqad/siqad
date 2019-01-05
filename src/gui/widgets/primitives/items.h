@@ -24,5 +24,6 @@
 #include "polygon_handle.h"
 #include "polygon_segment.h"
 #include "resizable_poly.h"
+#include "screenshot_clip_area.h"
 
 #endif

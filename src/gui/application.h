@@ -112,6 +112,11 @@ namespace gui{
     //! End Screenshot mode.
     void endScreenshotMode();
 
+    //! Toggle screenshot mode.
+    void toggleScreenshotMode() {
+      design_pan->displayMode() == gui::ScreenshotMode ? endScreenshotMode() : beginScreenshotMode();
+    }
+
     //! Take an svg capture of the entire GUI.
     void screenshot();
 
@@ -202,21 +207,22 @@ namespace gui{
 
     // action pointers
     QAction *action_screenshot_tool;
-    QAction *action_select_tool;  // change cursor tool to select
-    QAction *action_drag_tool;    // change cursor tool to drag
-    QAction *action_dbgen_tool;   // change cursor tool to gen
-    QAction *action_electrode_tool;   // change cursor tool to electrode
-    QAction *action_electrode_poly_tool;   // change cursor tool to electrode
-    QAction *action_afmarea_tool; // change cursor tool to AFM Area tool
-    QAction *action_afmpath_tool; // change cursor tool to AFM Path tool
-    QAction *action_label_tool;   // change cursor tool to label
-    QAction *action_run_sim;      // run the current simulation method
-    QAction *action_repeat_sim;
-    QAction *action_run_ground_state;      // run the current simulation method
-    QAction *action_sim_visualize;// show the sim visualize dock which allows simulation visualization
-    QAction *action_layer_sel;
-    QAction *action_circuit_lib;
-    QAction *action_dialog_dock_visibility;
+    QAction *action_select_tool=nullptr;          // change cursor tool to select
+    QAction *action_drag_tool=nullptr;            // change cursor tool to drag
+    QAction *action_dbgen_tool=nullptr;           // change cursor tool to gen
+    QAction *action_electrode_tool=nullptr;       // change cursor tool to electrode
+    QAction *action_electrode_poly_tool=nullptr;  // change cursor tool to electrode
+    QAction *action_afmarea_tool=nullptr;         // change cursor tool to AFM Area tool
+    QAction *action_afmpath_tool=nullptr;         // change cursor tool to AFM Path tool
+    QAction *action_label_tool=nullptr;           // change cursor tool to label
+    QAction *action_run_sim=nullptr;              // run the current simulation method
+    QAction *action_repeat_sim=nullptr;           // repeat the previous simulation
+    QAction *action_run_ground_state=nullptr;     // run the current simulation method
+    QAction *action_sim_visualize=nullptr;        // show the sim visualize dock which allows simulation visualization
+    QAction *action_layer_sel=nullptr;
+    QAction *action_circuit_lib=nullptr;
+    QAction *action_dialog_dock_visibility=nullptr;
+    QAction *action_screenshot_mode=nullptr;      // toggle screenshot mode
 
     // save file
     QTimer autosave_timer;     // timer for autosaves

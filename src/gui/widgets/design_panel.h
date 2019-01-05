@@ -24,6 +24,7 @@
 #include "layer_manager.h"
 #include "property_editor.h"
 #include "item_manager.h"
+#include "screenshot_manager.h"
 
 #include "primitives/layer.h"
 #include "primitives/lattice.h"
@@ -294,9 +295,10 @@ namespace gui{
     QUndoStack *undo_stack;   // undo stack
 
     // contained widgets
-    gui::LayerManager *layman;
-    gui::PropertyEditor *property_editor;
-    gui::ItemManager *itman;
+    gui::LayerManager *layman=nullptr;
+    gui::PropertyEditor *property_editor=nullptr;
+    gui::ItemManager *itman=nullptr;
+    gui::ScreenshotManager *screenman=nullptr;
 
     // background color presets
     static QColor background_col;         // normal background color

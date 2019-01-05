@@ -288,12 +288,19 @@ void gui::ApplicationGUI::initTopBar()
   connect(action_run_ground_state, &QAction::triggered,
           this, &gui::ApplicationGUI::runGroundState);
 
+
+  // screenshot mode
+  action_screenshot_mode = new QAction(QIcon(":/ico/screenshotarea.svg"), tr("Screenshot Mode"));
+  connect(action_screenshot_mode, &QAction::triggered,
+          this, &gui::ApplicationGUI::toggleScreenshotMode);
+
   // add them to top bar
   top_bar->addAction(action_run_sim);
   top_bar->addAction(action_run_ground_state);
   top_bar->addAction(action_sim_visualize);           // already initialised in menu bar
   top_bar->addAction(action_layer_sel);               // already initialised in menu bar
   top_bar->addAction(action_dialog_dock_visibility);  // already initialised in menu bar
+  top_bar->addAction(action_screenshot_mode);
 
   //action_circuit_lib= top_bar->addAction(QIcon(":/ico/circuitlib.svg"), tr("Circuit Library"));
 
