@@ -76,6 +76,14 @@ void gui::DesignPanel::initDesignPanel() {
   itman = new ItemManager(this, layman);
   screenman = new ScreenshotManager(this);
 
+  connect(screenman, &gui::ScreenshotManager::sig_takeScreenshot,
+          [this](const QString &target_img_path, const QRectF &scene_rect, bool always_overwrite) {
+            emit sig_screenshot(target_img_path, scene_rect, always_overwrite);
+          }
+  );
+  connect(screenman, &gui::ScreenshotManager::sig_clipSelectionTool,
+          [this]() {setTool(gui::ScreenshotAreaTool);});
+
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 
   scene = new QGraphicsScene(this);
@@ -451,6 +459,9 @@ void gui::DesignPanel::setDisplayMode(DisplayMode mode)
 {
   display_mode = mode;
   prim::Item::display_mode = mode;
+
+  screenman->setVisible(display_mode == ScreenshotMode);
+
   updateBackground();
 }
 
@@ -1000,9 +1011,15 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             createElectrodePolyNode(mapToScene(e->pos()));
             break;
           case gui::ToolType::ScreenshotAreaTool:
+          {
+            // TODO remove commented
             // take a screenshot of the rubberband area
-            sig_screenshot(rb_scene_rect);
+            //sig_screenshot(rb_scene_rect);
+            
+            // set the screenshot clip area in the screenshot manager
+            screenman->setClipArea(rb_scene_rect);
             break;
+          }
           case gui::ToolType::LabelTool:
             // create a label with the rubberband area
             createTextLabel(rb_scene_rect);
@@ -1113,11 +1130,6 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
       case Qt::Key_Return:
         if (tool_type == gui::ToolType::ElectrodePolyTool) {
           createElectrodePoly();
-        }
-        break;
-      case Qt::Key_S:
-        if (display_mode == ScreenshotMode) {
-          sig_screenshot(prev_screenshot_area);
         }
         break;
       default:

@@ -129,7 +129,7 @@ void gui::ApplicationGUI::initGUI()
   connect(design_pan, &gui::DesignPanel::sig_undoStackCleanChanged,
           this, &gui::ApplicationGUI::updateWindowTitle);
   connect(design_pan, &gui::DesignPanel::sig_screenshot,
-          this, QOverload<QRect>::of(&gui::ApplicationGUI::designScreenshot));
+          this, QOverload<const QString&, const QRectF&, bool>::of(&gui::ApplicationGUI::designScreenshot));
   connect(design_pan, &gui::DesignPanel::sig_showSimulationSetup,
           this, &gui::ApplicationGUI::simulationSetup);
   connect(design_pan, &gui::DesignPanel::sig_cancelScreenshot,
@@ -211,17 +211,13 @@ void gui::ApplicationGUI::initMenuBar()
   // tools menu actions
   QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
   QAction *select_color = new QAction(tr("Select Color..."), this);
-  QAction *area_screenshot = new QAction(tr("Region Screenshot..."), this);
-  QAction *design_screenshot = new QAction(tr("Design Screenshot..."), this);
-  QAction *screenshot = new QAction(tr("Window Screenshot..."), this);
+  QAction *window_screenshot = new QAction(tr("Window Screenshot..."), this);
   QAction *action_settings_dialog = new QAction(tr("Settings"), this);
 
   tools->addAction(change_lattice);
   tools->addAction(select_color);
   tools->addSeparator();
-  tools->addAction(area_screenshot);
-  tools->addAction(design_screenshot);
-  tools->addAction(screenshot);
+  tools->addAction(window_screenshot);
   tools->addSeparator();
   tools->addAction(action_settings_dialog);
 
@@ -240,10 +236,7 @@ void gui::ApplicationGUI::initMenuBar()
   connect(rotate_view_ccw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCcw);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
-  connect(area_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::beginScreenshotMode);
-  connect(screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
-  connect(design_screenshot, SIGNAL(triggered()),
-          this, SLOT(designScreenshot()));
+  connect(window_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
   connect(action_settings_dialog, &QAction::triggered, this, &gui::ApplicationGUI::showSettingsDialog);
   connect(about_version, &QAction::triggered, this, &gui::ApplicationGUI::aboutVersion);
 
@@ -942,7 +935,7 @@ void gui::ApplicationGUI::screenshot()
 }
 
 
-void gui::ApplicationGUI::designScreenshot()
+void gui::ApplicationGUI::fullDesignScreenshot()
 {
   beginScreenshotMode();
 
@@ -956,32 +949,47 @@ void gui::ApplicationGUI::designScreenshot()
                     design_pan->mapFromParent(rect.topLeft())).toPoint()
                 - rect.topLeft());
 
-  designScreenshot(rect);
+  // get save path
+  QString fpath = QFileDialog::getSaveFileName(this, tr("Save File"), img_dir.path(),
+                      tr("SVG files (*.svg)"));
+
+  designScreenshot(fpath, rect, true);
 }
 
 
-void gui::ApplicationGUI::designScreenshot(QRect rect)
+void gui::ApplicationGUI::designScreenshot(const QString &target_img_path, const QRectF &rect, bool always_overwrite)
 {
   qDebug() << tr("taking screenshot for rect (%1, %2) (%3, %4)")
       .arg(rect.left()).arg(rect.top()).arg(rect.right()).arg(rect.bottom());
-  // get save path
-  QString fname = QFileDialog::getSaveFileName(this, tr("Save File"), img_dir.path(),
-                      tr("SVG files (*.svg)"));
 
-  if(fname.isEmpty()) {
+  // check if target directory is writable
+  if (!QFileInfo(QFileInfo(target_img_path).dir().absolutePath()).isWritable()) {
+    qDebug() << tr("Directory not writable.");
     endScreenshotMode();
     return;
   }
-  img_dir = QDir(fname);
+
+  // check if target file already exists
+  if (!always_overwrite && QFileInfo(target_img_path).exists()) {
+    QMessageBox::StandardButton reply = QMessageBox::question(this, 
+        "File exists", 
+        tr("The target image file name %1 already exists. Do you want to \
+          overwrite it?").arg(target_img_path), 
+        QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::No) {
+      endScreenshotMode();
+      return;
+    }
+  }
 
   QSvgGenerator gen;
-  gen.setFileName(fname);
+  gen.setFileName(target_img_path);
   //gen.setSize(rect.size());
   gen.setViewBox(rect);
 
   QPainter painter;
   painter.begin(&gen);
-  design_pan->screenshot(&painter, rect);
+  design_pan->screenshot(&painter, rect.toAlignedRect());
   painter.end();
 
   endScreenshotMode();

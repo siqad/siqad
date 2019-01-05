@@ -121,10 +121,10 @@ namespace gui{
     void screenshot();
 
     //! Take an svg capture of the design window currently shown.
-    void designScreenshot();
+    void fullDesignScreenshot();
 
     //! Take an svg capture of the design window in the given QRect (scene coord).
-    void designScreenshot(QRect rect);
+    void designScreenshot(const QString &target_img_path, const QRectF &rect, bool always_overwrite);
 
     // show pop-up dialogs
     void showSettingsDialog() {settings_dialog->show();}

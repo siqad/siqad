@@ -240,8 +240,9 @@ namespace gui{
     void sig_quickRunSimulation();
 
     //! Request ApplicationGUI to take a screenshot of the design panel bounded
-    //! by the given QRect.
-    void sig_screenshot(QRect);
+    //! by the given scene_rect. If the rect is null, take a screenshot of the
+    //! entire scene.
+    void sig_screenshot(const QString &target_img_path, const QRectF &scene_rect, bool always_overwrite);
 
     //! Tell ApplicationGUI to cancel the current screenshot.
     void sig_cancelScreenshot();

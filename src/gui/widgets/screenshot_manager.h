@@ -31,14 +31,18 @@ namespace gui{
       ~ScreenshotManager();
 
       //! Return the screenshot clip area as a QRect.
-      QRectF clipArea() {return clip_area->rect();}
+      QRectF clipArea() {return clip_area->sceneRect();}
 
       //! Set the screenshot clip area.
-      void setClipArea(QRectF area) {clip_area->setRect(area);}
+      void setClipArea(QRectF area) {clip_area->setSceneRect(area);}
 
       //! Reset the screenshot clip area to a null rectangle (use isNull() to
       //! check for QRect null state.)
-      void resetClipArea() {clip_area->setRect(QRectF());}
+      void resetClipArea() {clip_area->setSceneRect(QRectF());}
+
+      //! Set the visibility of the clip area preview.
+      void setClipVisibility(bool visible) {clip_area->setVisible(visible);}
+
 
 
     public slots:
@@ -47,13 +51,16 @@ namespace gui{
 
     signals:
 
-      //! Take a screenshot of the same region as before.
-      void sig_repeatLastRegion();  
+      //! Take a screenshot of the area defined in the provided QRectF. If the
+      //! rect is null, take a screenshot of the entire scene.
+      void sig_takeScreenshot(const QString &target_img_path, 
+                              const QRectF &scene_rect=QRectF(),
+                              bool always_overwrite=false);
 
       //! Tell display panel to allow user to set screenshot clip area. The next
       //! rubberband selection should become the clip area.
-      void sig_selectClipArea();
-      
+      void sig_clipSelectionTool();
+
       // TODO include display options such as disabling publish mode, inclusion
       // of scale bar, etc.
 
@@ -67,10 +74,11 @@ namespace gui{
       // Variables
       prim::ScreenshotClipArea *clip_area=nullptr;  //! Clip area for region screenshot.
 
-      QLineEdit *le_name_format=nullptr;            //! Text field for file name format.
+      QLineEdit *le_name=nullptr;            //! Text field for file name format.
       QLineEdit *le_save_dir=nullptr;               //! Path to target directory.
       QCheckBox *cb_sim_result_style=nullptr;       //! Toggle simulation result style.
       QCheckBox *cb_publish_style=nullptr;          //! Toggle publish style.
+      QCheckBox *cb_overwrite=nullptr;              //! Overwrite file without asking.
       // TODO pointer to scale bar item
   };
 
