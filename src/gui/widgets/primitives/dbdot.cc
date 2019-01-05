@@ -148,22 +148,28 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
   qreal dxy = 0.5 * edge_width_paint;
   rect.adjust(dxy,dxy,-dxy,-dxy);
 
-  // draw outer circle
-  painter->setPen(QPen(edge_col_state, edge_width_paint));
-  painter->setBrush(Qt::NoBrush);
-  painter->drawEllipse(rect);
+  // draw outer circle (or skip altogether if completely transparent)
+  if (edge_col_state.alpha() != 0) {
+    painter->setPen(QPen(edge_col_state, edge_width_paint));
+    fill_fact == 1 ? painter->setBrush(fill_col_state) : painter->setBrush(Qt::NoBrush);
+    painter->drawEllipse(rect);
+  }
 
-  // draw inner fill
-  if(fill_fact>0){
+  // draw inner fill if a fill exists and the fill factor is less than 1 (in which
+  // case it would already have been drawn above)
+  if(fill_fact > 0 && fill_fact < 1){
     QRectF rect = boundingRect();
     QPointF center = rect.center();
     QSizeF size(diameter_paint, diameter_paint);
     rect.setSize(size*qSqrt(fill_fact));
     rect.moveCenter(center);
 
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(fill_col_state);
-    painter->drawEllipse(rect);
+    // draw inner circle or skip if completely transparent
+    if (fill_col_state.alpha() != 0) {
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(fill_col_state);
+      painter->drawEllipse(rect);
+    }
   }
 }
 

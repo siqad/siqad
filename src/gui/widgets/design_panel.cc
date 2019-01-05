@@ -429,17 +429,19 @@ void gui::DesignPanel::setFills(float *fills)
 void gui::DesignPanel::screenshot(QPainter *painter, const QRect &region)
 {
   // add lattice dot previews (vector graphics) instead of using the bitmap
-  // lattice background
-  QList<prim::LatticeCoord> coords = lattice->enclosedSites(region);
+  // include lattice background if layer is not hidden
   QList<prim::LatticeDotPreview*> latdot_previews;
-  for (prim::LatticeCoord coord : coords) {
-    if (lattice->isOccupied(coord))
-      continue;
-    prim::LatticeDotPreview *ldp = new prim::LatticeDotPreview(coord);
-    ldp->setPos(lattice->latticeCoord2ScenePos(coord));
-    ldp->setZValue(INT_MIN);
-    latdot_previews.append(ldp);
-    scene->addItem(ldp);
+  if (layman->getMRULayer(prim::Layer::Lattice)->isVisible()) {
+    QList<prim::LatticeCoord> coords = lattice->enclosedSites(region);
+    for (prim::LatticeCoord coord : coords) {
+      if (lattice->isOccupied(coord))
+        continue;
+      prim::LatticeDotPreview *ldp = new prim::LatticeDotPreview(coord);
+      ldp->setPos(lattice->latticeCoord2ScenePos(coord));
+      ldp->setZValue(INT_MIN);
+      latdot_previews.append(ldp);
+      scene->addItem(ldp);
+    }
   }
 
   // render scene onto painter

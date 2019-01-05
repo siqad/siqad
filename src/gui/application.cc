@@ -937,6 +937,10 @@ void gui::ApplicationGUI::screenshot()
 
 void gui::ApplicationGUI::fullDesignScreenshot()
 {
+  // TODO fold this into the designScreenshot function, if rect input is null
+  // then default to full design screenshot.
+  // TODO the save dialog will probably also be handled by the screenshot manager
+
   beginScreenshotMode();
 
   gui::DesignPanel *widget = this->design_pan;
@@ -965,7 +969,7 @@ void gui::ApplicationGUI::designScreenshot(const QString &target_img_path, const
   // check if target directory is writable
   if (!QFileInfo(QFileInfo(target_img_path).dir().absolutePath()).isWritable()) {
     qDebug() << tr("Directory not writable.");
-    endScreenshotMode();
+    //endScreenshotMode();
     return;
   }
 
@@ -976,8 +980,9 @@ void gui::ApplicationGUI::designScreenshot(const QString &target_img_path, const
         tr("The target image file name %1 already exists. Do you want to \
           overwrite it?").arg(target_img_path), 
         QMessageBox::Yes|QMessageBox::No);
+    // TODO add another button for browsing another path
     if (reply == QMessageBox::No) {
-      endScreenshotMode();
+      //endScreenshotMode();
       return;
     }
   }
@@ -992,7 +997,7 @@ void gui::ApplicationGUI::designScreenshot(const QString &target_img_path, const
   design_pan->screenshot(&painter, rect.toAlignedRect());
   painter.end();
 
-  endScreenshotMode();
+  //endScreenshotMode();
 }
 
 // FILE HANDLING
