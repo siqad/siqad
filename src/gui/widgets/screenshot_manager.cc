@@ -19,7 +19,7 @@ ScreenshotManager::ScreenshotManager(QWidget *parent)
 
 ScreenshotManager::~ScreenshotManager()
 {
-
+  // TODO safely remove clip_area
 }
 
 
@@ -33,18 +33,49 @@ void ScreenshotManager::initScreenshotManager()
 
   // Visual Setting Group
   QGroupBox *group_visual = new QGroupBox(tr("Visual"));
-  cb_sim_result_style = new QCheckBox(tr("Simulation Result Style"));
-  cb_publish_style = new QCheckBox(tr("Publish Style"));
+  // TODO implement style change
+  //cb_sim_result_style = new QCheckBox(tr("Simulation Result Style"));
+  //cb_publish_style = new QCheckBox(tr("Publish Style"));
+  QCheckBox *cb_scale_bar = new QCheckBox(tr("Show Scale Bar"));
+  QLabel *label_scale_bar_length = new QLabel(tr("Length"));
+  QLineEdit *le_scale_bar_length = new QLineEdit("0");
+  QComboBox *cbb_scale_bar_unit = new QComboBox();
+  
+  cbb_scale_bar_unit->addItems(Unit::distanceUnitStringList(Unit::pm,Unit::m));
+
+  // enable or disable scale bar options depending on the check state of cb_scale_bar
+  auto enableScaleBarOptions = [le_scale_bar_length, cbb_scale_bar_unit](int cb_state) {
+    bool show_scale_bar_settings = cb_state == Qt::Checked;
+    le_scale_bar_length->setEnabled(show_scale_bar_settings);
+    cbb_scale_bar_unit->setEnabled(show_scale_bar_settings);
+  };
+  connect(cb_scale_bar, &QCheckBox::stateChanged, enableScaleBarOptions);
+  enableScaleBarOptions(cb_scale_bar->checkState());
+
+  // update scale bar properties from GUI options
+  auto updateScaleBarFromOptions = [this, le_scale_bar_length, cbb_scale_bar_unit](){
+    float sb_length = le_scale_bar_length->text().toFloat();
+    Unit::DistanceUnit unit = Unit::stringToDistanceUnit(cbb_scale_bar_unit->currentText());
+    updateScaleBar(sb_length, unit);
+  };
+  connect(le_scale_bar_length, &QLineEdit::textChanged, 
+          updateScaleBarFromOptions);
+  connect(cbb_scale_bar_unit, &QComboBox::currentTextChanged, 
+          updateScaleBarFromOptions);
+  updateScaleBarFromOptions();
+
+  QHBoxLayout *hl_scale_bar = new QHBoxLayout();
+  hl_scale_bar->addWidget(label_scale_bar_length);
+  hl_scale_bar->addWidget(le_scale_bar_length);
+  hl_scale_bar->addWidget(cbb_scale_bar_unit);
 
   QVBoxLayout *vl_visual = new QVBoxLayout();
-  vl_visual->addWidget(cb_sim_result_style);
-  vl_visual->addWidget(cb_publish_style);
+  //vl_visual->addWidget(cb_sim_result_style);
+  //vl_visual->addWidget(cb_publish_style);
+  vl_visual->addWidget(cb_scale_bar);
+  vl_visual->addLayout(hl_scale_bar);
   group_visual->setLayout(vl_visual);
 
-  group_visual->setDisabled(true);
-
-  // TODO connect
-  
 
   // Clip Setting Group
   QGroupBox *group_clip = new QGroupBox(tr("Clipping"));
@@ -87,16 +118,18 @@ void ScreenshotManager::initScreenshotManager()
             le_save_dir->setText(dir);
           }
   );
+
   // disable relevant fields when user opts to ask for path and name every time
-  connect(cb_always_ask_name, &QCheckBox::stateChanged, 
-          [this, button_browse](int cb_state) {
-            bool disable = cb_state == Qt::Checked;
-            le_save_dir->setDisabled(disable);
-            button_browse->setDisabled(disable);
-            le_name->setDisabled(disable);
-            cb_overwrite->setDisabled(disable);
-          }
-  );
+  auto disableFilePathOptions = [this, button_browse](int cb_state) {
+    bool disable = cb_state == Qt::Checked;
+    le_save_dir->setDisabled(disable);
+    button_browse->setDisabled(disable);
+    le_name->setDisabled(disable);
+    cb_overwrite->setDisabled(disable);
+  };
+  connect(cb_always_ask_name, &QCheckBox::stateChanged, disableFilePathOptions);
+  disableFilePathOptions(cb_always_ask_name->checkState());
+
   // emit screenshot signal with relevant settings
   connect(button_take_screenshot, &QAbstractButton::clicked,
           [this]() {

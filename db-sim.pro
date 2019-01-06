@@ -44,6 +44,14 @@ macx:ICON = resources/ico/app.icns
 
 SOURCES += src/main.cc
 
+# global
+
+HEADERS += \
+    src/global.h
+
+SOURCES += \
+    src/global.cc
+
 # settings
 
 HEADERS += \

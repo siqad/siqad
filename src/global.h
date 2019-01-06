@@ -11,16 +11,45 @@
 
 #include <QTextStream>
 #include <QDebug>
+#include <QMetaEnum>
+#include <QStringList>
 
 namespace gui{
 
+  // Forward declarations
+  class Unit;
+
+  // Globally relevant enums
   enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool, ElectrodeTool,
                 AFMAreaTool, AFMPathTool, ScreenshotAreaTool, LabelTool, ElectrodePolyTool};
   enum DisplayMode{DesignMode, SimDisplayMode, ScreenshotMode};
 
+  // Handy unit functions
+  class Unit : public QObject
+  {
+    Q_OBJECT
+
+  public:
+
+    //! Common metric distance units in ascending order.
+    enum DistanceUnit{pm, ang, nm, um, mm, m};
+    Q_ENUM(DistanceUnit);
+
+    //! Return the corresponding float value for the given distance unit. Upon
+    //! error, return -1.
+    static float distanceUnitValue(DistanceUnit);
+
+    //! Return a QString QList of available units from start unit to end unit.
+    static QStringList distanceUnitStringList(DistanceUnit start, DistanceUnit end);
+
+    //! Return the corresponding DistanceUnit enum of a QString.
+    static DistanceUnit stringToDistanceUnit(QString unit);
+  };
+
+  // Global variables
   extern QString python_path;
 
-} // end global namespace
+} // end gui namespace
 
 struct QPairFirstComparer
 {

@@ -13,6 +13,7 @@
 #include <QtWidgets>
 #include <QGraphicsRectItem>
 
+#include "../../global.h"
 #include "primitives/items.h"
 
 
@@ -24,6 +25,7 @@ namespace gui{
 
     public:
 
+
       //! Constructor, the parent should normally be design panel.
       ScreenshotManager(QWidget *parent = 0);
 
@@ -31,7 +33,7 @@ namespace gui{
       ~ScreenshotManager();
 
       //! Return the screenshot clip area as a QRect.
-      QRectF clipArea() {return clip_area->sceneRect();}
+      QRectF clipArea() const {return clip_area->sceneRect();}
 
       //! Set the screenshot clip area.
       void setClipArea(QRectF area) {clip_area->setSceneRect(area);}
@@ -42,6 +44,9 @@ namespace gui{
 
       //! Set the visibility of the clip area preview.
       void setClipVisibility(bool visible) {clip_area->setVisible(visible);}
+
+      //! Update the scale bar length, or hide it if the length is less than 0.
+      void updateScaleBar(float t_length, Unit::DistanceUnit unit);
 
 
 
