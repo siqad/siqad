@@ -24,6 +24,7 @@
 #include "layer_manager.h"
 #include "property_editor.h"
 #include "item_manager.h"
+#include "screenshot_manager.h"
 
 #include "primitives/layer.h"
 #include "primitives/lattice.h"
@@ -89,12 +90,13 @@ namespace gui{
     //! Remove the given Item from the given Layer if possible.
     void removeItem(prim::Item *item, prim::Layer* layer);
 
-    //! add a new Item to the graphics scene. This either means the Item is already owned
-    //! by another class and only needs to be shown graphically, or the Item is merely
-    //! a temporary graphics item for purely indicative purposes.
+    //! Add a new Item to the graphics scene without adding it to a layer. This 
+    //! either means the Item is already owned by another class and only needs 
+    //! to be shown graphically, or the Item is merely a temporary graphics 
+    //! item for purely indicative purposes.
     void addItemToScene(prim::Item *item);
 
-    //! remove item from scene without deleting the item pointer. The caller has
+    //! Remove item from scene without deleting the item pointer. The caller has
     //! to handle the cleanup if so desired.
     void removeItemFromScene(prim::Item *item);
 
@@ -239,8 +241,9 @@ namespace gui{
     void sig_quickRunSimulation();
 
     //! Request ApplicationGUI to take a screenshot of the design panel bounded
-    //! by the given QRect.
-    void sig_screenshot(QRect);
+    //! by the given scene_rect. If the rect is null, take a screenshot of the
+    //! entire scene.
+    void sig_screenshot(const QString &target_img_path, const QRectF &scene_rect, bool always_overwrite);
 
     //! Tell ApplicationGUI to cancel the current screenshot.
     void sig_cancelScreenshot();
@@ -294,9 +297,10 @@ namespace gui{
     QUndoStack *undo_stack;   // undo stack
 
     // contained widgets
-    gui::LayerManager *layman;
-    gui::PropertyEditor *property_editor;
-    gui::ItemManager *itman;
+    gui::LayerManager *layman=nullptr;
+    gui::PropertyEditor *property_editor=nullptr;
+    gui::ItemManager *itman=nullptr;
+    gui::ScreenshotManager *screenman=nullptr;
 
     // background color presets
     static QColor background_col;         // normal background color

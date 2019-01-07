@@ -31,3 +31,5 @@ doxygen
 .qmake.stash
 tempfig.pdf
 .temp/
+.ycm*.py
+siqad-screenshot.svg

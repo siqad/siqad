@@ -74,6 +74,22 @@ void gui::DesignPanel::initDesignPanel() {
   layman = new LayerManager(this);
   property_editor = new PropertyEditor(this);
   itman = new ItemManager(this, layman);
+  screenman = new ScreenshotManager(this);
+
+  // ScreenshotManager signals
+  connect(screenman, &gui::ScreenshotManager::sig_takeScreenshot,
+          [this](const QString &target_img_path, const QRectF &scene_rect, bool always_overwrite) {
+            emit sig_screenshot(target_img_path, scene_rect, always_overwrite);
+          }
+  );
+  connect(screenman, &gui::ScreenshotManager::sig_clipSelectionTool,
+          [this]() {emit sig_toolChangeRequest(gui::ScreenshotAreaTool);});
+  connect(screenman, &gui::ScreenshotManager::sig_addVisualAidToDP,
+          [this](prim::Item *t_item) {addItemToScene(t_item);});
+  connect(screenman, &gui::ScreenshotManager::sig_removeVisualAidFromDP,
+          [this](prim::Item *t_item) {removeItemFromScene(t_item);});
+  connect(screenman, &gui::ScreenshotManager::sig_scaleBarAnchorTool,
+          [this]() {sig_toolChangeRequest(gui::ScaleBarAnchorTool);});
 
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 
@@ -149,11 +165,18 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   delete afm_panel;
   delete property_editor;
   delete eph;
-  // delete layers and contained items
   delete layman;
   delete itman;
+  delete screenman;
 
+  afm_panel=nullptr;
+  property_editor=nullptr;
+  eph=nullptr;
+  layman=nullptr;
+  itman=nullptr;
+  screenman=nullptr;
 
+  // delete layers and contained items
   if(reset) prim::Layer::resetLayers(); // reset layer counter
 
 
@@ -300,6 +323,8 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   for(prim::Item *const item : lattice->getItems())
     scene->addItem(item);
 
+  // DO NOT ADD LAYERS BEFORE LATTICE, LATTICE MUST BE LAYER 0
+
   // add the lattice to the layers, as layer 0
   layman->addLattice(lattice);
 
@@ -390,6 +415,9 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
     case gui::ToolType::ScreenshotAreaTool:
       setInteractive(true);
       break;
+    case gui::ToolType::ScaleBarAnchorTool:
+      setInteractive(true);
+      break;
     case gui::ToolType::LabelTool:
       setInteractive(true);
       break;
@@ -417,17 +445,19 @@ void gui::DesignPanel::setFills(float *fills)
 void gui::DesignPanel::screenshot(QPainter *painter, const QRect &region)
 {
   // add lattice dot previews (vector graphics) instead of using the bitmap
-  // lattice background
-  QList<prim::LatticeCoord> coords = lattice->enclosedSites(region);
+  // include lattice background if layer is not hidden
   QList<prim::LatticeDotPreview*> latdot_previews;
-  for (prim::LatticeCoord coord : coords) {
-    if (lattice->isOccupied(coord))
-      continue;
-    prim::LatticeDotPreview *ldp = new prim::LatticeDotPreview(coord);
-    ldp->setPos(lattice->latticeCoord2ScenePos(coord));
-    ldp->setZValue(INT_MIN);
-    latdot_previews.append(ldp);
-    scene->addItem(ldp);
+  if (layman->getMRULayer(prim::Layer::Lattice)->isVisible()) {
+    QList<prim::LatticeCoord> coords = lattice->enclosedSites(region);
+    for (prim::LatticeCoord coord : coords) {
+      if (lattice->isOccupied(coord))
+        continue;
+      prim::LatticeDotPreview *ldp = new prim::LatticeDotPreview(coord);
+      ldp->setPos(lattice->latticeCoord2ScenePos(coord));
+      ldp->setZValue(INT_MIN);
+      latdot_previews.append(ldp);
+      scene->addItem(ldp);
+    }
   }
 
   // render scene onto painter
@@ -447,6 +477,9 @@ void gui::DesignPanel::setDisplayMode(DisplayMode mode)
 {
   display_mode = mode;
   prim::Item::display_mode = mode;
+
+  screenman->prepareScreenshotMode(display_mode == ScreenshotMode);
+
   updateBackground();
 }
 
@@ -666,11 +699,12 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind, bool a
       db_dots_result[i]->setShowElec(job->elec_dists_avg[i]);
       //qDebug() << tr("Setting electron %1 to %2").arg(i).arg(job->elec_dists_avg[i]);
     } else if(db_dots_result[i]) {
-      // show the distribution of the selected index
       if (avg_degen) {
+        // show the average distribution of degenerate states
         db_dots_result[i]->setShowElec(job->elecDistAvgDegenOfDB(dist_ind, i));
         //qDebug() << tr("Setting electron %1 to %2, averaged").arg(i).arg(job->elecDistAvgDegenOfDB(dist_ind,i));
       } else {
+        // show the average distribution of the selected index
         db_dots_result[i]->setShowElec(job->filteredElecDists().at(dist_ind).dist[i]);
       }
     }
@@ -819,11 +853,12 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 
   switch(e->button()){
     case Qt::LeftButton:
-      if (tool_type == ScreenshotAreaTool) {
+      if (tool_type == ScaleBarAnchorTool) {
+        screenman->setScaleBarAnchor(mapToScene(e->pos()));
+      } else if (tool_type == ScreenshotAreaTool) {
         // use rubberband to select screenshot area
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
-
       } else if (tool_type == SelectTool || tool_type == ElectrodeTool ||
           tool_type == AFMAreaTool || tool_type == LabelTool) {
         // rubber band variables
@@ -844,7 +879,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
         if (tool_type == DBGenTool && snap_target)
           rb_start = snap_target->pos().toPoint();
         else*/
-          rb_start = mapToScene(e->pos()).toPoint();
+        rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
         coord_start = lattice->nearestSite(mapToScene(e->pos()));
 
@@ -996,9 +1031,11 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             createElectrodePolyNode(mapToScene(e->pos()));
             break;
           case gui::ToolType::ScreenshotAreaTool:
-            // take a screenshot of the rubberband area
-            sig_screenshot(rb_scene_rect);
+          {
+            // set the screenshot clip area in the screenshot manager
+            screenman->setClipArea(rb_scene_rect);
             break;
+          }
           case gui::ToolType::LabelTool:
             // create a label with the rubberband area
             createTextLabel(rb_scene_rect);
@@ -1095,10 +1132,6 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
   else{
     switch(e->key()){
       case Qt::Key_Escape:
-        // quit screenshot mode if currently in it
-        if (display_mode == ScreenshotMode)
-          emit sig_cancelScreenshot();
-
         // deactivate current tool
         if (tool_type != gui::ToolType::SelectTool) {
           //qDebug() << tr("Esc pressed, drop back to select tool");
@@ -1109,11 +1142,6 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
       case Qt::Key_Return:
         if (tool_type == gui::ToolType::ElectrodePolyTool) {
           createElectrodePoly();
-        }
-        break;
-      case Qt::Key_S:
-        if (display_mode == ScreenshotMode) {
-          sig_screenshot(prev_screenshot_area);
         }
         break;
       default:

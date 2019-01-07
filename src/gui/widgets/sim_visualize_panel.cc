@@ -171,13 +171,15 @@ void SimVisualize::showPotential()
 
 void SimVisualize::showAverageElecDist()
 {
+  qDebug() << tr("Showing average electron distribution.");
   emit showElecDistOnScene(show_job, -1);
 }
 
 
 void SimVisualize::showAverageElecDistDegen()
 {
-  emit showElecDistOnScene(show_job, combo_job_sel->currentIndex()-1, true);
+  qDebug() << tr("Show degenerate states for distribution %1").arg(slider_dist_sel->sliderPosition());
+  emit showElecDistOnScene(show_job, slider_dist_sel->sliderPosition()-1, true);
 }
 
 

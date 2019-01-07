@@ -44,6 +44,14 @@ macx:ICON = resources/ico/app.icns
 
 SOURCES += src/main.cc
 
+# global
+
+HEADERS += \
+    src/global.h
+
+SOURCES += \
+    src/global.cc
+
 # settings
 
 HEADERS += \
@@ -57,101 +65,107 @@ SOURCES += \
 # primitives for widgets
 
 HEADERS += \
-	src/gui/widgets/primitives/emitter.h \
-	src/gui/widgets/primitives/item.h \
-	src/gui/widgets/primitives/aggregate.h \
-	src/gui/widgets/primitives/dbdot.h \
-	src/gui/widgets/primitives/ghost.h \
-	src/gui/widgets/primitives/items.h \
-	src/gui/widgets/primitives/layer.h \
-	src/gui/widgets/primitives/lattice.h \
-	src/gui/widgets/primitives/sim_engine.h \
-	src/gui/widgets/primitives/sim_job.h \
-	src/gui/widgets/primitives/electrode.h \
-	src/gui/widgets/primitives/electrode_poly.h \
-  src/gui/widgets/primitives/afmarea.h \
-  src/gui/widgets/primitives/afmpath.h \
-  src/gui/widgets/primitives/afmnode.h \
-  src/gui/widgets/primitives/afmseg.h \
-  src/gui/widgets/primitives/pot_plot.h \
-	src/gui/widgets/primitives/resizablerect.h \
-	src/gui/widgets/primitives/resizable_poly.h \
-	src/gui/widgets/primitives/polygon_handle.h \
-	src/gui/widgets/primitives/polygon_segment.h \
-	src/gui/widgets/primitives/hull/hull.h \
-	src/gui/widgets/primitives/hull/convex.h \
-	src/gui/widgets/primitives/hull/hulls.h \
-  src/gui/widgets/primitives/labels/labelgroup.h \
-  src/gui/widgets/primitives/labels/textlabel.h
+    src/gui/widgets/primitives/emitter.h \
+   	src/gui/widgets/primitives/item.h \
+   	src/gui/widgets/primitives/aggregate.h \
+   	src/gui/widgets/primitives/dbdot.h \
+   	src/gui/widgets/primitives/ghost.h \
+   	src/gui/widgets/primitives/items.h \
+   	src/gui/widgets/primitives/layer.h \
+   	src/gui/widgets/primitives/lattice.h \
+   	src/gui/widgets/primitives/sim_engine.h \
+   	src/gui/widgets/primitives/sim_job.h \
+   	src/gui/widgets/primitives/electrode.h \
+   	src/gui/widgets/primitives/electrode_poly.h \
+    src/gui/widgets/primitives/afmarea.h \
+    src/gui/widgets/primitives/afmpath.h \
+    src/gui/widgets/primitives/afmnode.h \
+    src/gui/widgets/primitives/afmseg.h \
+    src/gui/widgets/primitives/pot_plot.h \
+    src/gui/widgets/primitives/resizablerect.h \
+   	src/gui/widgets/primitives/resizable_poly.h \
+   	src/gui/widgets/primitives/polygon_handle.h \
+   	src/gui/widgets/primitives/polygon_segment.h \
+   	src/gui/widgets/primitives/hull/hull.h \
+   	src/gui/widgets/primitives/hull/convex.h \
+   	src/gui/widgets/primitives/hull/hulls.h \
+    src/gui/widgets/primitives/labels/labelgroup.h \
+    src/gui/widgets/primitives/labels/textlabel.h \
+    src/gui/widgets/primitives/visualaids/screenshot_clip_area.h \
+    src/gui/widgets/primitives/visualaids/scale_bar.h
 
 
 
 SOURCES += \
-	src/gui/widgets/primitives/emitter.cc \
-	src/gui/widgets/primitives/item.cc \
-	src/gui/widgets/primitives/aggregate.cc \
-	src/gui/widgets/primitives/dbdot.cc \
-	src/gui/widgets/primitives/ghost.cc \
-	src/gui/widgets/primitives/layer.cc \
-	src/gui/widgets/primitives/lattice.cc \
-	src/gui/widgets/primitives/sim_engine.cc \
-	src/gui/widgets/primitives/sim_job.cc \
-	src/gui/widgets/primitives/electrode.cc \
-	src/gui/widgets/primitives/electrode_poly.cc \
-	src/gui/widgets/primitives/afmarea.cc \
-	src/gui/widgets/primitives/afmpath.cc \
-	src/gui/widgets/primitives/afmnode.cc \
-	src/gui/widgets/primitives/afmseg.cc \
-  src/gui/widgets/primitives/pot_plot.cc \
-	src/gui/widgets/primitives/resizablerect.cc \
-	src/gui/widgets/primitives/resizable_poly.cc \
-	src/gui/widgets/primitives/polygon_handle.cc \
-	src/gui/widgets/primitives/polygon_segment.cc \
-	src/gui/widgets/primitives/hull/hull.cc \
-	src/gui/widgets/primitives/hull/convex.cc \
-  src/gui/widgets/primitives/labels/labelgroup.cc \
-  src/gui/widgets/primitives/labels/textlabel.cc
+    src/gui/widgets/primitives/emitter.cc \
+   	src/gui/widgets/primitives/item.cc \
+   	src/gui/widgets/primitives/aggregate.cc \
+   	src/gui/widgets/primitives/dbdot.cc \
+   	src/gui/widgets/primitives/ghost.cc \
+   	src/gui/widgets/primitives/layer.cc \
+   	src/gui/widgets/primitives/lattice.cc \
+   	src/gui/widgets/primitives/sim_engine.cc \
+   	src/gui/widgets/primitives/sim_job.cc \
+   	src/gui/widgets/primitives/electrode.cc \
+   	src/gui/widgets/primitives/electrode_poly.cc \
+   	src/gui/widgets/primitives/afmarea.cc \
+   	src/gui/widgets/primitives/afmpath.cc \
+   	src/gui/widgets/primitives/afmnode.cc \
+   	src/gui/widgets/primitives/afmseg.cc \
+    src/gui/widgets/primitives/pot_plot.cc \
+    src/gui/widgets/primitives/resizablerect.cc \
+   	src/gui/widgets/primitives/resizable_poly.cc \
+   	src/gui/widgets/primitives/polygon_handle.cc \
+   	src/gui/widgets/primitives/polygon_segment.cc \
+   	src/gui/widgets/primitives/hull/hull.cc \
+   	src/gui/widgets/primitives/hull/convex.cc \
+    src/gui/widgets/primitives/labels/labelgroup.cc \
+    src/gui/widgets/primitives/labels/textlabel.cc \
+    src/gui/widgets/primitives/visualaids/screenshot_clip_area.cc \
+    src/gui/widgets/primitives/visualaids/scale_bar.cc
 
 
 # widgets
 
 HEADERS += \
-	src/gui/application.h \
-	src/gui/property_map.h \
-	src/gui/widgets/property_editor.h \
-	src/gui/widgets/property_form.h \
-	src/gui/widgets/design_panel.h \
-	src/gui/widgets/dialog_panel.h \
-	src/gui/widgets/input_field.h \
-	src/gui/widgets/info_panel.h \
-  src/gui/widgets/layer_manager.h \
-  src/gui/widgets/sim_manager.h \
-  src/gui/widgets/sim_visualize_panel.h \
-  src/gui/widgets/afm_panel.h \
-	src/gui/commander.h \
-	src/gui/widgets/completer.h \
-	src/gui/widgets/item_manager.h \
-	src/gui/widgets/electrode_poly_helper.h
+    src/gui/application.h \
+   	src/gui/property_map.h \
+   	src/gui/widgets/property_editor.h \
+   	src/gui/widgets/property_form.h \
+   	src/gui/widgets/design_panel.h \
+   	src/gui/widgets/dialog_panel.h \
+   	src/gui/widgets/input_field.h \
+   	src/gui/widgets/info_panel.h \
+    src/gui/widgets/layer_manager.h \
+    src/gui/widgets/sim_manager.h \
+    src/gui/widgets/sim_visualize_panel.h \
+    src/gui/widgets/afm_panel.h \
+  	src/gui/commander.h \
+  	src/gui/widgets/completer.h \
+  	src/gui/widgets/item_manager.h \
+  	src/gui/widgets/electrode_poly_helper.h \
+    src/gui/widgets/screenshot_manager.h
 
 
 
 SOURCES += \
-	src/gui/application.cc \
-	src/gui/property_map.cc \
-	src/gui/widgets/property_editor.cc \
-	src/gui/widgets/property_form.cc \
-	src/gui/widgets/design_panel.cc \
-	src/gui/widgets/dialog_panel.cc \
-	src/gui/widgets/input_field.cc \
-	src/gui/widgets/info_panel.cc \
-  src/gui/widgets/layer_manager.cc \
-  src/gui/widgets/sim_manager.cc \
-  src/gui/widgets/sim_visualize_panel.cc \
-	src/gui/widgets/afm_panel.cc \
-	src/gui/commander.cc \
-	src/gui/widgets/completer.cc \
-	src/gui/widgets/item_manager.cc \
-	src/gui/widgets/electrode_poly_helper.cc
+    src/gui/application.cc \
+   	src/gui/property_map.cc \
+   	src/gui/widgets/property_editor.cc \
+   	src/gui/widgets/property_form.cc \
+   	src/gui/widgets/design_panel.cc \
+   	src/gui/widgets/dialog_panel.cc \
+   	src/gui/widgets/input_field.cc \
+   	src/gui/widgets/info_panel.cc \
+    src/gui/widgets/layer_manager.cc \
+    src/gui/widgets/sim_manager.cc \
+    src/gui/widgets/sim_visualize_panel.cc \
+   	src/gui/widgets/afm_panel.cc \
+   	src/gui/commander.cc \
+   	src/gui/widgets/completer.cc \
+   	src/gui/widgets/item_manager.cc \
+   	src/gui/widgets/electrode_poly_helper.cc \
+    src/gui/widgets/screenshot_manager.cc
 
 
 
