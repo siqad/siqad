@@ -57,7 +57,7 @@ public:
 
 
 signals:
-  void emitSimJob(prim::SimJob *new_job);
+  void sig_simJob(prim::SimJob *new_job);
 
 public slots:
 

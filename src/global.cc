@@ -30,6 +30,19 @@ float Unit::distanceUnitValue(DistanceUnit du) {
   }
 }
 
+float Unit::valueConvertDistanceUnit(float val, DistanceUnit from_unit, DistanceUnit to_unit)
+{
+  float conv_scale = distanceUnitValue(from_unit) / distanceUnitValue(to_unit);
+  assert(conv_scale > 0);
+  return val * conv_scale;
+}
+
+QString Unit::distanceUnitString(DistanceUnit du)
+{
+  QMetaEnum du_enum = QMetaEnum::fromType<DistanceUnit>();
+  return du_enum.valueToKey(du);
+}
+
 QStringList Unit::distanceUnitStringList(DistanceUnit start, DistanceUnit end)
 {
   assert(end >= start);

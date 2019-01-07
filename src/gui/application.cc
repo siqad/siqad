@@ -118,7 +118,7 @@ void gui::ApplicationGUI::initGUI()
           info_pan, &gui::InfoPanel::updateSelItemCount);
 
   // widget-app gui signals
-  connect(sim_manager, &gui::SimManager::emitSimJob,
+  connect(sim_manager, &gui::SimManager::sig_simJob,
           this, &gui::ApplicationGUI::runSimulation);
   connect(design_pan, &gui::DesignPanel::sig_resetDesignPanel,
           this, &gui::ApplicationGUI::designPanelReset);
@@ -677,6 +677,10 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
       action_screenshot_tool->setChecked(true);
       setToolScreenshotArea();
       break;
+    case gui::ToolType::ScaleBarAnchorTool:
+      // TODO add action
+      setToolScaleBarAnchor();
+      break;
       /*
     case gui::ToolType::LabelTool:
       action_label_tool->setChecked(true);
@@ -732,6 +736,12 @@ void gui::ApplicationGUI::setToolScreenshotArea()
 {
   qDebug() << tr("selecting screenshot area tool");
   design_pan->setTool(gui::ToolType::ScreenshotAreaTool);
+}
+
+void gui::ApplicationGUI::setToolScaleBarAnchor()
+{
+  qDebug() << tr("selecting scale bar anchor tool");
+  design_pan->setTool(gui::ToolType::ScaleBarAnchorTool);
 }
 
 void gui::ApplicationGUI::setToolLabel()
@@ -888,7 +898,7 @@ void gui::ApplicationGUI::beginScreenshotMode()
   display_mode_cache = design_pan->displayMode();
   design_pan->setDisplayMode(ScreenshotMode);
   action_screenshot_tool->setVisible(true);
-  setTool(ScreenshotAreaTool);
+  //setTool(ScreenshotAreaTool);
 }
 
 void gui::ApplicationGUI::endScreenshotMode()

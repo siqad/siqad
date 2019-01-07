@@ -69,6 +69,7 @@ namespace gui{
     void setToolAFMArea();
     void setToolAFMPath();
     void setToolScreenshotArea();
+    void setToolScaleBarAnchor();
     void setToolLabel();
     void setToolElectrodePoly();
 

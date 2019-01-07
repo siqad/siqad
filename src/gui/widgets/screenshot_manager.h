@@ -32,21 +32,27 @@ namespace gui{
       //! Destructor.
       ~ScreenshotManager();
 
+      //! Actions performed when entering or exiting screenshot mode.
+      void prepareScreenshotMode(bool entering);
+
       //! Return the screenshot clip area as a QRect.
       QRectF clipArea() const {return clip_area->sceneRect();}
 
-      //! Set the screenshot clip area.
-      void setClipArea(QRectF area) {clip_area->setSceneRect(area);}
-
-      //! Reset the screenshot clip area to a null rectangle (use isNull() to
-      //! check for QRect null state.)
-      void resetClipArea() {clip_area->setSceneRect(QRectF());}
+      //! Set the screenshot clip area. If a null rectangle is received, then
+      //! clipping is disabled.
+      void setClipArea(QRectF area=QRectF());
 
       //! Set the visibility of the clip area preview.
       void setClipVisibility(bool visible) {clip_area->setVisible(visible);}
 
-      //! Update the scale bar length, or hide it if the length is less than 0.
-      void updateScaleBar(float t_length, Unit::DistanceUnit unit);
+      //! Set the scale bar length, or hide it if the length is less than 0.
+      void setScaleBar(float t_length, Unit::DistanceUnit unit);
+
+      //! Set the scale bar anchor position in screen coordinates.
+      void setScaleBarAnchor(QPointF anchor) {scale_bar->setScenePos(anchor);}
+
+      //! Set the visibility of the scale bar.
+      void setScaleBarVisibility(bool visible) {scale_bar->setVisible(visible);}
 
 
 
@@ -66,6 +72,15 @@ namespace gui{
       //! rubberband selection should become the clip area.
       void sig_clipSelectionTool();
 
+      //! Tell display panel to switch to scale bar position anchor tool.
+      void sig_scaleBarAnchorTool();
+
+      //! Add visual aid (scale bar, clip area preview) to display panel.
+      void sig_addVisualAidToDP(prim::Item *t_item);
+
+      //! Remove visual aid (scale bar, clip area preview) from display panel.
+      void sig_removeVisualAidFromDP(prim::Item *t_item);
+
       // TODO include display options such as disabling publish mode, inclusion
       // of scale bar, etc.
 
@@ -78,6 +93,7 @@ namespace gui{
 
       // Variables
       prim::ScreenshotClipArea *clip_area=nullptr;  //! Clip area for region screenshot.
+      prim::ScaleBar *scale_bar=nullptr;            //! Scale bar in screenshots.
 
       QLineEdit *le_name=nullptr;            //! Text field for file name format.
       QLineEdit *le_save_dir=nullptr;               //! Path to target directory.

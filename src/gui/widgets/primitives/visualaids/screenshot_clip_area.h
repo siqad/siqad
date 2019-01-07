@@ -12,7 +12,7 @@
 
 
 #include <QtWidgets>
-#include "item.h"
+#include "../item.h"
 
 namespace prim{
 
@@ -34,20 +34,21 @@ namespace prim{
     // accessors
 
     //! Set the screenshot clip area in scene coordinates.
-    void setSceneRect(QRectF t_scene_rect) {scene_rect = t_scene_rect;}
+    void setSceneRect(QRectF t_scene_rect);
 
     //! Return the scene_rect.
     QRectF sceneRect() {return scene_rect;}
 
-    //! Overridden paint function.
+    //! Overridden paint function. Unlike most other items, the screenshot clip
+    //! area preview's border does not overlap with the rect area.
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
 
   protected:
 
-    //! Return scene_rect.
+    //! Return the scene rect plus border.
     virtual QRectF boundingRect() const override;
 
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) override;
+    //virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) override;
 
 
   private:
@@ -62,9 +63,9 @@ namespace prim{
     QRectF scene_rect;
 
     // static class parameters for painting
-    static qreal edge_width;    // proportional width of boundary edge
-    static prim::Item::StateColors fill_col;
-    static prim::Item::StateColors edge_col;
+    static qreal edge_width;    // edge width in angstrom (in the future, make this independent of zoom)
+    //static prim::Item::StateColors fill_col;
+    static QColor edge_col;
 
   };
 

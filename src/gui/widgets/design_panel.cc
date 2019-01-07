@@ -76,13 +76,20 @@ void gui::DesignPanel::initDesignPanel() {
   itman = new ItemManager(this, layman);
   screenman = new ScreenshotManager(this);
 
+  // ScreenshotManager signals
   connect(screenman, &gui::ScreenshotManager::sig_takeScreenshot,
           [this](const QString &target_img_path, const QRectF &scene_rect, bool always_overwrite) {
             emit sig_screenshot(target_img_path, scene_rect, always_overwrite);
           }
   );
   connect(screenman, &gui::ScreenshotManager::sig_clipSelectionTool,
-          [this]() {setTool(gui::ScreenshotAreaTool);});
+          [this]() {emit sig_toolChangeRequest(gui::ScreenshotAreaTool);});
+  connect(screenman, &gui::ScreenshotManager::sig_addVisualAidToDP,
+          [this](prim::Item *t_item) {addItemToScene(t_item);});
+  connect(screenman, &gui::ScreenshotManager::sig_removeVisualAidFromDP,
+          [this](prim::Item *t_item) {removeItemFromScene(t_item);});
+  connect(screenman, &gui::ScreenshotManager::sig_scaleBarAnchorTool,
+          [this]() {sig_toolChangeRequest(gui::ScaleBarAnchorTool);});
 
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 
@@ -316,6 +323,8 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   for(prim::Item *const item : lattice->getItems())
     scene->addItem(item);
 
+  // DO NOT ADD LAYERS BEFORE LATTICE, LATTICE MUST BE LAYER 0
+
   // add the lattice to the layers, as layer 0
   layman->addLattice(lattice);
 
@@ -402,6 +411,9 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
     case gui::ToolType::ScreenshotAreaTool:
       setInteractive(true);
       break;
+    case gui::ToolType::ScaleBarAnchorTool:
+      setInteractive(true);
+      break;
     case gui::ToolType::LabelTool:
       setInteractive(true);
       break;
@@ -462,7 +474,7 @@ void gui::DesignPanel::setDisplayMode(DisplayMode mode)
   display_mode = mode;
   prim::Item::display_mode = mode;
 
-  screenman->setVisible(display_mode == ScreenshotMode);
+  screenman->prepareScreenshotMode(display_mode == ScreenshotMode);
 
   updateBackground();
 }
@@ -836,11 +848,12 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 
   switch(e->button()){
     case Qt::LeftButton:
-      if (tool_type == ScreenshotAreaTool) {
+      if (tool_type == ScaleBarAnchorTool) {
+        screenman->setScaleBarAnchor(mapToScene(e->pos()));
+      } else if (tool_type == ScreenshotAreaTool) {
         // use rubberband to select screenshot area
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
-
       } else if (tool_type == SelectTool || tool_type == ElectrodeTool ||
           tool_type == AFMAreaTool || tool_type == LabelTool) {
         // rubber band variables
@@ -861,7 +874,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
         if (tool_type == DBGenTool && snap_target)
           rb_start = snap_target->pos().toPoint();
         else*/
-          rb_start = mapToScene(e->pos()).toPoint();
+        rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
         coord_start = lattice->nearestSite(mapToScene(e->pos()));
 
@@ -1014,10 +1027,6 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             break;
           case gui::ToolType::ScreenshotAreaTool:
           {
-            // TODO remove commented
-            // take a screenshot of the rubberband area
-            //sig_screenshot(rb_scene_rect);
-            
             // set the screenshot clip area in the screenshot manager
             screenman->setClipArea(rb_scene_rect);
             break;

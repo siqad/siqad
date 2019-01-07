@@ -86,12 +86,13 @@ HEADERS += \
    	src/gui/widgets/primitives/resizable_poly.h \
    	src/gui/widgets/primitives/polygon_handle.h \
    	src/gui/widgets/primitives/polygon_segment.h \
-    src/gui/widgets/primitives/screenshot_clip_area.h \
    	src/gui/widgets/primitives/hull/hull.h \
    	src/gui/widgets/primitives/hull/convex.h \
    	src/gui/widgets/primitives/hull/hulls.h \
     src/gui/widgets/primitives/labels/labelgroup.h \
-    src/gui/widgets/primitives/labels/textlabel.h
+    src/gui/widgets/primitives/labels/textlabel.h \
+    src/gui/widgets/primitives/visualaids/screenshot_clip_area.h \
+    src/gui/widgets/primitives/visualaids/scale_bar.h
 
 
 
@@ -116,11 +117,12 @@ SOURCES += \
    	src/gui/widgets/primitives/resizable_poly.cc \
    	src/gui/widgets/primitives/polygon_handle.cc \
    	src/gui/widgets/primitives/polygon_segment.cc \
-    src/gui/widgets/primitives/screenshot_clip_area.cc \
    	src/gui/widgets/primitives/hull/hull.cc \
    	src/gui/widgets/primitives/hull/convex.cc \
     src/gui/widgets/primitives/labels/labelgroup.cc \
-    src/gui/widgets/primitives/labels/textlabel.cc
+    src/gui/widgets/primitives/labels/textlabel.cc \
+    src/gui/widgets/primitives/visualaids/screenshot_clip_area.cc \
+    src/gui/widgets/primitives/visualaids/scale_bar.cc
 
 
 # widgets
