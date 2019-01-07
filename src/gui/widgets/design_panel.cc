@@ -346,10 +346,14 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   layman->addLayer("Surface", prim::Layer::DB,0,0);
 
   // add in the metal layer for electrodes
-  layman->addLayer("Metal", prim::Layer::Electrode,-100E-9,10E-9);
+  layman->addLayer("Metal", prim::Layer::Electrode,-1000,100);
 
   // add in the AFM layer for AFM tip travel paths
-  layman->addLayer("AFM", prim::Layer::AFMTip,500E-12,50E-12);
+  layman->addLayer("AFM", prim::Layer::AFMTip,5,0.5);
+
+
+  // // add in the metal layer for electrodes
+  // layman->addLayer("Metal2", prim::Layer::Electrode,100E-9,10E-9);
 
   layman->populateLayerTable();
   layman->initSideWidget();
@@ -630,6 +634,7 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs)
   // TODO rethink this layer loading method
   prim::Layer* load_layer = layman->getLayer(layer_nm);
   if (!load_layer) {
+    qDebug() << tr("Created layer %1 instead").arg(layer_nm);
     layman->addLayer(layer_nm);
     load_layer = layman->getLayer(layman->layerCount()-1);
   }
