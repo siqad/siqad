@@ -16,10 +16,12 @@ QColor prim::ScreenshotClipArea::edge_col;
 
 namespace prim{
 
-ScreenshotClipArea::ScreenshotClipArea(QRectF t_scene_rect)
-  : prim::Item(prim::Item::ScreenshotClipArea, 0)
+ScreenshotClipArea::ScreenshotClipArea(int t_layer_id, QRectF t_scene_rect)
+  : prim::Item(prim::Item::ScreenshotClipArea, t_layer_id), scene_rect(t_scene_rect)
 {
-  initScreenshotClipArea(t_scene_rect);
+  // initialize static variables
+  if (edge_width < 0)
+    constructStatics();
 }
 
 
@@ -56,15 +58,6 @@ QRectF ScreenshotClipArea::boundingRect() const
 
 
 // PRIVATE
-
-void ScreenshotClipArea::initScreenshotClipArea(QRectF t_scene_rect)
-{
-  // initialize static variables
-  if (edge_width < 0)
-    constructStatics();
-
-  scene_rect = t_scene_rect;
-}
 
 void ScreenshotClipArea::constructStatics()
 {

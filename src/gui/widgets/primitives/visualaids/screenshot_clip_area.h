@@ -22,7 +22,7 @@ namespace prim{
 
     //! Construct a screenshot clip area with the given QRectF in physical
     //! coordinates.
-    ScreenshotClipArea(QRectF t_scene_rect=QRectF());
+    ScreenshotClipArea(int t_layer_id, QRectF t_scene_rect=QRectF());
 
     // TODO XML version for future implementation of saving and loading screenshot
     // clip areas.
@@ -52,9 +52,6 @@ namespace prim{
 
 
   private:
-
-    //! Initialize the clip area.
-    void initScreenshotClipArea(QRectF t_phys_rect);
 
     //! Construct static variables.
     void constructStatics();

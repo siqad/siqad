@@ -87,6 +87,9 @@ namespace gui{
     //! Returns 0 if none is found.
     prim::Layer *getMRULayer(prim::Layer::LayerType);
 
+    //! Similar to getMRULayer but return the ID.
+    int getMRULayerID(prim::Layer::LayerType lt) {return indexOf(getMRULayer(lt));}
+
     // SAVE / LOAD
 
     //! Save properties of all layers to XML stream. TODO improve structure

@@ -25,9 +25,10 @@ namespace gui{
 
     public:
 
-
-      //! Constructor, the parent should normally be design panel.
-      ScreenshotManager(QWidget *parent = 0);
+      //! Constructor, the parent should normally be design panel. The layer
+      //! id of the misc layer must be provided as that's the only layer which
+      //! ScreenshotManager will add items to.
+      ScreenshotManager(int misc_layer_id, QWidget *parent = 0);
 
       //! Destructor.
       ~ScreenshotManager();
@@ -92,6 +93,8 @@ namespace gui{
 
 
       // Variables
+      int misc_layer_id=-1;                         //! layer id of the misc layer
+
       prim::ScreenshotClipArea *clip_area=nullptr;  //! Clip area for region screenshot.
       prim::ScaleBar *scale_bar=nullptr;            //! Scale bar in screenshots.
 

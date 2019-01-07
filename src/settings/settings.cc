@@ -285,8 +285,8 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("screenshotcliparea/edge_col", QColor(0,0,0,255));      // edge color
 
   // scale bar parameters
-  S->setValue("scalebar/edge_width", .5);
-  S->setValue("scalebar/text_height", .5);
+  S->setValue("scalebar/edge_width", 1.5);
+  S->setValue("scalebar/text_height", 3);
   S->setValue("scalebar/edge_col", QColor(0,0,0,255));
 
   return S;

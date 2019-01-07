@@ -29,6 +29,14 @@ LayerManager::~LayerManager()
 
 void LayerManager::addLayer(const QString &name, const prim::Layer::LayerType cnt_type, const float zoffset, const float zheight)
 {
+  // there can only be one layer of misc type
+  for (prim::Layer *layer : layers) {
+    if (cnt_type == prim::Layer::Misc && layer->contentType() == prim::Layer::Misc) {
+      qWarning() << tr("A layer with type Misc already exists, more cannot be created.");
+      return;
+    }
+  }
+
   // check if name already taken
   bool taken = false;
   for(prim::Layer *layer : layers) {

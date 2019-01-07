@@ -15,9 +15,9 @@ qreal ScaleBar::bar_thickness=-1;
 qreal ScaleBar::text_height;
 QColor ScaleBar::bar_col;
 
-ScaleBar::ScaleBar(float t_bar_length, gui::Unit::DistanceUnit t_bar_unit, 
+ScaleBar::ScaleBar(int t_layer_id, float t_bar_length, gui::Unit::DistanceUnit t_bar_unit, 
                    QPointF scene_pos)
-  : prim::Item(prim::Item::ScaleBar, 0)
+  : prim::Item(prim::Item::ScaleBar, t_layer_id)
 {
   if (bar_thickness == -1)
     constructStatics();
@@ -48,13 +48,19 @@ void ScaleBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
   painter->setPen(QPen(bar_col, bar_thickness));
   painter->setBrush(Qt::NoBrush);
   painter->drawLine(QLineF(QPointF(0,0), QPointF(bar_length_px,0)));
+
+  QString scale_label = QString::number(bar_length) + " " 
+    + gui::Unit::distanceUnitString(bar_unit);
+  QFont font = painter->font();
+  font.setPixelSize(text_height);
+  painter->setFont(font);
+  painter->drawText(boundingRect(), Qt::AlignCenter, scale_label);
 }
 
 
 QRectF ScaleBar::boundingRect() const
 {
-  // TODO for now the scale text is not added. When added update this function.
-  return QRectF(0,0,bar_length_px,bar_thickness);
+  return QRectF(0,-.5*bar_thickness,bar_length_px,bar_thickness + 2 * text_height);
 }
 
 

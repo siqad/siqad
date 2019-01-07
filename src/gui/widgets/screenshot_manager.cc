@@ -11,8 +11,8 @@
 
 namespace gui{
 
-ScreenshotManager::ScreenshotManager(QWidget *parent)
-  : QWidget(parent, Qt::Dialog)
+ScreenshotManager::ScreenshotManager(int misc_layer_id, QWidget *parent)
+  : QWidget(parent, Qt::Dialog), misc_layer_id(misc_layer_id)
 {
   initScreenshotManager();
 }
@@ -20,14 +20,11 @@ ScreenshotManager::ScreenshotManager(QWidget *parent)
 ScreenshotManager::~ScreenshotManager()
 {
   // TODO safely remove clip_area and scale_bar
-  if (clip_area->scene() != 0) emit sig_removeVisualAidFromDP(clip_area);
-  if (scale_bar->scene() != 0) emit sig_removeVisualAidFromDP(scale_bar);
+  if (clip_area->scene() == 0) 
+    delete clip_area;
 
-  delete clip_area;
-  delete scale_bar;
-
-  clip_area = nullptr;
-  scale_bar = nullptr;
+  if (scale_bar->scene() == 0) 
+    delete scale_bar;
 }
 
 void ScreenshotManager::prepareScreenshotMode(bool entering)
@@ -67,8 +64,8 @@ void ScreenshotManager::setScaleBar(float t_length, Unit::DistanceUnit unit)
 
 void ScreenshotManager::initScreenshotManager()
 {
-  clip_area = new prim::ScreenshotClipArea();
-  scale_bar = new prim::ScaleBar();
+  clip_area = new prim::ScreenshotClipArea(misc_layer_id);
+  scale_bar = new prim::ScaleBar(misc_layer_id);
 
   // init GUI
 

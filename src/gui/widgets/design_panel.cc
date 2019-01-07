@@ -74,22 +74,7 @@ void gui::DesignPanel::initDesignPanel() {
   layman = new LayerManager(this);
   property_editor = new PropertyEditor(this);
   itman = new ItemManager(this, layman);
-  screenman = new ScreenshotManager(this);
 
-  // ScreenshotManager signals
-  connect(screenman, &gui::ScreenshotManager::sig_takeScreenshot,
-          [this](const QString &target_img_path, const QRectF &scene_rect, bool always_overwrite) {
-            emit sig_screenshot(target_img_path, scene_rect, always_overwrite);
-          }
-  );
-  connect(screenman, &gui::ScreenshotManager::sig_clipSelectionTool,
-          [this]() {emit sig_toolChangeRequest(gui::ScreenshotAreaTool);});
-  connect(screenman, &gui::ScreenshotManager::sig_addVisualAidToDP,
-          [this](prim::Item *t_item) {addItemToScene(t_item);});
-  connect(screenman, &gui::ScreenshotManager::sig_removeVisualAidFromDP,
-          [this](prim::Item *t_item) {removeItemFromScene(t_item);});
-  connect(screenman, &gui::ScreenshotManager::sig_scaleBarAnchorTool,
-          [this]() {sig_toolChangeRequest(gui::ScaleBarAnchorTool);});
 
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 
@@ -137,9 +122,6 @@ void gui::DesignPanel::initDesignPanel() {
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
-  // set display mode
-  setDisplayMode(DesignMode);
-
 
   // construct widgets
   afm_panel = new AFMPanel(layman->indexOf(layman->getMRULayer(prim::Layer::AFMTip)), this);
@@ -155,7 +137,34 @@ void gui::DesignPanel::initDesignPanel() {
   connect(this, &gui::DesignPanel::sig_toolChanged,
             eph, &gui::ElectrodePolyHelper::toolChangeResponse);
 
+
+
+
+  // initialize widgets which depend on other things to be initialized first
+
+  screenman = new ScreenshotManager(layman->getMRULayerID(prim::Layer::Misc), this);
+
+  // ScreenshotManager signals
+  connect(screenman, &gui::ScreenshotManager::sig_takeScreenshot,
+          [this](const QString &target_img_path, const QRectF &scene_rect, bool always_overwrite) {
+            emit sig_screenshot(target_img_path, scene_rect, always_overwrite);
+          }
+  );
+  connect(screenman, &gui::ScreenshotManager::sig_clipSelectionTool,
+          [this]() {emit sig_toolChangeRequest(gui::ScreenshotAreaTool);});
+  connect(screenman, &gui::ScreenshotManager::sig_addVisualAidToDP,
+          [this](prim::Item *t_item) {addItem(t_item, layman->getMRULayerID(prim::Layer::Misc));});
+  connect(screenman, &gui::ScreenshotManager::sig_removeVisualAidFromDP,
+          [this](prim::Item *t_item) {removeItem(t_item, layman->getMRULayerID(prim::Layer::Misc), true);});
+  connect(screenman, &gui::ScreenshotManager::sig_scaleBarAnchorTool,
+          [this]() {sig_toolChangeRequest(gui::ScaleBarAnchorTool);});
+
   emit sig_setItemManagerWidget(itman);
+
+
+  // set display mode
+  setDisplayMode(DesignMode);
+
 }
 
 // clear design panel
@@ -238,18 +247,19 @@ void gui::DesignPanel::addItem(prim::Item *item, int layer_index, int ind)
   itman->updateTableAdd();
 }
 
-void gui::DesignPanel::removeItem(prim::Item *item, int layer_index)
+void gui::DesignPanel::removeItem(prim::Item *item, int layer_index, bool retain_item)
 {
-  removeItem(item, layman->getLayer(layer_index));
+  removeItem(item, layman->getLayer(layer_index), retain_item);
 }
 
-void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
+void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer, bool retain_item)
 {
   // if layer contains the item, delete and remove froms scene, otherwise
   // do nothing
   if(layer->removeItem(item)){
     scene->removeItem(item);
-    delete item;
+    if (!retain_item)
+      delete item;
     QRectF sbr = scene->itemsBoundingRect();
     QRectF vp = mapToScene(viewport()->rect()).boundingRect();
     setSceneRect(min_scene_rect | sbr | vp);
@@ -323,10 +333,14 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   for(prim::Item *const item : lattice->getItems())
     scene->addItem(item);
 
-  // DO NOT ADD LAYERS BEFORE LATTICE, LATTICE MUST BE LAYER 0
+  // LATTICE MUST BE LAYER 0
+  // MISC MUST BE LAYER 1
 
   // add the lattice to the layers, as layer 0
   layman->addLattice(lattice);
+
+  // add the misc layer as layer 1
+  layman->addLayer("Misc", prim::Layer::Misc,0,0);
 
   // add in the dangling bond surface
   layman->addLayer("Surface", prim::Layer::DB,0,0);

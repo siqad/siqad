@@ -85,10 +85,11 @@ namespace gui{
     void addItem(prim::Item *item, int layer_index=-1, int ind=-1);
 
     //! Remove the given item from the layer at the given index if possible.
-    void removeItem(prim::Item *item, int layer_index);
+    //! If retain item is set to true, then the item itself would not be deleted.
+    void removeItem(prim::Item *item, int layer_index, bool retain_item=false);
 
     //! Remove the given Item from the given Layer if possible.
-    void removeItem(prim::Item *item, prim::Layer* layer);
+    void removeItem(prim::Item *item, prim::Layer* layer, bool retain_item=false);
 
     //! Add a new Item to the graphics scene without adding it to a layer. This 
     //! either means the Item is already owned by another class and only needs 

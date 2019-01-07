@@ -29,7 +29,8 @@ namespace prim{
     //! less than 0 then the scale bar won't be drawn. The position defines the
     //! location of the top left corner of the scale bar.
     //! No layer is needed since this is will appear in the scene directly.
-    ScaleBar(float t_bar_length=-1, gui::Unit::DistanceUnit t_bar_unit=gui::Unit::nm,
+    ScaleBar(int t_layer_id, float t_bar_length=-1, 
+             gui::Unit::DistanceUnit t_bar_unit=gui::Unit::nm,
              QPointF scene_pos=QPointF());
 
     //! Destructor.
