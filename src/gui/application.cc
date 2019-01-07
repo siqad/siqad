@@ -283,7 +283,7 @@ void gui::ApplicationGUI::initTopBar()
 
 
   // screenshot mode
-  action_screenshot_mode = new QAction(QIcon(":/ico/screenshotarea.svg"), tr("Screenshot Mode"));
+  action_screenshot_mode = new QAction(QIcon(":/ico/screenshotmode.svg"), tr("Screenshot Mode"));
   connect(action_screenshot_mode, &QAction::triggered,
           this, &gui::ApplicationGUI::toggleScreenshotMode);
 
@@ -327,9 +327,8 @@ void gui::ApplicationGUI::initSideBar()
 
   // actions
   QActionGroup *action_group = new QActionGroup(side_bar);
+  ag_screenshot = new QActionGroup(side_bar);
 
-  action_screenshot_tool = side_bar->addAction(QIcon(":/ico/screenshotarea.svg"),
-      tr("Screenshot Area tool"));
   action_select_tool = side_bar->addAction(QIcon(":/ico/select.svg"),
       tr("Select tool"));
   action_drag_tool = side_bar->addAction(QIcon(":/ico/drag.svg"),
@@ -348,8 +347,11 @@ void gui::ApplicationGUI::initSideBar()
   action_label_tool = side_bar->addAction(QIcon(":/ico/drawlabel.svg"),
       tr("Label tool"));
       */
+  action_screenshot_area_tool = side_bar->addAction(QIcon(":/ico/screenshotarea.svg"),
+      tr("Screenshot area tool"));
+  action_scale_bar_anchor_tool = side_bar->addAction(QIcon(":/ico/scalebaranchortool.svg"),
+      tr("Scale bar anchor tool"));
 
-  action_group->addAction(action_screenshot_tool);
   action_group->addAction(action_select_tool);
   action_group->addAction(action_drag_tool);
   action_group->addAction(action_dbgen_tool);
@@ -360,10 +362,11 @@ void gui::ApplicationGUI::initSideBar()
   action_group->addAction(action_afmpath_tool);
   action_group->addAction(action_label_tool);
   */
+  ag_screenshot->addAction(action_screenshot_area_tool);
+  ag_screenshot->addAction(action_scale_bar_anchor_tool);
 
-  action_screenshot_tool->setVisible(false);  // only shown in ScreenshotMode
+  ag_screenshot->setVisible(false); // hide screenshot action group by default
 
-  action_screenshot_tool->setCheckable(true);
   action_select_tool->setCheckable(true);
   action_drag_tool->setCheckable(true);
   action_dbgen_tool->setCheckable(true);
@@ -374,11 +377,9 @@ void gui::ApplicationGUI::initSideBar()
   action_afmpath_tool->setCheckable(true);
   action_label_tool->setCheckable(true);
   */
+  action_screenshot_area_tool->setCheckable(true);
+  action_scale_bar_anchor_tool->setCheckable(true);
 
-  action_select_tool->setChecked(true);
-
-  connect(action_screenshot_tool, &QAction::triggered,
-          this, &gui::ApplicationGUI::setToolScreenshotArea);
   connect(action_select_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolSelect);
   connect(action_drag_tool, &QAction::triggered,
@@ -397,6 +398,10 @@ void gui::ApplicationGUI::initSideBar()
   connect(action_label_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolLabel);
           */
+  connect(action_screenshot_area_tool, &QAction::triggered,
+          this, &gui::ApplicationGUI::setToolScreenshotArea);
+  connect(action_scale_bar_anchor_tool, &QAction::triggered,
+          this, &gui::ApplicationGUI::setToolScaleBarAnchor);
 
   addToolBar(area, side_bar);
 }
@@ -674,11 +679,11 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
       break;
       */
     case gui::ToolType::ScreenshotAreaTool:
-      action_screenshot_tool->setChecked(true);
+      action_screenshot_area_tool->setChecked(true);
       setToolScreenshotArea();
       break;
     case gui::ToolType::ScaleBarAnchorTool:
-      // TODO add action
+      action_scale_bar_anchor_tool->setChecked(true);
       setToolScaleBarAnchor();
       break;
       /*
@@ -897,14 +902,14 @@ void gui::ApplicationGUI::beginScreenshotMode()
 {
   display_mode_cache = design_pan->displayMode();
   design_pan->setDisplayMode(ScreenshotMode);
-  action_screenshot_tool->setVisible(true);
+  ag_screenshot->setVisible(true);
   //setTool(ScreenshotAreaTool);
 }
 
 void gui::ApplicationGUI::endScreenshotMode()
 {
   design_pan->setDisplayMode(display_mode_cache);
-  action_screenshot_tool->setVisible(false);
+  ag_screenshot->setVisible(false);
   setTool(SelectTool);
 }
 

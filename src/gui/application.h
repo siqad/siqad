@@ -206,8 +206,10 @@ namespace gui{
     QDockWidget *item_dock;   // right side panel for showing items
     QDockWidget *info_dock;   // bottom panel that shows information about items on screen
 
+    // action groups
+    QActionGroup *ag_screenshot=nullptr;          // action group containing screenshot related actions
+
     // action pointers
-    QAction *action_screenshot_tool;
     QAction *action_select_tool=nullptr;          // change cursor tool to select
     QAction *action_drag_tool=nullptr;            // change cursor tool to drag
     QAction *action_dbgen_tool=nullptr;           // change cursor tool to gen
@@ -224,6 +226,8 @@ namespace gui{
     QAction *action_circuit_lib=nullptr;
     QAction *action_dialog_dock_visibility=nullptr;
     QAction *action_screenshot_mode=nullptr;      // toggle screenshot mode
+    QAction *action_screenshot_area_tool=nullptr;
+    QAction *action_scale_bar_anchor_tool=nullptr;
 
     // save file
     QTimer autosave_timer;     // timer for autosaves
