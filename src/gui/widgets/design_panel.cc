@@ -346,7 +346,7 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   layman->addLayer("Surface", prim::Layer::DB,0,0);
 
   // add in the metal layer for electrodes
-  layman->addLayer("Metal", prim::Layer::Electrode,-1000,100);
+  layman->addLayer("Metal", prim::Layer::Electrode,1000,100);
 
   // add in the AFM layer for AFM tip travel paths
   layman->addLayer("AFM", prim::Layer::AFMTip,5,0.5);
