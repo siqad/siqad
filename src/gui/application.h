@@ -138,7 +138,7 @@ namespace gui{
     void saveNew();                     // save as a new file (calls saveToFile)
     void autoSave();                    // perform autosave at specified interval (ms)
     void openFromFile();                // open a previous save
-    void closeFile();                   // close the file when quitting the program
+    //bool closeFile();                   //! Close the file when quitting the program. Returns false if user cancels the closing.
 
     // Export to Labview
     bool exportToLabview();
@@ -149,7 +149,7 @@ namespace gui{
   protected:
 
     //! Override the close event to capture window close events.
-    void closeEvent(QCloseEvent *) {closeFile();}
+    void closeEvent(QCloseEvent *e);
 
   private:
 

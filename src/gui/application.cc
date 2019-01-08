@@ -67,6 +67,22 @@ gui::ApplicationGUI::~ApplicationGUI()
 }
 
 
+// PROTECTED
+
+void gui::ApplicationGUI::closeEvent(QCloseEvent *e)
+{
+  // prompt user to resolve unsaved changes if program has been modified
+  if(design_pan->stateChanged()) {
+    if(!resolveUnsavedChanges()) {
+      e->ignore();
+      return;
+    }
+  }
+
+  //QApplication::quit();
+  e->accept();
+}
+
 
 // GUI INITIALISATION
 
@@ -227,7 +243,7 @@ void gui::ApplicationGUI::initMenuBar()
   help->addAction(about_version);
 
   connect(new_file, &QAction::triggered, this, &gui::ApplicationGUI::newFile);
-  connect(quit, &QAction::triggered, this, &gui::ApplicationGUI::closeFile);
+  connect(quit, &QAction::triggered, this, &QWidget::close);
   connect(save, &QAction::triggered, this, &gui::ApplicationGUI::saveDefault);
   connect(save_as, &QAction::triggered, this, &gui::ApplicationGUI::saveNew);
   connect(open_save, &QAction::triggered, this, &gui::ApplicationGUI::openFromFile);
@@ -1209,17 +1225,6 @@ void gui::ApplicationGUI::openFromFile()
   // clean up
   file.close();
   qDebug() << tr("Load complete");
-}
-
-
-void gui::ApplicationGUI::closeFile()
-{
-  // prompt user to resolve unsaved changes if program has been modified
-  if(design_pan->stateChanged())
-    if(!resolveUnsavedChanges())
-      return;
-
-  QApplication::quit();
 }
 
 
