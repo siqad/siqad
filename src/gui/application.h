@@ -148,6 +148,8 @@ namespace gui{
 
   protected:
 
+    //! Override the close event to capture window close events.
+    void closeEvent(QCloseEvent *) {closeFile();}
 
   private:
 
