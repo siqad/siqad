@@ -77,7 +77,7 @@ void gui::ApplicationGUI::initGUI()
   design_pan = new gui::DesignPanel(this);
   input_field = new gui::InputField(this);
   info_pan = new gui::InfoPanel(this);
-  
+
   // detachable/pop-up widgets, order matters in some cases due to pointers
   sim_manager = new gui::SimManager(this);
   sim_visualize = new gui::SimVisualize(sim_manager, this);
@@ -337,9 +337,9 @@ void gui::ApplicationGUI::initSideBar()
       tr("DB tool"));
   action_electrode_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"),
       tr("Electrode tool"));
+  /*
   action_electrode_poly_tool = side_bar->addAction(QIcon(":/ico/drawelectrodepoly.svg"),
       tr("Electrode polygon tool"));
-  /*
   action_afmarea_tool = side_bar->addAction(QIcon(":/ico/drawafmarea.svg"),
       tr("AFM Area tool"));
   action_afmpath_tool = side_bar->addAction(QIcon(":/ico/drawafmpath.svg"),
@@ -356,8 +356,8 @@ void gui::ApplicationGUI::initSideBar()
   action_group->addAction(action_drag_tool);
   action_group->addAction(action_dbgen_tool);
   action_group->addAction(action_electrode_tool);
-  action_group->addAction(action_electrode_poly_tool);
   /*
+  action_group->addAction(action_electrode_poly_tool);
   action_group->addAction(action_afmarea_tool);
   action_group->addAction(action_afmpath_tool);
   action_group->addAction(action_label_tool);
@@ -371,8 +371,8 @@ void gui::ApplicationGUI::initSideBar()
   action_drag_tool->setCheckable(true);
   action_dbgen_tool->setCheckable(true);
   action_electrode_tool->setCheckable(true);
-  action_electrode_poly_tool->setCheckable(true);
   /*
+  action_electrode_poly_tool->setCheckable(true);
   action_afmarea_tool->setCheckable(true);
   action_afmpath_tool->setCheckable(true);
   action_label_tool->setCheckable(true);
@@ -388,9 +388,9 @@ void gui::ApplicationGUI::initSideBar()
           this, &gui::ApplicationGUI::setToolDBGen);
   connect(action_electrode_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolElectrode);
+  /*
   connect(action_electrode_poly_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolElectrodePoly);
-  /*
   connect(action_afmarea_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolAFMArea);
   connect(action_afmpath_tool, &QAction::triggered,
@@ -664,11 +664,11 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
       action_electrode_tool->setChecked(true);
       setToolElectrode();
       break;
+      /*
     case gui::ToolType::ElectrodePolyTool:
       action_electrode_poly_tool->setChecked(true);
       setToolElectrodePoly();
       break;
-      /*
     case gui::ToolType::AFMAreaTool:
       action_afmarea_tool->setChecked(true);
       setToolAFMArea();
@@ -990,10 +990,10 @@ void gui::ApplicationGUI::designScreenshot(const QString &target_img_path, const
 
   // check if target file already exists
   if (!always_overwrite && QFileInfo(target_img_path).exists()) {
-    QMessageBox::StandardButton reply = QMessageBox::question(this, 
-        "File exists", 
+    QMessageBox::StandardButton reply = QMessageBox::question(this,
+        "File exists",
         tr("The target image file name %1 already exists. Do you want to \
-          overwrite it?").arg(target_img_path), 
+          overwrite it?").arg(target_img_path),
         QMessageBox::Yes|QMessageBox::No);
     // TODO add another button for browsing another path
     if (reply == QMessageBox::No) {
