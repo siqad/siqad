@@ -162,16 +162,31 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
   rect.adjust(dxy,dxy,-dxy,-dxy); //make the bounding rectangle, and trim off the edges.
   painter->setPen(QPen(edge_col, edge_width));
   painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
-  painter->drawRect(rect);
+  // painter->drawRect(rect);
+  float angle = getProperty("angle").value.toFloat();
+
+  // qDebug() << "TRANSFORM" << getProperty("angle").value.toString();
+  QTransform t;
+  t.translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
+  t.rotate(angle);
+  // t.rotate(45);
+  t.translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
+  QPolygon poly = t.mapToPolygon(rect.toRect());
+  painter->drawPolygon(poly);
+  // painter->translate(sceneRect().width()*0.5,sceneRect().height()*0.5);
+  // painter->rotate(0);
+  // rect.translate(-sceneRect().width()*0.5,-sceneRect().height()*0.5);
+  // painter->drawRect(rect);
   if(tool_type == gui::SelectTool && isSelected()){
-    setPos(pos());
-    QPointF center = rect.center();
-    QSizeF size(sceneRect().width()+edge_width, sceneRect().height()+edge_width);
-    rect.setSize(size);
-    rect.moveCenter(center);
+    // setPos(pos());
+    // QPointF center = rect.center();
+    // QSizeF size(sceneRect().width()+edge_width, sceneRect().height()+edge_width);
+    // rect.setSize(size);
+    // rect.moveCenter(center);
     painter->setPen(Qt::NoPen);
     painter->setBrush(selected_col);
-    painter->drawRect(rect);
+    painter->drawPolygon(poly);
+    // painter->drawRect(rect);
   }
 }
 

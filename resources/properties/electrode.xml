@@ -22,6 +22,12 @@
       <clocked>Clocked</clocked>
     </value_selection>
   </type>
+  <angle>
+    <T>float</T>
+    <val>0</val>
+    <label>Angle</label>
+    <tip>Angle of rotation in degrees. Center of rotation is the center of the electrode.</tip>
+  </angle>
   <net>
     <T>int</T>
     <val>0</val>

@@ -11,6 +11,7 @@
 #define _GUI_PR_ELECTRODE_H_
 
 #include <QtWidgets>
+#include <QTransform>
 #include "resizablerect.h"
 
 namespace prim{
@@ -40,8 +41,8 @@ namespace prim{
     void initElectrode(int lay_id, const QRectF &scene_rect);
 
     // accessors
-    qreal getTopDepth(void){return top_depth;}
-    qreal getDepth(){return elec_depth;}
+    // qreal getTopDepth(void){return top_depth;}
+    // qreal getDepth(){return elec_depth;}
 
     // inherited abstract method implementations
     QRectF boundingRect() const Q_DECL_OVERRIDE;
@@ -76,8 +77,8 @@ namespace prim{
     static gui::PropertyMap default_class_properties; //! Default properties for this class
 
     // VARIABLES
-    qreal elec_depth;
-    qreal top_depth;
+    // qreal elec_depth;
+    // qreal top_depth;
 
     static qreal edge_width;  // proportional width of dot boundary edge
     static QColor fill_col;   // dot fill color (same for all lattice dots)
