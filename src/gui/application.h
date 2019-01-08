@@ -179,6 +179,8 @@ namespace gui{
 
     // VARIABLES
 
+    // flag to indicate closing/quitting
+    bool is_closing = false;
     // display mode cache for returning to previous mode
     DisplayMode display_mode_cache;
 

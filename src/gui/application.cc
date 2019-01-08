@@ -80,6 +80,7 @@ void gui::ApplicationGUI::closeEvent(QCloseEvent *e)
   }
 
   //QApplication::quit();
+  is_closing = true;
   e->accept();
 }
 
@@ -646,19 +647,21 @@ void gui::ApplicationGUI::saveSettings()
 
 void gui::ApplicationGUI::updateWindowTitle()
 {
-  QString title_name;
+  if (!is_closing){
+    QString title_name;
 
-  // prefix the title by an asterisk to the name if the file has been edited
-  if (design_pan->stateChanged())
-    title_name += "*";
+    // prefix the title by an asterisk to the name if the file has been edited
+    if (design_pan->stateChanged())
+      title_name += "*";
 
-  QFileInfo w_path_info(working_path);
-  title_name += (working_path.isEmpty()) ? "Untitled" : w_path_info.fileName();
+    QFileInfo w_path_info(working_path);
+    title_name += (working_path.isEmpty()) ? "Untitled" : w_path_info.fileName();
 
-  setWindowTitle(tr("%1 - %2")
-    .arg(title_name)
-    .arg(QCoreApplication::applicationName())
-  );
+    setWindowTitle(tr("%1 - %2")
+      .arg(title_name)
+      .arg(QCoreApplication::applicationName())
+    );    
+  }
 }
 
 void gui::ApplicationGUI::setTool(gui::ToolType tool)
