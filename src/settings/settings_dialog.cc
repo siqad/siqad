@@ -100,17 +100,6 @@ void SettingsDialog::applyPendingChanges()
     settings::Settings *s_cat = settingsCategory(changed_prop.meta["category"]);
     s_cat->setValue(changed_prop.meta["key"], changed_prop.value);
   }
-
-  /*
-  // TODO deduplicate
-  for (PendingChange pending_change : pending_changes) {
-    settings::Settings *category_setting = settingsCategory(
-        pending_change.category);
-    category_setting->setValue(pending_change.name, pending_change.value);
-  }
-
-  pending_changes.clear();
-  */
 }
 
 
@@ -183,7 +172,7 @@ void SettingsDialog::initSettingsDialog()
   setLayout(main_layout);
 }
 
-void SettingsDialog::writeUserSettingToProperty(gui::Property &t_prop) {
+void SettingsDialog::setPropertyWithUserSetting(gui::Property &t_prop) {
   if (!t_prop.meta.contains("category") || !t_prop.meta.contains("key"))
     qFatal("'key' or 'category' not found in the meta member of the given property.");
 
@@ -203,7 +192,7 @@ gui::PropertyForm *SettingsDialog::appSettingsPane()
   // initilize the settings pane from property map
   gui::PropertyMap app_settings_map(":/settings/general.xml");
   for (gui::Property &prop : app_settings_map)
-    writeUserSettingToProperty(prop);
+    setPropertyWithUserSetting(prop);
 
   app_settings_pane = new gui::PropertyForm(app_settings_map);
   return app_settings_pane;
@@ -230,9 +219,8 @@ gui::PropertyForm *SettingsDialog::latticeSettingsPane()
 
 settings::Settings *SettingsDialog::settingsCategory(const QString &t_cat) 
 {
-  int cat_int = QMetaEnum::fromType<SettingsCategory>().keyToValue(
-    t_cat.toLatin1().data());
-  SettingsCategory s_cat = static_cast<SettingsCategory>(cat_int);
+  QMetaEnum settings_enum = QMetaEnum::fromType<SettingsCategory>();
+  SettingsCategory s_cat = static_cast<SettingsCategory>(settings_enum.keyToValue(t_cat.toLatin1()));
   return settingsCategory(s_cat);
 }
 

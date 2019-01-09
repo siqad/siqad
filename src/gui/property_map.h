@@ -50,15 +50,16 @@ namespace gui{
   struct Property {
     //! Property constructor with all content.
     Property(int index, const QVariant &val, const QString &f_label,
-             const QString &f_tip, const ValueSelection &v_sel)
+             const QString &f_tip, const ValueSelection &v_sel, 
+             QMap<QString,QString> t_meta)
       : index(index), value(val), form_label(f_label), form_tip(f_tip),
-        value_selection(v_sel) {};
+        value_selection(v_sel), meta(t_meta) {};
 
     //! Property constructor with unique value and the rest of the values filled
     //! using the provided property map.
     Property(const QVariant &val, const Property &p)
       : index(p.index), value(val), form_label(p.form_label), form_tip(p.form_tip),
-        value_selection(p.value_selection) {};
+        value_selection(p.value_selection), meta(p.meta) {};
 
     //! Property constructor with only a value.
     Property(const QVariant &val)

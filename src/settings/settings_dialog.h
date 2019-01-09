@@ -56,7 +56,7 @@ namespace settings{
     //! Write user setting to the provided property, with the setting entry
     //! specified by the "category" and "key" entries in the property's "meta"
     //! member.
-    void writeUserSettingToProperty(gui::Property &prop);
+    void setPropertyWithUserSetting(gui::Property &prop);
 
     //! Return the application settings pane. Initilize the pane if first called.
     gui::PropertyForm *appSettingsPane();

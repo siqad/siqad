@@ -97,12 +97,13 @@ QSettings *settings::AppSettings::m_defs()
       QSettings::IniFormat
   );
 
-  // overwrites existing default values with same keys... no check
-  S->setValue("view/hidpi_support", true);
 
+  // overwrites existing default values with same keys... no check
   S->setValue("log/override", false);
   S->setValue("log/tofile", false);
   S->setValue("log/logfile", QString("<SYSTMP>/log/log.txt"));
+
+  S->setValue("view/hidpi_support", false);
 
   S->setValue("snap/diameter", 5.); //relative to scale_fact
 

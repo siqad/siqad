@@ -19,7 +19,8 @@
 #ifdef QT_NO_DEBUG
 #define DEFAULT_OVERRIDE false  // use user settings for release compilation
 #else
-#define DEFAULT_OVERRIDE false   // use default settings for debug compilation
+#define DEFAULT_OVERRIDE true   // use default settings for debug compilation
+//#define DEFAULT_OVERRIDE false   // TODO change back to true after implementation
 #endif
 
 namespace settings{

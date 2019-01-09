@@ -80,7 +80,7 @@ void PropertyForm::initForm()
     prop_fl->addRow(new QWidget, new QWidget);
 
   // generate form from map
-  PropertyMap::const_iterator it, end;
+  PropertyMap::const_iterator it;
   for (it = orig_map.cbegin(); it != orig_map.cend(); ++it) {
     Property prop = it.value();
 
