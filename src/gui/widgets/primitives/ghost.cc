@@ -110,6 +110,8 @@ prim::GhostPolygon::GhostPolygon(prim::Item *item, prim::Item *parent)
   if (item->item_type == prim::Item::ElectrodePoly) {
     poly = static_cast<prim::ElectrodePoly*>(item)->getPolygon();
     qDebug() << item->getQStringItemType();
+  } else if (item->item_type == prim::Item::Electrode) {
+    poly = static_cast<prim::Electrode*>(item)->getPolygon();
   } else {
     qFatal("Trying to make a GhostBox out of unsupported item type");
   }
@@ -119,7 +121,8 @@ prim::GhostPolygon::GhostPolygon(prim::Item *item, prim::Item *parent)
 
 QRectF prim::GhostPolygon::boundingRect() const
 {
-  return QRectF(0, 0, poly.boundingRect().width(), poly.boundingRect().height());
+  // return QRectF(0, 0, poly.boundingRect().width(), poly.boundingRect().height());
+  return QRectF(poly.boundingRect());
 }
 
 void prim::GhostPolygon::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
@@ -379,11 +382,11 @@ void prim::Ghost::prepareItem(prim::Item *item, prim::AggNode *node)
     createGhostDot(item);
   } else if (item->item_type == prim::Item::Electrode) {
     // add a new index-type IndexList
-    new_node = new prim::AggNode(box_sources.count());
+    new_node = new prim::AggNode(poly_sources.count());
     new_node->source_type = prim::AggNode::Electrode;
     node->nodes.append(new_node);
     // create a GhostBox for the Item
-    createGhostBox(item);
+    createGhostPolygon(item);
   } else if (item->item_type == prim::Item::AFMArea) {
     new_node = new prim::AggNode(box_sources.count());
     new_node->source_type = prim::AggNode::AFMArea;
@@ -470,11 +473,11 @@ prim::Item *prim::Ghost::getNodeItem(prim::AggNode *node) const
   }
   else if(node->source_type == prim::AggNode::DBDot)
     return sources.at(node->index);
-  else if(node->source_type == prim::AggNode::Electrode ||
-          node->source_type == prim::AggNode::AFMArea ||
+  else if(node->source_type == prim::AggNode::AFMArea ||
           node->source_type == prim::AggNode::TextLabel)
     return box_sources.at(node->index);
-  else if(node->source_type == prim::AggNode::ElectrodePoly)
+  else if(node->source_type == prim::AggNode::Electrode ||
+          node->source_type == prim::AggNode::ElectrodePoly)
     return poly_sources.at(node->index);
   else
     return 0;

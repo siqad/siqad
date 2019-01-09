@@ -49,7 +49,7 @@ namespace prim{
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
     Item *deepCopy() const override;
-    QPolygon getRotatedPolygon() const;
+    QPolygon getPolygon() const;
 
     // saving to design
     virtual void saveItems(QXmlStreamWriter *) const override;

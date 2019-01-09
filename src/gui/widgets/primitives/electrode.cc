@@ -146,7 +146,7 @@ void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)
 
 }
 
-QPolygon prim::Electrode::getRotatedPolygon() const
+QPolygon prim::Electrode::getPolygon() const
 {
   QRect rect = sceneRect().toRect();
   rect.moveTo(0,0);
@@ -169,14 +169,14 @@ QRectF prim::Electrode::boundingRect() const
   // qreal width = sceneRect().width()+edge_width;
   // qreal height = sceneRect().height()+edge_width;
   // return QRectF(0, 0, width, height);
-    // return QRectF(0,0, getRotatedPolygon().boundingRect().width(), getRotatedPolygon().boundingRect().height());
-  return QRectF(getRotatedPolygon().boundingRect());
+    // return QRectF(0,0, getPolygon().boundingRect().width(), getPolygon().boundingRect().height());
+  return QRectF(getPolygon().boundingRect());
 }
 
 QPainterPath prim::Electrode::shape() const
 {
   QPainterPath path;
-  path.addPolygon(getRotatedPolygon());
+  path.addPolygon(getPolygon());
   path.closeSubpath();
   return path;
 }
@@ -200,7 +200,7 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
   // // t.rotate(45);
   // t.translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
   // QPolygon poly = t.mapToPolygon(rect.toRect());
-  painter->drawPolygon(getRotatedPolygon());
+  painter->drawPolygon(getPolygon());
   // painter->translate(sceneRect().width()*0.5,sceneRect().height()*0.5);
   // painter->rotate(0);
   // rect.translate(-sceneRect().width()*0.5,-sceneRect().height()*0.5);
@@ -213,7 +213,7 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     // rect.moveCenter(center);
     painter->setPen(Qt::NoPen);
     painter->setBrush(selected_col);
-    painter->drawPolygon(getRotatedPolygon());
+    painter->drawPolygon(getPolygon());
     // painter->drawRect(rect);
   }
 }
