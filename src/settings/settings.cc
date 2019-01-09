@@ -109,7 +109,12 @@ QSettings *settings::AppSettings::m_defs()
 
   S->setValue("dir/lattice", QString("<BINPATH>/src/settings/lattices"));
 
-  S->setValue("python_path", QString(""));
+  // python path related
+  S->setValue("user_python_path", QString(""));   // user's own python path setting
+  S->setValue("python_search_linux", QString("python3;/usr/bin/python3;/bin/python3;python"));  // linux/bsd python search paths
+  S->setValue("python_search_winnt", QString("py,-3;python;C:\\Windows\\py.exe,-3"));           // windows python search paths
+  S->setValue("python_search_darwin", QString("python3,python"));                               // macos python search paths
+
 
   S->setValue("phys/debye_length", 50);
   S->setValue("phys/epsr", 10);

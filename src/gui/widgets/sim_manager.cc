@@ -69,11 +69,11 @@ prim::SimEngine *SimManager::getEngine(const QString &name)
 
 void SimManager::initPythonPath()
 {
-  QString s_py = settings::AppSettings::instance()->get<QString>("python_path");
+  QString s_py = settings::AppSettings::instance()->get<QString>("user_python_path");
 
   if (!s_py.isEmpty()) {
     gui::python_path = s_py;
-    qDebug() << tr("Python path retrieved from settings: %1").arg(gui::python_path);
+    qDebug() << tr("Python path retrieved from user settings: %1").arg(gui::python_path);
   } else {
     if (!findWorkingPythonPath())
       qWarning() << "No Python 3 interpreter found. Please set it in the settings dialog.";
@@ -82,23 +82,21 @@ void SimManager::initPythonPath()
 
 bool SimManager::findWorkingPythonPath()
 {
-  // TODO update to support arguments
   QStringList test_py_paths;
-#ifdef Q_OS_LINUX
-  test_py_paths << "python3"
-    << "/usr/bin/python3"
-    << "/bin/python3"
-    << "python";
-#elif defined(Q_OS_WIN32)
-  test_py_paths << "py,-3"
-    << "python"
-    << "C:\\Windows\\py.exe,-3";
-#elif defined(Q_OS_DARWIN)
-  test_py_paths << "python3"
-    << "python";
-#else
-  return false;
-#endif
+  QString kernel_type = QSysInfo::kernelType();
+  auto get_py_paths = [](const QString &os) -> QStringList {
+    return settings::AppSettings::instance()->getAllPossiblePaths("python_search_"+os);
+  };
+  if (kernel_type == "linux" || kernel_type == "freebsd") {
+    test_py_paths << get_py_paths("linux");
+  } else if (kernel_type == "winnt") {
+    test_py_paths << get_py_paths("winnt");
+  } else if (kernel_type == "darwin") {
+    test_py_paths << get_py_paths("darwin");
+  } else {
+    qWarning() << tr("No Python search path defined for your kernel type %1. Please enter your Python binary path in the Settings dialog and restart the application.").arg(kernel_type);
+    return false;
+  }
 
   QString test_script = QDir(QCoreApplication::applicationDirPath()).filePath("src/phys/is_python3.py");
   if (!QFile::exists(test_script)) {

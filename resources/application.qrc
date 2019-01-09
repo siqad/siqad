@@ -25,6 +25,5 @@
     <file>ico/scalebaranchortool.svg</file>
     <file>settings/general.xml</file>
     <file>help_text.xml</file>
-    <file>python_paths.xml</file>
 </qresource>
 </RCC>

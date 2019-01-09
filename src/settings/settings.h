@@ -97,7 +97,7 @@ public:
     regex.setMinimal(true);
 
     for (QString val : val_split) {
-      qDebug() << tr("val: %1").arg(val);
+      //qDebug() << tr("val: %1").arg(val);
       // assumes that there is only one replacement per splitted value
       if (val.indexOf(regex) != -1) {
         QString found_tag = regex.capturedTexts().first();
