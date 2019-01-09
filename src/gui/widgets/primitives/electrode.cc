@@ -21,7 +21,7 @@ QColor prim::Electrode::selected_col; // edge colour, selected
 
 // Draw on layer 0 for now.
 prim::Electrode::Electrode(int lay_id, const QRectF &scene_rect)
-  : prim::ResizableRect(prim::Item::Electrode)
+  : prim::ResizeRotateRect(prim::Item::Electrode)
 {
   if (edge_width == -1){
     constructStatics();
@@ -30,7 +30,7 @@ prim::Electrode::Electrode(int lay_id, const QRectF &scene_rect)
 }
 
 prim::Electrode::Electrode(int lay_id, QStringList points)
-  : prim::ResizableRect(prim::Item::Electrode)
+  : prim::ResizeRotateRect(prim::Item::Electrode)
 {
   if (edge_width == -1){
     constructStatics();
@@ -44,7 +44,7 @@ prim::Electrode::Electrode(int lay_id, QStringList points)
 }
 
 prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
-  prim::ResizableRect(prim::Item::Electrode)
+  prim::ResizeRotateRect(prim::Item::Electrode)
 {
   if(edge_width == -1){
     constructStatics();
@@ -150,13 +150,19 @@ QPolygonF prim::Electrode::getPolygon() const
 {
   QRectF rect = sceneRect();
   rect.moveTo(0,0);
-  QTransform t;
+  QTransform* t = getTransform();
   float angle = getProperty("angle").value.toFloat();
-  t.translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
-  t.rotate(angle);
-  t.translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
+  // t.translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
+  // t.rotate(angle);
+  // t.translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
+  t->reset();
+  t->translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
+  t->rotate(angle);
+  t->translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
+  // setTransform(t)
   QPolygonF poly(rect);
-  QPolygonF new_poly = t.map(poly);
+  QPolygonF new_poly = t->map(poly);
+  // QPolygonF new_poly = t.map(poly);
   return new_poly;
   // QRect rect = sceneRect().toRect();
   // rect.moveTo(0,0);

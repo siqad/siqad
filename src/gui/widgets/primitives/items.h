@@ -18,6 +18,7 @@
 #include "afmpath.h"
 #include "pot_plot.h"
 #include "resizablerect.h"
+#include "resizerotaterect.h"
 #include "labels/labelgroup.h"
 #include "labels/textlabel.h"
 #include "electrode_poly.h"

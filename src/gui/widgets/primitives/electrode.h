@@ -12,14 +12,14 @@
 
 #include <QtWidgets>
 #include <QTransform>
-#include "resizablerect.h"
+#include "resizerotaterect.h"
 
 namespace prim{
 
   // forward declarations
   class Layer;
 
-  class Electrode: public ResizableRect
+  class Electrode: public ResizeRotateRect
   {
   public:
     //! Clock types will vary over time. Fix types are static.
