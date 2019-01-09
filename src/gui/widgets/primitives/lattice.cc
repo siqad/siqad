@@ -375,15 +375,9 @@ void prim::LatticeDotPreview::paint(QPainter *painter, const QStyleOptionGraphic
   QRectF rect(0,0,diam_paint,diam_paint);
   rect.moveCenter(boundingRect().center());
 
-  // outer edge
-  painter->setBrush(Qt::NoBrush);
-  painter->setPen(QPen(edge_col_paint, edge_width_paint));
-  painter->drawEllipse(rect);
-
-  // inner fill
-  rect.adjust(edge_width/2, edge_width/2, -edge_width/2, -edge_width/2);
+  // paint circle
   painter->setBrush(fill_col_paint);
-  painter->setPen(Qt::NoPen);
+  painter->setPen(QPen(edge_col_paint, edge_width_paint));
   painter->drawEllipse(rect);
 }
 

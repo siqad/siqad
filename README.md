@@ -21,7 +21,7 @@ sudo apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt
 sudo apt install python3-dolfin gmsh
 sudo pip3 install pillow
 # hoppingdynamics python dependencies
-sudo pip3 install matplotlib numpy scipy pyqt5
+sudo pip3 install matplotlib numpy scipy pyside2
 ```
 
 On non-Debian systems, packages equivalent to the ones listed above will be needed. Feel free to contribute to [this issue](https://github.com/retallickj/siqad/issues/32) with dependencies required on other systems.

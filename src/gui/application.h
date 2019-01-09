@@ -69,6 +69,7 @@ namespace gui{
     void setToolAFMArea();
     void setToolAFMPath();
     void setToolScreenshotArea();
+    void setToolScaleBarAnchor();
     void setToolLabel();
     void setToolElectrodePoly();
 
@@ -112,14 +113,19 @@ namespace gui{
     //! End Screenshot mode.
     void endScreenshotMode();
 
+    //! Toggle screenshot mode.
+    void toggleScreenshotMode() {
+      design_pan->displayMode() == gui::ScreenshotMode ? endScreenshotMode() : beginScreenshotMode();
+    }
+
     //! Take an svg capture of the entire GUI.
     void screenshot();
 
     //! Take an svg capture of the design window currently shown.
-    void designScreenshot();
+    void fullDesignScreenshot();
 
     //! Take an svg capture of the design window in the given QRect (scene coord).
-    void designScreenshot(QRect rect);
+    void designScreenshot(const QString &target_img_path, const QRectF &rect, bool always_overwrite);
 
     // show pop-up dialogs
     void showSettingsDialog() {settings_dialog->show();}
@@ -132,7 +138,7 @@ namespace gui{
     void saveNew();                     // save as a new file (calls saveToFile)
     void autoSave();                    // perform autosave at specified interval (ms)
     void openFromFile();                // open a previous save
-    void closeFile();                   // close the file when quitting the program
+    //bool closeFile();                   //! Close the file when quitting the program. Returns false if user cancels the closing.
 
     // Export to Labview
     bool exportToLabview();
@@ -142,6 +148,8 @@ namespace gui{
 
   protected:
 
+    //! Override the close event to capture window close events.
+    void closeEvent(QCloseEvent *e);
 
   private:
 
@@ -171,6 +179,8 @@ namespace gui{
 
     // VARIABLES
 
+    // flag to indicate closing/quitting
+    bool is_closing = false;
     // display mode cache for returning to previous mode
     DisplayMode display_mode_cache;
 
@@ -200,23 +210,28 @@ namespace gui{
     QDockWidget *item_dock;   // right side panel for showing items
     QDockWidget *info_dock;   // bottom panel that shows information about items on screen
 
+    // action groups
+    QActionGroup *ag_screenshot=nullptr;          // action group containing screenshot related actions
+
     // action pointers
-    QAction *action_screenshot_tool;
-    QAction *action_select_tool;  // change cursor tool to select
-    QAction *action_drag_tool;    // change cursor tool to drag
-    QAction *action_dbgen_tool;   // change cursor tool to gen
-    QAction *action_electrode_tool;   // change cursor tool to electrode
-    QAction *action_electrode_poly_tool;   // change cursor tool to electrode
-    QAction *action_afmarea_tool; // change cursor tool to AFM Area tool
-    QAction *action_afmpath_tool; // change cursor tool to AFM Path tool
-    QAction *action_label_tool;   // change cursor tool to label
-    QAction *action_run_sim;      // run the current simulation method
-    QAction *action_repeat_sim;
-    QAction *action_run_ground_state;      // run the current simulation method
-    QAction *action_sim_visualize;// show the sim visualize dock which allows simulation visualization
-    QAction *action_layer_sel;
-    QAction *action_circuit_lib;
-    QAction *action_dialog_dock_visibility;
+    QAction *action_select_tool=nullptr;          // change cursor tool to select
+    QAction *action_drag_tool=nullptr;            // change cursor tool to drag
+    QAction *action_dbgen_tool=nullptr;           // change cursor tool to gen
+    QAction *action_electrode_tool=nullptr;       // change cursor tool to electrode
+    QAction *action_electrode_poly_tool=nullptr;  // change cursor tool to electrode
+    QAction *action_afmarea_tool=nullptr;         // change cursor tool to AFM Area tool
+    QAction *action_afmpath_tool=nullptr;         // change cursor tool to AFM Path tool
+    QAction *action_label_tool=nullptr;           // change cursor tool to label
+    QAction *action_run_sim=nullptr;              // run the current simulation method
+    QAction *action_repeat_sim=nullptr;           // repeat the previous simulation
+    QAction *action_run_ground_state=nullptr;     // run the current simulation method
+    QAction *action_sim_visualize=nullptr;        // show the sim visualize dock which allows simulation visualization
+    QAction *action_layer_sel=nullptr;
+    QAction *action_circuit_lib=nullptr;
+    QAction *action_dialog_dock_visibility=nullptr;
+    QAction *action_screenshot_mode=nullptr;      // toggle screenshot mode
+    QAction *action_screenshot_area_tool=nullptr;
+    QAction *action_scale_bar_anchor_tool=nullptr;
 
     // save file
     QTimer autosave_timer;     // timer for autosaves

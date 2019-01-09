@@ -29,6 +29,14 @@ LayerManager::~LayerManager()
 
 void LayerManager::addLayer(const QString &name, const prim::Layer::LayerType cnt_type, const float zoffset, const float zheight)
 {
+  // there can only be one layer of misc type
+  for (prim::Layer *layer : layers) {
+    if (cnt_type == prim::Layer::Misc && layer->contentType() == prim::Layer::Misc) {
+      qWarning() << tr("A layer with type Misc already exists, more cannot be created.");
+      return;
+    }
+  }
+
   // check if name already taken
   bool taken = false;
   for(prim::Layer *layer : layers) {
@@ -148,6 +156,8 @@ void LayerManager::setActiveLayer(prim::Layer *layer)
 {
   active_layer = layer;
   // TODO GUI stuff
+  //update active layer indicator
+  label_active_layer->setText(tr("Active layer: %1").arg(activeLayer()->getName()));
 }
 
 int LayerManager::indexOf(prim::Layer *layer) const
@@ -183,6 +193,13 @@ void LayerManager::saveLayerItems(QXmlStreamWriter *ws) const
   }
 }
 
+void LayerManager::tableSelectionChanged(int row)
+{
+  //table selection was changed, change the active layer to the one selected.
+  setActiveLayer(row);
+  qDebug() << "Active layer changed to layer " << row;
+}
+
 // PRIVATE
 
 // initialize widget
@@ -198,9 +215,13 @@ void LayerManager::initLayerManager()
   layer_table = new QTableWidget(this);
   initLayerTableHeaders();
 
+  //trigger a slot whenever a cell is clicked, or when a row is selected.
+  connect(layer_table->verticalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(tableSelectionChanged(int)));
+  connect(layer_table, SIGNAL(cellClicked(int, int)), this, SLOT(tableSelectionChanged(int)));
+
   // Main layout
   QVBoxLayout *main_vl = new QVBoxLayout;
-  //main_vl->addLayout(top_buttons_hl); TODO add this back when add function is implemented
+  // main_vl->addLayout(top_buttons_hl); TODO add this back when add function is implemented
   main_vl->addWidget(layer_table);
 
   setLayout(main_vl);
@@ -209,8 +230,95 @@ void LayerManager::initLayerManager()
   close_shortcut_esc = new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(hide()));
 
   // TODO change add/remove to signal based
+
+  initWizard();
 }
 
+void LayerManager::initWizard()
+{
+  //create new engine wizard
+  add_layer_dialog = new QWidget(this, Qt::Dialog);
+
+  // layouts
+  add_layer_vl = new QVBoxLayout;
+  QHBoxLayout *add_layer_name_hl = new QHBoxLayout;
+  QHBoxLayout *add_layer_content_hl = new QHBoxLayout;
+  QHBoxLayout *add_layer_offset_hl = new QHBoxLayout;
+  QHBoxLayout *add_layer_height_hl = new QHBoxLayout;
+  QHBoxLayout *add_layer_button_hl = new QHBoxLayout;
+  add_layer_name_hl->addStretch(1);
+  add_layer_content_hl->addStretch(1);
+  add_layer_offset_hl->addStretch(1);
+  add_layer_height_hl->addStretch(1);
+  add_layer_button_hl->addStretch(1);
+
+  QLabel *label_layer_name = new QLabel(tr("Layer Name:"));
+  QLabel *label_layer_content = new QLabel(tr("Layer Content:"));
+  QLabel *label_layer_offset = new QLabel(tr("Layer Offset:"));
+  QLabel *label_layer_height = new QLabel(tr("Layer Height:"));
+  le_layer_name = new QLineEdit();
+  cb_layer_content = new QComboBox();
+  le_layer_offset = new QLineEdit();
+  le_layer_height = new QLineEdit();
+  QPushButton *pb_add_layer = new QPushButton(tr("Add"));
+  QPushButton *pb_cancel = new QPushButton(tr("Cancel"));
+
+  add_layer_name_hl->addWidget(label_layer_name);
+  add_layer_name_hl->addWidget(le_layer_name);
+  add_layer_content_hl->addWidget(label_layer_content);
+  add_layer_content_hl->addWidget(cb_layer_content);
+  add_layer_offset_hl->addWidget(label_layer_offset);
+  add_layer_offset_hl->addWidget(le_layer_offset);
+  add_layer_height_hl->addWidget(label_layer_height);
+  add_layer_height_hl->addWidget(le_layer_height);
+  add_layer_button_hl->addWidget(pb_add_layer);
+  add_layer_button_hl->addWidget(pb_cancel);
+
+  add_layer_vl->addLayout(add_layer_name_hl);
+  add_layer_vl->addLayout(add_layer_content_hl);
+  add_layer_vl->addLayout(add_layer_offset_hl);
+  add_layer_vl->addLayout(add_layer_height_hl);
+  add_layer_vl->addLayout(add_layer_button_hl);
+
+  add_layer_dialog->setLayout(add_layer_vl);
+
+  //Getting the enum names for layer content
+  QMetaObject layer_mojb = prim::Layer::staticMetaObject;
+  QMetaEnum layer_types = layer_mojb.enumerator(layer_mojb.indexOfEnumerator("LayerType"));
+
+  //populating the layer content combobox
+  for( int i = 0; i < layer_types.keyCount(); i++){
+    cb_layer_content->addItem(layer_types.key(i));
+  }
+
+  //taking care of buttons
+  connect(pb_add_layer, &QAbstractButton::clicked, this, &LayerManager::addByWizard);
+  connect(pb_cancel, &QAbstractButton::clicked, add_layer_dialog, &QWidget::hide);
+
+  add_layer_dialog->setWindowTitle(tr("Add new layer"));
+}
+
+void LayerManager::addByWizard(){
+  QMetaObject layer_mojb = prim::Layer::staticMetaObject;
+  QMetaEnum layer_types = layer_mojb.enumerator(layer_mojb.indexOfEnumerator("LayerType"));
+  //grab the data from the dialog
+  QString layer_name = le_layer_name->text();
+  prim::Layer::LayerType content_type = static_cast<prim::Layer::LayerType>(cb_layer_content->currentIndex());
+  float offset = le_layer_offset->text().toFloat();
+  float height = le_layer_height->text().toFloat();
+  //create a new layer
+  addLayer(layer_name, content_type, offset, height);
+  //get the newly created layer
+  prim::Layer* layer = getLayer(layerCount()-1);
+  //add it to the layer table
+  addLayerRow(layer);
+  //clear the dialog
+  le_layer_name->clear();
+  le_layer_offset->clear();
+  le_layer_height->clear();
+  //hide the dialog
+  add_layer_dialog->hide();
+}
 
 void LayerManager::initSideWidget()
 {
@@ -219,10 +327,16 @@ void LayerManager::initSideWidget()
     sorted_layers.append(qMakePair(layer->zOffset(), layer));
   qSort(sorted_layers.begin(), sorted_layers.end(), QPairFirstReverseComparer());
 
+  //create label to show user the current active layer
+  label_active_layer = new QLabel(tr("Active layer: "));
+  QHBoxLayout *active_layer_hl = new QHBoxLayout;
+  active_layer_hl->addWidget(label_active_layer);
+
   // construct layer widgets row by row
   QVBoxLayout *layers_vl = new QVBoxLayout;
   layers_vl->setAlignment(Qt::AlignTop);
   QHBoxLayout *row_hl = new QHBoxLayout;
+  layers_vl->addLayout(active_layer_hl);
   for (int i=0; i<sorted_layers.size(); i++) {
     prim::Layer *layer = sorted_layers[i].second;
     QLabel *lb_layer_nm = new QLabel(layer->getName());
@@ -269,16 +383,20 @@ void LayerManager::initSideWidget()
 
   QPushButton *pb_adv = new QPushButton("Advanced");
   connect(pb_adv, &QAbstractButton::clicked, this, &QWidget::show);
+  QPushButton *pb_add = new QPushButton("Add Layer");
+  connect(pb_add, SIGNAL(clicked()),
+            this, SLOT(addLayerRow()));
+
   QHBoxLayout *btn_hl = new QHBoxLayout;
   btn_hl->addStretch();
   btn_hl->addWidget(pb_adv);
+  btn_hl->addWidget(pb_add);
   layers_vl->addLayout(btn_hl);
 
   side_widget = new QWidget(0, Qt::Dialog);
   side_widget->setLayout(layers_vl);
 
 }
-
 
 void LayerManager::initLayerTableHeaders()
 {
@@ -392,6 +510,12 @@ void LayerManager::updateLayerPropFromTable(int row, int column)
   // TODO edit layer property
 }
 
+
+void LayerManager::addLayerRow()
+{
+  add_layer_dialog->show();
+  return;
+}
 
 // update widget
 void LayerManager::addLayerRow(prim::Layer *layer)

@@ -75,6 +75,7 @@ void gui::DesignPanel::initDesignPanel() {
   property_editor = new PropertyEditor(this);
   itman = new ItemManager(this, layman);
 
+
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 
   scene = new QGraphicsScene(this);
@@ -121,9 +122,6 @@ void gui::DesignPanel::initDesignPanel() {
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
-  // set display mode
-  setDisplayMode(DesignMode);
-
 
   // construct widgets
   afm_panel = new AFMPanel(layman->indexOf(layman->getMRULayer(prim::Layer::AFMTip)), this);
@@ -139,7 +137,34 @@ void gui::DesignPanel::initDesignPanel() {
   connect(this, &gui::DesignPanel::sig_toolChanged,
             eph, &gui::ElectrodePolyHelper::toolChangeResponse);
 
+
+
+
+  // initialize widgets which depend on other things to be initialized first
+
+  screenman = new ScreenshotManager(layman->getMRULayerID(prim::Layer::Misc), this);
+
+  // ScreenshotManager signals
+  connect(screenman, &gui::ScreenshotManager::sig_takeScreenshot,
+          [this](const QString &target_img_path, const QRectF &scene_rect, bool always_overwrite) {
+            emit sig_screenshot(target_img_path, scene_rect, always_overwrite);
+          }
+  );
+  connect(screenman, &gui::ScreenshotManager::sig_clipSelectionTool,
+          [this]() {emit sig_toolChangeRequest(gui::ScreenshotAreaTool);});
+  connect(screenman, &gui::ScreenshotManager::sig_addVisualAidToDP,
+          [this](prim::Item *t_item) {addItem(t_item, layman->getMRULayerID(prim::Layer::Misc));});
+  connect(screenman, &gui::ScreenshotManager::sig_removeVisualAidFromDP,
+          [this](prim::Item *t_item) {removeItem(t_item, layman->getMRULayerID(prim::Layer::Misc), true);});
+  connect(screenman, &gui::ScreenshotManager::sig_scaleBarAnchorTool,
+          [this]() {sig_toolChangeRequest(gui::ScaleBarAnchorTool);});
+
   emit sig_setItemManagerWidget(itman);
+
+
+  // set display mode
+  setDisplayMode(DesignMode);
+
 }
 
 // clear design panel
@@ -149,11 +174,18 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   delete afm_panel;
   delete property_editor;
   delete eph;
-  // delete layers and contained items
   delete layman;
   delete itman;
+  delete screenman;
 
+  afm_panel=nullptr;
+  property_editor=nullptr;
+  eph=nullptr;
+  layman=nullptr;
+  itman=nullptr;
+  screenman=nullptr;
 
+  // delete layers and contained items
   if(reset) prim::Layer::resetLayers(); // reset layer counter
 
 
@@ -215,18 +247,19 @@ void gui::DesignPanel::addItem(prim::Item *item, int layer_index, int ind)
   itman->updateTableAdd();
 }
 
-void gui::DesignPanel::removeItem(prim::Item *item, int layer_index)
+void gui::DesignPanel::removeItem(prim::Item *item, int layer_index, bool retain_item)
 {
-  removeItem(item, layman->getLayer(layer_index));
+  removeItem(item, layman->getLayer(layer_index), retain_item);
 }
 
-void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer)
+void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer, bool retain_item)
 {
   // if layer contains the item, delete and remove froms scene, otherwise
   // do nothing
   if(layer->removeItem(item)){
     scene->removeItem(item);
-    delete item;
+    if (!retain_item)
+      delete item;
     QRectF sbr = scene->itemsBoundingRect();
     QRectF vp = mapToScene(viewport()->rect()).boundingRect();
     setSceneRect(min_scene_rect | sbr | vp);
@@ -300,17 +333,27 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   for(prim::Item *const item : lattice->getItems())
     scene->addItem(item);
 
+  // LATTICE MUST BE LAYER 0
+  // MISC MUST BE LAYER 1
+
   // add the lattice to the layers, as layer 0
   layman->addLattice(lattice);
+
+  // add the misc layer as layer 1
+  layman->addLayer("Misc", prim::Layer::Misc,0,0);
 
   // add in the dangling bond surface
   layman->addLayer("Surface", prim::Layer::DB,0,0);
 
   // add in the metal layer for electrodes
-  layman->addLayer("Metal", prim::Layer::Electrode,-100E-9,10E-9);
+  layman->addLayer("Metal", prim::Layer::Electrode,1000,100);
 
   // add in the AFM layer for AFM tip travel paths
-  layman->addLayer("AFM", prim::Layer::AFMTip,500E-12,50E-12);
+  layman->addLayer("AFM", prim::Layer::AFMTip,5,0.5);
+
+
+  // // add in the metal layer for electrodes
+  // layman->addLayer("Metal2", prim::Layer::Electrode,100E-9,10E-9);
 
   layman->populateLayerTable();
   layman->initSideWidget();
@@ -386,6 +429,9 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
     case gui::ToolType::ScreenshotAreaTool:
       setInteractive(true);
       break;
+    case gui::ToolType::ScaleBarAnchorTool:
+      setInteractive(true);
+      break;
     case gui::ToolType::LabelTool:
       setInteractive(true);
       break;
@@ -413,17 +459,19 @@ void gui::DesignPanel::setFills(float *fills)
 void gui::DesignPanel::screenshot(QPainter *painter, const QRect &region)
 {
   // add lattice dot previews (vector graphics) instead of using the bitmap
-  // lattice background
-  QList<prim::LatticeCoord> coords = lattice->enclosedSites(region);
+  // include lattice background if layer is not hidden
   QList<prim::LatticeDotPreview*> latdot_previews;
-  for (prim::LatticeCoord coord : coords) {
-    if (lattice->isOccupied(coord))
-      continue;
-    prim::LatticeDotPreview *ldp = new prim::LatticeDotPreview(coord);
-    ldp->setPos(lattice->latticeCoord2ScenePos(coord));
-    ldp->setZValue(INT_MIN);
-    latdot_previews.append(ldp);
-    scene->addItem(ldp);
+  if (layman->getMRULayer(prim::Layer::Lattice)->isVisible()) {
+    QList<prim::LatticeCoord> coords = lattice->enclosedSites(region);
+    for (prim::LatticeCoord coord : coords) {
+      if (lattice->isOccupied(coord))
+        continue;
+      prim::LatticeDotPreview *ldp = new prim::LatticeDotPreview(coord);
+      ldp->setPos(lattice->latticeCoord2ScenePos(coord));
+      ldp->setZValue(INT_MIN);
+      latdot_previews.append(ldp);
+      scene->addItem(ldp);
+    }
   }
 
   // render scene onto painter
@@ -443,6 +491,9 @@ void gui::DesignPanel::setDisplayMode(DisplayMode mode)
 {
   display_mode = mode;
   prim::Item::display_mode = mode;
+
+  screenman->prepareScreenshotMode(display_mode == ScreenshotMode);
+
   updateBackground();
 }
 
@@ -583,6 +634,7 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs)
   // TODO rethink this layer loading method
   prim::Layer* load_layer = layman->getLayer(layer_nm);
   if (!load_layer) {
+    qDebug() << tr("Created layer %1 instead").arg(layer_nm);
     layman->addLayer(layer_nm);
     load_layer = layman->getLayer(layman->layerCount()-1);
   }
@@ -661,11 +713,12 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind, bool a
       db_dots_result[i]->setShowElec(job->elec_dists_avg[i]);
       //qDebug() << tr("Setting electron %1 to %2").arg(i).arg(job->elec_dists_avg[i]);
     } else if(db_dots_result[i]) {
-      // show the distribution of the selected index
       if (avg_degen) {
+        // show the average distribution of degenerate states
         db_dots_result[i]->setShowElec(job->elecDistAvgDegenOfDB(dist_ind, i));
         //qDebug() << tr("Setting electron %1 to %2, averaged").arg(i).arg(job->elecDistAvgDegenOfDB(dist_ind,i));
       } else {
+        // show the average distribution of the selected index
         db_dots_result[i]->setShowElec(job->filteredElecDists().at(dist_ind).dist[i]);
       }
     }
@@ -810,15 +863,16 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
 
   // if other buttons are clicked during rubber band selection, end selection
   if(rb)
-    rubberBandEnd();
+    rubberBandClear();
 
   switch(e->button()){
     case Qt::LeftButton:
-      if (tool_type == ScreenshotAreaTool) {
+      if (tool_type == ScaleBarAnchorTool) {
+        screenman->setScaleBarAnchor(mapToScene(e->pos()));
+      } else if (tool_type == ScreenshotAreaTool) {
         // use rubberband to select screenshot area
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
-
       } else if (tool_type == SelectTool || tool_type == ElectrodeTool ||
           tool_type == AFMAreaTool || tool_type == LabelTool) {
         // rubber band variables
@@ -839,7 +893,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
         if (tool_type == DBGenTool && snap_target)
           rb_start = snap_target->pos().toPoint();
         else*/
-          rb_start = mapToScene(e->pos()).toPoint();
+        rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
         coord_start = lattice->nearestSite(mapToScene(e->pos()));
 
@@ -951,6 +1005,9 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
   // QPointF scene_pos = mapToScene(e->pos());
   QTransform trans = transform();
 
+  if (rb)
+    rubberBandSelect();
+
   // case specific behaviour
   if (ghosting) {
     // plant ghost and end ghosting
@@ -988,9 +1045,11 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             createElectrodePolyNode(mapToScene(e->pos()));
             break;
           case gui::ToolType::ScreenshotAreaTool:
-            // take a screenshot of the rubberband area
-            sig_screenshot(rb_scene_rect);
+          {
+            // set the screenshot clip area in the screenshot manager
+            screenman->setClipArea(rb_scene_rect);
             break;
+          }
           case gui::ToolType::LabelTool:
             // create a label with the rubberband area
             createTextLabel(rb_scene_rect);
@@ -1017,7 +1076,7 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
 
   // end rubber band if active
   if (rb)
-    rubberBandEnd();
+    rubberBandClear();
 
   clicked=false;
 }
@@ -1087,10 +1146,6 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
   else{
     switch(e->key()){
       case Qt::Key_Escape:
-        // quit screenshot mode if currently in it
-        if (display_mode == ScreenshotMode)
-          emit sig_cancelScreenshot();
-
         // deactivate current tool
         if (tool_type != gui::ToolType::SelectTool) {
           //qDebug() << tr("Esc pressed, drop back to select tool");
@@ -1101,11 +1156,6 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
       case Qt::Key_Return:
         if (tool_type == gui::ToolType::ElectrodePolyTool) {
           createElectrodePoly();
-        }
-        break;
-      case Qt::Key_S:
-        if (display_mode == ScreenshotMode) {
-          sig_screenshot(prev_screenshot_area);
         }
         break;
       default:
@@ -1406,17 +1456,13 @@ void gui::DesignPanel::initActions()
 void gui::DesignPanel::rubberBandUpdate(QPoint pos){
   // stop rubber band if moving item
   if (moving || resizing) {
-    rubberBandEnd();
+    rubberBandClear();
     return;
   }
 
-  // do nothing if mouse hasn't moved much
-  // TODO change snap_diameter to a separate variable
-  //if((pos-rb_cache).manhattanLength()<.01*snap_diameter)
-    //return;
   rb_cache = pos;
 
-  if (!rb) {
+  if (rb == nullptr) {
     // make rubber band
     rb = new QRubberBand(QRubberBand::Rectangle, this);
     rb->setGeometry(QRect(mapFromScene(rb_start), QSize()));
@@ -1425,28 +1471,29 @@ void gui::DesignPanel::rubberBandUpdate(QPoint pos){
     // update rubberband rectangle
     rb->setGeometry(QRect(mapFromScene(rb_start), pos).normalized());
     rb_scene_rect = QRect(rb_start, mapToScene(pos).toPoint()).normalized();
-
-    // deselect all items
-    QList<QGraphicsItem*> selected_items = scene->selectedItems();
-    for(QGraphicsItem* selected_item : selected_items)
-      selected_item->setSelected(false);
-
-    // select items that are now enclosed by the rubberband
-    QList<QGraphicsItem*> rb_items = scene->items(rb_scene_rect, Qt::ContainsItemShape);
-    for(QGraphicsItem* rb_item : rb_items)
-      rb_item->setSelected(true);
-
-    // append shift-selected items
-    for(QGraphicsItem* shift_selected_item : rb_shift_selected)
-      shift_selected_item->setSelected(true);
   }
 }
 
 
-void gui::DesignPanel::rubberBandEnd(){
-  if(rb){
+void gui::DesignPanel::rubberBandSelect(){
+  if (rb == nullptr)
+    return;
+
+  // select items that are enclosed by the rubberband
+  QPainterPath painter_path;
+  painter_path.addRect(rb_scene_rect);
+  scene->setSelectionArea(painter_path, Qt::ContainsItemShape);
+
+  // append shift-selected items
+  for(QGraphicsItem* shift_selected_item : rb_shift_selected)
+    shift_selected_item->setSelected(true);
+}
+
+
+void gui::DesignPanel::rubberBandClear() {
+  if (rb != nullptr) {
     rb->hide();
-    rb = 0;
+    rb = nullptr;
     rb_shift_selected.clear();
   }
 }

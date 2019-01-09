@@ -67,6 +67,23 @@ gui::ApplicationGUI::~ApplicationGUI()
 }
 
 
+// PROTECTED
+
+void gui::ApplicationGUI::closeEvent(QCloseEvent *e)
+{
+  // prompt user to resolve unsaved changes if program has been modified
+  if(design_pan->stateChanged()) {
+    if(!resolveUnsavedChanges()) {
+      e->ignore();
+      return;
+    }
+  }
+
+  //QApplication::quit();
+  is_closing = true;
+  e->accept();
+}
+
 
 // GUI INITIALISATION
 
@@ -77,7 +94,7 @@ void gui::ApplicationGUI::initGUI()
   design_pan = new gui::DesignPanel(this);
   input_field = new gui::InputField(this);
   info_pan = new gui::InfoPanel(this);
-  
+
   // detachable/pop-up widgets, order matters in some cases due to pointers
   sim_manager = new gui::SimManager(this);
   sim_visualize = new gui::SimVisualize(sim_manager, this);
@@ -118,7 +135,7 @@ void gui::ApplicationGUI::initGUI()
           info_pan, &gui::InfoPanel::updateSelItemCount);
 
   // widget-app gui signals
-  connect(sim_manager, &gui::SimManager::emitSimJob,
+  connect(sim_manager, &gui::SimManager::sig_simJob,
           this, &gui::ApplicationGUI::runSimulation);
   connect(design_pan, &gui::DesignPanel::sig_resetDesignPanel,
           this, &gui::ApplicationGUI::designPanelReset);
@@ -129,7 +146,7 @@ void gui::ApplicationGUI::initGUI()
   connect(design_pan, &gui::DesignPanel::sig_undoStackCleanChanged,
           this, &gui::ApplicationGUI::updateWindowTitle);
   connect(design_pan, &gui::DesignPanel::sig_screenshot,
-          this, QOverload<QRect>::of(&gui::ApplicationGUI::designScreenshot));
+          this, QOverload<const QString&, const QRectF&, bool>::of(&gui::ApplicationGUI::designScreenshot));
   connect(design_pan, &gui::DesignPanel::sig_showSimulationSetup,
           this, &gui::ApplicationGUI::simulationSetup);
   connect(design_pan, &gui::DesignPanel::sig_cancelScreenshot,
@@ -211,17 +228,13 @@ void gui::ApplicationGUI::initMenuBar()
   // tools menu actions
   QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
   QAction *select_color = new QAction(tr("Select Color..."), this);
-  QAction *area_screenshot = new QAction(tr("Region Screenshot..."), this);
-  QAction *design_screenshot = new QAction(tr("Design Screenshot..."), this);
-  QAction *screenshot = new QAction(tr("Window Screenshot..."), this);
+  QAction *window_screenshot = new QAction(tr("Window Screenshot..."), this);
   QAction *action_settings_dialog = new QAction(tr("Settings"), this);
 
   tools->addAction(change_lattice);
   tools->addAction(select_color);
   tools->addSeparator();
-  tools->addAction(area_screenshot);
-  tools->addAction(design_screenshot);
-  tools->addAction(screenshot);
+  tools->addAction(window_screenshot);
   tools->addSeparator();
   tools->addAction(action_settings_dialog);
 
@@ -231,7 +244,7 @@ void gui::ApplicationGUI::initMenuBar()
   help->addAction(about_version);
 
   connect(new_file, &QAction::triggered, this, &gui::ApplicationGUI::newFile);
-  connect(quit, &QAction::triggered, this, &gui::ApplicationGUI::closeFile);
+  connect(quit, &QAction::triggered, this, &QWidget::close);
   connect(save, &QAction::triggered, this, &gui::ApplicationGUI::saveDefault);
   connect(save_as, &QAction::triggered, this, &gui::ApplicationGUI::saveNew);
   connect(open_save, &QAction::triggered, this, &gui::ApplicationGUI::openFromFile);
@@ -240,10 +253,7 @@ void gui::ApplicationGUI::initMenuBar()
   connect(rotate_view_ccw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCcw);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
-  connect(area_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::beginScreenshotMode);
-  connect(screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
-  connect(design_screenshot, SIGNAL(triggered()),
-          this, SLOT(designScreenshot()));
+  connect(window_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
   connect(action_settings_dialog, &QAction::triggered, this, &gui::ApplicationGUI::showSettingsDialog);
   connect(about_version, &QAction::triggered, this, &gui::ApplicationGUI::aboutVersion);
 
@@ -288,12 +298,19 @@ void gui::ApplicationGUI::initTopBar()
   connect(action_run_ground_state, &QAction::triggered,
           this, &gui::ApplicationGUI::runGroundState);
 
+
+  // screenshot mode
+  action_screenshot_mode = new QAction(QIcon(":/ico/screenshotmode.svg"), tr("Screenshot Mode"));
+  connect(action_screenshot_mode, &QAction::triggered,
+          this, &gui::ApplicationGUI::toggleScreenshotMode);
+
   // add them to top bar
   top_bar->addAction(action_run_sim);
   top_bar->addAction(action_run_ground_state);
   top_bar->addAction(action_sim_visualize);           // already initialised in menu bar
   top_bar->addAction(action_layer_sel);               // already initialised in menu bar
   top_bar->addAction(action_dialog_dock_visibility);  // already initialised in menu bar
+  top_bar->addAction(action_screenshot_mode);
 
   //action_circuit_lib= top_bar->addAction(QIcon(":/ico/circuitlib.svg"), tr("Circuit Library"));
 
@@ -327,9 +344,8 @@ void gui::ApplicationGUI::initSideBar()
 
   // actions
   QActionGroup *action_group = new QActionGroup(side_bar);
+  ag_screenshot = new QActionGroup(side_bar);
 
-  action_screenshot_tool = side_bar->addAction(QIcon(":/ico/screenshotarea.svg"),
-      tr("Screenshot Area tool"));
   action_select_tool = side_bar->addAction(QIcon(":/ico/select.svg"),
       tr("Select tool"));
   action_drag_tool = side_bar->addAction(QIcon(":/ico/drag.svg"),
@@ -338,9 +354,9 @@ void gui::ApplicationGUI::initSideBar()
       tr("DB tool"));
   action_electrode_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"),
       tr("Electrode tool"));
+  /*
   action_electrode_poly_tool = side_bar->addAction(QIcon(":/ico/drawelectrodepoly.svg"),
       tr("Electrode polygon tool"));
-  /*
   action_afmarea_tool = side_bar->addAction(QIcon(":/ico/drawafmarea.svg"),
       tr("AFM Area tool"));
   action_afmpath_tool = side_bar->addAction(QIcon(":/ico/drawafmpath.svg"),
@@ -348,37 +364,39 @@ void gui::ApplicationGUI::initSideBar()
   action_label_tool = side_bar->addAction(QIcon(":/ico/drawlabel.svg"),
       tr("Label tool"));
       */
+  action_screenshot_area_tool = side_bar->addAction(QIcon(":/ico/screenshotarea.svg"),
+      tr("Screenshot area tool"));
+  action_scale_bar_anchor_tool = side_bar->addAction(QIcon(":/ico/scalebaranchortool.svg"),
+      tr("Scale bar anchor tool"));
 
-  action_group->addAction(action_screenshot_tool);
   action_group->addAction(action_select_tool);
   action_group->addAction(action_drag_tool);
   action_group->addAction(action_dbgen_tool);
   action_group->addAction(action_electrode_tool);
-  action_group->addAction(action_electrode_poly_tool);
   /*
+  action_group->addAction(action_electrode_poly_tool);
   action_group->addAction(action_afmarea_tool);
   action_group->addAction(action_afmpath_tool);
   action_group->addAction(action_label_tool);
   */
+  ag_screenshot->addAction(action_screenshot_area_tool);
+  ag_screenshot->addAction(action_scale_bar_anchor_tool);
 
-  action_screenshot_tool->setVisible(false);  // only shown in ScreenshotMode
+  ag_screenshot->setVisible(false); // hide screenshot action group by default
 
-  action_screenshot_tool->setCheckable(true);
   action_select_tool->setCheckable(true);
   action_drag_tool->setCheckable(true);
   action_dbgen_tool->setCheckable(true);
   action_electrode_tool->setCheckable(true);
-  action_electrode_poly_tool->setCheckable(true);
   /*
+  action_electrode_poly_tool->setCheckable(true);
   action_afmarea_tool->setCheckable(true);
   action_afmpath_tool->setCheckable(true);
   action_label_tool->setCheckable(true);
   */
+  action_screenshot_area_tool->setCheckable(true);
+  action_scale_bar_anchor_tool->setCheckable(true);
 
-  action_select_tool->setChecked(true);
-
-  connect(action_screenshot_tool, &QAction::triggered,
-          this, &gui::ApplicationGUI::setToolScreenshotArea);
   connect(action_select_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolSelect);
   connect(action_drag_tool, &QAction::triggered,
@@ -387,9 +405,9 @@ void gui::ApplicationGUI::initSideBar()
           this, &gui::ApplicationGUI::setToolDBGen);
   connect(action_electrode_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolElectrode);
+  /*
   connect(action_electrode_poly_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolElectrodePoly);
-  /*
   connect(action_afmarea_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolAFMArea);
   connect(action_afmpath_tool, &QAction::triggered,
@@ -397,6 +415,10 @@ void gui::ApplicationGUI::initSideBar()
   connect(action_label_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolLabel);
           */
+  connect(action_screenshot_area_tool, &QAction::triggered,
+          this, &gui::ApplicationGUI::setToolScreenshotArea);
+  connect(action_scale_bar_anchor_tool, &QAction::triggered,
+          this, &gui::ApplicationGUI::setToolScaleBarAnchor);
 
   addToolBar(area, side_bar);
 }
@@ -625,19 +647,21 @@ void gui::ApplicationGUI::saveSettings()
 
 void gui::ApplicationGUI::updateWindowTitle()
 {
-  QString title_name;
+  if (!is_closing){
+    QString title_name;
 
-  // prefix the title by an asterisk to the name if the file has been edited
-  if (design_pan->stateChanged())
-    title_name += "*";
+    // prefix the title by an asterisk to the name if the file has been edited
+    if (design_pan->stateChanged())
+      title_name += "*";
 
-  QFileInfo w_path_info(working_path);
-  title_name += (working_path.isEmpty()) ? "Untitled" : w_path_info.fileName();
+    QFileInfo w_path_info(working_path);
+    title_name += (working_path.isEmpty()) ? "Untitled" : w_path_info.fileName();
 
-  setWindowTitle(tr("%1 - %2")
-    .arg(title_name)
-    .arg(QCoreApplication::applicationName())
-  );
+    setWindowTitle(tr("%1 - %2")
+      .arg(title_name)
+      .arg(QCoreApplication::applicationName())
+    );    
+  }
 }
 
 void gui::ApplicationGUI::setTool(gui::ToolType tool)
@@ -659,11 +683,11 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
       action_electrode_tool->setChecked(true);
       setToolElectrode();
       break;
+      /*
     case gui::ToolType::ElectrodePolyTool:
       action_electrode_poly_tool->setChecked(true);
       setToolElectrodePoly();
       break;
-      /*
     case gui::ToolType::AFMAreaTool:
       action_afmarea_tool->setChecked(true);
       setToolAFMArea();
@@ -674,8 +698,12 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
       break;
       */
     case gui::ToolType::ScreenshotAreaTool:
-      action_screenshot_tool->setChecked(true);
+      action_screenshot_area_tool->setChecked(true);
       setToolScreenshotArea();
+      break;
+    case gui::ToolType::ScaleBarAnchorTool:
+      action_scale_bar_anchor_tool->setChecked(true);
+      setToolScaleBarAnchor();
       break;
       /*
     case gui::ToolType::LabelTool:
@@ -732,6 +760,12 @@ void gui::ApplicationGUI::setToolScreenshotArea()
 {
   qDebug() << tr("selecting screenshot area tool");
   design_pan->setTool(gui::ToolType::ScreenshotAreaTool);
+}
+
+void gui::ApplicationGUI::setToolScaleBarAnchor()
+{
+  qDebug() << tr("selecting scale bar anchor tool");
+  design_pan->setTool(gui::ToolType::ScaleBarAnchorTool);
 }
 
 void gui::ApplicationGUI::setToolLabel()
@@ -887,14 +921,14 @@ void gui::ApplicationGUI::beginScreenshotMode()
 {
   display_mode_cache = design_pan->displayMode();
   design_pan->setDisplayMode(ScreenshotMode);
-  action_screenshot_tool->setVisible(true);
-  setTool(ScreenshotAreaTool);
+  ag_screenshot->setVisible(true);
+  //setTool(ScreenshotAreaTool);
 }
 
 void gui::ApplicationGUI::endScreenshotMode()
 {
   design_pan->setDisplayMode(display_mode_cache);
-  action_screenshot_tool->setVisible(false);
+  ag_screenshot->setVisible(false);
   setTool(SelectTool);
 }
 
@@ -935,8 +969,12 @@ void gui::ApplicationGUI::screenshot()
 }
 
 
-void gui::ApplicationGUI::designScreenshot()
+void gui::ApplicationGUI::fullDesignScreenshot()
 {
+  // TODO fold this into the designScreenshot function, if rect input is null
+  // then default to full design screenshot.
+  // TODO the save dialog will probably also be handled by the screenshot manager
+
   beginScreenshotMode();
 
   gui::DesignPanel *widget = this->design_pan;
@@ -949,35 +987,51 @@ void gui::ApplicationGUI::designScreenshot()
                     design_pan->mapFromParent(rect.topLeft())).toPoint()
                 - rect.topLeft());
 
-  designScreenshot(rect);
+  // get save path
+  QString fpath = QFileDialog::getSaveFileName(this, tr("Save File"), img_dir.path(),
+                      tr("SVG files (*.svg)"));
+
+  designScreenshot(fpath, rect, true);
 }
 
 
-void gui::ApplicationGUI::designScreenshot(QRect rect)
+void gui::ApplicationGUI::designScreenshot(const QString &target_img_path, const QRectF &rect, bool always_overwrite)
 {
   qDebug() << tr("taking screenshot for rect (%1, %2) (%3, %4)")
       .arg(rect.left()).arg(rect.top()).arg(rect.right()).arg(rect.bottom());
-  // get save path
-  QString fname = QFileDialog::getSaveFileName(this, tr("Save File"), img_dir.path(),
-                      tr("SVG files (*.svg)"));
 
-  if(fname.isEmpty()) {
-    endScreenshotMode();
+  // check if target directory is writable
+  if (!QFileInfo(QFileInfo(target_img_path).dir().absolutePath()).isWritable()) {
+    qDebug() << tr("Directory not writable.");
+    //endScreenshotMode();
     return;
   }
-  img_dir = QDir(fname);
+
+  // check if target file already exists
+  if (!always_overwrite && QFileInfo(target_img_path).exists()) {
+    QMessageBox::StandardButton reply = QMessageBox::question(this,
+        "File exists",
+        tr("The target image file name %1 already exists. Do you want to \
+          overwrite it?").arg(target_img_path),
+        QMessageBox::Yes|QMessageBox::No);
+    // TODO add another button for browsing another path
+    if (reply == QMessageBox::No) {
+      //endScreenshotMode();
+      return;
+    }
+  }
 
   QSvgGenerator gen;
-  gen.setFileName(fname);
+  gen.setFileName(target_img_path);
   //gen.setSize(rect.size());
   gen.setViewBox(rect);
 
   QPainter painter;
   painter.begin(&gen);
-  design_pan->screenshot(&painter, rect);
+  design_pan->screenshot(&painter, rect.toAlignedRect());
   painter.end();
 
-  endScreenshotMode();
+  //endScreenshotMode();
 }
 
 // FILE HANDLING
@@ -1174,17 +1228,6 @@ void gui::ApplicationGUI::openFromFile()
   // clean up
   file.close();
   qDebug() << tr("Load complete");
-}
-
-
-void gui::ApplicationGUI::closeFile()
-{
-  // prompt user to resolve unsaved changes if program has been modified
-  if(design_pan->stateChanged())
-    if(!resolveUnsavedChanges())
-      return;
-
-  QApplication::quit();
 }
 
 

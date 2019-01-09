@@ -32,3 +32,6 @@ doxygen
 tempfig.pdf
 .temp/
 .vscode/
+.ycm*.py
+siqad-screenshot.svg
+>>>>>>> master

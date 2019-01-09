@@ -356,7 +356,7 @@ void SimManager::submitSimSetup()
   new_job->addSimParams(curr_sim_params_form->finalProperties());
 
   addJob(new_job);
-  emit emitSimJob(new_job);
+  emit sig_simJob(new_job);
 }
 
 

@@ -90,16 +90,15 @@ void SimVisualize::showPotPlot()
   QVector<qreal> x_vec;
   QVector<qreal> y_vec;
   qreal pixels_per_angstrom = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
-  qreal angstrom_per_meter = 1.0E10;
   QList<QVector<float>>::iterator iter = show_job->potentials.begin();
   // first entry will be topLeft
-  x_vec.append((*iter)[0]*angstrom_per_meter*pixels_per_angstrom);
-  y_vec.append((*iter)[1]*angstrom_per_meter*pixels_per_angstrom);
+  x_vec.append((*iter)[0]*pixels_per_angstrom);
+  y_vec.append((*iter)[1]*pixels_per_angstrom);
   // last entry will be bottomRight
   iter = show_job->potentials.end();
   iter--;
-  x_vec.append((*iter)[0]*angstrom_per_meter*pixels_per_angstrom);
-  y_vec.append((*iter)[1]*angstrom_per_meter*pixels_per_angstrom);
+  x_vec.append((*iter)[0]*pixels_per_angstrom);
+  y_vec.append((*iter)[1]*pixels_per_angstrom);
 
   if( x_vec.size() > 0){
     qDebug() << tr("QVectors filled. Size of vectors: %1").arg(x_vec.size());
@@ -172,13 +171,15 @@ void SimVisualize::showPotential()
 
 void SimVisualize::showAverageElecDist()
 {
+  qDebug() << tr("Showing average electron distribution.");
   emit showElecDistOnScene(show_job, -1);
 }
 
 
 void SimVisualize::showAverageElecDistDegen()
 {
-  emit showElecDistOnScene(show_job, combo_job_sel->currentIndex()-1, true);
+  qDebug() << tr("Show degenerate states for distribution %1").arg(slider_dist_sel->sliderPosition());
+  emit showElecDistOnScene(show_job, slider_dist_sel->sliderPosition()-1, true);
 }
 
 

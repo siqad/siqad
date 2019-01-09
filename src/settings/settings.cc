@@ -280,6 +280,15 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("afmseg/line_col_sel", QColor(0, 150, 110, 80));
   S->setValue("afmseg/line_width", 8);
 
+  // screenshot clip area parameters
+  S->setValue("screenshotcliparea/edge_width", .5);                    // edge width in angstrom
+  S->setValue("screenshotcliparea/edge_col", QColor(0,0,0,255));      // edge color
+
+  // scale bar parameters
+  S->setValue("scalebar/edge_width", 1.5);
+  S->setValue("scalebar/text_height", 3);
+  S->setValue("scalebar/edge_col", QColor(0,0,0,255));
+
   return S;
 }
 
