@@ -131,7 +131,7 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
     } else if (rs->name() == "meta") {
       readMeta(&prop, rs);
     } else {
-      qDebug() << QObject::tr("Unknown element '%1' when reading property map from XML").arg(rs->name());
+      qDebug() << QObject::tr("Unknown element '%1' when reading property map from XML").arg(rs->name().toString());
       rs->skipCurrentElement();
     }
   }
