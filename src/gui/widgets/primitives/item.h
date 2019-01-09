@@ -95,7 +95,7 @@ namespace prim{
     gui::PropertyMap properties() const;
     void propMapFromXml(QXmlStreamReader *rs);
     //! Get property from the property map
-    gui::Property getProperty(const QString &key);
+    gui::Property getProperty(const QString &key) const;
 
     //! Set a property in this item's property map
     void setProperty(const QString &key, QVariant var) {local_props[key]=var;}

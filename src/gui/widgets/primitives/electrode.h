@@ -45,9 +45,11 @@ namespace prim{
     // qreal getDepth(){return elec_depth;}
 
     // inherited abstract method implementations
+    QPainterPath shape() const Q_DECL_OVERRIDE;
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
     Item *deepCopy() const override;
+    QPolygon getRotatedPolygon() const;
 
     // saving to design
     virtual void saveItems(QXmlStreamWriter *) const override;

@@ -142,7 +142,7 @@ gui::PropertyMap prim::Item::properties() const
   return all_props;
 }
 
-gui::Property prim::Item::getProperty(const QString &key)
+gui::Property prim::Item::getProperty(const QString &key) const
 {
   if (local_props.contains(key)) {
     if (classPropertyMap()) {
