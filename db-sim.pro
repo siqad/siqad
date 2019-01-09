@@ -220,9 +220,9 @@ sim_afmmarcus.files = \
     $$PHYS_DIR/afmmarcus/hopping_animator.physeng \
     $$PHYS_DIR/afmmarcus/marcus_and_pois.physeng \
 sim_afmmarcus.files += \
-    $$PHYS_DIR/afmmarcus/src/swig_siqadconn/_siqadconn.cpython-36m-x86_64-linux-gnu.so
+    $$PHYS_DIR/afmmarcus/src/_siqadconn*.so
 win32: sim_afmmarcus.files += \
-    $$PHYS_DIR/afmmarcus/src/_siqadconn.pyd
+    $$PHYS_DIR/afmmarcus/src/_siqadconn*.pyd
 sim_afmmarcus.files += \
     $$PHYS_DIR/afmmarcus/src/afm.py \
     $$PHYS_DIR/afmmarcus/src/animator.py \
@@ -241,9 +241,9 @@ sim_afmmarcus_stylesheets.files = \
     $$PHYS_DIR/afmmarcus/src/stylesheets/animator.qss
 sim_afmmarcus_data.path = $$EXEC_DIR/src/phys/afmmarcus/data
 sim_afmmarcus_data.files = \
-		$$PHYS_DIR/afmmarcus/src/data/TIBB_vs_H.dat \
-		$$PHYS_DIR/afmmarcus/src/data/TIBB_vs_R_d200pm.dat \
-		$$PHYS_DIR/afmmarcus/src/data/tip_DB_system.py
+    $$PHYS_DIR/afmmarcus/src/data/TIBB_vs_H.dat \
+   	$$PHYS_DIR/afmmarcus/src/data/TIBB_vs_R_d200pm.dat \
+   	$$PHYS_DIR/afmmarcus/src/data/tip_DB_system.py
 INSTALLS += sim_afmmarcus
 INSTALLS += sim_afmmarcus_stylesheets
 INSTALLS += sim_afmmarcus_data
@@ -253,13 +253,13 @@ INSTALLS += sim_afmmarcus_data
 sim_poissolver.path = $$EXEC_DIR/src/phys/poissolver
 sim_poissolver.files = $$PHYS_DIR/poissolver/poissolver.physeng
 linux: sim_poissolver.files += \
-		$$PHYS_DIR/poissolver/FEM/src/poissolver \
-		$$PHYS_DIR/poissolver/FEM/src/python/poisson3D.py \
-		$$PHYS_DIR/poissolver/FEM/src/python/poisson_class.py \
-		$$PHYS_DIR/poissolver/FEM/src/python/subdomains.py \
-		$$PHYS_DIR/poissolver/FEM/src/python/helpers/mesh_writer_3D.py \
-		$$PHYS_DIR/poissolver/FEM/src/python/helpers/helpers.py \
-		$$PHYS_DIR/poissolver/FEM/src/python/dolfin_convert.py \
-		$$PHYS_DIR/poissolver/FEM/src/python/siqadconn.py \
-		$$PHYS_DIR/poissolver/FEM/src/python/_siqadconn.cpython-36m-x86_64-linux-gnu.so
+    $$PHYS_DIR/poissolver/FEM/src/poissolver \
+    $$PHYS_DIR/poissolver/FEM/src/python/poisson3D.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/poisson_class.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/subdomains.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/helpers/mesh_writer_3D.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/helpers/helpers.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/dolfin_convert.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/siqadconn.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/_siqadconn.cpython-36m-x86_64-linux-gnu.so
 INSTALLS += sim_poissolver
