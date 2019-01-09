@@ -146,16 +146,26 @@ void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)
 
 }
 
-QPolygon prim::Electrode::getPolygon() const
+QPolygonF prim::Electrode::getPolygon() const
 {
-  QRect rect = sceneRect().toRect();
+  QRectF rect = sceneRect();
   rect.moveTo(0,0);
   QTransform t;
   float angle = getProperty("angle").value.toFloat();
   t.translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
   t.rotate(angle);
   t.translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
-  return t.mapToPolygon(rect);
+  QPolygonF poly(rect);
+  QPolygonF new_poly = t.map(poly);
+  return new_poly;
+  // QRect rect = sceneRect().toRect();
+  // rect.moveTo(0,0);
+  // QTransform t;
+  // float angle = getProperty("angle").value.toFloat();
+  // t.translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
+  // t.rotate(angle);
+  // t.translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
+  // return t.mapToPolygon(rect);
 }
 
 QRectF prim::Electrode::boundingRect() const
