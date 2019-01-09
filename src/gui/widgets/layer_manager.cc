@@ -369,7 +369,11 @@ void LayerManager::initSideWidget()
     if (i > 0 && layer->zOffset() == sorted_layers[i-1].second->zOffset()) {
       // add to the same row as before
       row_hl->addWidget(layer_wg);
+      if (i == sorted_layers.size()-1) {
+        layers_vl->addLayout(row_hl);
+      }
     } else if (i == sorted_layers.size()-1) {
+      // last layer to add
       layers_vl->addLayout(row_hl);
       row_hl = new QHBoxLayout;
       row_hl->addWidget(layer_wg);
