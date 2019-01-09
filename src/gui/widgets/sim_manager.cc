@@ -85,7 +85,7 @@ bool SimManager::findWorkingPythonPath()
   QStringList test_py_paths;
   QString kernel_type = QSysInfo::kernelType();
   auto get_py_paths = [](const QString &os) -> QStringList {
-    return settings::AppSettings::instance()->getAllPossiblePaths("python_search_"+os);
+    return settings::AppSettings::instance()->getPaths("python_search_"+os);
   };
   if (kernel_type == "linux" || kernel_type == "freebsd") {
     test_py_paths << get_py_paths("linux");
@@ -413,7 +413,7 @@ void SimManager::initEngines()
 {
   //QString engine_lib_dirs = settings::AppSettings::instance()->getPath("phys/eng_lib_dirs");
   //QStringList engine_lib_dir_paths = engine_lib_dirs.split(';', QString::SkipEmptyParts);
-  QStringList engine_lib_dir_paths = settings::AppSettings::instance()->getAllPossiblePaths("phys/eng_lib_dirs");
+  QStringList engine_lib_dir_paths = settings::AppSettings::instance()->getPaths("phys/eng_lib_dirs");
 
   for (QString engine_lib_dir_path : engine_lib_dir_paths) {
     QDir engine_lib_dir(engine_lib_dir_path);

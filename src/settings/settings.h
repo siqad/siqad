@@ -78,15 +78,27 @@ public:
     return var;
   }
 
-  // returns a QString with each of the included replaceable paths replaced by
+  // Returns a QString with each of the included replaceable paths replaced by
   // a writable path (whatever QStandardPaths::writableLocation provides)
   QString getPath(const QString &key)
   {
     return pathReplacement(get<QString>(key));
   }
 
+  // Returns a QStringList of paths with the preset path replacements.
+  QStringList getPaths(const QString &key)
+  {
+    QStringList paths = get<QStringList>(key);
+    QStringList::iterator i;
+    for (i = paths.begin(); i != paths.end(); ++i) {
+      *i = pathReplacement(*i);
+    }
+    return paths;
+  }
+
   // returns a QStringList with each of the included replaceable paths replaced
   // by all possible paths given by QStandardPaths::standardLocations
+  /*
   QStringList getAllPossiblePaths(const QString &key)
   {
     QStringList val_split = get<QString>(key).split(';', QString::SkipEmptyParts);
@@ -115,6 +127,7 @@ public:
 
     return paths_return;
   }
+  */
 
   static QString pathReplacement(QString path)
   {

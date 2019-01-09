@@ -111,15 +111,32 @@ QSettings *settings::AppSettings::m_defs()
 
   // python path related
   S->setValue("user_python_path", QString(""));   // user's own python path setting
-  S->setValue("python_search_linux", QString("python3;/usr/bin/python3;/bin/python3;python"));  // linux/bsd python search paths
-  S->setValue("python_search_winnt", QString("py,-3;python;C:\\Windows\\py.exe,-3"));           // windows python search paths
-  S->setValue("python_search_darwin", QString("python3,python"));                               // macos python search paths
+  // linux/bsd python search paths
+  S->setValue("python_search_linux", QStringList({
+    "python3",
+    "/usr/bin/python3",
+    "/bin/python3;python"
+  }));
+  // windows python search paths
+  S->setValue("python_search_winnt", QStringList({
+    "py,-3",
+    "python",
+    "C:\\Windows\\py.exe,-3"
+  }));
+  // macos python search paths
+  S->setValue("python_search_darwin", QStringList({
+    "python3",
+    "python"
+  }));
 
 
   S->setValue("phys/debye_length", 50);
   S->setValue("phys/epsr", 10);
 
-  S->setValue("phys/eng_lib_dirs", QString("<APPLOCALDATA>/phys/;<BINPATH>/src/phys/"));
+  S->setValue("phys/eng_lib_dirs", QStringList({
+    "<APPLOCALDATA>/phys/",
+    "<BINPATH>/src/phys/"
+  }));
   //S->setValue("phys/eng_lib_dirs", QString("<APPLOCALDATA>/phys"));
   //S->setValue("phys/eng_lib_dirs", QString("<BINPATH>/src/phys/"));
   S->setValue("phys/eng_usr_cfg_dir", QString("<CONFIG>/phys/"));
