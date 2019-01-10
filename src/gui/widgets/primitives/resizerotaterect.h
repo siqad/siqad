@@ -10,6 +10,7 @@
 #define _PRIM_RESIZE_ROTATE_FRAME_H_
 
 #include<QTransform>
+#include<QtMath>
 #include "item.h"
 
 namespace prim{
@@ -49,6 +50,7 @@ namespace prim{
     QTransform* getTransform() const {return transform;}
 
     void setTransform(QTransform* t) {transform = t;}
+
   protected:
 
     //! Show resize frame when focused
@@ -96,6 +98,8 @@ namespace prim{
     void updateHandlePositions();
 
     // Graphics
+    //! Will freeze the handles that need to be fixed during resizing.
+    void freezeHandles(HandlePosition pos);
 
     //! Bounding rect for graphics calculations, just takes the resize_target's.
     virtual QRectF boundingRect() const override {return resize_target->boundingRect();}
@@ -143,6 +147,9 @@ namespace prim{
     //! Bounding rect of the handle for users to grab.
     virtual QRectF boundingRect() const override;
 
+    void setFreeze(bool freeze){frozen = freeze;}
+
+    bool isFrozen(){return frozen;}
     //! Paint a square indicating where users should grab for resize.
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem*, QWidget*) override;
 
@@ -160,6 +167,7 @@ namespace prim{
     static qreal handle_dim;
     static prim::Item::StateColors rotate_handle_col;
 
+    bool frozen = false;
     bool clicked;
     QPointF step_pos;   // cursor location at the last mouse move event
   }; // end of ResizeRotateHandle class

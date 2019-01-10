@@ -110,10 +110,63 @@ void ResizeRotateFrame::setResizeTarget(prim::ResizeRotateRect *new_target)
     updateHandlePositions();
 }
 
+void ResizeRotateFrame::freezeHandles(HandlePosition pos)
+{
+  switch(pos){
+    case TopLeft: //freeze bottom right
+      resize_handles[prim::ResizeRotateFrame::BottomRight]->setFreeze(true);
+      break;
+    case Top: //freeze bottom
+      resize_handles[prim::ResizeRotateFrame::BottomRight]->setFreeze(true);
+      resize_handles[prim::ResizeRotateFrame::Bottom]->setFreeze(true);
+      resize_handles[prim::ResizeRotateFrame::BottomLeft]->setFreeze(true);
+      break;
+    case TopRight:
+      resize_handles[prim::ResizeRotateFrame::BottomLeft]->setFreeze(true);
+      break;
+    case Right:
+      resize_handles[prim::ResizeRotateFrame::TopLeft]->setFreeze(true);
+      resize_handles[prim::ResizeRotateFrame::Left]->setFreeze(true);
+      resize_handles[prim::ResizeRotateFrame::BottomLeft]->setFreeze(true);
+      break;
+    case BottomRight:
+      resize_handles[prim::ResizeRotateFrame::TopLeft]->setFreeze(true);
+      break;
+    case Bottom:
+      resize_handles[prim::ResizeRotateFrame::TopLeft]->setFreeze(true);
+      resize_handles[prim::ResizeRotateFrame::Top]->setFreeze(true);
+      resize_handles[prim::ResizeRotateFrame::TopRight]->setFreeze(true);
+      break;
+    case BottomLeft:
+      resize_handles[prim::ResizeRotateFrame::TopRight]->setFreeze(true);
+      break;
+    case Left:
+      resize_handles[prim::ResizeRotateFrame::TopRight]->setFreeze(true);
+      resize_handles[prim::ResizeRotateFrame::Right]->setFreeze(true);
+      resize_handles[prim::ResizeRotateFrame::BottomRight]->setFreeze(true);
+      break;
+    default:
+      qCritical() << "Trying to freeze a non-existent resize handle position";
+      break;
+  }
+}
+
 
 void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
     const QPointF &delta)
 {
+
+  // qDebug() << prim::ResizeRotateFrame::TopLeft;
+  // qDebug() << resize_handles[prim::ResizeRotateFrame::TopLeft]->pos();
+  // QPointF del = t.map(delta);
+  // qreal dx = del.x();
+  // qreal dy = del.y();
+  // qDebug() << delta << "" << del;
+  // qDebug() << "x: " << delta.x() << " " << del.x();
+  // qDebug() << "y: " << delta.y() << " " << del.y();
+  // QPointF center = resizeTarget()->sceneRect().center();
+  // qDebug() << "1 " << center;
+  qDebug() << resizeTarget()->sceneRect();
   switch (pos) {
     case TopLeft:
       resizeTarget()->resize(delta.x(), delta.y(), 0, 0);
@@ -142,15 +195,50 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
     default:
       qCritical() << "Trying to access a non-existent resize handle position";
       break;
+  // switch (pos) {
+  //   case TopLeft:
+  //     resizeTarget()->resize(delta.x(), delta.y(), 0, 0);
+  //     break;
+  //   case Top:
+  //     resizeTarget()->resize(0, delta.y(), 0, 0);
+  //     break;
+  //   case TopRight:
+  //     resizeTarget()->resize(0, delta.y(), delta.x(), 0);
+  //     break;
+  //   case Right:
+  //     resizeTarget()->resize(0, 0, delta.x(), 0);
+  //     break;
+  //   case BottomRight:
+  //     resizeTarget()->resize(0, 0, delta.x(), delta.y());
+  //     break;
+  //   case Bottom:
+  //     resizeTarget()->resize(0, 0, 0, delta.y());
+  //     break;
+  //   case BottomLeft:
+  //     resizeTarget()->resize(delta.x(), 0, 0, delta.y());
+  //     break;
+  //   case Left:
+  //     resizeTarget()->resize(delta.x(), 0, 0, 0);
+  //     break;
+  //   default:
+  //     qCritical() << "Trying to access a non-existent resize handle position";
+  //     break;
   }
+  //
+  // center = resizeTarget()->sceneRect().center();
+  // qDebug() << "2 " << center;
+  // freezeHandles(pos);
   updateHandlePositions();
 }
 
 
 void ResizeRotateFrame::updateHandlePositions()
 {
-  for (prim::ResizeRotateHandle *handle : resize_handles)
-    handle->updatePosition();
+  for (prim::ResizeRotateHandle *handle : resize_handles){
+    if (!handle->isFrozen())
+      handle->updatePosition();
+    handle->setFreeze(false);
+  }
 }
 
 
@@ -221,31 +309,66 @@ ResizeRotateHandle::ResizeRotateHandle(prim::ResizeRotateFrame::HandlePosition h
 
 void ResizeRotateHandle::updatePosition()
 {
-  QRectF p_rect = parentItem()->boundingRect();
+  QTransform *t = static_cast<prim::ResizeRotateFrame*>(parentItem())->resizeTarget()->getTransform();
+
+  QRectF p_rect = static_cast<prim::ResizeRotateFrame*>(parentItem())->resizeTarget()->sceneRect();
+  p_rect.moveTo(0,0);
+
+  // QRectF p_rect = parentItem()->boundingRect();
+
+  // switch (handle_position) {
+  //   case prim::ResizeRotateFrame::TopLeft:
+  //     setPos((p_rect.topLeft()));
+  //     break;
+  //   case prim::ResizeRotateFrame::Top:
+  //     setPos((QPointF((p_rect.left()+p_rect.right())/2, p_rect.top())));
+  //     break;
+  //   case prim::ResizeRotateFrame::TopRight:
+  //     setPos((p_rect.topRight()));
+  //     break;
+  //   case prim::ResizeRotateFrame::Right:
+  //     setPos((QPointF(p_rect.right(), (p_rect.top()+p_rect.bottom())/2)));
+  //     break;
+  //   case prim::ResizeRotateFrame::BottomRight:
+  //     setPos((p_rect.bottomRight()));
+  //     break;
+  //   case prim::ResizeRotateFrame::Bottom:
+  //     setPos((QPointF((p_rect.left()+p_rect.right())/2, p_rect.bottom())));
+  //     break;
+  //   case prim::ResizeRotateFrame::BottomLeft:
+  //     setPos((p_rect.bottomLeft()));
+  //     break;
+  //   case prim::ResizeRotateFrame::Left:
+  //     setPos((QPointF(p_rect.left(), (p_rect.top()+p_rect.bottom())/2)));
+  //     break;
+  //   default:
+  //     qCritical() << "Trying to access a non-existent resize handle position";
+  //     break;
+  // }
   switch (handle_position) {
     case prim::ResizeRotateFrame::TopLeft:
-      setPos(p_rect.topLeft());
+      setPos(t->map(p_rect.topLeft()));
       break;
     case prim::ResizeRotateFrame::Top:
-      setPos(QPointF((p_rect.left()+p_rect.right())/2, p_rect.top()));
+      setPos(t->map(QPointF((p_rect.left()+p_rect.right())/2, p_rect.top())));
       break;
     case prim::ResizeRotateFrame::TopRight:
-      setPos(p_rect.topRight());
+      setPos(t->map(p_rect.topRight()));
       break;
     case prim::ResizeRotateFrame::Right:
-      setPos(QPointF(p_rect.right(), (p_rect.top()+p_rect.bottom())/2));
+      setPos(t->map(QPointF(p_rect.right(), (p_rect.top()+p_rect.bottom())/2)));
       break;
     case prim::ResizeRotateFrame::BottomRight:
-      setPos(p_rect.bottomRight());
+      setPos(t->map(p_rect.bottomRight()));
       break;
     case prim::ResizeRotateFrame::Bottom:
-      setPos(QPointF((p_rect.left()+p_rect.right())/2, p_rect.bottom()));
+      setPos(t->map(QPointF((p_rect.left()+p_rect.right())/2, p_rect.bottom())));
       break;
     case prim::ResizeRotateFrame::BottomLeft:
-      setPos(p_rect.bottomLeft());
+      setPos(t->map(p_rect.bottomLeft()));
       break;
     case prim::ResizeRotateFrame::Left:
-      setPos(QPointF(p_rect.left(), (p_rect.top()+p_rect.bottom())/2));
+      setPos(t->map(QPointF(p_rect.left(), (p_rect.top()+p_rect.bottom())/2)));
       break;
     default:
       qCritical() << "Trying to access a non-existent resize handle position";
