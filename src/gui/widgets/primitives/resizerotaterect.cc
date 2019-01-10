@@ -155,7 +155,7 @@ void ResizeRotateFrame::freezeHandles(HandlePosition pos)
 void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
     const QPointF &delta)
 {
-
+  //Maybe remove the edge handles, leaving only corner handles when the rotation angle is non-zero.
   // qDebug() << prim::ResizeRotateFrame::TopLeft;
   // qDebug() << resize_handles[prim::ResizeRotateFrame::TopLeft]->pos();
   // QPointF del = t.map(delta);
