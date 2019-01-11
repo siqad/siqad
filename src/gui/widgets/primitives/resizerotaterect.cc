@@ -191,11 +191,11 @@ QPointF ResizeRotateFrame::getUnitPoint(HandlePosition pos, qreal angle)
 
 qreal ResizeRotateFrame::getAngleDegrees()
 {
-  QLineF line(resize_handles[prim::ResizeRotateFrame::Left]->pos(),resize_handles[prim::ResizeRotateFrame::Right]->pos());
-  qreal temp = 360 - line.angle();
+  QTransform* t = resizeTarget()->getTransform();
+  QLineF line(QPointF(0,0),QPointF(1,0));
+  qreal temp = 360 - t->map(line).angle();
   while (temp >= 180)
     temp-=180;
-  qDebug() << temp;
   return temp;
 }
 
@@ -211,7 +211,7 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
   // qDebug() << "normalized dot: " << dot;
   //check if nan
   if (dot != dot)
-    dot = 1;
+    dot = 0;
   qreal cos_scale = qCos(getAngleRadians());
   qreal sin_scale = qSin(getAngleRadians());
 
