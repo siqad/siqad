@@ -164,8 +164,7 @@ QPointF ResizeRotateFrame::getUnitPoint(HandlePosition pos, qreal angle)
       unit = QPointF(0,1);
       break;
     case TopRight:
-      unit = QPointF(1,1);
-      unit /= unit.manhattanLength();
+      unit = QPointF();
       break;
     case Right:
       unit = QPointF(1,0);
@@ -190,12 +189,13 @@ QPointF ResizeRotateFrame::getUnitPoint(HandlePosition pos, qreal angle)
   // return unit;
 }
 
-qreal ResizeRotateFrame::getAngle()
+qreal ResizeRotateFrame::getAngleDegrees()
 {
   QLineF line(resize_handles[prim::ResizeRotateFrame::Left]->pos(),resize_handles[prim::ResizeRotateFrame::Right]->pos());
   qreal temp = 360 - line.angle();
-  while (temp >= 360)
-    temp-=360;
+  while (temp >= 180)
+    temp-=180;
+  qDebug() << temp;
   return temp;
 }
 
@@ -203,7 +203,7 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
     const QPointF &delta)
 {
   //find the angle of the rect
-  QPointF unit = getUnitPoint(pos, getAngle());
+  QPointF unit = getUnitPoint(pos, getAngleDegrees());
   //calculate the dot product
   qreal dot = QPointF::dotProduct(unit, delta/delta.manhattanLength());
   // qDebug() << "unit: " << unit;
@@ -212,10 +212,8 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
   //check if nan
   if (dot != dot)
     dot = 1;
-  // qreal xscale, yscale;
-  qreal cos_scale = qCos(qDegreesToRadians(getAngle()));
-  qreal sin_scale = qSin(qDegreesToRadians(getAngle()));
-
+  qreal cos_scale = qCos(getAngleRadians());
+  qreal sin_scale = qSin(getAngleRadians());
 
   switch (pos) {
     case TopLeft:
@@ -335,7 +333,6 @@ void ResizeRotateHandle::updatePosition()
   QTransform *t = static_cast<prim::ResizeRotateFrame*>(parentItem())->resizeTarget()->getTransform();
   QRectF p_rect = static_cast<prim::ResizeRotateFrame*>(parentItem())->resizeTarget()->sceneRect();
   p_rect.moveTo(0,0);
-  QPointF point;
   switch (handle_position) {
     case prim::ResizeRotateFrame::TopLeft:
       setPos(t->map(p_rect.topLeft()));
@@ -347,7 +344,6 @@ void ResizeRotateHandle::updatePosition()
       setPos(t->map(p_rect.topRight()));
       break;
     case prim::ResizeRotateFrame::Right:
-      point = QPointF(p_rect.left(), (p_rect.top()+p_rect.bottom())/2);
       setPos(t->map(QPointF(p_rect.right(), (p_rect.top()+p_rect.bottom())/2)));
       break;
     case prim::ResizeRotateFrame::BottomRight:
