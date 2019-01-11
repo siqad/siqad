@@ -232,6 +232,7 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     painter->drawPolygon(getPolygon());
     // painter->drawRect(rect);
   }
+  resize(0,0,0,0, true);
 }
 
 

@@ -101,6 +101,12 @@ namespace prim{
     //! Will freeze the handles that need to be fixed during resizing.
     void freezeHandles(HandlePosition pos);
 
+    //! returns a QPointF for use as a unit vector, relevant to the handle chosen.
+    QPointF getUnitPoint(HandlePosition pos, qreal angle);
+
+    //! returns the angle of the rotated rect
+    qreal getAngle();
+
     //! Bounding rect for graphics calculations, just takes the resize_target's.
     virtual QRectF boundingRect() const override {return resize_target->boundingRect();}
 
