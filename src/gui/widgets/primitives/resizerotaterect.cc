@@ -212,34 +212,36 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
   //check if nan
   if (dot != dot)
     dot = 1;
-  qreal xscale, yscale;
-  xscale = qCos(qDegreesToRadians(getAngle()));
-  yscale = qSin(qDegreesToRadians(getAngle()));
+  // qreal xscale, yscale;
+  qreal cos_scale = qCos(qDegreesToRadians(getAngle()));
+  qreal sin_scale = qSin(qDegreesToRadians(getAngle()));
 
 
   switch (pos) {
     case TopLeft:
       // resizeTarget()->resize(delta.x(), delta.y(), 0, 0);
-      resizeTarget()->resize(xscale*delta.x()+yscale*delta.y(), -yscale*delta.x()+xscale*delta.y(), 0, 0);
+      resizeTarget()->resize(cos_scale*delta.x()+sin_scale*delta.y(), -sin_scale*delta.x()+cos_scale*delta.y(), 0, 0);
       break;
     case Top:
       resizeTarget()->resize(0, dot*delta.manhattanLength(), 0, 0);
       break;
     case TopRight:
-    // resizeTarget()->resize(xscale*delta.x()+yscale*delta.y(), -yscale*delta.x()+xscale*delta.y(), 0, 0);
-      resizeTarget()->resize(0, delta.y(), delta.x(), 0);
+      resizeTarget()->resize(0, cos_scale*delta.y()-sin_scale*delta.x(), cos_scale*delta.x()+sin_scale*delta.y(), 0);
+      // resizeTarget()->resize(0, delta.y(), delta.x(), 0);
       break;
     case Right:
       resizeTarget()->resize(0, 0, dot*delta.manhattanLength(), 0);
       break;
     case BottomRight:
-      resizeTarget()->resize(0, 0, delta.x(), delta.y());
+      resizeTarget()->resize(0, 0, cos_scale*delta.x()+sin_scale*delta.y(), cos_scale*delta.y()-sin_scale*delta.x());
+      // resizeTarget()->resize(0, 0, delta.x(), delta.y());
       break;
     case Bottom:
       resizeTarget()->resize(0, 0, 0, dot*delta.manhattanLength());
       break;
     case BottomLeft:
-      resizeTarget()->resize(delta.x(), 0, 0, delta.y());
+      resizeTarget()->resize(cos_scale*delta.x()+sin_scale*delta.y(), 0, 0, cos_scale*delta.y()-sin_scale*delta.x());
+    // resizeTarget()->resize(delta.x(), 0, 0, delta.y());
       break;
     case Left:
       resizeTarget()->resize(dot*delta.manhattanLength(), 0, 0, 0);
