@@ -97,6 +97,9 @@ namespace prim{
     //! Update the position of all handles.
     void updateHandlePositions();
 
+    //! Fixes the location of the rect after resizing due to offsets from the rotational transformation.
+    void fixOffset(HandlePosition pos, QPointF delta_c);
+
     // Graphics
     //! Will freeze the handles that need to be fixed during resizing.
     void freezeHandles(HandlePosition pos);

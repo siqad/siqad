@@ -154,6 +154,8 @@ QPolygonF prim::Electrode::getPolygon() const
   float angle = getProperty("angle").value.toFloat();
   while (angle >= 180)
     angle -= 180;
+  while (angle < 0)
+    angle += 180;
   t->reset();
   t->translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
   t->rotate(angle);

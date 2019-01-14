@@ -35,7 +35,7 @@ void ResizeRotateRect::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2, bool u
   // update dimensions
   scene_rect.setTopLeft(scene_rect.topLeft()+QPointF(dx1,dy1));
   scene_rect.setBottomRight(scene_rect.bottomRight()+QPointF(dx2,dy2));
-  setPos(scene_rect.topLeft());
+  // setPos(scene_rect.topLeft());
   update();
 
   // update the frame
@@ -206,18 +206,15 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
   QPointF unit = getUnitPoint(pos, getAngleDegrees());
   //calculate the dot product
   qreal dot = QPointF::dotProduct(unit, delta/delta.manhattanLength());
-  // qDebug() << "unit: " << unit;
-  // qDebug() << "delta: " << delta;
-  // qDebug() << "normalized dot: " << dot;
   //check if nan
   if (dot != dot)
     dot = 0;
   qreal cos_scale = qCos(getAngleRadians());
   qreal sin_scale = qSin(getAngleRadians());
 
+  QPointF old_c = resizeTarget()->sceneRect().center();
   switch (pos) {
     case TopLeft:
-      // resizeTarget()->resize(delta.x(), delta.y(), 0, 0);
       resizeTarget()->resize(cos_scale*delta.x()+sin_scale*delta.y(), -sin_scale*delta.x()+cos_scale*delta.y(), 0, 0);
       break;
     case Top:
@@ -248,7 +245,47 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
       qCritical() << "Trying to access a non-existent resize handle position";
       break;
   }
+  QPointF new_c = resizeTarget()->sceneRect().center();
+  // qDebug() << new_c - old_c;
+  QPointF delta_c = resizeTarget()->getTransform()->map(new_c)-resizeTarget()->getTransform()->map(old_c);
+  // qDebug() << resizeTarget()->getTransform()->map(new_c)-resizeTarget()->getTransform()->map(old_c);
+  // fixOffset(pos, resizeTarget()->sceneRect().center()-old_c);
+  fixOffset(pos, delta_c);
+  // fixOffset(pos, new_c - old_c);
+  // qDebug() << resizeTarget()->getTransform()->map(old_c);
+  // QPointF del_c = new_c - old_c;
+  // qDebug() << del_c;
+  // resizeTarget()->moveItemBy(0,-del_c.y());
   updateHandlePositions();
+}
+
+void ResizeRotateFrame::fixOffset(HandlePosition pos, QPointF delta_c)
+{
+  qDebug() << delta_c;
+  // qDebug() << resizeTarget()->getTransform()->map(delta_c);
+  switch (pos) {
+    case TopLeft:
+      break;
+    case Top:
+    resizeTarget()->moveItemBy(qSin(getAngleRadians())*(delta_c.x()),qSin(getAngleRadians())*(delta_c.x()));
+      // resizeTarget()->moveItemBy(-qSin(getAngleRadians())*(delta_c.y()),-qCos(getAngleRadians())*(delta_c.y())-qSin(getAngleRadians())*(delta_c.y()));
+      break;
+    case TopRight:
+      break;
+    case Right:
+      break;
+    case BottomRight:
+      break;
+    case Bottom:
+      break;
+    case BottomLeft:
+      break;
+    case Left:
+      break;
+    default:
+      qCritical() << "Trying to access a non-existent resize handle position";
+      break;
+  }
 }
 
 
