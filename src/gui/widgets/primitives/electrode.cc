@@ -182,6 +182,7 @@ QPainterPath prim::Electrode::shape() const
 // pre-rendered bitma for speed.
 void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+  prepareGeometryChange();
   painter->setPen(QPen(edge_col, edge_width));
   painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
   painter->drawPolygon(getPolygon());

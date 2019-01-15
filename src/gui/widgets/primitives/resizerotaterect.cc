@@ -35,7 +35,7 @@ void ResizeRotateRect::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2, bool u
   // update dimensions
   scene_rect.setTopLeft(scene_rect.topLeft()+QPointF(dx1,dy1));
   scene_rect.setBottomRight(scene_rect.bottomRight()+QPointF(dx2,dy2));
-  // setPos(scene_rect.topLeft());
+  setPos(scene_rect.topLeft());
   update();
 
   // update the frame
@@ -216,15 +216,16 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
     dot = 0;
   qreal cos_scale = qCos(getAngleRadians());
   qreal sin_scale = qSin(getAngleRadians());
-
-  QPointF old_c = resizeTarget()->sceneRect().center();
+  QPointF old_anchor, new_anchor;
+  QTransform t = resizeTarget()->getTransform()->inverted();
   switch (pos) {
     case TopLeft:
       resizeTarget()->resize(cos_scale*delta.x()+sin_scale*delta.y(), -sin_scale*delta.x()+cos_scale*delta.y(), 0, 0);
       break;
     case Top:
-      // resizeTarget()->resize(0, 0, 0, -dot*delta.manhattanLength());
-    resizeTarget()->resize(0, dot*delta.manhattanLength(), 0, 0);
+      old_anchor = resize_handles[BottomRight]->scenePos();
+      // old_anchor = mapToScene(resizeTarget()->sceneRect().bottomRight());
+      resizeTarget()->resize(0, dot*delta.manhattanLength(), 0, 0);
       break;
     case TopRight:
       resizeTarget()->resize(0, cos_scale*delta.y()-sin_scale*delta.x(), cos_scale*delta.x()+sin_scale*delta.y(), 0);
@@ -251,33 +252,45 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
       qCritical() << "Trying to access a non-existent resize handle position";
       break;
   }
-  QPointF new_c = resizeTarget()->sceneRect().center();
-  // qDebug() << new_c - old_c;
-  QPointF delta_c = resizeTarget()->getTransform()->map(new_c)-resizeTarget()->getTransform()->map(old_c);
-  // qDebug() << resizeTarget()->getTransform()->map(new_c)-resizeTarget()->getTransform()->map(old_c);
-  // fixOffset(pos, resizeTarget()->sceneRect().center()-old_c);
-  fixOffset(pos, delta_c);
-  // fixOffset(pos, new_c - old_c);
-  // qDebug() << resizeTarget()->getTransform()->map(old_c);
-  // QPointF del_c = new_c - old_c;
-  // qDebug() << del_c;
-  // resizeTarget()->moveItemBy(0,-del_c.y());
   updateHandlePositions();
+  new_anchor = resize_handles[BottomRight]->scenePos();
+  QRectF rect;
+  if (old_anchor != new_anchor) {
+    // qDebug() << "old: " << old_anchor << " " << mapFromScene(old_anchor);
+    // qDebug() << "new: " << new_anchor << " " << mapFromScene(new_anchor);
+
+
+    // offset to fix in scene coordinates
+    qDebug() << "diff: " << old_anchor - new_anchor;
+
+    qDebug() << "unrotated: " << t.map(old_anchor) - t.map(new_anchor);
+    // qDebug() << old_anchor << " " << new_anchor;
+    // qDebug() << mapFromScene(old_anchor);
+    rect = resizeTarget()->sceneRect();
+    // qDebug() << "rect old: " << rect.topLeft() << " " << rect.bottomRight();
+
+    // rect.moveBottomRight(t->map(old_anchor));
+    // rect.translate(t.map(old_anchor)-t.map(new_anchor));
+    rect.translate((old_anchor - new_anchor)/2);
+    qDebug() << "rect new: " << rect.topLeft() << " " << rect.bottomRight();
+    resizeTarget()->setSceneRect(rect);
+  }
+
 }
 
 void ResizeRotateFrame::fixOffset(HandlePosition pos, QPointF delta_c)
 {
   qDebug() << delta_c;
   // qDebug() << "Manhattan: " << delta_c.manhattanLength();
-  QTransform t;
-  t.rotate(-getAngleDegrees());
-  qDebug() << "Mapped: " << t.map(delta_c);
+  // QTransform t;
+  // t.rotate(-getAngleDegrees());
+  // qDebug() << "Mapped: " << t.map(delta_c);
   // qDebug() << resizeTarget()->getTransform()->map(delta_c);
   switch (pos) {
     case TopLeft:
       break;
     case Top:
-      resizeTarget()->moveItemBy(qSin(getAngleRadians())*(delta_c.x()),qSin(getAngleRadians())*(delta_c.x()));
+      // resizeTarget()->moveItemBy(qSin(getAngleRadians())*(delta_c.x()),qSin(getAngleRadians())*(delta_c.x()));
       // resizeTarget()->moveItemBy(-qSin(getAngleRadians())*(delta_c.y()),-qCos(getAngleRadians())*(delta_c.y())-qSin(getAngleRadians())*(delta_c.y()));
       break;
     case TopRight:
