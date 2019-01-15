@@ -175,7 +175,6 @@ namespace prim{
   private:
     //! Initialize static class variables.
     void prepareStatics();
-
     prim::ResizeRotateFrame::HandlePosition handle_position; //! The position of this handle.
 
     static qreal handle_dim;

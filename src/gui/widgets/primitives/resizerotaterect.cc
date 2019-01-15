@@ -191,7 +191,6 @@ QPointF ResizeRotateFrame::getUnitPoint(HandlePosition pos, qreal angle)
       break;
   }
   return t.map(unit);
-  // return unit;
 }
 
 qreal ResizeRotateFrame::getAngleDegrees()
@@ -231,8 +230,9 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
       resizeTarget()->resize(0, cos_scale*delta.y()-sin_scale*delta.x(), cos_scale*delta.x()+sin_scale*delta.y(), 0);
       break;
     case Right:
-      old_anchor = resize_handles[TopLeft]->scenePos();
-      resizeTarget()->resize(0, 0, dot*delta.manhattanLength(), 0);
+      old_anchor = resize_handles[Left]->scenePos();
+      resizeTarget()->resize(-dot*delta.manhattanLength(), 0, 0, 0);
+      // resizeTarget()->resize(0, 0, dot*delta.manhattanLength(), 0);
       break;
     case BottomRight:
       old_anchor = resize_handles[TopLeft]->scenePos();
@@ -240,7 +240,8 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
       break;
     case Bottom:
       old_anchor = resize_handles[Top]->scenePos();
-      resizeTarget()->resize(0, 0, 0, dot*delta.manhattanLength());
+      resizeTarget()->resize(0, -dot*delta.manhattanLength(), 0, 0);
+      // resizeTarget()->resize(0, 0, 0, dot*delta.manhattanLength());
       break;
     case BottomLeft:
       old_anchor = resize_handles[TopRight]->scenePos();
@@ -255,17 +256,21 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
       break;
   }
   updateHandlePositions();
-  new_anchor = resize_handles[TopLeft]->scenePos();
-  // qDebug() << old_anchor - new_anchor;
-  qDebug() << old_anchor;
-  // fixOffset(pos, old_anchor);
+  new_anchor = resize_handles[Left]->scenePos();
+  if (old_anchor != new_anchor){
+    qDebug() << "different";
+    qDebug() << old_anchor - new_anchor;
+  }
+  fixOffset(pos, old_anchor);
 }
 
 void ResizeRotateFrame::fixOffset(HandlePosition pos, QPointF old_anchor)
 {
   QPointF new_anchor;
-  QTransform t = resizeTarget()->getTransform()->inverted();
+  QTransform t;
+  t.rotate(getAngleDegrees());
   QRectF rect;
+  rect = resizeTarget()->sceneRect();
   switch (pos) {
     case TopLeft:
       new_anchor = resize_handles[BottomRight]->scenePos();
@@ -277,13 +282,17 @@ void ResizeRotateFrame::fixOffset(HandlePosition pos, QPointF old_anchor)
       new_anchor = resize_handles[BottomLeft]->scenePos();
       break;
     case Right:
-      new_anchor = resize_handles[TopLeft]->scenePos();
+      new_anchor = resize_handles[Left]->scenePos();
+      qDebug() << t.map(old_anchor-new_anchor);
+      rect.translate(t.map(old_anchor-new_anchor)/2);
       break;
     case BottomRight:
       new_anchor = resize_handles[TopLeft]->scenePos();
       break;
     case Bottom:
       new_anchor = resize_handles[Top]->scenePos();
+      qDebug() << t.map(old_anchor-new_anchor);
+      rect.translate(t.map(old_anchor-new_anchor)/2);
       break;
     case BottomLeft:
       new_anchor = resize_handles[TopRight]->scenePos();
@@ -295,19 +304,8 @@ void ResizeRotateFrame::fixOffset(HandlePosition pos, QPointF old_anchor)
       qCritical() << "Trying to access a non-existent resize handle position";
       break;
   }
-
-  // if (old_anchor != new_anchor) {
-    // offset to fix in scene coordinates
-    // qDebug() << old_anchor;
-    // qDebug() << "diff: " << old_anchor - new_anchor;
-
-    // qDebug() << "unrotated: " << t.map(old_anchor) - t.map(new_anchor);
-    rect = resizeTarget()->sceneRect();
-    rect.translate((old_anchor - new_anchor)/2);
-    // rect.translate((old_anchor - new_anchor));
-    // qDebug() << "rect new: " << rect.topLeft() << " " << rect.bottomRight();
-    resizeTarget()->setSceneRect(rect);
-  // }
+  rect.translate((old_anchor - new_anchor)/2);
+  resizeTarget()->setSceneRect(rect);
 
 }
 
