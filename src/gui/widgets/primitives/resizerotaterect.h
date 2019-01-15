@@ -51,6 +51,8 @@ namespace prim{
 
     void setTransform(QTransform* t) {transform = t;}
 
+    prim::ResizeRotateFrame* getResizeFrame();
+
   protected:
 
     //! Show resize frame when focused
@@ -58,9 +60,9 @@ namespace prim{
 
   private:
     // Variables
+    prim::ResizeRotateFrame *resize_frame=0;  // the resize frame for this resizble rect
     QTransform *transform=0;             // the transform applied to the ResizeRotateRect
     QRectF scene_rect;        // the rectangle dimensions in scene coordinates
-    prim::ResizeRotateFrame *resize_frame=0;  // the resize frame for this resizble rect
     QRectF scene_rect_cache;            // the rectangle dimensions before resize
     QPointF pos_cache;                  // the top left point before resize
   };

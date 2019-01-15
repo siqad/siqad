@@ -190,7 +190,11 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     painter->setBrush(selected_col);
     painter->drawPolygon(getPolygon());
   }
-  resize(0,0,0,0, true);
+  if (getResizeFrame())
+    getResizeFrame()->updateHandlePositions();
+  // qDebug() << resize_frame;
+  // resize_frame->updateHandlePositions();
+  // resize(0,0,0,0, true);
 }
 
 

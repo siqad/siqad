@@ -62,6 +62,11 @@ void ResizeRotateRect::setSceneRect(const QRectF &rect) {
   update();
 }
 
+prim::ResizeRotateFrame* ResizeRotateRect::getResizeFrame()
+{
+  return resize_frame;
+}
+
 QVariant ResizeRotateRect::itemChange(GraphicsItemChange change, const QVariant &value)
 {
   if (change == QGraphicsItem::ItemSelectedChange) {
@@ -218,7 +223,8 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
       resizeTarget()->resize(cos_scale*delta.x()+sin_scale*delta.y(), -sin_scale*delta.x()+cos_scale*delta.y(), 0, 0);
       break;
     case Top:
-      resizeTarget()->resize(0, dot*delta.manhattanLength(), 0, 0);
+      // resizeTarget()->resize(0, 0, 0, -dot*delta.manhattanLength());
+    resizeTarget()->resize(0, dot*delta.manhattanLength(), 0, 0);
       break;
     case TopRight:
       resizeTarget()->resize(0, cos_scale*delta.y()-sin_scale*delta.x(), cos_scale*delta.x()+sin_scale*delta.y(), 0);
@@ -262,12 +268,16 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
 void ResizeRotateFrame::fixOffset(HandlePosition pos, QPointF delta_c)
 {
   qDebug() << delta_c;
+  // qDebug() << "Manhattan: " << delta_c.manhattanLength();
+  QTransform t;
+  t.rotate(-getAngleDegrees());
+  qDebug() << "Mapped: " << t.map(delta_c);
   // qDebug() << resizeTarget()->getTransform()->map(delta_c);
   switch (pos) {
     case TopLeft:
       break;
     case Top:
-    resizeTarget()->moveItemBy(qSin(getAngleRadians())*(delta_c.x()),qSin(getAngleRadians())*(delta_c.x()));
+      resizeTarget()->moveItemBy(qSin(getAngleRadians())*(delta_c.x()),qSin(getAngleRadians())*(delta_c.x()));
       // resizeTarget()->moveItemBy(-qSin(getAngleRadians())*(delta_c.y()),-qCos(getAngleRadians())*(delta_c.y())-qSin(getAngleRadians())*(delta_c.y()));
       break;
     case TopRight:
