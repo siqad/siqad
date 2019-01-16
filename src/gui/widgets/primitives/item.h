@@ -50,7 +50,7 @@ namespace prim{
     ~Item(){}
 
     //! update layer_id
-    void setLayerIndex(int lay_id) {layer_id = lay_id;}
+    void setLayerID(int lay_id) {layer_id = lay_id;}
 
     // abstract member functions for derived classes
     virtual QRectF boundingRect() const override = 0;

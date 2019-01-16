@@ -28,13 +28,12 @@ prim::ElectrodePoly::ElectrodePoly(const QPolygonF poly, int lay_id)
 
 
 
-prim::ElectrodePoly::ElectrodePoly(QXmlStreamReader *ls, QGraphicsScene *scene)
+prim::ElectrodePoly::ElectrodePoly(QXmlStreamReader *ls, QGraphicsScene *scene, int lay_id)
   : prim::ResizablePoly(prim::Item::ElectrodePoly)
 {
   if(edge_width == -1){
     constructStatics();
   }
-  int lay_id=-1;
   QPointF ld_point;
   QPolygonF points;
   while(!ls->atEnd()){
@@ -42,8 +41,12 @@ prim::ElectrodePoly::ElectrodePoly(QXmlStreamReader *ls, QGraphicsScene *scene)
       if(ls->name() == "electrode_poly")
         ls->readNext();
       else if(ls->name() == "layer_id"){
+        qDebug() << QObject::tr("The layer_id tag in designs are no longer used in loading. Using the lay_id supplied to the constructor instead.");
+        ls->readNext();
+        /*
         lay_id = ls->readElementText().toInt();
         ls->readNext();
+        */
       }
       else if(ls->name() == "vertex"){
         for(QXmlStreamAttribute &attr : ls->attributes()){

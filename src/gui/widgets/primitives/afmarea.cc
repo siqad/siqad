@@ -42,10 +42,9 @@ AFMArea::AFMArea(int lay_id, QStringList points, bool orientation,
 
 
 // Load XML constructor
-AFMArea::AFMArea(QXmlStreamReader *rs, QGraphicsScene *scene)
+AFMArea::AFMArea(QXmlStreamReader *rs, QGraphicsScene *scene, int lay_id)
   : prim::ResizableRect(prim::Item::AFMArea)
 {
-  int lay_id=-1;
   QPointF point1, point2;
   bool orientation;
   float z_spd, h_spd, v_spd, v_disp;
@@ -55,7 +54,7 @@ AFMArea::AFMArea(QXmlStreamReader *rs, QGraphicsScene *scene)
       if (rs->name() == "afmarea") {
         // do nothing
       } else if (rs->name() == "layer_id") {
-        lay_id = rs->readElementText().toInt();
+        qDebug() << QObject::tr("The layer_id tag in designs are no longer used in loading. Using the lay_id supplied to the constructor instead.");
       } else if (rs->name() == "dimensions") {
         for (QXmlStreamAttribute &attr : rs->attributes()) {
           if (attr.name().toString() == QLatin1String("x1"))

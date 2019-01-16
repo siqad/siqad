@@ -31,7 +31,7 @@ namespace prim{
     Electrode(int lay_id, QStringList points);
 
     //! constructor, creates an electrode from the design file.
-    Electrode(QXmlStreamReader *ls, QGraphicsScene *scene);
+    Electrode(QXmlStreamReader *ls, QGraphicsScene *scene, int lay_id);
 
     //! destructor
     ~Electrode(){}

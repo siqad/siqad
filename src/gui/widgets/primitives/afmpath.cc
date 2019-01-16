@@ -29,10 +29,9 @@ AFMPath::AFMPath(int lay_id, const QList<prim::AFMNode*> &nodes)
   initAFMPath(lay_id, nodes);
 }
 
-AFMPath::AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene)
+AFMPath::AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene, int lay_id)
   : prim::Item(prim::Item::AFMPath)
 {
-  int lay_id = -1;
   QList<prim::AFMNode*> ld_nodes;
 
   // TODO read own attributes, e.g. zoffset
@@ -40,7 +39,8 @@ AFMPath::AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene)
   while (!rs->atEnd()) {
     if (rs->isStartElement()) {
       if (rs->name() == "layer_id") {
-        lay_id = rs->readElementText().toInt();
+        qDebug() << QObject::tr("The layer_id tag in designs are no longer used in loading. Using the lay_id supplied to the constructor instead.");
+        //lay_id = rs->readElementText().toInt();
         rs->readNext();
       } else if (rs->name() == "afmnode") {
         qDebug() << QObject::tr("Adding node to path...");

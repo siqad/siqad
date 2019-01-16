@@ -27,6 +27,12 @@ LayerManager::~LayerManager()
   removeAllLayers();
 }
 
+void LayerManager::addLattice(prim::Lattice *lattice)
+{
+  lattice->setLayerID(layers.size());
+  layers.append(lattice);
+}
+
 void LayerManager::addLayer(const QString &name, const prim::Layer::LayerType cnt_type, const float zoffset, const float zheight)
 {
   // there can only be one layer of misc type
@@ -38,17 +44,11 @@ void LayerManager::addLayer(const QString &name, const prim::Layer::LayerType cn
   }
 
   // check if name already taken
-  bool taken = false;
   for(prim::Layer *layer : layers) {
     if(layer->getName() == name){
-      taken = true;
-      break;
+      qWarning() << tr("A layer already exists with the name : %1").arg(name);
+      return;
     }
-  }
-
-  if(taken){
-    qWarning() << tr("A layer already exists with the name : %1").arg(name);
-    return;
   }
 
   // layer is added to the end of layers stack, so ID = layers.size() before it was added
@@ -81,7 +81,7 @@ void LayerManager::removeLayer(int n)
 
   // update layer_id for subsequent layers in the stack and their contained items
   for (int i=n; i<layers.count(); i++)
-    layers.at(i)->setLayerIndex(i);
+    layers.at(i)->setLayerID(i);
 
   // if active layer was removed, default to surface if available else 0
   if (active_layer == layer)

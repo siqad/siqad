@@ -29,16 +29,16 @@ prim::DBDot::DBDot(prim::LatticeCoord l_coord, int lay_id, bool cp)
   initDBDot(l_coord, lay_id, cp);
 }
 
-prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *)
+prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *, int lay_id)
   : prim::Item(prim::Item::DBDot)
 {
   prim::LatticeCoord read_coord(0,0,-1);
   QPointF loc;
-  int lay_id=-1;      // layer id from file
 
   while (rs->readNextStartElement()) {
     if (rs->name() == "layer_id") {
-      lay_id = rs->readElementText().toInt();
+      qDebug() << QObject::tr("The layer_id tag in designs are no longer used in loading. Using the lay_id supplied to the constructor instead.");
+      rs->skipCurrentElement();
     } else if (rs->name() == "latcoord") {
       read_coord.n = rs->attributes().value("n").toInt();
       read_coord.m = rs->attributes().value("m").toInt();
@@ -94,7 +94,7 @@ void prim::DBDot::initDBDot(prim::LatticeCoord coord, int lay_id, bool cp)
   else
     setLatticeCoord(coord);
 
-  setLayerIndex(lay_id);
+  setLayerID(lay_id);
   fill_fact = 0.;
   diameter = diameter_m;
 

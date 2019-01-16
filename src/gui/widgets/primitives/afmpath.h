@@ -23,7 +23,7 @@ namespace prim{
     // TODO consider QList types
     AFMPath(int lay_id);
     AFMPath(int lay_id, const QList<prim::AFMNode*> &nodes);
-    AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene);
+    AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene, int lay_id);
     void initAFMPath(int lay_id, const QList<prim::AFMNode*> &);
 
     // Destructor
