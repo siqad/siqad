@@ -223,8 +223,8 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
       resizeTarget()->resize(cos_scale*delta.x()+sin_scale*delta.y(), -sin_scale*delta.x()+cos_scale*delta.y(), 0, 0);
       break;
     case Top:
-    // old_anchor = resize_handles[BottomRight]->scenePos();
-      new_anchor = mapToScene(resizeTarget()->sceneRect().topLeft());
+      old_anchor = resize_handles[Bottom]->scenePos();
+      // new_anchor = mapToScene(resizeTarget()->sceneRect().topLeft());
       // old_anchor = mapToScene(resizeTarget()->sceneRect().bottomLeft());
       resizeTarget()->resize(0, dot*delta.manhattanLength(), 0, 0);
       break;
@@ -284,7 +284,7 @@ void ResizeRotateFrame::fixOffset(HandlePosition pos, QPointF old_anchor)
       rect.translate((old_anchor - new_anchor)/2);
       break;
     case Top:
-      new_anchor = resize_handles[BottomRight]->scenePos();
+      new_anchor = resize_handles[Bottom]->scenePos();
       rect.translate((old_anchor - new_anchor)/2);
       break;
     case TopRight:
