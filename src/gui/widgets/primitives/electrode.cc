@@ -161,11 +161,6 @@ QPolygonF prim::Electrode::getPolygon() const
   QRectF rect = sceneRect();
   rect.moveTo(0,0);
   QTransform* t = getTransform();
-  // float angle = getProperty("angle").value.toFloat();
-  // while (angle >= 180)
-  //   angle -= 180;
-  // while (angle < 0)
-  //   angle += 180;
   t->reset();
   t->translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
   t->rotate(getAngleProperty());
@@ -225,9 +220,6 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     painter->setBrush(selected_col);
     painter->drawPolygon(getPolygon());
   }
-  // qDebug() << resize_frame;
-  // resize_frame->updateHandlePositions();
-  // resize(0,0,0,0, true);
 }
 
 
