@@ -171,19 +171,19 @@ void gui::DesignPanel::initDesignPanel() {
 void gui::DesignPanel::clearDesignPanel(bool reset)
 {
   // delete child widgets
+  delete screenman;
   delete afm_panel;
   delete property_editor;
   delete eph;
   delete layman;
   delete itman;
-  delete screenman;
 
+  screenman=nullptr;
   afm_panel=nullptr;
   property_editor=nullptr;
   eph=nullptr;
   layman=nullptr;
   itman=nullptr;
-  screenman=nullptr;
 
   // delete layers and contained items
   if(reset) prim::Layer::resetLayers(); // reset layer counter
