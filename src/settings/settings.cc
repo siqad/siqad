@@ -215,6 +215,11 @@ QSettings* settings::GUISettings::m_defs()
   //resizable rect params
   S->setValue("resizablerect/handle_dim", 100);            // size of resize handle
 
+  //resizable rotatable rect params
+  S->setValue("resizerotaterect/handle_dim", 100);            // size of resize handle
+  S->setValue("resizerotaterect/selected_col", QColor(0, 100, 255)); // edge color, selected
+  S->setValue("resizerotaterect/fill_col", QColor(255, 255, 255)); // edge color, selected
+
   //polygon handle params
   S->setValue("polygonhandle/handle_dim", 100);            // size of polygon handle
 

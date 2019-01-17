@@ -178,6 +178,8 @@ namespace prim{
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *) override;
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *) override;
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *) override;
 
   private:
     //! Initialize static class variables.
@@ -186,6 +188,8 @@ namespace prim{
 
     static qreal handle_dim;
     static prim::Item::StateColors rotate_handle_col;
+    static QColor fill_col;   // dot fill color (same for all lattice dots)
+    static QColor selected_col; // edge colour, selected
 
     bool clicked;
     QPointF step_pos;   // cursor location at the last mouse move event

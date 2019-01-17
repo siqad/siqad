@@ -16,6 +16,8 @@ qreal ResizeRotateFrame::border_width = -1;
 QList<ResizeRotateFrame::HandlePosition> ResizeRotateFrame::handle_positions;
 qreal ResizeRotateHandle::handle_dim = -1;
 prim::Item::StateColors rotate_handle_col;
+QColor ResizeRotateHandle::fill_col;
+QColor ResizeRotateHandle::selected_col; // edge colour, selected
 
 
 // Resizable Rectangle base class
@@ -115,7 +117,8 @@ void ResizeRotateRect::setRotation(qreal angle_in)
   t.translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
   setTransform(t);
   updatePolygon(); //update polygon cache
-  resize_frame->updateHandlePositions();
+  if (resize_frame)
+    resize_frame->updateHandlePositions();
 }
 
 // Resize Frame base class
@@ -337,19 +340,19 @@ ResizeRotateHandle::ResizeRotateHandle(prim::ResizeRotateFrame::HandlePosition h
   switch (handle_position) {
     case prim::ResizeRotateFrame::TopLeft:
     case prim::ResizeRotateFrame::BottomRight:
-      setCursor(Qt::SizeFDiagCursor);
+      // setCursor(Qt::SizeFDiagCursor);
       break;
     case prim::ResizeRotateFrame::TopRight:
     case prim::ResizeRotateFrame::BottomLeft:
-      setCursor(Qt::SizeBDiagCursor);
+      // setCursor(Qt::SizeBDiagCursor);
       break;
     case prim::ResizeRotateFrame::Top:
     case prim::ResizeRotateFrame::Bottom:
-      setCursor(Qt::SizeVerCursor);
+      // setCursor(Qt::SizeVerCursor);
       break;
     case prim::ResizeRotateFrame::Left:
     case prim::ResizeRotateFrame::Right:
-      setCursor(Qt::SizeHorCursor);
+      // setCursor(Qt::SizeHorCursor);
       break;
     default:
       qCritical() << "Trying to access a non-existent resize handle position";
@@ -359,6 +362,7 @@ ResizeRotateHandle::ResizeRotateHandle(prim::ResizeRotateFrame::HandlePosition h
   // Graphics
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemIsMovable, true);
+  setAcceptHoverEvents(true);
 }
 
 
@@ -410,7 +414,10 @@ void ResizeRotateHandle::paint(QPainter *painter,
   QRectF rect = boundingRect();
   // TODO use static parameters for pen
   painter->setPen(QPen(QColor(0,0,0), 1));
-  painter->setBrush(QColor(255,255,255));
+  // painter->setBrush(QColor(255,255,255));
+  painter->setBrush(fill_col);
+  if(isHovered())
+    painter->setBrush(selected_col);
   painter->drawRect(rect);
 }
 
@@ -464,10 +471,25 @@ void ResizeRotateHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent *)
   clicked = false;
 }
 
+void ResizeRotateHandle::hoverEnterEvent(QGraphicsSceneHoverEvent *)
+{
+  setHovered(true);
+  update();
+}
+
+void ResizeRotateHandle::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
+{
+  setHovered(false);
+  update();
+}
+
 void ResizeRotateHandle::prepareStatics()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
-  handle_dim = gui_settings->get<qreal>("resizablerect/handle_dim");
+  handle_dim = gui_settings->get<qreal>("resizerotaterect/handle_dim");
+  selected_col= gui_settings->get<QColor>("resizerotaterect/selected_col");
+  fill_col= gui_settings->get<QColor>("resizerotaterect/fill_col");
+
 }
 
 } // end of prim namespace
