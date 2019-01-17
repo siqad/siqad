@@ -23,7 +23,7 @@
 
 namespace gui{
 
-  enum ValueSelectionType{LineEdit, Combo};
+  enum ValueSelectionType{LineEdit, Combo, CheckBox};
 
   //! A struct that stores a ComboOption
   struct ComboOption {
@@ -38,7 +38,7 @@ namespace gui{
   //! specified then it's a line edit by default.
   struct ValueSelection {
     ValueSelection(const ValueSelectionType type,
-      QList<ComboOption> combo_options=QList<ComboOption>())
+                   QList<ComboOption> combo_options=QList<ComboOption>())
       : type(type), combo_options(combo_options) {};
     ValueSelection() : type(LineEdit) {};
 
@@ -48,22 +48,32 @@ namespace gui{
 
   //! A struct that stores all information relevant to a property
   struct Property {
+    //! Property constructor with all content.
     Property(int index, const QVariant &val, const QString &f_label,
-      const QString &f_tip, const ValueSelection &v_sel)
+             const QString &f_tip, const ValueSelection &v_sel, 
+             QMap<QString,QString> t_meta)
       : index(index), value(val), form_label(f_label), form_tip(f_tip),
-        value_selection(v_sel) {};
+        value_selection(v_sel), meta(t_meta) {};
+
+    //! Property constructor with unique value and the rest of the values filled
+    //! using the provided property map.
     Property(const QVariant &val, const Property &p)
       : index(p.index), value(val), form_label(p.form_label), form_tip(p.form_tip),
-        value_selection(p.value_selection) {};
+        value_selection(p.value_selection), meta(p.meta) {};
+
+    //! Property constructor with only a value.
     Property(const QVariant &val)
       : value(val) {};
+
+    //! Construct an empty peroperty.
     Property() {};
 
-    int index;          // original index when read from file
-    QVariant value;     // the value stored in this property
-    QString form_label; // descriptive label when showing this in a form
-    QString form_tip;   // tooltip when showing this in a form
-    ValueSelection value_selection; // value selection method and options
+    int index;          //! Original index when read from file.
+    QVariant value;     //! The value stored in this property.
+    QString form_label; //! Descriptive label when showing this in a form.
+    QString form_tip;   //! Tooltip when showing this in a form.
+    ValueSelection value_selection; //! Value selection method and options.
+    QMap<QString,QString> meta;     //! Meta information of this property for programming use.
   };
 
 
@@ -76,8 +86,12 @@ namespace gui{
 
   public:
 
-    //! Constructor
+    //! Empty constructor.
     PropertyMap() {};
+
+    //! Construct a new property map identical to the provided one.
+    PropertyMap(const PropertyMap &other)
+      : QMap(other), preserve_order(other.preserve_order), xml_path(other.xml_path) {}
 
     //! Constructor taking in XML file name to load properties from.
     PropertyMap(const QString &fname);
@@ -95,8 +109,11 @@ namespace gui{
     //! Read one property node from XML file.
     void readProperty(const QString &node_name, QXmlStreamReader *rs);
 
-    //! Read combo_options for a combo box
+    //! Read combo_options for a combo box.
     void readComboOptions(Property *prop, int type_id, QXmlStreamReader *rs);
+
+    //! Read meta data.
+    void readMeta(Property *prop, QXmlStreamReader *rs);
 
     //! Update property values from provided XML file path. Keys that don't exist
     //! in this map are ignored.

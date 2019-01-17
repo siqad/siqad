@@ -20,26 +20,22 @@ prim::Aggregate::Aggregate(int lay_id, QStack<Item*> &items, QGraphicsItem *pare
   initAggregate(items, parent);
 }
 
-prim::Aggregate::Aggregate(QXmlStreamReader *stream, QGraphicsScene *scene)
+prim::Aggregate::Aggregate(QXmlStreamReader *stream, QGraphicsScene *scene, int lay_id)
   : prim::Item(prim::Item::Aggregate)
 {
   //qDebug() << QObject::tr("Aggregate: constructing aggregate from XML");
   QStack<Item*> ld_children;
-
-  // NOTE for now, all aggregates are in DB layer.
-  // More sophisticated method of determination needed in the future.
-  int lay_id=1;
 
   // read from XML stream (children will be created recursively, add those children to stack)
   while(!stream->atEnd()){
     if(stream->isStartElement()){
       if(stream->name() == "dbdot"){
         //stream->readNext();
-        ld_children.push(new prim::DBDot(stream, scene));
+        ld_children.push(new prim::DBDot(stream, scene, lay_id));
       }
       else if(stream->name() == "aggregate"){
         stream->readNext();
-        ld_children.push(new prim::Aggregate(stream, scene));
+        ld_children.push(new prim::Aggregate(stream, scene, lay_id));
       }
       else{
         qDebug() << QObject::tr("Aggregate: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
@@ -65,7 +61,7 @@ prim::Aggregate::Aggregate(QXmlStreamReader *stream, QGraphicsScene *scene)
   }
 
   // fill in aggregate properties
-  setLayerIndex(lay_id);
+  setLayerID(lay_id);
   items = ld_children;
   initAggregate(ld_children);
 

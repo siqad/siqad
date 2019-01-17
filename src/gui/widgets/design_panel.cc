@@ -171,19 +171,19 @@ void gui::DesignPanel::initDesignPanel() {
 void gui::DesignPanel::clearDesignPanel(bool reset)
 {
   // delete child widgets
+  delete screenman;
   delete afm_panel;
   delete property_editor;
   delete eph;
   delete layman;
   delete itman;
-  delete screenman;
 
+  screenman=nullptr;
   afm_panel=nullptr;
   property_editor=nullptr;
   eph=nullptr;
   layman=nullptr;
   itman=nullptr;
-  screenman=nullptr;
 
   // delete layers and contained items
   if(reset) prim::Layer::resetLayers(); // reset layer counter
@@ -536,6 +536,8 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
   // reset the design panel state
   resetDesignPanel();
 
+  QList<int> layer_order_id;
+
   // read from xml stream and hand nodes off to appropriate functions
   while (rs->readNextStartElement()) {
     // read program flags
@@ -545,12 +547,12 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
     } else if(rs->name() == "gui") {
       loadGUIFlags(rs);
     } else if (rs->name() == "layers") {
-      loadLayers(rs);
+      loadLayers(rs, layer_order_id);
     } else if(rs->name() == "layer_prop") {
       // starting version 0.0.2 layer_prop should appear inside the layers level
-      loadLayerProps(rs);
+      loadLayerProps(rs, layer_order_id);
     } else if(rs->name() == "design") {
-      loadDesign(rs);
+      loadDesign(rs, layer_order_id);
     } else {
       qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2")
           .arg(rs->lineNumber()).arg(rs->name().toString());
@@ -591,16 +593,16 @@ void gui::DesignPanel::loadGUIFlags(QXmlStreamReader *rs)
 }
 
 
-void gui::DesignPanel::loadLayers(QXmlStreamReader *rs)
+void gui::DesignPanel::loadLayers(QXmlStreamReader *rs, QList<int> &layer_order_id)
 {
   qDebug() << "Loading layers";
   while (rs->readNextStartElement())
     if (rs->name() == "layer_prop")
-      loadLayerProps(rs);
+      loadLayerProps(rs, layer_order_id);
 }
 
 
-void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs)
+void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs, QList<int> &layer_order_id)
 {
   QString layer_nm;
   float zoffset=0, zheight=0;
@@ -643,19 +645,20 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs)
   load_layer->setZHeight(zheight);
   load_layer->setVisible(layer_visible);
   load_layer->setActive(layer_active);
+  layer_order_id.append(load_layer->layerID());
 }
 
 
-void gui::DesignPanel::loadDesign(QXmlStreamReader *rs)
+void gui::DesignPanel::loadDesign(QXmlStreamReader *rs, QList<int> &layer_order_id)
 {
   qDebug() << "Loading design";
-  int layer_id=0;
+  int layer_load_order=0;
   while (rs->readNextStartElement()) {
     if (rs->name() == "layer") {
       // recursively populate layer with items
       rs->readNext();
-      layman->getLayer(layer_id)->loadItems(rs, scene);
-      layer_id++;
+      layman->getLayer(layer_order_id[layer_load_order])->loadItems(rs, scene);
+      layer_load_order++;
     } else {
       qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2")
           .arg(rs->lineNumber()).arg(rs->name().toString());
@@ -2708,8 +2711,8 @@ void gui::DesignPanel::formAggregate()
   // check if selected items are on the surface
   for(prim::Item *item : selection){
     // if(items.last()->layer != layers.at(1)){ DOUBLE CHECK WITH JAKE
-    if(item->layer_id != 1){
-      qCritical() << tr("Selected aggregate item not in the surface...");
+    if(layman->getLayer(item->layer_id)->contentType() != prim::Layer::DB){
+      qCritical() << tr("Selected item not in a DB layer.");
       return;
     }
   }

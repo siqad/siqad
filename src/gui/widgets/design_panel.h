@@ -160,13 +160,13 @@ namespace gui{
     void loadGUIFlags(QXmlStreamReader *);
 
     //! Load layers.
-    void loadLayers(QXmlStreamReader *);
+    void loadLayers(QXmlStreamReader *, QList<int> &layer_order_id);
 
     //! Load layer properties.
-    void loadLayerProps(QXmlStreamReader *);
+    void loadLayerProps(QXmlStreamReader *, QList<int> &layer_order_id);
 
     //! Load design (items contained within layers).
-    void loadDesign(QXmlStreamReader *);
+    void loadDesign(QXmlStreamReader *, QList<int> &layer_order_id);
 
 
     // SIMULATION RESULT DISPLAY

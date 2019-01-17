@@ -43,13 +43,12 @@ prim::Electrode::Electrode(int lay_id, QStringList points)
   initElectrode(lay_id, scene_rect);
 }
 
-prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
-  prim::ResizeRotateRect(prim::Item::Electrode)
+prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene, int lay_id)
+  : prim::ResizeRotateRect(prim::Item::Electrode)
 {
   if(edge_width == -1){
     constructStatics();
   }
-  int lay_id=-1;
   QPointF ld_point1, ld_point2;
   qreal angle_in;
   while(!ls->atEnd()){
@@ -57,8 +56,12 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene) :
       if(ls->name() == "electrode")
         ls->readNext();
       else if(ls->name() == "layer_id"){
+        qDebug() << QObject::tr("The layer_id tag in designs are no longer used in loading. Using the lay_id supplied to the constructor instead.");
+        ls->readNext();
+        /*
         lay_id = ls->readElementText().toInt();
         ls->readNext();
+        */
       }
       else if(ls->name() == "angle"){
         angle_in = ls->readElementText().toFloat();

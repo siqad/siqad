@@ -24,7 +24,7 @@ namespace prim{
     //! constructor, creating DBDot using the DBGenTool.
     DBDot(prim::LatticeCoord l_coord, int lay_id, bool cp=false);
     //! constructor, creating DBDot from a design file.
-    DBDot(QXmlStreamReader *, QGraphicsScene *);
+    DBDot(QXmlStreamReader *, QGraphicsScene *, int lay_id);
 
     // initializer
     void initDBDot(prim::LatticeCoord coord, int lay_id, bool cp);

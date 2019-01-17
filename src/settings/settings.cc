@@ -97,23 +97,46 @@ QSettings *settings::AppSettings::m_defs()
       QSettings::IniFormat
   );
 
-  // overwrites existing default values with same keys... no check
-  S->setValue("view/hidpi_support", false);
 
-  S->setValue("log/override", true);
+  // overwrites existing default values with same keys... no check
+  S->setValue("log/override", false);
   S->setValue("log/tofile", false);
   S->setValue("log/logfile", QString("<SYSTMP>/log/log.txt"));
+
+  S->setValue("view/hidpi_support", false);
 
   S->setValue("snap/diameter", 5.); //relative to scale_fact
 
   S->setValue("dir/lattice", QString("<BINPATH>/src/settings/lattices"));
 
-  S->setValue("python_path", QString(""));
+  // python path related
+  S->setValue("user_python_path", QString(""));   // user's own python path setting
+  // linux/bsd python search paths
+  S->setValue("python_search_linux", QStringList({
+    "python3",
+    "/usr/bin/python3",
+    "/bin/python3;python"
+  }));
+  // windows python search paths
+  S->setValue("python_search_winnt", QStringList({
+    "py,-3",
+    "python",
+    "C:\\Windows\\py.exe,-3"
+  }));
+  // macos python search paths
+  S->setValue("python_search_darwin", QStringList({
+    "python3",
+    "python"
+  }));
+
 
   S->setValue("phys/debye_length", 50);
   S->setValue("phys/epsr", 10);
 
-  S->setValue("phys/eng_lib_dirs", QString("<APPLOCALDATA>/phys/;<BINPATH>/src/phys/"));
+  S->setValue("phys/eng_lib_dirs", QStringList({
+    "<APPLOCALDATA>/phys/",
+    "<BINPATH>/src/phys/"
+  }));
   //S->setValue("phys/eng_lib_dirs", QString("<APPLOCALDATA>/phys"));
   //S->setValue("phys/eng_lib_dirs", QString("<BINPATH>/src/phys/"));
   S->setValue("phys/eng_usr_cfg_dir", QString("<CONFIG>/phys/"));

@@ -78,10 +78,10 @@ void prim::Layer::resetLayers()
 }
 
 
-void prim::Layer::setLayerIndex(int lay_id){
+void prim::Layer::setLayerID(int lay_id){
   layer_id = lay_id;
   for(prim::Item *item : items)
-    item->setLayerIndex(lay_id);
+    item->setLayerID(lay_id);
 }
 
 // NOTE: in future, it might be worth keeping the items in a binary tree, sorted
@@ -187,22 +187,22 @@ void prim::Layer::loadItems(QXmlStreamReader *stream, QGraphicsScene *scene)
     if (stream->isStartElement()) {
       if (stream->name() == "dbdot") {
         stream->readNext();
-        addItem(new prim::DBDot(stream, scene));
+        addItem(new prim::DBDot(stream, scene, layer_id));
       } else if (stream->name() == "aggregate") {
         stream->readNext();
-        addItem(new prim::Aggregate(stream, scene));
+        addItem(new prim::Aggregate(stream, scene, layer_id));
       } else if (stream->name() == "electrode") {
         stream->readNext();
-        addItem(new prim::Electrode(stream, scene));
+        addItem(new prim::Electrode(stream, scene, layer_id));
       } else if (stream->name() == "electrode_poly") {
         stream->readNext();
-        addItem(new prim::ElectrodePoly(stream, scene));
+        addItem(new prim::ElectrodePoly(stream, scene, layer_id));
       } else if (stream->name() == "afmarea") {
         stream->readNext();
-        addItem(new prim::AFMArea(stream, scene));
+        addItem(new prim::AFMArea(stream, scene, layer_id));
       } else if (stream->name() == "afmpath") {
         stream->readNext();
-        addItem(new prim::AFMPath(stream, scene));
+        addItem(new prim::AFMPath(stream, scene, layer_id));
       } else {
         qDebug() << QObject::tr("Layer load item: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
         stream->readNext();

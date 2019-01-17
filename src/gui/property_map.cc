@@ -13,6 +13,7 @@ namespace gui{
 
 // initialize static variables
 QMap<QString, int> PropertyMap::string2type(std::map<QString, int> {
+  {"bool", QMetaType::Bool},
   {"int", QMetaType::Int},
   {"float", QMetaType::Float},
   {"double", QMetaType::Double},
@@ -120,17 +121,23 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
       prop.form_tip = rs->readElementText();
       //qDebug() << QObject::tr("%1 tip=%2").arg(node_name).arg(prop.form_tip);
     } else if (rs->name() == "value_selection") {
-      if (rs->attributes().value("type") == "ComboBox") {
+      QStringRef sel_type = rs->attributes().value("type");
+      if (sel_type == "ComboBox") {
         readComboOptions(&prop, p_type_id, rs);
+      } else if (sel_type == "CheckBox") {
+        prop.value_selection.type = CheckBox;
+        rs->skipCurrentElement();
       }
+    } else if (rs->name() == "meta") {
+      readMeta(&prop, rs);
     } else {
-      // TODO error message
+      qDebug() << QObject::tr("Unknown element '%1' when reading property map from XML").arg(rs->name().toString());
       rs->skipCurrentElement();
     }
   }
 
   // convert the value to the intended type
-  if (p_type_id == -1)
+  if (p_type_id < 0)
     qFatal("Unable to read type id of a property");
 
   prop.value = string2Type2QVariant(p_val, p_type_id);
@@ -145,11 +152,20 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
 // read combo options
 void PropertyMap::readComboOptions(Property *prop, int type_id, QXmlStreamReader *rs)
 {
-  prop->value_selection = Combo;
+  prop->value_selection.type = Combo;
   while (rs->readNextStartElement()) {
     prop->value_selection.combo_options.append(
         ComboOption(string2Type2QVariant(rs->name().toString(), type_id),
                     rs->readElementText()));
+  }
+}
+
+// read meta data
+void PropertyMap::readMeta(Property *prop, QXmlStreamReader *rs)
+{
+  while (rs->readNextStartElement()) {
+    prop->meta.insert(rs->name().toString(), rs->readElementText());
+    //qDebug() << QObject::tr("Added meta data '%1' with value '%2'").arg(rs->name().toString()).arg(prop->meta[rs->name().toString()]);
   }
 }
 
@@ -207,6 +223,9 @@ void PropertyMap::writeValuesToXMLStream(const PropertyMap &map, QXmlStreamWrite
 QVariant PropertyMap::string2Type2QVariant(const QString &val, int type_id)
 {
   switch (type_id) {
+    case QMetaType::Bool:
+      return QVariant(static_cast<bool>(val.toInt()));
+      break;
     case QMetaType::Int:
       return QVariant(val.toInt());
       break;

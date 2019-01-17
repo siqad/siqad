@@ -27,7 +27,7 @@ namespace prim{
         float z_spd=-1, float h_spd=-1, float v_spd=-1, float v_disp=-1);
 
     //! Constructor that creates an AFMArea from a loaded design file.
-    AFMArea(QXmlStreamReader *, QGraphicsScene *);
+    AFMArea(QXmlStreamReader *, QGraphicsScene *, int lay_id);
 
     //! Destructor.
     ~AFMArea() {}

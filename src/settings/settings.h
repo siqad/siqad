@@ -20,6 +20,7 @@
 #define DEFAULT_OVERRIDE false  // use user settings for release compilation
 #else
 #define DEFAULT_OVERRIDE true   // use default settings for debug compilation
+//#define DEFAULT_OVERRIDE false   // TODO change back to true after implementation
 #endif
 
 namespace settings{
@@ -44,8 +45,14 @@ public:
   template<typename T>
   T get(const QString &key)
   {
+    return get(key).value<T>();
+  }
+
+  //! Return the value of the specified key in QVariant type.
+  QVariant get(const QString &key)
+  {
     QVariant var = DEFAULT_OVERRIDE ? defaults->value(key) : this->value(key);
-    T val;
+
     // if key not found, get value from defaults
     if (!var.isValid() && defaults != 0) {
       var = defaults->value(key);
@@ -55,7 +62,7 @@ public:
         qDebug() << tr("Searching for key: %1").arg(key);
         qFatal(tr("Requested key missing in defaults... terminating").toLatin1().constData(),0);
       } else {
-        val = var.value<T>();
+        return var;
       }
 
       // save default value to current local settings
@@ -63,23 +70,35 @@ public:
     } else if (defaults==0) {   // terminate if no defaults
       qFatal(tr("No default settings available... terminating").toLatin1().constData(),0);
     } else if (var.isValid()) {
-      val = var.value<T>();
+      return var;
     } else {
       qFatal(tr("Unexpected key in Settings::get").toLatin1().constData(),0);
     }
 
-    return val;
+    return var;
   }
 
-  // returns a QString with each of the included replaceable paths replaced by
+  // Returns a QString with each of the included replaceable paths replaced by
   // a writable path (whatever QStandardPaths::writableLocation provides)
   QString getPath(const QString &key)
   {
     return pathReplacement(get<QString>(key));
   }
 
+  // Returns a QStringList of paths with the preset path replacements.
+  QStringList getPaths(const QString &key)
+  {
+    QStringList paths = get<QStringList>(key);
+    QStringList::iterator i;
+    for (i = paths.begin(); i != paths.end(); ++i) {
+      *i = pathReplacement(*i);
+    }
+    return paths;
+  }
+
   // returns a QStringList with each of the included replaceable paths replaced
   // by all possible paths given by QStandardPaths::standardLocations
+  /*
   QStringList getAllPossiblePaths(const QString &key)
   {
     QStringList val_split = get<QString>(key).split(';', QString::SkipEmptyParts);
@@ -90,7 +109,7 @@ public:
     regex.setMinimal(true);
 
     for (QString val : val_split) {
-      qDebug() << tr("val: %1").arg(val);
+      //qDebug() << tr("val: %1").arg(val);
       // assumes that there is only one replacement per splitted value
       if (val.indexOf(regex) != -1) {
         QString found_tag = regex.capturedTexts().first();
@@ -108,6 +127,7 @@ public:
 
     return paths_return;
   }
+  */
 
   static QString pathReplacement(QString path)
   {

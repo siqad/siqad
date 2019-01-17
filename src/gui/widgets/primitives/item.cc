@@ -74,6 +74,7 @@ prim::Item::ItemType prim::Item::getEnumItemType(QString type)
   else if (type == "PotPlot") return prim::Item::PotPlot;
   else if (type == "ResizeFrame") return prim::Item::ResizeFrame;
   else if (type == "ResizeHandle") return prim::Item::ResizeHandle;
+  else qFatal("Unknown item type %s encountered", type.toLatin1().data());
 }
 
 

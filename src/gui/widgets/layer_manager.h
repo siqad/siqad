@@ -33,7 +33,7 @@ namespace gui{
     ~LayerManager();
 
     //! Add a lattice.
-    void addLattice(prim::Lattice *lattice) {layers.append(lattice);}
+    void addLattice(prim::Lattice *lattice);
 
     //! Add a new layer with the given name. If no name is given, a default scheme
     //! is used. Checks if the layer already exists.

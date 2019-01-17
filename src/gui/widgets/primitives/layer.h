@@ -52,7 +52,10 @@ namespace prim{
     // accessors
 
     //! set layer index and update layer_id of contained items
-    void setLayerIndex(int lay_id);
+    void setLayerID(int lay_id);
+
+    //! get the layer id of this layer
+    int layerID() {return layer_id;}
 
     //! set the zoffset of the layer
     void setZOffset(const float z_offset) {zoffset = z_offset;}

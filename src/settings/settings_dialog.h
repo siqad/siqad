@@ -13,6 +13,8 @@
 #include <QtWidgets>
 
 #include "settings.h"
+#include "../gui/property_map.h"
+#include "../gui/widgets/property_form.h"
 
 namespace settings{
 
@@ -23,6 +25,7 @@ namespace settings{
   public:
 
     enum SettingsCategory{App, GUI, Lattice};
+    Q_ENUM(SettingsCategory)
 
     SettingsDialog(QWidget *parent=0);
     ~SettingsDialog() {};
@@ -47,23 +50,37 @@ namespace settings{
     void discardAndClose();
 
   private:
-    // initialise the dialog and panes
+    //! Initialise the settings dialog and panes of contained categories.
     void initSettingsDialog();
-    QWidget *appSettingsPane();
-    QWidget *guiSettingsPane();
-    QWidget *latticeSettingsPane();
 
-    // Return the Settings class pointer to the specified category
-    settings::Settings *settingsCategoryPointer(SettingsCategory);
+    //! Write user setting to the provided property, with the setting entry
+    //! specified by the "category" and "key" entries in the property's "meta"
+    //! member.
+    void setPropertyWithUserSetting(gui::Property &prop);
+
+    //! Return the application settings pane. Initilize the pane if first called.
+    gui::PropertyForm *appSettingsPane();
+
+    //! Return the application settings pane. Initilize the pane if first called.
+    gui::PropertyForm *guiSettingsPane();
+
+    //! Return the application settings pane. Initilize the pane if first called.
+    gui::PropertyForm *latticeSettingsPane();
+
+    //! Return the Settings class pointer to the specified category QString.
+    settings::Settings *settingsCategory(const QString &t_cat);
+
+    //! Return the Settings class pointer to the specified category.
+    settings::Settings *settingsCategory(SettingsCategory);
 
     // VARS
-    AppSettings *app_settings=0;
-    GUISettings *gui_settings=0;
-    LatticeSettings *lattice_settings=0;
+    AppSettings *app_settings=nullptr;
+    GUISettings *gui_settings=nullptr;
+    LatticeSettings *lattice_settings=nullptr;
 
-    QWidget *app_settings_pane=0;
-    QWidget *gui_settings_pane=0;
-    QWidget *lattice_settings_pane=0;
+    gui::PropertyForm *app_settings_pane=nullptr;
+    gui::PropertyForm *gui_settings_pane=nullptr;
+    gui::PropertyForm *lattice_settings_pane=nullptr;
 
     QList<PendingChange> pending_changes;
   };

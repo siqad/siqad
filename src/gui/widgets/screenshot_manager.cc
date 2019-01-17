@@ -20,11 +20,13 @@ ScreenshotManager::ScreenshotManager(int misc_layer_id, QWidget *parent)
 ScreenshotManager::~ScreenshotManager()
 {
   // TODO safely remove clip_area and scale_bar
-  if (clip_area->scene() == 0) 
-    delete clip_area;
+  if (clip_area->scene() != 0) 
+    emit sig_removeVisualAidFromDP(clip_area);
+  delete clip_area;
 
-  if (scale_bar->scene() == 0) 
-    delete scale_bar;
+  if (scale_bar->scene() != 0) 
+    emit sig_removeVisualAidFromDP(scale_bar);
+  delete scale_bar;
 }
 
 void ScreenshotManager::prepareScreenshotMode(bool entering)
