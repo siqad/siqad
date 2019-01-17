@@ -68,8 +68,6 @@ namespace prim{
 
     void updatePolygon();
 
-    prim::ResizeRotateFrame* getResizeFrame();
-
     void setRotation(qreal angle_in);
 
   protected:

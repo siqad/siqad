@@ -134,13 +134,6 @@ void prim::Electrode::requestRotation()
           QObject::tr("Rotation angle in degrees"), (double) getAngleDegrees(), -10000, 10000, 5, &ok) );
   if (ok) {
     setRotation(angle_in);
-    // setAngleDegrees(angle_in); //set the angle variable
-    // QTransform t; //update the transform.
-    // t.translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
-    // t.rotate(getAngleDegrees());
-    // t.translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
-    // setTransform(t);
-    // updatePolygon(); //update polygon cache
   }
 }
 
@@ -160,7 +153,6 @@ void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)
   }
   createActions();
   setSceneRect(scene_rect);
-  // polygon_cache = getPolygon();
   updatePolygon();
   setZValue(-1);
   // flags
@@ -168,30 +160,6 @@ void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)
   setFlag(QGraphicsItem::ItemIsFocusable, true);
 
 }
-
-// QPolygonF prim::Electrode::getPolygon()
-// {
-//   QRectF rect = sceneRect();
-//   rect.moveTo(0,0);
-//   //use pointer, so that the transform is updated after we're done here.
-//   QTransform t;
-//   // t.reset();
-//   // t.translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
-//   // t.rotate(getAngleDegrees());
-//   // t.translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
-//   QPolygonF poly(rect);
-//   // if (t != getTransform()) {
-//   //   //the transform has changed, get a new polygon and move handles to the right place.
-//   //   setTransform(t);
-//   //   polygon_cache = t.map(poly);
-//   //   if (getResizeFrame() != 0) {
-//   //     getResizeFrame()->updateHandlePositions();
-//   //   }
-//   //
-//   // }
-//   // QPolygonF poly(rect);
-//   return t.map(poly);
-// }
 
 QRectF prim::Electrode::boundingRect() const
 {

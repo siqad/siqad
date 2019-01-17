@@ -76,34 +76,6 @@ void ResizeRotateRect::updatePolygon()
   polygon_cache = getTransform().map(poly);
 }
 
-// QPolygonF ResizeRotateRect::getPolygon()
-// {
-//   QRectF rect = sceneRect();
-//   rect.moveTo(0,0);
-//   //use pointer, so that the transform is updated after we're done here.
-//   QTransform t;
-//   // t.reset();
-//   t.translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
-//   t.rotate(getAngleProperty());
-//   t.translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
-//   QPolygonF poly(rect);
-//   if (t != getTransform()) {
-//     //the transform has changed, get a new polygon and move handles to the right place.
-//     setTransform(t);
-//     polygon_cache = t.map(poly);
-//     if (getResizeFrame() != 0) {
-//       getResizeFrame()->updateHandlePositions();
-//     }
-//   }
-//   // QPolygonF poly(rect);
-//   return t.map(poly);
-// }
-
-prim::ResizeRotateFrame* ResizeRotateRect::getResizeFrame()
-{
-  return resize_frame;
-}
-
 QVariant ResizeRotateRect::itemChange(GraphicsItemChange change, const QVariant &value)
 {
   if (change == QGraphicsItem::ItemSelectedChange) {
@@ -211,16 +183,6 @@ QPointF ResizeRotateFrame::getUnitPoint(HandlePosition pos, qreal angle)
   }
   return t.map(unit);
 }
-
-// qreal ResizeRotateFrame::getAngleDegrees()
-// {
-  // QTransform t = resizeTarget()->getTransform();
-  // QLineF line(QPointF(0,0),QPointF(1,0));
-  // qreal temp = 360 - t.map(line).angle();
-  // while (temp >= 180)
-  //   temp-=180;
-  // return temp;
-// }
 
 void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
     const QPointF &delta)
