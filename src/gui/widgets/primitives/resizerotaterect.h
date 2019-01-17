@@ -122,21 +122,8 @@ namespace prim{
     void fixOffset(HandlePosition pos, QPointF old_anchor);
 
     // Graphics
-    //! Will freeze the handles that need to be fixed during resizing.
-    // void freezeHandles(HandlePosition pos);
-
     //! returns a QPointF for use as a unit vector, relevant to the handle chosen.
-    QPointF getUnitPoint(HandlePosition pos, qreal angle);
-
-    //! returns the angle of the rotated rect, bounded between 0 and 180 degrees
-    qreal getAngleDegrees(){return angle;}
-
-    //! returns the angle of the rotated rect, bounded between 0 and pi.
-    qreal getAngleRadians(){return qDegreesToRadians(getAngleDegrees());}
-
-    void setAngleDegrees(qreal angle_in){angle = angle_in;}
-
-    void setAngleRadians(qreal angle_in_radians){angle = qRadiansToDegrees(angle_in_radians);}
+    QPointF getUnitPoint(HandlePosition pos);
 
     //! Bounding rect for graphics calculations, just takes the resize_target's.
     virtual QRectF boundingRect() const override {return resize_target->boundingRect();}
@@ -163,8 +150,6 @@ namespace prim{
 
     // Graphics
     static qreal border_width;
-
-    qreal angle = 0;
 
   }; // end of ResizeRotateFrame class
 
