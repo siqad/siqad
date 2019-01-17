@@ -49,25 +49,28 @@ namespace prim{
     //! Return the item's transform
     QTransform getTransform() {return transform;}
 
-    // void setTransform(QTransform t) {transform = t;}
+    //! Sets the item's transform. Should be called whenever the size or angle changes.
     void setTransform(QTransform t);
 
-    // QPolygonF getPolygon();
     //! returns the angle of the rotated rect, bounded between 0 and 180 degrees
     qreal getAngleDegrees() const {return angle;}
 
     //! returns the angle of the rotated rect, bounded between 0 and pi.
     qreal getAngleRadians(){return qDegreesToRadians(getAngleDegrees());}
 
-    // void setAngleDegrees(qreal angle_in){angle = angle_in;}
+    //! Sets the angle of the rotated rect in degrees, bound between 0 and 180.
     void setAngleDegrees(qreal angle_in);
 
+    //! Sets the angle of the rotated rect in radians. Uses setAngleDegrees after converting the input from radians.
     void setAngleRadians(qreal angle_in_radians){setAngleDegrees(qRadiansToDegrees(angle_in_radians));}
 
+    //! Returns the cached polygon.
     QPolygonF getPolygon() const {return polygon_cache;}
 
+    //! Overwrites polygon_cache with a new one by mapping the rectangle using the current QTransform.
     void updatePolygon();
 
+    //! Sets the angle, updates the item's transform, updates polygon_cache, and updates handle position if possible.
     void setRotation(qreal angle_in);
 
   protected:
@@ -77,13 +80,13 @@ namespace prim{
 
   private:
     // Variables
-    qreal angle;
+    qreal angle;                              // the angle of rotation of the resizable rotatable rect
     prim::ResizeRotateFrame *resize_frame=0;  // the resize frame for this resizble rect
     QTransform transform = QTransform();             // the transform applied to the ResizeRotateRect
     QRectF scene_rect;        // the rectangle dimensions in scene coordinates
     QRectF scene_rect_cache;            // the rectangle dimensions before resize
     QPointF pos_cache;                  // the top left point before resize
-    QPolygonF polygon_cache;
+    QPolygonF polygon_cache;            // the polygon representing the rectangle after rotation.
   };
 
   //! A rectangular frame containing a few square handles for users to drag to
