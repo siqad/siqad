@@ -120,8 +120,21 @@ void prim::Electrode::performAction(QAction *action)
   //switch case doesnt work on non-ints, use if else.
   if (action->text() == action_show_prop->text()) {
     showProps();
+  } else if (action->text() == action_rotate_prop->text()) {
+    setRotation();
   } else {
     qDebug() << QObject::tr("Matched no action.");
+  }
+}
+
+void prim::Electrode::setRotation()
+{
+  bool ok;
+  qreal angle_in = qreal( QInputDialog::getDouble(0, QObject::tr("Set rotation"),
+          QObject::tr("Rotation angle in degrees"), (double) getAngleDegrees(), -10000, 10000, 5, &ok) );
+  if (ok) {
+    setAngleDegrees(angle_in); //set the angle variable
+
   }
 }
 
@@ -129,6 +142,8 @@ void prim::Electrode::createActions()
 {
   action_show_prop = new QAction(QObject::tr("Show properties"));
   actions_list.append(action_show_prop);
+  action_rotate_prop = new QAction(QObject::tr("Set rotation"));
+  actions_list.append(action_rotate_prop);
 }
 
 void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)
@@ -147,16 +162,6 @@ void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)
 
 }
 
-qreal prim::Electrode::getAngleProperty()
-{
-  float angle = getProperty("angle").value.toFloat();
-  while (angle >= 180)
-    angle -= 180;
-  while (angle < 0)
-    angle += 180;
-  return angle;
-}
-
 QPolygonF prim::Electrode::getPolygon()
 {
   QRectF rect = sceneRect();
@@ -165,7 +170,7 @@ QPolygonF prim::Electrode::getPolygon()
   QTransform t;
   // t.reset();
   t.translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
-  t.rotate(getAngleProperty());
+  t.rotate(getAngleDegrees());
   t.translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
   QPolygonF poly(rect);
   if (t != getTransform()) {
@@ -198,14 +203,13 @@ QPainterPath prim::Electrode::shape() const
 // pre-rendered bitma for speed.
 void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-  QPolygonF poly = getPolygon();
   painter->setPen(QPen(edge_col, edge_width));
   painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
   if(tool_type == gui::SelectTool && isSelected()){
     painter->setPen(Qt::NoPen);
     painter->setBrush(selected_col);
   }
-  painter->drawPolygon(poly);
+  painter->drawPolygon(polygon_cache);
 }
 
 

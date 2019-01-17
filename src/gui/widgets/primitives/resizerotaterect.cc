@@ -114,6 +114,17 @@ QVariant ResizeRotateRect::itemChange(GraphicsItemChange change, const QVariant 
   return QGraphicsItem::itemChange(change, value);
 }
 
+void ResizeRotateRect::setAngleDegrees(qreal angle_in)
+{
+  prepareGeometryChange();
+  angle = angle_in;
+  //reduce the angle to between 0 and 180. Bounds OK for rectangular.
+  while (angle >= 180)
+    angle -= 180;
+  while (angle < 0)
+    angle += 180;
+}
+
 // Resize Frame base class
 ResizeRotateFrame::ResizeRotateFrame(prim::ResizeRotateRect *resize_target)
   : Item(prim::Item::ResizeRotateFrame), resize_target(resize_target)
@@ -181,15 +192,15 @@ QPointF ResizeRotateFrame::getUnitPoint(HandlePosition pos, qreal angle)
   return t.map(unit);
 }
 
-qreal ResizeRotateFrame::getAngleDegrees()
-{
-  QTransform t = resizeTarget()->getTransform();
-  QLineF line(QPointF(0,0),QPointF(1,0));
-  qreal temp = 360 - t.map(line).angle();
-  while (temp >= 180)
-    temp-=180;
-  return temp;
-}
+// qreal ResizeRotateFrame::getAngleDegrees()
+// {
+  // QTransform t = resizeTarget()->getTransform();
+  // QLineF line(QPointF(0,0),QPointF(1,0));
+  // qreal temp = 360 - t.map(line).angle();
+  // while (temp >= 180)
+  //   temp-=180;
+  // return temp;
+// }
 
 void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
     const QPointF &delta)

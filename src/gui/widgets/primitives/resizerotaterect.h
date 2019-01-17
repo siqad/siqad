@@ -53,6 +53,17 @@ namespace prim{
     void setTransform(QTransform t);
 
     // QPolygonF getPolygon();
+    //! returns the angle of the rotated rect, bounded between 0 and 180 degrees
+    qreal getAngleDegrees(){return angle;}
+
+    //! returns the angle of the rotated rect, bounded between 0 and pi.
+    qreal getAngleRadians(){return qDegreesToRadians(getAngleDegrees());}
+
+    // void setAngleDegrees(qreal angle_in){angle = angle_in;}
+    void setAngleDegrees(qreal angle_in);
+
+    void setAngleRadians(qreal angle_in_radians){angle = qRadiansToDegrees(angle_in_radians);}
+
 
     prim::ResizeRotateFrame* getResizeFrame();
 
@@ -63,6 +74,7 @@ namespace prim{
 
   private:
     // Variables
+    qreal angle;
     prim::ResizeRotateFrame *resize_frame=0;  // the resize frame for this resizble rect
     QTransform transform = QTransform();             // the transform applied to the ResizeRotateRect
     QRectF scene_rect;        // the rectangle dimensions in scene coordinates
@@ -114,10 +126,14 @@ namespace prim{
     QPointF getUnitPoint(HandlePosition pos, qreal angle);
 
     //! returns the angle of the rotated rect, bounded between 0 and 180 degrees
-    qreal getAngleDegrees();
+    qreal getAngleDegrees(){return angle;}
 
     //! returns the angle of the rotated rect, bounded between 0 and pi.
     qreal getAngleRadians(){return qDegreesToRadians(getAngleDegrees());}
+
+    void setAngleDegrees(qreal angle_in){angle = angle_in;}
+
+    void setAngleRadians(qreal angle_in_radians){angle = qRadiansToDegrees(angle_in_radians);}
 
     //! Bounding rect for graphics calculations, just takes the resize_target's.
     virtual QRectF boundingRect() const override {return resize_target->boundingRect();}
@@ -144,6 +160,8 @@ namespace prim{
 
     // Graphics
     static qreal border_width;
+
+    qreal angle = 0;
 
   }; // end of ResizeRotateFrame class
 
