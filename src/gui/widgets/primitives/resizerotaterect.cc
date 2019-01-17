@@ -68,6 +68,14 @@ void ResizeRotateRect::setSceneRect(const QRectF &rect) {
   update();
 }
 
+void ResizeRotateRect::updatePolygon()
+{
+  QRectF rect = sceneRect();
+  rect.moveTo(0,0);
+  QPolygonF poly(rect);
+  polygon_cache = getTransform().map(poly);
+}
+
 // QPolygonF ResizeRotateRect::getPolygon()
 // {
 //   QRectF rect = sceneRect();
@@ -116,13 +124,25 @@ QVariant ResizeRotateRect::itemChange(GraphicsItemChange change, const QVariant 
 
 void ResizeRotateRect::setAngleDegrees(qreal angle_in)
 {
-  prepareGeometryChange();
   angle = angle_in;
   //reduce the angle to between 0 and 180. Bounds OK for rectangular.
   while (angle >= 180)
     angle -= 180;
   while (angle < 0)
     angle += 180;
+}
+
+void ResizeRotateRect::setRotation(qreal angle_in)
+{
+  prepareGeometryChange();
+  setAngleDegrees(angle_in); //set the angle variable
+  QTransform t; //update the transform.
+  t.translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
+  t.rotate(getAngleDegrees());
+  t.translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
+  setTransform(t);
+  updatePolygon(); //update polygon cache
+  resize_frame->updateHandlePositions();
 }
 
 // Resize Frame base class

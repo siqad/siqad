@@ -49,7 +49,7 @@ namespace prim{
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
     Item *deepCopy() const override;
-    QPolygonF getPolygon();
+    // QPolygonF getPolygon();
     // void hideHandles();
 
     // saving to design
@@ -75,7 +75,7 @@ namespace prim{
     void constructStatics();
     void createActions();
     void showProps();
-    void setRotation();
+    void requestRotation();
 
     // properties of this item class
     static gui::PropertyMap default_class_properties; //! Default properties for this class
@@ -83,7 +83,7 @@ namespace prim{
     // VARIABLES
     // qreal elec_depth;
     // qreal top_depth;
-    QPolygonF polygon_cache;
+    // QPolygonF polygon_cache;
 
     static qreal edge_width;  // proportional width of dot boundary edge
     static QColor fill_col;   // dot fill color (same for all lattice dots)

@@ -64,8 +64,13 @@ namespace prim{
 
     void setAngleRadians(qreal angle_in_radians){angle = qRadiansToDegrees(angle_in_radians);}
 
+    QPolygonF getPolygon() const {return polygon_cache;}
+
+    void updatePolygon();
 
     prim::ResizeRotateFrame* getResizeFrame();
+
+    void setRotation(qreal angle_in);
 
   protected:
 
@@ -80,7 +85,7 @@ namespace prim{
     QRectF scene_rect;        // the rectangle dimensions in scene coordinates
     QRectF scene_rect_cache;            // the rectangle dimensions before resize
     QPointF pos_cache;                  // the top left point before resize
-    // QPolygonF polygon_cache;
+    QPolygonF polygon_cache;
   };
 
   //! A rectangular frame containing a few square handles for users to drag to
