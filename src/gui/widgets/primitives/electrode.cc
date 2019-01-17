@@ -139,6 +139,7 @@ void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)
   }
   createActions();
   setSceneRect(scene_rect);
+  polygon_cache = getPolygon();
   setZValue(-1);
   // flags
   setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -161,13 +162,23 @@ QPolygonF prim::Electrode::getPolygon()
   QRectF rect = sceneRect();
   rect.moveTo(0,0);
   //use pointer, so that the transform is updated after we're done here.
-  QTransform* t = getTransform();
-  t->reset();
-  t->translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
-  t->rotate(getAngleProperty());
-  t->translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
+  QTransform t;
+  // t.reset();
+  t.translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
+  t.rotate(getAngleProperty());
+  t.translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
   QPolygonF poly(rect);
-  return t->map(poly);
+  if (t != getTransform()) {
+    //the transform has changed, get a new polygon and move handles to the right place.
+    setTransform(t);
+    polygon_cache = t.map(poly);
+    if (getResizeFrame() != 0) {
+      getResizeFrame()->updateHandlePositions();
+    }
+
+  }
+  // QPolygonF poly(rect);
+  return t.map(poly);
 }
 
 QRectF prim::Electrode::boundingRect() const
@@ -187,21 +198,14 @@ QPainterPath prim::Electrode::shape() const
 // pre-rendered bitma for speed.
 void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-  if (polygon_cache != getPolygon()){
-    prepareGeometryChange();
-    polygon_cache = getPolygon();
-    if (getResizeFrame() != 0) {
-      getResizeFrame()->updateHandlePositions();
-    }
-    update();
-  }
+  QPolygonF poly = getPolygon();
   painter->setPen(QPen(edge_col, edge_width));
   painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
   if(tool_type == gui::SelectTool && isSelected()){
     painter->setPen(Qt::NoPen);
     painter->setBrush(selected_col);
   }
-  painter->drawPolygon(polygon_cache);
+  painter->drawPolygon(poly);
 }
 
 

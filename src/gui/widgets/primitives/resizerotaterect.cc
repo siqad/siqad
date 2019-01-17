@@ -25,7 +25,6 @@ ResizeRotateRect::ResizeRotateRect(ItemType type, const QRectF &scene_rect, int 
 {
   setResizable(true);
   setSceneRect(scene_rect);
-  setTransform(new QTransform());
 }
 
 void ResizeRotateRect::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2, bool update_handles)
@@ -49,6 +48,13 @@ void ResizeRotateRect::preResize()
   pos_cache = pos();
 }
 
+void ResizeRotateRect::setTransform(QTransform t)
+{
+  prepareGeometryChange();
+  transform = t;
+  update();
+}
+
 void ResizeRotateRect::moveItemBy(qreal dx, qreal dy)
 {
   QRectF rect = scene_rect;
@@ -61,6 +67,29 @@ void ResizeRotateRect::setSceneRect(const QRectF &rect) {
   setPos(scene_rect.topLeft());
   update();
 }
+
+// QPolygonF ResizeRotateRect::getPolygon()
+// {
+//   QRectF rect = sceneRect();
+//   rect.moveTo(0,0);
+//   //use pointer, so that the transform is updated after we're done here.
+//   QTransform t;
+//   // t.reset();
+//   t.translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
+//   t.rotate(getAngleProperty());
+//   t.translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
+//   QPolygonF poly(rect);
+//   if (t != getTransform()) {
+//     //the transform has changed, get a new polygon and move handles to the right place.
+//     setTransform(t);
+//     polygon_cache = t.map(poly);
+//     if (getResizeFrame() != 0) {
+//       getResizeFrame()->updateHandlePositions();
+//     }
+//   }
+//   // QPolygonF poly(rect);
+//   return t.map(poly);
+// }
 
 prim::ResizeRotateFrame* ResizeRotateRect::getResizeFrame()
 {
@@ -154,9 +183,9 @@ QPointF ResizeRotateFrame::getUnitPoint(HandlePosition pos, qreal angle)
 
 qreal ResizeRotateFrame::getAngleDegrees()
 {
-  QTransform* t = resizeTarget()->getTransform();
+  QTransform t = resizeTarget()->getTransform();
   QLineF line(QPointF(0,0),QPointF(1,0));
-  qreal temp = 360 - t->map(line).angle();
+  qreal temp = 360 - t.map(line).angle();
   while (temp >= 180)
     temp-=180;
   return temp;
@@ -268,7 +297,6 @@ void ResizeRotateFrame::updateHandlePositions()
   }
 }
 
-
 void ResizeRotateFrame::paint(QPainter *, const QStyleOptionGraphicsItem*,
     QWidget*)
 {
@@ -337,33 +365,33 @@ ResizeRotateHandle::ResizeRotateHandle(prim::ResizeRotateFrame::HandlePosition h
 
 void ResizeRotateHandle::updatePosition()
 {
-  QTransform *t = static_cast<prim::ResizeRotateFrame*>(parentItem())->resizeTarget()->getTransform();
+  QTransform t = static_cast<prim::ResizeRotateFrame*>(parentItem())->resizeTarget()->getTransform();
   QRectF p_rect = static_cast<prim::ResizeRotateFrame*>(parentItem())->resizeTarget()->sceneRect();
   p_rect.moveTo(0,0);
   switch (handle_position) {
     case prim::ResizeRotateFrame::TopLeft:
-      setPos(t->map(p_rect.topLeft()));
+      setPos(t.map(p_rect.topLeft()));
       break;
     case prim::ResizeRotateFrame::Top:
-      setPos(t->map(QPointF((p_rect.left()+p_rect.right())/2, p_rect.top())));
+      setPos(t.map(QPointF((p_rect.left()+p_rect.right())/2, p_rect.top())));
       break;
     case prim::ResizeRotateFrame::TopRight:
-      setPos(t->map(p_rect.topRight()));
+      setPos(t.map(p_rect.topRight()));
       break;
     case prim::ResizeRotateFrame::Right:
-      setPos(t->map(QPointF(p_rect.right(), (p_rect.top()+p_rect.bottom())/2)));
+      setPos(t.map(QPointF(p_rect.right(), (p_rect.top()+p_rect.bottom())/2)));
       break;
     case prim::ResizeRotateFrame::BottomRight:
-      setPos(t->map(p_rect.bottomRight()));
+      setPos(t.map(p_rect.bottomRight()));
       break;
     case prim::ResizeRotateFrame::Bottom:
-      setPos(t->map(QPointF((p_rect.left()+p_rect.right())/2, p_rect.bottom())));
+      setPos(t.map(QPointF((p_rect.left()+p_rect.right())/2, p_rect.bottom())));
       break;
     case prim::ResizeRotateFrame::BottomLeft:
-      setPos(t->map(p_rect.bottomLeft()));
+      setPos(t.map(p_rect.bottomLeft()));
       break;
     case prim::ResizeRotateFrame::Left:
-      setPos(t->map(QPointF(p_rect.left(), (p_rect.top()+p_rect.bottom())/2)));
+      setPos(t.map(QPointF(p_rect.left(), (p_rect.top()+p_rect.bottom())/2)));
       break;
     default:
       qCritical() << "Trying to access a non-existent resize handle position";
