@@ -54,7 +54,7 @@ namespace prim{
 
     // QPolygonF getPolygon();
     //! returns the angle of the rotated rect, bounded between 0 and 180 degrees
-    qreal getAngleDegrees(){return angle;}
+    qreal getAngleDegrees() const {return angle;}
 
     //! returns the angle of the rotated rect, bounded between 0 and pi.
     qreal getAngleRadians(){return qDegreesToRadians(getAngleDegrees());}
@@ -62,7 +62,7 @@ namespace prim{
     // void setAngleDegrees(qreal angle_in){angle = angle_in;}
     void setAngleDegrees(qreal angle_in);
 
-    void setAngleRadians(qreal angle_in_radians){angle = qRadiansToDegrees(angle_in_radians);}
+    void setAngleRadians(qreal angle_in_radians){setAngleDegrees(qRadiansToDegrees(angle_in_radians));}
 
     QPolygonF getPolygon() const {return polygon_cache;}
 

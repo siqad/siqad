@@ -155,7 +155,6 @@ QPointF ResizeRotateFrame::getUnitPoint(HandlePosition pos)
 {
   QTransform t;
   t.rotate(resizeTarget()->getAngleDegrees());
-  // t.rotate(angle);
   QPointF unit;
   switch (pos) {
     case TopLeft:
@@ -213,7 +212,6 @@ void ResizeRotateFrame::resizeTargetToHandle(const HandlePosition &pos,
       resizeTarget()->resize(0, dot*delta.manhattanLength(), 0, 0);
       break;
     case TopRight:
-      // old_anchor = QPointF(cos_scale*delta.y()-sin_scale*delta.x(), cos_scale*delta.x()+sin_scale*delta.y());
       old_anchor = resize_handles[BottomLeft]->scenePos();
       resizeTarget()->resize(0, cos_scale*delta.y()-sin_scale*delta.x(), cos_scale*delta.x()+sin_scale*delta.y(), 0);
       break;
@@ -414,7 +412,6 @@ void ResizeRotateHandle::paint(QPainter *painter,
   QRectF rect = boundingRect();
   // TODO use static parameters for pen
   painter->setPen(QPen(QColor(0,0,0), 1));
-  // painter->setBrush(QColor(255,255,255));
   painter->setBrush(fill_col);
   if(isHovered())
     painter->setBrush(selected_col);
