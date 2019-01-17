@@ -146,7 +146,7 @@ void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)
 
 }
 
-qreal prim::Electrode::getAngleProperty() const
+qreal prim::Electrode::getAngleProperty()
 {
   float angle = getProperty("angle").value.toFloat();
   while (angle >= 180)
@@ -156,70 +156,52 @@ qreal prim::Electrode::getAngleProperty() const
   return angle;
 }
 
-QPolygonF prim::Electrode::getPolygon() const
+QPolygonF prim::Electrode::getPolygon()
 {
   QRectF rect = sceneRect();
   rect.moveTo(0,0);
+  //use pointer, so that the transform is updated after we're done here.
   QTransform* t = getTransform();
   t->reset();
   t->translate(sceneRect().width()*0.5, sceneRect().height()*0.5);
   t->rotate(getAngleProperty());
   t->translate(-sceneRect().width()*0.5, -sceneRect().height()*0.5);
   QPolygonF poly(rect);
-  QPolygonF new_poly = t->map(poly);
-  return new_poly;
+  return t->map(poly);
 }
 
 QRectF prim::Electrode::boundingRect() const
 {
-  return QRectF(getPolygon().boundingRect());
+  return QRectF(polygon_cache.boundingRect());
 }
 
 QPainterPath prim::Electrode::shape() const
 {
   QPainterPath path;
-  path.addPolygon(getPolygon());
+  path.addPolygon(polygon_cache);
   path.closeSubpath();
   return path;
-}
-
-void prim::Electrode::hideHandles()
-{
-  if (getResizeFrame()){
-    if (getAngleProperty()!= 0){
-      //hide the top right and bottom corner handles since they dont work well when rotated.
-      getResizeFrame()->handle(ResizeRotateFrame::TopRight)->hide();
-      getResizeFrame()->handle(ResizeRotateFrame::BottomRight)->hide();
-      getResizeFrame()->handle(ResizeRotateFrame::BottomLeft)->hide();
-    } else {
-      getResizeFrame()->handle(ResizeRotateFrame::TopRight)->show();
-      getResizeFrame()->handle(ResizeRotateFrame::BottomRight)->show();
-      getResizeFrame()->handle(ResizeRotateFrame::BottomLeft)->show();
-    }
-  }
 }
 
 // NOTE: nothing in this paint method changes... possibly cache background as
 // pre-rendered bitma for speed.
 void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-  if (angle_cache != getAngleProperty())
-  {
-    angle_cache = getAngleProperty();
+  if (polygon_cache != getPolygon()){
     prepareGeometryChange();
+    polygon_cache = getPolygon();
     if (getResizeFrame() != 0) {
       getResizeFrame()->updateHandlePositions();
-      hideHandles();
     }
+    update();
   }
   painter->setPen(QPen(edge_col, edge_width));
   painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
-  painter->drawPolygon(getPolygon());
   if(tool_type == gui::SelectTool && isSelected()){
     painter->setPen(Qt::NoPen);
     painter->setBrush(selected_col);
-    painter->drawPolygon(getPolygon());
   }
+  painter->drawPolygon(polygon_cache);
 }
 
 

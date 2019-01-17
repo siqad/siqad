@@ -115,47 +115,6 @@ void ResizeRotateFrame::setResizeTarget(prim::ResizeRotateRect *new_target)
     updateHandlePositions();
 }
 
-void ResizeRotateFrame::freezeHandles(HandlePosition pos)
-{
-  switch(pos){
-    case TopLeft: //freeze bottom right
-      resize_handles[prim::ResizeRotateFrame::BottomRight]->setFreeze(true);
-      break;
-    case Top: //freeze bottom
-      resize_handles[prim::ResizeRotateFrame::BottomRight]->setFreeze(true);
-      resize_handles[prim::ResizeRotateFrame::Bottom]->setFreeze(true);
-      resize_handles[prim::ResizeRotateFrame::BottomLeft]->setFreeze(true);
-      break;
-    case TopRight:
-      resize_handles[prim::ResizeRotateFrame::BottomLeft]->setFreeze(true);
-      break;
-    case Right:
-      resize_handles[prim::ResizeRotateFrame::TopLeft]->setFreeze(true);
-      resize_handles[prim::ResizeRotateFrame::Left]->setFreeze(true);
-      resize_handles[prim::ResizeRotateFrame::BottomLeft]->setFreeze(true);
-      break;
-    case BottomRight:
-      resize_handles[prim::ResizeRotateFrame::TopLeft]->setFreeze(true);
-      break;
-    case Bottom:
-      resize_handles[prim::ResizeRotateFrame::TopLeft]->setFreeze(true);
-      resize_handles[prim::ResizeRotateFrame::Top]->setFreeze(true);
-      resize_handles[prim::ResizeRotateFrame::TopRight]->setFreeze(true);
-      break;
-    case BottomLeft:
-      resize_handles[prim::ResizeRotateFrame::TopRight]->setFreeze(true);
-      break;
-    case Left:
-      resize_handles[prim::ResizeRotateFrame::TopRight]->setFreeze(true);
-      resize_handles[prim::ResizeRotateFrame::Right]->setFreeze(true);
-      resize_handles[prim::ResizeRotateFrame::BottomRight]->setFreeze(true);
-      break;
-    default:
-      qCritical() << "Trying to freeze a non-existent resize handle position";
-      break;
-  }
-}
-
 QPointF ResizeRotateFrame::getUnitPoint(HandlePosition pos, qreal angle)
 {
   QTransform t;
@@ -410,7 +369,6 @@ void ResizeRotateHandle::updatePosition()
       qCritical() << "Trying to access a non-existent resize handle position";
       break;
   }
-  // delete t;
   update();
 }
 
