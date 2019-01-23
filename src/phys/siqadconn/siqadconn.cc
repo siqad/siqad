@@ -1,7 +1,7 @@
 // @file:     siqadconn.cc
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2018.09.18 - Nathan
+// @editted:  2019.01.23 - Nathan
 // @license:  Apache License 2.0
 //
 // @desc:     Convenient functions for interacting with SiQAD
@@ -165,10 +165,11 @@ void SiQADConnector::readItemTree(const bpt::ptree &subtree, const std::shared_p
 
 void SiQADConnector::readElectrode(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
 {
-  double x1, x2, y1, y2, pixel_per_angstrom, potential, phase;
+  double x1, x2, y1, y2, pixel_per_angstrom, potential, phase, angle;
   int layer_id, electrode_type, net;
   // read values from XML stream
   layer_id = subtree.get<int>("layer_id");
+  angle = subtree.get<double>("angle");
   potential = subtree.get<double>("property_map.potential.val");
   phase = subtree.get<double>("property_map.phase.val");
   std::string electrode_type_s = subtree.get<std::string>("property_map.type.val");
@@ -183,7 +184,7 @@ void SiQADConnector::readElectrode(const bpt::ptree &subtree, const std::shared_
   x2 = subtree.get<double>("dim.<xmlattr>.x2");
   y1 = subtree.get<double>("dim.<xmlattr>.y1");
   y2 = subtree.get<double>("dim.<xmlattr>.y2");
-  agg_parent->elecs.push_back(std::make_shared<Electrode>(layer_id,x1,x2,y1,y2,potential,phase,electrode_type,pixel_per_angstrom,net));
+  agg_parent->elecs.push_back(std::make_shared<Electrode>(layer_id,x1,x2,y1,y2,potential,phase,electrode_type,pixel_per_angstrom,net,angle));
 
   std::cout << "Electrode created with x1=" << agg_parent->elecs.back()->x1 << ", y1=" << agg_parent->elecs.back()->y1 <<
     ", x2=" << agg_parent->elecs.back()->x2 << ", y2=" << agg_parent->elecs.back()->y2 <<
