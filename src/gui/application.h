@@ -71,7 +71,7 @@ namespace gui{
     void setToolScreenshotArea();
     void setToolScaleBarAnchor();
     void setToolLabel();
-    void setToolElectrodePoly();
+    // void setToolElectrodePoly();
 
     // change lattice
     void changeLattice();

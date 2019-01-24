@@ -130,12 +130,12 @@ void gui::DesignPanel::initDesignPanel() {
   connect(this, &gui::DesignPanel::sig_toolChanged,
             afm_panel, &gui::AFMPanel::toolChangeResponse);
 
-  eph = new ElectrodePolyHelper(this);
-  scene->addItem(eph->ghostHandle());
-  scene->addItem(eph->ghostSegment().first());
-  scene->addItem(eph->ghostSegment().last());
-  connect(this, &gui::DesignPanel::sig_toolChanged,
-            eph, &gui::ElectrodePolyHelper::toolChangeResponse);
+  // eph = new ElectrodePolyHelper(this);
+  // scene->addItem(eph->ghostHandle());
+  // scene->addItem(eph->ghostSegment().first());
+  // scene->addItem(eph->ghostSegment().last());
+  // connect(this, &gui::DesignPanel::sig_toolChanged,
+  //           eph, &gui::ElectrodePolyHelper::toolChangeResponse);
 
 
 
@@ -174,14 +174,14 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   delete screenman;
   delete afm_panel;
   delete property_editor;
-  delete eph;
+  // delete eph;
   delete layman;
   delete itman;
 
   screenman=nullptr;
   afm_panel=nullptr;
   property_editor=nullptr;
-  eph=nullptr;
+  // eph=nullptr;
   layman=nullptr;
   itman=nullptr;
 
@@ -413,11 +413,11 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
       setDragMode(QGraphicsView::NoDrag);
       setInteractive(true);
       break;
-    case gui::ToolType::ElectrodePolyTool:
-      layman->setActiveLayer(layman->getMRULayer(prim::Layer::Electrode));
-      setDragMode(QGraphicsView::NoDrag);
-      setInteractive(true);
-      break;
+    // case gui::ToolType::ElectrodePolyTool:
+    //   layman->setActiveLayer(layman->getMRULayer(prim::Layer::Electrode));
+    //   setDragMode(QGraphicsView::NoDrag);
+    //   setInteractive(true);
+    //   break;
     case gui::ToolType::AFMAreaTool:
       layman->setActiveLayer(layman->getMRULayer(prim::Layer::AFMTip));
       setInteractive(true);
@@ -931,9 +931,9 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     prim::LatticeCoord offset;
     if (snapGhost(scene_pos, offset)) // if there are db dots
       prim::Ghost::instance()->moveByCoord(offset, lattice);
-  } else if (tool_type == ElectrodePolyTool) {
-    eph->showGhost(true);
-    eph->ghostHandle()->setPos(mapToScene(e->pos()));
+  // } else if (tool_type == ElectrodePolyTool) {
+  //   eph->showGhost(true);
+  //   eph->ghostHandle()->setPos(mapToScene(e->pos()));
   } else if (tool_type == AFMPathTool) {
     // update ghost node and ghost segment if there is a focused node, only update
     // ghost node if there's none.
@@ -1044,9 +1044,9 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             // Make node at the ghost position
             createAFMNode();
             break;
-          case gui::ToolType::ElectrodePolyTool:
-            createElectrodePolyNode(mapToScene(e->pos()));
-            break;
+          // case gui::ToolType::ElectrodePolyTool:
+          //   createElectrodePolyNode(mapToScene(e->pos()));
+          //   break;
           case gui::ToolType::ScreenshotAreaTool:
           {
             // set the screenshot clip area in the screenshot manager
@@ -1156,11 +1156,11 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
           emit sig_toolChangeRequest(gui::ToolType::SelectTool);
         }
         break;
-      case Qt::Key_Return:
-        if (tool_type == gui::ToolType::ElectrodePolyTool) {
-          createElectrodePoly();
-        }
-        break;
+      // case Qt::Key_Return:
+      //   if (tool_type == gui::ToolType::ElectrodePolyTool) {
+      //     createElectrodePoly();
+      //   }
+      //   break;
       default:
         QGraphicsView::keyReleaseEvent(e);
         break;
@@ -1542,7 +1542,7 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, prim::LatticeCoord &offset)
   for (prim::Item *item : pasting ? clipboard : selectedItems()) {
     if (item->item_type != prim::Item::Electrode &&
         item->item_type != prim::Item::AFMArea &&
-        item->item_type != prim::Item::ElectrodePoly &&
+        // item->item_type != prim::Item::ElectrodePoly &&
         item->item_type != prim::Item::TextLabel) {
       is_all_floating = false;
       break;
@@ -1813,34 +1813,34 @@ void gui::DesignPanel::CreatePotPlot::destroy()
 
 
 // CreateElectrodePoly class
-gui::DesignPanel::CreateElectrodePoly::CreateElectrodePoly(gui::DesignPanel *dp, QPolygonF poly, int layer_index, prim::ElectrodePoly *ep, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), dp(dp), poly(poly), ep(ep), layer_index(layer_index), invert(invert)
-{  //if called to destroy, *elec points to selected electrode. if called to create, *elec = 0
-  prim::Layer *layer = dp->layman->getLayer(layer_index);
-  index = invert ? layer->getItemIndex(ep) : layer->getItems().size();
-}
-
-void gui::DesignPanel::CreateElectrodePoly::undo()
-{
-  invert ? create() : destroy();
-}
-
-void gui::DesignPanel::CreateElectrodePoly::redo()
-{
-  invert ? destroy() : create();
-}
-
-void gui::DesignPanel::CreateElectrodePoly::create()
-{
-  ep = new prim::ElectrodePoly(poly, layer_index);
-  dp->addItem(ep, layer_index, index);
-}
-
-void gui::DesignPanel::CreateElectrodePoly::destroy()
-{
-  dp->removeItem(ep, dp->layman->getLayer(ep->layer_id));
-  ep = 0;
-}
+// gui::DesignPanel::CreateElectrodePoly::CreateElectrodePoly(gui::DesignPanel *dp, QPolygonF poly, int layer_index, prim::ElectrodePoly *ep, bool invert, QUndoCommand *parent)
+//   : QUndoCommand(parent), dp(dp), poly(poly), ep(ep), layer_index(layer_index), invert(invert)
+// {  //if called to destroy, *elec points to selected electrode. if called to create, *elec = 0
+//   prim::Layer *layer = dp->layman->getLayer(layer_index);
+//   index = invert ? layer->getItemIndex(ep) : layer->getItems().size();
+// }
+//
+// void gui::DesignPanel::CreateElectrodePoly::undo()
+// {
+//   invert ? create() : destroy();
+// }
+//
+// void gui::DesignPanel::CreateElectrodePoly::redo()
+// {
+//   invert ? destroy() : create();
+// }
+//
+// void gui::DesignPanel::CreateElectrodePoly::create()
+// {
+//   ep = new prim::ElectrodePoly(poly, layer_index);
+//   dp->addItem(ep, layer_index, index);
+// }
+//
+// void gui::DesignPanel::CreateElectrodePoly::destroy()
+// {
+//   dp->removeItem(ep, dp->layman->getLayer(ep->layer_id));
+//   ep = 0;
+// }
 
 // CreateAFMPath class
 
@@ -2482,31 +2482,31 @@ void gui::DesignPanel::createElectrode(QRect scene_rect)
   undo_stack->endMacro();
 }
 
-void gui::DesignPanel::createElectrodePolyNode(QPointF point)
-{
-  bool add_new_segment = eph->addPoint(point);
-  addItemToScene(eph->getLastHandle());
-  if (add_new_segment) {
-    addItemToScene(eph->getLastSegment());
-  }
-}
+// void gui::DesignPanel::createElectrodePolyNode(QPointF point)
+// {
+//   bool add_new_segment = eph->addPoint(point);
+//   addItemToScene(eph->getLastHandle());
+//   if (add_new_segment) {
+//     addItemToScene(eph->getLastSegment());
+//   }
+// }
 
-void gui::DesignPanel::createElectrodePoly()
-{
-  int layer_index = layman->indexOf(layman->activeLayer());
-  QPolygonF poly = QPolygonF(eph->getPoints().toVector());
-  eph->clearPoints();
-  for (prim::PolygonHandle* handle: eph->getTrail()) {
-    removeItemFromScene(handle);
-  }
-  for (prim::PolygonSegment* segment: eph->getSegments()) {
-    removeItemFromScene(segment);
-  }
-  eph->clearTrail();
-  undo_stack->beginMacro(tr("Create electrode polygon with given points"));
-  undo_stack->push(new CreateElectrodePoly(this, poly, layer_index));
-  undo_stack->endMacro();
-}
+// void gui::DesignPanel::createElectrodePoly()
+// {
+//   int layer_index = layman->indexOf(layman->activeLayer());
+//   QPolygonF poly = QPolygonF(eph->getPoints().toVector());
+//   eph->clearPoints();
+//   for (prim::PolygonHandle* handle: eph->getTrail()) {
+//     removeItemFromScene(handle);
+//   }
+//   for (prim::PolygonSegment* segment: eph->getSegments()) {
+//     removeItemFromScene(segment);
+//   }
+//   eph->clearTrail();
+//   undo_stack->beginMacro(tr("Create electrode polygon with given points"));
+//   undo_stack->push(new CreateElectrodePoly(this, poly, layer_index));
+//   undo_stack->endMacro();
+// }
 
 
 void gui::DesignPanel::createPotPlot(QString pot_plot_path, QRectF graph_container, QString pot_plot_anim)
@@ -2684,13 +2684,13 @@ void gui::DesignPanel::deleteSelection()
             static_cast<prim::PotPlot*>(item), true));
         break;
         }
-      case prim::Item::ElectrodePoly:
-        {
-        prim::ElectrodePoly *ep = static_cast<prim::ElectrodePoly*>(item);
-        undo_stack->push(new CreateElectrodePoly(this, ep->getTranslatedPolygon(), ep->layer_id,
-            static_cast<prim::ElectrodePoly*>(item), true));
-        break;
-        }
+      // case prim::Item::ElectrodePoly:
+      //   {
+      //   prim::ElectrodePoly *ep = static_cast<prim::ElectrodePoly*>(item);
+      //   undo_stack->push(new CreateElectrodePoly(this, ep->getTranslatedPolygon(), ep->layer_id,
+      //       static_cast<prim::ElectrodePoly*>(item), true));
+      //   break;
+      //   }
       default:
         // generic item removal
         undo_stack->push(new CreateItem(item->layer_id, this, item, true));
@@ -2789,7 +2789,7 @@ bool gui::DesignPanel::pasteAtGhost()
   bool is_all_floating = true;
   for(QGraphicsItem *gitem : clipboard){
     if (static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode &&
-        static_cast<prim::Item*>(gitem)->item_type != prim::Item::ElectrodePoly &&
+        // static_cast<prim::Item*>(gitem)->item_type != prim::Item::ElectrodePoly &&
         static_cast<prim::Item*>(gitem)->item_type != prim::Item::AFMArea &&
         reinterpret_cast<prim::TextLabel*>(gitem)->item_type != prim::Item::TextLabel){
       is_all_floating = false;
@@ -2834,9 +2834,9 @@ void gui::DesignPanel::pasteItem(prim::Ghost *ghost, int n, prim::Item *item)
     case prim::Item::Electrode:
       pasteElectrode(ghost, n, static_cast<prim::Electrode*>(item));
       break;
-    case prim::Item::ElectrodePoly:
-      pasteElectrodePoly(ghost, n, static_cast<prim::ElectrodePoly*>(item));
-      break;
+    // case prim::Item::ElectrodePoly:
+    //   pasteElectrodePoly(ghost, n, static_cast<prim::ElectrodePoly*>(item));
+    //   break;
     case prim::Item::AFMArea:
       pasteAFMArea(ghost, n, static_cast<prim::AFMArea*>(item));
       break;
@@ -2883,16 +2883,16 @@ void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, int n, prim::Electrode
   undo_stack->endMacro();
 }
 
-void gui::DesignPanel::pasteElectrodePoly(prim::Ghost *ghost, int n, prim::ElectrodePoly *ep)
-{
-  QRectF rect = ep->sceneRect();
-  rect.moveTopLeft(ghost->pos()+rect.topLeft());
-  QPolygonF poly = ep->getPolygon();
-  poly.translate(rect.topLeft());
-  undo_stack->beginMacro(tr("create electrode with given vertices"));
-  undo_stack->push(new CreateElectrodePoly(this, poly, ep->layer_id));
-  undo_stack->endMacro();
-}
+// void gui::DesignPanel::pasteElectrodePoly(prim::Ghost *ghost, int n, prim::ElectrodePoly *ep)
+// {
+//   QRectF rect = ep->sceneRect();
+//   rect.moveTopLeft(ghost->pos()+rect.topLeft());
+//   QPolygonF poly = ep->getPolygon();
+//   poly.translate(rect.topLeft());
+//   undo_stack->beginMacro(tr("create electrode with given vertices"));
+//   undo_stack->push(new CreateElectrodePoly(this, poly, ep->layer_id));
+//   undo_stack->endMacro();
+// }
 
 
 void gui::DesignPanel::pasteAFMArea(prim::Ghost *ghost, int n, prim::AFMArea *afm_area)
@@ -2924,7 +2924,7 @@ bool gui::DesignPanel::moveToGhost(bool kill)
     for (prim::Item *item : selectedItems()) {
       if (item->item_type != prim::Item::Electrode &&
           item->item_type != prim::Item::AFMArea &&
-          item->item_type != prim::Item::ElectrodePoly &&
+          // item->item_type != prim::Item::ElectrodePoly &&
           item->item_type != prim::Item::TextLabel) {
         is_all_floating = false;
       }

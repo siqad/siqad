@@ -107,10 +107,11 @@ prim::GhostPolygon::GhostPolygon(prim::Item *item, prim::Item *parent)
 {
   constructStatics();
 
-  if (item->item_type == prim::Item::ElectrodePoly) {
-    poly = static_cast<prim::ElectrodePoly*>(item)->getPolygon();
-    qDebug() << item->getQStringItemType();
-  } else if (item->item_type == prim::Item::Electrode) {
+  // if (item->item_type == prim::Item::ElectrodePoly) {
+    // poly = static_cast<prim::ElectrodePoly*>(item)->getPolygon();
+    // qDebug() << item->getQStringItemType();
+  // } else if (item->item_type == prim::Item::Electrode) {
+  if (item->item_type == prim::Item::Electrode) {
     poly = static_cast<prim::Electrode*>(item)->getPolygon();
   } else {
     qFatal("Trying to make a GhostBox out of unsupported item type");
@@ -397,11 +398,11 @@ void prim::Ghost::prepareItem(prim::Item *item, prim::AggNode *node)
     new_node->source_type = prim::AggNode::TextLabel;
     node->nodes.append(new_node);
     createGhostBox(item);
-  } else if (item->item_type == prim::Item::ElectrodePoly) {
-    new_node = new prim::AggNode(poly_sources.count());
-    new_node->source_type = prim::AggNode::ElectrodePoly;
-    node->nodes.append(new_node);
-    createGhostPolygon(item);
+  // } else if (item->item_type == prim::Item::ElectrodePoly) {
+  //   new_node = new prim::AggNode(poly_sources.count());
+  //   new_node->source_type = prim::AggNode::ElectrodePoly;
+  //   node->nodes.append(new_node);
+  //   createGhostPolygon(item);
   }
 }
 
@@ -476,9 +477,10 @@ prim::Item *prim::Ghost::getNodeItem(prim::AggNode *node) const
   else if(node->source_type == prim::AggNode::AFMArea ||
           node->source_type == prim::AggNode::TextLabel)
     return box_sources.at(node->index);
-  else if(node->source_type == prim::AggNode::Electrode ||
-          node->source_type == prim::AggNode::ElectrodePoly)
+  else if(node->source_type == prim::AggNode::Electrode)
     return poly_sources.at(node->index);
+  // else if(node->source_type == prim::AggNode::Electrode ||
+  //         node->source_type == prim::AggNode::ElectrodePoly)
   else
     return 0;
 

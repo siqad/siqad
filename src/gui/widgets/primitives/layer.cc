@@ -194,9 +194,9 @@ void prim::Layer::loadItems(QXmlStreamReader *stream, QGraphicsScene *scene)
       } else if (stream->name() == "electrode") {
         stream->readNext();
         addItem(new prim::Electrode(stream, scene, layer_id));
-      } else if (stream->name() == "electrode_poly") {
-        stream->readNext();
-        addItem(new prim::ElectrodePoly(stream, scene, layer_id));
+      // } else if (stream->name() == "electrode_poly") {
+      //   stream->readNext();
+      //   addItem(new prim::ElectrodePoly(stream, scene, layer_id));
       } else if (stream->name() == "afmarea") {
         stream->readNext();
         addItem(new prim::AFMArea(stream, scene, layer_id));

@@ -80,11 +80,11 @@ void ElectrodePolyHelper::clearTrail()
 
 void ElectrodePolyHelper::toolChangeResponse(gui::ToolType tool_type)
 {
-  if (tool_type != ElectrodePolyTool) {
-    clearPoints();
-    clearTrail();
-    showGhost(false);
-  }
+  // if (tool_type != ElectrodePolyTool) {
+  clearPoints();
+  clearTrail();
+  showGhost(false);
+  // }
 
 }
 

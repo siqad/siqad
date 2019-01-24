@@ -660,7 +660,7 @@ void gui::ApplicationGUI::updateWindowTitle()
     setWindowTitle(tr("%1 - %2")
       .arg(title_name)
       .arg(QCoreApplication::applicationName())
-    );    
+    );
   }
 }
 
@@ -774,11 +774,11 @@ void gui::ApplicationGUI::setToolLabel()
   design_pan->setTool(gui::ToolType::LabelTool);
 }
 
-void gui::ApplicationGUI::setToolElectrodePoly()
-{
-  qDebug() << tr("selecting electrode polygon tool");
-  design_pan->setTool(gui::ToolType::ElectrodePolyTool);
-}
+// void gui::ApplicationGUI::setToolElectrodePoly()
+// {
+//   qDebug() << tr("selecting electrode polygon tool");
+//   design_pan->setTool(gui::ToolType::ElectrodePolyTool);
+// }
 
 void gui::ApplicationGUI::changeLattice()
 {

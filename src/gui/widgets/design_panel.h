@@ -91,9 +91,9 @@ namespace gui{
     //! Remove the given Item from the given Layer if possible.
     void removeItem(prim::Item *item, prim::Layer* layer, bool retain_item=false);
 
-    //! Add a new Item to the graphics scene without adding it to a layer. This 
-    //! either means the Item is already owned by another class and only needs 
-    //! to be shown graphically, or the Item is merely a temporary graphics 
+    //! Add a new Item to the graphics scene without adding it to a layer. This
+    //! either means the Item is already owned by another class and only needs
+    //! to be shown graphically, or the Item is merely a temporary graphics
     //! item for purely indicative purposes.
     void addItemToScene(prim::Item *item);
 
@@ -322,7 +322,7 @@ namespace gui{
 
     // children panels
     AFMPanel *afm_panel;
-    ElectrodePolyHelper *eph;
+    // ElectrodePolyHelper *eph;
     // TODO layer manager
 
     // copy/paste
@@ -463,7 +463,7 @@ namespace gui{
     class MoveItem;         // move a single Item
 
     class CreatePotPlot;  // create an electrode at the given points
-    class CreateElectrodePoly;  // create an electrode at the given points
+    // class CreateElectrodePoly;  // create an electrode at the given points
 
     class CreateAFMPath;    // create an empty AFMPath that should later contain AFMNodes
     class CreateAFMNode;    // create AFMNodes that should be children of AFMPath
@@ -480,9 +480,9 @@ namespace gui{
     //! in scene coordinates.
     void createElectrode(QRect scene_rect);
 
-    void createElectrodePolyNode(QPointF point);
+    // void createElectrodePolyNode(QPointF point);
 
-    void createElectrodePoly();
+    // void createElectrodePoly();
 
     //create potential plot on panel
     void createPotPlot(QString pot_plot_path, QRectF graph_container, QString pot_anim_path);
@@ -528,7 +528,7 @@ namespace gui{
     void pasteDBDot(prim::Ghost *ghost, int n, prim::DBDot *db);
     void pasteAggregate(prim::Ghost *ghost, int n, prim::Aggregate *agg);
     void pasteElectrode(prim::Ghost *ghost, int n, prim::Electrode *elec);
-    void pasteElectrodePoly(prim::Ghost *ghost, int n, prim::ElectrodePoly *ep);
+    // void pasteElectrodePoly(prim::Ghost *ghost, int n, prim::ElectrodePoly *ep);
     void pasteAFMArea(prim::Ghost *ghost, int n, prim::AFMArea *afm_area);
 
     // move the selected items to the current Ghost, returns True if successful
@@ -665,29 +665,29 @@ namespace gui{
   };
 
 
-  class DesignPanel::CreateElectrodePoly : public QUndoCommand
-  {
-  public:
-    // create an plot at the given points
-    CreateElectrodePoly(gui::DesignPanel *dp, QPolygonF poly,
-      int layer_index, prim::ElectrodePoly *ep = 0, bool invert=false, QUndoCommand *parent=0);
-
-  private:
-
-    // destroy the dangling bond and update the lattice dot
-    virtual void undo();
-    // re-create the dangling bond
-    virtual void redo();
-
-    void create();  // create the dangling bond
-    void destroy(); // destroy the dangling bond
-    DesignPanel *dp;  // DesignPanel pointer
-    QPolygonF poly;
-    prim::ElectrodePoly* ep;
-    int layer_index;
-    int index;
-    bool invert;
-  };
+  // class DesignPanel::CreateElectrodePoly : public QUndoCommand
+  // {
+  // public:
+  //   // create an plot at the given points
+  //   CreateElectrodePoly(gui::DesignPanel *dp, QPolygonF poly,
+  //     int layer_index, prim::ElectrodePoly *ep = 0, bool invert=false, QUndoCommand *parent=0);
+  //
+  // private:
+  //
+  //   // destroy the dangling bond and update the lattice dot
+  //   virtual void undo();
+  //   // re-create the dangling bond
+  //   virtual void redo();
+  //
+  //   void create();  // create the dangling bond
+  //   void destroy(); // destroy the dangling bond
+  //   DesignPanel *dp;  // DesignPanel pointer
+  //   QPolygonF poly;
+  //   prim::ElectrodePoly* ep;
+  //   int layer_index;
+  //   int index;
+  //   bool invert;
+  // };
 
 
 
