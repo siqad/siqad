@@ -22,9 +22,9 @@
 #include "labels/labelgroup.h"
 #include "labels/textlabel.h"
 // #include "electrode_poly.h"
-#include "polygon_handle.h"
-#include "polygon_segment.h"
-#include "resizable_poly.h"
+// #include "polygon_handle.h"
+// #include "polygon_segment.h"
+// #include "resizable_poly.h"
 #include "visualaids/screenshot_clip_area.h"
 #include "visualaids/scale_bar.h"
 

@@ -40,7 +40,8 @@ namespace prim{
                   Text, Electrode, GhostBox, AFMArea, AFMPath, AFMNode, AFMSeg,
                   // PotPlot, ResizeFrame, ResizeHandle, TextLabel, ElectrodePoly,
                   PotPlot, ResizeFrame, ResizeHandle, TextLabel,
-                  GhostPolygon, PolygonHandle, PolygonSegment, ResizablePoly,
+                  // GhostPolygon, PolygonHandle, PolygonSegment, ResizablePoly,
+                  GhostPolygon, PolygonHandle, PolygonSegment,
                   ScreenshotClipArea, ScaleBar, ResizeRotateFrame, ResizeRotateHandle, LastItemType};
 
     //! constructor, layer = 0 should indicate temporary objects that do not

@@ -45,8 +45,8 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
           this, &gui::DesignPanel::resizeBegin);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeFinalizeRect,
           this, &gui::DesignPanel::resizeItemRect);
-  connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeFinalizePoly,
-          this, &gui::DesignPanel::resizeItemPoly);
+  // connect(prim::Emitter::instance(), &prim::Emitter::sig_resizeFinalizePoly,
+  //         this, &gui::DesignPanel::resizeItemPoly);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_moveDBToLatticeCoord,
           this, &gui::DesignPanel::moveDBToLatticeCoord);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_physLoc2LatticeCoord,
@@ -2598,24 +2598,24 @@ void gui::DesignPanel::resizeItemRect(prim::Item *item,
   }
 }
 
-void gui::DesignPanel::resizeItemPoly(prim::Item *item)
-{
-  resizing = false;
-  if (item->isResizable()) {
-    prim::ResizablePoly *poly_item = static_cast<prim::ResizablePoly *>(item);
-    QRectF old_rect = poly_item->sceneRect();
-    QPolygonF new_poly;
-    for (prim::PolygonHandle *handle: poly_item->getHandles())
-      new_poly.append(handle->scenePos());
-    poly_item->setPolygon(new_poly);
-    poly_item->setRect(new_poly.boundingRect(), true);
-    poly_item->createHandles();
-    for (prim::PolygonHandle *handle: poly_item->getHandles())
-      handle->setVisible(true);
-    poly_item->update();
-    poly_item->scene()->update(old_rect);
-  }
-}
+// void gui::DesignPanel::resizeItemPoly(prim::Item *item)
+// {
+//   resizing = false;
+//   if (item->isResizable()) {
+//     prim::ResizablePoly *poly_item = static_cast<prim::ResizablePoly *>(item);
+//     QRectF old_rect = poly_item->sceneRect();
+//     QPolygonF new_poly;
+//     for (prim::PolygonHandle *handle: poly_item->getHandles())
+//       new_poly.append(handle->scenePos());
+//     poly_item->setPolygon(new_poly);
+//     poly_item->setRect(new_poly.boundingRect(), true);
+//     poly_item->createHandles();
+//     for (prim::PolygonHandle *handle: poly_item->getHandles())
+//       handle->setVisible(true);
+//     poly_item->update();
+//     poly_item->scene()->update(old_rect);
+//   }
+// }
 
 void gui::DesignPanel::destroyAFMPath(prim::AFMPath *afm_path)
 {
