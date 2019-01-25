@@ -20,7 +20,7 @@
 #include "../../global.h"
 
 #include "afm_panel.h"
-#include "electrode_poly_helper.h"
+// #include "electrode_poly_helper.h"
 #include "layer_manager.h"
 #include "property_editor.h"
 #include "item_manager.h"

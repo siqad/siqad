@@ -218,7 +218,7 @@ namespace gui{
     QAction *action_drag_tool=nullptr;            // change cursor tool to drag
     QAction *action_dbgen_tool=nullptr;           // change cursor tool to gen
     QAction *action_electrode_tool=nullptr;       // change cursor tool to electrode
-    QAction *action_electrode_poly_tool=nullptr;  // change cursor tool to electrode
+    // QAction *action_electrode_poly_tool=nullptr;  // change cursor tool to electrode
     QAction *action_afmarea_tool=nullptr;         // change cursor tool to AFM Area tool
     QAction *action_afmpath_tool=nullptr;         // change cursor tool to AFM Path tool
     QAction *action_label_tool=nullptr;           // change cursor tool to label

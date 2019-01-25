@@ -12,7 +12,7 @@
 #include "electrode.h"
 #include "afmarea.h"
 #include "afmpath.h"
-#include "electrode_poly.h"
+// #include "electrode_poly.h"
 
 
 // statics
