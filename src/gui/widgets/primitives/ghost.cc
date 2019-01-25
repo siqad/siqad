@@ -107,10 +107,6 @@ prim::GhostPolygon::GhostPolygon(prim::Item *item, prim::Item *parent)
 {
   constructStatics();
 
-  // if (item->item_type == prim::Item::ElectrodePoly) {
-    // poly = static_cast<prim::ElectrodePoly*>(item)->getPolygon();
-    // qDebug() << item->getQStringItemType();
-  // } else if (item->item_type == prim::Item::Electrode) {
   if (item->item_type == prim::Item::Electrode) {
     poly = static_cast<prim::Electrode*>(item)->getPolygon();
   } else {

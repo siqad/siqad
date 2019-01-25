@@ -49,9 +49,6 @@ const QString prim::Item::getQStringItemType(ItemType type_in)
     case prim::Item::PotPlot: return "PotPlot";
     case prim::Item::ResizeFrame: return "ResizeFrame";
     case prim::Item::ResizeHandle: return "ResizeHandle";
-    // case prim::Item::ElectrodePoly: return "ElectrodePoly";
-    case prim::Item::PolygonHandle: return "PolygonHandle";
-    case prim::Item::PolygonSegment: return "PolygonSegment";
     default: return "Erroneous Item";
   }
 }
@@ -63,9 +60,6 @@ prim::Item::ItemType prim::Item::getEnumItemType(QString type)
   else if (type == "Ghost") return prim::Item::Ghost;
   else if (type == "GhostDot") return prim::Item::GhostDot;
   else if (type == "Electrode") return prim::Item::Electrode;
-  // else if (type == "ElectrodePoly") return prim::Item::ElectrodePoly;
-  else if (type == "PolygonHandle") return prim::Item::PolygonHandle;
-  else if (type == "PolygonSegment") return prim::Item::PolygonSegment;
   else if (type == "GhostBox") return prim::Item::GhostBox;
   else if (type == "AFMArea") return prim::Item::AFMArea;
   else if (type == "AFMPath") return prim::Item::AFMPath;

@@ -76,7 +76,6 @@ HEADERS += \
    	src/gui/widgets/primitives/sim_engine.h \
    	src/gui/widgets/primitives/sim_job.h \
    	src/gui/widgets/primitives/electrode.h \
-#   	src/gui/widgets/primitives/electrode_poly.h \
     src/gui/widgets/primitives/afmarea.h \
     src/gui/widgets/primitives/afmpath.h \
     src/gui/widgets/primitives/afmnode.h \
@@ -84,9 +83,6 @@ HEADERS += \
     src/gui/widgets/primitives/pot_plot.h \
     src/gui/widgets/primitives/resizablerect.h \
     src/gui/widgets/primitives/resizerotaterect.h \
-#   	src/gui/widgets/primitives/resizable_poly.h \
-#   	src/gui/widgets/primitives/polygon_handle.h \
-#   	src/gui/widgets/primitives/polygon_segment.h \
    	src/gui/widgets/primitives/hull/hull.h \
    	src/gui/widgets/primitives/hull/convex.h \
    	src/gui/widgets/primitives/hull/hulls.h \
@@ -108,7 +104,6 @@ SOURCES += \
    	src/gui/widgets/primitives/sim_engine.cc \
    	src/gui/widgets/primitives/sim_job.cc \
    	src/gui/widgets/primitives/electrode.cc \
-#   	src/gui/widgets/primitives/electrode_poly.cc \
    	src/gui/widgets/primitives/afmarea.cc \
    	src/gui/widgets/primitives/afmpath.cc \
    	src/gui/widgets/primitives/afmnode.cc \
@@ -116,9 +111,6 @@ SOURCES += \
     src/gui/widgets/primitives/pot_plot.cc \
     src/gui/widgets/primitives/resizablerect.cc \
     src/gui/widgets/primitives/resizerotaterect.cc \
-#   	src/gui/widgets/primitives/resizable_poly.cc \
-#   	src/gui/widgets/primitives/polygon_handle.cc \
-#   	src/gui/widgets/primitives/polygon_segment.cc \
    	src/gui/widgets/primitives/hull/hull.cc \
    	src/gui/widgets/primitives/hull/convex.cc \
     src/gui/widgets/primitives/labels/labelgroup.cc \
@@ -145,7 +137,6 @@ HEADERS += \
   	src/gui/commander.h \
   	src/gui/widgets/completer.h \
   	src/gui/widgets/item_manager.h \
-#  	src/gui/widgets/electrode_poly_helper.h \
     src/gui/widgets/screenshot_manager.h
 
 
@@ -166,7 +157,6 @@ SOURCES += \
    	src/gui/commander.cc \
    	src/gui/widgets/completer.cc \
    	src/gui/widgets/item_manager.cc \
-#   	src/gui/widgets/electrode_poly_helper.cc \
     src/gui/widgets/screenshot_manager.cc
 
 

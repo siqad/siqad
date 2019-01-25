@@ -355,8 +355,6 @@ void gui::ApplicationGUI::initSideBar()
   action_electrode_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"),
       tr("Electrode tool"));
   /*
-  action_electrode_poly_tool = side_bar->addAction(QIcon(":/ico/drawelectrodepoly.svg"),
-      tr("Electrode polygon tool"));
   action_afmarea_tool = side_bar->addAction(QIcon(":/ico/drawafmarea.svg"),
       tr("AFM Area tool"));
   action_afmpath_tool = side_bar->addAction(QIcon(":/ico/drawafmpath.svg"),
@@ -374,7 +372,6 @@ void gui::ApplicationGUI::initSideBar()
   action_group->addAction(action_dbgen_tool);
   action_group->addAction(action_electrode_tool);
   /*
-  action_group->addAction(action_electrode_poly_tool);
   action_group->addAction(action_afmarea_tool);
   action_group->addAction(action_afmpath_tool);
   action_group->addAction(action_label_tool);
@@ -389,7 +386,6 @@ void gui::ApplicationGUI::initSideBar()
   action_dbgen_tool->setCheckable(true);
   action_electrode_tool->setCheckable(true);
   /*
-  action_electrode_poly_tool->setCheckable(true);
   action_afmarea_tool->setCheckable(true);
   action_afmpath_tool->setCheckable(true);
   action_label_tool->setCheckable(true);
@@ -406,8 +402,6 @@ void gui::ApplicationGUI::initSideBar()
   connect(action_electrode_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolElectrode);
   /*
-  connect(action_electrode_poly_tool, &QAction::triggered,
-          this, &gui::ApplicationGUI::setToolElectrodePoly);
   connect(action_afmarea_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolAFMArea);
   connect(action_afmpath_tool, &QAction::triggered,
@@ -684,10 +678,6 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
       setToolElectrode();
       break;
       /*
-    case gui::ToolType::ElectrodePolyTool:
-      action_electrode_poly_tool->setChecked(true);
-      setToolElectrodePoly();
-      break;
     case gui::ToolType::AFMAreaTool:
       action_afmarea_tool->setChecked(true);
       setToolAFMArea();
@@ -773,12 +763,6 @@ void gui::ApplicationGUI::setToolLabel()
   qDebug() << tr("selecting label tool");
   design_pan->setTool(gui::ToolType::LabelTool);
 }
-
-// void gui::ApplicationGUI::setToolElectrodePoly()
-// {
-//   qDebug() << tr("selecting electrode polygon tool");
-//   design_pan->setTool(gui::ToolType::ElectrodePolyTool);
-// }
 
 void gui::ApplicationGUI::changeLattice()
 {

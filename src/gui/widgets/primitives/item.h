@@ -38,10 +38,8 @@ namespace prim{
     //! LastItemType stays at the end of the enum list.
     enum ItemType{Aggregate, DBDot, DBDotPreview, LatticeDotPreview, Ghost, GhostDot,
                   Text, Electrode, GhostBox, AFMArea, AFMPath, AFMNode, AFMSeg,
-                  // PotPlot, ResizeFrame, ResizeHandle, TextLabel, ElectrodePoly,
                   PotPlot, ResizeFrame, ResizeHandle, TextLabel,
-                  // GhostPolygon, PolygonHandle, PolygonSegment, ResizablePoly,
-                  GhostPolygon, PolygonHandle, PolygonSegment,
+                  GhostPolygon,
                   ScreenshotClipArea, ScaleBar, ResizeRotateFrame, ResizeRotateHandle, LastItemType};
 
     //! constructor, layer = 0 should indicate temporary objects that do not
