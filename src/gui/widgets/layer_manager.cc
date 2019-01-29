@@ -518,6 +518,8 @@ void LayerManager::updateLayerPropFromTable(int row, int column)
 void LayerManager::addLayerRow()
 {
   add_layer_dialog->show();
+  // populateLayerTable();
+  // qDebug() << layerCount();
   return;
 }
 
@@ -579,6 +581,7 @@ void LayerManager::addLayerRow(LayerTableRowContent *row_content)
 
   layer_table->setCellWidget(curr_row, static_cast<int>(Visibility), row_content->bt_visibility);
   layer_table->setCellWidget(curr_row, static_cast<int>(Editability), row_content->bt_editability);
+
 }
 
 

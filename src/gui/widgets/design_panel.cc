@@ -546,6 +546,10 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
   if(rs->hasError()){
     qCritical() << tr("XML error: ") << rs->errorString().data();
   }
+
+  //make sure all layers from the loaded file are present in the advanced layer table
+  layman->populateLayerTable();
+
 }
 
 
