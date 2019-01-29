@@ -444,7 +444,7 @@ void SimVisualize::initSimVisualize()
   visualize_layout->addWidget(job_info_group);
   visualize_layout->addWidget(dist_group);
   visualize_layout->addWidget(view_potential_group);
-  visualize_layout->addStretch(1);
+  //visualize_layout->addStretch(1);
   setLayout(visualize_layout);
 }
 

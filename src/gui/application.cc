@@ -463,6 +463,7 @@ void gui::ApplicationGUI::initSimVisualizeDock()
 
   QScrollArea *sa_sim_vis = new QScrollArea;
   sa_sim_vis->setWidget(sim_visualize);
+  sa_sim_vis->setWidgetResizable(true);
 
   sim_visualize_dock->setWidget(sa_sim_vis);
   sim_visualize_dock->hide();
@@ -486,7 +487,11 @@ void gui::ApplicationGUI::initLayerDock()
 
   layer_dock->setMinimumWidth(gui_settings->get<int>("LAYDOCK/mw"));
 
-  layer_dock->setWidget(design_pan->layerManagerSideWidget());
+  QScrollArea *sa_layer_dock = new QScrollArea;
+  sa_layer_dock->setWidget(design_pan->layerManagerSideWidget());
+  sa_layer_dock->setWidgetResizable(true);
+
+  layer_dock->setWidget(sa_layer_dock);
   layer_dock->show();
   addDockWidget(area, layer_dock);
 }
@@ -545,7 +550,12 @@ void gui::ApplicationGUI::initCommander()
 void gui::ApplicationGUI::setLayerManagerWidget(QWidget *widget)
 {
   qDebug() << "Making layer manager widget";
-  layer_dock->setWidget(widget);
+
+  QScrollArea *sa_layer_dock = new QScrollArea;
+  sa_layer_dock->setWidget(widget);
+  sa_layer_dock->setWidgetResizable(true);
+
+  layer_dock->setWidget(sa_layer_dock);
 }
 
 void gui::ApplicationGUI::setItemManagerWidget(QWidget *widget)

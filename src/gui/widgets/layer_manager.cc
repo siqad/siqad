@@ -397,7 +397,7 @@ void LayerManager::initSideWidget()
   btn_hl->addWidget(pb_add);
   layers_vl->addLayout(btn_hl);
 
-  side_widget = new QWidget(0, Qt::Dialog);
+  side_widget = new QWidget(0, Qt::Widget);
   side_widget->setLayout(layers_vl);
 
 }
