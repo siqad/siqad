@@ -30,7 +30,7 @@
         <tip>Arguments are comma-separated. e.g. C:\Windows\py.exe,-3</tip>
         <meta>
             <category>App</category>
-            <key>python_path</key>
+            <key>user_python_path</key>
         </meta>
     </python_path>
 </properties>
