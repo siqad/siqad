@@ -187,7 +187,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("view/bg_col_pb", QColor(255,255,255)); // background color
   S->setValue("view/zoom_factor", 0.1);           // scaling factor for zoom operations
   S->setValue("view/zoom_boost", 2);              // must have factor*boost < 1
-  S->setValue("view/zoom_min", .01);              // minimum zoom factor
+  S->setValue("view/zoom_min", .001);              // minimum zoom factor
   S->setValue("view/zoom_max", 1);                // maximum zoom factor
   S->setValue("view/wheel_pan_step", 20);         // screen pan per wheel tick
   S->setValue("view/wheel_pan_boost", 5);         // shift-boost factor
