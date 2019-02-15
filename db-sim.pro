@@ -251,6 +251,8 @@ linux: sim_poissolver.files += \
     $$PHYS_DIR/poissolver/FEM/src/python/plotter.py \
     $$PHYS_DIR/poissolver/FEM/src/python/res_cap.py \
     $$PHYS_DIR/poissolver/FEM/src/python/mesher.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/dopant.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/charge_density.py \
     $$PHYS_DIR/poissolver/FEM/src/python/subdomains.py \
     $$PHYS_DIR/poissolver/FEM/src/python/helpers/mesh_writer_3D.py \
     $$PHYS_DIR/poissolver/FEM/src/python/helpers/helpers.py \
