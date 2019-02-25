@@ -31,6 +31,15 @@ echo "Building SimAnneal... $FOR_OS"
 cd $qmake_dir/src/phys/simanneal
 make $multicore_compile FOR_OS=$FOR_OS
 
+# make qpuanneal
+echo "Building QPUAnneal... $FOR_OS"
+if [[ "$@" == "-swig" ]]
+then
+    echo "Building swig for QPUAnneal"
+    cd $qmake_dir/src/phys/qpuanneal/src/swig_siqadconn
+    ./swig_generate_and_compile FOR_OS=$FOR_OS
+fi
+
 # make afmmarcus
 echo "Building AFMMarcus... $FOR_OS"
 if [[ "$@" == "-swig" ]]

@@ -204,6 +204,18 @@ macx:  sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal
 win32: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal.exe
 INSTALLS += sim_simanneal
 
+# QPUAnneal
+
+sim_qpuanneal.path = $$EXEC_DIR/src/phys/qpuanneal
+sim_qpuanneal.files = \
+    $$PHYS_DIR/qpuanneal/qpu_anneal.physeng \
+    $$PHYS_DIR/qpuanneal/src/groundstate-dwave.py \
+    $$PHYS_DIR/qpuanneal/src/_siqadconn*.so \
+    $$PHYS_DIR/qpuanneal/src/siqadconn.py
+win32: sim_qpuanneal.files += \
+    $$PHYS_DIR/qpuanneal/src/_siqadconn*.pyd
+INSTALLS += sim_qpuanneal
+
 # AFMMarcus
 
 sim_afmmarcus.path = $$EXEC_DIR/src/phys/afmmarcus
