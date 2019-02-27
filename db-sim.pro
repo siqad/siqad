@@ -250,6 +250,7 @@ linux: sim_poissolver.files += \
     $$PHYS_DIR/poissolver/FEM/src/python/poisson_class.py \
     $$PHYS_DIR/poissolver/FEM/src/python/plotter.py \
     $$PHYS_DIR/poissolver/FEM/src/python/res_cap.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/res_graph.py \
     $$PHYS_DIR/poissolver/FEM/src/python/mesher.py \
     $$PHYS_DIR/poissolver/FEM/src/python/dopant.py \
     $$PHYS_DIR/poissolver/FEM/src/python/charge_density.py \
