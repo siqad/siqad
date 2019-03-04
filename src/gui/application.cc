@@ -614,7 +614,7 @@ void gui::ApplicationGUI::loadSettings()
     if(autosave_dir.mkpath("."))
       qDebug() << tr("Successfully created autosave directory");
     else
-      qCritical() << tr("Failed to create autosave direcrory");
+      qCritical() << tr("Failed to create autosave directory");
   }
 
   // auto save signal
@@ -635,8 +635,6 @@ void gui::ApplicationGUI::saveSettings()
   // remove autosave during peaceful termination
   for(const QString &dirFile : autosave_dir.entryList())
     autosave_dir.remove(dirFile); // remove autosave files
-
-  qDebug() << tr("Test: %1").arg(autosave_dir.absolutePath());
 
   if(autosave_dir.removeRecursively())
     qDebug() << tr("Removed autosave directory: %1").arg(autosave_dir.path());

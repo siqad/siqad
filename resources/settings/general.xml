@@ -23,6 +23,16 @@
             <key>log/override</key>
         </meta>
     </debug_msg>
+    <log_file_keep_count>
+        <T>int</T>
+        <val></val>
+        <label>Log files to keep</label>
+        <tip>Number of old log files to keep.</tip>
+        <meta>
+            <category>App</category>
+            <key>log/keepcount</key>
+        </meta>
+    </log_file_keep_count>
     <python_path>
         <T>string</T>
         <val></val>

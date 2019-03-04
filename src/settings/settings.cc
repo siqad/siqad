@@ -99,9 +99,10 @@ QSettings *settings::AppSettings::m_defs()
 
 
   // overwrites existing default values with same keys... no check
-  S->setValue("log/override", false);
-  S->setValue("log/tofile", false);
-  S->setValue("log/logfile", QString("<SYSTMP>/log/log.txt"));
+  S->setValue("log/override", true);
+  S->setValue("log/tofile", true);
+  S->setValue("log/logdir", QString("<SYSTMP>/log/"));
+  S->setValue("log/keepcount", 10);
 
   S->setValue("view/hidpi_support", false);
 

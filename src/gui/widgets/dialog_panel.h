@@ -39,7 +39,12 @@ namespace gui{
 
   private:
 
-    QFile *file;  // target file for logging
+    //! Purge oldest log files if log file count > log/keepcount.
+    void purgeOldLogs();
+
+    QDir log_dir;         // log directory
+    QFile *file=nullptr;  // target file for logging
+    QString filename;     // log file name (excluding dir path)
   };
 
 } // end gui namespace

@@ -17,10 +17,10 @@
 #include <QRegExp>
 
 #ifdef QT_NO_DEBUG
-#define DEFAULT_OVERRIDE false  // use user settings for release compilation
+#define DEFAULT_OVERRIDE true   // use user settings for release compilation
+//#define DEFAULT_OVERRIDE false   // TODO change back to false after implementation
 #else
 #define DEFAULT_OVERRIDE true   // use default settings for debug compilation
-//#define DEFAULT_OVERRIDE false   // TODO change back to true after implementation
 #endif
 
 namespace settings{
