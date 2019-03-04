@@ -42,12 +42,9 @@ namespace settings{
     };
 
   public slots:
-    void addPendingBoolUpdate(bool new_state);
-    void addPendingStringUpdate(QString new_text);
 
+    //! Apply changes made in the settings forms.
     void applyPendingChanges();
-    void applyAndClose();
-    void discardAndClose();
 
   private:
     //! Initialise the settings dialog and panes of contained categories.

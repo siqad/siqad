@@ -27,70 +27,6 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 }
 
 
-// public slots
-void SettingsDialog::addPendingBoolUpdate(bool new_state)
-{
-  // TODO put into functions
-  QObject *sender = const_cast<QObject*>(QObject::sender());
-
-  SettingsCategory category;
-  QString name;
-
-  QStringList splitted_name = sender->objectName().split(':');
-  if (splitted_name.at(0) == "app")
-    category = App;
-  else if (splitted_name.at(0) == "gui")
-    category = GUI;
-  else if (splitted_name.at(0) == "lattice")
-    category = Lattice;
-  else
-    qFatal("Specified a settings category that doesn't exist");
-
-  name = splitted_name.at(1);
-
-  pending_changes.append(
-    PendingChange(category, name, QVariant(new_state))
-  );
-
-  /*pending_changes.append(
-    PendingChange(SettingsCategory::App, sender->objectName(),
-        QVariant(new_state))
-  );*/
-  // app_settings->setValue(sender->objectName(), QVariant(new_state));
-  qDebug() << "Changed setting!";
-}
-
-void SettingsDialog::addPendingStringUpdate(QString new_text)
-{
-  // TODO put into functions
-  QObject *sender = const_cast<QObject*>(QObject::sender());
-
-  SettingsCategory category;
-  QString name;
-
-  QStringList splitted_name = sender->objectName().split(':');
-  if (splitted_name.at(0) == "app")
-    category = App;
-  else if (splitted_name.at(0) == "gui")
-    category = GUI;
-  else if (splitted_name.at(0) == "lattice")
-    category = Lattice;
-  else
-    qFatal("Specified a settings category that doesn't exist");
-
-  name = splitted_name.at(1);
-
-  pending_changes.append(PendingChange(category, name, QVariant(new_text)));
-
-  /*pending_changes.append(
-    PendingChange(SettingsCategory::App, sender->objectName(),
-        QVariant(new_state))
-  );*/
-  // app_settings->setValue(sender->objectName(), QVariant(new_state));
-  qDebug() << "Changed setting!";
-}
-
-
 void SettingsDialog::applyPendingChanges()
 {
   // TODO specific implementation for app settings pane for now, make generic later
@@ -100,20 +36,6 @@ void SettingsDialog::applyPendingChanges()
     settings::Settings *s_cat = settingsCategory(changed_prop.meta["category"]);
     s_cat->setValue(changed_prop.meta["key"], changed_prop.value);
   }
-}
-
-
-void SettingsDialog::applyAndClose()
-{
-  applyPendingChanges();
-  setVisible(false);
-}
-
-
-void SettingsDialog::discardAndClose()
-{
-  pending_changes.clear();
-  setVisible(false);
 }
 
 
@@ -138,8 +60,8 @@ void SettingsDialog::initSettingsDialog()
   //settings_category_list->addItem("Interface");
   //settings_category_list->addItem("Lattice");
 
-  connect(settings_category_list, SIGNAL(currentRowChanged(int)),
-          stacked_settings_panes, SLOT(setCurrentIndex(int)));
+  connect(settings_category_list, &QListWidget::currentRowChanged,
+          stacked_settings_panes, &QStackedWidget::setCurrentIndex);
 
   // horizontal layout for list on the left and settings pane on the right
   QHBoxLayout *settings_hl = new QHBoxLayout;
@@ -157,14 +79,20 @@ void SettingsDialog::initSettingsDialog()
   bottom_buttons_hl->addWidget(pb_apply_and_close);
   bottom_buttons_hl->addWidget(pb_cancel);
 
-  connect(pb_apply, SIGNAL(clicked(bool)),
-          this, SLOT(applyPendingChanges()));
-  connect(pb_apply_and_close, SIGNAL(clicked(bool)),
-          this, SLOT(applyAndClose()));
-  connect(pb_cancel, SIGNAL(clicked(bool)),
-          this, SLOT(discardAndClose()));
+  connect(pb_apply, &QAbstractButton::clicked,
+          this, &SettingsDialog::applyPendingChanges);
+  connect(pb_apply_and_close, &QAbstractButton::clicked,
+          this, [this](){
+            applyPendingChanges();
+            setVisible(false);
+          });
+  connect(pb_cancel, &QAbstractButton::clicked,
+          this, [this](){
+            pending_changes.clear();
+            setVisible(false);
+          });
 
-  // wrap everything together in a neat layout
+  // main layout
   QVBoxLayout *main_layout = new QVBoxLayout;
   main_layout->addLayout(settings_hl);
   main_layout->addLayout(bottom_buttons_hl);
