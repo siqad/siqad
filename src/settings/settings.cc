@@ -178,6 +178,8 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("INFODOCK/loc", 8);   // info dock default to bottom
   S->setValue("Panel/logw", 400);
 
+  S->setValue("SIMMAN/mw", 100);     // simulation manager minimum width
+
   S->setValue("lattice/fname", QString("src/settings/lattices/si_100_2x1.ini"));
   S->setValue("lattice/minsize", 50);  // minimum lattice n, m size
 

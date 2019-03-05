@@ -8,6 +8,7 @@
 //            users to edit.
 
 #include "property_form.h"
+#include "src/settings/settings.h"
 
 namespace gui{
 
@@ -110,8 +111,15 @@ void PropertyForm::initForm()
         break;
       }
       case LineEdit:
-        prop_val_widget = new QLineEdit(prop.value.value<QString>());
+      {
+        if (prop.dp != -1 && static_cast<QMetaType::Type>(prop.value.type()) == QMetaType::Float) {
+          prop_val_widget = new QLineEdit(QString::number(prop.value.value<float>(), 'f', prop.dp));
+        } else {
+          prop_val_widget = new QLineEdit(prop.value.value<QString>());
+        }
+        prop_val_widget->setMinimumWidth(settings::GUISettings::instance()->get<int>("SIMMAN/mw"));
         break;
+      }
       case CheckBox:
         prop_val_widget = new QCheckBox();
         static_cast<QCheckBox*>(prop_val_widget)->setChecked(prop.value.toBool());

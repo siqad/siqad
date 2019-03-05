@@ -99,7 +99,7 @@ void gui::DialogPanel::purgeOldLogs()
   int keep_count = app_settings->get<int>("log/keepcount");
 
   // get list of closed logs sorted by modification time
-  QStringList closed_logs = log_dir.entryList(QStringList({"closed-log*"}), 
+  QStringList closed_logs = log_dir.entryList(QStringList({"*.log"}), 
       QDir::NoFilter, QDir::Time|QDir::Reversed);
 
   // remove closed logs until the file count is below the desired count
