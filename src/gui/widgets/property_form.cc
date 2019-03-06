@@ -16,7 +16,9 @@ namespace gui{
 PropertyForm::PropertyForm(PropertyMap t_map, QWidget *parent)
   : QWidget(parent), orig_map(t_map)
 {
+  prop_fl = new QFormLayout;
   initForm();
+  setLayout(prop_fl);
 }
 
 
@@ -44,6 +46,17 @@ PropertyMap PropertyForm::changedProperties()
       map_changed.insert(key, Property(form_val, orig_map[key]));
   }
   return map_changed;
+}
+
+
+void PropertyForm::resetFormValues()
+{
+  // delete existing form entries
+  if (prop_fl != nullptr)
+    while (!prop_fl->isEmpty())
+      prop_fl->removeRow(0);
+
+  initForm();
 }
 
 
@@ -80,13 +93,6 @@ void PropertyForm::initForm()
 
   // make a map with the sort index as the key
   QMap<int, QPair<QWidget*, QWidget*>> form_map;
-
-  // populate a form with the desired number of null widgets first
-  QFormLayout *prop_fl = new QFormLayout;
-  /*
-  for (int i=0; i<orig_map.size(); i++)
-    prop_fl->addRow(new QWidget, new QWidget);
-    */
 
   // generate form from property map
   PropertyMap::const_iterator it;
@@ -138,8 +144,6 @@ void PropertyForm::initForm()
   // populate the form layout with contents from the form map
   for (auto it = form_map.begin(); it != form_map.end(); it++)
     prop_fl->addRow(it.value().first, it.value().second);
-
-  setLayout(prop_fl);
 }
 
 

@@ -29,12 +29,12 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
 void SettingsDialog::applyPendingChanges()
 {
-  // TODO specific implementation for app settings pane for now, make generic later
-  gui::PropertyMap changed_settings = app_settings_pane->changedProperties();
-
-  for (gui::Property changed_prop : changed_settings) {
-    settings::Settings *s_cat = settingsCategory(changed_prop.meta["category"]);
-    s_cat->setValue(changed_prop.meta["key"], changed_prop.value);
+  for (gui::PropertyForm *s_form : s_forms) {
+    gui::PropertyMap changed_settings = s_form->changedProperties();
+    for (gui::Property changed_prop : changed_settings) {
+      settings::Settings *s_cat = settingsCategory(changed_prop.meta["category"]);
+      s_cat->setValue(changed_prop.meta["key"], changed_prop.value);
+    }
   }
 }
 
@@ -42,26 +42,37 @@ void SettingsDialog::applyPendingChanges()
 // private
 void SettingsDialog::initSettingsDialog()
 {
-  // all settings panes reside in a stacked widget, only one is shown at a time.
+  QDir s_dir(":/settings/");
+  if (!s_dir.exists()) {
+    qWarning() << "Settings resource directory not found.";
+    return;
+  }
+
+  // construct list of all settings categories and construct the forms
+  QFileInfoList s_f_infos = s_dir.entryInfoList();
+  QListWidget *settings_category_list = new QListWidget(this);
   QStackedWidget *stacked_settings_panes = new QStackedWidget(this);
 
-  if (appSettingsPane() != nullptr)
-    stacked_settings_panes->addWidget(appSettingsPane());
+  for (QFileInfo s_f_info : s_f_infos) {
+    QString s_path = s_f_info.absoluteFilePath();
+    qDebug() << tr("Settings file %1").arg(s_path);
+    gui::PropertyMap s_map(s_path);
+    for (gui::Property &prop : s_map)
+      setPropertyWithUserSetting(prop);
+    s_forms.append(new gui::PropertyForm(s_map));
 
-  if (guiSettingsPane() != nullptr)
-    stacked_settings_panes->addWidget(guiSettingsPane());
-
-  if (latticeSettingsPane() != nullptr)
-    stacked_settings_panes->addWidget(latticeSettingsPane());
-
-  // list of all categories
-  QListWidget *settings_category_list = new QListWidget(this);
-  settings_category_list->addItem("Application");
-  //settings_category_list->addItem("Interface");
-  //settings_category_list->addItem("Lattice");
+    // add to appropriate lists
+    settings_category_list->addItem(s_map.map_label);
+    stacked_settings_panes->addWidget(s_forms.back());
+  }
 
   connect(settings_category_list, &QListWidget::currentRowChanged,
           stacked_settings_panes, &QStackedWidget::setCurrentIndex);
+
+  // if the settings are always overriden (settings.h DEFAULT_OVERRIDE), then 
+  // disable the settings widgets as a visual cue that the settings won't be 
+  // applied.
+  stacked_settings_panes->setEnabled(!DEFAULT_OVERRIDE);
 
   // horizontal layout for list on the left and settings pane on the right
   QHBoxLayout *settings_hl = new QHBoxLayout;
@@ -88,7 +99,8 @@ void SettingsDialog::initSettingsDialog()
           });
   connect(pb_cancel, &QAbstractButton::clicked,
           this, [this](){
-            pending_changes.clear();
+            // TODO reset form settings to original state
+            resetForms();
             setVisible(false);
           });
 
@@ -98,6 +110,12 @@ void SettingsDialog::initSettingsDialog()
   main_layout->addLayout(bottom_buttons_hl);
 
   setLayout(main_layout);
+}
+
+void SettingsDialog::resetForms()
+{
+  for (gui::PropertyForm *s_form : s_forms)
+    s_form->resetFormValues();
 }
 
 void SettingsDialog::setPropertyWithUserSetting(gui::Property &t_prop) {
@@ -110,40 +128,6 @@ void SettingsDialog::setPropertyWithUserSetting(gui::Property &t_prop) {
   s_val.convert(s_type);
   t_prop.value.setValue(s_val);
 }
-
-gui::PropertyForm *SettingsDialog::appSettingsPane()
-{
-  // return the existing settings pane if available
-  if (app_settings_pane != nullptr)
-    return app_settings_pane;
-
-  // initilize the settings pane from property map
-  gui::PropertyMap app_settings_map(":/settings/general.xml");
-  for (gui::Property &prop : app_settings_map)
-    setPropertyWithUserSetting(prop);
-
-  app_settings_pane = new gui::PropertyForm(app_settings_map);
-  return app_settings_pane;
-}
-
-gui::PropertyForm *SettingsDialog::guiSettingsPane()
-{
-  if (gui_settings_pane != nullptr)
-    return gui_settings_pane;
-
-  // TODO implement
-  return nullptr;
-}
-
-gui::PropertyForm *SettingsDialog::latticeSettingsPane()
-{
-  if (lattice_settings_pane != nullptr)
-    return lattice_settings_pane;
-
-  // TODO implement
-  return nullptr;
-}
-
 
 settings::Settings *SettingsDialog::settingsCategory(const QString &t_cat) 
 {

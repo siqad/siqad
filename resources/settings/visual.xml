@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Doesn't matter what the default values in the fields are, they will be overwritten during runtime-->
+<properties map_label="Visual">
+    <zoom_min>
+        <T>float</T>
+        <val></val>
+        <label>Minimum zoom factor</label>
+        <tip>Farthest zoom extent.</tip>
+        <meta>
+            <category>GUI</category>
+            <key>view/zoom_min</key>
+        </meta>
+    </zoom_min>
+    <zoom_max>
+        <T>float</T>
+        <val></val>
+        <label>Maximum zoom factor</label>
+        <tip>Closest zoom extent.</tip>
+        <meta>
+            <category>GUI</category>
+            <key>view/zoom_max</key>
+        </meta>
+    </zoom_max>
+</properties>

@@ -93,7 +93,8 @@ namespace gui{
 
     //! Construct a new property map identical to the provided one.
     PropertyMap(const PropertyMap &other)
-      : QMap(other), preserve_order(other.preserve_order), xml_path(other.xml_path) {}
+      : QMap(other), map_label(other.map_label), 
+        preserve_order(other.preserve_order), xml_path(other.xml_path) {}
 
     //! Constructor taking in XML file name to load properties from.
     PropertyMap(const QString &fname);
@@ -129,6 +130,9 @@ namespace gui{
     //! Convert value to specified type and return a QVariant containing that
     //! converted value. Give the type_id in terms of QMetaType's enum.
     static QVariant string2Type2QVariant(const QString &val, int type_id);
+
+    //! Property map label (set in XML via map_label attribute).
+    QString map_label;
 
 
   private:

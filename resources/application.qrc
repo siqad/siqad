@@ -24,6 +24,7 @@
     <file>ico/screenshotmode.svg</file>
     <file>ico/scalebaranchortool.svg</file>
     <file>settings/general.xml</file>
+    <file>settings/visual.xml</file>
     <file>help_text.xml</file>
 </qresource>
 </RCC>

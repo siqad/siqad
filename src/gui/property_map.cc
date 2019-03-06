@@ -53,8 +53,10 @@ void PropertyMap::readPropertiesFromXML(const QString &fname)
     preserve_order = true;
 
   // start reading properties
-  if (rs.name() == "properties")
+  if (rs.name() == "properties") {
+    map_label = rs.attributes().value("map_label").toString();
     readPropertiesFromXMLStream(&rs);
+  }
 
   file.close();
   qDebug() << QObject::tr("Finished loading from %1").arg(file.fileName());

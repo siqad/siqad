@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--Doesn't matter what the default values in the fields are, they will be overwritten during runtime-->
-<properties label="General Settings">
+<properties map_label="General">
     <hidpi_mode>
         <T>bool</T>
         <val>0</val>
