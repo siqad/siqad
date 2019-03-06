@@ -47,7 +47,7 @@ namespace gui{
     enum SaveFlag{Save, SaveAs, AutoSave, Simulation};
 
     // constructor
-    explicit ApplicationGUI(QWidget *parent=0);
+    explicit ApplicationGUI(const QString &f_path=QString(), QWidget *parent=0);
 
     // destructor
     ~ApplicationGUI();
@@ -77,15 +77,6 @@ namespace gui{
 
     // parse input field and act accordingly
     void parseInputField();
-
-    void designPanelReset();
-
-    // Start current simulation method
-    // ... it might be worth modifying the work-flow such that instead of running
-    // the simulation method we push the problem onto a working stack to be run
-    // in the background: will need to be able to display results on request
-    // after job finished.
-    void simulationSetup();
 
     // Repeat previous simulation
     void repeatSimulation();
@@ -126,18 +117,21 @@ namespace gui{
     //! Take an svg capture of the design window in the given QRect (scene coord).
     void designScreenshot(const QString &target_img_path, const QRectF &rect, bool always_overwrite);
 
-    // show pop-up dialogs
-    void showSettingsDialog() {settings_dialog->show();}
+    //! Pop-up dialog to resolve unsaved changes (save or discard).
+    bool resolveUnsavedChanges();
 
-    // FILE HANDLING
-    bool resolveUnsavedChanges();       // returns whether to proceed or not
-    void newFile();                     // create a new file
-    bool saveToFile(SaveFlag flag=Save, const QString &path=QString(), prim::SimJob *sim_job=0);   // actual save function
-    void saveDefault();                 // save normally (calls saveToFile)
-    void saveNew();                     // save as a new file (calls saveToFile)
-    void autoSave();                    // perform autosave at specified interval (ms)
-    void openFromFile();                // open a previous save
-    //bool closeFile();                   //! Close the file when quitting the program. Returns false if user cancels the closing.
+    //! Close current design and start new design.
+    void newFile();
+
+    //! Save design to file.
+    bool saveToFile(SaveFlag flag=Save, const QString &path=QString(), prim::SimJob *sim_job=0);
+
+    //! Perform autosave.
+    void autoSave();
+
+    //! Open a previous save. A file chooser dialog would be presented if no 
+    //! file path is given.
+    void openFromFile(const QString &f_path=QString());
 
     // Export to Labview
     bool exportToLabview();
@@ -148,7 +142,13 @@ namespace gui{
   protected:
 
     //! Override the close event to capture window close events.
-    void closeEvent(QCloseEvent *e);
+    void closeEvent(QCloseEvent *e) Q_DECL_OVERRIDE;
+
+    //! Override the drop enter event to allow opening files through dropping.
+    void dragEnterEvent(QDragEnterEvent *e) Q_DECL_OVERRIDE;
+
+    //! Override the drop event to allow opening files through dropping.
+    void dropEvent(QDropEvent *e) Q_DECL_OVERRIDE;
 
   private:
 

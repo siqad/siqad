@@ -279,6 +279,8 @@ namespace gui{
     void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
     void keyReleaseEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
 
+    void dragEnterEvent(QDragEnterEvent *e) Q_DECL_OVERRIDE;
+
   private slots:
     void undoAction();
     void redoAction();

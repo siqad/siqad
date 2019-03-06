@@ -3,6 +3,7 @@
     <file>blank_save.xml</file>
    	<file>properties/afmarea.xml</file>
    	<file>properties/electrode.xml</file>
+    <file>ico/siqad.svg</file>
    	<file>ico/select.svg</file>
    	<file>ico/drag.svg</file>
    	<file>ico/dbgen.svg</file>
