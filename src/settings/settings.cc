@@ -90,8 +90,8 @@ void settings::LatticeSettings::updateLattice(const QString &fname)
 QSettings *settings::AppSettings::m_defs()
 {
   qDebug("Loading default application settings...");
-  QString the_path = pathReplacement("<CONFIG>/defaults/app_settings.ini");
-  qDebug() << QObject::tr("app settings path: %1").arg(the_path);
+  QString t_path = pathReplacement("<CONFIG>/defaults/app_settings.ini");
+  qDebug() << QObject::tr("app settings path: %1").arg(t_path);
   QSettings *S = new QSettings(
       pathReplacement("<CONFIG>/defaults/app_settings.ini"),
       QSettings::IniFormat
@@ -104,9 +104,9 @@ QSettings *settings::AppSettings::m_defs()
   S->setValue("log/logdir", QString("<SYSTMP>/log/"));
   S->setValue("log/keepcount", 10);
 
-  S->setValue("view/hidpi_support", false);
+  S->setValue("view/hidpi_support", false);     // Qt HiDPI support
 
-  S->setValue("snap/diameter", 5.); //relative to scale_fact
+  S->setValue("snap/diameter", 5.);             //relative to scale_fact
 
   S->setValue("dir/lattice", QString("<BINPATH>/src/settings/lattices"));
 
@@ -130,10 +130,6 @@ QSettings *settings::AppSettings::m_defs()
     "python"
   }));
 
-
-  S->setValue("phys/debye_length", 50);
-  S->setValue("phys/epsr", 10);
-
   S->setValue("phys/eng_lib_dirs", QStringList({
     "<APPLOCALDATA>/phys/",
     "<BINPATH>/src/phys/"
@@ -143,8 +139,8 @@ QSettings *settings::AppSettings::m_defs()
   S->setValue("phys/eng_usr_cfg_dir", QString("<CONFIG>/phys/"));
   S->setValue("phys/runtime_temp_dir", QString("<SYSTMP>/phys/"));
 
-  S->setValue("float_prc", 6);  // float precision specified in QString::setNum
-  S->setValue("float_fmt", "g");   // float format specified in QString::setNum
+  S->setValue("float_prc", 6);  // float precision specified in QString::setNum; not always obeyed.
+  S->setValue("float_fmt", "g");   // float format specified in QString::setNum; not always obeyed.
 
   S->setValue("save/autosaveroot", QString("<SYSTMP>/autosave/"));
   S->setValue("save/autosavenum", 3);

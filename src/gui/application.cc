@@ -45,13 +45,21 @@ gui::ApplicationGUI::ApplicationGUI(QWidget *parent)
 // destructor
 gui::ApplicationGUI::~ApplicationGUI()
 {
-  // save current settings
-  saveSettings();
+  QStringList settings_remove_paths;
+  if (reset_settings) {
+    // store list of config files to be removed at the end
+    settings::AppSettings *S = settings::AppSettings::instance();
+    settings_remove_paths.append(S->pathReplacement(settings::app_settings_path));
+    settings_remove_paths.append(S->pathReplacement(settings::gui_settings_path));
+    settings_remove_paths.append(S->pathReplacement(settings::lattice_settings_path));
+  } else {
+    saveSettings();
+  }
 
-  // delete dialog panel manually and set pointer to 0. This avoids segfaults from
-  // attempts to echo in dialog panel
+  // delete dialog panel manually. This avoids segfaults from attempts to echo 
+  // in dialog panel.
   delete dialog_pan;
-  dialog_pan = 0;
+  dialog_pan = nullptr;
 
   // disown the layer dock widget so it can be properly destructed by design panel
   layer_dock->setParent(0);
@@ -64,6 +72,12 @@ gui::ApplicationGUI::~ApplicationGUI()
   delete settings::GUISettings::instance();
   delete settings::LatticeSettings::instance();
   delete prim::Emitter::instance();
+
+  // remove config files if marked for removal.
+  for (QString rm_path : settings_remove_paths) {
+    QFile f(rm_path);
+    f.remove();
+  }
 }
 
 
@@ -137,6 +151,8 @@ void gui::ApplicationGUI::initGUI()
   // widget-app gui signals
   connect(sim_manager, &gui::SimManager::sig_simJob,
           this, &gui::ApplicationGUI::runSimulation);
+  connect(settings_dialog, &settings::SettingsDialog::sig_resetSettings,
+          [this](){reset_settings = true;});
   connect(design_pan, &gui::DesignPanel::sig_resetDesignPanel,
           this, &gui::ApplicationGUI::designPanelReset);
   connect(design_pan, &gui::DesignPanel::sig_setLayerManagerWidget,

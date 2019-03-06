@@ -7,6 +7,7 @@
 // @desc:     Settings dialog for users to alter settings
 
 #include <algorithm>
+#include <QMessageBox>
 
 #include "settings_dialog.h"
 #include "../global.h"
@@ -72,7 +73,7 @@ void SettingsDialog::initSettingsDialog()
   // if the settings are always overriden (settings.h DEFAULT_OVERRIDE), then 
   // disable the settings widgets as a visual cue that the settings won't be 
   // applied.
-  stacked_settings_panes->setEnabled(!DEFAULT_OVERRIDE);
+  stacked_settings_panes->setDisabled(DEFAULT_OVERRIDE);
 
   // horizontal layout for list on the left and settings pane on the right
   QHBoxLayout *settings_hl = new QHBoxLayout;
@@ -83,25 +84,38 @@ void SettingsDialog::initSettingsDialog()
   QPushButton *pb_apply = new QPushButton("Apply");
   QPushButton *pb_apply_and_close = new QPushButton("OK");
   QPushButton *pb_cancel = new QPushButton("Cancel");
+  QPushButton *pb_reset = new QPushButton("Reset");
 
   QHBoxLayout *bottom_buttons_hl = new QHBoxLayout;
   bottom_buttons_hl->addStretch();
   bottom_buttons_hl->addWidget(pb_apply);
   bottom_buttons_hl->addWidget(pb_apply_and_close);
   bottom_buttons_hl->addWidget(pb_cancel);
+  bottom_buttons_hl->addWidget(pb_reset);
 
   connect(pb_apply, &QAbstractButton::clicked,
           this, &SettingsDialog::applyPendingChanges);
   connect(pb_apply_and_close, &QAbstractButton::clicked,
-          this, [this](){
+          [this](){
             applyPendingChanges();
             setVisible(false);
           });
   connect(pb_cancel, &QAbstractButton::clicked,
-          this, [this](){
+          [this](){
             // TODO reset form settings to original state
             resetForms();
             setVisible(false);
+          });
+  connect(pb_reset, &QAbstractButton::clicked,
+          [this](){
+            QMessageBox msg_reset;
+            msg_reset.setText("Reset all settings?");
+            msg_reset.setInformativeText("Are you sure you want to reset all \
+              settings? This will take effect after restarting the application.");
+            msg_reset.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            if (msg_reset.exec()) {
+              emit sig_resetSettings();
+            }
           });
 
   // main layout

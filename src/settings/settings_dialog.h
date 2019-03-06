@@ -41,6 +41,11 @@ namespace settings{
       QVariant value;
     };
 
+  signals:
+
+    //! Signal application.cc to reset all settings at application destruction.
+    void sig_resetSettings();
+
   public slots:
 
     //! Apply changes made in the settings forms.
@@ -71,14 +76,6 @@ namespace settings{
 
     //! List of pointers to property forms of settings
     QList<gui::PropertyForm*> s_forms;
-
-    /*
-    gui::PropertyForm *app_settings_pane=nullptr;
-    gui::PropertyForm *gui_settings_pane=nullptr;
-    gui::PropertyForm *lattice_settings_pane=nullptr;
-
-    QList<PendingChange> pending_changes;
-    */
   };
 
 } // end of settings namespace

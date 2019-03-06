@@ -242,6 +242,8 @@ namespace gui{
     QString working_path;      // path currently in use
     Commander* commander;      // Handles commands
 
+    bool reset_settings=false; // reset all settings at destruction
+
   };
 
 } // end gui namespace
