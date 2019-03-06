@@ -6,8 +6,8 @@ Controller.prototype.IntroductionPageCallback = function()
 {
     var widget = gui.currentPageWidget(); // get the current wizard page
     if (widget != null) {
-        widget.title = "SiQAD Installer"; // set the page title
-        widget.MessageLabel.setText("Welcome to the installer. Please follow the prompts to install the simulator and the dependencies."); // set the welcome text
+        widget.title = "SiQAD Installer";
+        widget.MessageLabel.setText("Welcome to the SiQAD (Silicon Quantum Atomic Designer) installer. Please follow the prompts to install the CAD tool and simulators.");
     }
 }
 
