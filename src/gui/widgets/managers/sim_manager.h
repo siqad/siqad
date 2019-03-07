@@ -14,9 +14,9 @@
 #include <QDialog>
 #include <QShortcut>
 
-#include "property_form.h"
-#include "primitives/sim_engine.h"
-#include "primitives/sim_job.h"
+#include "../property_form.h"
+#include "../primitives/sim_engine.h"
+#include "../primitives/sim_job.h"
 
 namespace gui{
 

@@ -20,10 +20,10 @@
 #include "../../global.h"
 
 #include "afm_panel.h"
-#include "layer_manager.h"
 #include "property_editor.h"
-#include "item_manager.h"
-#include "screenshot_manager.h"
+#include "managers/layer_manager.h"
+#include "managers/item_manager.h"
+#include "managers/screenshot_manager.h"
 
 #include "primitives/layer.h"
 #include "primitives/lattice.h"

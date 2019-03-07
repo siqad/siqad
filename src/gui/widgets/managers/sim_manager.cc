@@ -8,7 +8,7 @@
 //            as well as manage ongoing or completed simulations.
 
 #include "sim_manager.h"
-#include "../../global.h"
+#include "../../../global.h"
 
 
 namespace gui{

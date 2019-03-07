@@ -139,15 +139,13 @@ void gui::ApplicationGUI::initGUI()
 
   // initialise mainwindow panels
   dialog_pan = new gui::DialogPanel(this); // init first to capture std output
-  design_pan = new gui::DesignPanel(this);
   input_field = new gui::InputField(this);
+  design_pan = new gui::DesignPanel(this);
   info_pan = new gui::InfoPanel(this);
 
   // detachable/pop-up widgets, order matters in some cases due to pointers
   sim_manager = new gui::SimManager(this);
   sim_visualize = new gui::SimVisualize(sim_manager, this);
-
-  // individual pop-up widgets
   settings_dialog = new settings::SettingsDialog(this);
 
   // initialise docks

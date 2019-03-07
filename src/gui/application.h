@@ -24,8 +24,8 @@
 #include "widgets/dialog_panel.h"
 #include "widgets/input_field.h"
 #include "widgets/info_panel.h"
-#include "widgets/sim_manager.h"
 #include "widgets/sim_visualize_panel.h"
+#include "widgets/managers/sim_manager.h"
 #include "widgets/primitives/sim_job.h" // TODO move these stuff to SimManager later
 #include "commander.h"
 

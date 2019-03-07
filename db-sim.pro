@@ -130,14 +130,14 @@ HEADERS += \
    	src/gui/widgets/dialog_panel.h \
    	src/gui/widgets/input_field.h \
    	src/gui/widgets/info_panel.h \
-    src/gui/widgets/layer_manager.h \
-    src/gui/widgets/sim_manager.h \
     src/gui/widgets/sim_visualize_panel.h \
     src/gui/widgets/afm_panel.h \
   	src/gui/commander.h \
   	src/gui/widgets/completer.h \
-  	src/gui/widgets/item_manager.h \
-    src/gui/widgets/screenshot_manager.h
+  	src/gui/widgets/managers/item_manager.h \
+    src/gui/widgets/managers/layer_manager.h \
+    src/gui/widgets/managers/sim_manager.h \
+    src/gui/widgets/managers/screenshot_manager.h
 
 
 
@@ -150,14 +150,14 @@ SOURCES += \
    	src/gui/widgets/dialog_panel.cc \
    	src/gui/widgets/input_field.cc \
    	src/gui/widgets/info_panel.cc \
-    src/gui/widgets/layer_manager.cc \
-    src/gui/widgets/sim_manager.cc \
     src/gui/widgets/sim_visualize_panel.cc \
    	src/gui/widgets/afm_panel.cc \
    	src/gui/commander.cc \
    	src/gui/widgets/completer.cc \
-   	src/gui/widgets/item_manager.cc \
-    src/gui/widgets/screenshot_manager.cc
+   	src/gui/widgets/managers/item_manager.cc \
+    src/gui/widgets/managers/layer_manager.cc \
+    src/gui/widgets/managers/sim_manager.cc \
+    src/gui/widgets/managers/screenshot_manager.cc
 
 
 
