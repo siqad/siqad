@@ -7,3 +7,6 @@
 [submodule "src/phys/simanneal"]
 	path = src/phys/simanneal
 	url = https://github.com/samuelngsh/simanneal-sidb.git
+[submodule "src/phys/qpuanneal"]
+	path = src/phys/qpuanneal
+	url = https://github.com/samuelngsh/qpuanneal-sidb
