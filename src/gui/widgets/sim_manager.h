@@ -104,11 +104,6 @@ private:
   QVBoxLayout *sim_params_vl;
   QLineEdit *le_job_nm;
 
-  // PoisSolver
-  /*QLabel *label_xml_path;
-  QLineEdit *le_xml_path;
-  QPushButton *button_xml_find;*/
-
   // button group
   QHBoxLayout *bottom_buttons_hl;
   QVBoxLayout *new_setup_dialog_l;
