@@ -32,11 +32,6 @@ namespace gui{
     //! Write QString s into the QPlainTextEdit widget
     void echo(const QString& s);
 
-  protected:
-
-    // interrupts
-    void mousePressEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
-
   private:
 
     //! Purge oldest log files if log file count > log/keepcount.

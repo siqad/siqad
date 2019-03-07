@@ -11,7 +11,7 @@
 
 #include <QtWidgets>
 
-#include "primitives/items.h"
+#include "../primitives/items.h"
 #include "layer_manager.h"
 
 namespace gui{

@@ -21,6 +21,8 @@ gui::DialogPanel::DialogPanel(QWidget *parent)
 
   setReadOnly(true);
   setLineWrapMode(QPlainTextEdit::WidgetWidth);
+  setTextInteractionFlags(textInteractionFlags() 
+                          | Qt::TextSelectableByKeyboard);
 
   // show message if this dialog isn't set to capture debug outputs
   if (!app_settings->get<bool>("log/override")) {
@@ -113,7 +115,3 @@ void gui::DialogPanel::purgeOldLogs()
     closed_logs.removeAt(0);
   }
 }
-
-
-void gui::DialogPanel::mousePressEvent(QMouseEvent *)
-{}

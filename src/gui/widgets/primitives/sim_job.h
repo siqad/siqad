@@ -26,7 +26,36 @@ namespace prim{
   {
     Q_OBJECT
   public:
-    //! constructor
+
+    struct JobStep
+    {
+      JobStep() {};
+      JobStep(SimEngine *t_engine) : engine(t_engine) {};
+      JobStep(SimEngine *t_engine, QStringList t_command_format, 
+              QMap<QString, QString> t_sim_params)
+        : engine(t_engine), command_format(t_command_format), 
+          sim_params(t_sim_params) {};
+      JobStep(SimEngine *t_engine, QStringList t_command_format, 
+              gui::PropertyMap t_sim_prop_map)
+        : engine(t_engine), command_format(t_command_format) 
+      {
+        for (const QString &key : t_sim_prop_map.keys())
+          sim_params.insert(key, t_sim_prop_map.value(key).value.toString());
+      };
+
+      bool isEmpty()
+      {
+        if (engine == nullptr && command_format.isEmpty() && sim_params.isEmpty())
+          return true;
+        return false;
+      }
+
+      SimEngine *engine=nullptr;
+      QStringList command_format;
+      QMap<QString, QString> sim_params;
+    };
+
+    //! Constructor expecting no or one engine.
     SimJob(const QString &nm, SimEngine *eng=0, QWidget *parent=0);
 
     //! destructor
@@ -34,28 +63,16 @@ namespace prim{
 
     // JOB SETUP
 
-    // TODO emit signal from SimJob to save job, instead of letting design panel call
-    // invoke binary.
-    // bool saveJob(const QString &);
+    //! Append a job step.
+    void addJobStep(JobStep js) {job_steps.append(js);}
 
+    //! Return the job step at the specified index.
+    JobStep getJobStep(int i) {return job_steps.at(i);}
 
-    // load job from XML (for jobs that keep running even if parent terminates)
-    // TODO sim_manager probably needs to check folders for unfinished simulations
-    bool loadJob(const QString &) {return false;}
+    //! Return a pointer to the list of all job steps.
+    QList<JobStep> *jobSteps() {return &job_steps;}
 
     // simulation parameters
-
-    //! Returns a list key-value pairs representing simulation parameters.
-    QList<QPair<QString, QString>> simParams() const {return sim_params;}
-
-    //! Appends two strings to the list of simulation parametres as a key-value pair
-    void addSimParam(const QString &field, const QString &value) {sim_params.append(qMakePair(field, value));}
-
-    //! Appends a list of key-value pairs to the list of simulation parameters
-    void addSimParams(const QList<QPair<QString, QString>> &add_params) {sim_params.append(add_params);}
-
-    //! Appends all entries in the provided PropertyMap to the list of simulation parameters
-    void addSimParams(const gui::PropertyMap &sim_param_map);
 
 
     // JOB EXECUTION
@@ -119,15 +136,12 @@ namespace prim{
     //! job name
     QString name() {return job_name;}
 
-    //! engine setter
-    void setEngine(SimEngine *eng) {engine = eng;}
     //prim::SimEngine *engine() {return engine;}
     //! getter for engine name
-    QString engineName() {return engine ? engine->name() : "Undefined";}
 
-    QString runtimeTempDir();     //!< runtime job directory
-    QString problemFile();        //!< runtime problem file
-    QString resultFile();         //!< runtime result file
+    QString runtimeTempPath();            //!< runtime job directory (all job steps share the same dir)
+    QString problemFilePath(int i);       //!< runtime problem file for the i th job step
+    QString resultFilePath(int i);        //!< runtime result file for the i th job step
 
     QDateTime startTime() {return start_time;}
     QDateTime endTime() {return end_time;}
@@ -150,27 +164,24 @@ namespace prim{
     QList<float> elec_dists_avg;          //! the average charge across all dots
 
     QList<LineScanPath> line_scan_paths;  //!< line scan path props and results
+
   private:
 
     void deduplicateDist();           // deduplicate charge distribution results
 
     // variables
+    // TODO make some sort of struct that stores the engine, command and simparams for each engine instead of going where this is currently going
+    QList<JobStep> job_steps; // list of steps in this simulation job, each step invokes one simulation
     QString job_name;         // job name for identification
-    SimEngine *engine;        // the engine used by this job
-    QString run_job_dir;      // job directory for storing runtime data
-    QString problem_path;     // path to problem file
-    QString result_path;      // path to result file
+    QString job_tmp_dir_path; // job directory for storing runtime data
     QString terminal_output;  // terminal output from the job
     QDateTime start_time, end_time; // start and end times of the job
     QProcess *sim_process;    // runtime process of the job
     QStringList cml_arguments;// command line arguments when invoking the job
-    bool completed;           // whether the job has completed simulation
+    bool completed=false;     // whether the job has completed simulation
 
     // read xml
     QStringList ignored_xml_elements; // XML elements to ignore when reading results
-
-    // parameters
-    QList<QPair<QString, QString>> sim_params;
 
     // results
     // TODO flag storing what types of results are available
