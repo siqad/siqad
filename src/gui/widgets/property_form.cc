@@ -8,6 +8,7 @@
 //            users to edit.
 
 #include "property_form.h"
+#include "src/settings/settings.h"
 
 namespace gui{
 
@@ -15,7 +16,9 @@ namespace gui{
 PropertyForm::PropertyForm(PropertyMap t_map, QWidget *parent)
   : QWidget(parent), orig_map(t_map)
 {
+  prop_fl = new QFormLayout;
   initForm();
+  setLayout(prop_fl);
 }
 
 
@@ -46,6 +49,17 @@ PropertyMap PropertyForm::changedProperties()
 }
 
 
+void PropertyForm::resetFormValues()
+{
+  // delete existing form entries
+  if (prop_fl != nullptr)
+    while (!prop_fl->isEmpty())
+      prop_fl->removeRow(0);
+
+  initForm();
+}
+
+
 QVariant PropertyForm::formValue(const QString &key)
 {
   QVariant new_val;
@@ -59,6 +73,9 @@ QVariant PropertyForm::formValue(const QString &key)
     case LineEdit:
     {
       QLineEdit *prop_field = QObject::findChild<QLineEdit*>(key);
+      if (!prop_field) {
+        qWarning() << tr("Cannot find property field with key %1").arg(key);
+      }
       new_val = PropertyMap::string2Type2QVariant(prop_field->text(),
                                                   orig_map[key].value.type());
       break;
@@ -74,12 +91,10 @@ void PropertyForm::initForm()
 {
   setWindowTitle("Property Editor");
 
-  // populate a form with the desired number of null widgets first
-  QFormLayout *prop_fl = new QFormLayout;
-  for (int i=0; i<orig_map.size(); i++)
-    prop_fl->addRow(new QWidget, new QWidget);
+  // make a map with the sort index as the key
+  QMap<int, QPair<QWidget*, QWidget*>> form_map;
 
-  // generate form from map
+  // generate form from property map
   PropertyMap::const_iterator it;
   for (it = orig_map.cbegin(); it != orig_map.cend(); ++it) {
     Property prop = it.value();
@@ -102,8 +117,15 @@ void PropertyForm::initForm()
         break;
       }
       case LineEdit:
-        prop_val_widget = new QLineEdit(prop.value.value<QString>());
+      {
+        if (prop.dp != -1 && static_cast<QMetaType::Type>(prop.value.type()) == QMetaType::Float) {
+          prop_val_widget = new QLineEdit(QString::number(prop.value.value<float>(), 'f', prop.dp));
+        } else {
+          prop_val_widget = new QLineEdit(prop.value.value<QString>());
+        }
+        prop_val_widget->setMinimumWidth(settings::GUISettings::instance()->get<int>("SIMMAN/mw"));
         break;
+      }
       case CheckBox:
         prop_val_widget = new QCheckBox();
         static_cast<QCheckBox*>(prop_val_widget)->setChecked(prop.value.toBool());
@@ -116,12 +138,12 @@ void PropertyForm::initForm()
     prop_val_widget->setObjectName(it.key());
     prop_val_widget->setToolTip(prop.form_tip);
 
-    // delete the null widget at the target row and insert the new row
-    prop_fl->removeRow(prop.index);
-    prop_fl->insertRow(prop.index, label_prop, prop_val_widget);
+    form_map.insert(prop.index, qMakePair(label_prop, prop_val_widget));
   }
 
-  setLayout(prop_fl);
+  // populate the form layout with contents from the form map
+  for (auto it = form_map.begin(); it != form_map.end(); it++)
+    prop_fl->addRow(it.value().first, it.value().second);
 }
 
 

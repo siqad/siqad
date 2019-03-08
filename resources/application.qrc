@@ -3,6 +3,7 @@
     <file>blank_save.xml</file>
    	<file>properties/afmarea.xml</file>
    	<file>properties/electrode.xml</file>
+    <file>ico/siqad.svg</file>
    	<file>ico/select.svg</file>
    	<file>ico/drag.svg</file>
    	<file>ico/dbgen.svg</file>
@@ -24,6 +25,7 @@
     <file>ico/screenshotmode.svg</file>
     <file>ico/scalebaranchortool.svg</file>
     <file>settings/general.xml</file>
+    <file>settings/visual.xml</file>
     <file>help_text.xml</file>
 </qresource>
 </RCC>

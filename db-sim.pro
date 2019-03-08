@@ -34,8 +34,8 @@ QMAKE_TARGET_DESCRIPTION = "Silicon Quantum Atomic Designer"
 QMAKE_TARGET_COPYRIGHT = "GPLv3"
 
 RESOURCES = resources/application.qrc
-win32:RC_ICONS = resources/ico/app.ico
-macx:ICON = resources/ico/app.icns
+win32:RC_ICONS = resources/ico/siqad.ico
+# macx:ICON = resources/ico/siqad.icns
 
 
 #################################

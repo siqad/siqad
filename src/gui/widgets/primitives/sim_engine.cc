@@ -9,14 +9,11 @@
 #include "sim_engine.h"
 #include <QUiLoader>
 
-namespace prim{
-
+using namespace prim;
 
 SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
-  : QObject(parent)
+  : QObject(parent), eng_desc_path(eng_desc_path)
 {
-  eng_desc_file = eng_desc_path;
-
   QFile eng_f(eng_desc_path);
   QFileInfo file_info(eng_desc_path);
   QString eng_rt = file_info.absolutePath();
@@ -32,45 +29,38 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
   qDebug() << tr("Reading engine file from %1").arg(eng_f.fileName());
 
   QString read_eng_nm, read_eng_ver;
-  QString read_interpreter, read_bin_path, read_linked_script_path;
-  while (!rs.atEnd()) {
-    if (rs.isStartElement()) {
-      if (rs.name() == "physeng") {
-        while (!(rs.isEndElement() && rs.name() == "physeng")) {
-          if (!rs.readNextStartElement())
-            continue; // skip until a start element is encountered
+  QString read_interpreter, read_bin_path;
 
-          if (rs.name() == "name") {
-            eng_nm = rs.readElementText();
-          } else if (rs.name() == "version") {
-            setVersion(rs.readElementText());
-          } else if (rs.name() == "bin_path") {
-            setBinaryPath(eng_dir.absoluteFilePath(rs.readElementText()));
-          } else if (rs.name() == "interpreter") {
-            setRuntimeInterpreter(rs.readElementText());
-          } else if (rs.name() == "linked_script_path") {
-            setLinkedScriptPath(eng_dir.absoluteFilePath(rs.readElementText()));
-          } else if (rs.name() == "gui_dialog_path") {
-            setParamDialogPath(eng_dir.absoluteFilePath(rs.readElementText()));
-          } else if (rs.name() == "sim_params") {
-            sim_params_map.readPropertiesFromXMLStream(&rs);
-          }
-        } // end of physeng
-        rs.readNext();
-      } else {
-        qDebug() << tr("SimEngine: invalid element encountered on line %1 - %2").arg(rs.lineNumber()).arg(rs.name().toString());
-      }
+  // enter the root node
+  rs.readNextStartElement();
+
+  while (rs.readNextStartElement()) {
+    // recognized XML elements
+    if (rs.name() == "name") {
+      eng_nm = rs.readElementText();
+    } else if (rs.name() == "version") {
+      setVersion(rs.readElementText());
+    } else if (rs.name() == "bin_path") {
+      setBinaryPath(eng_dir.absoluteFilePath(rs.readElementText()));
+    } else if (rs.name() == "dep_path") {
+      setDependenciesPath(eng_dir.absoluteFilePath(rs.readElementText()));
+    } else if (rs.name() == "interpreter") {
+      setRuntimeInterpreter(rs.readElementText());
+    } else if (rs.name() == "sim_params") {
+      sim_params_map.readPropertiesFromXMLStream(&rs);
     } else {
-      rs.readNext();
+      qDebug() << tr("SimEngine: invalid element encountered on line %1 - %2").arg(rs.lineNumber()).arg(rs.name().toString());
+      rs.skipCurrentElement();
     }
   }
+
   eng_f.close();
 
   // store user engine settings path in case of need
   QString usr_cfg_dir_path = settings::AppSettings::instance()->getPath("phys/eng_usr_cfg_dir");
   usr_cfg_dir_path += file_info.dir().dirName();
   QDir usr_cfg_dir(usr_cfg_dir_path);
-  eng_usr_cfg_file = usr_cfg_dir.absoluteFilePath(file_info.fileName());
+  eng_usr_cfg_path = usr_cfg_dir.absoluteFilePath(file_info.fileName());
 
   initSimEngine(eng_nm, eng_rt);
 }
@@ -81,12 +71,6 @@ SimEngine::SimEngine(const QString &eng_nm, const QString &eng_rt, QWidget *pare
   initSimEngine(eng_nm, eng_rt);
 }
 
-void SimEngine::initSimEngine(const QString &eng_nm, const QString &eng_rt)
-{
-  eng_name = eng_nm;
-  eng_root = eng_rt;
-}
-
 QString SimEngine::runtimeTempDir()
 {
   if(runtime_temp_dir.isEmpty()){
@@ -95,5 +79,8 @@ QString SimEngine::runtimeTempDir()
   return runtime_temp_dir;
 }
 
-
-} // end of prim namespace
+void SimEngine::initSimEngine(const QString &eng_nm, const QString &eng_rt)
+{
+  eng_name = eng_nm;
+  eng_root = eng_rt;
+}

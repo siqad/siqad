@@ -26,7 +26,7 @@ gui::DialogPanel *gui::ApplicationGUI::dialog_pan = 0;
 
 
 // constructor
-gui::ApplicationGUI::ApplicationGUI(QWidget *parent)
+gui::ApplicationGUI::ApplicationGUI(const QString &f_path, QWidget *parent)
   : QMainWindow(parent)
 {
   // save start time for instance recognition
@@ -40,18 +40,31 @@ gui::ApplicationGUI::ApplicationGUI(QWidget *parent)
 
   // load settings, resize mainwindow
   loadSettings();
+
+  // load the specified file
+  if (!f_path.isEmpty() && QFile(f_path).exists()) {
+    openFromFile(f_path);
+  }
 }
 
 // destructor
 gui::ApplicationGUI::~ApplicationGUI()
 {
-  // save current settings
-  saveSettings();
+  QStringList settings_remove_paths;
+  if (reset_settings) {
+    // store list of config files to be removed at the end
+    settings::AppSettings *S = settings::AppSettings::instance();
+    settings_remove_paths.append(S->pathReplacement(settings::app_settings_path));
+    settings_remove_paths.append(S->pathReplacement(settings::gui_settings_path));
+    settings_remove_paths.append(S->pathReplacement(settings::lattice_settings_path));
+  } else {
+    saveSettings();
+  }
 
-  // delete dialog panel manually and set pointer to 0. This avoids segfaults from
-  // attempts to echo in dialog panel
+  // delete dialog panel manually. This avoids segfaults from attempts to echo 
+  // in dialog panel.
   delete dialog_pan;
-  dialog_pan = 0;
+  dialog_pan = nullptr;
 
   // disown the layer dock widget so it can be properly destructed by design panel
   layer_dock->setParent(0);
@@ -64,6 +77,12 @@ gui::ApplicationGUI::~ApplicationGUI()
   delete settings::GUISettings::instance();
   delete settings::LatticeSettings::instance();
   delete prim::Emitter::instance();
+
+  // remove config files if marked for removal.
+  for (QString rm_path : settings_remove_paths) {
+    QFile f(rm_path);
+    f.remove();
+  }
 }
 
 
@@ -84,11 +103,40 @@ void gui::ApplicationGUI::closeEvent(QCloseEvent *e)
   e->accept();
 }
 
+void gui::ApplicationGUI::dragEnterEvent(QDragEnterEvent *e)
+{
+  if (e->mimeData()->hasUrls())
+    e->acceptProposedAction();
+}
+
+void gui::ApplicationGUI::dropEvent(QDropEvent *e)
+{
+  const QMimeData *mime_data = e->mimeData();
+
+  QList<QUrl> url_list = mime_data->urls();
+  if (url_list.length() == 1) {
+    QString f_path = url_list.at(0).toLocalFile();
+    if (f_path.right(4) == ".sqd")
+      openFromFile(f_path);
+    else
+      qWarning() << tr("Only accept dropping of *.sqd files. Your attempted path was %1.").arg(f_path);
+  } else {
+    qWarning() << tr("Drop event only supports opening exactly 1 file, %1 \
+        received instead.").arg(url_list.length());
+  }
+}
+
 
 // GUI INITIALISATION
 
 void gui::ApplicationGUI::initGUI()
 {
+  // Qt GUI flags
+  setAcceptDrops(true);
+
+  // Initialize GUI icon
+  setWindowIcon(QIcon(":/ico/siqad.svg"));
+
   // initialise mainwindow panels
   dialog_pan = new gui::DialogPanel(this); // init first to capture std output
   design_pan = new gui::DesignPanel(this);
@@ -137,8 +185,10 @@ void gui::ApplicationGUI::initGUI()
   // widget-app gui signals
   connect(sim_manager, &gui::SimManager::sig_simJob,
           this, &gui::ApplicationGUI::runSimulation);
+  connect(settings_dialog, &settings::SettingsDialog::sig_resetSettings,
+          [this](){reset_settings = true;});
   connect(design_pan, &gui::DesignPanel::sig_resetDesignPanel,
-          this, &gui::ApplicationGUI::designPanelReset);
+          [this](){initState();});
   connect(design_pan, &gui::DesignPanel::sig_setLayerManagerWidget,
           this, &gui::ApplicationGUI::setLayerManagerWidget);
   connect(design_pan, &gui::DesignPanel::sig_setItemManagerWidget,
@@ -148,7 +198,7 @@ void gui::ApplicationGUI::initGUI()
   connect(design_pan, &gui::DesignPanel::sig_screenshot,
           this, QOverload<const QString&, const QRectF&, bool>::of(&gui::ApplicationGUI::designScreenshot));
   connect(design_pan, &gui::DesignPanel::sig_showSimulationSetup,
-          this, &gui::ApplicationGUI::simulationSetup);
+          [this](){sim_manager->showSimSetupDialog();});
   connect(design_pan, &gui::DesignPanel::sig_cancelScreenshot,
           this, &gui::ApplicationGUI::endScreenshotMode);
 
@@ -245,16 +295,26 @@ void gui::ApplicationGUI::initMenuBar()
 
   connect(new_file, &QAction::triggered, this, &gui::ApplicationGUI::newFile);
   connect(quit, &QAction::triggered, this, &QWidget::close);
-  connect(save, &QAction::triggered, this, &gui::ApplicationGUI::saveDefault);
-  connect(save_as, &QAction::triggered, this, &gui::ApplicationGUI::saveNew);
-  connect(open_save, &QAction::triggered, this, &gui::ApplicationGUI::openFromFile);
+  connect(save, &QAction::triggered,
+      [this](){
+        if (saveToFile(Save))
+          design_pan->stateSet();
+      });
+  connect(save_as, &QAction::triggered, 
+      [this](){
+        if (saveToFile(SaveAs))
+          design_pan->stateSet();
+      });
+  connect(open_save, &QAction::triggered, 
+      [this](){openFromFile();});
   connect(export_lvm, &QAction::triggered, this, &gui::ApplicationGUI::exportToLabview);
   connect(rotate_view_cw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCw);
   connect(rotate_view_ccw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCcw);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(window_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
-  connect(action_settings_dialog, &QAction::triggered, this, &gui::ApplicationGUI::showSettingsDialog);
+  connect(action_settings_dialog, &QAction::triggered, 
+      [this](){settings_dialog->show();});
   connect(about_version, &QAction::triggered, this, &gui::ApplicationGUI::aboutVersion);
 
 }
@@ -284,7 +344,7 @@ void gui::ApplicationGUI::initTopBar()
   action_run_sim = new QAction(QIcon(":/ico/runsim.svg"), tr("Run Simulation..."));
   action_run_sim->setShortcut(tr("CTRL+R"));
   connect(action_run_sim, &QAction::triggered,
-          this, &gui::ApplicationGUI::simulationSetup);
+          [this](){sim_manager->showSimSetupDialog();});
 
   action_repeat_sim = new QAction(tr("Repeat Previous Simulation"), this);
   action_repeat_sim->setShortcut(tr("CTRL+SHIFT+R"));
@@ -614,7 +674,7 @@ void gui::ApplicationGUI::loadSettings()
     if(autosave_dir.mkpath("."))
       qDebug() << tr("Successfully created autosave directory");
     else
-      qCritical() << tr("Failed to create autosave direcrory");
+      qCritical() << tr("Failed to create autosave directory");
   }
 
   // auto save signal
@@ -635,8 +695,6 @@ void gui::ApplicationGUI::saveSettings()
   // remove autosave during peaceful termination
   for(const QString &dirFile : autosave_dir.entryList())
     autosave_dir.remove(dirFile); // remove autosave files
-
-  qDebug() << tr("Test: %1").arg(autosave_dir.absolutePath());
 
   if(autosave_dir.removeRecursively())
     qDebug() << tr("Removed autosave directory: %1").arg(autosave_dir.path());
@@ -793,16 +851,6 @@ void gui::ApplicationGUI::parseInputField()
   if(!input.isEmpty()){
     commander->parseInputs(input);
   }
-}
-
-void gui::ApplicationGUI::designPanelReset()
-{
-  initState();
-}
-
-void gui::ApplicationGUI::simulationSetup()
-{
-  sim_manager->showSimSetupDialog();
 }
 
 void gui::ApplicationGUI::repeatSimulation()
@@ -1095,40 +1143,40 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   }
 
   // WRITE TO XML
-  QXmlStreamWriter stream(&file);
+  QXmlStreamWriter ws(&file);
   qDebug() << tr("Save: Beginning write to %1").arg(file.fileName());
-  stream.setAutoFormatting(true);
-  stream.writeStartDocument();
+  ws.setAutoFormatting(true);
+  ws.writeStartDocument();
 
   // call the save functions for each relevant class
-  stream.writeStartElement("siqad");
+  ws.writeStartElement("siqad");
 
   // save program flags
-  stream.writeComment("Program Flags");
-  stream.writeStartElement("program");
+  ws.writeComment("Program Flags");
+  ws.writeStartElement("program");
 
   QString file_purpose = flag==Simulation ? "simulation" : "save";
-  stream.writeTextElement("file_purpose", file_purpose);
-  stream.writeTextElement("version", "TBD");
-  stream.writeTextElement("date", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+  ws.writeTextElement("file_purpose", file_purpose);
+  ws.writeTextElement("version", "TBD");
+  ws.writeTextElement("date", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
 
-  stream.writeEndElement();
+  ws.writeEndElement();
 
   // save simulation parameters
   if(flag == Simulation && sim_job){
-    stream.writeStartElement("sim_params");
+    ws.writeStartElement("sim_params");
     QList<QPair<QString, QString>> sim_params = sim_job->simParams();
     for(auto sim_param_pair : sim_params)
-      stream.writeTextElement(sim_param_pair.first, sim_param_pair.second);
+      ws.writeTextElement(sim_param_pair.first, sim_param_pair.second);
 
-    stream.writeEndElement();
+    ws.writeEndElement();
   }
 
   // save design panel content (including GUI flags, layers and their corresponding contents (electrode, dbs, etc.)
-  design_pan->saveToFile(&stream, flag==Simulation);
+  design_pan->saveToFile(&ws, flag==Simulation);
 
   // close root element & close file
-  stream.writeEndElement();
+  ws.writeEndElement();
   file.close();
 
   // delete the existing file and rename the new one to it
@@ -1145,22 +1193,6 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   }
 
   return true;
-}
-
-
-void gui::ApplicationGUI::saveDefault()
-{
-  // default manual save without forcing file chooser
-  if(saveToFile(Save))
-    design_pan->stateSet();
-}
-
-
-void gui::ApplicationGUI::saveNew()
-{
-  // save to new file path with file chooser
-  if(saveToFile(SaveAs))
-    design_pan->stateSet();
 }
 
 
@@ -1182,42 +1214,48 @@ void gui::ApplicationGUI::autoSave()
 }
 
 
-void gui::ApplicationGUI::openFromFile()
+void gui::ApplicationGUI::openFromFile(const QString &f_path)
 {
   // prompt user to resolve unsaved changes if program has been modified
   if(design_pan->stateChanged())
     if(!resolveUnsavedChanges())
       return;
 
-  // file dialog
-  QFileDialog load_dialog;
-  load_dialog.setDefaultSuffix("qad");
-  QString prompt_path = load_dialog.getOpenFileName(this, tr("Open File"),
-      save_dir.absolutePath(), tr("SQD (*.sqd);;All files (*.*)"));
+  QString open_path;
+  if (!f_path.isEmpty()) {
+    open_path = f_path;
+  } else {
+    QFileDialog load_dialog;
+    load_dialog.setDefaultSuffix("sqd");
+    open_path = load_dialog.getOpenFileName(this, tr("Open File"),
+        save_dir.absolutePath(), tr("SQD (*.sqd);;All files (*.*)"));
+    if(open_path.isEmpty()) {
+      qDebug() << "No file chosen, cancelling file open operation.";
+      return;
+    }
+  }
 
-  if(prompt_path.isEmpty())
-    return;
-
-  working_path = prompt_path;
-  save_dir.setPath(QFileInfo(prompt_path).absolutePath());
-  updateWindowTitle();
-  QFile file(working_path);
+  QFile file(open_path);
 
   if(!file.open(QFile::ReadOnly | QFile::Text)){
     qDebug() << tr("Error when opening file to read: %1").arg(file.errorString());
     return;
   }
 
+  working_path = open_path;
+  save_dir.setPath(QFileInfo(open_path).absolutePath());
+  updateWindowTitle();
+
   // read from XML stream
-  QXmlStreamReader stream(&file);
+  QXmlStreamReader rs(&file);
   qDebug() << tr("Beginning load from %1").arg(file.fileName());
 
   // TODO load program status here instead of from file
   // TODO if save type is simulation, warn the user when opening the file, especially the fact that sim params will not be retained the next time they save
 
   // enter the root node and hand the loading over to design panel
-  stream.readNextStartElement();
-  design_pan->loadFromFile(&stream);
+  rs.readNextStartElement();
+  design_pan->loadFromFile(&rs);
 
   // clean up
   file.close();

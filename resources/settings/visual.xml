@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Doesn't matter what the default values in the fields are, they will be overwritten during runtime-->
+<properties map_label="Visual">
+    <hidpi_mode>
+        <T>bool</T>
+        <val>0</val>
+        <label>Automatic HiDPI mode</label>
+        <tip>Allow Qt to automatically control HiDPI mode. Qt attempts to find the optimal scaling for the monitor in use, the end result might not always look good.</tip>
+        <value_selection type="CheckBox"></value_selection>
+        <meta>
+            <category>App</category>
+            <key>view/hidpi_support</key>
+        </meta>
+    </hidpi_mode>
+    <zoom_min>
+        <T>float</T>
+        <val></val>
+        <dp>5</dp>
+        <label>Minimum zoom factor</label>
+        <tip>Farthest zoom extent.</tip>
+        <meta>
+            <category>GUI</category>
+            <key>view/zoom_min</key>
+        </meta>
+    </zoom_min>
+    <zoom_max>
+        <T>float</T>
+        <val></val>
+        <label>Maximum zoom factor</label>
+        <tip>Closest zoom extent.</tip>
+        <meta>
+            <category>GUI</category>
+            <key>view/zoom_max</key>
+        </meta>
+    </zoom_max>
+</properties>

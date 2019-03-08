@@ -49,27 +49,29 @@ namespace gui{
   //! A struct that stores all information relevant to a property
   struct Property {
     //! Property constructor with all content.
-    Property(int index, const QVariant &val, const QString &f_label,
-             const QString &f_tip, const ValueSelection &v_sel, 
+    Property(int t_index, const QVariant &t_value, const int &t_dp, 
+             const QString &t_form_label, const QString &t_form_tip, 
+             const ValueSelection &t_value_selection, 
              QMap<QString,QString> t_meta)
-      : index(index), value(val), form_label(f_label), form_tip(f_tip),
-        value_selection(v_sel), meta(t_meta) {};
+      : index(t_index), value(t_value), dp(t_dp), form_label(t_form_label), 
+        form_tip(t_form_tip), value_selection(t_value_selection), meta(t_meta) {};
 
     //! Property constructor with unique value and the rest of the values filled
     //! using the provided property map.
-    Property(const QVariant &val, const Property &p)
-      : index(p.index), value(val), form_label(p.form_label), form_tip(p.form_tip),
-        value_selection(p.value_selection), meta(p.meta) {};
+    Property(const QVariant &t_value, const Property &p)
+      : index(p.index), value(t_value), dp(p.dp), form_label(p.form_label), 
+        form_tip(p.form_tip), value_selection(p.value_selection), meta(p.meta) {};
 
     //! Property constructor with only a value.
-    Property(const QVariant &val)
-      : value(val) {};
+    Property(const QVariant &t_value)
+      : value(t_value) {};
 
     //! Construct an empty peroperty.
     Property() {};
 
     int index;          //! Original index when read from file.
     QVariant value;     //! The value stored in this property.
+    int dp;             //! Decimal places to show when appropriate, set to -1 for default C++ behavior.
     QString form_label; //! Descriptive label when showing this in a form.
     QString form_tip;   //! Tooltip when showing this in a form.
     ValueSelection value_selection; //! Value selection method and options.
@@ -91,7 +93,8 @@ namespace gui{
 
     //! Construct a new property map identical to the provided one.
     PropertyMap(const PropertyMap &other)
-      : QMap(other), preserve_order(other.preserve_order), xml_path(other.xml_path) {}
+      : QMap(other), map_label(other.map_label), 
+        preserve_order(other.preserve_order), xml_path(other.xml_path) {}
 
     //! Constructor taking in XML file name to load properties from.
     PropertyMap(const QString &fname);
@@ -127,6 +130,9 @@ namespace gui{
     //! Convert value to specified type and return a QVariant containing that
     //! converted value. Give the type_id in terms of QMetaType's enum.
     static QVariant string2Type2QVariant(const QString &val, int type_id);
+
+    //! Property map label (set in XML via map_label attribute).
+    QString map_label;
 
 
   private:

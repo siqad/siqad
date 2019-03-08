@@ -5,7 +5,7 @@
     <Title>SiQAD Installer</Title>
     <Publisher>Qt-Project</Publisher>
     <!-- Directory name is used in component.xml -->
-   <StartMenuDir>SiQAD</StartMenuDir>
-    <TargetDir>C:/Program Files/SiQAD</TargetDir>
-	<ControlScript>controllScript.qs</ControlScript>
+    <StartMenuDir>SiQAD</StartMenuDir>
+    <TargetDir>@ApplicationsDir@/SiQAD</TargetDir>
+    <ControlScript>controllScript.qs</ControlScript>
 </Installer>

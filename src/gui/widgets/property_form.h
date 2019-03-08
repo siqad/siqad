@@ -38,15 +38,19 @@ namespace gui{
     //! Return a property map containing only the changed properties.
     PropertyMap changedProperties();
 
-  private:
+    //! Reset the property form to the original settings.
+    void resetFormValues();
 
     //! Return the form field content for the specified key value.
     QVariant formValue(const QString &key);
 
+  private:
+
     //! Initialize the form
     void initForm();
 
-    PropertyMap orig_map;  //! the original property map
+    PropertyMap orig_map;           //! The original property map.
+    QFormLayout *prop_fl=nullptr;   //! The form layout holding all children.
   };
 
 } // end of gui namespace

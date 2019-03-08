@@ -62,8 +62,8 @@ bool SimJob::invokeBinary()
       if (splitted_path.size() == 0)
         return false;
 
-      sim_process->setProgram(splitted_path.at(0));
-      cml_arguments << splitted_path.mid(1);
+      sim_process->setProgram(splitted_path.at(0)); // interpreter
+      cml_arguments << splitted_path.mid(1);        // interpreter args
       cml_arguments << engine->binaryPath();
     } else {
       qCritical() << tr("Runtime interpreter %1 not recognized, ceasing binary invocation").arg(engine->runtimeInterpreter());
@@ -77,11 +77,6 @@ bool SimJob::invokeBinary()
   
   cml_arguments << problem_file_info.canonicalFilePath(); // problem file
   cml_arguments << resultFile();                          // result file
-
-  if (!engine->linkedScriptPath().isEmpty()) {
-    // script called by binary, if applicable
-    cml_arguments << engine->linkedScriptPath();
-  }
 
   start_time = QDateTime::currentDateTime();
 

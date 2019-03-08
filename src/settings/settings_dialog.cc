@@ -7,6 +7,7 @@
 // @desc:     Settings dialog for users to alter settings
 
 #include <algorithm>
+#include <QMessageBox>
 
 #include "settings_dialog.h"
 #include "../global.h"
@@ -27,119 +28,52 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 }
 
 
-// public slots
-void SettingsDialog::addPendingBoolUpdate(bool new_state)
-{
-  // TODO put into functions
-  QObject *sender = const_cast<QObject*>(QObject::sender());
-
-  SettingsCategory category;
-  QString name;
-
-  QStringList splitted_name = sender->objectName().split(':');
-  if (splitted_name.at(0) == "app")
-    category = App;
-  else if (splitted_name.at(0) == "gui")
-    category = GUI;
-  else if (splitted_name.at(0) == "lattice")
-    category = Lattice;
-  else
-    qFatal("Specified a settings category that doesn't exist");
-
-  name = splitted_name.at(1);
-
-  pending_changes.append(
-    PendingChange(category, name, QVariant(new_state))
-  );
-
-  /*pending_changes.append(
-    PendingChange(SettingsCategory::App, sender->objectName(),
-        QVariant(new_state))
-  );*/
-  // app_settings->setValue(sender->objectName(), QVariant(new_state));
-  qDebug() << "Changed setting!";
-}
-
-void SettingsDialog::addPendingStringUpdate(QString new_text)
-{
-  // TODO put into functions
-  QObject *sender = const_cast<QObject*>(QObject::sender());
-
-  SettingsCategory category;
-  QString name;
-
-  QStringList splitted_name = sender->objectName().split(':');
-  if (splitted_name.at(0) == "app")
-    category = App;
-  else if (splitted_name.at(0) == "gui")
-    category = GUI;
-  else if (splitted_name.at(0) == "lattice")
-    category = Lattice;
-  else
-    qFatal("Specified a settings category that doesn't exist");
-
-  name = splitted_name.at(1);
-
-  pending_changes.append(PendingChange(category, name, QVariant(new_text)));
-
-  /*pending_changes.append(
-    PendingChange(SettingsCategory::App, sender->objectName(),
-        QVariant(new_state))
-  );*/
-  // app_settings->setValue(sender->objectName(), QVariant(new_state));
-  qDebug() << "Changed setting!";
-}
-
-
 void SettingsDialog::applyPendingChanges()
 {
-  // TODO specific implementation for app settings pane for now, make generic later
-  gui::PropertyMap changed_settings = app_settings_pane->changedProperties();
-
-  for (gui::Property changed_prop : changed_settings) {
-    settings::Settings *s_cat = settingsCategory(changed_prop.meta["category"]);
-    s_cat->setValue(changed_prop.meta["key"], changed_prop.value);
+  for (gui::PropertyForm *s_form : s_forms) {
+    gui::PropertyMap changed_settings = s_form->changedProperties();
+    for (gui::Property changed_prop : changed_settings) {
+      settings::Settings *s_cat = settingsCategory(changed_prop.meta["category"]);
+      s_cat->setValue(changed_prop.meta["key"], changed_prop.value);
+    }
   }
-}
-
-
-void SettingsDialog::applyAndClose()
-{
-  applyPendingChanges();
-  setVisible(false);
-}
-
-
-void SettingsDialog::discardAndClose()
-{
-  pending_changes.clear();
-  setVisible(false);
 }
 
 
 // private
 void SettingsDialog::initSettingsDialog()
 {
-  // all settings panes reside in a stacked widget, only one is shown at a time.
+  QDir s_dir(":/settings/");
+  if (!s_dir.exists()) {
+    qWarning() << "Settings resource directory not found.";
+    return;
+  }
+
+  // construct list of all settings categories and construct the forms
+  QFileInfoList s_f_infos = s_dir.entryInfoList();
+  QListWidget *settings_category_list = new QListWidget(this);
   QStackedWidget *stacked_settings_panes = new QStackedWidget(this);
 
-  if (appSettingsPane() != nullptr)
-    stacked_settings_panes->addWidget(appSettingsPane());
+  for (QFileInfo s_f_info : s_f_infos) {
+    QString s_path = s_f_info.absoluteFilePath();
+    qDebug() << tr("Settings file %1").arg(s_path);
+    gui::PropertyMap s_map(s_path);
+    for (gui::Property &prop : s_map)
+      setPropertyWithUserSetting(prop);
+    s_forms.append(new gui::PropertyForm(s_map));
 
-  if (guiSettingsPane() != nullptr)
-    stacked_settings_panes->addWidget(guiSettingsPane());
+    // add to appropriate lists
+    settings_category_list->addItem(s_map.map_label);
+    stacked_settings_panes->addWidget(s_forms.back());
+  }
 
-  if (latticeSettingsPane() != nullptr)
-    stacked_settings_panes->addWidget(latticeSettingsPane());
+  connect(settings_category_list, &QListWidget::currentRowChanged,
+          stacked_settings_panes, &QStackedWidget::setCurrentIndex);
 
-  // list of all categories
-  QListWidget *settings_category_list = new QListWidget(this);
-  settings_category_list->addItem("Application");
-  //settings_category_list->addItem("Interface");
-  //settings_category_list->addItem("Lattice");
-
-  connect(settings_category_list, SIGNAL(currentRowChanged(int)),
-          stacked_settings_panes, SLOT(setCurrentIndex(int)));
+  // if the settings are always overriden (settings.h DEFAULT_OVERRIDE), then 
+  // disable the settings widgets as a visual cue that the settings won't be 
+  // applied.
+  stacked_settings_panes->setDisabled(DEFAULT_OVERRIDE);
 
   // horizontal layout for list on the left and settings pane on the right
   QHBoxLayout *settings_hl = new QHBoxLayout;
@@ -150,26 +84,52 @@ void SettingsDialog::initSettingsDialog()
   QPushButton *pb_apply = new QPushButton("Apply");
   QPushButton *pb_apply_and_close = new QPushButton("OK");
   QPushButton *pb_cancel = new QPushButton("Cancel");
+  QPushButton *pb_reset = new QPushButton("Reset");
 
   QHBoxLayout *bottom_buttons_hl = new QHBoxLayout;
   bottom_buttons_hl->addStretch();
   bottom_buttons_hl->addWidget(pb_apply);
   bottom_buttons_hl->addWidget(pb_apply_and_close);
   bottom_buttons_hl->addWidget(pb_cancel);
+  bottom_buttons_hl->addWidget(pb_reset);
 
-  connect(pb_apply, SIGNAL(clicked(bool)),
-          this, SLOT(applyPendingChanges()));
-  connect(pb_apply_and_close, SIGNAL(clicked(bool)),
-          this, SLOT(applyAndClose()));
-  connect(pb_cancel, SIGNAL(clicked(bool)),
-          this, SLOT(discardAndClose()));
+  connect(pb_apply, &QAbstractButton::clicked,
+          this, &SettingsDialog::applyPendingChanges);
+  connect(pb_apply_and_close, &QAbstractButton::clicked,
+          [this](){
+            applyPendingChanges();
+            setVisible(false);
+          });
+  connect(pb_cancel, &QAbstractButton::clicked,
+          [this](){
+            // TODO reset form settings to original state
+            resetForms();
+            setVisible(false);
+          });
+  connect(pb_reset, &QAbstractButton::clicked,
+          [this](){
+            QMessageBox msg_reset;
+            msg_reset.setText("Reset all settings?");
+            msg_reset.setInformativeText("Are you sure you want to reset all \
+              settings? This will take effect after restarting the application.");
+            msg_reset.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            if (msg_reset.exec()) {
+              emit sig_resetSettings();
+            }
+          });
 
-  // wrap everything together in a neat layout
+  // main layout
   QVBoxLayout *main_layout = new QVBoxLayout;
   main_layout->addLayout(settings_hl);
   main_layout->addLayout(bottom_buttons_hl);
 
   setLayout(main_layout);
+}
+
+void SettingsDialog::resetForms()
+{
+  for (gui::PropertyForm *s_form : s_forms)
+    s_form->resetFormValues();
 }
 
 void SettingsDialog::setPropertyWithUserSetting(gui::Property &t_prop) {
@@ -182,40 +142,6 @@ void SettingsDialog::setPropertyWithUserSetting(gui::Property &t_prop) {
   s_val.convert(s_type);
   t_prop.value.setValue(s_val);
 }
-
-gui::PropertyForm *SettingsDialog::appSettingsPane()
-{
-  // return the existing settings pane if available
-  if (app_settings_pane != nullptr)
-    return app_settings_pane;
-
-  // initilize the settings pane from property map
-  gui::PropertyMap app_settings_map(":/settings/general.xml");
-  for (gui::Property &prop : app_settings_map)
-    setPropertyWithUserSetting(prop);
-
-  app_settings_pane = new gui::PropertyForm(app_settings_map);
-  return app_settings_pane;
-}
-
-gui::PropertyForm *SettingsDialog::guiSettingsPane()
-{
-  if (gui_settings_pane != nullptr)
-    return gui_settings_pane;
-
-  // TODO implement
-  return nullptr;
-}
-
-gui::PropertyForm *SettingsDialog::latticeSettingsPane()
-{
-  if (lattice_settings_pane != nullptr)
-    return lattice_settings_pane;
-
-  // TODO implement
-  return nullptr;
-}
-
 
 settings::Settings *SettingsDialog::settingsCategory(const QString &t_cat) 
 {

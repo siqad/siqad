@@ -53,8 +53,10 @@ void PropertyMap::readPropertiesFromXML(const QString &fname)
     preserve_order = true;
 
   // start reading properties
-  if (rs.name() == "properties")
+  if (rs.name() == "properties") {
+    map_label = rs.attributes().value("map_label").toString();
     readPropertiesFromXMLStream(&rs);
+  }
 
   file.close();
   qDebug() << QObject::tr("Finished loading from %1").arg(file.fileName());
@@ -102,6 +104,7 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
 
   Property prop;
   prop.index = size();
+  prop.dp = -1;
   int p_type_id=-1;
   QString p_val;
   //qDebug() << QObject::tr("Reading content of property %1").arg(node_name);
@@ -114,6 +117,8 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
     } else if (rs->name() == "val") {
       p_val = rs->readElementText();
       //qDebug() << QObject::tr("%1 val=%2").arg(node_name).arg(p_val);
+    } else if (rs->name() == "dp") {
+      prop.dp = rs->readElementText().toInt();
     } else if (rs->name() == "label") {
       prop.form_label = rs->readElementText();
       //qDebug() << QObject::tr("%1 label=%2").arg(node_name).arg(prop.form_label);

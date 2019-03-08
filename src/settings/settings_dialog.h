@@ -41,31 +41,27 @@ namespace settings{
       QVariant value;
     };
 
-  public slots:
-    void addPendingBoolUpdate(bool new_state);
-    void addPendingStringUpdate(QString new_text);
+  signals:
 
+    //! Signal application.cc to reset all settings at application destruction.
+    void sig_resetSettings();
+
+  public slots:
+
+    //! Apply changes made in the settings forms.
     void applyPendingChanges();
-    void applyAndClose();
-    void discardAndClose();
 
   private:
     //! Initialise the settings dialog and panes of contained categories.
     void initSettingsDialog();
 
+    //! Reset the form value of all forms.
+    void resetForms();
+
     //! Write user setting to the provided property, with the setting entry
     //! specified by the "category" and "key" entries in the property's "meta"
     //! member.
     void setPropertyWithUserSetting(gui::Property &prop);
-
-    //! Return the application settings pane. Initilize the pane if first called.
-    gui::PropertyForm *appSettingsPane();
-
-    //! Return the application settings pane. Initilize the pane if first called.
-    gui::PropertyForm *guiSettingsPane();
-
-    //! Return the application settings pane. Initilize the pane if first called.
-    gui::PropertyForm *latticeSettingsPane();
 
     //! Return the Settings class pointer to the specified category QString.
     settings::Settings *settingsCategory(const QString &t_cat);
@@ -78,11 +74,8 @@ namespace settings{
     GUISettings *gui_settings=nullptr;
     LatticeSettings *lattice_settings=nullptr;
 
-    gui::PropertyForm *app_settings_pane=nullptr;
-    gui::PropertyForm *gui_settings_pane=nullptr;
-    gui::PropertyForm *lattice_settings_pane=nullptr;
-
-    QList<PendingChange> pending_changes;
+    //! List of pointers to property forms of settings
+    QList<gui::PropertyForm*> s_forms;
   };
 
 } // end of settings namespace

@@ -8,6 +8,7 @@
 //            Modify only if you know what you are doing.
 
 #include <QApplication>
+#include <QCommandLineParser>
 #include <QMainWindow>
 #include <QResource>
 #include <QDebug>
@@ -27,19 +28,24 @@ static void messageHandler(QtMsgType type, const QMessageLogContext &context, co
     QByteArray localMsg = msg.toLocal8Bit();
     switch(type){
       case QtDebugMsg:
-        fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), 
+                context.file, context.line, context.function);
         break;
       case QtInfoMsg:
-        fprintf(stderr, "Info: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf(stderr, "Info: %s (%s:%u, %s)\n", localMsg.constData(), 
+                context.file, context.line, context.function);
         break;
       case QtWarningMsg:
-        fprintf(stderr, "Warning: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf(stderr, "Warning: %s (%s:%u, %s)\n", localMsg.constData(), 
+                context.file, context.line, context.function);
         break;
       case QtCriticalMsg:
-        fprintf(stderr, "Critical: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf(stderr, "Critical: %s (%s:%u, %s)\n", localMsg.constData(), 
+                context.file, context.line, context.function);
         break;
       case QtFatalMsg:
-        fprintf(stderr, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf(stderr, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), 
+                context.file, context.line, context.function);
         abort();
       }
   }
@@ -68,28 +74,44 @@ int main(int argc, char **argv){
   // initialise rand
   srand(time(NULL));
 
-  settings::AppSettings *app_settings = settings::AppSettings::instance();
+  // initialise QApplication
+  QApplication app(argc, argv);
+  app.setApplicationName(APPLICATION_NAME);
+  app.setApplicationVersion(APP_VERSION);
 
+  // command line parsing
+  QCommandLineParser parser;
+  parser.setApplicationDescription("Silicon Quantum Atomic Designer.");
+  parser.addHelpOption();
+  parser.addVersionOption();
+  parser.addPositionalArgument("file", "Design file to open (normally *.sqd).");
+
+  parser.process(app);
+  const QStringList args = parser.positionalArguments();
+  QString f_path;
+  if (!args.isEmpty()) {
+    f_path = args.at(0);
+    qDebug() << QObject::tr("CML file path: %1").arg(f_path);
+  }
+
+  // pre-launch setup
+  settings::AppSettings *app_settings = settings::AppSettings::instance();
   if(app_settings->get<bool>("view/hidpi_support"))
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
   // call the message handler only if the override flag is set
-  // note that if the override is set and the log file is suppresed there will
+  // note that if the override is set and the log file is suppressed there will
   // be no way to get error messages if the app crashes.
   if(app_settings->get<bool>("log/override"))
     qInstallMessageHandler(messageHandler);
   else
     qDebug("Using default qdebug target");
 
-  // initialise QApplication
-  QApplication app(argc, argv);
-  app.setApplicationName(APPLICATION_NAME);
-  app.setApplicationVersion(APP_VERSION);
-
-  // Main Window
-  gui::ApplicationGUI w;
+  // main window
+  gui::ApplicationGUI w(f_path);
   w.show();
 
+  // execute
   return app.exec();
 
 }

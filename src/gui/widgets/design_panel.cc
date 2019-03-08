@@ -80,6 +80,8 @@ void gui::DesignPanel::initDesignPanel() {
   setScene(scene);
   setMouseTracking(true);
 
+  setAcceptDrops(true);
+
   // setup flags
   clicked = ghosting = moving = pasting = resizing = false;
 
@@ -1141,6 +1143,13 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
         break;
     }
   }
+}
+
+void gui::DesignPanel::dragEnterEvent(QDragEnterEvent *e)
+{
+  // no actions associated with dragEnterEvent, leave it up to application 
+  // window to parse.
+  e->ignore();
 }
 
 // INTERNAL METHODS
