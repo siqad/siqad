@@ -32,9 +32,6 @@ public:
   // destructor
   ~SimManager();
 
-  // show manager dialog
-  void showManager() {show();}
-
   // show sim setup dialog
   void showSimSetupDialog();
 
@@ -42,14 +39,11 @@ public:
   bool addJob(prim::SimJob *job);   // add a simulation job
 
   // ACCESSORS
-  QComboBox *getComboEngSel(){return combo_eng_sel;}
+  QComboBox *getComboEngSel(){return cb_eng_sel;}
 
   // various ways to get simulation engine
   prim::SimEngine *getEngine(int index) {return (index >= 0 && index < sim_engines.length()) ? sim_engines.at(index) : 0;}  // by index
   prim::SimEngine *getEngine(const QString &name);  // by name
-
-  // TODO get job by name
-
 
   // variables
   QList<prim::SimEngine*>  sim_engines;   // stack of all simulators
@@ -76,16 +70,30 @@ private:
 
   // sim manager related (like showing all jobs, all engines, etc.)
   void initSimManager();
-  void initMenu() {};
-  void initListPan() {};
-  void initSimActionsPan();
 
   // sim setup dialog is responsible for setting up new simulation jobs to run
   void initSimSetupDialog();
   void updateEngineSelectionList();
-  void updateJobNameDateTime();
+
+  //! Return a default generic job name with date time.
+  QString defaultJobName();
+
+  //! Save simulation settings of the currently selected engine as a preset 
+  //! available for future reuse. A pop-up dialog prompts for the desired 
+  //! preset name.
+  void saveSimulationPreset();
+
+  //! Export simulation settings of the currently selected engine as a preset 
+  //! to the given file path.
+  void exportSimulationPreset(const QString &f_path);
+
+  //! Import simulation settings preset from the given file path for the 
+  //! currently selected engine.
+  //! TODO check and report differences in available setting fields.
+  void importSimulationPreset(const QString &f_path);
 
   // save or reset engine settings
+  // TODO remove these after completing the preset feature.
   void saveSettingsAsDefault();
   void resetToUserDefault();
   void resetToEngineDefault();
@@ -110,7 +118,7 @@ private:
   QPushButton *button_run;
   QPushButton *button_cancel;
   QShortcut *shortcut_enter;
-  QComboBox *combo_eng_sel;
+  QComboBox *cb_eng_sel;
 };
 
 

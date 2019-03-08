@@ -41,7 +41,7 @@ SimManager::~SimManager()
 void SimManager::showSimSetupDialog()
 {
   sim_setup_dialog->show();
-  updateJobNameDateTime();
+  le_job_nm->setText(defaultJobName());
 }
 
 bool SimManager::addJob(prim::SimJob *job)
@@ -145,11 +145,6 @@ void SimManager::initSimManager()
   sim_list_pan = new QListWidget();
   sim_actions_pan = new QVBoxLayout();
 
-  // populate panes
-  initMenu();
-  initListPan();
-  initSimActionsPan();
-
   // simulator manager layout
   QHBoxLayout *man_main = new QHBoxLayout();
   man_main->addWidget(sim_list_pan);
@@ -160,54 +155,30 @@ void SimManager::initSimManager()
   setWindowTitle(tr("Simulation Manager"));
 }
 
-void SimManager::initSimActionsPan()
-{
-  /*QPushButton *new_simulation = new QPushButton(tr("&New Simulation"));
-  QPushButton *close_button = new QPushButton(tr("Close"));
-
-  connect(new_simulation, &QAbstractButton::clicked, this, &gui::SimManager::newSimSetup);
-  connect(close_button, &QAbstractButton::clicked, this, &QWidget::hide);
-
-  close_button->setShortcut(tr("Esc"));
-
-  sim_actions_pan->addWidget(new_simulation);
-  sim_actions_pan->addWidget(close_button);
-  sim_actions_pan->addStretch(1);*/
-}
-
 void SimManager::initSimSetupDialog()
 {
   sim_setup_dialog = new QWidget(this, Qt::Dialog);
 
-  // Engine Select Group, can be written here since only done once.
+  // Engine Select Group, can be written here since it's only initialized once.
   QGroupBox *engine_sel_group = new QGroupBox(tr("Engine Selection"));
+
   QLabel *label_eng_sel = new QLabel(tr("Engine:"));
-  QLabel *label_job_nm = new QLabel(tr("Job Name:"));
-
-  QString job_nm_default = "SIM_" + QDateTime::currentDateTime().toString("yyMMdd_HHmmss"); // TODO SA to engine short name
-
-  combo_eng_sel = new QComboBox();
-  combo_eng_sel->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+  cb_eng_sel = new QComboBox();
+  cb_eng_sel->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   updateEngineSelectionList();
-  le_job_nm = new QLineEdit(job_nm_default);
 
-  label_eng_sel->setBuddy(combo_eng_sel);
-  label_job_nm->setBuddy(le_job_nm);
+  QLabel *label_job_nm = new QLabel(tr("Job Name:"));
+  le_job_nm = new QLineEdit(defaultJobName());
 
-  QHBoxLayout *eng_sel_hl = new QHBoxLayout;
-  QHBoxLayout *job_nm_hl = new QHBoxLayout;
+  QFormLayout *engine_sel_fl = new QFormLayout;
+  engine_sel_fl->addRow(label_eng_sel, cb_eng_sel);
+  engine_sel_fl->addRow(label_job_nm, le_job_nm);
 
-  eng_sel_hl->addWidget(label_eng_sel);
-  eng_sel_hl->addWidget(combo_eng_sel);
-  job_nm_hl->addWidget(label_job_nm);
-  job_nm_hl->addWidget(le_job_nm);
+  engine_sel_group->setLayout(engine_sel_fl);
 
-  QVBoxLayout *engine_sel_vl = new QVBoxLayout;
-  engine_sel_vl->addLayout(eng_sel_hl);
-  engine_sel_vl->addLayout(job_nm_hl);
-
-  engine_sel_group->setLayout(engine_sel_vl);
-  connect(combo_eng_sel, SIGNAL(currentIndexChanged(int)), this, SLOT(updateSimParams())); //updates parameter list based on selection
+  // updates parameter list based on selection
+  connect(cb_eng_sel, QOverload<int>::of(&QComboBox::currentIndexChanged), 
+          [this](){updateSimParams();});
 
   // Sim Params Group, this will change depending on combo box selection.
   sim_params_group = new QGroupBox(tr("Simulation Parameters"));
@@ -230,12 +201,7 @@ void SimManager::initSimSetupDialog()
   connect(button_cancel, &QAbstractButton::clicked,
           sim_setup_dialog, &QWidget::hide);
 
-  //extra shortcuts
-  shortcut_enter = new QShortcut(QKeySequence(Qt::Key_Enter),button_run);
-  connect(shortcut_enter, SIGNAL(activated()), button_run, SLOT(animateClick()));
-
   // save or reset settings
-  //QAction *action_more = new QAction("More");
   QMenu *menu_more = new QMenu("More");
   QAction *action_save_as_default = new QAction("Save as Default");
   QAction *action_reset_to_usr_default = new QAction("Reset to User Default");
@@ -269,7 +235,7 @@ void SimManager::initSimSetupDialog()
   sim_setup_dialog->setLayout(new_setup_dialog_l);
 }
 
-//only called when combo_eng_sel selection is changed.
+//only called when cb_eng_sel selection is changed.
 void SimManager::updateSimParams()
 {
   // clear out existing sim params layout
@@ -281,8 +247,7 @@ void SimManager::updateSimParams()
   }
 
   // add the property form of the currently selected engine
-  QString curr_eng_name = combo_eng_sel->currentText();
-  prim::SimEngine *curr_engine = getEngine(curr_eng_name);
+  prim::SimEngine *curr_engine = getEngine(cb_eng_sel->currentText());
   PropertyMap sim_params_map = curr_engine->sim_params_map;
   if (!sim_params_map.isEmpty()) {
     // update the map with user configurations
@@ -295,6 +260,7 @@ void SimManager::updateSimParams()
     curr_sim_params_form->show();
     sim_params_vl->addWidget(curr_sim_params_form);
   } else {
+    // no parameters to show
     curr_sim_params_form = 0;
     sim_params_vl->addWidget(new QLabel("No simulation parameters available for this engine."));
   }
@@ -305,37 +271,83 @@ void SimManager::updateSimParams()
 
 void SimManager::quickRun()
 {
-  updateJobNameDateTime();
+  le_job_nm->setText(defaultJobName());
   submitSimSetup();
 }
 
 void SimManager::updateEngineSelectionList()
 {
-  if(!combo_eng_sel)
+  if(!cb_eng_sel)
     return;
-  combo_eng_sel->clear();
+  cb_eng_sel->clear();
 
   if(sim_engines.isEmpty())
-    combo_eng_sel->addItem("No Engines");
+    cb_eng_sel->addItem("No Engines");
   else
     for(auto eng : sim_engines)
-      combo_eng_sel->addItem(eng->name());
+      cb_eng_sel->addItem(eng->name());
 }
 
 
-void SimManager::updateJobNameDateTime()
+QString SimManager::defaultJobName()
 {
-  if (!le_job_nm)
-    return;
-  le_job_nm->clear();
+  return "SIM_" + QDateTime::currentDateTime().toString("yyMMdd_HHmmss");
+}
 
-  le_job_nm->setText("SIM_" + QDateTime::currentDateTime().toString("yyMMdd_HHmmss"));
+
+void SimManager::saveSimulationPreset()
+{
+  prim::SimEngine *curr_engine = getEngine(cb_eng_sel->currentIndex());
+
+  if (!curr_engine || !curr_sim_params_form) {
+    qCritical() << tr("Invalid engine selection or engine doesn't have parameters");
+    return;
+  }
+
+  // set up the directory
+  QDir config_dir(curr_engine->userPresetDirectoryPath());
+  if (!config_dir.mkpath("."))
+    qWarning() << tr("Unable to create user preset directory at %1").arg(config_dir.path());
+
+  // prompt for preset name
+  bool ok;
+  QString preset_name = QInputDialog::getText(this, tr("Preset name"),
+                                              tr("Preset name:"), QLineEdit::Normal,
+                                              tr("Custom Preset"), &ok);
+  if (!ok) {
+    return;
+  } else if (preset_name.isEmpty()) {
+    QMessageBox msg;
+    msg.setText("The preset name cannot be empty, aborting.");
+    msg.exec();
+    return;
+  }
+  // TODO check for preset name conflicts with existing presets
+
+  QString preset_path = config_dir.filePath(preset_name);
+  QFile f(preset_path);
+  if (!f.open(QIODevice::WriteOnly)) {
+    qCritical() << tr("Error when opening file to save preset.");
+    return;
+  }
+
+  QXmlStreamWriter ws(&f);
+  qDebug() << tr("Beginning preset writing to %1").arg(preset_path);
+  ws.setAutoFormatting(true);
+  ws.writeStartDocument();
+
+  ws.writeStartElement("properties");
+  PropertyMap::writeValuesToXMLStream(curr_sim_params_form->finalProperties(), &ws);
+  ws.writeEndElement();
+
+  f.close();
+  qDebug() << tr("Preset writing complete");
 }
 
 
 void SimManager::submitSimSetup()
 {
-  prim::SimEngine *curr_engine = getEngine(combo_eng_sel->currentIndex());
+  prim::SimEngine *curr_engine = getEngine(cb_eng_sel->currentIndex());
 
   if (!curr_engine) {
     qCritical() << tr("Invalid engine selection");
@@ -356,7 +368,7 @@ void SimManager::submitSimSetup()
 
 void SimManager::saveSettingsAsDefault()
 {
-  prim::SimEngine *curr_engine = getEngine(combo_eng_sel->currentIndex());
+  prim::SimEngine *curr_engine = getEngine(cb_eng_sel->currentIndex());
 
   if (!curr_engine || !curr_sim_params_form) {
     qCritical() << tr("Invalid engine selection or engine doesn't have parameters");
@@ -394,7 +406,7 @@ void SimManager::resetToUserDefault()
 
 void SimManager::resetToEngineDefault()
 {
-  prim::SimEngine *curr_engine = getEngine(combo_eng_sel->currentIndex());
+  prim::SimEngine *curr_engine = getEngine(cb_eng_sel->currentIndex());
   QFile usr_cfg_file(curr_engine->userConfigurationFilePath());
   if (usr_cfg_file.remove()) {
     qDebug() << tr("Removed user config file");

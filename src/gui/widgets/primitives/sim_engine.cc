@@ -45,7 +45,7 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
     } else if (rs.name() == "dep_path") {
       setDependenciesPath(eng_dir.absoluteFilePath(rs.readElementText()));
     } else if (rs.name() == "interpreter") {
-      setRuntimeInterpreter(rs.readElementText());
+      setInterpreter(rs.readElementText());
     } else if (rs.name() == "sim_params") {
       sim_params_map.readPropertiesFromXMLStream(&rs);
     } else {
@@ -71,16 +71,33 @@ SimEngine::SimEngine(const QString &eng_nm, const QString &eng_rt, QWidget *pare
   initSimEngine(eng_nm, eng_rt);
 }
 
-QString SimEngine::runtimeTempDir()
+SimEngine::userPresetDirectoryPath()
 {
-  if(runtime_temp_dir.isEmpty()){
-    runtime_temp_dir = settings::AppSettings::instance()->getPath("phys/runtime_temp_dir");
+  if (preset_dir_path.isEmpty()) {
+    QDir preset_root_dir(settings::AppSettings::instance()->getPath("phys/preset_root_path"));
+    if (!preset_root_dir.mkpath(".")) {
+      qWarning() << tr("Unable to create preset root directory %1").arg(preset_root_dir.path());
+      return;
+    }
+    if (!preset_root_dir.exists(name) && !preset_root_dir.mkdir(name)) {
+      qWarning() << tr("Unable to create engine preset directory %1").arg(preset_root_dir.filePath(name));
+      return;
+    }
+    
   }
-  return runtime_temp_dir;
+  return preset_dir_path;
+}
+
+QString SimEngine::runtimeTempPath()
+{
+  if(tmp_path.isEmpty()){
+    tmp_path = settings::AppSettings::instance()->getPath("phys/runtime_tmp_root_path");
+  }
+  return tmp_path;
 }
 
 void SimEngine::initSimEngine(const QString &eng_nm, const QString &eng_rt)
 {
-  eng_name = eng_nm;
-  eng_root = eng_rt;
+  name = eng_nm;
+  root_dir_path = eng_rt;
 }

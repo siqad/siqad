@@ -1,5 +1,5 @@
 [submodule "src/phys/afmmarcus"]
-	path = src/phys/afmmarcus
+	path = src/phys/hopdyn
 	url = https://github.com/retallickj/afm-sim.git
 [submodule "src/phys/poissolver"]
 	path = src/phys/poissolver

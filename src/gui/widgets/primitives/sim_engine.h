@@ -45,25 +45,31 @@ namespace prim{
     void setDescriptionFilePath(const QString &p) {eng_desc_path = p;}
 
     //! Return the path to the saved user engine configuration file.
+    //! TODO remove this after the completion of the preset feature.
     QString userConfigurationFilePath() {return eng_usr_cfg_path;}
 
+    //! Return the path to the directory where user presets for this engine 
+    //! should be saved.
+    //! TODO implement
+    QString userPresetDirectoryPath();
+
     //! Return the engine name.
-    QString name() {return eng_name;}
+    QString name() {return name;}
 
     //! Set the engine name.
-    void setName(const QString &nm) {eng_name = nm;}
+    void setName(const QString &t_name) {name = t_name;}
 
     //! Return the engine version.
-    QString version() {return eng_version;}
+    QString version() {return version;}
 
     //! Set the engine version.
-    void setVersion(const QString &ver) {eng_version = ver;}
+    void setVersion(const QString &ver) {version = ver;}
 
     //! Return the runtime interpreter of the engine (e.g. python).
-    QString runtimeInterpreter() {return runtime_interpreter;}
+    QString interpreter() {return interpreter;}
 
     //! Set the runtime interpreter of the engine (e.g. python).
-    void setRuntimeInterpreter(const QString &inter) {runtime_interpreter = inter;}
+    void setInterpreter(const QString &inter) {runtime_interpreter = inter;}
 
     //! Return the path to the binary (no interpreter) or script (interpreter 
     //! set) of the physics engine.
@@ -81,7 +87,7 @@ namespace prim{
 
     //! Return the temporary directory where this engine stores simulation 
     //! problems and results.
-    QString runtimeTempDir();
+    QString runtimeTempPath();
 
   private:
 
@@ -90,14 +96,15 @@ namespace prim{
 
     // variables like binary location, temp file location, etc.
     QString eng_desc_path;      // description file of this engine
-    QString eng_usr_cfg_path;   // user default settings of this engine
-    QString eng_name;           // name of this engine
-    QString eng_root;           // root directory of this engine containing description and more
-    QString eng_version;
-    QString runtime_interpreter;// runtime interpreter (e.g. Python), blank if not applicable
+    QString eng_usr_cfg_path;   // user default settings of this engine TODO remove after preset feature
+    QString name;               // name of this engine
+    QString root_dir_path;      // root directory of this engine containing description and more
+    QString preset_dir_path;    // path to the directory where user presets should be stored
+    QString version;
+    QString interpreter;        // runtime interpreter (e.g. Python), blank if not applicable
     QString bin_path;           // binary (standalone) or script (interpreted) path of this engine
     QString dep_path;           // dependencies path (requirements.txt for Python scripts)
-    QString runtime_temp_dir;   // root directory for all problems files for this engine
+    QString tmp_path;           // root directory for all problems files for this engine
   };
 
 } // end of prim namespace
