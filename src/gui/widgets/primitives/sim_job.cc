@@ -18,136 +18,134 @@ extern QString gui::python_path;
 namespace prim{
 
 SimJob::SimJob(const QString &nm, SimEngine *eng, QWidget *parent)
-  : QObject(parent), job_name(nm), engine(eng)
+  : QObject(parent), job_name(nm)
 {
-  completed = false;
+  if (eng)
+    job_steps.append(JobStep(eng));
 }
-
-
-// append all entries in the provided PropertyMap to the list of simulation parameters
-void SimJob::addSimParams(const gui::PropertyMap &sim_params_map)
-{
-  for (const QString &key : sim_params_map.keys())
-    addSimParam(key, sim_params_map[key].value.toString());
-}
-
 
 // invoke the simulator binary. Assumes that the problem file has already been written to
 // the path specified by problemFile()
 bool SimJob::invokeBinary()
 {
-  QFileInfo problem_file_info(problemFilePath());
 
-  // check if problem file exists
-  if(!(problem_file_info.exists() && problem_file_info.isFile())){
-    qDebug() << tr("SimJob: problem file '%1' doesn't exist.").arg(problem_file_info.filePath());
-    return false;
-  }
+  // iterate through job steps
 
-  // check if binary path of simulation engine exists
-  QFileInfo bin_path_info(engine->binaryPath());
-  if(!(bin_path_info.exists() && bin_path_info.isFile())){
-    qDebug() << tr("SimJob: engine binary/script '%1' doesn't exist.").arg(bin_path_info.filePath());
-    return false;
-  }
+  for (int i=0; i<job_steps.length(); i++) {
+    JobStep job_step = job_steps.at(i);
 
-  // setup simulation process
-
-  if (command_format.isEmpty()) {
-    // default command format
-    command_format = "@INTERP@ @BINPATH@ @PROBLEMPATH@ @RESULTPATH@";
-  }
-
-  QString command = command_format;
-  QString interp_command = interp_format;
-
-  // TODO move to class
-  QMap<QString, QString> replace_map;
-  replace_map["@PYTHON@"] = gui::python_path; // TODO needs further splitting for comma separated calls
-  replace_map["@BINPATH@"] = engine->binaryPath();
-  replace_map["@PHYSENGPATH@"] = QFileInfo(engine->descriptionFilePath()).absolutePath();
-  replace_map["@PROBLEMPATH@"] = problemFilePath();
-  replace_map["@RESULTPATH@"] = resultFilePath();
-  replace_map["@JOBTMP@"] = runtimeTempPath();
-
-  QRegExp regex("@(.*)?@");
-  regex.setMinimal(true);
-
-  while (interp_command.indexOf(regex) != -1) {
-    QString found_replace = regex.capturedTexts().first();
-    qDebug() << tr("replacing: %1").arg(found_replace);
-    if (!replace_map.contains(found_replace)) {
-      qWarning() << tr("Key %1 not found, passed for replacement.").arg(found_replace);
-    }
-    interp_command.replace(interp_command.indexOf(regex), interp_command.length(), replace_map[found_replace]);
-  }
-
-  replace_map["@INTERP@"] = interp_command;
-
-  while (command.indexOf(regex) != -1) {
-    QString found_replace = regex.capturedTexts().first();
-    if (!replace_map.contains(found_replace)) {
-      qFatal(tr("Path replacement failed, key '%1' not found.")
-          .arg(found_replace).toLatin1().constData(),0);
-    }
-    command.replace(command.indexOf(regex), found_replace.length(), replace_map[found_replace]);
-  }
-
-  qDebug() << tr("Final replaced command: %1").arg(command);
-
-  // set up process
-  sim_process = new QProcess();
-  /*
-  if (!engine->interpreter().isEmpty()) {
-    if (engine->interpreter() == "python" && !gui::python_path.isEmpty()) {
-      // using an interpreter, e.g. Python
-      // template: `python /path/to/script.py /path/to/problem/file /path/to/result/file`
-      QStringList splitted_path = gui::python_path.split(',');
-      if (splitted_path.size() == 0)
-        return false;
-
-      sim_process->setProgram(splitted_path.at(0)); // interpreter
-      cml_arguments << splitted_path.mid(1);        // interpreter args
-      cml_arguments << engine->binaryPath();
-    } else {
-      qCritical() << tr("Runtime interpreter %1 not recognized, ceasing binary invocation").arg(engine->interpreter());
+    // check if problem file exists
+    QFileInfo problem_file_info(problemFilePath(i));
+    if(!(problem_file_info.exists() && problem_file_info.isFile())){
+      qDebug() << tr("SimJob: problem file '%1' doesn't exist.").arg(problem_file_info.filePath());
       return false;
     }
-  } else {
-    // calling a binary
-    // template: `/path/to/binary /path/to/problem/file /path/to/result/file`
-    sim_process->setProgram(engine->binaryPath());
+
+    // check if binary path of simulation engine exists
+    QFileInfo bin_path_info(job_step.engine->binaryPath());
+    if(!(bin_path_info.exists() && bin_path_info.isFile())){
+      qDebug() << tr("SimJob: engine binary/script '%1' doesn't exist.").arg(bin_path_info.filePath());
+      return false;
+    }
+
+    // setup simulation process
+
+    if (job_step.command_format.isEmpty()) {
+      // default command format
+      job_step.command_format = "@INTERP@ @BINPATH@ @PROBLEMPATH@ @RESULTPATH@";
+    }
+
+    QString command = job_step.command_format;
+    QString interp_command = job_step.interp_format;
+
+    // TODO move to class
+    QMap<QString, QString> replace_map;
+    replace_map["@PYTHON@"] = gui::python_path; // TODO needs further splitting for comma separated calls
+    replace_map["@BINPATH@"] = job_step.engine->binaryPath();
+    replace_map["@PHYSENGPATH@"] = QFileInfo(job_step.engine->descriptionFilePath()).absolutePath();
+    replace_map["@PROBLEMPATH@"] = problemFilePath(i);
+    replace_map["@RESULTPATH@"] = resultFilePath(i);
+    replace_map["@JOBTMP@"] = runtimeTempPath();
+
+    QRegExp regex("@(.*)?@");
+    regex.setMinimal(true);
+
+    while (interp_command.indexOf(regex) != -1) {
+      QString found_replace = regex.capturedTexts().first();
+      qDebug() << tr("replacing: %1").arg(found_replace);
+      if (!replace_map.contains(found_replace)) {
+        qWarning() << tr("Key %1 not found, passed for replacement.").arg(found_replace);
+      }
+      interp_command.replace(interp_command.indexOf(regex), interp_command.length(), replace_map[found_replace]);
+    }
+
+    replace_map["@INTERP@"] = interp_command;
+
+    while (command.indexOf(regex) != -1) {
+      QString found_replace = regex.capturedTexts().first();
+      if (!replace_map.contains(found_replace)) {
+        qFatal(tr("Path replacement failed, key '%1' not found.")
+            .arg(found_replace).toLatin1().constData(),0);
+      }
+      command.replace(command.indexOf(regex), found_replace.length(), replace_map[found_replace]);
+    }
+
+    qDebug() << tr("Final replaced command: %1").arg(command);
+
+    // set up process
+    sim_process = new QProcess();
+    /*
+    if (!engine->interpreter().isEmpty()) {
+      if (engine->interpreter() == "python" && !gui::python_path.isEmpty()) {
+        // using an interpreter, e.g. Python
+        // template: `python /path/to/script.py /path/to/problem/file /path/to/result/file`
+        QStringList splitted_path = gui::python_path.split(',');
+        if (splitted_path.size() == 0)
+          return false;
+
+        sim_process->setProgram(splitted_path.at(0)); // interpreter
+        cml_arguments << splitted_path.mid(1);        // interpreter args
+        cml_arguments << engine->binaryPath();
+      } else {
+        qCritical() << tr("Runtime interpreter %1 not recognized, ceasing binary invocation").arg(engine->interpreter());
+        return false;
+      }
+    } else {
+      // calling a binary
+      // template: `/path/to/binary /path/to/problem/file /path/to/result/file`
+      sim_process->setProgram(engine->binaryPath());
+    }
+    
+    cml_arguments << problem_file_info.canonicalFilePath(); // problem file
+    cml_arguments << resultFilePath();                          // result file
+    */
+    cml_arguments << command;
+
+    start_time = QDateTime::currentDateTime();
+
+    //sim_process->setArguments(cml_arguments);
+    sim_process->setProcessChannelMode(QProcess::MergedChannels);
+    qDebug() << tr("SimJob: Starting process");
+    sim_process->start(command);
+
+    // TODO connect signals for error and finish
+
+    // temperary solution: just wait till completion
+    qDebug() << tr("SimJob: Process started, waiting for completion...");
+    if (!sim_process->waitForStarted())
+      return false;
+
+    while(sim_process->waitForReadyRead(-1))
+      terminal_output.append(QString::fromStdString(sim_process->readAll().toStdString())); // dump output TODO might not have to do it in while
+
+    // clean up sim_process pointer
+    delete sim_process;
+    sim_process = nullptr;
   }
-  
-  cml_arguments << problem_file_info.canonicalFilePath(); // problem file
-  cml_arguments << resultFilePath();                          // result file
-  */
-  cml_arguments << command;
-
-  start_time = QDateTime::currentDateTime();
-
-  //sim_process->setArguments(cml_arguments);
-  sim_process->setProcessChannelMode(QProcess::MergedChannels);
-  qDebug() << tr("SimJob: Starting process");
-  sim_process->start(command);
-
-  // TODO connect signals for error and finish
-
-  // temperary solution: just wait till completion
-  qDebug() << tr("SimJob: Process started, waiting for completion...");
-  if (!sim_process->waitForStarted())
-    return false;
-
-  while(sim_process->waitForReadyRead(-1))
-    terminal_output.append(QString::fromStdString(sim_process->readAll().toStdString())); // dump output TODO might not have to do it in while
 
   // post-simulation flag setting
   end_time = QDateTime::currentDateTime();
   completed = true;
-
-  // clean up sim_process pointer
-  delete sim_process;
-  sim_process = NULL;
 
   qDebug() << tr("SimJob: simulation complete. You may check the job's terminal output on the simulation visualization panel.");
   return true;
@@ -157,7 +155,10 @@ bool SimJob::invokeBinary()
 bool SimJob::readResults()
 {
   // TODO check path exists
-  QFile result_file(resultFilePath());
+  // TODO for now, assume that only the result from the last job step matters.
+  // In the future, read all of the result files available and let the user 
+  // choose what results they would like to see.
+  QFile result_file(resultFilePath(job_steps.length()-1));
 
   if(!result_file.open(QFile::ReadOnly | QFile::Text)){
     qDebug() << tr("SimJob: Error when opening result file to read: %1").arg(result_file.errorString());
@@ -429,19 +430,15 @@ QString SimJob::runtimeTempPath()
 }
 
 
-QString SimJob::problemFilePath()
+QString SimJob::problemFilePath(int i)
 {
-  if(problem_path.isEmpty())
-    problem_path = QDir(runtimeTempPath()).filePath("sim_problem.xml");
-  return problem_path;
+  return QDir(runtimeTempPath()).filePath(tr("sim_problem_%1.xml").arg(i));
 }
 
 
-QString SimJob::resultFilePath()
+QString SimJob::resultFilePath(int i)
 {
-  if(result_path.isEmpty())
-    result_path = QDir(runtimeTempPath()).filePath("sim_result.xml");
-  return result_path;
+  return QDir(runtimeTempPath()).filePath(tr("sim_result_%1.xml").arg(i));
 }
 
 

@@ -885,7 +885,9 @@ void gui::ApplicationGUI::runSimulation(prim::SimJob *job)
   qDebug() << tr("ApplicationGUI: About to run job '%1'").arg(job->name());
 
   // call saveToFile TODO don't forget to account for setup dialog settings
-  saveToFile(Simulation, job->problemFilePath(), job);
+  for (int i=0; i<job->jobSteps()->length(); i++) {
+    saveToFile(Simulation, job->problemFilePath(i), job->getJobStep(i));
+  }
 
   // call job binary and read output when done
   job->invokeBinary();
@@ -1108,7 +1110,9 @@ void gui::ApplicationGUI::newFile()
 
 
 // save/load:
-bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const QString &path, prim::SimJob *sim_job)
+bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, 
+                                     const QString &path,
+                                     prim::SimJob::JobStep job_step)
 {
   QString write_path;
 
@@ -1161,12 +1165,11 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, const Q
   ws.writeEndElement();
 
   // save simulation parameters
-  if(flag == Simulation && sim_job){
+  if (flag == Simulation && !job_step.isEmpty()) {
     ws.writeStartElement("sim_params");
-    QList<QPair<QString, QString>> sim_params = sim_job->simParams();
-    for(auto sim_param_pair : sim_params)
-      ws.writeTextElement(sim_param_pair.first, sim_param_pair.second);
-
+    for (const QString &key : job_step.sim_params.keys()) {
+      ws.writeTextElement(key, job_step.sim_params.value(key));
+    }
     ws.writeEndElement();
   }
 

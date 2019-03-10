@@ -234,6 +234,7 @@ void SimManager::initSimManager()
 
             gui::PropertyForm *eng_form = new gui::PropertyForm(getEngine(action->text())->sim_params_map);
             eng_list_property_form.insert(lwi_eng, qMakePair(action->text(), eng_form));
+            lwi_eng->setSelected(true);
 
             connect(pb_remove, &QAbstractButton::clicked,
                     [this, lw_chained_eng, lwi_eng]()
@@ -264,7 +265,7 @@ void SimManager::initSimManager()
   auto updateEngCommandForm = [this, le_eng_interp, te_eng_command](QString eng_name)
   {
     prim::SimEngine *curr_eng = getEngine(eng_name);
-    // TODO the interpreter field should show the path found by the manager instead
+    // TODO should not poll from the engine every time, should be saved in some field or data structure instead
     le_eng_interp->setText(curr_eng->interpreter());
     if (curr_eng->commandFormats().length() > 0) {
       te_eng_command->setText(curr_eng->commandFormats().at(0).second);
@@ -326,18 +327,45 @@ void SimManager::initSimManager()
   pb_close->setShortcut(Qt::Key_Escape);
 
   connect(pb_run, &QAbstractButton::clicked,
-          [this, currentEngineForm, le_job_name, le_eng_interp, te_eng_command](){
-            // create sim job and submit to application
+          [this, lwi_single, lwi_chained, lw_chained_eng, currentEngineForm, le_job_name, le_eng_interp, te_eng_command]()
+          {
             hide();
-            auto eng_form = currentEngineForm();
-            QString eng_name = currentEngineForm().first;
-            prim::SimEngine *eng = getEngine(eng_name);
-            prim::SimJob *new_job = new prim::SimJob(le_job_name->text(), eng);
-            new_job->addSimParams(eng_form.second->finalProperties());
-            new_job->setInterpreterFormat(le_eng_interp->text());
-            new_job->setCommandFormat(te_eng_command->toPlainText());
-            addJob(new_job);
-            emit sig_simJob(new_job);
+            // create sim job and submit to application
+            // TODO improve Job constructor to take job step directly
+            // TODO simplify this lambda function
+            if (lwi_single->isSelected()) {
+              auto eng_form_pair = currentEngineForm();
+              prim::SimEngine *eng = getEngine(eng_form_pair.first);
+              prim::SimJob *new_job = new prim::SimJob(le_job_name->text());
+              prim::SimJob::JobStep js(eng, le_eng_interp->text(),
+                                       te_eng_command->toPlainText(),
+                                       eng_form_pair.second->finalProperties()
+                                       );
+              new_job->addJobStep(js);
+              addJob(new_job);
+              emit sig_simJob(new_job);
+            } else if (lwi_chained->isSelected()) {
+              // TODO now it's just always reading the same interpreter and command, need to separate those into easily accessible forms
+              prim::SimJob *new_job = new prim::SimJob(le_job_name->text());
+              for (int i=0; i<lw_chained_eng->count(); i++) {
+                QListWidgetItem *lwi_eng_form = lw_chained_eng->item(i);
+                auto eng_form_pair = eng_list_property_form.value(lwi_eng_form);
+                if (eng_form_pair.first.isEmpty())
+                  continue;
+
+                prim::SimEngine *eng = getEngine(eng_form_pair.first);
+                // create sim job step and add it to the sim job
+                prim::SimJob::JobStep js(eng, le_eng_interp->text(),
+                                         te_eng_command->toPlainText(),
+                                         eng_form_pair.second->finalProperties()
+                                         );
+                new_job->addJobStep(js);
+              }
+              addJob(new_job);
+              emit sig_simJob(new_job);
+            } else {
+              qWarning() << "Neither expected engine execution mode is selected, nothing to run.";
+            }
           });
   connect(pb_close, &QAbstractButton::clicked,
           this, &QWidget::hide);
@@ -552,6 +580,7 @@ void SimManager::saveSimulationPreset()
 
 void SimManager::submitSimSetup()
 {
+  /* TODO remove after finishing new simulation submission implementation
   prim::SimEngine *curr_engine = getEngine(cb_eng_sel->currentIndex());
 
   if (!curr_engine) {
@@ -568,6 +597,7 @@ void SimManager::submitSimSetup()
 
   addJob(new_job);
   emit sig_simJob(new_job);
+  */
 }
 
 
