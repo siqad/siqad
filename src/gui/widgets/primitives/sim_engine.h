@@ -27,9 +27,6 @@ namespace prim{
     //! constructor, uses engine_description.xml
     SimEngine(const QString &eng_desc_path, QWidget *parent=0);
 
-    //! constructor, uses an engine name and root path
-    SimEngine(const QString &eng_nm, const QString &eng_rt, QWidget *parent=0);
-
     //! destructor
     ~SimEngine() {};
 
@@ -37,6 +34,11 @@ namespace prim{
     gui::PropertyMap sim_params_map;  // a property map containing all of the simulation parameters
 
     // ACCESSORS
+
+    //! Return the available engine command formats as a QList of QPair. The 
+    //! first element of each pair is a descriptive command label and the second 
+    //! element is the actual command.
+    QList<QPair<QString, QString>> commandFormats() {return eng_command_formats;}
 
     //! Return the path to the engine description file.
     QString descriptionFilePath() {return eng_desc_path;}
@@ -50,26 +52,25 @@ namespace prim{
 
     //! Return the path to the directory where user presets for this engine 
     //! should be saved.
-    //! TODO implement
     QString userPresetDirectoryPath();
 
     //! Return the engine name.
-    QString name() {return name;}
+    QString name() {return eng_name;}
 
     //! Set the engine name.
-    void setName(const QString &t_name) {name = t_name;}
+    void setName(const QString &t_name) {eng_name = t_name;}
 
     //! Return the engine version.
-    QString version() {return version;}
+    QString version() {return eng_version;}
 
     //! Set the engine version.
-    void setVersion(const QString &ver) {version = ver;}
+    void setVersion(const QString &ver) {eng_version = ver;}
 
     //! Return the runtime interpreter of the engine (e.g. python).
-    QString interpreter() {return interpreter;}
+    QString interpreter() {return runtime_interpreter;}
 
     //! Set the runtime interpreter of the engine (e.g. python).
-    void setInterpreter(const QString &inter) {runtime_interpreter = inter;}
+    void setInterpreter(const QString &interp) {runtime_interpreter = interp;}
 
     //! Return the path to the binary (no interpreter) or script (interpreter 
     //! set) of the physics engine.
@@ -85,23 +86,20 @@ namespace prim{
     //! Set the dependencies description (e.g. requirements.txt for Python).
     void setDependenciesPath(const QString &p) {dep_path = p;}
 
-    //! Return the temporary directory where this engine stores simulation 
-    //! problems and results.
-    QString runtimeTempPath();
-
   private:
 
     //! Initialize the simulation engine.
     void initSimEngine(const QString &eng_nm, const QString &eng_rt);
 
     // variables like binary location, temp file location, etc.
+    QList<QPair<QString, QString>> eng_command_formats;  // pairs of command labels and actual commands
     QString eng_desc_path;      // description file of this engine
     QString eng_usr_cfg_path;   // user default settings of this engine TODO remove after preset feature
-    QString name;               // name of this engine
+    QString eng_name;           // name of this engine
     QString root_dir_path;      // root directory of this engine containing description and more
     QString preset_dir_path;    // path to the directory where user presets should be stored
-    QString version;
-    QString interpreter;        // runtime interpreter (e.g. Python), blank if not applicable
+    QString eng_version;
+    QString runtime_interpreter;// runtime interpreter (e.g. Python), blank if not applicable
     QString bin_path;           // binary (standalone) or script (interpreted) path of this engine
     QString dep_path;           // dependencies path (requirements.txt for Python scripts)
     QString tmp_path;           // root directory for all problems files for this engine

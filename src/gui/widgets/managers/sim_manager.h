@@ -100,14 +100,15 @@ private:
 
   void initEngines();
 
+  // map QListWidgetItem to the corresponding engine property form
+  QMap<QListWidgetItem*,QPair<QString, PropertyForm*>> eng_list_property_form;
+
   // dialogs
   QWidget *sim_manager_dialog;
   QWidget *sim_setup_dialog;
   PropertyForm *curr_sim_params_form=0;
 
   // manager panes
-  QListWidget *sim_list_pan;
-  QVBoxLayout *sim_actions_pan;
   QGroupBox *sim_params_group;
   QVBoxLayout *sim_params_vl;
   QLineEdit *le_job_nm;

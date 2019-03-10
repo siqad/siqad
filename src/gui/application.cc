@@ -342,7 +342,7 @@ void gui::ApplicationGUI::initTopBar()
   action_run_sim = new QAction(QIcon(":/ico/runsim.svg"), tr("Run Simulation..."));
   action_run_sim->setShortcut(tr("CTRL+R"));
   connect(action_run_sim, &QAction::triggered,
-          [this](){sim_manager->showSimSetupDialog();});
+          [this](){sim_manager->show();});
 
   action_repeat_sim = new QAction(tr("Repeat Previous Simulation"), this);
   action_repeat_sim->setShortcut(tr("CTRL+SHIFT+R"));
@@ -885,7 +885,7 @@ void gui::ApplicationGUI::runSimulation(prim::SimJob *job)
   qDebug() << tr("ApplicationGUI: About to run job '%1'").arg(job->name());
 
   // call saveToFile TODO don't forget to account for setup dialog settings
-  saveToFile(Simulation, job->problemFile(), job);
+  saveToFile(Simulation, job->problemFilePath(), job);
 
   // call job binary and read output when done
   job->invokeBinary();

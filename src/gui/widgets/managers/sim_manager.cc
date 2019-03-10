@@ -56,11 +56,12 @@ bool SimManager::addJob(prim::SimJob *job)
 prim::SimEngine *SimManager::getEngine(const QString &name)
 {
   for (prim::SimEngine *engine : sim_engines) {
-    if (engine->name() == name)
+    if (engine->name() == name) {
       return engine;
+    }
   }
   // not found
-  return 0;
+  return nullptr;
 }
 
 
@@ -139,20 +140,224 @@ bool SimManager::findWorkingPythonPath()
 
 void SimManager::initSimManager()
 {
-  // init simulation manager GUI
-
-  // simulator manager panes
-  sim_list_pan = new QListWidget();
-  sim_actions_pan = new QVBoxLayout();
-
-  // simulator manager layout
-  QHBoxLayout *man_main = new QHBoxLayout();
-  man_main->addWidget(sim_list_pan);
-  man_main->addLayout(sim_actions_pan);
-
-  setLayout(man_main);
-
   setWindowTitle(tr("Simulation Manager"));
+
+  QListWidget *lw_job_plurality = new QListWidget();    // single or chained simulations
+  QStackedWidget *sw_eng_list = new QStackedWidget();   // engine list, layout depends on lw_job_plurality
+  QVBoxLayout *vl_sim_settings = new QVBoxLayout();     // simulation settings containing job and eng params
+  QFormLayout *fl_job_params = new QFormLayout();       // job parameters
+  QFormLayout *fl_eng_cmd_params = new QFormLayout();   // engine command parameters
+  QVBoxLayout *vl_eng_sim_params = new QVBoxLayout();   // engine simulation parameters
+
+  // job plurality
+  QListWidgetItem *lwi_single = new QListWidgetItem("Single");    // TODO add icon
+  QListWidgetItem *lwi_chained = new QListWidgetItem("Chained");  // TODO add icon
+  lw_job_plurality->addItem(lwi_single);
+  lw_job_plurality->addItem(lwi_chained);
+  lw_job_plurality->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+
+  // engine list corresponding to job plurality list
+  // TODO this does not account for duplicated names, account for that in the future
+  // TODO there's no saving or loading chained simulation presets for now, add that in the future
+  QListWidget *lw_single_eng = new QListWidget();
+  QListWidget *lw_chained_eng = new QListWidget();
+  QToolButton *tb_add_chained_eng = new QToolButton();
+  QMenu *menu_add_chained_eng = new QMenu();
+  tb_add_chained_eng->setIcon(QIcon::fromTheme("list-add"));
+  tb_add_chained_eng->setText("Add Engine to Chain");
+  tb_add_chained_eng->setPopupMode(QToolButton::InstantPopup);
+  tb_add_chained_eng->setMenu(menu_add_chained_eng);
+  tb_add_chained_eng->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  for (prim::SimEngine *engine : sim_engines) {
+    QListWidgetItem *lwi_single_eng = new QListWidgetItem(engine->name());
+    lw_single_eng->addItem(lwi_single_eng);
+    eng_list_property_form.insert(lwi_single_eng, 
+        qMakePair(engine->name(), new gui::PropertyForm(engine->sim_params_map)));
+
+    // add the engine to the list of engines that can be added to a chained simulation
+    menu_add_chained_eng->addAction(engine->name());
+  }
+  QListWidgetItem *lw_add_chain_eng = new QListWidgetItem("Add Engine to Chain");
+  lw_chained_eng->addItem(lw_add_chain_eng);
+  lw_chained_eng->setItemWidget(lw_add_chain_eng, tb_add_chained_eng);
+
+  sw_eng_list->addWidget(lw_single_eng);
+  sw_eng_list->addWidget(lw_chained_eng);
+  sw_eng_list->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+
+  // initialize job params form
+  QGroupBox *group_job = new QGroupBox("Job");
+  QLineEdit *le_job_name = new QLineEdit();
+  fl_job_params->addRow(new QLabel("Job Name:"), le_job_name);
+  group_job->setLayout(fl_job_params);
+  group_job->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+  // initialize engine command line parameters form
+  QGroupBox *group_eng_cml = new QGroupBox("Engine Command");
+  QLineEdit *le_eng_interp = new QLineEdit();
+  QTextEdit *te_eng_command = new QTextEdit();
+  fl_eng_cmd_params->addRow(new QLabel("Interpreter"), le_eng_interp);
+  fl_eng_cmd_params->addRow(new QLabel("Invocation command format"));
+  fl_eng_cmd_params->addRow(te_eng_command);
+  group_eng_cml->setLayout(fl_eng_cmd_params);
+  group_eng_cml->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+  // initialize engine simulation parameters form
+  QGroupBox *group_eng_sim = new QGroupBox("Engine Simulation Parameters");
+  group_eng_sim->setLayout(vl_eng_sim_params);
+  group_eng_sim->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+  // add engine name to chained engine list when engine is selected from add
+  // engine menu
+  connect(menu_add_chained_eng, &QMenu::triggered,
+          [this, lw_chained_eng](QAction *action)
+          {
+            // insert into the second-last row
+            int row = (lw_chained_eng->count() > 1) ? lw_chained_eng->count()-1 : 0;
+            QWidget *w_eng = new QWidget();
+            QHBoxLayout *hl_eng = new QHBoxLayout();
+            QPushButton *pb_remove = new QPushButton();
+            if (QIcon::hasThemeIcon("list-remove")) {
+              pb_remove->setIcon(QIcon::fromTheme("list-remove"));
+            } else {
+              pb_remove->setText("Remove");
+            }
+            hl_eng->addWidget(new QLabel(action->text()));
+            hl_eng->addStretch();
+            hl_eng->addWidget(pb_remove);
+            w_eng->setLayout(hl_eng);
+
+            QListWidgetItem *lwi_eng = new QListWidgetItem();
+            lwi_eng->setSizeHint(w_eng->sizeHint());
+            lw_chained_eng->insertItem(row, lwi_eng);
+            lw_chained_eng->setItemWidget(lwi_eng, w_eng);
+
+            gui::PropertyForm *eng_form = new gui::PropertyForm(getEngine(action->text())->sim_params_map);
+            eng_list_property_form.insert(lwi_eng, qMakePair(action->text(), eng_form));
+
+            connect(pb_remove, &QAbstractButton::clicked,
+                    [this, lw_chained_eng, lwi_eng]()
+                    {
+                      int rm_row = lw_chained_eng->row(lwi_eng);
+                      QListWidgetItem *rm_eng = lw_chained_eng->takeItem(rm_row);
+                      if (rm_eng != nullptr) {
+                        auto f_entry = eng_list_property_form.take(rm_eng); // TODO might cost issues when removing the form that's currently shown, test later
+                        delete f_entry.second;
+                        delete rm_eng;
+                      }
+                    });
+          });
+
+  // get current engine name, property form pair
+  auto currentEngineForm = [this, sw_eng_list]() -> QPair<QString, PropertyForm*>
+  {
+    QListWidget *curr_list = static_cast<QListWidget*>(sw_eng_list->currentWidget());
+    return eng_list_property_form.value(curr_list->currentItem());
+  };
+
+  // update job parameters form according to the current plurality and engine selection
+  auto updateJobParamsForm = [this, le_job_name]()
+  {
+    le_job_name->setText(defaultJobName());
+  };
+
+  auto updateEngCommandForm = [this, le_eng_interp, te_eng_command](QString eng_name)
+  {
+    prim::SimEngine *curr_eng = getEngine(eng_name);
+    // TODO the interpreter field should show the path found by the manager instead
+    le_eng_interp->setText(curr_eng->interpreter());
+    if (curr_eng->commandFormats().length() > 0) {
+      te_eng_command->setText(curr_eng->commandFormats().at(0).second);
+    } else {
+      te_eng_command->setText("");
+    }
+  };
+
+  // update simulation parameters form according to the current engine selection
+  auto updateSimParamsForm = [vl_eng_sim_params](gui::PropertyForm *eng_form) mutable
+  {
+    // remove previous form
+    QLayoutItem *child;
+    while ((child = vl_eng_sim_params->takeAt(0)) != 0) {
+      QWidget *old_form = child->widget();
+      old_form->setParent(nullptr);
+      delete child;
+    }
+
+    // show new form
+    vl_eng_sim_params->addWidget(eng_form);
+  };
+
+  // actions performed whenever engine selection changes
+  auto engineSelectionChangeActions = [currentEngineForm, updateEngCommandForm,
+                                       updateSimParamsForm]() mutable
+  {
+    auto curr_eng_form = currentEngineForm();
+    if (!curr_eng_form.first.isEmpty()) {
+      updateEngCommandForm(curr_eng_form.first);
+      updateSimParamsForm(curr_eng_form.second);
+    }
+  };
+
+  // update the sim param property form every time one of the lists have changed
+  connect(lw_job_plurality, &QListWidget::currentRowChanged,
+          [sw_eng_list, updateJobParamsForm, engineSelectionChangeActions](int list_row) mutable 
+          {
+            sw_eng_list->setCurrentIndex(list_row);
+            updateJobParamsForm();
+            engineSelectionChangeActions();
+          });
+  connect(lw_single_eng, &QListWidget::currentRowChanged, engineSelectionChangeActions);
+  connect(lw_chained_eng, &QListWidget::currentRowChanged, engineSelectionChangeActions);
+
+  // select the top item by default
+  lw_job_plurality->setCurrentItem(lw_job_plurality->item(0));
+  lw_single_eng->setCurrentItem(lw_single_eng->item(0));
+
+  // job params form
+  vl_sim_settings->addWidget(group_job);
+  vl_sim_settings->addWidget(group_eng_cml);
+  vl_sim_settings->addWidget(group_eng_sim);
+
+  // buttons
+  QPushButton *pb_run = new QPushButton(tr("&Run"));
+  pb_run->setShortcut(Qt::Key_Return);
+  QPushButton *pb_close = new QPushButton(tr("&Close"));
+  pb_close->setShortcut(Qt::Key_Escape);
+
+  connect(pb_run, &QAbstractButton::clicked,
+          [this, currentEngineForm, le_job_name, le_eng_interp, te_eng_command](){
+            // create sim job and submit to application
+            hide();
+            auto eng_form = currentEngineForm();
+            QString eng_name = currentEngineForm().first;
+            prim::SimEngine *eng = getEngine(eng_name);
+            prim::SimJob *new_job = new prim::SimJob(le_job_name->text(), eng);
+            new_job->addSimParams(eng_form.second->finalProperties());
+            new_job->setInterpreterFormat(le_eng_interp->text());
+            new_job->setCommandFormat(te_eng_command->toPlainText());
+            addJob(new_job);
+            emit sig_simJob(new_job);
+          });
+  connect(pb_close, &QAbstractButton::clicked,
+          this, &QWidget::hide);
+
+  // main layout
+  QHBoxLayout *hl_sim_panes = new QHBoxLayout();
+  hl_sim_panes->addWidget(lw_job_plurality);
+  hl_sim_panes->addWidget(sw_eng_list);
+  hl_sim_panes->addLayout(vl_sim_settings);
+
+  QHBoxLayout *hl_buttons = new QHBoxLayout();
+  hl_buttons->addStretch();
+  hl_buttons->addWidget(pb_run);
+  hl_buttons->addWidget(pb_close);
+
+  QVBoxLayout *vl_main = new QVBoxLayout();
+  vl_main->addLayout(hl_sim_panes);
+  vl_main->addLayout(hl_buttons);
+
+  setLayout(vl_main);
 }
 
 void SimManager::initSimSetupDialog()
@@ -311,7 +516,7 @@ void SimManager::saveSimulationPreset()
 
   // prompt for preset name
   bool ok;
-  QString preset_name = QInputDialog::getText(this, tr("Preset name"),
+  QString preset_name = QInputDialog::getText(sim_manager_dialog, tr("Preset name"),
                                               tr("Preset name:"), QLineEdit::Normal,
                                               tr("Custom Preset"), &ok);
   if (!ok) {

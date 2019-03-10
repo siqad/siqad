@@ -34,14 +34,11 @@ namespace prim{
 
     // JOB SETUP
 
-    // TODO emit signal from SimJob to save job, instead of letting design panel call
-    // invoke binary.
-    // bool saveJob(const QString &);
+    //! Set the simulation interpreter using the given format. TODO path replacement instructions
+    void setInterpreterFormat(const QString &t_interp_format) {interp_format = t_interp_format;}
 
-
-    // load job from XML (for jobs that keep running even if parent terminates)
-    // TODO sim_manager probably needs to check folders for unfinished simulations
-    bool loadJob(const QString &) {return false;}
+    //! Set the simulation invocation command format.
+    void setCommandFormat(const QString &t_command_format) {command_format = t_command_format;}
 
     // simulation parameters
 
@@ -125,9 +122,9 @@ namespace prim{
     //! getter for engine name
     QString engineName() {return engine ? engine->name() : "Undefined";}
 
-    QString runtimeTempDir();     //!< runtime job directory
-    QString problemFile();        //!< runtime problem file
-    QString resultFile();         //!< runtime result file
+    QString runtimeTempPath();        //!< runtime job directory
+    QString problemFilePath();        //!< runtime problem file
+    QString resultFilePath();         //!< runtime result file
 
     QDateTime startTime() {return start_time;}
     QDateTime endTime() {return end_time;}
@@ -156,8 +153,10 @@ namespace prim{
 
     // variables
     QString job_name;         // job name for identification
+    QString interp_format;    // format for interpreter path or command
+    QString command_format;   // format of the invocation command
     SimEngine *engine;        // the engine used by this job
-    QString run_job_dir;      // job directory for storing runtime data
+    QString job_tmp_dir_path; // job directory for storing runtime data
     QString problem_path;     // path to problem file
     QString result_path;      // path to result file
     QString terminal_output;  // terminal output from the job
