@@ -32,11 +32,11 @@ namespace prim{
       JobStep() {};
       JobStep(SimEngine *t_engine) : engine(t_engine) {};
       JobStep(SimEngine *t_engine, QString t_interp_format, 
-              QString t_command_format, QMap<QString, QString> t_sim_params)
+              QStringList t_command_format, QMap<QString, QString> t_sim_params)
         : engine(t_engine), interp_format(t_interp_format), 
           command_format(t_command_format), sim_params(t_sim_params) {};
       JobStep(SimEngine *t_engine, QString t_interp_format, 
-              QString t_command_format, gui::PropertyMap t_sim_prop_map)
+              QStringList t_command_format, gui::PropertyMap t_sim_prop_map)
         : engine(t_engine), interp_format(t_interp_format), 
           command_format(t_command_format) 
       {
@@ -54,7 +54,7 @@ namespace prim{
 
       SimEngine *engine=nullptr;
       QString interp_format;
-      QString command_format;
+      QStringList command_format;
       QMap<QString, QString> sim_params;
     };
 

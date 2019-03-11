@@ -53,8 +53,15 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
       while (rs.readNextStartElement()) {
         if (rs.name() == "command") {
           QString cmd_label = rs.attributes().value("label").toString();
-          eng_command_formats.append(qMakePair(cmd_label, 
-                                               rs.readElementText()));
+          QStringList cmd_list;
+          while (rs.readNextStartElement()) {
+            if (rs.name() == "program" || rs.name() == "arg") {
+              cmd_list.append(rs.readElementText());
+            } else {
+              unrecognizedElement(rs);
+            }
+          }
+          eng_command_formats.append(qMakePair(cmd_label, cmd_list));
         } else {
           unrecognizedElement(rs);
         }

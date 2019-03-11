@@ -38,10 +38,13 @@ namespace prim{
     //! Return the available engine command formats as a QList of QPair. The 
     //! first element of each pair is a descriptive command label and the second 
     //! element is the actual command.
-    QList<QPair<QString, QString>> commandFormats() {return eng_command_formats;}
+    QList<QPair<QString, QStringList>> commandFormats() {return eng_command_formats;}
 
-    //! Return the command format corresponding to the given label.
-    QPair<QString, QString> commandFormat(int i) {return eng_command_formats.at(i);}
+    //! Return the command format corresponding to the given label. The first 
+    //! element is the label and the second element is a string representing 
+    //! the command with arguments delimited by end lines ("\n").
+    QPair<QString, QString> jointCommandFormat(int i)
+    {return qMakePair(eng_command_formats.at(i).first, eng_command_formats.at(i).second.join("\n"));}
 
     //! Return the path to the engine description file.
     QString descriptionFilePath() {return eng_desc_path;}
@@ -94,8 +97,12 @@ namespace prim{
     //! Initialize the simulation engine.
     void initSimEngine(const QString &eng_nm, const QString &eng_rt);
 
+    //! Pairs of command labels and actual command elements. The first element 
+    //! in the QStringList is always the program/command, the rest of the 
+    //! elements are arguments.
+    QList<QPair<QString, QStringList>> eng_command_formats;
+
     // variables like binary location, temp file location, etc.
-    QList<QPair<QString, QString>> eng_command_formats;  // pairs of command labels and actual commands
     QString eng_desc_path;      // description file of this engine
     QString eng_usr_cfg_path;   // user default settings of this engine TODO remove after preset feature
     QString eng_name;           // name of this engine

@@ -37,7 +37,7 @@ public:
     {
       interp_format = engine->interpreter();
       if (engine->commandFormats().length() > 0)
-        command_format = engine->commandFormats().at(0).second;
+        command_format = engine->jointCommandFormat(0).second;
       prop_form = new PropertyForm(engine->sim_params_map);
     }
 
@@ -54,8 +54,8 @@ public:
     }
 
     prim::SimEngine *engine=nullptr;
-    QString interp_format;
-    QString command_format;
+    QString interp_format;            // interpreter format
+    QString command_format;           // command format with arguments delimited by "\n".
     PropertyForm *prop_form=nullptr;
   };
 

@@ -199,9 +199,10 @@ void SimManager::initSimManager()
   QToolButton *tb_eng_command_preset = new QToolButton();
   QMenu *menu_eng_command_preset = new QMenu();
   tb_eng_command_preset->setIcon(QIcon::fromTheme("preferences-system"));
-  tb_eng_command_preset->setText("Command Presets");
+  tb_eng_command_preset->setText("Presets");
   tb_eng_command_preset->setPopupMode(QToolButton::InstantPopup);
   tb_eng_command_preset->setMenu(menu_eng_command_preset);
+  tb_eng_command_preset->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
   QHBoxLayout *hl_eng_command = new QHBoxLayout();
   hl_eng_command->addWidget(new QLabel("Invocation command format"));
@@ -284,7 +285,7 @@ void SimManager::initSimManager()
 
     // update engine command presets
     menu_eng_command_preset->clear();
-    for (QPair<QString, QString> cmd_format : eng_data->engine->commandFormats()) {
+    for (auto cmd_format : eng_data->engine->commandFormats()) {
       menu_eng_command_preset->addAction(cmd_format.first);
     }
   };
@@ -362,7 +363,7 @@ void SimManager::initSimManager()
           {
             EngineDataset *eng_dataset = currentEngineDataset();
             int action_i = menu_eng_command_preset->actions().indexOf(action);
-            QString chosen_cmd = eng_dataset->engine->commandFormat(action_i).second;
+            QString chosen_cmd = eng_dataset->engine->jointCommandFormat(action_i).second;
             te_eng_command->setText(chosen_cmd);
           });
 
@@ -396,7 +397,7 @@ void SimManager::initSimManager()
               prim::SimJob *new_job = new prim::SimJob(le_job_name->text());
               prim::SimJob::JobStep js(eng_data->engine, 
                                        eng_data->interp_format,
-                                       eng_data->command_format,
+                                       eng_data->command_format.split("\n"),
                                        eng_data->prop_form->finalProperties()
                                        );
               new_job->addJobStep(js);
@@ -413,7 +414,7 @@ void SimManager::initSimManager()
                 // create sim job step and add it to the sim job
                 prim::SimJob::JobStep js(eng_data->engine, 
                                          eng_data->interp_format,
-                                         eng_data->command_format,
+                                         eng_data->command_format.split("\n"),
                                          eng_data->prop_form->finalProperties());
                 new_job->addJobStep(js);
               }

@@ -52,12 +52,14 @@ bool SimJob::invokeBinary()
 
     if (job_step.command_format.isEmpty()) {
       // default command format
-      job_step.command_format = "@INTERP@ @BINPATH@ @PROBLEMPATH@ @RESULTPATH@";
+      job_step.command_format = QStringList({"@INTERP@", "@BINPATH@", "@PROBLEMPATH@", "@RESULTPATH@"});
     }
 
-    QString command = job_step.command_format;
+    QStringList command = job_step.command_format;
     QString interp_command = job_step.interp_format;
 
+    // TODO paths that contain spaces would lead to issues using the current 
+    // code, convert to using Qt's argument class instead
     // TODO move to class
     QMap<QString, QString> replace_map;
     replace_map["@PYTHON@"] = gui::python_path; // TODO needs further splitting for comma separated calls
@@ -81,16 +83,18 @@ bool SimJob::invokeBinary()
 
     replace_map["@INTERP@"] = interp_command;
 
-    while (command.indexOf(regex) != -1) {
-      QString found_replace = regex.capturedTexts().first();
-      if (!replace_map.contains(found_replace)) {
-        qFatal(tr("Path replacement failed, key '%1' not found.")
-            .arg(found_replace).toLatin1().constData(),0);
+    for (int i=0; i<command.length(); i++) {
+      while (command[i].indexOf(regex) != -1) {
+        QString found_replace = regex.capturedTexts().first();
+        if (!replace_map.contains(found_replace)) {
+          qFatal(tr("Path replacement failed, key '%1' not found.")
+              .arg(found_replace).toLatin1().constData(),0);
+        }
+        command[i].replace(command[i].indexOf(regex), found_replace.length(), replace_map[found_replace]);
       }
-      command.replace(command.indexOf(regex), found_replace.length(), replace_map[found_replace]);
     }
 
-    qDebug() << tr("Final replaced command: %1").arg(command);
+    qDebug() << tr("Final replaced command: %1").arg(command.join("\n"));
 
     // set up process
     sim_process = new QProcess();
@@ -119,14 +123,15 @@ bool SimJob::invokeBinary()
     cml_arguments << problem_file_info.canonicalFilePath(); // problem file
     cml_arguments << resultFilePath();                          // result file
     */
-    cml_arguments << command;
+    sim_process->setProgram(command.takeFirst());
+    sim_process->setArguments(command);
 
     start_time = QDateTime::currentDateTime();
 
     //sim_process->setArguments(cml_arguments);
     sim_process->setProcessChannelMode(QProcess::MergedChannels);
     qDebug() << tr("SimJob: Starting process");
-    sim_process->start(command);
+    sim_process->start();
 
     // TODO connect signals for error and finish
 
