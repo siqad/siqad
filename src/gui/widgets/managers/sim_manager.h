@@ -26,6 +26,39 @@ class SimManager : public QWidget
 
 public:
 
+  struct EngineDataset
+  {
+    //! Empty constructor.
+    EngineDataset() {};
+
+    //! Construct a dataset using engine defaults.
+    EngineDataset(prim::SimEngine *t_engine)
+      : engine(t_engine)
+    {
+      interp_format = engine->interpreter();
+      if (engine->commandFormats().length() > 0)
+        command_format = engine->commandFormats().at(0).second;
+      prop_form = new PropertyForm(engine->sim_params_map);
+    }
+
+    //! Construct a dataset with all values specified.
+    EngineDataset(prim::SimEngine *t_engine, const QString &t_interp_format,
+                  const QString &t_command_format, PropertyForm *t_prop_form)
+      : engine(t_engine), interp_format(t_interp_format), 
+        command_format(t_command_format), prop_form(t_prop_form) {};
+
+    //! Check whether this dataset is empty.
+    bool isEmpty()
+    {
+      return engine == nullptr;
+    }
+
+    prim::SimEngine *engine=nullptr;
+    QString interp_format;
+    QString command_format;
+    PropertyForm *prop_form=nullptr;
+  };
+
   // constructor
   SimManager(QWidget *parent = 0);
 
@@ -101,7 +134,8 @@ private:
   void initEngines();
 
   // map QListWidgetItem to the corresponding engine property form
-  QMap<QListWidgetItem*,QPair<QString, PropertyForm*>> eng_list_property_form;
+  //QMap<QListWidgetItem*,QPair<QString, PropertyForm*>> eng_list_property_form; // TODO remove
+  QMap<QListWidgetItem*, EngineDataset*> eng_datasets;
 
   // dialogs
   QWidget *sim_manager_dialog;

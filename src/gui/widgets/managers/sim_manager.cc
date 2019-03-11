@@ -171,15 +171,15 @@ void SimManager::initSimManager()
   for (prim::SimEngine *engine : sim_engines) {
     QListWidgetItem *lwi_single_eng = new QListWidgetItem(engine->name());
     lw_single_eng->addItem(lwi_single_eng);
-    eng_list_property_form.insert(lwi_single_eng, 
-        qMakePair(engine->name(), new gui::PropertyForm(engine->sim_params_map)));
+    eng_datasets.insert(lwi_single_eng, new EngineDataset(engine));
 
     // add the engine to the list of engines that can be added to a chained simulation
     menu_add_chained_eng->addAction(engine->name());
   }
-  QListWidgetItem *lw_add_chain_eng = new QListWidgetItem("Add Engine to Chain");
-  lw_chained_eng->addItem(lw_add_chain_eng);
-  lw_chained_eng->setItemWidget(lw_add_chain_eng, tb_add_chained_eng);
+  QListWidgetItem *lwi_add_chain_eng = new QListWidgetItem("Add Engine to Chain");
+  lw_chained_eng->addItem(lwi_add_chain_eng);
+  lw_chained_eng->setItemWidget(lwi_add_chain_eng, tb_add_chained_eng);
+  eng_datasets.insert(lwi_add_chain_eng, new EngineDataset());  // insert blank dataset for the add engine action
 
   sw_eng_list->addWidget(lw_single_eng);
   sw_eng_list->addWidget(lw_chained_eng);
@@ -232,28 +232,30 @@ void SimManager::initSimManager()
             lw_chained_eng->insertItem(row, lwi_eng);
             lw_chained_eng->setItemWidget(lwi_eng, w_eng);
 
-            gui::PropertyForm *eng_form = new gui::PropertyForm(getEngine(action->text())->sim_params_map);
-            eng_list_property_form.insert(lwi_eng, qMakePair(action->text(), eng_form));
-            lwi_eng->setSelected(true);
+            prim::SimEngine *engine = getEngine(action->text());
+            eng_datasets.insert(lwi_eng, new EngineDataset(engine));
+            lw_chained_eng->setCurrentItem(lwi_eng);
 
             connect(pb_remove, &QAbstractButton::clicked,
                     [this, lw_chained_eng, lwi_eng]()
                     {
                       int rm_row = lw_chained_eng->row(lwi_eng);
-                      QListWidgetItem *rm_eng = lw_chained_eng->takeItem(rm_row);
-                      if (rm_eng != nullptr) {
-                        auto f_entry = eng_list_property_form.take(rm_eng); // TODO might cost issues when removing the form that's currently shown, test later
-                        delete f_entry.second;
-                        delete rm_eng;
+                      QListWidgetItem *lwi_rm_eng = lw_chained_eng->takeItem(rm_row);
+                      if (lwi_rm_eng != nullptr) {
+                        EngineDataset *rm_dataset = eng_datasets.take(lwi_rm_eng);
+                        // TODO deal with the removal of all form fields
+                        delete rm_dataset->prop_form;
+                        delete rm_dataset;
+                        delete lwi_rm_eng;
                       }
                     });
           });
 
   // get current engine name, property form pair
-  auto currentEngineForm = [this, sw_eng_list]() -> QPair<QString, PropertyForm*>
+  auto currentEngineDataset = [this, sw_eng_list]() -> EngineDataset*
   {
     QListWidget *curr_list = static_cast<QListWidget*>(sw_eng_list->currentWidget());
-    return eng_list_property_form.value(curr_list->currentItem());
+    return eng_datasets.value(curr_list->currentItem());
   };
 
   // update job parameters form according to the current plurality and engine selection
@@ -262,20 +264,14 @@ void SimManager::initSimManager()
     le_job_name->setText(defaultJobName());
   };
 
-  auto updateEngCommandForm = [this, le_eng_interp, te_eng_command](QString eng_name)
+  auto updateEngCommandForm = [le_eng_interp, te_eng_command](EngineDataset *eng_data)
   {
-    prim::SimEngine *curr_eng = getEngine(eng_name);
-    // TODO should not poll from the engine every time, should be saved in some field or data structure instead
-    le_eng_interp->setText(curr_eng->interpreter());
-    if (curr_eng->commandFormats().length() > 0) {
-      te_eng_command->setText(curr_eng->commandFormats().at(0).second);
-    } else {
-      te_eng_command->setText("");
-    }
+    le_eng_interp->setText(eng_data->interp_format);
+    te_eng_command->setText(eng_data->command_format);
   };
 
   // update simulation parameters form according to the current engine selection
-  auto updateSimParamsForm = [vl_eng_sim_params](gui::PropertyForm *eng_form) mutable
+  auto updateSimParamsForm = [vl_eng_sim_params](EngineDataset *eng_data) mutable
   {
     // remove previous form
     QLayoutItem *child;
@@ -286,30 +282,67 @@ void SimManager::initSimManager()
     }
 
     // show new form
-    vl_eng_sim_params->addWidget(eng_form);
+    vl_eng_sim_params->addWidget(eng_data->prop_form);
   };
 
   // actions performed whenever engine selection changes
-  auto engineSelectionChangeActions = [currentEngineForm, updateEngCommandForm,
+  auto engineSelectionChangeActions = [currentEngineDataset, 
+                                       updateEngCommandForm,
                                        updateSimParamsForm]() mutable
   {
-    auto curr_eng_form = currentEngineForm();
-    if (!curr_eng_form.first.isEmpty()) {
-      updateEngCommandForm(curr_eng_form.first);
-      updateSimParamsForm(curr_eng_form.second);
+    EngineDataset *curr_eng_data = currentEngineDataset();
+    if (curr_eng_data != nullptr && !curr_eng_data->isEmpty()) {
+      updateEngCommandForm(curr_eng_data);
+      updateSimParamsForm(curr_eng_data);
     }
   };
 
   // update the sim param property form every time one of the lists have changed
-  connect(lw_job_plurality, &QListWidget::currentRowChanged,
-          [sw_eng_list, updateJobParamsForm, engineSelectionChangeActions](int list_row) mutable 
+  connect(lw_job_plurality, &QListWidget::currentItemChanged,
+          [sw_eng_list, updateJobParamsForm, engineSelectionChangeActions,
+            lw_job_plurality]
+            (QListWidgetItem *lwi_new, QListWidgetItem *) mutable 
           {
-            sw_eng_list->setCurrentIndex(list_row);
+            // write changes before updating list
+            //writeChangesToEngineData();
+            sw_eng_list->setCurrentIndex(lw_job_plurality->row(lwi_new));
             updateJobParamsForm();
             engineSelectionChangeActions();
           });
-  connect(lw_single_eng, &QListWidget::currentRowChanged, engineSelectionChangeActions);
-  connect(lw_chained_eng, &QListWidget::currentRowChanged, engineSelectionChangeActions);
+
+  // react to single engine list changes
+  connect(lw_single_eng, &QListWidget::currentItemChanged, 
+          [engineSelectionChangeActions]() mutable
+          {
+            engineSelectionChangeActions();
+          });
+  
+  // react to chained engine list changes
+  connect(lw_chained_eng, &QListWidget::currentItemChanged, 
+          [engineSelectionChangeActions]() mutable
+          {
+            engineSelectionChangeActions();
+          });
+
+  // immediately update the current engine dataset when engine interpreter or 
+  // command fields are updated by the user (but not programmatically)
+  connect(le_eng_interp, &QLineEdit::textEdited,
+          [currentEngineDataset](const QString &new_text)
+          {
+            EngineDataset *eng_dataset = currentEngineDataset();
+            if (eng_dataset != nullptr) {
+              eng_dataset->interp_format = new_text;
+            }
+          });
+  connect(te_eng_command, &QTextEdit::textChanged,
+          [currentEngineDataset, te_eng_command]()
+          {
+            EngineDataset *eng_dataset = currentEngineDataset();
+            if (eng_dataset != nullptr) {
+              eng_dataset->command_format = te_eng_command->toPlainText();
+            }
+          });
+
 
   // select the top item by default
   lw_job_plurality->setCurrentItem(lw_job_plurality->item(0));
@@ -326,39 +359,40 @@ void SimManager::initSimManager()
   QPushButton *pb_close = new QPushButton(tr("&Close"));
   pb_close->setShortcut(Qt::Key_Escape);
 
+  // button actions
+  connect(pb_close, &QAbstractButton::clicked, this, &QWidget::hide);
   connect(pb_run, &QAbstractButton::clicked,
-          [this, lwi_single, lwi_chained, lw_chained_eng, currentEngineForm, le_job_name, le_eng_interp, te_eng_command]()
+          [this, lwi_single, lwi_chained, lw_chained_eng, currentEngineDataset, 
+           le_job_name]()
           {
             hide();
             // create sim job and submit to application
             // TODO improve Job constructor to take job step directly
             // TODO simplify this lambda function
             if (lwi_single->isSelected()) {
-              auto eng_form_pair = currentEngineForm();
-              prim::SimEngine *eng = getEngine(eng_form_pair.first);
+              EngineDataset *eng_data = currentEngineDataset();
               prim::SimJob *new_job = new prim::SimJob(le_job_name->text());
-              prim::SimJob::JobStep js(eng, le_eng_interp->text(),
-                                       te_eng_command->toPlainText(),
-                                       eng_form_pair.second->finalProperties()
+              prim::SimJob::JobStep js(eng_data->engine, 
+                                       eng_data->interp_format,
+                                       eng_data->command_format,
+                                       eng_data->prop_form->finalProperties()
                                        );
               new_job->addJobStep(js);
               addJob(new_job);
               emit sig_simJob(new_job);
             } else if (lwi_chained->isSelected()) {
-              // TODO now it's just always reading the same interpreter and command, need to separate those into easily accessible forms
               prim::SimJob *new_job = new prim::SimJob(le_job_name->text());
               for (int i=0; i<lw_chained_eng->count(); i++) {
                 QListWidgetItem *lwi_eng_form = lw_chained_eng->item(i);
-                auto eng_form_pair = eng_list_property_form.value(lwi_eng_form);
-                if (eng_form_pair.first.isEmpty())
+                EngineDataset *eng_data = eng_datasets.value(lwi_eng_form);
+                if (eng_data == nullptr || eng_data->isEmpty())
                   continue;
 
-                prim::SimEngine *eng = getEngine(eng_form_pair.first);
                 // create sim job step and add it to the sim job
-                prim::SimJob::JobStep js(eng, le_eng_interp->text(),
-                                         te_eng_command->toPlainText(),
-                                         eng_form_pair.second->finalProperties()
-                                         );
+                prim::SimJob::JobStep js(eng_data->engine, 
+                                         eng_data->interp_format,
+                                         eng_data->command_format,
+                                         eng_data->prop_form->finalProperties());
                 new_job->addJobStep(js);
               }
               addJob(new_job);
@@ -367,8 +401,6 @@ void SimManager::initSimManager()
               qWarning() << "Neither expected engine execution mode is selected, nothing to run.";
             }
           });
-  connect(pb_close, &QAbstractButton::clicked,
-          this, &QWidget::hide);
 
   // main layout
   QHBoxLayout *hl_sim_panes = new QHBoxLayout();
