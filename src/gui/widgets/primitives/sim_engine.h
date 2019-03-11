@@ -40,6 +40,9 @@ namespace prim{
     //! element is the actual command.
     QList<QPair<QString, QString>> commandFormats() {return eng_command_formats;}
 
+    //! Return the command format corresponding to the given label.
+    QPair<QString, QString> commandFormat(int i) {return eng_command_formats.at(i);}
+
     //! Return the path to the engine description file.
     QString descriptionFilePath() {return eng_desc_path;}
 

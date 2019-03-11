@@ -196,8 +196,20 @@ void SimManager::initSimManager()
   QGroupBox *group_eng_cml = new QGroupBox("Engine Command");
   QLineEdit *le_eng_interp = new QLineEdit();
   QTextEdit *te_eng_command = new QTextEdit();
+  QToolButton *tb_eng_command_preset = new QToolButton();
+  QMenu *menu_eng_command_preset = new QMenu();
+  tb_eng_command_preset->setIcon(QIcon::fromTheme("preferences-system"));
+  tb_eng_command_preset->setText("Command Presets");
+  tb_eng_command_preset->setPopupMode(QToolButton::InstantPopup);
+  tb_eng_command_preset->setMenu(menu_eng_command_preset);
+
+  QHBoxLayout *hl_eng_command = new QHBoxLayout();
+  hl_eng_command->addWidget(new QLabel("Invocation command format"));
+  hl_eng_command->addStretch();
+  hl_eng_command->addWidget(tb_eng_command_preset);
+
   fl_eng_cmd_params->addRow(new QLabel("Interpreter"), le_eng_interp);
-  fl_eng_cmd_params->addRow(new QLabel("Invocation command format"));
+  fl_eng_cmd_params->addRow(hl_eng_command);
   fl_eng_cmd_params->addRow(te_eng_command);
   group_eng_cml->setLayout(fl_eng_cmd_params);
   group_eng_cml->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -264,10 +276,17 @@ void SimManager::initSimManager()
     le_job_name->setText(defaultJobName());
   };
 
-  auto updateEngCommandForm = [le_eng_interp, te_eng_command](EngineDataset *eng_data)
+  auto updateEngCommandForm = [le_eng_interp, te_eng_command, 
+                               menu_eng_command_preset](EngineDataset *eng_data)
   {
     le_eng_interp->setText(eng_data->interp_format);
     te_eng_command->setText(eng_data->command_format);
+
+    // update engine command presets
+    menu_eng_command_preset->clear();
+    for (QPair<QString, QString> cmd_format : eng_data->engine->commandFormats()) {
+      menu_eng_command_preset->addAction(cmd_format.first);
+    }
   };
 
   // update simulation parameters form according to the current engine selection
@@ -312,17 +331,11 @@ void SimManager::initSimManager()
 
   // react to single engine list changes
   connect(lw_single_eng, &QListWidget::currentItemChanged, 
-          [engineSelectionChangeActions]() mutable
-          {
-            engineSelectionChangeActions();
-          });
+          engineSelectionChangeActions);
   
   // react to chained engine list changes
   connect(lw_chained_eng, &QListWidget::currentItemChanged, 
-          [engineSelectionChangeActions]() mutable
-          {
-            engineSelectionChangeActions();
-          });
+          engineSelectionChangeActions);
 
   // immediately update the current engine dataset when engine interpreter or 
   // command fields are updated by the user (but not programmatically)
@@ -341,6 +354,16 @@ void SimManager::initSimManager()
             if (eng_dataset != nullptr) {
               eng_dataset->command_format = te_eng_command->toPlainText();
             }
+          });
+
+  // update the command format if a preset format has been chosen by the user
+  connect(menu_eng_command_preset, &QMenu::triggered,
+          [currentEngineDataset, menu_eng_command_preset, te_eng_command](QAction *action)
+          {
+            EngineDataset *eng_dataset = currentEngineDataset();
+            int action_i = menu_eng_command_preset->actions().indexOf(action);
+            QString chosen_cmd = eng_dataset->engine->commandFormat(action_i).second;
+            te_eng_command->setText(chosen_cmd);
           });
 
 

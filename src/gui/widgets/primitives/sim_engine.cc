@@ -52,8 +52,9 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
     } else if (rs.name() == "commands") {
       while (rs.readNextStartElement()) {
         if (rs.name() == "command") {
-          eng_command_formats.append(qMakePair(rs.attributes().value("label").toString(), 
-                                     rs.readElementText()));
+          QString cmd_label = rs.attributes().value("label").toString();
+          eng_command_formats.append(qMakePair(cmd_label, 
+                                               rs.readElementText()));
         } else {
           unrecognizedElement(rs);
         }
