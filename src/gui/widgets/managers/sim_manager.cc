@@ -187,7 +187,7 @@ void SimManager::initSimManager()
 
   // initialize job params form
   QGroupBox *group_job = new QGroupBox("Job");
-  QLineEdit *le_job_name = new QLineEdit();
+  le_job_name = new QLineEdit();
   fl_job_params->addRow(new QLabel("Job Name:"), le_job_name);
   group_job->setLayout(fl_job_params);
   group_job->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -271,7 +271,7 @@ void SimManager::initSimManager()
   };
 
   // update job parameters form according to the current plurality and engine selection
-  auto updateJobParamsForm = [this, le_job_name]()
+  auto updateJobParamsForm = [this]()
   {
     le_job_name->setText(defaultJobName());
   };
@@ -385,8 +385,7 @@ void SimManager::initSimManager()
   // button actions
   connect(pb_close, &QAbstractButton::clicked, this, &QWidget::hide);
   connect(pb_run, &QAbstractButton::clicked,
-          [this, lwi_single, lwi_chained, lw_chained_eng, currentEngineDataset, 
-           le_job_name]()
+          [this, lwi_single, lwi_chained, lw_chained_eng, currentEngineDataset]()
           {
             hide();
             // create sim job and submit to application
@@ -554,6 +553,14 @@ void SimManager::updateSimParams()
   }
 
   sim_setup_dialog->adjustSize();
+}
+
+
+void SimManager::showEvent(QShowEvent *e)
+{
+  if (!e->spontaneous()) {
+    le_job_name->setText(defaultJobName());
+  }
 }
 
 

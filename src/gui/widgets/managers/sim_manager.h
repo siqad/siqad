@@ -86,6 +86,12 @@ public:
 signals:
   void sig_simJob(prim::SimJob *new_job);
 
+protected:
+
+  //! Override the show event to update job time title every time the widget is
+  //! shown.
+  void showEvent(QShowEvent *e) Q_DECL_OVERRIDE;
+
 public slots:
 
   //! Without showing the dialog, just activate "Run" and start a job with
@@ -145,7 +151,8 @@ private:
   // manager panes
   QGroupBox *sim_params_group;
   QVBoxLayout *sim_params_vl;
-  QLineEdit *le_job_nm;
+  QLineEdit *le_job_nm; // TODO delete
+  QLineEdit *le_job_name;
 
   // button group
   QHBoxLayout *bottom_buttons_hl;
