@@ -31,14 +31,13 @@ namespace prim{
     {
       JobStep() {};
       JobStep(SimEngine *t_engine) : engine(t_engine) {};
-      JobStep(SimEngine *t_engine, QString t_interp_format, 
-              QStringList t_command_format, QMap<QString, QString> t_sim_params)
-        : engine(t_engine), interp_format(t_interp_format), 
-          command_format(t_command_format), sim_params(t_sim_params) {};
-      JobStep(SimEngine *t_engine, QString t_interp_format, 
-              QStringList t_command_format, gui::PropertyMap t_sim_prop_map)
-        : engine(t_engine), interp_format(t_interp_format), 
-          command_format(t_command_format) 
+      JobStep(SimEngine *t_engine, QStringList t_command_format, 
+              QMap<QString, QString> t_sim_params)
+        : engine(t_engine), command_format(t_command_format), 
+          sim_params(t_sim_params) {};
+      JobStep(SimEngine *t_engine, QStringList t_command_format, 
+              gui::PropertyMap t_sim_prop_map)
+        : engine(t_engine), command_format(t_command_format) 
       {
         for (const QString &key : t_sim_prop_map.keys())
           sim_params.insert(key, t_sim_prop_map.value(key).value.toString());
@@ -46,14 +45,12 @@ namespace prim{
 
       bool isEmpty()
       {
-        if (engine == nullptr && interp_format.isEmpty() 
-            && command_format.isEmpty() && sim_params.isEmpty())
+        if (engine == nullptr && command_format.isEmpty() && sim_params.isEmpty())
           return true;
         return false;
       }
 
       SimEngine *engine=nullptr;
-      QString interp_format;
       QStringList command_format;
       QMap<QString, QString> sim_params;
     };
@@ -173,7 +170,7 @@ namespace prim{
     void deduplicateDist();           // deduplicate charge distribution results
 
     // variables
-    // TODO make some sort of struct that stores the engine, interpreter, command and simparams for each engine instead of going where this is currently going
+    // TODO make some sort of struct that stores the engine, command and simparams for each engine instead of going where this is currently going
     QList<JobStep> job_steps; // list of steps in this simulation job, each step invokes one simulation
     QString job_name;         // job name for identification
     QString job_tmp_dir_path; // job directory for storing runtime data

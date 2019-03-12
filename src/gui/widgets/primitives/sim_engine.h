@@ -72,12 +72,6 @@ namespace prim{
     //! Set the engine version.
     void setVersion(const QString &ver) {eng_version = ver;}
 
-    //! Return the runtime interpreter of the engine (e.g. python).
-    QString interpreter() {return runtime_interpreter;}
-
-    //! Set the runtime interpreter of the engine (e.g. python).
-    void setInterpreter(const QString &interp) {runtime_interpreter = interp;}
-
     //! Return the path to the binary (no interpreter) or script (interpreter 
     //! set) of the physics engine.
     QString binaryPath() {return bin_path;}
@@ -109,7 +103,6 @@ namespace prim{
     QString root_dir_path;      // root directory of this engine containing description and more
     QString preset_dir_path;    // path to the directory where user presets should be stored
     QString eng_version;
-    QString runtime_interpreter;// runtime interpreter (e.g. Python), blank if not applicable
     QString bin_path;           // binary (standalone) or script (interpreted) path of this engine
     QString dep_path;           // dependencies path (requirements.txt for Python scripts)
     QString tmp_path;           // root directory for all problems files for this engine

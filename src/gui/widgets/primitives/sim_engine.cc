@@ -47,8 +47,6 @@ SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
       setBinaryPath(eng_dir.absoluteFilePath(rs.readElementText()));
     } else if (rs.name() == "dep_path") {
       setDependenciesPath(eng_dir.absoluteFilePath(rs.readElementText()));
-    } else if (rs.name() == "interpreter") {
-      setInterpreter(rs.readElementText());
     } else if (rs.name() == "commands") {
       while (rs.readNextStartElement()) {
         if (rs.name() == "command") {

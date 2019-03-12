@@ -35,17 +35,15 @@ public:
     EngineDataset(prim::SimEngine *t_engine)
       : engine(t_engine)
     {
-      interp_format = engine->interpreter();
       if (engine->commandFormats().length() > 0)
         command_format = engine->jointCommandFormat(0).second;
       prop_form = new PropertyForm(engine->sim_params_map);
     }
 
     //! Construct a dataset with all values specified.
-    EngineDataset(prim::SimEngine *t_engine, const QString &t_interp_format,
-                  const QString &t_command_format, PropertyForm *t_prop_form)
-      : engine(t_engine), interp_format(t_interp_format), 
-        command_format(t_command_format), prop_form(t_prop_form) {};
+    EngineDataset(prim::SimEngine *t_engine, const QString &t_command_format, 
+                  PropertyForm *t_prop_form)
+      : engine(t_engine), command_format(t_command_format), prop_form(t_prop_form) {};
 
     //! Check whether this dataset is empty.
     bool isEmpty()
@@ -54,7 +52,6 @@ public:
     }
 
     prim::SimEngine *engine=nullptr;
-    QString interp_format;            // interpreter format
     QString command_format;           // command format with arguments delimited by "\n".
     PropertyForm *prop_form=nullptr;
   };

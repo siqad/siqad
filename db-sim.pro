@@ -210,9 +210,8 @@ sim_qpuanneal.path = $$EXEC_DIR/src/phys/qpuanneal
 sim_qpuanneal.files = \
     $$PHYS_DIR/qpuanneal/qpu_anneal.physeng \
     $$PHYS_DIR/qpuanneal/src/groundstate-dwave.py \
+    $$PHYS_DIR/qpuanneal/src/siqadconn.py \
     $$PHYS_DIR/qpuanneal/src/_siqadconn*.so \
-    $$PHYS_DIR/qpuanneal/src/siqadconn.py
-win32: sim_qpuanneal.files += \
     $$PHYS_DIR/qpuanneal/src/_siqadconn*.pyd
 INSTALLS += sim_qpuanneal
 
@@ -223,11 +222,9 @@ sim_afmmarcus.files = \
     $$PHYS_DIR/afmmarcus/afm_line_scan.physeng \
     $$PHYS_DIR/afmmarcus/hopping_animator.physeng \
     $$PHYS_DIR/afmmarcus/marcus_and_pois.physeng \
-sim_afmmarcus.files += \
-    $$PHYS_DIR/afmmarcus/src/_siqadconn*.so
-win32: sim_afmmarcus.files += \
-    $$PHYS_DIR/afmmarcus/src/_siqadconn*.pyd
-sim_afmmarcus.files += \
+    $$PHYS_DIR/afmmarcus/src/_siqadconn*.so \
+    $$PHYS_DIR/afmmarcus/src/_siqadconn*.pyd \
+    $$PHYS_DIR/afmmarcus/src/siqadconn.py \
     $$PHYS_DIR/afmmarcus/src/afm.py \
     $$PHYS_DIR/afmmarcus/src/animator.py \
     $$PHYS_DIR/afmmarcus/src/channel.py \
@@ -238,8 +235,7 @@ sim_afmmarcus.files += \
     $$PHYS_DIR/afmmarcus/src/marcus.py \
     $$PHYS_DIR/afmmarcus/src/model.py \
     $$PHYS_DIR/afmmarcus/src/tip_model.py \
-    $$PHYS_DIR/afmmarcus/src/qt_import.py \
-    $$PHYS_DIR/afmmarcus/src/siqadconn.py
+    $$PHYS_DIR/afmmarcus/src/qt_import.py
 sim_afmmarcus_stylesheets.path = $$EXEC_DIR/src/phys/afmmarcus/stylesheets
 sim_afmmarcus_stylesheets.files = \
     $$PHYS_DIR/afmmarcus/src/stylesheets/animator.qss
@@ -255,8 +251,8 @@ INSTALLS += sim_afmmarcus_data
 # PoisSolver
 
 sim_poissolver.path = $$EXEC_DIR/src/phys/poissolver
-sim_poissolver.files = $$PHYS_DIR/poissolver/poissolver.physeng
-linux: sim_poissolver.files += \
+sim_poissolver.files = \
+    $$PHYS_DIR/poissolver/poissolver.physeng \
     $$PHYS_DIR/poissolver/FEM/src/poissolver \
     $$PHYS_DIR/poissolver/FEM/src/python/poisson3D.py \
     $$PHYS_DIR/poissolver/FEM/src/python/poisson_class.py \
@@ -275,4 +271,13 @@ linux: sim_poissolver.files += \
     $$PHYS_DIR/poissolver/FEM/src/python/siqadconn.py \
     $$PHYS_DIR/poissolver/FEM/src/python/_siqadconn.*.so \
     $$PHYS_DIR/poissolver/FEM/src/docker/Dockerfile
+sim_poissolver_swig.path = $$EXEC_DIR/src/phys/poissolver/swig_siqadconn
+sim_poissolver_swig.files = \
+    $$PHYS_DIR/poissolver/FEM/src/python/swig_siqadconn/setup.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/swig_siqadconn/siqadconn.cc \
+    $$PHYS_DIR/poissolver/FEM/src/python/swig_siqadconn/siqadconn.h \
+    $$PHYS_DIR/poissolver/FEM/src/python/swig_siqadconn/siqadconn.i \
+    $$PHYS_DIR/poissolver/FEM/src/python/swig_siqadconn/swig_generate_and_compile
 INSTALLS += sim_poissolver
+INSTALLS += sim_poissolver_swig
+

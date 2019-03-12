@@ -52,11 +52,10 @@ bool SimJob::invokeBinary()
 
     if (job_step.command_format.isEmpty()) {
       // default command format
-      job_step.command_format = QStringList({"@INTERP@", "@BINPATH@", "@PROBLEMPATH@", "@RESULTPATH@"});
+      job_step.command_format = QStringList({"@BINPATH@", "@PROBLEMPATH@", "@RESULTPATH@"});
     }
 
     QStringList command = job_step.command_format;
-    QString interp_command = job_step.interp_format;
 
     // TODO paths that contain spaces would lead to issues using the current 
     // code, convert to using Qt's argument class instead
@@ -71,17 +70,6 @@ bool SimJob::invokeBinary()
 
     QRegExp regex("@(.*)?@");
     regex.setMinimal(true);
-
-    while (interp_command.indexOf(regex) != -1) {
-      QString found_replace = regex.capturedTexts().first();
-      qDebug() << tr("replacing: %1").arg(found_replace);
-      if (!replace_map.contains(found_replace)) {
-        qWarning() << tr("Key %1 not found, passed for replacement.").arg(found_replace);
-      }
-      interp_command.replace(interp_command.indexOf(regex), found_replace.length(), replace_map[found_replace]);
-    }
-
-    replace_map["@INTERP@"] = interp_command;
 
     for (int i=0; i<command.length(); i++) {
       while (command[i].indexOf(regex) != -1) {
@@ -98,50 +86,30 @@ bool SimJob::invokeBinary()
 
     // set up process
     sim_process = new QProcess();
-    /*
-    if (!engine->interpreter().isEmpty()) {
-      if (engine->interpreter() == "python" && !gui::python_path.isEmpty()) {
-        // using an interpreter, e.g. Python
-        // template: `python /path/to/script.py /path/to/problem/file /path/to/result/file`
-        QStringList splitted_path = gui::python_path.split(',');
-        if (splitted_path.size() == 0)
-          return false;
-
-        sim_process->setProgram(splitted_path.at(0)); // interpreter
-        cml_arguments << splitted_path.mid(1);        // interpreter args
-        cml_arguments << engine->binaryPath();
-      } else {
-        qCritical() << tr("Runtime interpreter %1 not recognized, ceasing binary invocation").arg(engine->interpreter());
-        return false;
-      }
-    } else {
-      // calling a binary
-      // template: `/path/to/binary /path/to/problem/file /path/to/result/file`
-      sim_process->setProgram(engine->binaryPath());
-    }
-    
-    cml_arguments << problem_file_info.canonicalFilePath(); // problem file
-    cml_arguments << resultFilePath();                          // result file
-    */
+    sim_process->setProcessChannelMode(QProcess::MergedChannels); // TODO doesn't seem to be working now, check
     sim_process->setProgram(command.takeFirst());
     sim_process->setArguments(command);
 
     start_time = QDateTime::currentDateTime();
 
     //sim_process->setArguments(cml_arguments);
-    sim_process->setProcessChannelMode(QProcess::MergedChannels);
     qDebug() << tr("SimJob: Starting process");
     sim_process->start();
 
     // TODO connect signals for error and finish
 
-    // temperary solution: just wait till completion
+    // temperary solution: just wait until completion
     qDebug() << tr("SimJob: Process started, waiting for completion...");
     if (!sim_process->waitForStarted())
       return false;
 
-    while(sim_process->waitForReadyRead(-1))
-      terminal_output.append(QString::fromStdString(sim_process->readAll().toStdString())); // dump output TODO might not have to do it in while
+    while(sim_process->waitForReadyRead(-1)) {}
+      
+    terminal_output.append(QString::fromStdString(sim_process->readAll().toStdString()));
+
+    // NOTE hacky way to get stderr output because MergedChannels doesn't seem 
+    // to be working
+    terminal_output.append(QString::fromLatin1(sim_process->readAllStandardError()));
 
     // clean up sim_process pointer
     delete sim_process;

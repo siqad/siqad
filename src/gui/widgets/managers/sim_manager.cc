@@ -194,7 +194,6 @@ void SimManager::initSimManager()
 
   // initialize engine command line parameters form
   QGroupBox *group_eng_cml = new QGroupBox("Engine Command");
-  QLineEdit *le_eng_interp = new QLineEdit();
   QTextEdit *te_eng_command = new QTextEdit();
   QToolButton *tb_eng_command_preset = new QToolButton();
   QMenu *menu_eng_command_preset = new QMenu();
@@ -209,7 +208,6 @@ void SimManager::initSimManager()
   hl_eng_command->addStretch();
   hl_eng_command->addWidget(tb_eng_command_preset);
 
-  fl_eng_cmd_params->addRow(new QLabel("Interpreter"), le_eng_interp);
   fl_eng_cmd_params->addRow(hl_eng_command);
   fl_eng_cmd_params->addRow(te_eng_command);
   group_eng_cml->setLayout(fl_eng_cmd_params);
@@ -277,10 +275,8 @@ void SimManager::initSimManager()
     le_job_name->setText(defaultJobName());
   };
 
-  auto updateEngCommandForm = [le_eng_interp, te_eng_command, 
-                               menu_eng_command_preset](EngineDataset *eng_data)
+  auto updateEngCommandForm = [te_eng_command, menu_eng_command_preset](EngineDataset *eng_data)
   {
-    le_eng_interp->setText(eng_data->interp_format);
     te_eng_command->setText(eng_data->command_format);
 
     // update engine command presets
@@ -338,16 +334,8 @@ void SimManager::initSimManager()
   connect(lw_chained_eng, &QListWidget::currentItemChanged, 
           engineSelectionChangeActions);
 
-  // immediately update the current engine dataset when engine interpreter or 
-  // command fields are updated by the user (but not programmatically)
-  connect(le_eng_interp, &QLineEdit::textEdited,
-          [currentEngineDataset](const QString &new_text)
-          {
-            EngineDataset *eng_dataset = currentEngineDataset();
-            if (eng_dataset != nullptr) {
-              eng_dataset->interp_format = new_text;
-            }
-          });
+  // immediately update the current engine dataset when the command field is 
+  // updated by the user (but not programmatically)
   connect(te_eng_command, &QTextEdit::textChanged,
           [currentEngineDataset, te_eng_command]()
           {
@@ -396,7 +384,6 @@ void SimManager::initSimManager()
               EngineDataset *eng_data = currentEngineDataset();
               prim::SimJob *new_job = new prim::SimJob(le_job_name->text());
               prim::SimJob::JobStep js(eng_data->engine, 
-                                       eng_data->interp_format,
                                        eng_data->command_format.split("\n"),
                                        eng_data->prop_form->finalProperties()
                                        );
@@ -413,7 +400,6 @@ void SimManager::initSimManager()
 
                 // create sim job step and add it to the sim job
                 prim::SimJob::JobStep js(eng_data->engine, 
-                                         eng_data->interp_format,
                                          eng_data->command_format.split("\n"),
                                          eng_data->prop_form->finalProperties());
                 new_job->addJobStep(js);
