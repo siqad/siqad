@@ -78,7 +78,7 @@ bool SimJob::invokeBinary()
       if (!replace_map.contains(found_replace)) {
         qWarning() << tr("Key %1 not found, passed for replacement.").arg(found_replace);
       }
-      interp_command.replace(interp_command.indexOf(regex), interp_command.length(), replace_map[found_replace]);
+      interp_command.replace(interp_command.indexOf(regex), found_replace.length(), replace_map[found_replace]);
     }
 
     replace_map["@INTERP@"] = interp_command;
@@ -94,7 +94,7 @@ bool SimJob::invokeBinary()
       }
     }
 
-    qDebug() << tr("Final replaced command: %1").arg(command.join("\n"));
+    qDebug() << tr("Final replaced command: %1").arg(command.join(" "));
 
     // set up process
     sim_process = new QProcess();

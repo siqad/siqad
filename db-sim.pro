@@ -273,5 +273,6 @@ linux: sim_poissolver.files += \
     $$PHYS_DIR/poissolver/FEM/src/python/helpers/helpers.py \
     $$PHYS_DIR/poissolver/FEM/src/python/dolfin_convert.py \
     $$PHYS_DIR/poissolver/FEM/src/python/siqadconn.py \
-    $$PHYS_DIR/poissolver/FEM/src/python/_siqadconn.cpython-36m-x86_64-linux-gnu.so
+    $$PHYS_DIR/poissolver/FEM/src/python/_siqadconn.*.so \
+    $$PHYS_DIR/poissolver/FEM/src/docker/Dockerfile
 INSTALLS += sim_poissolver
