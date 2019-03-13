@@ -1,7 +1,7 @@
 // @file:     siqadconn.i
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2018.09.18 - Nathan
+// @editted:  2019.03.08 - Samuel
 // @license:  Apache License 2.0
 //
 // @desc:     Convenient functions for interacting with SiQAD
@@ -68,7 +68,10 @@ namespace std {
   %pythoncode{
     def export(self, *args, **kwargs):
       for key in kwargs:
-        self.setExport(key, StringVector2D(self.tuplify(kwargs[key])))
+        if key == 'db_loc':
+            self.setExport(key, StringPairVector(self.tuplify(kwargs[key])))
+        else:
+            self.setExport(key, StringVector2D(self.tuplify(kwargs[key])))
   }
   %pythoncode{
     def tuplify(self, data):
