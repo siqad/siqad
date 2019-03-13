@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+Available path/command replacements:
+    @INTERP@        : Interpreter command/path (cannot be used in the interpreter field).
+    @PYTHON@        : Use a Python interpreter command/path provided by SiQAD (either from the default settings or the user's overriden choice).
+    @BINPATH@       : Path to the binary or script path to the engine (cannot be used in the bin_path field).
+    @PLUGINPATH@    : Path to the directory containing this *.physeng file.
+    @PROBLEMPATH@   : Path to the problem file describing the simulation problem and parameters.
+    @RESULTPATH@    : Path to the result file that will be read by SiQAD after the simulation is complete.
+    @JOBTMP@        : Temporary path for this simulation job to store generated files.
+
+These replacements are done on the following fields:
+    interpreter, bin_path, command
+-->
+
+<plugin>
+    <name>DB-pair Recognition</name>
+    <version>0.1</version>
+    <description>Recognize DB pairs in the selected region and return SiQAD commands instructing SiQAD to form an aggregate for each DB-pair. DBs which are already in aggregates are ignored.</description>
+    <!-- Services this plugin provides, used by SimManager and DesignAssistant classes to identify the type of simulation or assistance this plugin can provide. Comma separated, spaces are neither ignored nor truncated. -->
+    <services>DBPatternRecognition</services>
+    <!-- Path to the engine script or compiled binary. -->
+    <!--<bin_path>@PLUGINPATH@/db-pattern-recognition.py</bin_path> TODO switch to this form later-->
+    <bin_path>dbp_recognition.py</bin_path>
+    <!-- Selection of invocation commands to call this engine. The first one is the one that is shown in SiQAD by default. TODO tie this to presets in some ways. -->
+    <commands>
+        <!-- Default command. -->
+        <command label="Default">
+            <program>@PYTHON@</program>
+            <arg>@BINPATH@</arg>
+            <arg>@PROBLEMPATH@</arg>
+            <arg>@RESULTPATH@</arg>
+        </command>
+    </commands>
+    <!-- Python dependencies file path, relative to the directory containing this physeng file. -->
+    <dep_path>requirements.txt</dep_path> 
+    <!-- SiQAD data types needed by this plugin. -->
+    <requested_datasets>dbdots</requested_datasets>
+    <!-- SiQAD data types returned by this plugin. -->
+    <return_datasets>commands</return_datasets>
+    <!-- Simulation parameters, read into SiQAD as a property map. -->
+    <sim_params preserve_order="true">
+        <min_dbp_inner_distance>
+            <T>float</T>
+            <dp>2</dp>
+            <val>0</val>
+            <label>Minimum DB-pair inner distance (ang)</label>
+            <tip>The minimum euclidean distance between the two DBs to form a DB pair (center-to-center).</tip>
+        </min_dbp_inner_distance>
+        <max_dbp_inner_distance>
+            <T>float</T>
+            <dp>2</dp>
+            <val>200</val>
+            <label>Maximum DB-pair inner distance (ang)</label>
+            <tip>The maximum euclidean distance between the two DBs to form a DB pair (center-to-center).</tip>
+        </max_dbp_inner_distance>
+    </sim_params>
+</plugin>

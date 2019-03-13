@@ -1,0 +1,1 @@
+Classes in this directories and sub-directories are intended mostly for loading and storing data, e.g. plugin engines, simulation results, etc. They often don't directly contain graphical QWidgets nor are they intended to.

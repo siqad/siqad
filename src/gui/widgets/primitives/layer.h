@@ -114,7 +114,7 @@ namespace prim{
     // SAVE LOAD
     virtual void saveLayer(QXmlStreamWriter *) const;
     void saveLayerProperties(QXmlStreamWriter *) const;
-    virtual void saveItems(QXmlStreamWriter *) const;
+    virtual void saveItems(QXmlStreamWriter *, gui::DesignInclusionArea) const;
     virtual void loadItems(QXmlStreamReader *, QGraphicsScene *);
 
   private:

@@ -166,57 +166,68 @@ void prim::Layer::saveLayerProperties(QXmlStreamWriter *ws) const
   ws->writeTextElement("active", QString::number(isActive()));
 }
 
-void prim::Layer::saveItems(QXmlStreamWriter *stream) const
+void prim::Layer::saveItems(QXmlStreamWriter *ws, gui::DesignInclusionArea inclusion_area) const
 {
-  stream->writeStartElement("layer");
-  stream->writeAttribute("type", contentTypeString());
+  ws->writeStartElement("layer");
+  ws->writeAttribute("type", contentTypeString());
 
   for(prim::Item *item : items){
-    item->saveItems(stream);
+    switch (inclusion_area) {
+      case gui::IncludeSelectedItems:
+        // save only selected items
+        if (item->isSelected())
+          item->saveItems(ws);
+        break;
+      // TODO implement IncludeAreaOfInterest
+      case gui::IncludeEntireDesign:
+      default:
+        // save entire design
+        item->saveItems(ws);
+    }
   }
 
-  stream->writeEndElement();
+  ws->writeEndElement();
 }
 
-void prim::Layer::loadItems(QXmlStreamReader *stream, QGraphicsScene *scene)
+void prim::Layer::loadItems(QXmlStreamReader *ws, QGraphicsScene *scene)
 {
   qDebug() << QObject::tr("Loading layer items for %1").arg(name);
   // create items according to hierarchy
-  while (!stream->atEnd()) {
-    if (stream->isStartElement()) {
-      if (stream->name() == "dbdot") {
-        stream->readNext();
-        addItem(new prim::DBDot(stream, scene, layer_id));
-      } else if (stream->name() == "aggregate") {
-        stream->readNext();
-        addItem(new prim::Aggregate(stream, scene, layer_id));
-      } else if (stream->name() == "electrode") {
-        stream->readNext();
-        addItem(new prim::Electrode(stream, scene, layer_id));
-      } else if (stream->name() == "afmarea") {
-        stream->readNext();
-        addItem(new prim::AFMArea(stream, scene, layer_id));
-      } else if (stream->name() == "afmpath") {
-        stream->readNext();
-        addItem(new prim::AFMPath(stream, scene, layer_id));
+  while (!ws->atEnd()) {
+    if (ws->isStartElement()) {
+      if (ws->name() == "dbdot") {
+        ws->readNext();
+        addItem(new prim::DBDot(ws, scene, layer_id));
+      } else if (ws->name() == "aggregate") {
+        ws->readNext();
+        addItem(new prim::Aggregate(ws, scene, layer_id));
+      } else if (ws->name() == "electrode") {
+        ws->readNext();
+        addItem(new prim::Electrode(ws, scene, layer_id));
+      } else if (ws->name() == "afmarea") {
+        ws->readNext();
+        addItem(new prim::AFMArea(ws, scene, layer_id));
+      } else if (ws->name() == "afmpath") {
+        ws->readNext();
+        addItem(new prim::AFMPath(ws, scene, layer_id));
       } else {
-        qDebug() << QObject::tr("Layer load item: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
-        stream->readNext();
+        qDebug() << QObject::tr("Layer load item: invalid element encountered on line %1 - %2").arg(ws->lineNumber()).arg(ws->name().toString());
+        ws->readNext();
       }
-    } else if (stream->isEndElement()) {
+    } else if (ws->isEndElement()) {
       // break out of stream if the end of this element has been reached
-      if (stream->name() == "layer") {
-        stream->readNext();
+      if (ws->name() == "layer") {
+        ws->readNext();
         break;
       }
-      stream->readNext();
+      ws->readNext();
     } else {
-      stream->readNext();
+      ws->readNext();
     }
   }
 
   // show error if any
-  if(stream->hasError()){
-    qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
+  if(ws->hasError()){
+    qCritical() << QObject::tr("XML error: ") << ws->errorString().data();
   }
 }

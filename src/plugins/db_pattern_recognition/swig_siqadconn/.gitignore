@@ -1,0 +1,6 @@
+build
+lib
+*.cxx
+*.o
+*.so
+*.pyd

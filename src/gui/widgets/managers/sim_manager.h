@@ -15,8 +15,9 @@
 #include <QShortcut>
 
 #include "../property_form.h"
-#include "../primitives/sim_engine.h"
-#include "../primitives/sim_job.h"
+#include "../components/plugin_engine.h"
+//#include "../components/sim_engine.h" TODO remove
+#include "../components/sim_job.h"
 
 namespace gui{
 
@@ -32,18 +33,20 @@ public:
     EngineDataset() {};
 
     //! Construct a dataset using engine defaults.
-    EngineDataset(prim::SimEngine *t_engine)
+    EngineDataset(comp::PluginEngine *t_engine)
       : engine(t_engine)
     {
+      id = t_engine->uniqueIdentifier();
       if (engine->commandFormats().length() > 0)
         command_format = engine->jointCommandFormat(0).second;
-      prop_form = new PropertyForm(engine->sim_params_map);
+      prop_form = new PropertyForm(engine->defaultPropertyMap());
     }
 
     //! Construct a dataset with all values specified.
-    EngineDataset(prim::SimEngine *t_engine, const QString &t_command_format, 
-                  PropertyForm *t_prop_form)
-      : engine(t_engine), command_format(t_command_format), prop_form(t_prop_form) {};
+    EngineDataset(uint t_id, comp::PluginEngine *t_engine, 
+                  const QString &t_command_format, PropertyForm *t_prop_form)
+      : id(t_id), engine(t_engine), command_format(t_command_format), 
+        prop_form(t_prop_form) {};
 
     //! Check whether this dataset is empty.
     bool isEmpty()
@@ -51,7 +54,8 @@ public:
       return engine == nullptr;
     }
 
-    prim::SimEngine *engine=nullptr;
+    uint id=0;
+    comp::PluginEngine *engine=nullptr;
     QString command_format;           // command format with arguments delimited by "\n".
     PropertyForm *prop_form=nullptr;
   };
@@ -62,26 +66,16 @@ public:
   // destructor
   ~SimManager();
 
-  // show sim setup dialog
-  void showSimSetupDialog();
-
   // manager actions
-  bool addJob(prim::SimJob *job);   // add a simulation job
-
-  // ACCESSORS
-  QComboBox *getComboEngSel(){return cb_eng_sel;}
-
-  // various ways to get simulation engine
-  prim::SimEngine *getEngine(int index) {return (index >= 0 && index < sim_engines.length()) ? sim_engines.at(index) : 0;}  // by index
-  prim::SimEngine *getEngine(const QString &name);  // by name
+  bool addJob(comp::SimJob *job);   // add a simulation job
 
   // variables
-  QList<prim::SimEngine*>  sim_engines;   // stack of all simulators
-  QList<prim::SimJob*>     sim_jobs;      // stack of all jobs
+  // TODO remove QList<comp::SimEngine*>  sim_engines;   // stack of all simulators
+  QList<comp::SimJob*>     sim_jobs;      // stack of all jobs
 
 
 signals:
-  void sig_simJob(prim::SimJob *new_job);
+  void sig_simJob(comp::SimJob *new_job);
 
 protected:
 
@@ -96,20 +90,12 @@ public slots:
   void quickRun();
 
 private slots:
-  void updateSimParams();
   void submitSimSetup();
 
 private:
-  // initialize python path
-  void initPythonPath();
-  bool findWorkingPythonPath();
 
   // sim manager related (like showing all jobs, all engines, etc.)
   void initSimManager();
-
-  // sim setup dialog is responsible for setting up new simulation jobs to run
-  void initSimSetupDialog();
-  void updateEngineSelectionList();
 
   //! Return a default generic job name with date time.
   QString defaultJobName();
@@ -121,10 +107,12 @@ private:
 
   //! Export simulation settings of the currently selected engine as a preset 
   //! to the given file path.
+  //! NOTE work in progress
   void exportSimulationPreset(const QString &f_path);
 
   //! Import simulation settings preset from the given file path for the 
   //! currently selected engine.
+  //! NOTE work in progress
   //! TODO check and report differences in available setting fields.
   void importSimulationPreset(const QString &f_path);
 
@@ -134,7 +122,9 @@ private:
   void resetToUserDefault();
   void resetToEngineDefault();
 
-  void initEngines();
+  // Map unique engine identifier to simulation engines (plugin engines which 
+  // provide simulation service)
+  QMap<uint, comp::PluginEngine*> plugin_engines;
 
   // map QListWidgetItem to the corresponding engine property form
   //QMap<QListWidgetItem*,QPair<QString, PropertyForm*>> eng_list_property_form; // TODO remove
@@ -142,22 +132,9 @@ private:
 
   // dialogs
   QWidget *sim_manager_dialog;
-  QWidget *sim_setup_dialog;
-  PropertyForm *curr_sim_params_form=0;
 
   // manager panes
-  QGroupBox *sim_params_group;
-  QVBoxLayout *sim_params_vl;
-  QLineEdit *le_job_nm; // TODO delete
   QLineEdit *le_job_name;
-
-  // button group
-  QHBoxLayout *bottom_buttons_hl;
-  QVBoxLayout *new_setup_dialog_l;
-  QPushButton *button_run;
-  QPushButton *button_cancel;
-  QShortcut *shortcut_enter;
-  QComboBox *cb_eng_sel;
 };
 
 

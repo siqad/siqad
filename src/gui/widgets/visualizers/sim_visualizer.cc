@@ -1,35 +1,241 @@
-// @file:     sim_visualize_panel.h
+// @file:     sim_visualizer.cc
 // @author:   Samuel
 // @created:  2017.10.03
-// @editted:  2017.10.03 - Samuel
 // @license:  GNU LGPL v3
 //
-// @desc:     SimVisualize classes
+// @desc:     SimVisualizer classes
 
-#include "sim_visualize_panel.h"
 #include <QImage>
+#include <QtCharts/QChartView>
+#include <QtCharts/QScatterSeries>
 
+#include "sim_visualizer.h"
+#include "src/settings/settings.h"
 
-namespace gui{
+using namespace gui;
+
+typedef comp::JobResult JR;
+typedef comp::ElectronConfigSet ECS;
+typedef comp::PotentialLandscape PL;
 
 // Qt::Dialog makes the main window unclickable. Use Qt::Window if this behavior should be changed.
-SimVisualize::SimVisualize(SimManager *sim_man, QWidget *parent)
-  : QWidget(parent, Qt::Widget), sim_manager(sim_man), show_job(0)
+SimVisualizer::SimVisualizer(DesignPanel *design_pan, QWidget *parent)
+  : QWidget(parent, Qt::Widget), design_pan(design_pan)
 {
-  initSimVisualize();
+  // basic job information
+  gb_job_info = new QGroupBox("Job Information");
+  QVBoxLayout *vl_job_info = new QVBoxLayout(gb_job_info);
+  job_info_model = new QStandardItemModel();
+  tv_job_info = new QTableView();
+  tv_job_info->setModel(job_info_model);
+  tv_job_info->horizontalHeader()->hide();
+  tv_job_info->verticalHeader()->hide();
+  QPushButton *pb_job_terminal = new QPushButton("Terminal Output");
+  vl_job_info->addWidget(tv_job_info);
+  vl_job_info->addWidget(pb_job_terminal);
+
+  // show job terminal
+  connect(pb_job_terminal, &QPushButton::clicked,
+          [this]()
+          {
+            if (sim_job != nullptr) {
+              sim_job->terminalOutputDialog(this)->show();
+            }
+          });
+
+  // TODO the following can probably be templated
+
+  // electron configuration results
+  elec_config_set_visualizer = new ElectronConfigSetVisualizer(design_pan);
+  gb_elec_configs = new QGroupBox("Electron Configurations");
+  cb_job_steps_elec_configs = new QComboBox();
+  QToolButton *tb_refresh_job_steps_elec_configs = new QToolButton();
+  tb_refresh_job_steps_elec_configs->setIcon(QIcon::fromTheme("view-refresh"));
+  tb_refresh_job_steps_elec_configs->setText("Refresh");
+  tb_refresh_job_steps_elec_configs->setToolTip("Refresh result view");
+  QHBoxLayout *hl_job_steps_elec_configs = new QHBoxLayout();
+  hl_job_steps_elec_configs->addWidget(new QLabel("Relevant job steps"));
+  hl_job_steps_elec_configs->addWidget(cb_job_steps_elec_configs);
+  hl_job_steps_elec_configs->addWidget(tb_refresh_job_steps_elec_configs);
+  QVBoxLayout *vl_elec_configs = new QVBoxLayout();
+  vl_elec_configs->addLayout(hl_job_steps_elec_configs);
+  vl_elec_configs->addWidget(elec_config_set_visualizer);
+  gb_elec_configs->setLayout(vl_elec_configs);
+
+  auto setElectronConfigSetJobStep = [this](const int &job_step_ind)
+  {
+    comp::JobStep *js = sim_job->getJobStep(job_step_ind);
+    ECS *elec_config_set = static_cast<ECS*>(
+        js->jobResults().value(comp::JobResult::ElectronConfigsResult));
+    elec_config_set_visualizer->setElectronConfigSet(elec_config_set);
+  };
+
+  // update electron config set selection GUI elements when a job step is selected
+  connect(cb_job_steps_elec_configs, &QComboBox::currentTextChanged,
+          [setElectronConfigSetJobStep](const QString &str_job_step_ind)
+          {
+            if (str_job_step_ind.isEmpty())
+              return;
+            setElectronConfigSetJobStep(str_job_step_ind.toInt());
+          });
+
+  // same as above but explicitly for user manual activation
+  connect(cb_job_steps_elec_configs, QOverload<const QString &>::of(&QComboBox::activated),
+          [setElectronConfigSetJobStep](const QString &str_job_step_ind)
+          {
+            if (str_job_step_ind.isEmpty())
+              return;
+            setElectronConfigSetJobStep(str_job_step_ind.toInt());
+          });
+
+  // map refresh button to reactivate the currently selected electron config set step
+  connect(tb_refresh_job_steps_elec_configs, &QToolButton::pressed,
+          [this, setElectronConfigSetJobStep]()
+          {
+            QString str_job_step_ind = cb_job_steps_elec_configs->currentText();
+            if (str_job_step_ind.isEmpty())
+              return;
+            setElectronConfigSetJobStep(str_job_step_ind.toInt());
+          });
+
+  // potential landscape results
+  pot_landscape_visualizer = new PotentialLandscapeVisualizer(design_pan);
+  gb_pot_landscape = new QGroupBox("Potential Landscape");
+  cb_job_steps_pot_landscape = new QComboBox();
+  QToolButton *tb_refresh_job_steps_pot_landscape = new QToolButton();
+  tb_refresh_job_steps_pot_landscape->setIcon(QIcon::fromTheme("view-refresh"));
+  tb_refresh_job_steps_pot_landscape->setText("Refresh");
+  tb_refresh_job_steps_pot_landscape->setToolTip("Refresh result view");
+  QHBoxLayout *hl_job_steps_pot_landscape = new QHBoxLayout();
+  hl_job_steps_pot_landscape->addWidget(new QLabel("Relevant job steps"));
+  hl_job_steps_pot_landscape->addWidget(cb_job_steps_pot_landscape);
+  hl_job_steps_pot_landscape->addWidget(tb_refresh_job_steps_pot_landscape);
+  QVBoxLayout *vl_pot_landscape = new QVBoxLayout();
+  vl_pot_landscape->addLayout(hl_job_steps_pot_landscape);
+  vl_pot_landscape->addWidget(pot_landscape_visualizer);
+  gb_pot_landscape->setLayout(vl_pot_landscape);
+
+  auto setPotentialLandscapeJobStep = [this](const int &job_step_ind)
+  {
+    comp::JobStep *js = sim_job->getJobStep(job_step_ind);
+    PL *pot_landscape = static_cast<PL*>(
+        js->jobResults().value(comp::JobResult::PotentialLandscapeResult));
+    pot_landscape_visualizer->setPotentialLandscape(pot_landscape);
+  };
+
+  // update potential landscape results selection GUI elements when a job step
+  // is selected
+  connect(cb_job_steps_pot_landscape, &QComboBox::currentTextChanged,
+          [setPotentialLandscapeJobStep](const QString &str_job_step_ind)
+          {
+            if (str_job_step_ind.isEmpty())
+              return;
+            setPotentialLandscapeJobStep(str_job_step_ind.toInt());
+          });
+
+  // same as above but explicitly for user manual activation
+  connect(cb_job_steps_pot_landscape, QOverload<const QString &>::of(&QComboBox::activated),
+          [setPotentialLandscapeJobStep](const QString &str_job_step_ind)
+          {
+            if (str_job_step_ind.isEmpty())
+              return;
+            setPotentialLandscapeJobStep(str_job_step_ind.toInt());}
+          );
+
+  // map refresh button to reactivate the currently selected potential landscape step
+  connect(tb_refresh_job_steps_pot_landscape, &QToolButton::pressed,
+          [this, setPotentialLandscapeJobStep]()
+          {
+            QString str_job_step_ind = cb_job_steps_elec_configs->currentText();
+            if (str_job_step_ind.isEmpty())
+              return;
+            setPotentialLandscapeJobStep(cb_job_steps_pot_landscape->currentText().toInt());
+          });
+
+  // set widget layout
+  QVBoxLayout *vl_main = new QVBoxLayout();
+  vl_main->addWidget(gb_job_info);
+  vl_main->addWidget(gb_elec_configs);
+  vl_main->addWidget(gb_pot_landscape);
+  vl_main->addStretch();
+
+  setLayout(vl_main);
+}
+
+void SimVisualizer::showJob(comp::SimJob *job)
+{
+  sim_job = job;
+  qDebug() << tr("Showing job %1").arg(job->name());
+  // TODO update relevant panels
+
+  // generic job information
+  job_info_model->clear();
+  typedef comp::SimJob::JobInfoStandardItemField SIF;
+  QList<SIF> info_list = QList<SIF>({
+        SIF::JobNameField,
+        SIF::JobStartTimeField,
+        SIF::JobEndTimeField,
+        SIF::JobStepCountField,
+        SIF::JobTempPathField
+      });
+  QList<QStandardItem*> labels = QList<QStandardItem*>({
+        new QStandardItem("Name"),
+        new QStandardItem("Start time"),
+        new QStandardItem("End time"),
+        new QStandardItem("Step count"),
+        new QStandardItem("Temp path")
+      });
+  QList<QStandardItem*> job_si_row = job->jobInfoStandardItemRow(info_list);
+  job_info_model->appendColumn(labels);
+  job_info_model->appendColumn(job_si_row);
+  tv_job_info->resizeColumnsToContents();
+
+  // TODO update siqadconn to put physloc and elecconfigresult inside the same parent node
+  QList<JR::ResultType> result_types = job->resultTypeStepMap().uniqueKeys();
+
+  // deal with ElectronConfigsResult type
+  cb_job_steps_elec_configs->clear();
+  if (result_types.contains(JR::ElectronConfigsResult)) {
+    gb_elec_configs->setEnabled(true);
+    for (comp::JobStep *step : job->resultTypeStepMap().values(JR::ElectronConfigsResult)) {
+      cb_job_steps_elec_configs->addItem(QString::number(step->jobStepPlacement()));
+    }
+  } else {
+    gb_elec_configs->setEnabled(false);
+  }
+
+  // deal with PotentialLandscapeResult type
+  cb_job_steps_pot_landscape->clear();
+  if (result_types.contains(JR::PotentialLandscapeResult)) {
+    gb_pot_landscape->setEnabled(true);
+    for (comp::JobStep *step : job->resultTypeStepMap().values(JR::PotentialLandscapeResult)) {
+      cb_job_steps_pot_landscape->addItem(QString::number(step->jobStepPlacement()));
+    }
+  } else {
+    gb_pot_landscape->setEnabled(false);
+  }
+}
+
+void SimVisualizer::clearJob()
+{
+  // TODO clear job information from data model in this widget and from children
+  // widgets
+  job_info_model->clear();
+
+  elec_config_set_visualizer->clearVisualizer();
+  pot_landscape_visualizer->clearVisualizer();
+
+  sim_job = nullptr;
+
+  // TODO doesn't belong here but move it to the appropriate location: terminal
+  // output dialog button somewhere
 }
 
 
-bool SimVisualize::setManager(SimManager *sim_man)
-{
-  if(!sim_man)
-    return false;
-  sim_manager = sim_man;
-  return true;
-}
+// PRIVATE
 
-
-bool SimVisualize::showJob(int job_ind)
+/*
+bool SimVisualizer::showJob(int job_ind)
 {
   if(job_ind < 0 || job_ind >= sim_manager->sim_jobs.size()){
     // TODO throw error
@@ -39,7 +245,7 @@ bool SimVisualize::showJob(int job_ind)
 }
 
 
-bool SimVisualize::showJob(prim::SimJob *job)
+bool SimVisualizer::showJob(comp::SimJob *job)
 {
   if(!job)
     return false;
@@ -48,7 +254,7 @@ bool SimVisualize::showJob(prim::SimJob *job)
   return true;
 }
 
-void SimVisualize::showJobTerminalOutput()
+void SimVisualizer::showJobTerminalOutput()
 {
   if(!show_job){
     qWarning() << tr("No job is being shown, cannot show terminal output.");
@@ -66,7 +272,7 @@ void SimVisualize::showJobTerminalOutput()
   button_save_term_out->setShortcut(tr("CTRL+S"));
   button_close_term_out->setShortcut(tr("Esc"));
 
-  connect(button_save_term_out, &QAbstractButton::clicked, show_job, &prim::SimJob::saveTerminalOutput);
+  connect(button_save_term_out, &QAbstractButton::clicked, show_job, &comp::SimJob::saveTerminalOutput);
   connect(button_close_term_out, &QAbstractButton::clicked, w_job_term, &QWidget::close);
 
   // layout
@@ -85,7 +291,7 @@ void SimVisualize::showJobTerminalOutput()
   w_job_term->show();
 }
 
-void SimVisualize::showPotPlot()
+void SimVisualizer::showPotPlot()
 {
   QVector<qreal> x_vec;
   QVector<qreal> y_vec;
@@ -117,7 +323,7 @@ void SimVisualize::showPotPlot()
   }
 }
 
-void SimVisualize::updateJobSelCombo()
+void SimVisualizer::updateJobSelCombo()
 {
   if(!combo_job_sel)
     return;
@@ -131,7 +337,7 @@ void SimVisualize::updateJobSelCombo()
 }
 
 
-bool SimVisualize::showElecDist(int dist_ind)
+bool SimVisualizer::showElecDist(int dist_ind)
 {
   if(!show_job || dist_ind < 0 || dist_ind >= show_job->filteredElecDists().size())
     return false;
@@ -141,7 +347,7 @@ bool SimVisualize::showElecDist(int dist_ind)
 }
 
 
-void SimVisualize::showElecCountFilter(int check_state)
+void SimVisualizer::showElecCountFilter(int check_state)
 {
   bool show = check_state == Qt::Checked;
   elec_count_filter_group->setVisible(show);
@@ -157,7 +363,7 @@ void SimVisualize::showElecCountFilter(int check_state)
 }
 
 
-void SimVisualize::showPotential()
+void SimVisualizer::showPotential()
 {
   QDir image_dir = QDir(show_job->resultFilePath(show_job->jobSteps()->length()-1)); // TODO only reading the last step in the job for now, in the future check for which job step is relevant before attempting read
   image_dir.cdUp();
@@ -169,27 +375,28 @@ void SimVisualize::showPotential()
 }
 
 
-void SimVisualize::showAverageElecDist()
+void SimVisualizer::showAverageElecDist()
 {
   qDebug() << tr("Showing average electron distribution.");
   emit showElecDistOnScene(show_job, -1);
 }
 
 
-void SimVisualize::showAverageElecDistDegen()
+void SimVisualizer::showAverageElecDistDegen()
 {
   qDebug() << tr("Show degenerate states for distribution %1").arg(slider_dist_sel->sliderPosition());
   emit showElecDistOnScene(show_job, slider_dist_sel->sliderPosition()-1, true);
 }
 
 
-void SimVisualize::updateElecDistOptions()
+void SimVisualizer::updateElecDistOptions()
 {
   // slider
   if(!text_dist_selected || !slider_dist_sel || !show_job)
     return;
 
-  if (!show_job->isComplete() || show_job->elec_dists.isEmpty()) {
+  if (show_job->jobState() != comp::SimJob::FinishedNormally 
+      || show_job->elec_dists.isEmpty()) {
     // reset electron count filter options
     slider_elec_count_sel->setMinimum(0);
     slider_elec_count_sel->setMaximum(0);
@@ -226,11 +433,12 @@ void SimVisualize::updateElecDistOptions()
   }
 }
 
-void SimVisualize::updateViewPotentialOptions()
+void SimVisualizer::updateViewPotentialOptions()
 {
   if(!show_job)
     return;
-  if (!show_job->isComplete() || show_job->potentials.isEmpty()) {
+  if (show_job->jobState() != comp::SimJob::FinishedNormally 
+      || show_job->potentials.isEmpty()) {
     view_potential_group->setVisible(false);
   } else {
     view_potential_group->setVisible(true);
@@ -238,12 +446,12 @@ void SimVisualize::updateViewPotentialOptions()
   }
 }
 
-void SimVisualize::updateOptions()
+void SimVisualizer::updateOptions()
 {
   if (!show_job) {
     // don't show any options
     qDebug() << tr("Job is null, exiting.");
-  } else if (!show_job->isComplete()) {
+  } else if (show_job->jobState() != comp::SimJob::FinishedNormally) {
     // maybe also set this up to catch job completion signals, so when a job is complete this panel also updates
     qDebug() << tr("Job isn't complete, exiting. Job Name: %1").arg(show_job->name());
   } else {
@@ -267,7 +475,7 @@ void SimVisualize::updateOptions()
 
 // PRIVATE
 
-void SimVisualize::initSimVisualize()
+void SimVisualizer::initSimVisualizer()
 {
   // Job Info Group
   QGroupBox *job_info_group = new QGroupBox(tr("Job Information"));
@@ -415,29 +623,29 @@ void SimVisualize::initSimVisualize()
 
   // signal connection
   connect(button_show_term_out, &QAbstractButton::clicked,
-          this, &gui::SimVisualize::showJobTerminalOutput);
+          this, &gui::SimVisualizer::showJobTerminalOutput);
   connect(combo_job_sel, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-          this, &gui::SimVisualize::jobSelUpdate);
+          this, &gui::SimVisualizer::jobSelUpdate);
   connect(slider_dist_sel, static_cast<void(QSlider::*)(int)>(&QSlider::valueChanged),
-          this, &gui::SimVisualize::distSelUpdate);
+          this, &gui::SimVisualizer::distSelUpdate);
   connect(button_dist_prev, &QAbstractButton::clicked,
-          this, &gui::SimVisualize::distPrev);
+          this, &gui::SimVisualizer::distPrev);
   connect(button_dist_next, &QAbstractButton::clicked,
-          this, &gui::SimVisualize::distNext);
+          this, &gui::SimVisualizer::distNext);
   connect(slider_elec_count_sel, static_cast<void(QSlider::*)(int)>(&QSlider::valueChanged),
-          this, &gui::SimVisualize::elecCountFilterUpdate);
+          this, &gui::SimVisualizer::elecCountFilterUpdate);
   connect(button_elec_count_prev, &QAbstractButton::clicked,
-          this, &gui::SimVisualize::elecCountPrev);
+          this, &gui::SimVisualizer::elecCountPrev);
   connect(button_elec_count_next, &QAbstractButton::clicked,
-          this, &gui::SimVisualize::elecCountNext);
+          this, &gui::SimVisualizer::elecCountNext);
   connect(cb_elec_count_filter, &QCheckBox::stateChanged,
-          this, &gui::SimVisualize::showElecCountFilter);
+          this, &gui::SimVisualizer::showElecCountFilter);
   connect(button_average_elec_dist_all, &QAbstractButton::clicked,
-          this, &gui::SimVisualize::showAverageElecDist);
+          this, &gui::SimVisualizer::showAverageElecDist);
   connect(button_average_elec_dist_degen, &QAbstractButton::clicked,
-          this, &gui::SimVisualize::showAverageElecDistDegen);
+          this, &gui::SimVisualizer::showAverageElecDistDegen);
   connect(button_view_potential, &QAbstractButton::clicked,
-          this, &gui::SimVisualize::showPotential);
+          this, &gui::SimVisualizer::showPotential);
   // TODO show energy level, and maybe sorting feature
 
   QVBoxLayout *visualize_layout = new QVBoxLayout;
@@ -449,13 +657,13 @@ void SimVisualize::initSimVisualize()
 }
 
 
-void SimVisualize::jobSelUpdate()
+void SimVisualizer::jobSelUpdate()
 {
   showJob(combo_job_sel->currentIndex());
 }
 
 
-void SimVisualize::elecCountFilterUpdate(bool apply_filter)
+void SimVisualizer::elecCountFilterUpdate(bool apply_filter)
 {
   if (show_job->elec_counts.isEmpty())
     return;
@@ -464,7 +672,7 @@ void SimVisualize::elecCountFilterUpdate(bool apply_filter)
   text_elec_count->setText(tr("%1").arg(show_job->elec_counts[elec_counts_ind]));
 
   // save the current distribution being shown so it can be reselected later
-  prim::SimJob::elecDist show_dist;
+  comp::SimJob::elecDist show_dist;
   int slider_pos = slider_dist_sel->sliderPosition(); // slider pos = dist_ind + 1
   if (slider_pos > 0 && slider_pos <= show_job->filteredElecDists().size())
     show_dist = show_job->filteredElecDists().at(slider_dist_sel->sliderPosition()-1);
@@ -490,7 +698,7 @@ void SimVisualize::elecCountFilterUpdate(bool apply_filter)
 }
 
 
-void SimVisualize::elecCountPrev()
+void SimVisualizer::elecCountPrev()
 {
   if(!slider_elec_count_sel)
     return;
@@ -499,7 +707,7 @@ void SimVisualize::elecCountPrev()
     slider_elec_count_sel->setValue(slider_elec_count_sel->value() - 1);
 }
 
-void SimVisualize::elecCountNext()
+void SimVisualizer::elecCountNext()
 {
   if (!slider_elec_count_sel)
     return;
@@ -509,7 +717,7 @@ void SimVisualize::elecCountNext()
 }
 
 
-void SimVisualize::distSelUpdate()
+void SimVisualizer::distSelUpdate()
 {
   if (show_job->elec_dists.isEmpty())
     return;
@@ -526,7 +734,7 @@ void SimVisualize::distSelUpdate()
   text_dist_energy->setText(energy_text);
 }
 
-void SimVisualize::distPrev()
+void SimVisualizer::distPrev()
 {
   if(!slider_dist_sel)
     return;
@@ -535,7 +743,7 @@ void SimVisualize::distPrev()
     slider_dist_sel->setValue(slider_dist_sel->value() - 1);
 }
 
-void SimVisualize::distNext()
+void SimVisualizer::distNext()
 {
   if (!slider_dist_sel)
     return;
@@ -543,6 +751,4 @@ void SimVisualize::distNext()
   if (!(slider_dist_sel->value() + 1 > slider_dist_sel->maximum()))
     slider_dist_sel->setValue(slider_dist_sel->value() + 1);
 }
-
-
-} // end gui namespace
+*/

@@ -24,9 +24,11 @@
 #include "widgets/dialog_panel.h"
 #include "widgets/input_field.h"
 #include "widgets/info_panel.h"
-#include "widgets/sim_visualize_panel.h"
 #include "widgets/managers/sim_manager.h"
-#include "widgets/primitives/sim_job.h"
+#include "widgets/managers/plugin_manager.h"
+#include "widgets/managers/job_manager.h"
+#include "widgets/components/sim_job.h"
+#include "widgets/visualizers/sim_visualizer.h"
 #include "commander.h"
 
 
@@ -44,7 +46,7 @@ namespace gui{
 
   public:
 
-    enum SaveFlag{Save, SaveAs, AutoSave, Simulation};
+    enum SaveFlag{Save, SaveAs, AutoSave, SaveSimulationProblem};
 
     // constructor
     explicit ApplicationGUI(const QString &f_path=QString(), QWidget *parent=0);
@@ -84,11 +86,8 @@ namespace gui{
     // Run ground state simulation
     void runGroundState();
 
-    // Dispatch simulation job
-    void runSimulation(prim::SimJob *job);  // high-level structure for running simulation
-
     // Read simulation results
-    bool readSimResult(const QString &result_path);                // read simulator output
+    bool readSimResult(const QString &result_path);
 
     // SANDBOX
 
@@ -125,7 +124,8 @@ namespace gui{
 
     //! Save design to file.
     bool saveToFile(SaveFlag flag=Save, const QString &path=QString(), 
-                    prim::SimJob::JobStep job_step=prim::SimJob::JobStep());
+                    gui::DesignInclusionArea inclusion_area=gui::IncludeEntireDesign, 
+                    comp::JobStep *job_step=nullptr);
 
     //! Perform autosave.
     void autoSave();
@@ -159,7 +159,7 @@ namespace gui{
     void initTopBar();            // initialise the GUI topbar, toolbar
     void initSideBar();           // initialise the GUI sidebar, toolbar
     void initDialogDock();        // initialise the bottom dialog dock
-    void initSimVisualizeDock();  // initialise the side sim visualize dock
+    void initSimVisualizerDock();  // initialise the side sim visualize dock
     void initLayerDock();         // initialise the side layer dock
     void initCommander();         // initialise the input field whitelist
     void initItemDock();          // initialise the side item dock
@@ -196,11 +196,13 @@ namespace gui{
     QToolBar *side_bar;
 
     // functional widgets, DialogPanel is a static in public above.
-    gui::DesignPanel  *design_pan;  // mainwindow design panel
-    gui::InfoPanel    *info_pan;    // mainwindow info panel
-    gui::InputField   *input_field; // mainwindow input field
-    gui::SimManager   *sim_manager; // pop-up simulator manager
-    gui::SimVisualize *sim_visualize; // simulation visualizer that goes in sim visualize dock
+    gui::DesignPanel    *design_pan;      // mainwindow design panel
+    gui::InfoPanel      *info_pan;        // mainwindow info panel
+    gui::InputField     *input_field;     // mainwindow input field
+    gui::SimManager     *sim_manager;     // pop-up simulator manager
+    gui::PluginManager  *plugin_manager;  // pop-up plugin manager
+    gui::JobManager     *job_manager;     // pop-up job manager
+    gui::SimVisualizer   *sim_visualize;   // simulation visualizer that goes in sim visualize dock
     settings::SettingsDialog *settings_dialog;  // dialog for changing settings
 
     // dockable widgets

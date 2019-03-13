@@ -6,8 +6,8 @@
 //
 // @desc:     SimEngine object that SimManager interacts with
 
-#ifndef _PRIM_SIM_ENG_H_
-#define _PRIM_SIM_ENG_H_
+#ifndef _COMP_SIM_ENG_H_
+#define _COMP_SIM_ENG_H_
 
 #include <QtWidgets>
 #include <QtCore>
@@ -16,7 +16,7 @@
 #include "src/settings/settings.h"
 #include "src/gui/property_map.h"
 
-namespace prim{
+namespace comp{
 
   //! A simulation engine that can be used with the design tool.
   class SimEngine : public QObject
@@ -31,7 +31,7 @@ namespace prim{
     ~SimEngine() {};
 
     // property map with simulator information
-    gui::PropertyMap sim_params_map;  // a property map containing all of the simulation parameters
+    gui::PropertyMap sim_params_map;  // a property map containing all of the default simulation parameters
 
     // ACCESSORS
 
@@ -88,9 +88,6 @@ namespace prim{
 
   private:
 
-    //! Initialize the simulation engine.
-    void initSimEngine(const QString &eng_nm, const QString &eng_rt);
-
     //! Pairs of command labels and actual command elements. The first element 
     //! in the QStringList is always the program/command, the rest of the 
     //! elements are arguments.
@@ -105,9 +102,8 @@ namespace prim{
     QString eng_version;
     QString bin_path;           // binary (standalone) or script (interpreted) path of this engine
     QString dep_path;           // dependencies path (requirements.txt for Python scripts)
-    QString tmp_path;           // root directory for all problems files for this engine
   };
 
-} // end of prim namespace
+} // end of comp namespace
 
 #endif
