@@ -19,9 +19,9 @@ This tutorial is based on Ubuntu 17.10, and should also work on Ubuntu 18.04 LTS
 sudo apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5-dev qttools5-dev qttools5-dev-tools libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev pkg-config
 # poissolver dependencies
 sudo apt install python3-dolfin gmsh swig
-sudo pip3 install pillow networkx matplotlib numpy shapely
+pip3 install --user pillow networkx matplotlib numpy shapely
 # hoppingdynamics python dependencies
-sudo pip3 install matplotlib numpy scipy pyside2
+pip3 install --user matplotlib numpy scipy pyside2
 ```
 
 On non-Debian systems, packages equivalent to the ones listed above will be needed. Feel free to contribute to [this issue](https://github.com/retallickj/siqad/issues/32) with dependencies required on other systems.
