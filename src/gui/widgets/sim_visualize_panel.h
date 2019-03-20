@@ -11,7 +11,7 @@
 
 #include <QtWidgets>
 #include <QtCore>
-#include "sim_manager.h"
+#include "managers/sim_manager.h"
 #include "primitives/sim_job.h"
 
 #include "src/settings/settings.h" // TODO probably need this later

@@ -13,8 +13,8 @@
 #include <QtWidgets>
 #include <QGraphicsRectItem>
 
-#include "../../global.h"
-#include "primitives/items.h"
+#include "../../../global.h"
+#include "../primitives/items.h"
 
 
 namespace gui{

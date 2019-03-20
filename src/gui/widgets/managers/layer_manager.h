@@ -11,9 +11,9 @@
 
 #include <QtWidgets>
 
-#include "primitives/items.h"
-#include "primitives/layer.h"
-#include "primitives/lattice.h"
+#include "../primitives/items.h"
+#include "../primitives/layer.h"
+#include "../primitives/lattice.h"
 
 namespace gui{
 

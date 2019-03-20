@@ -21,6 +21,8 @@ gui::DialogPanel::DialogPanel(QWidget *parent)
 
   setReadOnly(true);
   setLineWrapMode(QPlainTextEdit::WidgetWidth);
+  setTextInteractionFlags(textInteractionFlags()
+                          | Qt::TextSelectableByKeyboard);
 
   // show message if this dialog isn't set to capture debug outputs
   if (!app_settings->get<bool>("log/override")) {
@@ -38,7 +40,7 @@ gui::DialogPanel::DialogPanel(QWidget *parent)
         qDebug() << tr("Successfully created log file directory: %1")
           .arg(log_dir.absolutePath());
       } else {
-        qWarning() 
+        qWarning()
           << tr("Failed to create log file directory at %1").arg(log_dir.absolutePath())
           << endl << "This SiQAD session will not be logged on file.";
         return;
@@ -99,7 +101,7 @@ void gui::DialogPanel::purgeOldLogs()
   int keep_count = app_settings->get<int>("log/keepcount");
 
   // get list of closed logs sorted by modification time
-  QStringList closed_logs = log_dir.entryList(QStringList({"*.log"}), 
+  QStringList closed_logs = log_dir.entryList(QStringList({"*.log"}),
       QDir::NoFilter, QDir::Time|QDir::Reversed);
 
   // remove closed logs until the file count is below the desired count
@@ -113,7 +115,3 @@ void gui::DialogPanel::purgeOldLogs()
     closed_logs.removeAt(0);
   }
 }
-
-
-void gui::DialogPanel::mousePressEvent(QMouseEvent *)
-{}

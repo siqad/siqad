@@ -24,9 +24,9 @@
 #include "widgets/dialog_panel.h"
 #include "widgets/input_field.h"
 #include "widgets/info_panel.h"
-#include "widgets/sim_manager.h"
 #include "widgets/sim_visualize_panel.h"
-#include "widgets/primitives/sim_job.h" // TODO move these stuff to SimManager later
+#include "widgets/managers/sim_manager.h"
+#include "widgets/primitives/sim_job.h"
 #include "commander.h"
 
 
@@ -124,12 +124,13 @@ namespace gui{
     void newFile();
 
     //! Save design to file.
-    bool saveToFile(SaveFlag flag=Save, const QString &path=QString(), prim::SimJob *sim_job=0);
+    bool saveToFile(SaveFlag flag=Save, const QString &path=QString(), 
+                    prim::SimJob::JobStep job_step=prim::SimJob::JobStep());
 
     //! Perform autosave.
     void autoSave();
 
-    //! Open a previous save. A file chooser dialog would be presented if no 
+    //! Open a previous save. A file chooser dialog would be presented if no
     //! file path is given.
     void openFromFile(const QString &f_path=QString());
 
