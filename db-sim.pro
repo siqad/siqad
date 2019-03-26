@@ -262,13 +262,14 @@ sim_poissolver.files = \
     $$PHYS_DIR/poissolver/FEM/src/python/res_graph.py \
     $$PHYS_DIR/poissolver/FEM/src/python/mesher.py \
     $$PHYS_DIR/poissolver/FEM/src/python/dopant.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/ac.py \
     $$PHYS_DIR/poissolver/FEM/src/python/capacitance.py \
     $$PHYS_DIR/poissolver/FEM/src/python/resistance.py \
     $$PHYS_DIR/poissolver/FEM/src/python/res_graph.py \
     $$PHYS_DIR/poissolver/FEM/src/python/charge_density.py \
     $$PHYS_DIR/poissolver/FEM/src/python/subdomains.py \
-    $$PHYS_DIR/poissolver/FEM/src/python/helpers/mesh_writer_3D.py \
-    $$PHYS_DIR/poissolver/FEM/src/python/helpers/helpers.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/mesh_writer_3D.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/helpers.py \
     $$PHYS_DIR/poissolver/FEM/src/python/dolfin_convert.py \
     $$PHYS_DIR/poissolver/FEM/src/python/siqadconn.py \
     $$PHYS_DIR/poissolver/FEM/src/python/_siqadconn.*.so \
@@ -282,4 +283,3 @@ sim_poissolver_swig.files = \
     $$PHYS_DIR/poissolver/FEM/src/python/swig_siqadconn/swig_generate_and_compile
 INSTALLS += sim_poissolver
 INSTALLS += sim_poissolver_swig
-
