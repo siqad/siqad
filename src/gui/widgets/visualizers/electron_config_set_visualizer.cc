@@ -212,6 +212,11 @@ void ECSVisualizer::showElectronConfigResult(const ECS::ElectronConfig &elec_con
 
   // set the charge fill state of the provided set of DBs
   showing_db_sites = design_pan->getDBsAtLocs(db_phys_locs);
+  if (db_phys_locs.size() != 0 && showing_db_sites.empty()) {
+    qCritical() << tr("Failed to retrieve all DB locations, aborting electron \
+        config result showing.");
+    return;
+  }
   for (int i=0; i<curr_elec_config.config.length(); i++) {
     showing_db_sites.at(i)->setShowElec(elec_config.config.at(i));
     /*
