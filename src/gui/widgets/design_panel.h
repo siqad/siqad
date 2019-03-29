@@ -229,7 +229,8 @@ namespace gui{
     void sig_toolChangeRequest(gui::ToolType tool);  // request ApplicationGUI to change tool
     void sig_toolChanged(gui::ToolType tool); // notify other components of the
                                               // change in tool
-    void sig_resetDesignPanel();
+    void sig_preDPResetCleanUp();
+    void sig_postDPReset();
     void sig_undoStackCleanChanged(bool); // emitted when undo_stack emits cleanChanged(bool)
 
     //! Request ApplicationGUI to update the layer manager widget being used.

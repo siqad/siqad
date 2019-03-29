@@ -32,9 +32,12 @@ namespace gui{
     void clearVisualizer();
 
     //! Set a new ElectronConfigSet (which contains all electron configurations).
+    //! most_popular_elec_count instructs whether to default to filtering for 
+    //! the most popular electron count in the results.
     //! bool value show_results_now instructs visualizer whether to immediately
     //! take focus and show results.
     void setElectronConfigSet(comp::ElectronConfigSet *t_set,
+                              bool most_popular_elec_count=true,
                               bool show_results_now=true);
 
     //! Set a new electron config list (which contains electron configurations

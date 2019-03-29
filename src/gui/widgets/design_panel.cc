@@ -196,12 +196,15 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
 // reset
 void gui::DesignPanel::resetDesignPanel()
 {
+  // tell application to perform pre-reset clean-ups
+  emit sig_preDPResetCleanUp();
+
   clearDesignPanel(true);
   initDesignPanel();
   // REBUILD
 
   //let application know that design panel has been reset.
-  emit sig_resetDesignPanel();
+  emit sig_postDPReset();
   qDebug() << tr("Design Panel reset complete");
 }
 
@@ -741,6 +744,8 @@ void gui::DesignPanel::clearSimResults()
 {
   setDisplayMode(DesignMode);
 
+  // TODO remove the following code when all simulation related item handling 
+  // are moved over to SimVisualizer
   // set show_elec of all DBDots to 0
   if(!db_dots_result.isEmpty()) {
     for(auto *db : db_dots_result)

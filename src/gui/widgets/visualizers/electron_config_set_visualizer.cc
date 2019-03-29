@@ -94,7 +94,7 @@ ECSVisualizer::ElectronConfigSetVisualizer(DesignPanel *design_pan, QWidget *par
                 electronCountSliderPositionOfValue(curr_elec_config.elec_count));
             updateElectronCountFilterState();
           });
-  s_elec_count_filter->setEnabled(cb_elec_count_filter->checkState() == Qt::Checked);
+  w_elec_count_slider_complex->setEnabled(cb_elec_count_filter->checkState() == Qt::Checked);
 
   // link electron count filter slider to filter action
   connect(s_elec_count_filter, &QSlider::valueChanged,
@@ -122,10 +122,11 @@ ECSVisualizer::ElectronConfigSetVisualizer(DesignPanel *design_pan, QWidget *par
 
 void ECSVisualizer::clearVisualizer()
 {
-  setElectronConfigSet(nullptr, false);
+  setElectronConfigSet(nullptr, false, false);
 }
 
 void ECSVisualizer::setElectronConfigSet(comp::ElectronConfigSet *t_set,
+                                         bool most_popular_elec_count,
                                          bool show_results_now)
 {
   // clean up past results
@@ -139,7 +140,19 @@ void ECSVisualizer::setElectronConfigSet(comp::ElectronConfigSet *t_set,
   setElectronConfigList(t_set == nullptr ? QList<ECS::ElectronConfig>() : elec_config_set->electronConfigs());
   if (t_set != nullptr && show_results_now) {
     showElectronConfigResultFromSlider();
+    if (most_popular_elec_count) {
+      // filter to the most popular electron count
+      QMap<int, int> elec_count_occ = t_set->electronCountOccurances();
+      QMap<int, int>::iterator it, it_max_val=elec_count_occ.begin();
+      for (it = elec_count_occ.begin(); it != elec_count_occ.end(); it++) {
+        if (it.value() > it_max_val.value()) {
+          it_max_val = it;
+        }
+      }
+      applyElectronCountFilter(it_max_val.key());
+    }
   }
+
 }
 
 void ECSVisualizer::setElectronConfigList(const QList<comp::ElectronConfigSet::ElectronConfig> &ec)
@@ -214,6 +227,7 @@ void ECSVisualizer::applyElectronCountFilter(const int &elec_count)
 {
   if (elec_count >= 0) {
     setElectronConfigList(elec_config_set->electronConfigs(elec_count));
+    s_elec_count_filter->setValue(elec_config_set->electronCounts().indexOf(elec_count));
   } else {
     setElectronConfigList(elec_config_set->electronConfigs());
   }
@@ -319,10 +333,12 @@ void ECSVisualizer::updateGUIFilterStateChange()
 
 void ECSVisualizer::updateGUIFilterSelectionChange(const int &elec_count)
 {
-  if (elec_count > -1)
+  cb_elec_count_filter->setChecked(elec_count > -1);
+  if (elec_count > -1) {
     cb_elec_count_filter->setText(tr("Filter: %1 electrons").arg(elec_count));
-  else
+  } else {
     cb_elec_count_filter->setText("Filter: all configs");
+  }
 }
 
 /*

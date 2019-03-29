@@ -195,7 +195,13 @@ void gui::ApplicationGUI::initGUI()
           });
   connect(settings_dialog, &settings::SettingsDialog::sig_resetSettings,
           [this](){reset_settings = true;});
-  connect(design_pan, &gui::DesignPanel::sig_resetDesignPanel,
+  connect(design_pan, &gui::DesignPanel::sig_preDPResetCleanUp,
+          [this]()
+          {
+            // clear SimVisualize content before DesignPanel cleanup
+            sim_visualize->clearJob();
+          });
+  connect(design_pan, &gui::DesignPanel::sig_postDPReset,
           [this](){initState();});
   connect(design_pan, &gui::DesignPanel::sig_setLayerManagerWidget,
           this, &gui::ApplicationGUI::setLayerManagerWidget);
@@ -527,7 +533,14 @@ void gui::ApplicationGUI::initSimVisualizerDock()
   // size policy
   sim_visualize_dock->setMinimumWidth(gui_settings->get<int>("SIMVDOCK/mw"));
 
-  connect(sim_visualize_dock, &QDockWidget::visibilityChanged, design_pan, &gui::DesignPanel::simVisualizeDockVisibilityChanged);
+  connect(sim_visualize_dock, &QDockWidget::visibilityChanged, 
+          design_pan, &gui::DesignPanel::simVisualizeDockVisibilityChanged);
+  connect(sim_visualize_dock, &QDockWidget::visibilityChanged, 
+          [this](const bool &visible)
+          {
+            if (!visible)
+              sim_visualize->clearJob();
+          });
 
   QScrollArea *sa_sim_vis = new QScrollArea;
   sa_sim_vis->setWidget(sim_visualize);
@@ -1119,7 +1132,6 @@ void gui::ApplicationGUI::newFile()
 
   // reset widgets and reinitialize GUI state
   working_path.clear();
-  sim_visualize->clearJob();
   design_pan->resetDesignPanel();
   initState();
 }
