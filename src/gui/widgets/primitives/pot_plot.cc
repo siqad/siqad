@@ -30,9 +30,14 @@ prim::PotPlot::~PotPlot()
 
 void prim::PotPlot::initPotPlot(QString pot_plot_path_in, QRectF graph_container_in, QString pot_anim_path)
 {
+  if (edge_width == -1)
+    constructStatics();
+
   qDebug() << pot_anim_path;
-  potential_animation = new QMovie(pot_anim_path);
-  if (potential_animation->isValid()) {
+  potential_animation = new QMovie();
+  if (!pot_anim_path.isEmpty())
+    potential_animation->setFileName(pot_anim_path);
+  if (!pot_anim_path.isEmpty() && potential_animation->isValid()) {
     qDebug() << "Showing animation";
     potential_animation->setSpeed(100);
     potential_animation->start();
@@ -42,7 +47,6 @@ void prim::PotPlot::initPotPlot(QString pot_plot_path_in, QRectF graph_container
   pot_plot_path = pot_plot_path_in;
   potential_plot = QImage(pot_plot_path);
   graph_container = graph_container_in;
-  constructStatics();
   setZValue(-1);
   setPos(graph_container.topLeft());
   // flags

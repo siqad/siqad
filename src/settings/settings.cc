@@ -130,9 +130,13 @@ QSettings *settings::AppSettings::m_defs()
     "python"
   }));
 
+  // TODO rename phys to plug where applicable
+
   S->setValue("phys/eng_lib_dirs", QStringList({
     "<APPLOCALDATA>/phys/",
-    "<BINPATH>/src/phys/"
+    "<APPLOCALDATA>/plugins/",
+    "<BINPATH>/src/phys/",
+    "<BINPATH>/plugins/"
   }));
   //S->setValue("phys/eng_lib_dirs", QString("<APPLOCALDATA>/phys"));
   //S->setValue("phys/eng_lib_dirs", QString("<BINPATH>/src/phys/"));

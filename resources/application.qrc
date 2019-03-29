@@ -1,6 +1,7 @@
 <RCC>
 <qresource>
     <file>blank_save.xml</file>
+    <file>plugin_services.xml</file>
    	<file>properties/afmarea.xml</file>
    	<file>properties/electrode.xml</file>
     <file>ico/siqad.svg</file>

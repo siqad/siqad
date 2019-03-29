@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin_services>
+    <service>
+        <name>PotentialLandscape</name>
+        <category>Simulation</category>
+        <label>Electric Potential Landscape</label>
+    </service>
+    <service>
+        <name>ElectronGroundState</name>
+        <category>Simulation</category>
+        <label>Electron Ground State</label>
+    </service>
+    <service>
+        <name>ElectronDynamics</name>
+        <category>Simulation</category>
+        <label>Electron Dynamics</label>
+    </service>
+    <service>
+        <name>DBPatternRecognition</name>
+        <category>Assistance</category>
+        <label>DB Pattern Recognition</label>
+    </service>
+    <service>
+        <name>LogicEvaluation</name>
+        <category>Assistance</category>
+        <label>Logic Evaluation</label>
+    </service>
+</plugin_services>

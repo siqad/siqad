@@ -96,7 +96,7 @@ namespace gui{
     void saveLayers(QXmlStreamWriter *) const;
 
     //! Save items contained in all layers to XML stream. TODO improve structure
-    void saveLayerItems(QXmlStreamWriter *) const;
+    void saveLayerItems(QXmlStreamWriter *, DesignInclusionArea) const;
 
 
     // GUI

@@ -17,7 +17,7 @@
 #include <QDialog>
 #include <QImage>
 
-#include "../../global.h"
+#include "src/global.h"
 
 #include "afm_panel.h"
 #include "property_editor.h"
@@ -29,7 +29,7 @@
 #include "primitives/lattice.h"
 #include "primitives/items.h"
 #include "primitives/emitter.h"
-#include "primitives/sim_job.h"
+#include "components/sim_job.h"
 
 namespace gui{
 
@@ -106,6 +106,10 @@ namespace gui{
     //! get a list of all the surface dangling bonds
     QList<prim::DBDot*> getSurfaceDBs() const;
 
+    //! Return a list of DBDot pointers at the provided physical locations. If 
+    //! any of the locations are not valid DB sites, an exception is thrown.
+    QList<prim::DBDot*> getDBsAtLocs(QList<QPointF> phys_locs);
+
     //! resets the drawing layer and builds a lattice from the given <lattice>.ini
     //! file. If no file is given, the default lattice is used
     void buildLattice(const QString &fname=QString());
@@ -147,7 +151,7 @@ namespace gui{
     int save_ind=0;
 
     //! Save layers and items into the given write stream.
-    void saveToFile(QXmlStreamWriter *, bool for_sim=false);
+    void writeToXmlStream(QXmlStreamWriter *, DesignInclusionArea);
 
 
     // LOAD
@@ -171,7 +175,7 @@ namespace gui{
     // SIMULATION RESULT DISPLAY
 
     //! Display the simulation result from SimAnneal
-    void displaySimResults(prim::SimJob *job, int dist_int, bool avg_degen);
+    void displaySimResults(comp::SimJob *job, int dist_int, bool avg_degen);
 
     //! Clear the simulation result from SimAnneal
     void clearSimResults();
@@ -225,7 +229,8 @@ namespace gui{
     void sig_toolChangeRequest(gui::ToolType tool);  // request ApplicationGUI to change tool
     void sig_toolChanged(gui::ToolType tool); // notify other components of the
                                               // change in tool
-    void sig_resetDesignPanel();
+    void sig_preDPResetCleanUp();
+    void sig_postDPReset();
     void sig_undoStackCleanChanged(bool); // emitted when undo_stack emits cleanChanged(bool)
 
     //! Request ApplicationGUI to update the layer manager widget being used.
@@ -505,8 +510,8 @@ namespace gui{
     // delete all selected items
     void deleteSelection();
 
-    // create an aggregate from the selected surface Items
-    void formAggregate();
+    // create an aggregate from the provided list or from selected surface Items
+    void formAggregate(QList<prim::Item*> items=QList<prim::Item*>());
 
     // split all selected aggregates without deleting the contained items
     void splitAggregates();

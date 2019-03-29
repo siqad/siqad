@@ -85,10 +85,12 @@ namespace prim{
     QList<prim::LatticeCoord> enclosedSites(const prim::LatticeCoord &coord1,
         const prim::LatticeCoord &coord2) const;
 
-    //! Convert lattice coordinates to scene position in QPointF. Does not check for validity!
+    //! Convert lattice coordinates to scene position in QPointF. Does not check 
+    //! for validity.
     QPointF latticeCoord2ScenePos(const prim::LatticeCoord &l_coord) const;
 
-    //! Convert lattice coordinates to physical location in angstrom. Does not check for validity!
+    //! Convert lattice coordinates to physical location in angstrom. Does not 
+    //! check for validity.
     QPointF latticeCoord2PhysLoc(const prim::LatticeCoord &coord) const;
 
     //! Return whether a given scene_pos collides with the given lattice position
@@ -114,9 +116,9 @@ namespace prim{
       return (l_coord.l >= 0 && l_coord.l < b.length());
     }
 
-    //! Return the DBDot pointer at the specified lattice coord, or 0 if none.
+    //! Return the DBDot pointer at the specified lattice coord, or nullptr if none.
     prim::DBDot *dbAt(const prim::LatticeCoord &l_coord) {
-      return occ_latdots.contains(l_coord) ? occ_latdots.value(l_coord) : 0;
+      return occ_latdots.contains(l_coord) ? occ_latdots.value(l_coord) : nullptr;
     }
 
     //! identify the bounding rect of an approximately rectangular supercell

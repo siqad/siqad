@@ -21,7 +21,7 @@ gui::DialogPanel::DialogPanel(QWidget *parent)
 
   setReadOnly(true);
   setLineWrapMode(QPlainTextEdit::WidgetWidth);
-  setTextInteractionFlags(textInteractionFlags()
+  setTextInteractionFlags(textInteractionFlags() 
                           | Qt::TextSelectableByKeyboard);
 
   // show message if this dialog isn't set to capture debug outputs

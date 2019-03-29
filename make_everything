@@ -25,42 +25,52 @@ else
     QMAKE_COMMAND=qmake
 fi
 
+# make SWIG at the central location and copy to desired destinations
+if [[ "$@" == "-swig" ]]
+then
+    echo "Building SWIG SiQADConnector at central location... $FOR_OS"
+    cd $qmake_dir/src/phys/siqadconn
+    ./swig_generate_and_compile FOR_OS=$FOR_OS
+
+    cp lib/* $qmake_dir/src/phys/qpuanneal/src
+    cp lib/* $qmake_dir/src/phys/afmmarcus/src
+    cp lib/* $qmake_dir/src/phys/poissolver/FEM/src/python
+    cp lib/* $qmake_dir/src/plugins/db_pattern_recognition
+fi
 
 # make simanneal
 echo "Building SimAnneal... $FOR_OS"
 cd $qmake_dir/src/phys/simanneal
 make $multicore_compile FOR_OS=$FOR_OS
 
-# make qpuanneal
-echo "Building QPUAnneal... $FOR_OS"
-if [[ "$@" == "-swig" ]]
-then
-    echo "Building swig for QPUAnneal"
-    cd $qmake_dir/src/phys/qpuanneal/src/swig_siqadconn
-    ./swig_generate_and_compile FOR_OS=$FOR_OS
-fi
+# Uncomment particular sections if you want to build a specific version of SWIG for that engine
 
-# make afmmarcus
-echo "Building AFMMarcus... $FOR_OS"
-if [[ "$@" == "-swig" ]]
-then
-    echo "Building swig for AFMMarcus"
-    cd $qmake_dir/src/phys/afmmarcus/src/swig_siqadconn
-    ./swig_generate_and_compile FOR_OS=$FOR_OS
-fi
-#cd $qmake_dir/src/phys/afmmarcus/src
-#make $multicore_compile FOR_OS=$FOR_OS
-
-# make poissolver
-echo "Building PoisSolver... $FOR_OS"
-if [[ "$@" == "-swig" ]]
-then
-    echo "Building swig for PoisSolver"
-    cd $qmake_dir/src/phys/poissolver/FEM/src/python/swig_siqadconn
-    ./swig_generate_and_compile FOR_OS=$FOR_OS
-fi
-#cd $qmake_dir/src/phys/poissolver/FEM/src
-#make $multicore_compile FOR_OS=$FOR_OS
+## make qpuanneal
+#echo "Building QPUAnneal... $FOR_OS"
+#if [[ "$@" == "-swig" ]]
+#then
+#    echo "Building swig for QPUAnneal"
+#    cd $qmake_dir/src/phys/qpuanneal/src/swig_siqadconn
+#    ./swig_generate_and_compile FOR_OS=$FOR_OS
+#fi
+#
+## make afmmarcus
+#echo "Building AFMMarcus... $FOR_OS"
+#if [[ "$@" == "-swig" ]]
+#then
+#    echo "Building swig for AFMMarcus"
+#    cd $qmake_dir/src/phys/afmmarcus/src/swig_siqadconn
+#    ./swig_generate_and_compile FOR_OS=$FOR_OS
+#fi
+#
+## make poissolver
+#echo "Building PoisSolver... $FOR_OS"
+#if [[ "$@" == "-swig" ]]
+#then
+#    echo "Building swig for PoisSolver"
+#    cd $qmake_dir/src/phys/poissolver/FEM/src/python/swig_siqadconn
+#    ./swig_generate_and_compile FOR_OS=$FOR_OS
+#fi
 
 # use qmake to create Make files for the GUI
 cd "$make_dir"

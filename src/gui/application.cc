@@ -144,12 +144,14 @@ void gui::ApplicationGUI::initGUI()
   info_pan = new gui::InfoPanel(this);
 
   // detachable/pop-up widgets, order matters in some cases due to pointers
+  plugin_manager = new gui::PluginManager(this);
   sim_manager = new gui::SimManager(this);
-  sim_visualize = new gui::SimVisualize(sim_manager, this);
+  sim_visualize = new gui::SimVisualizer(design_pan, this);
+  job_manager = new gui::JobManager(plugin_manager, sim_visualize, this);
   settings_dialog = new settings::SettingsDialog(this);
 
   // initialise docks
-  initSimVisualizeDock();
+  initSimVisualizerDock();
   initDialogDock();
   initLayerDock();
   initItemDock();
@@ -165,11 +167,11 @@ void gui::ApplicationGUI::initGUI()
   initCommander();
 
   // inter-widget signals
-  connect(sim_visualize, &gui::SimVisualize::showElecDistOnScene,
+  connect(sim_visualize, &gui::SimVisualizer::showElecDistOnScene,
           design_pan, &gui::DesignPanel::displaySimResults);
-  connect(sim_visualize, &gui::SimVisualize::showPotPlotOnScene,
+  connect(sim_visualize, &gui::SimVisualizer::showPotPlotOnScene,
           design_pan, &gui::DesignPanel::displayPotentialPlot);
-  connect(sim_visualize, &gui::SimVisualize::clearPotPlots,
+  connect(sim_visualize, &gui::SimVisualizer::clearPotPlots,
           design_pan, &gui::DesignPanel::clearPlots);
   connect(design_pan, &gui::DesignPanel::sig_quickRunSimulation,
           sim_manager, &gui::SimManager::quickRun);
@@ -179,13 +181,27 @@ void gui::ApplicationGUI::initGUI()
           info_pan, &gui::InfoPanel::updateZoom);
   connect(design_pan, &gui::DesignPanel::sig_selectedItems,
           info_pan, &gui::InfoPanel::updateSelItemCount);
+  connect(job_manager, &gui::JobManager::sig_executeSQCommand,
+          [this](const QString &command)
+          {
+            commander->parseInputs(command);
+          });
 
   // widget-app gui signals
-  connect(sim_manager, &gui::SimManager::sig_simJob,
-          this, &gui::ApplicationGUI::runSimulation);
+  connect(job_manager, &gui::JobManager::sig_exportJobProblem,
+          [this](comp::JobStep *js, gui::DesignInclusionArea inclusion_area)
+          {
+            saveToFile(SaveSimulationProblem, js->problemPath(), inclusion_area, js);
+          });
   connect(settings_dialog, &settings::SettingsDialog::sig_resetSettings,
           [this](){reset_settings = true;});
-  connect(design_pan, &gui::DesignPanel::sig_resetDesignPanel,
+  connect(design_pan, &gui::DesignPanel::sig_preDPResetCleanUp,
+          [this]()
+          {
+            // clear SimVisualize content before DesignPanel cleanup
+            sim_visualize->clearJob();
+          });
+  connect(design_pan, &gui::DesignPanel::sig_postDPReset,
           [this](){initState();});
   connect(design_pan, &gui::DesignPanel::sig_setLayerManagerWidget,
           this, &gui::ApplicationGUI::setLayerManagerWidget);
@@ -195,8 +211,8 @@ void gui::ApplicationGUI::initGUI()
           this, &gui::ApplicationGUI::updateWindowTitle);
   connect(design_pan, &gui::DesignPanel::sig_screenshot,
           this, QOverload<const QString&, const QRectF&, bool>::of(&gui::ApplicationGUI::designScreenshot));
-  connect(design_pan, &gui::DesignPanel::sig_showSimulationSetup,
-          [this](){sim_manager->showSimSetupDialog();});
+  //connect(design_pan, &gui::DesignPanel::sig_showSimulationSetup,
+  //        [this](){sim_manager->showSimSetupDialog();});
   connect(design_pan, &gui::DesignPanel::sig_cancelScreenshot,
           this, &gui::ApplicationGUI::endScreenshotMode);
 
@@ -342,7 +358,7 @@ void gui::ApplicationGUI::initTopBar()
   action_run_sim = new QAction(QIcon(":/ico/runsim.svg"), tr("Run Simulation..."));
   action_run_sim->setShortcut(tr("CTRL+R"));
   connect(action_run_sim, &QAction::triggered,
-          [this](){sim_manager->show();});
+          [this](){job_manager->show();});
 
   action_repeat_sim = new QAction(tr("Repeat Previous Simulation"), this);
   action_repeat_sim->setShortcut(tr("CTRL+SHIFT+R"));
@@ -364,7 +380,7 @@ void gui::ApplicationGUI::initTopBar()
 
   // add them to top bar
   top_bar->addAction(action_run_sim);
-  top_bar->addAction(action_run_ground_state);
+  //top_bar->addAction(action_run_ground_state); TODO reimplement this when the new plugin manager matures
   top_bar->addAction(action_sim_visualize);           // already initialised in menu bar
   top_bar->addAction(action_layer_sel);               // already initialised in menu bar
   top_bar->addAction(action_dialog_dock_visibility);  // already initialised in menu bar
@@ -501,7 +517,7 @@ void gui::ApplicationGUI::initDialogDock()
   addDockWidget(area, dialog_dock);
 }
 
-void gui::ApplicationGUI::initSimVisualizeDock()
+void gui::ApplicationGUI::initSimVisualizerDock()
 {
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
 
@@ -517,7 +533,14 @@ void gui::ApplicationGUI::initSimVisualizeDock()
   // size policy
   sim_visualize_dock->setMinimumWidth(gui_settings->get<int>("SIMVDOCK/mw"));
 
-  connect(sim_visualize_dock, &QDockWidget::visibilityChanged, design_pan, &gui::DesignPanel::simVisualizeDockVisibilityChanged);
+  connect(sim_visualize_dock, &QDockWidget::visibilityChanged, 
+          design_pan, &gui::DesignPanel::simVisualizeDockVisibilityChanged);
+  connect(sim_visualize_dock, &QDockWidget::visibilityChanged, 
+          [this](const bool &visible)
+          {
+            if (!visible)
+              sim_visualize->clearJob();
+          });
 
   QScrollArea *sa_sim_vis = new QScrollArea;
   sa_sim_vis->setWidget(sim_visualize);
@@ -864,6 +887,7 @@ void gui::ApplicationGUI::repeatSimulation()
 
 void gui::ApplicationGUI::runGroundState()
 {
+  /* TODO re-implement
   int index = sim_manager->getComboEngSel()->findText("SimAnneal");
   if (index != -1) { //if index found
     sim_manager->getComboEngSel()->setCurrentIndex(index);
@@ -871,9 +895,12 @@ void gui::ApplicationGUI::runGroundState()
   } else {
     qDebug() << tr("Ground state engine not found.");
   }
+  */
 }
 
-void gui::ApplicationGUI::runSimulation(prim::SimJob *job)
+// TODO remove
+/*
+void gui::ApplicationGUI::runSimulation(comp::SimJob *job)
 {
   if(!job){
     qWarning() << tr("ApplicationGUI: Received job is not a valid pointer.");
@@ -884,9 +911,9 @@ void gui::ApplicationGUI::runSimulation(prim::SimJob *job)
 
   qDebug() << tr("ApplicationGUI: About to run job '%1'").arg(job->name());
 
-  // call saveToFile TODO don't forget to account for setup dialog settings
-  for (int i=0; i<job->jobSteps()->length(); i++) {
-    saveToFile(Simulation, job->problemFilePath(i), job->getJobStep(i));
+  // call saveToFile
+  for (int i=0; i<job->jobSteps().length(); i++) {
+    saveToFile(SaveSimulationProblem, job->problemFilePath(i), job->getJobStep(i));
   }
 
   // call job binary and read output when done
@@ -897,6 +924,7 @@ void gui::ApplicationGUI::runSimulation(prim::SimJob *job)
   sim_visualize_dock->show();
   sim_visualize->updateJobSelCombo(); // TODO make sim_visualize capture job completion signals, so it updates the field on its own
 }
+*/
 
 bool gui::ApplicationGUI::readSimResult(const QString &result_path)
 {
@@ -1110,15 +1138,27 @@ void gui::ApplicationGUI::newFile()
 
 
 // save/load:
-bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag,
+bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, 
                                      const QString &path,
-                                     prim::SimJob::JobStep job_step)
+                                     gui::DesignInclusionArea inclusion_area,
+                                     comp::JobStep *job_step)
 {
   QString write_path;
 
   QFileDialog save_dialog;
   // determine target file
   if (!path.isEmpty()) {
+    // ask for user confirmation if the path already contains a file and the 
+    // save flag is not an AutoSave
+    if (QFile(path).exists() && flag != AutoSave) {
+      QMessageBox::StandardButton reply = QMessageBox::question(this, "Warning",
+          tr("The path %1 already contains a file. Overwrite?").arg(path), 
+          QMessageBox::Yes|QMessageBox::No);
+      if (reply == QMessageBox::No) {
+        qDebug() << tr("User chose not to overwrite %1, save terminated.").arg(path);
+        return false;
+      }
+    }
     write_path = path;
   } else if (working_path.isEmpty() || flag==SaveAs) {
     save_dialog.setDefaultSuffix("sqd");
@@ -1130,13 +1170,12 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag,
     write_path = working_path;
   }
 
-  // add .xml extension if there isn't
-  if (! (write_path.endsWith(".sqd", Qt::CaseInsensitive) ||
-         write_path.endsWith(".qad", Qt::CaseInsensitive) ||
-         write_path.endsWith(".xml", Qt::CaseInsensitive)) )
+  // add .sqd extension if there isn't
+  if (!QStringList({"sqd", "qad", "xml"}).contains(QFileInfo(write_path).suffix()))
     write_path.append(".sqd");
 
-  // set file name of [whatevername].writing while writing to prevent loss of previous save if this save fails
+  // set file name to write_path.writing while writing to prevent loss of 
+  // previous save if this save fails
   QFile file(write_path+".writing");
 
   if(!file.open(QIODevice::WriteOnly)){
@@ -1157,7 +1196,7 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag,
   ws.writeComment("Program Flags");
   ws.writeStartElement("program");
 
-  QString file_purpose = flag==Simulation ? "simulation" : "save";
+  QString file_purpose = flag==SaveSimulationProblem ? "simulation" : "save";
   ws.writeTextElement("file_purpose", file_purpose);
   ws.writeTextElement("version", "TBD");
   ws.writeTextElement("date", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
@@ -1165,16 +1204,16 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag,
   ws.writeEndElement();
 
   // save simulation parameters
-  if (flag == Simulation && !job_step.isEmpty()) {
+  if (flag == SaveSimulationProblem && job_step != nullptr) {
     ws.writeStartElement("sim_params");
-    for (const QString &key : job_step.sim_params.keys()) {
-      ws.writeTextElement(key, job_step.sim_params.value(key));
+    for (const QString &key : job_step->jobParameters().keys()) {
+      ws.writeTextElement(key, job_step->jobParameters().value(key));
     }
     ws.writeEndElement();
   }
 
   // save design panel content (including GUI flags, layers and their corresponding contents (electrode, dbs, etc.)
-  design_pan->saveToFile(&ws, flag==Simulation);
+  design_pan->writeToXmlStream(&ws, inclusion_area);
 
   // close root element & close file
   ws.writeEndElement();

@@ -185,11 +185,11 @@ void LayerManager::saveLayers(QXmlStreamWriter *ws) const
     layer->saveLayer(ws);
 }
 
-void LayerManager::saveLayerItems(QXmlStreamWriter *ws) const
+void LayerManager::saveLayerItems(QXmlStreamWriter *ws, DesignInclusionArea inclusion_area) const
 {
   for(prim::Layer *layer : layers){
     ws->writeComment(layer->getName());
-    layer->saveItems(ws);
+    layer->saveItems(ws, inclusion_area);
   }
 }
 

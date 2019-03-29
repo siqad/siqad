@@ -7,9 +7,8 @@
 // @desc:     SimEngine classes
 
 #include "sim_engine.h"
-#include <QUiLoader>
 
-using namespace prim;
+using namespace comp;
 
 SimEngine::SimEngine(const QString &eng_desc_path, QWidget *parent)
   : QObject(parent), eng_desc_path(eng_desc_path)

@@ -11,7 +11,7 @@ CONFIG += c++11
 CONFIG += debug
 #CONFIG += release
 
-QT += core gui widgets svg printsupport uitools
+QT += core gui widgets svg printsupport uitools charts
 
 greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 
@@ -73,8 +73,6 @@ HEADERS += \
    	src/gui/widgets/primitives/items.h \
    	src/gui/widgets/primitives/layer.h \
    	src/gui/widgets/primitives/lattice.h \
-   	src/gui/widgets/primitives/sim_engine.h \
-   	src/gui/widgets/primitives/sim_job.h \
    	src/gui/widgets/primitives/electrode.h \
     src/gui/widgets/primitives/afmarea.h \
     src/gui/widgets/primitives/afmpath.h \
@@ -88,8 +86,8 @@ HEADERS += \
    	src/gui/widgets/primitives/hull/hulls.h \
     src/gui/widgets/primitives/labels/labelgroup.h \
     src/gui/widgets/primitives/labels/textlabel.h \
-    src/gui/widgets/primitives/visualaids/screenshot_clip_area.h \
-    src/gui/widgets/primitives/visualaids/scale_bar.h
+    src/gui/widgets/primitives/visual_aids/screenshot_clip_area.h \
+    src/gui/widgets/primitives/visual_aids/scale_bar.h
 
 
 
@@ -101,8 +99,6 @@ SOURCES += \
    	src/gui/widgets/primitives/ghost.cc \
    	src/gui/widgets/primitives/layer.cc \
    	src/gui/widgets/primitives/lattice.cc \
-   	src/gui/widgets/primitives/sim_engine.cc \
-   	src/gui/widgets/primitives/sim_job.cc \
    	src/gui/widgets/primitives/electrode.cc \
    	src/gui/widgets/primitives/afmarea.cc \
    	src/gui/widgets/primitives/afmpath.cc \
@@ -115,14 +111,37 @@ SOURCES += \
    	src/gui/widgets/primitives/hull/convex.cc \
     src/gui/widgets/primitives/labels/labelgroup.cc \
     src/gui/widgets/primitives/labels/textlabel.cc \
-    src/gui/widgets/primitives/visualaids/screenshot_clip_area.cc \
-    src/gui/widgets/primitives/visualaids/scale_bar.cc
+    src/gui/widgets/primitives/visual_aids/screenshot_clip_area.cc \
+    src/gui/widgets/primitives/visual_aids/scale_bar.cc
 
+# components for widgets
+
+HEADERS += \
+   	src/gui/widgets/components/plugin_engine.h \
+   	src/gui/widgets/components/sim_engine.h \
+   	src/gui/widgets/components/sim_job.h \
+    src/gui/widgets/components/job_results/job_result_types.h \
+    src/gui/widgets/components/job_results/job_result.h \
+    src/gui/widgets/components/job_results/db_locations.h \
+    src/gui/widgets/components/job_results/electron_config_set.h \
+    src/gui/widgets/components/job_results/potential_landscape.h \
+    src/gui/widgets/components/job_results/sqcommands.h
+
+SOURCES += \
+   	src/gui/widgets/components/plugin_engine.cc \
+   	src/gui/widgets/components/sim_engine.cc \
+   	src/gui/widgets/components/sim_job.cc \
+    src/gui/widgets/components/job_results/job_result.cc \
+    src/gui/widgets/components/job_results/db_locations.cc \
+    src/gui/widgets/components/job_results/electron_config_set.cc \
+    src/gui/widgets/components/job_results/potential_landscape.cc \
+    src/gui/widgets/components/job_results/sqcommands.cc
 
 # widgets
 
 HEADERS += \
     src/gui/application.h \
+  	src/gui/commander.h \
    	src/gui/property_map.h \
    	src/gui/widgets/property_editor.h \
    	src/gui/widgets/property_form.h \
@@ -130,19 +149,23 @@ HEADERS += \
    	src/gui/widgets/dialog_panel.h \
    	src/gui/widgets/input_field.h \
    	src/gui/widgets/info_panel.h \
-    src/gui/widgets/sim_visualize_panel.h \
     src/gui/widgets/afm_panel.h \
-  	src/gui/commander.h \
   	src/gui/widgets/completer.h \
   	src/gui/widgets/managers/item_manager.h \
     src/gui/widgets/managers/layer_manager.h \
+    src/gui/widgets/managers/plugin_manager.h \
+    src/gui/widgets/managers/job_manager.h \
     src/gui/widgets/managers/sim_manager.h \
-    src/gui/widgets/managers/screenshot_manager.h
+    src/gui/widgets/managers/screenshot_manager.h \
+    src/gui/widgets/visualizers/sim_visualizer.h \
+    src/gui/widgets/visualizers/electron_config_set_visualizer.h \
+    src/gui/widgets/visualizers/potential_landscape_visualizer.h
 
 
 
 SOURCES += \
     src/gui/application.cc \
+   	src/gui/commander.cc \
    	src/gui/property_map.cc \
    	src/gui/widgets/property_editor.cc \
    	src/gui/widgets/property_form.cc \
@@ -150,14 +173,17 @@ SOURCES += \
    	src/gui/widgets/dialog_panel.cc \
    	src/gui/widgets/input_field.cc \
    	src/gui/widgets/info_panel.cc \
-    src/gui/widgets/sim_visualize_panel.cc \
    	src/gui/widgets/afm_panel.cc \
-   	src/gui/commander.cc \
    	src/gui/widgets/completer.cc \
    	src/gui/widgets/managers/item_manager.cc \
     src/gui/widgets/managers/layer_manager.cc \
+    src/gui/widgets/managers/plugin_manager.cc \
+    src/gui/widgets/managers/job_manager.cc \
     src/gui/widgets/managers/sim_manager.cc \
-    src/gui/widgets/managers/screenshot_manager.cc
+    src/gui/widgets/managers/screenshot_manager.cc \
+    src/gui/widgets/visualizers/sim_visualizer.cc \
+    src/gui/widgets/visualizers/electron_config_set_visualizer.cc \
+    src/gui/widgets/visualizers/potential_landscape_visualizer.cc
 
 
 
@@ -184,6 +210,8 @@ UI_DIR		= $$DESTDIR/.ui
 EXEC_DIR = $$OUT_PWD/$$DESTDIR
 # directory holding the physics engines, relative to db-sim.pro
 PHYS_DIR = src/phys
+# directory holding plugins
+PLUGIN_DIR = src/plugins
 
 macx:   EXEC_DIR = $${DESTDIR}/$${TARGET}.app/Contents/MacOS
 
@@ -262,7 +290,6 @@ sim_poissolver.files = \
     $$PHYS_DIR/poissolver/FEM/src/python/res_graph.py \
     $$PHYS_DIR/poissolver/FEM/src/python/mesher.py \
     $$PHYS_DIR/poissolver/FEM/src/python/dopant.py \
-    $$PHYS_DIR/poissolver/FEM/src/python/ac.py \
     $$PHYS_DIR/poissolver/FEM/src/python/capacitance.py \
     $$PHYS_DIR/poissolver/FEM/src/python/resistance.py \
     $$PHYS_DIR/poissolver/FEM/src/python/res_graph.py \
@@ -283,3 +310,14 @@ sim_poissolver_swig.files = \
     $$PHYS_DIR/poissolver/FEM/src/python/swig_siqadconn/swig_generate_and_compile
 INSTALLS += sim_poissolver
 INSTALLS += sim_poissolver_swig
+
+# DB pattern recognition
+
+db_pair_recognition.path = $$EXEC_DIR/plugins/db_pattern_recognition
+db_pair_recognition.files = \
+    $$PLUGIN_DIR/db_pattern_recognition/dbp_recognition.sqplug \
+    $$PLUGIN_DIR/db_pattern_recognition/dbp_recognition.py \
+    $$PLUGIN_DIR/db_pattern_recognition/_siqadconn*.so \
+    $$PLUGIN_DIR/db_pattern_recognition/_siqadconn*.pyd \
+    $$PLUGIN_DIR/db_pattern_recognition/siqadconn.py
+INSTALLS += db_pair_recognition

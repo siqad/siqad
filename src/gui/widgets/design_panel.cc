@@ -196,12 +196,15 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
 // reset
 void gui::DesignPanel::resetDesignPanel()
 {
+  // tell application to perform pre-reset clean-ups
+  emit sig_preDPResetCleanUp();
+
   clearDesignPanel(true);
   initDesignPanel();
   // REBUILD
 
   //let application know that design panel has been reset.
-  emit sig_resetDesignPanel();
+  emit sig_postDPReset();
   qDebug() << tr("Design Panel reset complete");
 }
 
@@ -282,11 +285,11 @@ QList<prim::Item*> gui::DesignPanel::selectedItems()
 }
 
 
-QList<prim::DBDot *> gui::DesignPanel::getSurfaceDBs() const
+QList<prim::DBDot*> gui::DesignPanel::getSurfaceDBs() const
 {
   QList<prim::Layer*> db_layers = layman->getLayers(prim::Layer::DB);
-  if (db_layers.count() == 0) {
-    qWarning() << tr("No DB layers found");
+  if (db_layers.isEmpty()) {
+    qDebug() << tr("No DB layers found");
     return QList<prim::DBDot*>();
   }
 
@@ -296,6 +299,24 @@ QList<prim::DBDot *> gui::DesignPanel::getSurfaceDBs() const
     for(prim::Item *item : layer->getItems())
       if(item->item_type==prim::Item::DBDot)
         dbs.append(static_cast<prim::DBDot *>(item));
+
+  return dbs;
+}
+
+
+QList<prim::DBDot*> gui::DesignPanel::getDBsAtLocs(QList<QPointF> phys_locs)
+{
+  QList<prim::DBDot*> dbs;
+
+  for (QPointF phys_loc : phys_locs) {
+    QPointF scene_pos = phys_loc * prim::Item::scale_factor;
+    prim::DBDot *db = lattice->dbAt(lattice->nearestSite(scene_pos));
+    if (db == nullptr) {
+      qCritical() << tr("Invalid DB location (%1, %2)").arg(phys_loc.x()).arg(phys_loc.y());
+      throw "Invalid DB location.";
+    }
+    dbs.append(db);
+  }
 
   return dbs;
 }
@@ -484,11 +505,11 @@ void gui::DesignPanel::setDisplayMode(DisplayMode mode)
 
 // SAVE
 
-void gui::DesignPanel::saveToFile(QXmlStreamWriter *ws, bool for_sim)
+void gui::DesignPanel::writeToXmlStream(QXmlStreamWriter *ws, 
+                                        DesignInclusionArea inclusion_area)
 {
-  if(for_sim){
-    // if saving for simulation, do something
-  }
+  // TODO implement inclusion area
+
   // save gui flags
   ws->writeComment("GUI Flags");
   ws->writeStartElement("gui");
@@ -511,7 +532,7 @@ void gui::DesignPanel::saveToFile(QXmlStreamWriter *ws, bool for_sim)
   // save item hierarchy
   ws->writeComment("Item Hierarchy");
   ws->writeStartElement("design");
-  layman->saveLayerItems(ws);
+  layman->saveLayerItems(ws, inclusion_area);
   ws->writeEndElement(); // end of design node
 }
 
@@ -659,8 +680,9 @@ void gui::DesignPanel::loadDesign(QXmlStreamReader *rs, QList<int> &layer_order_
 
 
 // SIMULATION RESULT DISPLAY
-void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind, bool avg_degen)
+void gui::DesignPanel::displaySimResults(comp::SimJob *job, int dist_ind, bool avg_degen)
 {
+  /*
   // TODO in the future, show results in a pop up windows instead of the result screen itself
   setDisplayMode(SimDisplayMode);
 
@@ -714,6 +736,7 @@ void gui::DesignPanel::displaySimResults(prim::SimJob *job, int dist_ind, bool a
       }
     }
   }
+  */
 }
 
 
@@ -721,6 +744,8 @@ void gui::DesignPanel::clearSimResults()
 {
   setDisplayMode(DesignMode);
 
+  // TODO remove the following code when all simulation related item handling 
+  // are moved over to SimVisualizer
   // set show_elec of all DBDots to 0
   if(!db_dots_result.isEmpty()) {
     for(auto *db : db_dots_result)
@@ -1383,8 +1408,12 @@ void gui::DesignPanel::pasteAction()
 
 void gui::DesignPanel::deleteAction()
 {
-  if(tool_type == gui::ToolType::SelectTool && display_mode == DesignMode)
+  if(tool_type == gui::ToolType::SelectTool && display_mode == DesignMode) {
+    qDebug() << "Delete action invoked";
     deleteSelection();
+  } else {
+    qDebug() << "Delete action conditions not met.";
+  }
 }
 
 
@@ -1430,7 +1459,8 @@ void gui::DesignPanel::initActions()
   connect(action_copy, &QAction::triggered, this, &gui::DesignPanel::copyAction);
   connect(action_paste, &QAction::triggered, this, &gui::DesignPanel::pasteAction);
   connect(action_delete, &QAction::triggered, this, &gui::DesignPanel::deleteAction);
-  connect(action_form_agg, &QAction::triggered, this, &gui::DesignPanel::formAggregate);
+  connect(action_form_agg, &QAction::triggered, 
+          [this](){formAggregate();});
   connect(action_split_agg, &QAction::triggered, this, &gui::DesignPanel::splitAggregates);
   connect(action_dup, &QAction::triggered, this, &gui::DesignPanel::duplicateSelection);
 
@@ -2276,6 +2306,35 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
         }
       }
       break;
+    case prim::Item::Aggregate:
+    {
+      // NOTE current implementation is a quick hack and is non-ideal, future 
+      // implementation should also allow (n,m,l) coordinates.
+      if (item_args.size() % 2 != 0) {
+        qWarning() << tr("Expect an even number of arguments with each pair representing one physical coordinate");
+        return false;
+      }
+      QList<prim::Item*> dbs_for_agg;
+      while (item_args.size() != 0) {
+        float x = item_args.takeFirst().toFloat();
+        float y = item_args.takeFirst().toFloat();
+        prim::LatticeCoord l_coord = lattice->nearestSite(QPointF(x,y)*prim::Item::scale_factor);
+        prim::DBDot *db = lattice->dbAt(l_coord);
+        if (db == nullptr) {
+          qWarning() << tr("Location (%1, %2) does not contain a DB, ceasing aggregate creation.").arg(x).arg(y);
+          return false;
+        }
+        qDebug() << tr("DB found at (%1, %2) and added to pending aggregate list.").arg(x).arg(y);
+        dbs_for_agg.append(db);
+      }
+      if (dbs_for_agg.length() < 2) {
+        qWarning() << tr("Less than 2 DBs on Aggregate list when Aggregate must contain more than 1 DB. Ceasing creation.");
+        return false;
+      }
+      formAggregate(dbs_for_agg);
+      return true;
+      break;
+    }
     case prim::Item::AFMArea:
       if (item_args.size()==4) {
         setTool(gui::ToolType::AFMAreaTool);
@@ -2290,6 +2349,7 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
     default:
       return false;
   }
+  return false;
 }
 
 bool gui::DesignPanel::commandRemoveItem(QString type, QStringList brackets, QStringList numericals)
@@ -2603,10 +2663,13 @@ void gui::DesignPanel::deleteSelection()
 }
 
 
-void gui::DesignPanel::formAggregate()
+void gui::DesignPanel::formAggregate(QList<prim::Item*> items)
 {
-  // do something only if there is a selection
-  QList<prim::Item*> selection = selectedItems();
+  QList<prim::Item*> selection = items;
+
+  if (items.isEmpty())
+    selection = selectedItems();
+
   if(selection.isEmpty())
     return;
 

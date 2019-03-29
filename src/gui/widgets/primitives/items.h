@@ -21,7 +21,7 @@
 #include "resizerotaterect.h"
 #include "labels/labelgroup.h"
 #include "labels/textlabel.h"
-#include "visualaids/screenshot_clip_area.h"
-#include "visualaids/scale_bar.h"
+#include "visual_aids/screenshot_clip_area.h"
+#include "visual_aids/scale_bar.h"
 
 #endif

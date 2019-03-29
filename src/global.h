@@ -16,14 +16,29 @@
 
 namespace gui{
 
+  Q_NAMESPACE
+
   // Forward declarations
   class Unit;
 
   // Globally relevant enums
+
+  //! Application tool type
   enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool, ElectrodeTool,
                 AFMAreaTool, AFMPathTool, ScreenshotAreaTool, ScaleBarAnchorTool,
                 LabelTool};
+
+  //! Design Panel display mode
   enum DisplayMode{DesignMode, SimDisplayMode, ScreenshotMode};
+
+  //! Design save/export area inclusion policy
+  //! IncludeEntireDesign: All items contained in layers.
+  //! IncludeAreaOfInterest: All items within the indiciated area of interest 
+  //!                        (NOTE AoE feature not implemented yet).
+  //! IncludeSelectedItems: All items that are currently selected.
+  enum DesignInclusionArea{IncludeEntireDesign, IncludeAreaOfInterest,
+                           IncludeSelectedItems};
+  Q_ENUM_NS(DesignInclusionArea)
 
   // Handy unit functions
   class Unit : public QObject
@@ -34,7 +49,7 @@ namespace gui{
 
     //! Common metric distance units in ascending order.
     enum DistanceUnit{pm, ang, nm, um, mm, m};
-    Q_ENUM(DistanceUnit);
+    Q_ENUM(DistanceUnit)
 
     //! Return the corresponding float value for the given distance unit. Upon
     //! error, return -1.
