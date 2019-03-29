@@ -312,8 +312,8 @@ QList<prim::DBDot*> gui::DesignPanel::getDBsAtLocs(QList<QPointF> phys_locs)
     QPointF scene_pos = phys_loc * prim::Item::scale_factor;
     prim::DBDot *db = lattice->dbAt(lattice->nearestSite(scene_pos));
     if (db == nullptr) {
-      qCritical() << tr("Invalid DB location (%1, %2)").arg(phys_loc.x()).arg(phys_loc.y());
-      throw "Invalid DB location.";
+      qCritical() << tr("Invalid DB location (%1, %2), aborting DB gathering.").arg(phys_loc.x()).arg(phys_loc.y());
+      return QList<prim::DBDot*>();
     }
     dbs.append(db);
   }

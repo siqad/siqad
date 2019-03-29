@@ -166,7 +166,7 @@ void SimVisualizer::showJob(comp::SimJob *job)
 {
   sim_job = job;
   qDebug() << tr("Showing job %1").arg(job->name());
-  // TODO update relevant panels
+  setEnabled(true);
 
   // generic job information
   job_info_model->clear();
@@ -218,7 +218,7 @@ void SimVisualizer::showJob(comp::SimJob *job)
 
 void SimVisualizer::clearJob()
 {
-  // TODO clear job information from data model in this widget and from children
+  // clear job information from data model in this widget and from children
   // widgets
   job_info_model->clear();
 
@@ -226,6 +226,9 @@ void SimVisualizer::clearJob()
   pot_landscape_visualizer->clearVisualizer();
 
   sim_job = nullptr;
+
+  // disable user interaction to the entire plugin
+  setEnabled(false);
 
   // TODO doesn't belong here but move it to the appropriate location: terminal
   // output dialog button somewhere
