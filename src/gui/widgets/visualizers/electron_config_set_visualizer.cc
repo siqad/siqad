@@ -21,6 +21,8 @@ ECSVisualizer::ElectronConfigSetVisualizer(DesignPanel *design_pan, QWidget *par
   // config set selection
   l_energy_val = new QLabel();
   l_elec_count_val = new QLabel();
+  l_pop_occ = new QLabel();
+  l_config_occ = new QLabel();
   l_elec_config_set_ind = new QLabel();
   s_elec_config_list = new QSlider(Qt::Horizontal);
   QPushButton *pb_elec_config_set_left = new QPushButton("<");
@@ -112,6 +114,8 @@ ECSVisualizer::ElectronConfigSetVisualizer(DesignPanel *design_pan, QWidget *par
   fl_elec_configs->setLabelAlignment(Qt::AlignLeft);
   fl_elec_configs->addRow(new QLabel("Energy"), l_energy_val);
   fl_elec_configs->addRow(new QLabel("Electron count"), l_elec_count_val);
+  fl_elec_configs->addRow(new QLabel("Occurances of this config"), l_config_occ);
+  fl_elec_configs->addRow(new QLabel("Occurances of this electron count"), l_pop_occ);
   fl_elec_configs->addRow(new QLabel("Config set"), l_elec_config_set_ind);
   fl_elec_configs->addRow(w_config_slider_complex);
   fl_elec_configs->addRow(cb_elec_count_filter);
@@ -298,6 +302,8 @@ void ECSVisualizer::updateGUIConfigSetChange()
     // clear information field values if no config set
     l_energy_val->setText("");
     l_elec_count_val->setText("");
+    l_pop_occ->setText("");
+    l_config_occ->setText("");
     cb_elec_count_filter->setChecked(false);
     cb_elec_count_filter->setText("Filter: all configs");
   }
@@ -323,8 +329,14 @@ void ECSVisualizer::updateGUIConfigListChange()
 void ECSVisualizer::updateGUIConfigSelectionChange(const int &elec_config_list_ind)
 {
   // information
+  int config_occ = curr_elec_config.config_occ;
+  int pop_occ = elec_config_set->electronCountOccurances().value(curr_elec_config.elec_count);
+  int total_occ = elec_config_set->totalConfigCount();
+
   l_energy_val->setText(tr("%1 eV").arg(curr_elec_config.energy));
   l_elec_count_val->setText(QString::number(curr_elec_config.elec_count));
+  l_pop_occ->setText(tr("%1 (%2\%)").arg(pop_occ).arg((float)pop_occ/total_occ*100));
+  l_config_occ->setText(tr("%1 (%2\%)").arg(config_occ).arg((float)config_occ/total_occ*100));
 
   // slider
   int max_ind = (elec_config_set != nullptr) ? elec_config_list.length() : 0;

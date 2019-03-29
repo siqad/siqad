@@ -51,7 +51,10 @@ void ECS::readFromXMLStream(QXmlStreamReader *rs)
       }
 
       elec_configs_read.append(elec_config);
+
+      // stats bookkeeping
       elec_count_occ[elec_config.elec_count] += elec_config.config_occ;
+      total_config_count += elec_config.config_occ;
       //qDebug() << tr("Distribution: %1, Energy: %2, Count: %3").arg(dist).arg(read_dist.energy).arg(config_count);
     } else {
       unrecognizedXMLElement(*rs);

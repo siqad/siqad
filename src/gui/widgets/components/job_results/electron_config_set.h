@@ -72,6 +72,9 @@ namespace comp{
     //! configurations with that count.
     QMap<int, int> electronCountOccurances() {return elec_count_occ;}
 
+    //! Return the number of electron configurations (duplicates counted).
+    int totalConfigCount() {return total_config_count;}
+
     //! Return the electron count which has the highest accumulated occurances.
     //! If there's a tie, the configuration with the lower electron count
     //! is returned.
@@ -106,6 +109,7 @@ namespace comp{
     QList<QPointF> phys_locs;                     // physical location of DBs
     QMultiMap<int, ElectronConfig> elec_configs;  // electron configurations with electron count as key
     QMap<int, int> elec_count_occ;                // the accumulated occurances of each electron count
+    int total_config_count=0;                     // total number of electron configurations (duplicates counted)
   };
 
 } // end of comp namespace

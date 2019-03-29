@@ -114,6 +114,8 @@ namespace gui{
     // GUI variables
     QLabel *l_energy_val;                     // energy of a configuration
     QLabel *l_elec_count_val;                 // electron count of a configuration
+    QLabel *l_pop_occ;                        // population occurances
+    QLabel *l_config_occ;                     // configuration occurances
 
     // config set selection
     QLabel *l_elec_config_set_ind;            // electron config set index within slider
