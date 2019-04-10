@@ -257,6 +257,7 @@ sim_afmmarcus.files = \
     $$PHYS_DIR/afmmarcus/src/animator.py \
     $$PHYS_DIR/afmmarcus/src/channel.py \
     $$PHYS_DIR/afmmarcus/src/clocking.py \
+    $$PHYS_DIR/afmmarcus/src/energy_tracker.py \    
     $$PHYS_DIR/afmmarcus/src/db-sim-connector.py \
     $$PHYS_DIR/afmmarcus/src/hopper.py \
     $$PHYS_DIR/afmmarcus/src/lineview.py \
