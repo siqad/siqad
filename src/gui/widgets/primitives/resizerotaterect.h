@@ -80,7 +80,7 @@ namespace prim{
 
   private:
     // Variables
-    qreal angle;                              // the angle of rotation of the resizable rotatable rect
+    qreal angle=0;                              // the angle of rotation of the resizable rotatable rect
     prim::ResizeRotateFrame *resize_frame=0;  // the resize frame for this resizble rect
     QTransform transform = QTransform();             // the transform applied to the ResizeRotateRect
     QRectF scene_rect;        // the rectangle dimensions in scene coordinates
