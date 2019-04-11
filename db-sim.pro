@@ -257,7 +257,7 @@ sim_afmmarcus.files = \
     $$PHYS_DIR/afmmarcus/src/animator.py \
     $$PHYS_DIR/afmmarcus/src/channel.py \
     $$PHYS_DIR/afmmarcus/src/clocking.py \
-    $$PHYS_DIR/afmmarcus/src/energy_tracker.py \    
+    $$PHYS_DIR/afmmarcus/src/energy_tracker.py \
     $$PHYS_DIR/afmmarcus/src/db-sim-connector.py \
     $$PHYS_DIR/afmmarcus/src/hopper.py \
     $$PHYS_DIR/afmmarcus/src/lineview.py \
@@ -291,7 +291,7 @@ sim_poissolver.files = \
     $$PHYS_DIR/poissolver/FEM/src/python/res_graph.py \
     $$PHYS_DIR/poissolver/FEM/src/python/mesher.py \
     $$PHYS_DIR/poissolver/FEM/src/python/dopant.py \
-    $$PHYS_DIR/poissolver/FEM/src/python/capacitance.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/ac.py \
     $$PHYS_DIR/poissolver/FEM/src/python/resistance.py \
     $$PHYS_DIR/poissolver/FEM/src/python/res_graph.py \
     $$PHYS_DIR/poissolver/FEM/src/python/charge_density.py \
