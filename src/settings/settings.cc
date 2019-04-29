@@ -116,13 +116,14 @@ QSettings *settings::AppSettings::m_defs()
   S->setValue("python_search_linux", QStringList({
     "python3",
     "/usr/bin/python3",
-    "/bin/python3;python"
+    "/bin/python3",
+    "python"
   }));
   // windows python search paths
   S->setValue("python_search_winnt", QStringList({
-    "py,-3",
+    "py -3",
     "python",
-    "C:\\Windows\\py.exe,-3"
+    "C:\\Windows\\py.exe -3"
   }));
   // macos python search paths
   S->setValue("python_search_darwin", QStringList({

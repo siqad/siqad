@@ -26,7 +26,7 @@
         <T>string</T>
         <val></val>
         <label>Python path</label>
-        <tip>Leave blank to let the application attempt to find a Python interpreter automatically. Arguments are comma-separated. e.g. C:\Windows\py.exe,-3</tip>
+        <tip>Leave blank to let the application attempt to find a Python interpreter automatically. Arguments are space-separated. e.g. C:\Windows\py.exe -3</tip>
         <meta>
             <category>App</category>
             <key>user_python_path</key>
