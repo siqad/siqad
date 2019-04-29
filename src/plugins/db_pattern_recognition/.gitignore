@@ -1,3 +1,4 @@
 *.xml
 _siqadconn.*.so
+_siqadconn.*.pyd
 siqadconn.py
