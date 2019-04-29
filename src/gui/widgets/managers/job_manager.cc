@@ -463,6 +463,12 @@ QWidget *JobManager::initJobSetupPanel()
   connect(pb_job_run, &QPushButton::clicked,
           [this, job_details_pane]()
           {
+            if (job_steps_model->rowCount() == 0) {
+              QMessageBox mb_no_js;
+              mb_no_js.setText("Job step list is empty.");
+              mb_no_js.exec();
+              return;
+            }
             hide();
             auto job_details = job_details_pane->finalJobDetails();
             if (job_details.name.isEmpty()) {

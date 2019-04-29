@@ -237,6 +237,7 @@ INSTALLS += sim_simanneal
 sim_qpuanneal.path = $$EXEC_DIR/src/phys/qpuanneal
 sim_qpuanneal.files = \
     $$PHYS_DIR/qpuanneal/qpu_anneal.physeng \
+    $$PHYS_DIR/qpuanneal/qpu_anneal_qbsolv.physeng \
     $$PHYS_DIR/qpuanneal/src/groundstate-dwave.py \
     $$PHYS_DIR/qpuanneal/src/siqadconn.py \
     $$PHYS_DIR/qpuanneal/src/_siqadconn*.so \

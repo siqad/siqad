@@ -48,6 +48,11 @@ void ScreenshotManager::setClipArea(QRectF area)
   }
 }
 
+void ScreenshotManager::setClipVisibility(const bool &visible)
+{
+  emit visible ? sig_addVisualAidToDP(clip_area) : sig_removeVisualAidFromDP(clip_area);
+}
+
 void ScreenshotManager::setScaleBar(float t_length, Unit::DistanceUnit unit)
 {
   scale_bar->setScaleBar(t_length, unit);
@@ -59,6 +64,11 @@ void ScreenshotManager::setScaleBar(float t_length, Unit::DistanceUnit unit)
     // remove scale bar from scene if it's in one
     emit sig_removeVisualAidFromDP(scale_bar);
   }
+}
+
+void ScreenshotManager::setScaleBarVisibility(const bool &visible)
+{
+  emit visible ? sig_addVisualAidToDP(scale_bar) : sig_removeVisualAidFromDP(scale_bar);
 }
 
 
@@ -178,7 +188,8 @@ void ScreenshotManager::initScreenshotManager()
           [this]() {
             QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
                 "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-            le_save_dir->setText(dir);
+            if (!dir.isEmpty())
+              le_save_dir->setText(dir);
           }
   );
 

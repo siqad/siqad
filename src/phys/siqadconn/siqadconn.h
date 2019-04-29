@@ -1,7 +1,7 @@
 // @file:     siqadconn.h
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2019.03.26 - Samuel
+// @editted:  2019.04.26 - Samuel
 // @license:  Apache License 2.0
 //
 // @desc:     Convenient functions for interacting with SiQAD including
@@ -143,6 +143,7 @@ namespace phys{
     bpt::ptree potentialPropertyTree();
     bpt::ptree dbPotentialPropertyTree(); // TODO fix up this function, a lot of redundant information
     bpt::ptree sqCommandsPropertyTree();
+    bpt::ptree miscPropertyTree();
 
     // Engine properties
     std::string eng_name;                 // name of simulation engine
@@ -168,6 +169,7 @@ namespace phys{
     std::vector<std::pair<std::string, std::string>> dbl_data;  // pair of location x and y
     std::vector<std::vector<std::string>> db_charge_data;       // pair of elec dist and energy
     std::vector<std::string> export_commands;                   // SQCommands to be exported
+    std::vector<std::pair<std::string, std::string>> misc_data; // misc data output that is ignored by SiQAD, first string for element name and second string for value
 
     // Runtime information
     int return_code=0;

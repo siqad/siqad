@@ -70,7 +70,7 @@ namespace std {
   %pythoncode{
     def export(self, *args, **kwargs):
       for key in kwargs:
-        if key == 'db_loc':
+        if key in ['db_loc', 'misc']:
             self.setExport(key, StringPairVector(self.tuplify(kwargs[key])))
         else:
             self.setExport(key, StringVector2D(self.tuplify(kwargs[key])))

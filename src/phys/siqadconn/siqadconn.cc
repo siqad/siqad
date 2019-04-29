@@ -1,7 +1,7 @@
 // @file:     siqadconn.cc
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2019.03.26 - Samuel
+// @editted:  2019.04.26 - Samuel
 // @license:  Apache License 2.0
 //
 // @desc:     Convenient functions for interacting with SiQAD
@@ -37,11 +37,14 @@ SiQADConnector::SiQADConnector(const std::string &eng_name,
 
 void SiQADConnector::setExport(std::string type, std::vector< std::pair< std::string, std::string > > &data_in)
 {
-  if (type == "db_loc")
+  if (type == "db_loc") {
     dbl_data = data_in;
-  else
+  } else if (type == "misc") {
+    misc_data = data_in;
+  } else {
     throw std::invalid_argument(std::string("No candidate for export type '") +
         type + std::string("' with class std::vector<std::pair<std::string, std::string>>"));
+  }
 }
 
 void SiQADConnector::setExport(std::string type, std::vector< std::vector< std::string > > &data_in)
@@ -284,13 +287,17 @@ void SiQADConnector::writeResultsXml()
   if (!elec_data.empty())
     node_root.add_child("electrode", electrodePropertyTree());
 
-  //electric potentials
+  // electric potentials
   if (!pot_data.empty())
     node_root.add_child("potential_map", potentialPropertyTree());
 
-  //potentials at db locations
+  // potentials at db locations
   if (!db_pot_data.empty())
     node_root.add_child("dbdots", dbPotentialPropertyTree());
+
+  // misc outputs
+  if (!misc_data.empty())
+    node_root.add_child("misc", miscPropertyTree());
 
   // SQCommands
   if (!export_commands.empty()) {
@@ -353,6 +360,11 @@ bpt::ptree SiQADConnector::dbChargePropertyTree()
     node_dist.put("", db_charge_data[i][0]);
     node_dist.put("<xmlattr>.energy", db_charge_data[i][1]);
     node_dist.put("<xmlattr>.count", db_charge_data[i][2]);
+    // quick hack to add physically valid boolean support
+    // TODO in the future revamp SiQADConnector to use a class structure
+    if (db_charge_data[i].size() > 3) {
+      node_dist.put("<xmlattr>.physically_valid", db_charge_data[i][3]);
+    }
     node_elec_dist.add_child("dist", node_dist);
   }
   return node_elec_dist;
@@ -420,6 +432,17 @@ bpt::ptree SiQADConnector::sqCommandsPropertyTree()
     node_sqcommands.add_child("sqc", node_sqc);
   }
   return node_sqcommands;
+}
+
+bpt::ptree SiQADConnector::miscPropertyTree()
+{
+  bpt::ptree node_misc;
+  for (unsigned int i=0; i < misc_data.size(); i++) {
+    bpt::ptree node_misc_item;
+    node_misc_item.put("", misc_data[i].second);
+    node_misc.add_child(misc_data[i].first, node_misc_item);
+  }
+  return node_misc;
 }
 
 //DB ITERATOR

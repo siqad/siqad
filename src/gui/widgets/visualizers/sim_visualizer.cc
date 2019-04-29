@@ -31,8 +31,10 @@ SimVisualizer::SimVisualizer(DesignPanel *design_pan, QWidget *parent)
   tv_job_info->horizontalHeader()->hide();
   tv_job_info->verticalHeader()->hide();
   QPushButton *pb_job_terminal = new QPushButton("Terminal Output");
+  QPushButton *pb_open_result_path = new QPushButton("Open Result Directory");
   vl_job_info->addWidget(tv_job_info);
   vl_job_info->addWidget(pb_job_terminal);
+  vl_job_info->addWidget(pb_open_result_path);
 
   // show job terminal
   connect(pb_job_terminal, &QPushButton::clicked,
@@ -40,6 +42,15 @@ SimVisualizer::SimVisualizer(DesignPanel *design_pan, QWidget *parent)
           {
             if (sim_job != nullptr) {
               sim_job->terminalOutputDialog(this)->show();
+            }
+          });
+
+  // open result directory
+  connect(pb_open_result_path, &QPushButton::clicked,
+          [this]()
+          {
+            if (sim_job != nullptr) {
+              QDesktopServices::openUrl(QUrl::fromLocalFile(sim_job->runtimeTempPath()));
             }
           });
 

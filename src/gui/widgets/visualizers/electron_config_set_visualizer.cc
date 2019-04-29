@@ -21,6 +21,7 @@ ECSVisualizer::ElectronConfigSetVisualizer(DesignPanel *design_pan, QWidget *par
   // config set selection
   l_energy_val = new QLabel();
   l_elec_count_val = new QLabel();
+  l_is_valid = new QLabel();
   l_pop_occ = new QLabel();
   l_config_occ = new QLabel();
   l_elec_config_set_ind = new QLabel();
@@ -47,7 +48,9 @@ ECSVisualizer::ElectronConfigSetVisualizer(DesignPanel *design_pan, QWidget *par
 
 
   // filter
+  pb_degenerate_states = new QPushButton("Degenerate states");
   cb_elec_count_filter = new QCheckBox("Filter: all configs");
+  cb_phys_valid_filter = new QCheckBox("Only physically valid states\n(buggy when used with elec count filter)");
   s_elec_count_filter = new QSlider(Qt::Horizontal);
   QPushButton *pb_elec_count_filter_left = new QPushButton("<");
   QPushButton *pb_elec_count_filter_right = new QPushButton(">");
@@ -108,30 +111,45 @@ ECSVisualizer::ElectronConfigSetVisualizer(DesignPanel *design_pan, QWidget *par
   connect(pb_elec_count_filter_right, &QPushButton::clicked,
           [this](){s_elec_count_filter->setValue(s_elec_count_filter->value()+1);});
 
+  // show degenerate states
+  connect(pb_degenerate_states, &QPushButton::pressed,
+          [this]()
+          {
+            if (elec_config_set == nullptr || curr_elec_config.config.empty()) 
+              return;
+            visualizeDegenerateStates(curr_elec_config);
+          });
+
+  // physically valid state filter
+  connect(cb_phys_valid_filter, &QCheckBox::stateChanged,
+          updateElectronCountFilterState);
 
   // whole layout
   QFormLayout *fl_elec_configs = new QFormLayout();
   fl_elec_configs->setLabelAlignment(Qt::AlignLeft);
   fl_elec_configs->addRow(new QLabel("Energy"), l_energy_val);
   fl_elec_configs->addRow(new QLabel("Electron count"), l_elec_count_val);
+  fl_elec_configs->addRow(new QLabel("Physically valid"), l_is_valid);
   fl_elec_configs->addRow(new QLabel("Occurances of this config"), l_config_occ);
   fl_elec_configs->addRow(new QLabel("Occurances of this electron count"), l_pop_occ);
   fl_elec_configs->addRow(new QLabel("Config set"), l_elec_config_set_ind);
+  fl_elec_configs->addRow(pb_degenerate_states);
   fl_elec_configs->addRow(w_config_slider_complex);
   fl_elec_configs->addRow(cb_elec_count_filter);
   fl_elec_configs->addRow(w_elec_count_slider_complex);
+  fl_elec_configs->addRow(cb_phys_valid_filter);
   setLayout(fl_elec_configs);
   show();
 }
 
 void ECSVisualizer::clearVisualizer()
 {
-  setElectronConfigSet(nullptr, false, false);
+  setElectronConfigSet(nullptr, false);
 }
 
 void ECSVisualizer::setElectronConfigSet(comp::ElectronConfigSet *t_set,
-                                         bool most_popular_elec_count,
-                                         bool show_results_now)
+                                         bool show_results_now,
+                                         PreferredSelection preferred_sel)
 {
   // clean up past results
   clearElectronConfigResult();
@@ -141,10 +159,15 @@ void ECSVisualizer::setElectronConfigSet(comp::ElectronConfigSet *t_set,
   // set up new results
   elec_config_set = t_set;
   updateGUIConfigSetChange();
-  setElectronConfigList(t_set == nullptr ? QList<ECS::ElectronConfig>() : elec_config_set->electronConfigs());
+  bool phys_valid_filter = cb_phys_valid_filter->isChecked();
+  setElectronConfigList(t_set == nullptr ? QList<ECS::ElectronConfig>() : elec_config_set->electronConfigs(phys_valid_filter));
   if (t_set != nullptr && show_results_now) {
     showElectronConfigResultFromSlider();
-    if (most_popular_elec_count) {
+    if (preferred_sel == LowestPhysicallyValidState) {
+      // select the lowest energy configuration that is physically valid
+      int gs_ind = ECS::lowestPhysicallyValidInd(elec_config_list);
+      s_elec_config_list->setValue(gs_ind);
+    } else if (preferred_sel == LowestInMostPopularElectronCount) {
       // filter to the most popular electron count
       QMap<int, int> elec_count_occ = t_set->electronCountOccurances();
       QMap<int, int>::iterator it, it_max_val=elec_count_occ.begin();
@@ -204,7 +227,8 @@ void ECSVisualizer::showElectronConfigResultFromSlider()
 }
 
 void ECSVisualizer::showElectronConfigResult(const ECS::ElectronConfig &elec_config,
-                                             const QList<QPointF> &db_phys_locs)
+                                             const QList<QPointF> &db_phys_locs,
+                                             const QList<float> &db_fill)
 {
   // clean up previous result
   clearElectronConfigResult();
@@ -222,7 +246,8 @@ void ECSVisualizer::showElectronConfigResult(const ECS::ElectronConfig &elec_con
     return;
   }
   for (int i=0; i<curr_elec_config.config.length(); i++) {
-    showing_db_sites.at(i)->setShowElec(elec_config.config.at(i));
+    float t_fill = db_fill.empty() ? elec_config.config.at(i) : db_fill.at(i);
+    showing_db_sites.at(i)->setShowElec(t_fill);
     /*
     qDebug() << tr("DB site (%1, %2) set to %3 filled")
       .arg(showing_db_sites.at(i)->x())
@@ -232,13 +257,41 @@ void ECSVisualizer::showElectronConfigResult(const ECS::ElectronConfig &elec_con
   }
 }
 
+void ECSVisualizer::visualizeDegenerateStates(const ECS::ElectronConfig &elec_config)
+{
+  QList<ECS::ElectronConfig> degen_configs = elec_config_set->degenerateConfigs(elec_config);
+  QList<float> db_fill;
+
+  // add all of the degen configs
+  bool init=true;
+  for (ECS::ElectronConfig t_config : degen_configs) {
+    for (int i=0; i<t_config.config.size(); i++) {
+      if (init)
+        db_fill.append(t_config.config.at(i));
+      else 
+        db_fill[i] += t_config.config.at(i);
+    }
+    init=false;
+  }
+
+  // divide the degen config count and sqrt
+  for (int i=0; i<db_fill.size(); i++) {
+    db_fill[i] = pow((db_fill[i] / degen_configs.size()), 2);
+  }
+
+  showElectronConfigResult(curr_elec_config, 
+                           elec_config_set->dbPhysicalLocations(),
+                           db_fill);
+}
+
 void ECSVisualizer::applyElectronCountFilter(const int &elec_count)
 {
+  bool phys_valid_filter = cb_phys_valid_filter->isChecked();
   if (elec_count >= 0) {
-    setElectronConfigList(elec_config_set->electronConfigs(elec_count));
+    setElectronConfigList(elec_config_set->electronConfigs(phys_valid_filter, elec_count));
     s_elec_count_filter->setValue(elec_config_set->electronCounts().indexOf(elec_count));
   } else {
-    setElectronConfigList(elec_config_set->electronConfigs());
+    setElectronConfigList(elec_config_set->electronConfigs(phys_valid_filter));
   }
   updateGUIFilterSelectionChange(elec_count);
 }
@@ -288,6 +341,7 @@ void ECSVisualizer::updateGUIConfigSetChange()
   w_config_slider_complex->setEnabled(enable);
   w_elec_count_slider_complex->setEnabled(enable);
   cb_elec_count_filter->setEnabled(enable);
+  pb_degenerate_states->setEnabled(enable);
   /*
   s_elec_config_list->setEnabled(enable);
   s_elec_count_filter->setEnabled(enable);
@@ -302,10 +356,12 @@ void ECSVisualizer::updateGUIConfigSetChange()
     // clear information field values if no config set
     l_energy_val->setText("");
     l_elec_count_val->setText("");
+    l_is_valid->setText("");
     l_pop_occ->setText("");
     l_config_occ->setText("");
     cb_elec_count_filter->setChecked(false);
     cb_elec_count_filter->setText("Filter: all configs");
+    cb_phys_valid_filter->setChecked(false);
   }
 }
 
@@ -335,6 +391,12 @@ void ECSVisualizer::updateGUIConfigSelectionChange(const int &elec_config_list_i
 
   l_energy_val->setText(tr("%1 eV").arg(curr_elec_config.energy));
   l_elec_count_val->setText(QString::number(curr_elec_config.elec_count));
+  if (curr_elec_config.is_valid == 0)
+    l_is_valid->setText("No");
+  else if (curr_elec_config.is_valid == 1)
+    l_is_valid->setText("Yes");
+  else
+    l_is_valid->setText("Unknown");
   l_pop_occ->setText(tr("%1 (%2\%)").arg(pop_occ).arg((float)pop_occ/total_occ*100));
   l_config_occ->setText(tr("%1 (%2\%)").arg(config_occ).arg((float)config_occ/total_occ*100));
 

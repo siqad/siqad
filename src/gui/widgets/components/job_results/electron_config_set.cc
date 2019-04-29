@@ -38,6 +38,8 @@ void ECS::readFromXMLStream(QXmlStreamReader *rs)
           elec_config.energy = attr.value().toFloat();
         } else if (attr.name().toString() == QLatin1String("count")) {
           elec_config.config_occ = attr.value().toInt();
+        } else if (attr.name().toString() == QLatin1String("physically_valid")) {
+          elec_config.is_valid = attr.value().toInt();
         }
       }
 
@@ -84,7 +86,17 @@ QList<ECS::ElectronConfig> ECS::degenerateConfigs(const ECS::ElectronConfig &t_c
 {
   QList<ECS::ElectronConfig> degen_configs;
   for (ECS::ElectronConfig config : elec_configs)
-    if (config.energy == t_config.energy && config.config != t_config.config)
+    if (config.energy == t_config.energy)
       degen_configs.append(config);
   return degen_configs;
+}
+
+int ECS::lowestPhysicallyValidInd(const QList<ElectronConfig> &elec_configs)
+{
+  for (int i=0; i<elec_configs.size(); i++) {
+    if (elec_configs.at(i).is_valid == true) {
+      return i;
+    }
+  }
+  return -1;
 }

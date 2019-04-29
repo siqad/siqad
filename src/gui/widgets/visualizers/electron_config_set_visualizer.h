@@ -22,6 +22,8 @@ namespace gui{
 
   public:
 
+    enum PreferredSelection{LowestPhysicallyValidState, LowestInMostPopularElectronCount};
+
     //! Constructor.
     ElectronConfigSetVisualizer(DesignPanel *design_pan, QWidget *parent=nullptr);
 
@@ -37,8 +39,8 @@ namespace gui{
     //! bool value show_results_now instructs visualizer whether to immediately
     //! take focus and show results.
     void setElectronConfigSet(comp::ElectronConfigSet *t_set,
-                              bool most_popular_elec_count=true,
-                              bool show_results_now=true);
+                              bool show_results_now=true,
+                              PreferredSelection preferred_sel=LowestPhysicallyValidState);
 
     //! Set a new electron config list (which contains electron configurations
     //! with applied filters, sort rules, etc.) Without filter, the list would
@@ -48,9 +50,15 @@ namespace gui{
     //! Show the electron config specified by the current slider location.
     void showElectronConfigResultFromSlider();
 
-    //! Show the specified electron config.
+    //! Show the specified electron config. db_fill indicates DB fill state for
+    //! showing partial fills in the case of degenerate state visualization, 
+    //! leave empty to show just the elec_config.
     void showElectronConfigResult(const comp::ElectronConfigSet::ElectronConfig &elec_config,
-                                  const QList<QPointF> &db_phys_locs);
+                                  const QList<QPointF> &db_phys_locs,
+                                  const QList<float> &db_fill=QList<float>());
+
+    //! Color in degenerate states.
+    void visualizeDegenerateStates(const comp::ElectronConfigSet::ElectronConfig &elec_config);
 
     //! Apply an electron count filter with the given electron count. If the 
     //! specified count doesn't agree with the current count value on the 
@@ -114,6 +122,7 @@ namespace gui{
     // GUI variables
     QLabel *l_energy_val;                     // energy of a configuration
     QLabel *l_elec_count_val;                 // electron count of a configuration
+    QLabel *l_is_valid;                       // is physically valid
     QLabel *l_pop_occ;                        // population occurances
     QLabel *l_config_occ;                     // configuration occurances
 
@@ -123,10 +132,13 @@ namespace gui{
     QSlider *s_elec_config_list;              // slider to choose which config to show
 
     // filter selection
+    QPushButton *pb_degenerate_states;        // show degenerate states
     QCheckBox *cb_elec_count_filter;          // checkbox for enabling electron count filter
     QWidget *w_elec_count_slider_complex;     // widget storing filter slider complex (slider and buttons)
     QSlider *s_elec_count_filter;             // slider to choose electron count filter
 
+    // filter physically valid states
+    QCheckBox *cb_phys_valid_filter;          // checkbox for enabling physically valid state filter
 
   };  // end of ElectronConfigSetVisualizer
 

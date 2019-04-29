@@ -30,6 +30,7 @@ namespace comp{
       QList<int> config;
       float energy=0;       // energy of this configuration
       int elec_count=0;     // number of electrons in this config
+      int is_valid=-1;      // is physically valid, -1 for unknown (not provided)
       int config_occ=0;     // number of occurances of this config
 
       bool operator == (const ElectronConfig &other) const {
@@ -91,17 +92,38 @@ namespace comp{
     //! Return all available electron counts.
     QList<int> electronCounts() const {return elec_configs.uniqueKeys();}
 
-    //! Return all electron configurations.
-    QList<ElectronConfig> electronConfigs() const {return elec_configs.values();}
-
     //! Return electron configurations with the specified electron count.
-    QList<ElectronConfig> electronConfigs(const int &elec_count) const
+    //! If the specified electron count is less than 0, assumes that all configs
+    //! are wanted.
+    QList<ElectronConfig> electronConfigs(bool phys_valid_filter=false,
+                                          const int &elec_count=-1) const
     {
-      return elec_configs.values(elec_count);
+      QList<ElectronConfig> configs = elec_count < 0 ? elec_configs.values() : elec_configs.values(elec_count);
+      if (configs.size() > 0 && phys_valid_filter)
+        physicallyValidFilter(configs);
+      return configs;
     }
 
-    //! Return degenerate states of the given electron configuration.
+    //! Filter out physically invalid states in the provided list reference.
+    void physicallyValidFilter(QList<ElectronConfig> &configs) const
+    {
+      QList<ElectronConfig>::iterator it = configs.begin();
+      while (it != configs.end()) {
+        if ((*it).is_valid != 1)
+          it = configs.erase(it);
+        else
+          ++it;
+      }
+    }
+
+    //! Return degenerate states of the given electron configuration including
+    //! the given config.
     QList<ElectronConfig> degenerateConfigs(const ElectronConfig &config) const;
+
+    //! Return the index to the lowest energy state which is physically valid 
+    //! in the given list of electron configs. If there is no physically valid
+    //! index, return -1.
+    static int lowestPhysicallyValidInd(const QList<ElectronConfig> &elec_configs);
 
   private:
 
