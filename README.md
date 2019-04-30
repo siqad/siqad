@@ -38,7 +38,7 @@ git clone --recurse-submodules https://github.com/retallickj/qsi-sim.git
 Next, run the `make_everything` script from the project root:
 ```
 chmod +x make_everything
-./make_everything -swig
+./make_everything --swig
 ```
 
 If the `make_everything` script returns errors, please jump to the "Detailed Compilation" section and try again. Otherwise, you should be able to run the binary by running `./build/debug/siqad` from the project root.
@@ -84,7 +84,7 @@ The cross-compiling guide uses [MXE (M Cross Environment)](http://mxe.cc/) for c
 
 Install the following packages:
 ```
-sudo apt install mxe-x86-64-w64-mingw32.static-boost mxe-i686-w64-mingw32.static-boost mxe-x86-64-w64-mingw32.static-qtbase mxe-x86-64-w64-mingw32.static-qtsvg mxe-i686-w64-mingw32.static-qtbase mxe-i686-w64-mingw32.static-qtsvg mxe-x86-64-w64-mingw32.static-qttools mxe-i686-w64-mingw32.static-qttools
+sudo apt install mxe-x86-64-w64-mingw32.static-boost mxe-i686-w64-mingw32.static-boost mxe-x86-64-w64-mingw32.static-qtbase mxe-x86-64-w64-mingw32.static-qtsvg mxe-i686-w64-mingw32.static-qtbase mxe-i686-w64-mingw32.static-qtsvg mxe-x86-64-w64-mingw32.static-qttools mxe-i686-w64-mingw32.static-qttools mxe-x86-64-w64-mingw32.static-qtcharts
 ```
 
 MXE's Qt does not support compiling in DEBUG mode, so take out the `debug` flag from `CONFIG` and add the `release` flag in `db-sim.pro`:
