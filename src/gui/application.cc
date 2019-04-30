@@ -137,6 +137,9 @@ void gui::ApplicationGUI::initGUI()
   // Initialize GUI icon
   setWindowIcon(QIcon(":/ico/siqad.svg"));
 
+  // Set breeze as the fallback theme (add relevant icons to :/icon/breeze/)
+  QIcon::setFallbackThemeName("breeze");
+
   // initialise mainwindow panels
   dialog_pan = new gui::DialogPanel(this); // init first to capture std output
   input_field = new gui::InputField(this);

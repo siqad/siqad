@@ -2,8 +2,31 @@
 <qresource>
     <file>blank_save.xml</file>
     <file>plugin_services.xml</file>
+
+    <!--property maps-->
    	<file>properties/afmarea.xml</file>
    	<file>properties/electrode.xml</file>
+
+    <!--breeze theme icons-->
+    <file>icons/breeze/index.theme</file>
+    <file>icons/breeze/actions/32/edit-redo.svg</file>
+    <file>icons/breeze/actions/32/view-refresh.svg</file>
+    <file>icons/breeze/actions/32/document-save-as.svg</file>
+    <file>icons/breeze/actions/32/document-open.svg</file>
+    <file>icons/breeze/actions/32/application-exit.svg</file>
+    <file>icons/breeze/actions/32/document-new.svg</file>
+    <file>icons/breeze/actions/32/document-save.svg</file>
+    <file>icons/breeze/actions/32/edit-undo.svg</file>
+    <file>icons/breeze/actions/32/document-properties.svg</file>
+    <file>icons/breeze/actions/32/edit-delete.svg</file>
+    <file>icons/breeze/actions/24/edit-paste.svg</file>
+    <file>icons/breeze/actions/24/object-rotate-right.svg</file>
+    <file>icons/breeze/actions/24/edit-cut.svg</file>
+    <file>icons/breeze/actions/24/object-rotate-left.svg</file>
+    <file>icons/breeze/actions/24/edit-copy.svg</file>
+    <file>icons/breeze/app/48/preferences-system.svg</file>
+
+    <!--custom icons-->
     <file>ico/siqad.svg</file>
    	<file>ico/select.svg</file>
    	<file>ico/drag.svg</file>
@@ -25,8 +48,12 @@
     <file>ico/screenshotarea.svg</file>
     <file>ico/screenshotmode.svg</file>
     <file>ico/scalebaranchortool.svg</file>
+
+    <!--settings dialog form generation-->
     <file>settings/general.xml</file>
     <file>settings/visual.xml</file>
+
+    <!--SQCommand help text-->
     <file>help_text.xml</file>
 </qresource>
 </RCC>
