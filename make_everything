@@ -10,6 +10,10 @@ multicore_compile="-j $cpu_cores"
 make_dir=$(pwd)
 qmake_dir=$(cd `dirname $0` && pwd)
 
+# path to Breeze Qt icon theme for cross-compilation
+# an example is to clone https://github.com/KDE/breeze-icons and point the following variable to the icons directory.
+qt_theme_path=$HOME/global/siqad-cross-compilation-resources/breeze-icons/icons
+
 # figure out which qmake command to use
 if [ "$FOR_OS" == "win32" ]; then
     export FOR_OS
@@ -86,12 +90,26 @@ make install
 # extra actions if building for Windows
 if [ "$FOR_OS" == "win64" ] || [ "$FOR_OS" == "win32" ] ; then
     cd "$make_dir/build/release/"
+
+    # Clean up
     rm -rf .moc .obj .qrc
 
+    # Copy Qt theme icons since Windows doesn't have one
+    target_qt_theme_path=icons/breeze
+    mkdir -p "$target_qt_theme_path"
+    cp -r "$qt_theme_path/"* "$target_qt_theme_path"
+
+    # PoisSolver and QPUAnneal not officially supported on Windows yet
     cd "$make_dir/build/release/src/phys/"
     rm -rf poissolver
+    rm -rf qpuanneal
+
+    # Change physeng file to include .exe suffix for engines that have compiled binaries
     sed -i 's/<\/bin_path>/\.exe&/' ./simanneal/sim_anneal.physeng
 
+    # Create an archive
     cd "$make_dir/build/"
-    zip -r "siqad_64.zip" "release"
+    archive_name=siqad_64.zip
+    rm "$archive_name"
+    zip -r "$archive_name" "release"
 fi
