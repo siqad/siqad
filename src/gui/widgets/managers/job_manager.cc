@@ -342,9 +342,9 @@ QWidget *JobManager::initJobSetupPanel()
                                         "Add job step");
   QAction *a_remove_job_step = new QAction(QIcon::fromTheme("list-remove"),
                                            "Remove job step");
-  QAction *a_move_up_job_step = new QAction(QIcon::fromTheme("up"),
+  QAction *a_move_up_job_step = new QAction(QIcon::fromTheme("arrow-up"),
                                             "Move up");
-  QAction *a_move_down_job_step = new QAction(QIcon::fromTheme("down"),
+  QAction *a_move_down_job_step = new QAction(QIcon::fromTheme("arrow-down"),
                                               "Move down");
   tb_job_steps->addAction(a_add_job_step);
   tb_job_steps->addAction(a_remove_job_step);

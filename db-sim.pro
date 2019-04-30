@@ -216,6 +216,10 @@ PLUGIN_DIR = src/plugins
 macx:   EXEC_DIR = $${DESTDIR}/$${TARGET}.app/Contents/MacOS
 
 
+install_common.path = $$EXEC_DIR
+install_common.files = LICENSE
+INSTALLS += install_common
+
 sim_common.path = $$EXEC_DIR/src/phys
 sim_common.files = \
     $$PHYS_DIR/installing-new-engines.txt \
@@ -226,7 +230,8 @@ INSTALLS += sim_common
 
 sim_simanneal.path = $$EXEC_DIR/src/phys/simanneal
 sim_simanneal.files = \
-    $$PHYS_DIR/simanneal/sim_anneal.physeng
+    $$PHYS_DIR/simanneal/sim_anneal.physeng \
+    $$PHYS_DIR/simanneal/LICENSE
 linux: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal
 macx:  sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal
 win32: sim_simanneal.files += $$PHYS_DIR/simanneal/simanneal.exe
@@ -241,7 +246,8 @@ sim_qpuanneal.files = \
     $$PHYS_DIR/qpuanneal/src/groundstate-dwave.py \
     $$PHYS_DIR/qpuanneal/src/siqadconn.py \
     $$PHYS_DIR/qpuanneal/src/_siqadconn*.so \
-    $$PHYS_DIR/qpuanneal/src/_siqadconn*.pyd
+    $$PHYS_DIR/qpuanneal/src/_siqadconn*.pyd \
+    $$PHYS_DIR/qpuanneal/LICENSE
 INSTALLS += sim_qpuanneal
 
 # AFMMarcus
@@ -264,7 +270,8 @@ sim_afmmarcus.files = \
     $$PHYS_DIR/afmmarcus/src/marcus.py \
     $$PHYS_DIR/afmmarcus/src/model.py \
     $$PHYS_DIR/afmmarcus/src/tip_model.py \
-    $$PHYS_DIR/afmmarcus/src/qt_import.py
+    $$PHYS_DIR/afmmarcus/src/qt_import.py \
+    $$PHYS_DIR/afmmarcus/LICENSE
 sim_afmmarcus_stylesheets.path = $$EXEC_DIR/src/phys/afmmarcus/stylesheets
 sim_afmmarcus_stylesheets.files = \
     $$PHYS_DIR/afmmarcus/src/stylesheets/animator.qss
@@ -301,7 +308,8 @@ sim_poissolver.files = \
     $$PHYS_DIR/poissolver/FEM/src/python/dolfin_convert.py \
     $$PHYS_DIR/poissolver/FEM/src/python/siqadconn.py \
     $$PHYS_DIR/poissolver/FEM/src/python/_siqadconn.*.so \
-    $$PHYS_DIR/poissolver/FEM/src/docker/Dockerfile
+    $$PHYS_DIR/poissolver/FEM/src/docker/Dockerfile \
+    $$PHYS_DIR/poissolver/LICENSE
 sim_poissolver_swig.path = $$EXEC_DIR/src/phys/poissolver/swig_siqadconn
 sim_poissolver_swig.files = \
     $$PHYS_DIR/poissolver/FEM/src/python/swig_siqadconn/setup.py \

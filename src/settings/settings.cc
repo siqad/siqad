@@ -110,6 +110,10 @@ QSettings *settings::AppSettings::m_defs()
 
   S->setValue("dir/lattice", QString("<BINPATH>/src/settings/lattices"));
 
+  S->setValue("extra_icon_theme_path", QStringList({
+        "<BINPATH>/icons/"
+  }));
+
   // python path related
   S->setValue("user_python_path", QString(""));   // user's own python path setting
   // linux/bsd python search paths

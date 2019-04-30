@@ -137,6 +137,16 @@ void gui::ApplicationGUI::initGUI()
   // Initialize GUI icon
   setWindowIcon(QIcon(":/ico/siqad.svg"));
 
+  // (Windows and macOS): If the system doesn't provide a Qt theme, set the 
+  // bundled Breeze theme as the default.
+  // Linux builds don't come bundled with a Qt theme.
+  if (QIcon::fromTheme("document-new").isNull()) {
+    QStringList extra_search_paths = settings::AppSettings::instance()->getPaths("extra_icon_theme_path");
+    //QIcon::setThemeSearchPaths(theme_search_paths);
+    QIcon::setThemeSearchPaths(QIcon::themeSearchPaths() << extra_search_paths);
+    QIcon::setThemeName("Breeze");
+  }
+
   // initialise mainwindow panels
   dialog_pan = new gui::DialogPanel(this); // init first to capture std output
   input_field = new gui::InputField(this);

@@ -2,8 +2,12 @@
 <qresource>
     <file>blank_save.xml</file>
     <file>plugin_services.xml</file>
+
+    <!--property maps-->
    	<file>properties/afmarea.xml</file>
    	<file>properties/electrode.xml</file>
+
+    <!--custom icons-->
     <file>ico/siqad.svg</file>
    	<file>ico/select.svg</file>
    	<file>ico/drag.svg</file>
@@ -25,8 +29,12 @@
     <file>ico/screenshotarea.svg</file>
     <file>ico/screenshotmode.svg</file>
     <file>ico/scalebaranchortool.svg</file>
+
+    <!--settings dialog form generation-->
     <file>settings/general.xml</file>
     <file>settings/visual.xml</file>
+
+    <!--SQCommand help text-->
     <file>help_text.xml</file>
 </qresource>
 </RCC>
