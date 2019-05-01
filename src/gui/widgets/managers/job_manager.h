@@ -100,10 +100,42 @@ namespace gui{
     //! Emit a SiQAD command for commander to parse.
     void sig_executeSQCommand(QString command);
 
+  protected:
+
+    void showEvent(QShowEvent *e) override
+    {
+      loadWidgetState(); QWidget::showEvent(e);
+    }
+
+    void hideEvent(QHideEvent *e) override
+    {
+      saveWidgetState(); QWidget::hideEvent(e);
+    }
+
+    void closeEvent(QCloseEvent *e) override
+    {
+      saveWidgetState(); QWidget::closeEvent(e);
+    }
+
   private:
 
     //! Initialize the job setup widget GUI.
     void initJobManagerGUI();
+
+    //! Save the GUI state.
+    void saveWidgetState()
+    {
+      settings::GUISettings *gui_settings = settings::GUISettings::instance();
+      gui_settings->setValue("jobmanager/geometry", saveGeometry());
+    }
+
+    //! Load previous GUI state.
+    void loadWidgetState()
+    {
+      settings::GUISettings *gui_settings = settings::GUISettings::instance();
+      if (gui_settings->contains("jobmanager/geometry"))
+        restoreGeometry(gui_settings->value("jobmanager/geometry").toByteArray());
+    }
 
     //! Initilize the job setup panel.
     QWidget *initJobSetupPanel();

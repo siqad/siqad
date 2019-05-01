@@ -305,9 +305,10 @@ void gui::ApplicationGUI::initMenuBar()
   QAction *window_screenshot = new QAction(tr("Window Screenshot..."), this);
   QAction *action_settings_dialog = new QAction(tr("Settings"), this);
 
-  tools->addAction(change_lattice);
-  tools->addAction(select_color);
-  tools->addSeparator();
+  // TODO add lattice button back in the future when updated support is implemented
+  //tools->addAction(change_lattice);
+  //tools->addAction(select_color);
+  //tools->addSeparator();
   tools->addAction(window_screenshot);
   tools->addSeparator();
   tools->addAction(action_settings_dialog);

@@ -313,7 +313,6 @@ void SimJob::prepareJob()
   }
 
   // connect necessary signals
-  qDebug() << "Connecting job step completion signals...";
   for (JobStep *job_step : job_steps) {
     connect(job_step, &comp::JobStep::sig_jobStepFinishState,
             this, &SimJob::continueJob);

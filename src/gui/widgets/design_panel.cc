@@ -1501,9 +1501,10 @@ void gui::DesignPanel::rubberBandSelect(){
   painter_path.addRect(rb_scene_rect);
   scene->setSelectionArea(painter_path, Qt::ContainsItemShape);
 
-  // append shift-selected items
+  // append shift-selected items if they're still visible
   for(QGraphicsItem* shift_selected_item : rb_shift_selected)
-    shift_selected_item->setSelected(true);
+    if (shift_selected_item->isVisible())
+      shift_selected_item->setSelected(true);
 }
 
 
@@ -1511,6 +1512,9 @@ void gui::DesignPanel::rubberBandClear() {
   if (rb != nullptr) {
     rb->hide();
     rb = nullptr;
+    rb_start = QPoint();
+    rb_cache = QPoint();
+    rb_scene_rect = QRect();
     rb_shift_selected.clear();
   }
 }
@@ -2488,6 +2492,8 @@ void gui::DesignPanel::createDBs(prim::LatticeCoord lat_coord)
 
 void gui::DesignPanel::createElectrode(QRect scene_rect)
 {
+  if (scene_rect.isNull())
+    return;
   int layer_index = layman->indexOf(layman->activeLayer());
   //only ever create one electrode at a time
   undo_stack->beginMacro(tr("create electrode with given corners"));
@@ -2507,6 +2513,8 @@ void gui::DesignPanel::createPotPlot(QString pot_plot_path, QRectF graph_contain
 
 void gui::DesignPanel::createAFMArea(QRect scene_rect)
 {
+  if (scene_rect.isNull())
+    return;
   int layer_index = layman->indexOf(layman->activeLayer());
 
   // create the AFM area
@@ -2543,6 +2551,8 @@ void gui::DesignPanel::createAFMNode()
 
 void gui::DesignPanel::createTextLabel(const QRect &scene_rect)
 {
+  if (scene_rect.isNull())
+    return;
   bool ok;
   QString text = prim::TextLabel::textPrompt("", &ok);
   if (!ok)

@@ -91,16 +91,15 @@ void prim::Layer::addItem(prim::Item *item, int index)
   if(!items.contains(item)){
     if(index <= items.size()){
       items.insert(index < 0 ? items.size() : index, item);
-      qDebug() << "item inserted";
       // set item flags to agree with layer
       item->setActive(active);
       item->setVisible(visible);
-    }
-    else
+    } else {
       qCritical() << tr("Layer item index invalid");
-  }
-  else
+    }
+  } else {
     qDebug() << tr("item aleady contained in layer...");
+  }
 }
 
 

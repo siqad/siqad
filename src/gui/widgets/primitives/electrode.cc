@@ -227,12 +227,13 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
 
 void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
+  // TODO Nathan do these need to be captured?
   switch(e->buttons()){
     case Qt::RightButton:
-      qDebug() << "Right clicked!";
+      //qDebug() << "Right clicked!";
       break;
     case Qt::LeftButton:
-      qDebug() << "Left clicked!";
+      //qDebug() << "Left clicked!";
       break;
     default:
       prim::Item::mousePressEvent(e);

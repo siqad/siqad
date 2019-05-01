@@ -50,7 +50,9 @@ void ScreenshotManager::setClipArea(QRectF area)
 
 void ScreenshotManager::setClipVisibility(const bool &visible)
 {
-  emit visible ? sig_addVisualAidToDP(clip_area) : sig_removeVisualAidFromDP(clip_area);
+  if (visible && !clip_area->scene())
+    emit sig_addVisualAidToDP(clip_area);
+  clip_area->setVisible(visible);
 }
 
 void ScreenshotManager::setScaleBar(float t_length, Unit::DistanceUnit unit)
@@ -68,7 +70,9 @@ void ScreenshotManager::setScaleBar(float t_length, Unit::DistanceUnit unit)
 
 void ScreenshotManager::setScaleBarVisibility(const bool &visible)
 {
-  emit visible ? sig_addVisualAidToDP(scale_bar) : sig_removeVisualAidFromDP(scale_bar);
+  if (visible && !scale_bar->scene())
+    emit sig_addVisualAidToDP(scale_bar);
+  scale_bar->setVisible(visible);
 }
 
 
