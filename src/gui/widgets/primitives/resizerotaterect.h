@@ -74,19 +74,21 @@ namespace prim{
     void setRotation(qreal angle_in);
 
   protected:
-
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
+    // virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *) override;
     //! Show resize frame when focused
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
   private:
     // Variables
-    qreal angle;                              // the angle of rotation of the resizable rotatable rect
+    qreal angle=0;                              // the angle of rotation of the resizable rotatable rect
     prim::ResizeRotateFrame *resize_frame=0;  // the resize frame for this resizble rect
     QTransform transform = QTransform();             // the transform applied to the ResizeRotateRect
     QRectF scene_rect;        // the rectangle dimensions in scene coordinates
     QRectF scene_rect_cache;            // the rectangle dimensions before resize
     QPointF pos_cache;                  // the top left point before resize
     QPolygonF polygon_cache;            // the polygon representing the rectangle after rotation.
+    bool clicked = false;
   };
 
   //! A rectangular frame containing a few square handles for users to drag to
