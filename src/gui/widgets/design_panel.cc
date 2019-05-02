@@ -1669,15 +1669,7 @@ void gui::DesignPanel::copySelection()
   for (prim::Item *item : selection)
     clipboard.append(item->deepCopy());
 
-  qDebug() << tr("Clipboard: %1 items").arg(clipboard.count());
-  for(prim::Item *item : clipboard){
-    if(item->item_type == prim::Item::Aggregate){
-      qDebug() << tr("  aggregate");
-    }
-    else
-      qDebug() << tr("  item at: %1,%2").arg(item->x()).arg(item->y());
-
-  }
+  qDebug() << tr("Added to clipboard: %1 items").arg(clipboard.count());
 }
 
 void gui::DesignPanel::createDBPreviews(QList<prim::LatticeCoord> coords)
@@ -2473,9 +2465,9 @@ QPointF gui::DesignPanel::findMoveOffset(QStringList args)
 void gui::DesignPanel::createDBs(prim::LatticeCoord lat_coord)
 {
   int layer_index = layman->indexOf(layman->activeLayer());
+  // save list of lattice coords where DBs should be created
   QList<prim::LatticeCoord> lat_list = QList<prim::LatticeCoord>();
-  // since l = -1 is invalid, default is set to n = m = l = -1
-  if (lat_coord == prim::LatticeCoord(-1,-1,-1)) {
+  if (!lat_coord.isValid()) {
     // multiple creation, from using tool
     for (prim::DBDotPreview *db_prev : db_previews)
       lat_list.append(db_prev->latticeCoord());
@@ -2797,7 +2789,6 @@ bool gui::DesignPanel::pasteAtGhost()
 
 void gui::DesignPanel::pasteItem(prim::Ghost *ghost, int n, prim::Item *item)
 {
-  qDebug() << "pasteItem()";
   switch(item->item_type){
     case prim::Item::DBDot:
       pasteDBDot(ghost, n, static_cast<prim::DBDot*>(item));

@@ -21,11 +21,17 @@ namespace prim{
   struct LatticeCoord {
     //! Construct a lattice coordinate with n, m and l coordinates.
     LatticeCoord(int n, int m, int l) : n(n), m(m), l(l) {};
-    //! Construct empty lattice coordinates
-    LatticeCoord() {};
+
+    //! Construct an empty and invalid lattice coordinate
+    LatticeCoord() : n(-1), m(-1), l(-1) {};
+
     int n;
     int m;
     int l;  // invalid if l < 0
+
+    bool isValid() const {
+      return (n < 0 || m < 0 || l < 0) ? false : true;
+    }
 
     bool operator==(const LatticeCoord &other) const {
       if (other.n == n && other.m == m && other.l == l)
