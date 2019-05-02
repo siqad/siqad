@@ -86,7 +86,7 @@ QVariant ResizeRotateRect::itemChange(GraphicsItemChange change, const QVariant 
       if (!resize_frame) {
         resize_frame = new prim::ResizeRotateFrame(this);
       }
-      resize_frame->setVisible(true);
+      // resize_frame->setVisible(true);
     } else {
       if (resize_frame) {
         resize_frame->setVisible(false);
@@ -95,6 +95,24 @@ QVariant ResizeRotateRect::itemChange(GraphicsItemChange change, const QVariant 
   }
 
   return QGraphicsItem::itemChange(change, value);
+}
+
+void ResizeRotateRect::mousePressEvent(QGraphicsSceneMouseEvent *e)
+{
+  switch(e->buttons()) {
+    case Qt::LeftButton:
+    {
+      if (resize_frame)
+        resize_frame->setVisible(true);
+      e->accept();
+      break;
+    }
+    default:
+    {
+      prim::Item::mousePressEvent(e);
+      break;
+    }
+  }
 }
 
 void ResizeRotateRect::setAngleDegrees(qreal angle_in)

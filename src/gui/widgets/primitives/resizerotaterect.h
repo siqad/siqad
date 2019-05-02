@@ -74,7 +74,8 @@ namespace prim{
     void setRotation(qreal angle_in);
 
   protected:
-
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
+    // virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *) override;
     //! Show resize frame when focused
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
@@ -87,6 +88,7 @@ namespace prim{
     QRectF scene_rect_cache;            // the rectangle dimensions before resize
     QPointF pos_cache;                  // the top left point before resize
     QPolygonF polygon_cache;            // the polygon representing the rectangle after rotation.
+    bool clicked = false;
   };
 
   //! A rectangular frame containing a few square handles for users to drag to

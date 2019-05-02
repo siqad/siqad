@@ -233,6 +233,7 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
       break;
     case Qt::LeftButton:
       qDebug() << "Left clicked!";
+      ResizeRotateRect::mousePressEvent(e);
       break;
     default:
       prim::Item::mousePressEvent(e);
