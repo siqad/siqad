@@ -75,7 +75,7 @@ namespace prim{
 
   protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
-    // virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *) override;
     //! Show resize frame when focused
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 

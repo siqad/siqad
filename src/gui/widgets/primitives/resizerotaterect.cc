@@ -27,6 +27,7 @@ ResizeRotateRect::ResizeRotateRect(ItemType type, const QRectF &scene_rect, int 
 {
   setResizable(true);
   setSceneRect(scene_rect);
+  // setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
 
 void ResizeRotateRect::resize(qreal dx1, qreal dy1, qreal dx2, qreal dy2, bool update_handles)
@@ -81,12 +82,17 @@ void ResizeRotateRect::updatePolygon()
 
 QVariant ResizeRotateRect::itemChange(GraphicsItemChange change, const QVariant &value)
 {
+  qDebug() << change << value;
   if (change == QGraphicsItem::ItemSelectedChange) {
     if (value == true) {
       if (!resize_frame) {
         resize_frame = new prim::ResizeRotateFrame(this);
+        // resize_frame->setVisible(false);
       }
-      // resize_frame->setVisible(true);
+      if (clicked) {
+        resize_frame->setVisible(true);
+        clicked = false;
+      }
     } else {
       if (resize_frame) {
         resize_frame->setVisible(false);
@@ -102,9 +108,38 @@ void ResizeRotateRect::mousePressEvent(QGraphicsSceneMouseEvent *e)
   switch(e->buttons()) {
     case Qt::LeftButton:
     {
-      if (resize_frame)
-        resize_frame->setVisible(true);
+      if (!resize_frame){
+      resize_frame = new prim::ResizeRotateFrame(this);
+      resize_frame->setVisible(false);
+      }
+      // if (resize_frame){
+      clicked = true;
+        // resize_frame->setVisible(true);
+      // }
       e->accept();
+      break;
+    }
+    default:
+    {
+      prim::Item::mousePressEvent(e);
+      break;
+    }
+  }
+}
+
+void ResizeRotateRect::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
+{
+  switch(e->buttons()) {
+    case Qt::LeftButton:
+    {
+      if (resize_frame){
+        // resize_frame->setVisible(true);
+        // clicked = false;
+        resize_frame->setSelected(true);
+        itemChange(QGraphicsItem::ItemSelectedChange, true);
+        e->accept();
+        // setSelected(true);
+      }
       break;
     }
     default:
@@ -150,6 +185,7 @@ ResizeRotateFrame::ResizeRotateFrame(prim::ResizeRotateRect *resize_target)
     setParentItem(resize_target);
     // setFlag(ItemStacksBehindParent, true);
   }
+  // setFlag(QGraphicsItem::ItemIsSelectable, true);
   // create a set of handles
   for (HandlePosition handle_pos : handle_positions) {
     prim::ResizeRotateHandle *handle = new prim::ResizeRotateHandle(handle_pos, this);

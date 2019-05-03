@@ -242,6 +242,23 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
   }
 }
 
+void prim::Electrode::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
+{
+  // TODO Nathan do these need to be captured?
+  switch(e->buttons()){
+    case Qt::RightButton:
+      //qDebug() << "Right clicked!";
+      break;
+    case Qt::LeftButton:
+      qDebug() << "Left clicked!";
+      ResizeRotateRect::mouseReleaseEvent(e);
+      break;
+    default:
+      prim::Item::mouseReleaseEvent(e);
+      break;
+  }
+}
+
 void prim::Electrode::constructStatics() //needs to be changed to look at electrode settings instead.
 {
 
