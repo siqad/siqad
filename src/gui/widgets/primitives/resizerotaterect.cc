@@ -82,7 +82,6 @@ void ResizeRotateRect::updatePolygon()
 
 QVariant ResizeRotateRect::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-  qDebug() << change << value;
   if (change == QGraphicsItem::ItemSelectedChange) {
     if (value == true) {
       if (!resize_frame) {
