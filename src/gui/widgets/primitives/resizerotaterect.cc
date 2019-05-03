@@ -87,7 +87,7 @@ QVariant ResizeRotateRect::itemChange(GraphicsItemChange change, const QVariant 
     if (value == true) {
       if (!resize_frame) {
         resize_frame = new prim::ResizeRotateFrame(this);
-        // resize_frame->setVisible(false);
+        resize_frame->setVisible(false);
       }
       if (clicked) {
         resize_frame->setVisible(true);
