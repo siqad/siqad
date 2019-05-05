@@ -250,6 +250,18 @@ sim_qpuanneal.files = \
     $$PHYS_DIR/qpuanneal/LICENSE
 INSTALLS += sim_qpuanneal
 
+# ExhaustiveGS
+
+sim_exhaustive_gs.path = $$EXEC_DIR/src/phys/exhaustive_gs
+sim_exhaustive_gs.files = \
+    $$PHYS_DIR/exhaustive_gs/exhaustive_gs.physeng \
+    $$PHYS_DIR/exhaustive_gs/src/exhaustive_db_ground_state_search.py \
+    $$PHYS_DIR/exhaustive_gs/src/siqadconn.py \
+    $$PHYS_DIR/exhaustive_gs/src/_siqadconn.*.so \
+    $$PHYS_DIR/exhaustive_gs/src/_siqadconn.*.pyd
+    $$PHYS_DIR/exhaustive_gs/LICENSE
+INSTALLS += sim_exhaustive_gs
+
 # AFMMarcus
 
 sim_afmmarcus.path = $$EXEC_DIR/src/phys/afmmarcus

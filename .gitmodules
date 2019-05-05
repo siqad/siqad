@@ -10,3 +10,6 @@
 [submodule "src/phys/qpuanneal"]
 	path = src/phys/qpuanneal
 	url = https://github.com/samuelngsh/qpuanneal-sidb
+[submodule "src/phys/exhaustive_gs"]
+	path = src/phys/exhaustive_gs
+	url = https://github.com/samuelngsh/exhaustive-gs-sidb

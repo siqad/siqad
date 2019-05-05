@@ -36,6 +36,7 @@ then
     cd $qmake_dir/src/phys/siqadconn
     ./swig_generate_and_compile FOR_OS=$FOR_OS
 
+    cp lib/* $qmake_dir/src/phys/exhaustive_gs/src
     cp lib/* $qmake_dir/src/phys/qpuanneal/src
     cp lib/* $qmake_dir/src/phys/afmmarcus/src
     cp lib/* $qmake_dir/src/phys/poissolver/FEM/src/python
