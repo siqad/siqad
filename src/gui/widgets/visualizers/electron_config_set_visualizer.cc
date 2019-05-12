@@ -96,7 +96,7 @@ ECSVisualizer::ElectronConfigSetVisualizer(DesignPanel *design_pan, QWidget *par
           {
             updateGUIFilterStateChange();
             s_elec_count_filter->setValue(
-                electronCountSliderPositionOfValue(curr_elec_config.elec_count));
+                electronCountSliderPositionOfValue(curr_elec_config.dbm_count));
             updateElectronCountFilterState();
           });
   w_elec_count_slider_complex->setEnabled(cb_elec_count_filter->checkState() == Qt::Checked);
@@ -315,7 +315,7 @@ QWidget *ECSVisualizer::scatterPlotElectronConfigSet()
 
   if (elec_config_set != nullptr) {
     for (comp::ElectronConfigSet::ElectronConfig config : elec_config_set->electronConfigs()) {
-      series->append(config.elec_count, config.energy);
+      series->append(config.dbm_count, config.energy);
     }
   } else {
     qCritical() << tr("No electron config set selected/available.");
@@ -386,11 +386,11 @@ void ECSVisualizer::updateGUIConfigSelectionChange(const int &elec_config_list_i
 {
   // information
   int config_occ = curr_elec_config.config_occ;
-  int pop_occ = elec_config_set->electronCountOccurances().value(curr_elec_config.elec_count);
+  int pop_occ = elec_config_set->electronCountOccurances().value(curr_elec_config.dbm_count);
   int total_occ = elec_config_set->totalConfigCount();
 
   l_energy_val->setText(tr("%1 eV").arg(curr_elec_config.energy));
-  l_elec_count_val->setText(QString::number(curr_elec_config.elec_count));
+  l_elec_count_val->setText(QString::number(curr_elec_config.dbm_count));
   if (curr_elec_config.is_valid == 0)
     l_is_valid->setText("No");
   else if (curr_elec_config.is_valid == 1)

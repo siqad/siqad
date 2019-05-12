@@ -223,6 +223,22 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("dbdot/fill_col_elec_sel", QColor(255,90,90));  // dot fill color for dot showing electron
   S->setValue("dbdot/fill_col_elec_hovered", QColor(255,90,90));  // dot fill color for dot showing electron
   S->setValue("dbdot/fill_col_elec_pb", QColor(255,90,90));  // dot fill color for dot showing electron
+  S->setValue("dbdot/edge_col_hole", QColor(90,90,255));     // edge color
+  S->setValue("dbdot/edge_col_hole_sel", QColor(90,90,255)); // edge color (selected)
+  S->setValue("dbdot/edge_col_hole_hovered", QColor(90,90,255)); // edge color (hovered)
+  S->setValue("dbdot/edge_col_hole_pb", QColor(0,0,0)); // edge color (publish mode)
+  S->setValue("dbdot/fill_col_hole", QColor(90,90,255));   // dot fill color for dot showing electron
+  S->setValue("dbdot/fill_col_hole_sel", QColor(90,90,255));  // dot fill color for dot showing electron
+  S->setValue("dbdot/fill_col_hole_hovered", QColor(90,90,255));  // dot fill color for dot showing electron
+  S->setValue("dbdot/fill_col_hole_pb", QColor(90,90,255));  // dot fill color for dot showing electron
+  S->setValue("dbdot/edge_col_neutral", QColor(255,255,255));     // edge color
+  S->setValue("dbdot/edge_col_neutral_sel", QColor(255,255,255)); // edge color (selected)
+  S->setValue("dbdot/edge_col_neutral_hovered", QColor(255,255,255)); // edge color (hovered)
+  S->setValue("dbdot/edge_col_neutral_pb", QColor(0,0,0)); // edge color (publish mode)
+  S->setValue("dbdot/fill_col_neutral", QColor(255,255,255));   // dot fill color for dot showing electron
+  S->setValue("dbdot/fill_col_neutral_sel", QColor(255,255,255));  // dot fill color for dot showing electron
+  S->setValue("dbdot/fill_col_neutral_hovered", QColor(255,255,255));  // dot fill color for dot showing electron
+  S->setValue("dbdot/fill_col_neutral_pb", QColor(255,255,255));  // dot fill color for dot showing electron
 
   S->setValue("dbdotprev/diameter", 2.0);
   S->setValue("dbdotprev/edge_width", .15);

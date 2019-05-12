@@ -29,14 +29,16 @@ namespace comp{
     {
       QList<int> config;
       float energy=0;       // energy of this configuration
-      int elec_count=0;     // number of electrons in this config
+      int dbm_count=0;      // number of DB- sites in this config
+      int db0_count=0;      // number of DB0 sites in this config
+      int dbp_count=0;      // number of DB+ sites in this config
       int is_valid=-1;      // is physically valid, -1 for unknown (not provided)
+      int state_count=2;    // number of supported states, if 2 then 0=DB0 and 1=DB-; if 3 then {+,0,-} = {DB+, DB0, DB0}
       int config_occ=0;     // number of occurances of this config
 
       bool operator == (const ElectronConfig &other) const {
         if (config.length() != other.config.length()
             || energy != other.energy
-            || elec_count != other.elec_count
             || config_occ != other.config_occ
             || config != other.config) {
           return false;
