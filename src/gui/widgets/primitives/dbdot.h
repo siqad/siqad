@@ -80,10 +80,14 @@ namespace prim{
 
     // static class parameters for painting
 
-    static prim::Item::StateColors fill_col;           // normal dbdot
-    static prim::Item::StateColors fill_col_electron;  // contains electron
-    static prim::Item::StateColors edge_col;           // edge of the dbdot
-    static prim::Item::StateColors edge_col_electron;  // edge of the dbdot
+    static prim::Item::StateColors fill_col;            // normal dbdot
+    static prim::Item::StateColors fill_col_electron;   // DB- site
+    static prim::Item::StateColors fill_col_hole;       // DB+ site
+    static prim::Item::StateColors fill_col_neutral;    // DB+ site
+    static prim::Item::StateColors edge_col;            // edge of the dbdot
+    static prim::Item::StateColors edge_col_electron;   // edge of the dbdot
+    static prim::Item::StateColors edge_col_hole;       // edge of the dbdot
+    static prim::Item::StateColors edge_col_neutral;    // edge of the dbdot
 
 
     qreal diameter;      // dot diameter in angstroms

@@ -19,8 +19,12 @@ qreal prim::DBDot::publish_scale;
 
 prim::Item::StateColors prim::DBDot::fill_col;           // normal dbdot
 prim::Item::StateColors prim::DBDot::fill_col_electron;  // contains electron
+prim::Item::StateColors prim::DBDot::fill_col_hole;      // contains hole
+prim::Item::StateColors prim::DBDot::fill_col_neutral;   // contains hole
 prim::Item::StateColors prim::DBDot::edge_col;           // edge of the dbdot
 prim::Item::StateColors prim::DBDot::edge_col_electron;  // edge of the dbdot
+prim::Item::StateColors prim::DBDot::edge_col_hole;      // edge of the dbdot
+prim::Item::StateColors prim::DBDot::edge_col_neutral;   // edge of the dbdot
 
 
 prim::DBDot::DBDot(prim::LatticeCoord l_coord, int lay_id, bool cp)
@@ -125,10 +129,19 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
   QColor edge_col_state;
   if (display_mode == gui::SimDisplayMode ||
       display_mode == gui::ScreenshotMode) {
-    setFill(show_elec);
+    setFill(abs(show_elec));
     diameter = diameter_l;
-    fill_col_state = getCurrentStateColor(fill_col_electron);
-    edge_col_state = getCurrentStateColor(edge_col_electron);
+    if (show_elec < 0) {
+      fill_col_state = getCurrentStateColor(fill_col_hole);
+      edge_col_state = getCurrentStateColor(edge_col_hole);
+    } else if (show_elec > 0) {
+      fill_col_state = getCurrentStateColor(fill_col_electron);
+      edge_col_state = getCurrentStateColor(edge_col_electron);
+    } else {
+      fill_col_state = getCurrentStateColor(fill_col_neutral);
+      edge_col_state = getCurrentStateColor(fill_col_neutral);
+    }
+    // TODO figure out a good color explicitly for DB0 sites
   } else {
     setFill(1);
     diameter = diameter_m;
@@ -231,6 +244,26 @@ void prim::DBDot::constructStatics()
   fill_col_electron.selected = gui_settings->get<QColor>("dbdot/fill_col_elec_sel");
   fill_col_electron.hovered = gui_settings->get<QColor>("dbdot/fill_col_elec_hovered");
   fill_col_electron.publish = gui_settings->get<QColor>("dbdot/fill_col_elec_pb");
+
+  edge_col_hole.normal = gui_settings->get<QColor>("dbdot/edge_col_hole");
+  edge_col_hole.selected = gui_settings->get<QColor>("dbdot/edge_col_hole_sel");
+  edge_col_hole.hovered = gui_settings->get<QColor>("dbdot/edge_col_hole_hovered");
+  edge_col_hole.publish = gui_settings->get<QColor>("dbdot/edge_col_hole_pb");
+
+  fill_col_hole.normal = gui_settings->get<QColor>("dbdot/fill_col_hole");
+  fill_col_hole.selected = gui_settings->get<QColor>("dbdot/fill_col_hole_sel");
+  fill_col_hole.hovered = gui_settings->get<QColor>("dbdot/fill_col_hole_hovered");
+  fill_col_hole.publish = gui_settings->get<QColor>("dbdot/fill_col_hole_pb");
+
+  edge_col_neutral.normal = gui_settings->get<QColor>("dbdot/edge_col_neutral");
+  edge_col_neutral.selected = gui_settings->get<QColor>("dbdot/edge_col_neutral_sel");
+  edge_col_neutral.hovered = gui_settings->get<QColor>("dbdot/edge_col_neutral_hovered");
+  edge_col_neutral.publish = gui_settings->get<QColor>("dbdot/edge_col_neutral_pb");
+
+  fill_col_neutral.normal = gui_settings->get<QColor>("dbdot/fill_col_neutral");
+  fill_col_neutral.selected = gui_settings->get<QColor>("dbdot/fill_col_neutral_sel");
+  fill_col_neutral.hovered = gui_settings->get<QColor>("dbdot/fill_col_neutral_hovered");
+  fill_col_neutral.publish = gui_settings->get<QColor>("dbdot/fill_col_neutral_pb");
 }
 
 void prim::DBDot::mousePressEvent(QGraphicsSceneMouseEvent *e)
