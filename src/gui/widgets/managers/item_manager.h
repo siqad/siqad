@@ -47,9 +47,9 @@ namespace gui{
     void updateTableAdd();
     void updateTableRemove(prim::Item* item);
     void showProperties();
+    void updateItemSelection();
 
   private:
-    void itemSelectionChanged();
     void initItemManager();
     void initItemTableHeaders();
     void addItemRow(prim::Item *item);
@@ -63,8 +63,11 @@ namespace gui{
 
   class TableWidget: public QTableWidget
   {
+    Q_OBJECT
   public:
     TableWidget(QWidget *parent = 0);
+  signals:
+    void sig_update_selection();
   protected:
     void mouseReleaseEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
     void mousePressEvent(QMouseEvent *e) Q_DECL_OVERRIDE;

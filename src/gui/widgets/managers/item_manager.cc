@@ -29,47 +29,22 @@ void ItemManager::initItemManager()
 {
   // item_table = new QTableWidget(this);
   item_table = new TableWidget(this);
-  // connect(item_table, &QTableWidget::mouseReleaseEvent,
-  //         this, &ItemManager::itemSelectionChanged);
+  connect(item_table, SIGNAL(sig_update_selection()),
+          this, SLOT(updateItemSelection()));
   main_vl = new QVBoxLayout;
   main_vl->addWidget(item_table);
   initItemTableHeaders();
   setLayout(main_vl);
-  // item_table->viewport()->installEventFilter(this);
 }
 
-// bool ItemManager::eventFilter(QObject *object, QEvent *event)
-// {
-//   // if (object == item_table->viewport() && event->type() == QEvent::MouseButtonPress) {
-//     if (event->type() == QEvent::MouseButtonPress) {
-//         QMouseEvent *me = static_cast<QMouseEvent*>(event);
-//         if (me->type() == QEvent::MouseButtonPress) {
-//           qDebug() << "press";
-//           // return false;
-//         }
-//     }
-//     return QObject::eventFilter(object, event);
-// }
-
-void ItemManager::itemSelectionChanged()
+void ItemManager::updateItemSelection()
 {
   //deselect all items
   emit sig_deselect();
   for (QTableWidgetItem *item : item_table->selectedItems()){
-    //item->row() gets the relevant row index in the table.
-
     ItemTableRowContent* content = table_row_contents[item->row()];
     content->item->setSelected(true);
-    qDebug() << content->type->text() << content->layer_id->text() << content->index->text() << content->item->layer_id;
-    // qDebug() << table_row_contents[item->row()]
   }
-
-  // if (curr_row != prev_row)
-    //highlight the item corresponding row
-
-
-  // qDebug() << "CHANGED";
-  // qDebug() << curr_row << curr_col << prev_row << prev_col;
 }
 
 void ItemManager::clearItemTable()
@@ -192,17 +167,23 @@ void TableWidget::mousePressEvent(QMouseEvent *e)
 }
 void TableWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-  qDebug() << "Release";
+  // qDebug() << "Release";
   switch(e->button()) {
     case Qt::LeftButton:
     {
+      //catch the release off the left mouse button.
+      //Update selection of items on the scene according to the
+      //selected items in the manager.
+      emit sig_update_selection();
+      QTableWidget::mouseReleaseEvent(e);
       break;
     }
     default:
+    {
       QTableWidget::mouseReleaseEvent(e);
       break;
+    }
   }
-  qDebug() << e->button();
 }
 
 }

@@ -164,7 +164,7 @@ void gui::DesignPanel::initDesignPanel() {
 void gui::DesignPanel::deselectAll()
 {
   scene->clearSelection();
-  qDebug() << "Deselecting All";
+  // qDebug() << "Deselecting All";
 }
 
 // clear design panel
