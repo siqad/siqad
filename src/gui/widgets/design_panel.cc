@@ -150,12 +150,21 @@ void gui::DesignPanel::initDesignPanel() {
   connect(screenman, &gui::ScreenshotManager::sig_scaleBarAnchorTool,
           [this]() {sig_toolChangeRequest(gui::ScaleBarAnchorTool);});
 
+  connect(itman, &gui::ItemManager::sig_deselect,
+          this, &gui::DesignPanel::deselectAll);
+
   emit sig_setItemManagerWidget(itman);
 
 
   // set display mode
   setDisplayMode(DesignMode);
 
+}
+
+void gui::DesignPanel::deselectAll()
+{
+  scene->clearSelection();
+  qDebug() << "Deselecting All";
 }
 
 // clear design panel
@@ -505,7 +514,7 @@ void gui::DesignPanel::setDisplayMode(DisplayMode mode)
 
 // SAVE
 
-void gui::DesignPanel::writeToXmlStream(QXmlStreamWriter *ws, 
+void gui::DesignPanel::writeToXmlStream(QXmlStreamWriter *ws,
                                         DesignInclusionArea inclusion_area)
 {
   // TODO implement inclusion area
@@ -744,7 +753,7 @@ void gui::DesignPanel::clearSimResults()
 {
   setDisplayMode(DesignMode);
 
-  // TODO remove the following code when all simulation related item handling 
+  // TODO remove the following code when all simulation related item handling
   // are moved over to SimVisualizer
   // set show_elec of all DBDots to 0
   if(!db_dots_result.isEmpty()) {
@@ -1172,7 +1181,7 @@ void gui::DesignPanel::keyReleaseEvent(QKeyEvent *e)
 
 void gui::DesignPanel::dragEnterEvent(QDragEnterEvent *e)
 {
-  // no actions associated with dragEnterEvent, leave it up to application 
+  // no actions associated with dragEnterEvent, leave it up to application
   // window to parse.
   e->ignore();
 }
@@ -1459,7 +1468,7 @@ void gui::DesignPanel::initActions()
   connect(action_copy, &QAction::triggered, this, &gui::DesignPanel::copyAction);
   connect(action_paste, &QAction::triggered, this, &gui::DesignPanel::pasteAction);
   connect(action_delete, &QAction::triggered, this, &gui::DesignPanel::deleteAction);
-  connect(action_form_agg, &QAction::triggered, 
+  connect(action_form_agg, &QAction::triggered,
           [this](){formAggregate();});
   connect(action_split_agg, &QAction::triggered, this, &gui::DesignPanel::splitAggregates);
   connect(action_dup, &QAction::triggered, this, &gui::DesignPanel::duplicateSelection);
@@ -2304,7 +2313,7 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
       break;
     case prim::Item::Aggregate:
     {
-      // NOTE current implementation is a quick hack and is non-ideal, future 
+      // NOTE current implementation is a quick hack and is non-ideal, future
       // implementation should also allow (n,m,l) coordinates.
       if (item_args.size() % 2 != 0) {
         qWarning() << tr("Expect an even number of arguments with each pair representing one physical coordinate");

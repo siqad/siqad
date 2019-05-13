@@ -27,11 +27,49 @@ ItemManager::~ItemManager()
 
 void ItemManager::initItemManager()
 {
-  item_table = new QTableWidget(this);
+  // item_table = new QTableWidget(this);
+  item_table = new TableWidget(this);
+  // connect(item_table, &QTableWidget::mouseReleaseEvent,
+  //         this, &ItemManager::itemSelectionChanged);
   main_vl = new QVBoxLayout;
   main_vl->addWidget(item_table);
   initItemTableHeaders();
   setLayout(main_vl);
+  // item_table->viewport()->installEventFilter(this);
+}
+
+// bool ItemManager::eventFilter(QObject *object, QEvent *event)
+// {
+//   // if (object == item_table->viewport() && event->type() == QEvent::MouseButtonPress) {
+//     if (event->type() == QEvent::MouseButtonPress) {
+//         QMouseEvent *me = static_cast<QMouseEvent*>(event);
+//         if (me->type() == QEvent::MouseButtonPress) {
+//           qDebug() << "press";
+//           // return false;
+//         }
+//     }
+//     return QObject::eventFilter(object, event);
+// }
+
+void ItemManager::itemSelectionChanged()
+{
+  //deselect all items
+  emit sig_deselect();
+  for (QTableWidgetItem *item : item_table->selectedItems()){
+    //item->row() gets the relevant row index in the table.
+
+    ItemTableRowContent* content = table_row_contents[item->row()];
+    content->item->setSelected(true);
+    qDebug() << content->type->text() << content->layer_id->text() << content->index->text() << content->item->layer_id;
+    // qDebug() << table_row_contents[item->row()]
+  }
+
+  // if (curr_row != prev_row)
+    //highlight the item corresponding row
+
+
+  // qDebug() << "CHANGED";
+  // qDebug() << curr_row << curr_col << prev_row << prev_col;
 }
 
 void ItemManager::clearItemTable()
@@ -130,7 +168,6 @@ void ItemManager::showProperties()
   }
 }
 
-
 void ItemManager::updateTableRemove(prim::Item *item)
 {
   for (ItemTableRowContent* row_content: table_row_contents) {
@@ -143,5 +180,29 @@ void ItemManager::updateTableRemove(prim::Item *item)
   }
 }
 
+TableWidget::TableWidget(QWidget *parent)
+  :QTableWidget(parent)
+{
+}
+
+void TableWidget::mousePressEvent(QMouseEvent *e)
+{
+  // qDebug() << "Press";
+  QTableWidget::mousePressEvent(e);
+}
+void TableWidget::mouseReleaseEvent(QMouseEvent *e)
+{
+  qDebug() << "Release";
+  switch(e->button()) {
+    case Qt::LeftButton:
+    {
+      break;
+    }
+    default:
+      QTableWidget::mouseReleaseEvent(e);
+      break;
+  }
+  qDebug() << e->button();
+}
 
 }

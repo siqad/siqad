@@ -106,7 +106,7 @@ namespace gui{
     //! get a list of all the surface dangling bonds
     QList<prim::DBDot*> getSurfaceDBs() const;
 
-    //! Return a list of DBDot pointers at the provided physical locations. If 
+    //! Return a list of DBDot pointers at the provided physical locations. If
     //! any of the locations are not valid DB sites, an exception is thrown.
     QList<prim::DBDot*> getDBsAtLocs(QList<QPointF> phys_locs);
 
@@ -188,7 +188,7 @@ namespace gui{
 
   public slots:
     // items
-
+    void deselectAll();
     //! A selected item has been clicked on.
     void selectClicked(prim::Item *item);
 
@@ -477,7 +477,7 @@ namespace gui{
 
     // functions including undo/redo behaviour
 
-    //! If no lat_coord is provided, create DBs at all DB preview locations 
+    //! If no lat_coord is provided, create DBs at all DB preview locations
     //! stored in the db_previews list. Otherwise, create a DB at the provided
     //! coord (intended for SQCommand).
     void createDBs(prim::LatticeCoord lat_coord = prim::LatticeCoord());

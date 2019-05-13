@@ -28,6 +28,8 @@ namespace gui{
     ItemManager(QWidget *parent, LayerManager* layman_in);
     ~ItemManager();
 
+    // bool eventFilter(QObject *object, QEvent *event);
+
     struct ItemTableRowContent
     {
       prim::Item *item;
@@ -38,12 +40,16 @@ namespace gui{
       QPushButton *bt_show_properties;
     };
 
+  signals:
+    void sig_deselect();
+
   public slots:
     void updateTableAdd();
     void updateTableRemove(prim::Item* item);
     void showProperties();
 
   private:
+    void itemSelectionChanged();
     void initItemManager();
     void initItemTableHeaders();
     void addItemRow(prim::Item *item);
@@ -53,6 +59,15 @@ namespace gui{
     QTableWidget *item_table;
     QList<ItemTableRowContent*> table_row_contents;
     QVBoxLayout *main_vl;
+  };
+
+  class TableWidget: public QTableWidget
+  {
+  public:
+    TableWidget(QWidget *parent = 0);
+  protected:
+    void mouseReleaseEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
+    void mousePressEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
   };
 }
 
