@@ -1133,7 +1133,44 @@ void gui::DesignPanel::wheelEvent(QWheelEvent *e)
 // don't typically do anything on key press.
 void gui::DesignPanel::keyPressEvent(QKeyEvent *e)
 {
-  QGraphicsView::keyPressEvent(e);
+  //if an item is selected, move the item instead of scrolling the view.
+  if (!selectedItems().isEmpty()) {
+    QPointF offset(0,0);
+    switch(e->key()){
+      case Qt::Key_Up:
+        offset = QPointF(0,-50);
+        break;
+      case Qt::Key_Down:
+        offset = QPointF(0,50);
+        break;
+      case Qt::Key_Left:
+        offset = QPointF(-50,0);
+        break;
+      case Qt::Key_Right:
+        offset = QPointF(50,0);
+        break;
+      case Qt::Key_Escape:
+        deselectAll();
+        QGraphicsView::keyPressEvent(e);
+        return;
+      default:
+        QGraphicsView::keyPressEvent(e);
+        return;
+    }
+    //only here if we break out of the if-else, meaning:
+    //items were selected and an arrow key was pressed
+    Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
+    if(keymods & Qt::ShiftModifier)
+      offset *= 10;
+    undo_stack->beginMacro(tr("moving item"));
+    for (prim::Item* item : selectedItems())
+      undo_stack->push(new MoveItem(static_cast<prim::Item*>(item), offset, this));
+    undo_stack->endMacro();
+  } else {
+    QGraphicsView::keyPressEvent(e);
+    return;
+  }
+
 }
 
 // all the shortcut keys should be done here. Must release keypress event for
@@ -1355,6 +1392,7 @@ void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
   }
   QMenu *menu = new QMenu(this);
   if (itemAt(e->pos())) {
+    //all items at that position
     QList<QGraphicsItem*> gitems = items(e->pos());
     //keep track of inserted types, so as to not double insert.
     QList<int> inserted_types = QList<int>();
@@ -1431,6 +1469,7 @@ void gui::DesignPanel::dummyAction()
   QPoint pos = sender()->property("pos").toPoint();
   if (itemAt(pos)) {
     QList<QGraphicsItem*> gitems = items(pos);
+    qDebug() << gitems.length() << " items at " << pos;
     for (auto gitem: gitems) {
       //make sure the item type is correct.
       if (static_cast<prim::Item*>(gitem)->item_type == sender()->property("item_type").toInt()) {
