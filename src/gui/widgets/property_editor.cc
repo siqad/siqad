@@ -21,6 +21,7 @@ PropertyEditor::PropertyEditor(QWidget *parent)
 // appropriate signals to update the target item.
 void PropertyEditor::showForms(QList<prim::Item*> target_items)
 {
+  qDebug() << target_items.length() << "items in list.";
   for (prim::Item *item : target_items) {
     if (!item || !item->classPropertyMap()) {
       continue;
@@ -69,6 +70,23 @@ void PropertyEditor::applyForms()
   }
 }
 
+void PropertyEditor::applyFormsToAll()
+{
+  qDebug() << "Applying to all";
+  /*for (PropertyForm *form : form_item_pair)
+    form->pushPropertyChanges();*/
+  // for (QPair<PropertyForm*, prim::Item*> p : form_item_pair) {
+  //   PropertyMap final_map = p.first->finalProperties();
+  //   prim::Item *item = p.second;
+  //
+  //   for (const QString &key : item->properties().keys()) {
+  //     if (item->getProperty(key).value != final_map.value(key).value) {
+  //       item->setProperty(key, final_map.value(key).value);
+  //     }
+  //   }
+  // }
+}
+
 
 void PropertyEditor::discardForms()
 {
@@ -85,11 +103,13 @@ void PropertyEditor::initPropertyEditor()
 
   // editor buttons
   QHBoxLayout *buttons_hl = new QHBoxLayout;
+  QPushButton *pb_apply_to_all = new QPushButton("Apply to all");
   QPushButton *pb_apply = new QPushButton("Apply");
   QPushButton *pb_ok = new QPushButton("OK");
   pb_ok->setShortcut(Qt::Key_Return);
   QPushButton *pb_cancel = new QPushButton("Cancel");
   pb_cancel->setShortcut(Qt::Key_Escape);
+  buttons_hl->addWidget(pb_apply_to_all);
   buttons_hl->addWidget(pb_apply);
   buttons_hl->addWidget(pb_ok);
   buttons_hl->addWidget(pb_cancel);
@@ -105,6 +125,8 @@ void PropertyEditor::initPropertyEditor()
   setLayout(editor_container);
 
   // connect signals to parse form submission (generate a list of changed items)
+  connect(pb_apply_to_all, &QAbstractButton::clicked,
+          this, &PropertyEditor::applyFormsToAll);
   connect(pb_apply, &QAbstractButton::clicked,
           this, &PropertyEditor::applyForms);
   connect(pb_ok, &QAbstractButton::clicked,

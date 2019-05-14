@@ -44,6 +44,9 @@ namespace gui{
     //! Apply updated settings to items currently being edited.
     void applyForms();
 
+    //! Apply currently shown settings to all items in the editor.
+    void applyFormsToAll();
+
     //! Discard a form without applying settings.
     void discardForms();
 

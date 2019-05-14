@@ -1466,13 +1466,20 @@ void gui::DesignPanel::deleteAction()
 void gui::DesignPanel::dummyAction()
 {
   QPoint pos = sender()->property("pos").toPoint();
+  QList<QGraphicsItem*> gitems;
   if (itemAt(pos)) {
-    QList<QGraphicsItem*> gitems = items(pos);
-    qDebug() << gitems.length() << " items at " << pos;
-    for (auto gitem: gitems) {
+    //if there are selected items, use those that are same type as the one clicked.
+    QList<prim::Item*> items_list = selectedItems();
+    if (items_list.isEmpty()) {
+      QList<QGraphicsItem*> gitems = items(pos);
+      //since the list was empty, just add the ones we want to the list.
+      for (auto gitem: gitems)
+        items_list.append(static_cast<prim::Item*>(gitem));
+    }
+    for (auto item: items_list) {
       //make sure the item type is correct.
-      if (static_cast<prim::Item*>(gitem)->item_type == sender()->property("item_type").toInt()) {
-        static_cast<prim::Item*>(gitem)->performAction(static_cast<QAction*>(sender()));
+      if (item->item_type == sender()->property("item_type").toInt()) {
+        item->performAction(static_cast<QAction*>(sender()));
       }
     }
   }
