@@ -1463,7 +1463,6 @@ void gui::DesignPanel::deleteAction()
   }
 }
 
-
 void gui::DesignPanel::dummyAction()
 {
   QPoint pos = sender()->property("pos").toPoint();
