@@ -21,7 +21,6 @@ PropertyEditor::PropertyEditor(QWidget *parent)
 // appropriate signals to update the target item.
 void PropertyEditor::showForms(QList<prim::Item*> target_items)
 {
-  qDebug() << target_items.length() << "items in list.";
   for (prim::Item *item : target_items) {
     if (!item || !item->classPropertyMap()) {
       continue;
@@ -70,21 +69,21 @@ void PropertyEditor::applyForms()
   }
 }
 
-void PropertyEditor::applyFormsToAll()
+void PropertyEditor::applyFormToAll()
 {
-  qDebug() << "Applying to all";
-  /*for (PropertyForm *form : form_item_pair)
-    form->pushPropertyChanges();*/
-  // for (QPair<PropertyForm*, prim::Item*> p : form_item_pair) {
-  //   PropertyMap final_map = p.first->finalProperties();
-  //   prim::Item *item = p.second;
-  //
-  //   for (const QString &key : item->properties().keys()) {
-  //     if (item->getProperty(key).value != final_map.value(key).value) {
-  //       item->setProperty(key, final_map.value(key).value);
-  //     }
-  //   }
-  // }
+  //get the property map for the currently shown form
+  PropertyMap final_map = static_cast<PropertyForm*>(form_tab_widget->currentWidget())->finalProperties();
+  for (QPair<PropertyForm*, prim::Item*> p : form_item_pair) {
+    prim::Item *item = p.second;
+    for (const QString &key : item->properties().keys()) {
+      if (item->getProperty(key).value != final_map.value(key).value) {
+        item->setProperty(key, final_map.value(key).value);
+      }
+    }
+  }
+  //close the form. The form doesn't update until closed and reopened.
+  discardForms();
+  hide();
 }
 
 
@@ -103,7 +102,7 @@ void PropertyEditor::initPropertyEditor()
 
   // editor buttons
   QHBoxLayout *buttons_hl = new QHBoxLayout;
-  QPushButton *pb_apply_to_all = new QPushButton("Apply to all");
+  QPushButton *pb_apply_to_all = new QPushButton("Apply to all tabs");
   QPushButton *pb_apply = new QPushButton("Apply");
   QPushButton *pb_ok = new QPushButton("OK");
   pb_ok->setShortcut(Qt::Key_Return);
@@ -126,7 +125,7 @@ void PropertyEditor::initPropertyEditor()
 
   // connect signals to parse form submission (generate a list of changed items)
   connect(pb_apply_to_all, &QAbstractButton::clicked,
-          this, &PropertyEditor::applyFormsToAll);
+          this, &PropertyEditor::applyFormToAll);
   connect(pb_apply, &QAbstractButton::clicked,
           this, &PropertyEditor::applyForms);
   connect(pb_ok, &QAbstractButton::clicked,

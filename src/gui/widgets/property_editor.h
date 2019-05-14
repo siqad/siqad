@@ -45,7 +45,7 @@ namespace gui{
     void applyForms();
 
     //! Apply currently shown settings to all items in the editor.
-    void applyFormsToAll();
+    void applyFormToAll();
 
     //! Discard a form without applying settings.
     void discardForms();
