@@ -100,6 +100,8 @@ namespace prim{
     //! Set a property in this item's property map
     void setProperty(const QString &key, QVariant var) {local_props[key]=var;}
 
+    //! Change the color of the item. initially does nothing
+    virtual void colorChange(QColor color) const {}
 
     // securing the item type and layer as private isn't worth the copy
     // constructor calls for accessors, make public

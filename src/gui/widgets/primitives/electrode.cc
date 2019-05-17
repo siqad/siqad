@@ -16,7 +16,8 @@
 gui::PropertyMap prim::Electrode::default_class_properties;
 qreal prim::Electrode::edge_width = -1;
 QColor prim::Electrode::edge_col;
-QColor prim::Electrode::fill_col;
+// prim::Item::StateColors prim::Electrode::fill_col;
+// QColor prim::Electrode::fill_col;
 QColor prim::Electrode::selected_col; // edge colour, selected
 
 // Draw on layer 0 for now.
@@ -188,7 +189,9 @@ QPainterPath prim::Electrode::shape() const
 void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
   painter->setPen(QPen(edge_col, edge_width));
-  painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
+  QColor curr_fill_col = getCurrentStateColor(fill_col);
+  // painter->setBrush(fill_col.normal.isValid() ? fill_col.normal : Qt::NoBrush);
+  painter->setBrush(curr_fill_col.isValid() ? curr_fill_col : Qt::NoBrush);
   if(tool_type == gui::SelectTool && isSelected()){
     painter->setPen(Qt::NoPen);
     painter->setBrush(selected_col);
@@ -242,6 +245,11 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
   }
 }
 
+void prim::Electrode::colorChange(QColor color) const
+{
+  fill_col.normal = color;
+}
+
 void prim::Electrode::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
 {
   // TODO Nathan do these need to be captured?
@@ -267,6 +275,8 @@ void prim::Electrode::constructStatics() //needs to be changed to look at electr
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   edge_width = gui_settings->get<qreal>("electrode/edge_width");
   edge_col= gui_settings->get<QColor>("electrode/edge_col");
-  fill_col= gui_settings->get<QColor>("electrode/fill_col");
+  // fill_col= gui_settings->get<QColor>("electrode/fill_col");
+  // fill_col.normal = gui_settings->get<QColor>("electrode/fill_col");
+
   selected_col= gui_settings->get<QColor>("electrode/selected_col");
 }

@@ -2954,3 +2954,13 @@ bool gui::DesignPanel::moveToGhost(bool kill)
   undo_stack->endMacro();
   return true;
 }
+
+void gui::DesignPanel::changeItemColors(QColor color)
+{
+  //change each selected item's fill color to color
+  QList<prim::Item *> items = selectedItems();
+  for (auto item: items){
+    item->colorChange(color);
+    // qDebug() << item->
+  }
+}

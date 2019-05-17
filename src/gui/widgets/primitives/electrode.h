@@ -40,6 +40,8 @@ namespace prim{
     // Initializer for initial attribute values.
     void initElectrode(int lay_id, const QRectF &scene_rect);
 
+    virtual void colorChange(QColor color) const override;
+
     // accessors
     // qreal getTopDepth(void){return top_depth;}
     // qreal getDepth(){return elec_depth;}
@@ -86,7 +88,9 @@ namespace prim{
     // qreal top_depth;
 
     static qreal edge_width;  // proportional width of dot boundary edge
-    static QColor fill_col;   // dot fill color (same for all lattice dots)
+    // static QColor fill_col;   // dot fill color (same for all lattice dots)
+    // static prim::Item::StateColors fill_col;   // dot fill color (same for all lattice dots)
+    prim::Item::StateColors fill_col;   // dot fill color (same for all lattice dots)
     static QColor edge_col;     // edge colour, unselected
     static QColor selected_col; // edge colour, selected
 
