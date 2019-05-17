@@ -998,8 +998,18 @@ bool gui::ApplicationGUI::readSimResult(const QString &result_path)
 
 void gui::ApplicationGUI::selectColor()
 {
-  QColor color = QColorDialog::getColor(Qt::white, this,
-    tr("Select a color"), QColorDialog::ShowAlphaChannel);
+  QColorDialog color_dia(this);
+  color_dia.setOption(QColorDialog::ShowAlphaChannel,true);
+  color_dia.setOption(QColorDialog::DontUseNativeDialog,true);
+  qDebug() << color_dia.testOption(QColorDialog::ShowAlphaChannel);
+  qDebug() << color_dia.testOption(QColorDialog::DontUseNativeDialog);
+  QColor color = color_dia.getColor(Qt::white, this,
+    tr("Select a color"),color_dia.options());
+
+  // QColor color = QColorDialog::getColor(Qt::white, this,
+  //   tr("Select a color"), QColorDialog::ShowAlphaChannel);
+  // QColor color = QColorDialog::getColor(Qt::white, this,
+  //   tr("Select a color"), QColorDialog::DontUseNativeDialog, QColorDialog::DontUseNativeDialog);
   // qDebug() << color << color.isValid();
   if (color.isValid()) {
     //apply change to the fill color of each selected item to this color

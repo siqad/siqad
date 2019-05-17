@@ -16,7 +16,7 @@
 gui::PropertyMap prim::Electrode::default_class_properties;
 qreal prim::Electrode::edge_width = -1;
 QColor prim::Electrode::edge_col;
-// prim::Item::StateColors prim::Electrode::fill_col;
+prim::Item::StateColors prim::Electrode::fill_col_def;
 // QColor prim::Electrode::fill_col;
 QColor prim::Electrode::selected_col; // edge colour, selected
 
@@ -161,6 +161,7 @@ void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)
   if(edge_width == -1){
     constructStatics();
   }
+  setColor(fill_col_def.normal);
   createActions();
   setSceneRect(scene_rect);
   updatePolygon();
@@ -245,7 +246,7 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
   }
 }
 
-void prim::Electrode::colorChange(QColor color) const
+void prim::Electrode::setColor(QColor color)
 {
   fill_col.normal = color;
 }
@@ -276,7 +277,7 @@ void prim::Electrode::constructStatics() //needs to be changed to look at electr
   edge_width = gui_settings->get<qreal>("electrode/edge_width");
   edge_col= gui_settings->get<QColor>("electrode/edge_col");
   // fill_col= gui_settings->get<QColor>("electrode/fill_col");
-  // fill_col.normal = gui_settings->get<QColor>("electrode/fill_col");
+  fill_col_def.normal = gui_settings->get<QColor>("electrode/fill_col");
 
   selected_col= gui_settings->get<QColor>("electrode/selected_col");
 }
