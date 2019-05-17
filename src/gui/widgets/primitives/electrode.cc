@@ -249,6 +249,7 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 void prim::Electrode::setColor(QColor color)
 {
   fill_col.normal = color;
+  fill_col_def.normal = color;
 }
 
 void prim::Electrode::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
