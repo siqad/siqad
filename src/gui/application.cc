@@ -248,6 +248,11 @@ void gui::ApplicationGUI::initGUI()
   // additional actions
   initActions();
 
+  //initialise the color dialog
+  color_dialog = new QColorDialog(this);
+  color_dialog->setOption(QColorDialog::ShowAlphaChannel,true);
+  color_dialog->setOption(QColorDialog::DontUseNativeDialog,true);
+
   // prepare initial GUI state
   initState();
 }
@@ -998,13 +1003,11 @@ bool gui::ApplicationGUI::readSimResult(const QString &result_path)
 
 void gui::ApplicationGUI::selectColor()
 {
-  QColorDialog color_dia(this);
-  color_dia.setOption(QColorDialog::ShowAlphaChannel,true);
-  color_dia.setOption(QColorDialog::DontUseNativeDialog,true);
-  qDebug() << color_dia.testOption(QColorDialog::ShowAlphaChannel);
-  qDebug() << color_dia.testOption(QColorDialog::DontUseNativeDialog);
-  QColor color = color_dia.getColor(Qt::white, this,
-    tr("Select a color"),color_dia.options());
+  // QColorDialog color_dialog(this);
+  // color_dialog->setOption(QColorDialog::ShowAlphaChannel,true);
+  // color_dialog->setOption(QColorDialog::DontUseNativeDialog,true);
+  QColor color = color_dialog->getColor(Qt::white, this,
+    tr("Select a color"),color_dialog->options());
 
   // QColor color = QColorDialog::getColor(Qt::white, this,
   //   tr("Select a color"), QColorDialog::ShowAlphaChannel);
