@@ -232,7 +232,9 @@ void gui::DesignPanel::addItem(prim::Item *item, int layer_index, int ind)
   // update scene rect
   QRectF sbr = scene->itemsBoundingRect();
   QRectF vp = mapToScene(viewport()->rect()).boundingRect();
-  setSceneRect(min_scene_rect | sbr | vp);
+  QRectF combined_rect = min_scene_rect | sbr | vp;
+  combined_rect.adjust(-1000, -1000, 1000, 1000);
+  setSceneRect(combined_rect);
   scene->setSceneRect(min_scene_rect | sbr);
 
   // update item manager
@@ -254,7 +256,9 @@ void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer, bool ret
       delete item;
     QRectF sbr = scene->itemsBoundingRect();
     QRectF vp = mapToScene(viewport()->rect()).boundingRect();
-    setSceneRect(min_scene_rect | sbr | vp);
+    QRectF combined_rect = min_scene_rect | sbr | vp;
+    combined_rect.adjust(-1000, -1000, 1000, 1000);
+    setSceneRect(combined_rect);
     scene->setSceneRect(min_scene_rect | sbr);
     emit sig_itemRemoved(item);
   }
@@ -1231,7 +1235,10 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
     QRectF vp = mapToScene(viewport()->rect()).boundingRect();
     if (ds < 0)
       vp.adjust(-vp.width(), -vp.height(), vp.width(), vp.height()); // account for zoom out viewport size
-    setSceneRect(min_scene_rect | sbr | vp);
+    qDebug() << vp;
+    QRectF combined_rect = min_scene_rect | sbr | vp;
+    combined_rect.adjust(-1000, -1000, 1000, 1000);
+    setSceneRect(combined_rect);
 
     // perform zoom
     scale(1+ds,1+ds);
@@ -1308,6 +1315,12 @@ void gui::DesignPanel::wheelPan(bool shift_scroll, bool boost)
 
   horizontalScrollBar()->setValue(horizontalScrollBar()->value()+ dx);
   verticalScrollBar()->setValue(verticalScrollBar()->value() + dy);
+
+
+  QRectF sbr = scene->itemsBoundingRect();
+  QRectF vp = mapToScene(viewport()->rect()).boundingRect();
+  QRectF combined_rect = min_scene_rect | sbr | vp;
+  setSceneRect(combined_rect);
 }
 
 
