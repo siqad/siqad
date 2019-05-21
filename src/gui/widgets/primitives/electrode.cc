@@ -16,7 +16,8 @@
 gui::PropertyMap prim::Electrode::default_class_properties;
 qreal prim::Electrode::edge_width = -1;
 QColor prim::Electrode::edge_col;
-QColor prim::Electrode::fill_col;
+prim::Item::StateColors prim::Electrode::fill_col_def;
+// QColor prim::Electrode::fill_col;
 QColor prim::Electrode::selected_col; // edge colour, selected
 
 // Draw on layer 0 for now.
@@ -51,6 +52,7 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene, int lay_
   }
   QPointF ld_point1, ld_point2;
   qreal angle_in;
+  QColor color;
   while(!ls->atEnd()){
     if(ls->isStartElement()){
       if(ls->name() == "electrode")
@@ -62,6 +64,10 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene, int lay_
         lay_id = ls->readElementText().toInt();
         ls->readNext();
         */
+      }
+      else if(ls->name() == "color"){
+        color = QColor(ls->readElementText());
+        ls->readNext();
       }
       else if(ls->name() == "angle"){
         angle_in = ls->readElementText().toFloat();
@@ -115,6 +121,7 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene, int lay_
   //load all read data into init_electrode
   QRectF rect(ld_point1, ld_point2);
   initElectrode(lay_id, rect.normalized());
+  setColor(color);
   setRotation(angle_in);
   scene->addItem(this);
 }
@@ -160,6 +167,7 @@ void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)
   if(edge_width == -1){
     constructStatics();
   }
+  setColor(fill_col_def.normal);
   createActions();
   setSceneRect(scene_rect);
   updatePolygon();
@@ -188,7 +196,9 @@ QPainterPath prim::Electrode::shape() const
 void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
   painter->setPen(QPen(edge_col, edge_width));
-  painter->setBrush(fill_col.isValid() ? fill_col : Qt::NoBrush);
+  QColor curr_fill_col = getCurrentStateColor(fill_col);
+  // painter->setBrush(fill_col.normal.isValid() ? fill_col.normal : Qt::NoBrush);
+  painter->setBrush(curr_fill_col.isValid() ? curr_fill_col : Qt::NoBrush);
   if(tool_type == gui::SelectTool && isSelected()){
     painter->setPen(Qt::NoPen);
     painter->setBrush(selected_col);
@@ -217,6 +227,7 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
   ss->writeAttribute("y2", QString::number(sceneRect().bottomRight().y()/scale_factor));
   ss->writeTextElement("pixel_per_angstrom", QString::number(scale_factor));
   ss->writeTextElement("angle", QString::number(getAngleDegrees()));
+  ss->writeTextElement("color", fill_col.normal.name(QColor::HexArgb));
   ss->writeStartElement("property_map");
   gui::PropertyMap::writeValuesToXMLStream(properties(), ss);
   // other attributes
@@ -240,6 +251,15 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
       prim::Item::mousePressEvent(e);
       break;
   }
+}
+
+void prim::Electrode::setColor(QColor color)
+{
+  //Change the color for this specific electrode
+  fill_col.normal = color;
+  //Change the default color used for later electrodes
+  fill_col_def.normal = color;
+  // qDebug() << color.name(QColor::HexArgb);
 }
 
 void prim::Electrode::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
@@ -267,6 +287,8 @@ void prim::Electrode::constructStatics() //needs to be changed to look at electr
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
   edge_width = gui_settings->get<qreal>("electrode/edge_width");
   edge_col= gui_settings->get<QColor>("electrode/edge_col");
-  fill_col= gui_settings->get<QColor>("electrode/fill_col");
+  // fill_col= gui_settings->get<QColor>("electrode/fill_col");
+  fill_col_def.normal = gui_settings->get<QColor>("electrode/fill_col");
+
   selected_col= gui_settings->get<QColor>("electrode/selected_col");
 }

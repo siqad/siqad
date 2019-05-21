@@ -137,7 +137,7 @@ void gui::ApplicationGUI::initGUI()
   // Initialize GUI icon
   setWindowIcon(QIcon(":/ico/siqad.svg"));
 
-  // (Windows and macOS): If the system doesn't provide a Qt theme, set the 
+  // (Windows and macOS): If the system doesn't provide a Qt theme, set the
   // bundled Breeze theme as the default.
   // Linux builds don't come bundled with a Qt theme.
   if (QIcon::fromTheme("document-new").isNull()) {
@@ -248,6 +248,11 @@ void gui::ApplicationGUI::initGUI()
   // additional actions
   initActions();
 
+  //initialise the color dialog
+  color_dialog = new QColorDialog(this);
+  color_dialog->setOption(QColorDialog::ShowAlphaChannel,true);
+  color_dialog->setOption(QColorDialog::DontUseNativeDialog,true);
+
   // prepare initial GUI state
   initState();
 }
@@ -257,9 +262,9 @@ void gui::ApplicationGUI::initMenuBar()
 {
   // initialise menus
   QMenu *file = menuBar()->addMenu(tr("&File"));
-  // QMenu *edit = menuBar()->addMenu(tr("&Edit"));
   QMenu *view = menuBar()->addMenu(tr("&View"));
-  menuBar()->addMenu(tr("&Edit"));
+  QMenu *edit = menuBar()->addMenu(tr("&Edit"));
+  // menuBar()->addMenu(tr("&Edit"));
   QMenu *tools = menuBar()->addMenu(tr("&Tools"));
   QMenu *help = menuBar()->addMenu(tr("&Help"));
 
@@ -299,6 +304,10 @@ void gui::ApplicationGUI::initMenuBar()
   view->addAction(rotate_view_cw);
   view->addAction(rotate_view_ccw);
 
+  //edit menu actions
+  QAction *action_color = new QAction(tr("Color..."), this);
+  edit->addAction(action_color);
+
   // tools menu actions
   QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
   QAction *select_color = new QAction(tr("Select Color..."), this);
@@ -307,7 +316,7 @@ void gui::ApplicationGUI::initMenuBar()
 
   // TODO add lattice button back in the future when updated support is implemented
   //tools->addAction(change_lattice);
-  //tools->addAction(select_color);
+  // tools->addAction(select_color);
   //tools->addSeparator();
   tools->addAction(window_screenshot);
   tools->addSeparator();
@@ -336,6 +345,7 @@ void gui::ApplicationGUI::initMenuBar()
   connect(rotate_view_cw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCw);
   connect(rotate_view_ccw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCcw);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
+  connect(action_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(window_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
   connect(action_settings_dialog, &QAction::triggered,
@@ -544,9 +554,9 @@ void gui::ApplicationGUI::initSimVisualizerDock()
   // size policy
   sim_visualize_dock->setMinimumWidth(gui_settings->get<int>("SIMVDOCK/mw"));
 
-  connect(sim_visualize_dock, &QDockWidget::visibilityChanged, 
+  connect(sim_visualize_dock, &QDockWidget::visibilityChanged,
           design_pan, &gui::DesignPanel::simVisualizeDockVisibilityChanged);
-  connect(sim_visualize_dock, &QDockWidget::visibilityChanged, 
+  connect(sim_visualize_dock, &QDockWidget::visibilityChanged,
           [this](const bool &visible)
           {
             if (!visible)
@@ -993,8 +1003,22 @@ bool gui::ApplicationGUI::readSimResult(const QString &result_path)
 
 void gui::ApplicationGUI::selectColor()
 {
-  QColorDialog::getColor(Qt::white, this,
-    tr("Select a color"), QColorDialog::ShowAlphaChannel);
+  // QColorDialog color_dialog(this);
+  // color_dialog->setOption(QColorDialog::ShowAlphaChannel,true);
+  // color_dialog->setOption(QColorDialog::DontUseNativeDialog,true);
+  QColor color = color_dialog->getColor(Qt::white, this,
+    tr("Select a color"),color_dialog->options());
+
+  // QColor color = QColorDialog::getColor(Qt::white, this,
+  //   tr("Select a color"), QColorDialog::ShowAlphaChannel);
+  // QColor color = QColorDialog::getColor(Qt::white, this,
+  //   tr("Select a color"), QColorDialog::DontUseNativeDialog, QColorDialog::DontUseNativeDialog);
+  // qDebug() << color << color.isValid();
+  if (color.isValid()) {
+    //apply change to the fill color of each selected item to this color
+    design_pan->changeItemColors(color);
+  }
+
 }
 
 
@@ -1149,7 +1173,7 @@ void gui::ApplicationGUI::newFile()
 
 
 // save/load:
-bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag, 
+bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag,
                                      const QString &path,
                                      gui::DesignInclusionArea inclusion_area,
                                      comp::JobStep *job_step)
@@ -1159,11 +1183,11 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag,
   QFileDialog save_dialog;
   // determine target file
   if (!path.isEmpty()) {
-    // ask for user confirmation if the path already contains a file and the 
+    // ask for user confirmation if the path already contains a file and the
     // save flag is not an AutoSave
     if (QFile(path).exists() && flag != AutoSave) {
       QMessageBox::StandardButton reply = QMessageBox::question(this, "Warning",
-          tr("The path %1 already contains a file. Overwrite?").arg(path), 
+          tr("The path %1 already contains a file. Overwrite?").arg(path),
           QMessageBox::Yes|QMessageBox::No);
       if (reply == QMessageBox::No) {
         qDebug() << tr("User chose not to overwrite %1, save terminated.").arg(path);
@@ -1185,7 +1209,7 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag,
   if (!QStringList({"sqd", "qad", "xml"}).contains(QFileInfo(write_path).suffix()))
     write_path.append(".sqd");
 
-  // set file name to write_path.writing while writing to prevent loss of 
+  // set file name to write_path.writing while writing to prevent loss of
   // previous save if this save fails
   QFile file(write_path+".writing");
 

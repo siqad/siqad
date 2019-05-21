@@ -123,8 +123,8 @@ namespace gui{
     void newFile();
 
     //! Save design to file.
-    bool saveToFile(SaveFlag flag=Save, const QString &path=QString(), 
-                    gui::DesignInclusionArea inclusion_area=gui::IncludeEntireDesign, 
+    bool saveToFile(SaveFlag flag=Save, const QString &path=QString(),
+                    gui::DesignInclusionArea inclusion_area=gui::IncludeEntireDesign,
                     comp::JobStep *job_step=nullptr);
 
     //! Perform autosave.
@@ -194,6 +194,9 @@ namespace gui{
     // purely graphics widgets
     QToolBar *top_bar;
     QToolBar *side_bar;
+
+    //Color dialog widget
+    QColorDialog *color_dialog = 0;
 
     // functional widgets, DialogPanel is a static in public above.
     gui::DesignPanel    *design_pan;      // mainwindow design panel

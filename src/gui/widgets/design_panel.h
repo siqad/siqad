@@ -143,7 +143,8 @@ namespace gui{
     //! get afm_panel pointer
     AFMPanel *afmPanel() {return afm_panel;}
 
-
+    //! change the color of selected items
+    void changeItemColors(QColor color);
     // SAVE
 
     // flag if actions are performed after last saved
