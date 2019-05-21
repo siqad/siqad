@@ -38,11 +38,14 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *, int lay_id)
 {
   prim::LatticeCoord read_coord(0,0,-1);
   QPointF loc;
-
+  QColor color;
   while (rs->readNextStartElement()) {
     if (rs->name() == "layer_id") {
       qDebug() << QObject::tr("The layer_id tag in designs are no longer used in loading. Using the lay_id supplied to the constructor instead.");
       rs->skipCurrentElement();
+    } else if (rs->name() == "color") {
+      color = QColor(rs->readElementText());
+      // rs->skipCurrentElement();
     } else if (rs->name() == "latcoord") {
       read_coord.n = rs->attributes().value("n").toInt();
       read_coord.m = rs->attributes().value("m").toInt();
@@ -76,6 +79,7 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *, int lay_id)
 
   // initialize
   initDBDot(read_coord, lay_id, false);
+  setColor(color);
   prim::Emitter::instance()->addItemToScene(this);
 }
 
@@ -221,6 +225,9 @@ void prim::DBDot::saveItems(QXmlStreamWriter *ws) const
   ws->writeEmptyElement("physloc");
   ws->writeAttribute("x", QString::number(physloc.x()));
   ws->writeAttribute("y", QString::number(physloc.y()));
+
+  // color
+  ws->writeTextElement("color", fill_col.normal.name(QColor::HexArgb));
 
   ws->writeEndElement();
 }
