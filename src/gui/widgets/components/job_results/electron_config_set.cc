@@ -57,6 +57,9 @@ void ECS::readFromXMLStream(QXmlStreamReader *rs)
         if (elec_config.state_count == 2) {
           // legacy format where 1=DB- and 0=DB0
           neg_charge = charge_str.toInt();
+          if (neg_charge == 1) {
+            elec_config.dbm_count++;
+          }
         } else {
           // preferred new format
           if (charge_str == "+") {
