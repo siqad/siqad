@@ -52,6 +52,7 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene, int lay_
   }
   QPointF ld_point1, ld_point2;
   qreal angle_in;
+  QColor color;
   while(!ls->atEnd()){
     if(ls->isStartElement()){
       if(ls->name() == "electrode")
@@ -63,6 +64,10 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene, int lay_
         lay_id = ls->readElementText().toInt();
         ls->readNext();
         */
+      }
+      else if(ls->name() == "color"){
+        color = QColor(ls->readElementText());
+        ls->readNext();
       }
       else if(ls->name() == "angle"){
         angle_in = ls->readElementText().toFloat();
@@ -116,6 +121,7 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene, int lay_
   //load all read data into init_electrode
   QRectF rect(ld_point1, ld_point2);
   initElectrode(lay_id, rect.normalized());
+  setColor(color);
   setRotation(angle_in);
   scene->addItem(this);
 }
@@ -221,6 +227,7 @@ void prim::Electrode::saveItems(QXmlStreamWriter *ss) const
   ss->writeAttribute("y2", QString::number(sceneRect().bottomRight().y()/scale_factor));
   ss->writeTextElement("pixel_per_angstrom", QString::number(scale_factor));
   ss->writeTextElement("angle", QString::number(getAngleDegrees()));
+  ss->writeTextElement("color", fill_col.normal.name(QColor::HexArgb));
   ss->writeStartElement("property_map");
   gui::PropertyMap::writeValuesToXMLStream(properties(), ss);
   // other attributes
@@ -248,8 +255,11 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
 
 void prim::Electrode::setColor(QColor color)
 {
+  //Change the color for this specific electrode
   fill_col.normal = color;
+  //Change the default color used for later electrodes
   fill_col_def.normal = color;
+  // qDebug() << color.name(QColor::HexArgb);
 }
 
 void prim::Electrode::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
