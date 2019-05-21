@@ -17,7 +17,7 @@ qreal prim::DBDot::diameter_l;
 qreal prim::DBDot::edge_width;
 qreal prim::DBDot::publish_scale;
 
-prim::Item::StateColors prim::DBDot::fill_col;           // normal dbdot
+prim::Item::StateColors prim::DBDot::fill_col_def;           // normal dbdot
 prim::Item::StateColors prim::DBDot::fill_col_electron;  // contains electron
 prim::Item::StateColors prim::DBDot::fill_col_hole;      // contains hole
 prim::Item::StateColors prim::DBDot::fill_col_neutral;   // contains hole
@@ -79,6 +79,14 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *, int lay_id)
   prim::Emitter::instance()->addItemToScene(this);
 }
 
+void prim::DBDot::setColor(QColor color)
+{
+  //Change the default color used for later dbs
+  fill_col_def.normal = color;
+  //Change the color for this specific db
+  fill_col = fill_col_def;
+  // qDebug() << color.name(QColor::HexArgb);
+}
 
 void prim::DBDot::setLatticeCoord(prim::LatticeCoord l_coord)
 {
@@ -98,6 +106,7 @@ void prim::DBDot::initDBDot(prim::LatticeCoord coord, int lay_id, bool cp)
   else
     setLatticeCoord(coord);
 
+  setColor(fill_col_def.normal);
   setLayerID(lay_id);
   fill_fact = 0.;
   diameter = diameter_m;
@@ -145,6 +154,7 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
   } else {
     setFill(1);
     diameter = diameter_m;
+    // fill_col_state = getCurrentStateColor(fill_col_def);
     fill_col_state = getCurrentStateColor(fill_col);
     edge_col_state = getCurrentStateColor(edge_col);
   }
@@ -230,10 +240,10 @@ void prim::DBDot::constructStatics()
   edge_col.hovered = gui_settings->get<QColor>("dbdot/edge_col_hovered");
   edge_col.publish = gui_settings->get<QColor>("dbdot/edge_col_pb");
 
-  fill_col.normal = gui_settings->get<QColor>("dbdot/fill_col");
-  fill_col.selected = gui_settings->get<QColor>("dbdot/fill_col_sel");
-  fill_col.hovered = gui_settings->get<QColor>("dbdot/fill_col_hovered");
-  fill_col.publish = gui_settings->get<QColor>("dbdot/fill_col_pb");
+  fill_col_def.normal = gui_settings->get<QColor>("dbdot/fill_col");
+  fill_col_def.selected = gui_settings->get<QColor>("dbdot/fill_col_sel");
+  fill_col_def.hovered = gui_settings->get<QColor>("dbdot/fill_col_hovered");
+  fill_col_def.publish = gui_settings->get<QColor>("dbdot/fill_col_pb");
 
   edge_col_electron.normal = gui_settings->get<QColor>("dbdot/edge_col_elec");
   edge_col_electron.selected = gui_settings->get<QColor>("dbdot/edge_col_elec_sel");

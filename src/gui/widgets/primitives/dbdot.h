@@ -54,7 +54,7 @@ namespace prim{
     void setFill(float fill){fill_fact = fill;}
 
     // inherited abstract method implementations
-
+    virtual void setColor(QColor color) override;
     virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
 
@@ -78,9 +78,10 @@ namespace prim{
 
     qreal fill_fact;          // area proportional of dot filled
 
+    prim::Item::StateColors fill_col;
     // static class parameters for painting
 
-    static prim::Item::StateColors fill_col;            // normal dbdot
+    static prim::Item::StateColors fill_col_def;            // normal dbdot
     static prim::Item::StateColors fill_col_electron;   // DB- site
     static prim::Item::StateColors fill_col_hole;       // DB+ site
     static prim::Item::StateColors fill_col_neutral;    // DB+ site
