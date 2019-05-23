@@ -121,7 +121,11 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene, int lay_
   //load all read data into init_electrode
   QRectF rect(ld_point1, ld_point2);
   initElectrode(lay_id, rect.normalized());
-  setColor(color);
+  if (color.isValid()) {
+    setColor(color);
+  } else {
+    setColor(settings::GUISettings::instance()->get<QColor>("electrode/fill_col"));
+  }
   setRotation(angle_in);
   scene->addItem(this);
 }

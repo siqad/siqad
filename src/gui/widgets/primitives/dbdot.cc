@@ -9,7 +9,6 @@
 
 #include "dbdot.h"
 #include "src/settings/settings.h"
-
 // Initialize statics
 
 qreal prim::DBDot::diameter_m = -1;
@@ -79,7 +78,11 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *, int lay_id)
 
   // initialize
   initDBDot(read_coord, lay_id, false);
-  setColor(color);
+  if (color.isValid()){
+    setColor(color);
+  } else {
+    settings::GUISettings::instance()->get<QColor>("dbdot/fill_col");
+  }
   prim::Emitter::instance()->addItemToScene(this);
 }
 
