@@ -42,12 +42,14 @@ namespace gui{
 
   signals:
     void sig_deselect();
+    void sig_delete_selected();
 
   public slots:
     void updateTableAdd();
     void updateTableRemove(prim::Item* item);
     void showProperties();
     void updateItemSelection();
+    void deleteItemSelection();
 
   private:
     void initItemManager();
@@ -66,11 +68,21 @@ namespace gui{
     Q_OBJECT
   public:
     TableWidget(QWidget *parent = 0);
+
   signals:
     void sig_update_selection();
+    void sig_delete_selection();
+
+  public slots:
+    void showContextMenu(const QPoint& p);
+    void deleteItems();
+
   protected:
     void mouseReleaseEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
     void mousePressEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
+
+  private:
+    QMenu menu;
   };
 }
 

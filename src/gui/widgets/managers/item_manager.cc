@@ -31,6 +31,8 @@ void ItemManager::initItemManager()
   item_table = new TableWidget(this);
   connect(item_table, SIGNAL(sig_update_selection()),
           this, SLOT(updateItemSelection()));
+  connect(item_table, SIGNAL(sig_delete_selection()),
+          this, SLOT(deleteItemSelection()));
   main_vl = new QVBoxLayout;
   main_vl->addWidget(item_table);
   initItemTableHeaders();
@@ -45,6 +47,12 @@ void ItemManager::updateItemSelection()
     ItemTableRowContent* content = table_row_contents[item->row()];
     content->item->setSelected(true);
   }
+}
+
+void ItemManager::deleteItemSelection()
+{
+  emit sig_delete_selected();
+  qDebug() << "Deleting item";
 }
 
 void ItemManager::clearItemTable()
@@ -158,13 +166,37 @@ void ItemManager::updateTableRemove(prim::Item *item)
 TableWidget::TableWidget(QWidget *parent)
   :QTableWidget(parent)
 {
+  menu.addAction("Delete", this, SLOT(deleteItems()));
+}
+
+void TableWidget::deleteItems()
+{
+  emit sig_delete_selection();
+}
+
+void TableWidget::showContextMenu(const QPoint& p)
+{
+  QPoint p_global = mapToGlobal(p);
+  menu.exec(p_global);
 }
 
 void TableWidget::mousePressEvent(QMouseEvent *e)
 {
-  // qDebug() << "Press";
-  QTableWidget::mousePressEvent(e);
+  switch(e->button()) {
+    case Qt::RightButton:
+    {
+      // qDebug() << "Right Clicked!";
+      // QTableWidget::mouseReleaseEvent(e);
+      break;
+    }
+    default:
+    {
+      QTableWidget::mousePressEvent(e);
+      break;
+    }
+  }
 }
+
 void TableWidget::mouseReleaseEvent(QMouseEvent *e)
 {
   // qDebug() << "Release";
@@ -174,8 +206,15 @@ void TableWidget::mouseReleaseEvent(QMouseEvent *e)
       //catch the release off the left mouse button.
       //Update selection of items on the scene according to the
       //selected items in the manager.
-      emit sig_update_selection();
       QTableWidget::mouseReleaseEvent(e);
+      emit sig_update_selection();
+      break;
+    }
+    case Qt::RightButton:
+    {
+      // qDebug() << "Right Clicked!";
+      showContextMenu(e->pos());
+      // QTableWidget::mouseReleaseEvent(e);
       break;
     }
     default:

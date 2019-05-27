@@ -152,6 +152,8 @@ void gui::DesignPanel::initDesignPanel() {
 
   connect(itman, &gui::ItemManager::sig_deselect,
           this, &gui::DesignPanel::deselectAll);
+  connect(itman, &gui::ItemManager::sig_delete_selected,
+          this, &gui::DesignPanel::deleteAction);
 
   emit sig_setItemManagerWidget(itman);
 
