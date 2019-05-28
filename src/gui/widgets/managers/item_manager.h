@@ -85,6 +85,7 @@ namespace gui{
     void initTableWidget();
 
     QMenu menu;
+    QAction *delete_action = 0;
   };
 }
 

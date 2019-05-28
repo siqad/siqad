@@ -167,7 +167,7 @@ TableWidget::TableWidget(QWidget *parent)
   :QTableWidget(parent)
 {
   initTableWidget();
-  menu.addAction("Delete", this, SLOT(deleteItems()));
+  delete_action = menu.addAction("Delete", this, SLOT(deleteItems()));
 }
 
 void TableWidget::initTableWidget()
@@ -186,6 +186,12 @@ void TableWidget::deleteItems()
 void TableWidget::showContextMenu(const QPoint& p)
 {
   QPoint p_global = mapToGlobal(p);
+  if (selectedItems().length() == 0)
+  {
+    delete_action->setEnabled(false);
+  } else {
+    delete_action->setEnabled(true);
+  }
   menu.exec(p_global);
 }
 
