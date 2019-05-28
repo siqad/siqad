@@ -79,10 +79,7 @@ void gui::DesignPanel::initDesignPanel() {
 
   color_dialog = new ColorDialog(this);
 
-  rotate_dialog = new QInputDialog(this);
-  rotate_dialog->setInputMode(QInputDialog::DoubleInput);
-  rotate_dialog->setWindowTitle(QObject::tr("Set rotation"));
-  rotate_dialog->setLabelText(QObject::tr("Rotation angle in degrees"));
+  rotate_dialog = new RotateDialog(this);
 
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 
@@ -168,6 +165,9 @@ void gui::DesignPanel::initDesignPanel() {
   connect(color_dialog, &QColorDialog::colorSelected,
           this, &gui::DesignPanel::changeItemColors);
 
+  connect(rotate_dialog, &QInputDialog::doubleValueSelected,
+          this, &gui::DesignPanel::setItemRotations);
+
   emit sig_setItemManagerWidget(itman);
 
 
@@ -192,6 +192,7 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   delete layman;
   delete itman;
   delete color_dialog;
+  delete rotate_dialog;
 
   screenman=nullptr;
   afm_panel=nullptr;
@@ -2997,8 +2998,20 @@ void gui::DesignPanel::showColorDialog(QList<prim::Item*> target_items)
     color_dialog->show(item);
 }
 
-void gui::DesignPanel::showRotateDialog(prim::Item *item)
+void gui::DesignPanel::showRotateDialog(QList<prim::Item*> target_items)
 {
-  qDebug() << "showRotateDialog";
-  rotate_dialog->show();
+  for (prim::Item* item : target_items)
+    rotate_dialog->show(item);
+}
+
+void gui::DesignPanel::setItemRotations(double rot)
+{
+  QList<prim::Item *> items = rotate_dialog->getTargetItems();
+  if (items.length() == 0)
+    qDebug() << "No items selected for color change.";
+
+  for (auto item: items){
+    item->setRotation(rot);
+  }
+  rotate_dialog->clearItems();
 }

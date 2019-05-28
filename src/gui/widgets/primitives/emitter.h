@@ -60,7 +60,7 @@ namespace prim{
 
     void sig_showProperty(Item *);
 
-    void sig_rotate(Item *);
+    void sig_rotate(QList<Item *>);
 
     void sig_color_change(QList<Item *>);
 

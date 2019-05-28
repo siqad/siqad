@@ -25,6 +25,7 @@
 #include "managers/item_manager.h"
 #include "managers/screenshot_manager.h"
 #include "color_dialog.h"
+#include "rotate_dialog.h"
 
 #include "primitives/layer.h"
 #include "primitives/lattice.h"
@@ -188,6 +189,9 @@ namespace gui{
     //! Show the color dialog, adding the target items into the list of items to recolor.
     void showColorDialog(QList<prim::Item*> target_items);
 
+    //!Show rotation dialog
+    void showRotateDialog(QList<prim::Item*> target_items);
+
   public slots:
     // items
     void deselectAll();
@@ -210,7 +214,8 @@ namespace gui{
     //! change the color of selected items
     void changeItemColors(QColor);
 
-    void showRotateDialog(prim::Item *item);
+    //! change the rotation of items.
+    void setItemRotations(double rot);
 
     //! Move item to given lattice coordinates. Mainly for Item Emitter to instruct
     //! movements, use setPos directly otherwise.
@@ -316,7 +321,7 @@ namespace gui{
     gui::ItemManager *itman=nullptr;
     gui::ScreenshotManager *screenman=nullptr;
     ColorDialog *color_dialog = 0;    //Color dialog widget
-    QInputDialog *rotate_dialog = 0;    //rotate dialog widget
+    RotateDialog *rotate_dialog = 0;    //rotate dialog widget
 
 
     // background color presets

@@ -158,16 +158,9 @@ void prim::Electrode::colorChange()
 
 void prim::Electrode::requestRotation()
 {
-  // QList<prim::Item*> target;
-  // target.append(this);
-  // prim::Emitter::instance()->sig_rotate(target);
-  prim::Emitter::instance()->sig_rotate(this);
-  // bool ok;
-  // qreal angle_in = qreal( QInputDialog::getDouble(0, QObject::tr("Set rotation"),
-  //         QObject::tr("Rotation angle in degrees"), (double) getAngleDegrees(), -10000, 10000, 5, &ok) );
-  // if (ok) {
-  //   setRotation(angle_in);
-  // }
+  QList<prim::Item*> target;
+  target.append(this);
+  prim::Emitter::instance()->sig_rotate(target);
 }
 
 void prim::Electrode::createActions()
