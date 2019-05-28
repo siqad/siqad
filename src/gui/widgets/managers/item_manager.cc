@@ -166,7 +166,16 @@ void ItemManager::updateTableRemove(prim::Item *item)
 TableWidget::TableWidget(QWidget *parent)
   :QTableWidget(parent)
 {
+  initTableWidget();
   menu.addAction("Delete", this, SLOT(deleteItems()));
+}
+
+void TableWidget::initTableWidget()
+{
+  //hide the left hand column of numbers
+  verticalHeader()->hide();
+  //force full row selection
+  setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
 void TableWidget::deleteItems()
@@ -213,8 +222,10 @@ void TableWidget::mouseReleaseEvent(QMouseEvent *e)
     case Qt::RightButton:
     {
       // qDebug() << "Right Clicked!";
-      showContextMenu(e->pos());
       // QTableWidget::mouseReleaseEvent(e);
+      QTableWidget::mouseReleaseEvent(e);
+      emit sig_update_selection();
+      showContextMenu(e->pos());
       break;
     }
     default:

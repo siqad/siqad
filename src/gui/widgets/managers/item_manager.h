@@ -82,6 +82,8 @@ namespace gui{
     void mousePressEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
 
   private:
+    void initTableWidget();
+
     QMenu menu;
   };
 }
