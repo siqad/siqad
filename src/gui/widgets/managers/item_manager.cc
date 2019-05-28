@@ -52,7 +52,7 @@ void ItemManager::updateItemSelection()
 void ItemManager::deleteItemSelection()
 {
   emit sig_delete_selected();
-  qDebug() << "Deleting item";
+  // qDebug() << "Deleting item";
 }
 
 void ItemManager::clearItemTable()
@@ -186,7 +186,7 @@ void TableWidget::mousePressEvent(QMouseEvent *e)
     case Qt::RightButton:
     {
       // qDebug() << "Right Clicked!";
-      // QTableWidget::mouseReleaseEvent(e);
+      QTableWidget::mousePressEvent(e);
       break;
     }
     default:
