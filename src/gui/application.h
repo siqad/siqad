@@ -164,6 +164,7 @@ namespace gui{
     void initCommander();         // initialise the input field whitelist
     void initItemDock();          // initialise the side item dock
     void initInfoDock();          // initialise the bottom info dock
+    // void initColorDialog();       // initialise the color dialog for changing item colors.
     void setLayerManagerWidget(QWidget *widget);
     void setItemManagerWidget(QWidget *widget);
 
@@ -194,9 +195,6 @@ namespace gui{
     // purely graphics widgets
     QToolBar *top_bar;
     QToolBar *side_bar;
-
-    //Color dialog widget
-    QColorDialog *color_dialog = 0;
 
     // functional widgets, DialogPanel is a static in public above.
     gui::DesignPanel    *design_pan;      // mainwindow design panel

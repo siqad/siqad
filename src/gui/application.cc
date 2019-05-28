@@ -249,14 +249,21 @@ void gui::ApplicationGUI::initGUI()
   initActions();
 
   //initialise the color dialog
-  color_dialog = new QColorDialog(this);
-  color_dialog->setOption(QColorDialog::ShowAlphaChannel,true);
-  color_dialog->setOption(QColorDialog::DontUseNativeDialog,true);
+  // initColorDialog();
+  // color_dialog = new QColorDialog(this);
+  // color_dialog->setOption(QColorDialog::ShowAlphaChannel,true);
+  // color_dialog->setOption(QColorDialog::DontUseNativeDialog,true);
 
   // prepare initial GUI state
   initState();
 }
 
+// void gui::ApplicationGUI::initColorDialog()
+// {
+//   color_dialog = new QColorDialog(this);
+//   color_dialog->setOption(QColorDialog::ShowAlphaChannel,true);
+//   color_dialog->setOption(QColorDialog::DontUseNativeDialog,true);
+// }
 
 void gui::ApplicationGUI::initMenuBar()
 {
@@ -1003,24 +1010,8 @@ bool gui::ApplicationGUI::readSimResult(const QString &result_path)
 
 void gui::ApplicationGUI::selectColor()
 {
-  // QColorDialog color_dialog(this);
-  // color_dialog->setOption(QColorDialog::ShowAlphaChannel,true);
-  // color_dialog->setOption(QColorDialog::DontUseNativeDialog,true);
-  QColor color = color_dialog->getColor(Qt::white, this,
-    tr("Select a color"),color_dialog->options());
-
-  // QColor color = QColorDialog::getColor(Qt::white, this,
-  //   tr("Select a color"), QColorDialog::ShowAlphaChannel);
-  // QColor color = QColorDialog::getColor(Qt::white, this,
-  //   tr("Select a color"), QColorDialog::DontUseNativeDialog, QColorDialog::DontUseNativeDialog);
-  // qDebug() << color << color.isValid();
-  if (color.isValid()) {
-    //apply change to the fill color of each selected item to this color
-    design_pan->changeItemColors(color);
-  }
-
+  design_pan->showColorDialog(design_pan->selectedItems());
 }
-
 
 void gui::ApplicationGUI::beginScreenshotMode()
 {

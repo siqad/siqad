@@ -53,6 +53,10 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
           this, &gui::DesignPanel::updateBackground);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_editTextLabel,
           this, QOverload<prim::Item*, const QString &>::of(&gui::DesignPanel::editTextLabel));
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_rotate,
+          this, &gui::DesignPanel::showRotateDialog);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_color_change,
+          this, &gui::DesignPanel::showColorDialog);
 }
 
 // destructor
@@ -73,6 +77,12 @@ void gui::DesignPanel::initDesignPanel() {
   property_editor = new PropertyEditor(this);
   itman = new ItemManager(this, layman);
 
+  color_dialog = new ColorDialog(this);
+
+  rotate_dialog = new QInputDialog(this);
+  rotate_dialog->setInputMode(QInputDialog::DoubleInput);
+  rotate_dialog->setWindowTitle(QObject::tr("Set rotation"));
+  rotate_dialog->setLabelText(QObject::tr("Rotation angle in degrees"));
 
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 
@@ -155,6 +165,9 @@ void gui::DesignPanel::initDesignPanel() {
   connect(itman, &gui::ItemManager::sig_delete_selected,
           this, &gui::DesignPanel::deleteAction);
 
+  connect(color_dialog, &QColorDialog::colorSelected,
+          this, &gui::DesignPanel::changeItemColors);
+
   emit sig_setItemManagerWidget(itman);
 
 
@@ -178,6 +191,7 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   delete property_editor;
   delete layman;
   delete itman;
+  delete color_dialog;
 
   screenman=nullptr;
   afm_panel=nullptr;
@@ -2959,10 +2973,32 @@ bool gui::DesignPanel::moveToGhost(bool kill)
 
 void gui::DesignPanel::changeItemColors(QColor color)
 {
-  //change each selected item's fill color to color
-  QList<prim::Item *> items = selectedItems();
-  for (auto item: items){
-    item->setColor(color);
-    // qDebug() << item->
+  if (color.isValid()) {
+    //change each selected item's fill color to color
+    QList<prim::Item *> items = color_dialog->getTargetItems();
+
+    if (items.length()==0)
+      qDebug() << "No items selected for color change.";
+
+    for (auto item: items){
+      item->setColor(color);
+      //paint the item again
+      item->update();
+    }
+  } else {
+    qDebug() << "Selected color: " << color << " is invalid.";
   }
+  color_dialog->clearItems();
+}
+
+void gui::DesignPanel::showColorDialog(QList<prim::Item*> target_items)
+{
+  for (prim::Item* item : target_items)
+    color_dialog->show(item);
+}
+
+void gui::DesignPanel::showRotateDialog(prim::Item *item)
+{
+  qDebug() << "showRotateDialog";
+  rotate_dialog->show();
 }

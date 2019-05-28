@@ -78,6 +78,7 @@ namespace prim{
     void constructStatics();
     void createActions();
     void showProps();
+    void colorChange();
     void requestRotation();
 
     // properties of this item class
@@ -99,6 +100,7 @@ namespace prim{
     QList<QAction*> actions_list;
     QAction* action_rotate_prop;
     QAction* action_show_prop;
+    QAction* action_color_prop;
   };
 
 } // end prim namespace

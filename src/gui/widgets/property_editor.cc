@@ -21,6 +21,7 @@ PropertyEditor::PropertyEditor(QWidget *parent)
 // appropriate signals to update the target item.
 void PropertyEditor::showForms(QList<prim::Item*> target_items)
 {
+  qDebug() << target_items.length();
   for (prim::Item *item : target_items) {
     if (!item || !item->classPropertyMap()) {
       continue;

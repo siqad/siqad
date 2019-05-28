@@ -142,19 +142,32 @@ void prim::Electrode::performAction(QAction *action)
     showProps();
   } else if (action->text() == action_rotate_prop->text()) {
     requestRotation();
+  } else if (action->text() == action_color_prop->text()) {
+    colorChange();
   } else {
     qDebug() << QObject::tr("Matched no action.");
   }
 }
 
+void prim::Electrode::colorChange()
+{
+  QList<prim::Item*> target;
+  target.append(this);
+  prim::Emitter::instance()->sig_color_change(target);
+}
+
 void prim::Electrode::requestRotation()
 {
-  bool ok;
-  qreal angle_in = qreal( QInputDialog::getDouble(0, QObject::tr("Set rotation"),
-          QObject::tr("Rotation angle in degrees"), (double) getAngleDegrees(), -10000, 10000, 5, &ok) );
-  if (ok) {
-    setRotation(angle_in);
-  }
+  // QList<prim::Item*> target;
+  // target.append(this);
+  // prim::Emitter::instance()->sig_rotate(target);
+  prim::Emitter::instance()->sig_rotate(this);
+  // bool ok;
+  // qreal angle_in = qreal( QInputDialog::getDouble(0, QObject::tr("Set rotation"),
+  //         QObject::tr("Rotation angle in degrees"), (double) getAngleDegrees(), -10000, 10000, 5, &ok) );
+  // if (ok) {
+  //   setRotation(angle_in);
+  // }
 }
 
 void prim::Electrode::createActions()
@@ -163,6 +176,8 @@ void prim::Electrode::createActions()
   actions_list.append(action_show_prop);
   action_rotate_prop = new QAction(QObject::tr("Set rotation"));
   actions_list.append(action_rotate_prop);
+  action_color_prop = new QAction(QObject::tr("Set color"));
+  actions_list.append(action_color_prop);
 }
 
 void prim::Electrode::initElectrode(int lay_id, const QRectF &scene_rect)

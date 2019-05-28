@@ -24,6 +24,7 @@
 #include "managers/layer_manager.h"
 #include "managers/item_manager.h"
 #include "managers/screenshot_manager.h"
+#include "color_dialog.h"
 
 #include "primitives/layer.h"
 #include "primitives/lattice.h"
@@ -143,8 +144,6 @@ namespace gui{
     //! get afm_panel pointer
     AFMPanel *afmPanel() {return afm_panel;}
 
-    //! change the color of selected items
-    void changeItemColors(QColor color);
     // SAVE
 
     // flag if actions are performed after last saved
@@ -186,6 +185,8 @@ namespace gui{
     //! Display the simulation result from PoisSolver
     void displayPotentialPlot(QString pot_plot_path, QRectF graph_container, QString pot_anim_path);
 
+    //! Show the color dialog, adding the target items into the list of items to recolor.
+    void showColorDialog(QList<prim::Item*> target_items);
 
   public slots:
     // items
@@ -205,6 +206,11 @@ namespace gui{
     // gui
     void rotateCw();
     void rotateCcw();
+
+    //! change the color of selected items
+    void changeItemColors(QColor);
+
+    void showRotateDialog(prim::Item *item);
 
     //! Move item to given lattice coordinates. Mainly for Item Emitter to instruct
     //! movements, use setPos directly otherwise.
@@ -309,6 +315,9 @@ namespace gui{
     gui::PropertyEditor *property_editor=nullptr;
     gui::ItemManager *itman=nullptr;
     gui::ScreenshotManager *screenman=nullptr;
+    ColorDialog *color_dialog = 0;    //Color dialog widget
+    QInputDialog *rotate_dialog = 0;    //rotate dialog widget
+
 
     // background color presets
     static QColor background_col;         // normal background color
