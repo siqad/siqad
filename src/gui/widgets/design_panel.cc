@@ -2139,7 +2139,7 @@ void gui::DesignPanel::ResizeItem::redo()
 }
 
 
-// RotateeItem class
+// RotateItem class
 gui::DesignPanel::RotateItem::RotateItem(int layer_index, DesignPanel *dp,
                                          int item_index, double init_ang, double fin_ang,
                                          bool invert, QUndoCommand *parent)
@@ -2160,6 +2160,31 @@ void gui::DesignPanel::RotateItem::redo()
 {
   prim::Item *item = dp->layman->getLayer(layer_index)->getItem(item_index);
   item->setRotation(fin_ang);
+}
+
+// ChangeColor class
+gui::DesignPanel::ChangeColor::ChangeColor(int layer_index, DesignPanel *dp,
+                                         int item_index, QColor init_col, QColor fin_col,
+                                         bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), invert(invert),
+    layer_index(layer_index), item_index(item_index), init_col(init_col),
+    fin_col(fin_col)
+{
+
+}
+
+void gui::DesignPanel::ChangeColor::undo()
+{
+  prim::Item *item = dp->layman->getLayer(layer_index)->getItem(item_index);
+  item->setColor(init_col);
+  item->update();
+}
+
+void gui::DesignPanel::ChangeColor::redo()
+{
+  prim::Item *item = dp->layman->getLayer(layer_index)->getItem(item_index);
+  item->setColor(fin_col);
+  item->update();
 }
 
 
@@ -3006,11 +3031,15 @@ void gui::DesignPanel::changeItemColors(QColor color)
     if (items.length()==0)
       qDebug() << "No items selected for color change.";
 
+    int item_index;
+
+    undo_stack->beginMacro(tr("Change Colors"));
     for (auto item: items){
-      item->setColor(color);
-      //paint the item again
-      item->update();
+      item_index = layman->getLayer(item->layer_id)->getItemIndex(item);
+      undo_stack->push(new ChangeColor(item->layer_id, this, item_index,
+            item->getCurrentFillColor(), color, false));
     }
+    undo_stack->endMacro();
   } else {
     qDebug() << "Selected color: " << color << " is invalid.";
   }

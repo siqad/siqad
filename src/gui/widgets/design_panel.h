@@ -492,6 +492,8 @@ namespace gui{
 
     class RotateItem;       // resize a ResizableRect
 
+    class ChangeColor;       // change color of item
+
     // functions including undo/redo behaviour
 
     //! If no lat_coord is provided, create DBs at all DB preview locations
@@ -849,6 +851,27 @@ namespace gui{
     int item_index;
     double init_ang;
     double fin_ang;
+  };
+
+  //! Change the colour of an item.
+  class DesignPanel::ChangeColor : public QUndoCommand
+  {
+  public:
+    //! Set manual to true if the resize was done manually, which means the rect
+    //! already has the correct dimensions.
+    ChangeColor(int layer_index, DesignPanel *dp, int item_index,
+               QColor init_col, QColor fin_col, bool invert=false, QUndoCommand *parent=0);
+
+    virtual void undo();
+    virtual void redo();
+
+  private:
+    DesignPanel *dp;
+    bool invert;
+    int layer_index;
+    int item_index;
+    QColor init_col;
+    QColor fin_col;
   };
 
 

@@ -62,6 +62,8 @@ namespace prim{
 
     // SAVE LOAD
     virtual void saveItems(QXmlStreamWriter *) const override;
+    
+    virtual QColor getCurrentFillColor() override {return fill_col.normal;}
 
   protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) override;
