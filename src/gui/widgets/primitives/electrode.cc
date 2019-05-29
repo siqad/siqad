@@ -222,6 +222,8 @@ void prim::Electrode::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 prim::Item *prim::Electrode::deepCopy() const
 {
   prim::Electrode *elec = new Electrode(layer_id, sceneRect());
+  elec->setColor(fill_col.normal);
+  elec->setRotation(getAngleDegrees());
   return elec;
 }
 

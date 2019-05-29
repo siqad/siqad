@@ -3032,21 +3032,19 @@ void gui::DesignPanel::showRotateDialog(QList<prim::Item*> target_items)
 void gui::DesignPanel::setItemRotations(double rot)
 {
   QList<prim::Item *> items = rotate_dialog->getTargetItems();
-  int item_index;
+
   if (items.length() == 0)
-    qDebug() << "No items selected for color change.";
+    qDebug() << "No items selected for rotation.";
 
-    undo_stack->beginMacro(tr("Rotate Item"));
-    for (auto item: items){
-      item_index = layman->getLayer(item->layer_id)->getItemIndex(item);
-      undo_stack->push(new RotateItem(item->layer_id, this, item_index,
-            (double) static_cast<prim::ResizeRotateRect*>(item)->getAngleDegrees(), rot, false));
-    }
-    undo_stack->endMacro();
+  int item_index;
+  undo_stack->beginMacro(tr("Rotate Item"));
+  for (auto item: items){
+    item_index = layman->getLayer(item->layer_id)->getItemIndex(item);
 
-  // for (auto item: items){
-  //   item->setRotation(rot);
-  // }
+    undo_stack->push(new RotateItem(item->layer_id, this, item_index,
+          (double) static_cast<prim::ResizeRotateRect*>(item)->getAngleDegrees(), rot, false));
+  }
+  undo_stack->endMacro();
 
   rotate_dialog->clearItems();
 }
