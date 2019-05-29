@@ -490,6 +490,8 @@ namespace gui{
     class CreateTextLabel;  // create a text label
     class EditTextLabel;
 
+    class RotateItem;       // resize a ResizableRect
+
     // functions including undo/redo behaviour
 
     //! If no lat_coord is provided, create DBs at all DB preview locations
@@ -826,6 +828,27 @@ namespace gui{
     QRectF new_rect;
     QPointF top_left_delta;
     QPointF bottom_right_delta;
+  };
+
+  //! Rotate a ResizeRotateRect
+  class DesignPanel::RotateItem : public QUndoCommand
+  {
+  public:
+    //! Set manual to true if the resize was done manually, which means the rect
+    //! already has the correct dimensions.
+    RotateItem(int layer_index, DesignPanel *dp, int item_index,
+               double init_ang, double fin_ang, bool invert=false, QUndoCommand *parent=0);
+
+    virtual void undo();
+    virtual void redo();
+
+  private:
+    DesignPanel *dp;
+    bool invert;
+    int layer_index;
+    int item_index;
+    double init_ang;
+    double fin_ang;
   };
 
 

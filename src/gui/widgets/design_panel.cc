@@ -2138,6 +2138,31 @@ void gui::DesignPanel::ResizeItem::redo()
                bottom_right_delta.x(), bottom_right_delta.y(), true);
 }
 
+
+// RotateeItem class
+gui::DesignPanel::RotateItem::RotateItem(int layer_index, DesignPanel *dp,
+                                         int item_index, double init_ang, double fin_ang,
+                                         bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), invert(invert),
+    layer_index(layer_index), item_index(item_index), init_ang(init_ang),
+    fin_ang(fin_ang)
+{
+
+}
+
+void gui::DesignPanel::RotateItem::undo()
+{
+  prim::Item *item = dp->layman->getLayer(layer_index)->getItem(item_index);
+  item->setRotation(init_ang);
+}
+
+void gui::DesignPanel::RotateItem::redo()
+{
+  prim::Item *item = dp->layman->getLayer(layer_index)->getItem(item_index);
+  item->setRotation(fin_ang);
+}
+
+
 // FromAggregate class
 gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
                                             DesignPanel *dp, QUndoCommand *parent)
@@ -3007,11 +3032,21 @@ void gui::DesignPanel::showRotateDialog(QList<prim::Item*> target_items)
 void gui::DesignPanel::setItemRotations(double rot)
 {
   QList<prim::Item *> items = rotate_dialog->getTargetItems();
+  int item_index;
   if (items.length() == 0)
     qDebug() << "No items selected for color change.";
 
-  for (auto item: items){
-    item->setRotation(rot);
-  }
+    undo_stack->beginMacro(tr("Rotate Item"));
+    for (auto item: items){
+      item_index = layman->getLayer(item->layer_id)->getItemIndex(item);
+      undo_stack->push(new RotateItem(item->layer_id, this, item_index,
+            (double) static_cast<prim::ResizeRotateRect*>(item)->getAngleDegrees(), rot, false));
+    }
+    undo_stack->endMacro();
+
+  // for (auto item: items){
+  //   item->setRotation(rot);
+  // }
+
   rotate_dialog->clearItems();
 }
