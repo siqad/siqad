@@ -71,7 +71,7 @@ namespace prim{
     void updatePolygon();
 
     //! Sets the angle, updates the item's transform, updates polygon_cache, and updates handle position if possible.
-    void setRotation(qreal angle_in);
+    virtual void setRotation(qreal angle_in) override;
 
   protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;

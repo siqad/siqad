@@ -53,6 +53,10 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
           this, &gui::DesignPanel::updateBackground);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_editTextLabel,
           this, QOverload<prim::Item*, const QString &>::of(&gui::DesignPanel::editTextLabel));
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_rotate,
+          this, &gui::DesignPanel::showRotateDialog);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_color_change,
+          this, &gui::DesignPanel::showColorDialog);
 }
 
 // destructor
@@ -73,6 +77,9 @@ void gui::DesignPanel::initDesignPanel() {
   property_editor = new PropertyEditor(this);
   itman = new ItemManager(this, layman);
 
+  color_dialog = new ColorDialog(this);
+
+  rotate_dialog = new RotateDialog(this);
 
   settings::AppSettings *app_settings = settings::AppSettings::instance();
 
@@ -155,6 +162,12 @@ void gui::DesignPanel::initDesignPanel() {
   connect(itman, &gui::ItemManager::sig_delete_selected,
           this, &gui::DesignPanel::deleteAction);
 
+  connect(color_dialog, &QColorDialog::colorSelected,
+          this, &gui::DesignPanel::changeItemColors);
+
+  connect(rotate_dialog, &QInputDialog::doubleValueSelected,
+          this, &gui::DesignPanel::setItemRotations);
+
   emit sig_setItemManagerWidget(itman);
 
 
@@ -178,6 +191,8 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   delete property_editor;
   delete layman;
   delete itman;
+  delete color_dialog;
+  delete rotate_dialog;
 
   screenman=nullptr;
   afm_panel=nullptr;
@@ -2123,6 +2138,56 @@ void gui::DesignPanel::ResizeItem::redo()
                bottom_right_delta.x(), bottom_right_delta.y(), true);
 }
 
+
+// RotateItem class
+gui::DesignPanel::RotateItem::RotateItem(int layer_index, DesignPanel *dp,
+                                         int item_index, double init_ang, double fin_ang,
+                                         bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), invert(invert),
+    layer_index(layer_index), item_index(item_index), init_ang(init_ang),
+    fin_ang(fin_ang)
+{
+
+}
+
+void gui::DesignPanel::RotateItem::undo()
+{
+  prim::Item *item = dp->layman->getLayer(layer_index)->getItem(item_index);
+  item->setRotation(init_ang);
+}
+
+void gui::DesignPanel::RotateItem::redo()
+{
+  prim::Item *item = dp->layman->getLayer(layer_index)->getItem(item_index);
+  item->setRotation(fin_ang);
+}
+
+// ChangeColor class
+gui::DesignPanel::ChangeColor::ChangeColor(int layer_index, DesignPanel *dp,
+                                         int item_index, QColor init_col, QColor fin_col,
+                                         bool invert, QUndoCommand *parent)
+  : QUndoCommand(parent), dp(dp), invert(invert),
+    layer_index(layer_index), item_index(item_index), init_col(init_col),
+    fin_col(fin_col)
+{
+
+}
+
+void gui::DesignPanel::ChangeColor::undo()
+{
+  prim::Item *item = dp->layman->getLayer(layer_index)->getItem(item_index);
+  item->setColor(init_col);
+  item->update();
+}
+
+void gui::DesignPanel::ChangeColor::redo()
+{
+  prim::Item *item = dp->layman->getLayer(layer_index)->getItem(item_index);
+  item->setColor(fin_col);
+  item->update();
+}
+
+
 // FromAggregate class
 gui::DesignPanel::FormAggregate::FormAggregate(QList<prim::Item *> &items,
                                             DesignPanel *dp, QUndoCommand *parent)
@@ -2959,10 +3024,56 @@ bool gui::DesignPanel::moveToGhost(bool kill)
 
 void gui::DesignPanel::changeItemColors(QColor color)
 {
-  //change each selected item's fill color to color
-  QList<prim::Item *> items = selectedItems();
-  for (auto item: items){
-    item->setColor(color);
-    // qDebug() << item->
+  if (color.isValid()) {
+    //change each selected item's fill color to color
+    QList<prim::Item *> items = color_dialog->getTargetItems();
+
+    if (items.length()==0)
+      qDebug() << "No items selected for color change.";
+
+    int item_index;
+
+    undo_stack->beginMacro(tr("Change Colors"));
+    for (auto item: items){
+      item_index = layman->getLayer(item->layer_id)->getItemIndex(item);
+      undo_stack->push(new ChangeColor(item->layer_id, this, item_index,
+            item->getCurrentFillColor(), color, false));
+    }
+    undo_stack->endMacro();
+  } else {
+    qDebug() << "Selected color: " << color << " is invalid.";
   }
+  color_dialog->clearItems();
+}
+
+void gui::DesignPanel::showColorDialog(QList<prim::Item*> target_items)
+{
+  for (prim::Item* item : target_items)
+    color_dialog->show(item);
+}
+
+void gui::DesignPanel::showRotateDialog(QList<prim::Item*> target_items)
+{
+  for (prim::Item* item : target_items)
+    rotate_dialog->show(item);
+}
+
+void gui::DesignPanel::setItemRotations(double rot)
+{
+  QList<prim::Item *> items = rotate_dialog->getTargetItems();
+
+  if (items.length() == 0)
+    qDebug() << "No items selected for rotation.";
+
+  int item_index;
+  undo_stack->beginMacro(tr("Rotate Item"));
+  for (auto item: items){
+    item_index = layman->getLayer(item->layer_id)->getItemIndex(item);
+
+    undo_stack->push(new RotateItem(item->layer_id, this, item_index,
+          (double) static_cast<prim::ResizeRotateRect*>(item)->getAngleDegrees(), rot, false));
+  }
+  undo_stack->endMacro();
+
+  rotate_dialog->clearItems();
 }

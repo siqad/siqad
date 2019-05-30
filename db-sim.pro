@@ -150,6 +150,8 @@ HEADERS += \
    	src/gui/widgets/input_field.h \
    	src/gui/widgets/info_panel.h \
     src/gui/widgets/afm_panel.h \
+    src/gui/widgets/color_dialog.h \
+    src/gui/widgets/rotate_dialog.h \
   	src/gui/widgets/completer.h \
   	src/gui/widgets/managers/item_manager.h \
     src/gui/widgets/managers/layer_manager.h \
@@ -173,7 +175,9 @@ SOURCES += \
    	src/gui/widgets/dialog_panel.cc \
    	src/gui/widgets/input_field.cc \
    	src/gui/widgets/info_panel.cc \
-   	src/gui/widgets/afm_panel.cc \
+    src/gui/widgets/afm_panel.cc \
+    src/gui/widgets/color_dialog.cc \
+    src/gui/widgets/rotate_dialog.cc \
    	src/gui/widgets/completer.cc \
    	src/gui/widgets/managers/item_manager.cc \
     src/gui/widgets/managers/layer_manager.cc \

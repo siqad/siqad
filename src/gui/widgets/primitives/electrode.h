@@ -63,6 +63,7 @@ namespace prim{
     virtual QList<QAction*> contextMenuActions() override {return actions_list;}
     virtual void performAction(QAction *action) override;
 
+    virtual QColor getCurrentFillColor() override {return fill_col.normal;}
   protected:
 
     // Mouse events
@@ -78,6 +79,7 @@ namespace prim{
     void constructStatics();
     void createActions();
     void showProps();
+    void colorChange();
     void requestRotation();
 
     // properties of this item class
@@ -99,6 +101,7 @@ namespace prim{
     QList<QAction*> actions_list;
     QAction* action_rotate_prop;
     QAction* action_show_prop;
+    QAction* action_color_prop;
   };
 
 } // end prim namespace

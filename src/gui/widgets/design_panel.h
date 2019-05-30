@@ -24,6 +24,8 @@
 #include "managers/layer_manager.h"
 #include "managers/item_manager.h"
 #include "managers/screenshot_manager.h"
+#include "color_dialog.h"
+#include "rotate_dialog.h"
 
 #include "primitives/layer.h"
 #include "primitives/lattice.h"
@@ -143,8 +145,6 @@ namespace gui{
     //! get afm_panel pointer
     AFMPanel *afmPanel() {return afm_panel;}
 
-    //! change the color of selected items
-    void changeItemColors(QColor color);
     // SAVE
 
     // flag if actions are performed after last saved
@@ -186,6 +186,11 @@ namespace gui{
     //! Display the simulation result from PoisSolver
     void displayPotentialPlot(QString pot_plot_path, QRectF graph_container, QString pot_anim_path);
 
+    //! Show the color dialog, adding the target items into the list of items to recolor.
+    void showColorDialog(QList<prim::Item*> target_items);
+
+    //!Show rotation dialog
+    void showRotateDialog(QList<prim::Item*> target_items);
 
   public slots:
     // items
@@ -205,6 +210,12 @@ namespace gui{
     // gui
     void rotateCw();
     void rotateCcw();
+
+    //! change the color of selected items
+    void changeItemColors(QColor);
+
+    //! change the rotation of items.
+    void setItemRotations(double rot);
 
     //! Move item to given lattice coordinates. Mainly for Item Emitter to instruct
     //! movements, use setPos directly otherwise.
@@ -309,6 +320,9 @@ namespace gui{
     gui::PropertyEditor *property_editor=nullptr;
     gui::ItemManager *itman=nullptr;
     gui::ScreenshotManager *screenman=nullptr;
+    ColorDialog *color_dialog = 0;    //Color dialog widget
+    RotateDialog *rotate_dialog = 0;    //rotate dialog widget
+
 
     // background color presets
     static QColor background_col;         // normal background color
@@ -475,6 +489,10 @@ namespace gui{
 
     class CreateTextLabel;  // create a text label
     class EditTextLabel;
+
+    class RotateItem;       // resize a ResizableRect
+
+    class ChangeColor;       // change color of item
 
     // functions including undo/redo behaviour
 
@@ -812,6 +830,48 @@ namespace gui{
     QRectF new_rect;
     QPointF top_left_delta;
     QPointF bottom_right_delta;
+  };
+
+  //! Rotate a ResizeRotateRect
+  class DesignPanel::RotateItem : public QUndoCommand
+  {
+  public:
+    //! Set manual to true if the resize was done manually, which means the rect
+    //! already has the correct dimensions.
+    RotateItem(int layer_index, DesignPanel *dp, int item_index,
+               double init_ang, double fin_ang, bool invert=false, QUndoCommand *parent=0);
+
+    virtual void undo();
+    virtual void redo();
+
+  private:
+    DesignPanel *dp;
+    bool invert;
+    int layer_index;
+    int item_index;
+    double init_ang;
+    double fin_ang;
+  };
+
+  //! Change the colour of an item.
+  class DesignPanel::ChangeColor : public QUndoCommand
+  {
+  public:
+    //! Set manual to true if the resize was done manually, which means the rect
+    //! already has the correct dimensions.
+    ChangeColor(int layer_index, DesignPanel *dp, int item_index,
+               QColor init_col, QColor fin_col, bool invert=false, QUndoCommand *parent=0);
+
+    virtual void undo();
+    virtual void redo();
+
+  private:
+    DesignPanel *dp;
+    bool invert;
+    int layer_index;
+    int item_index;
+    QColor init_col;
+    QColor fin_col;
   };
 
 
