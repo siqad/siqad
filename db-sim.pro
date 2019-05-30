@@ -256,6 +256,7 @@ sim_exhaustive_gs.path = $$EXEC_DIR/src/phys/exhaustive_gs
 sim_exhaustive_gs.files = \
     $$PHYS_DIR/exhaustive_gs/exhaustive_gs.physeng \
     $$PHYS_DIR/exhaustive_gs/src/exhaustive_db_ground_state_search.py \
+    $$PHYS_DIR/exhaustive_gs/src/exhaustive_3_states_search.py \
     $$PHYS_DIR/exhaustive_gs/src/siqadconn.py \
     $$PHYS_DIR/exhaustive_gs/src/_siqadconn.*.so \
     $$PHYS_DIR/exhaustive_gs/src/_siqadconn.*.pyd

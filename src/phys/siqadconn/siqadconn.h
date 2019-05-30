@@ -1,7 +1,7 @@
 // @file:     siqadconn.h
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2019.04.26 - Samuel
+// @editted:  2019.05.25 - Samuel
 // @license:  Apache License 2.0
 //
 // @desc:     Convenient functions for interacting with SiQAD including
@@ -57,7 +57,7 @@ namespace phys{
   public:
     // CONSTRUCTOR
     SiQADConnector(const std::string &eng_name, const std::string &input_path,
-        const std::string &output_path);
+        const std::string &output_path, const bool &verbose=false);
     // DESTRUCTOR
     ~SiQADConnector()
     {
@@ -172,6 +172,7 @@ namespace phys{
     std::vector<std::pair<std::string, std::string>> misc_data; // misc data output that is ignored by SiQAD, first string for element name and second string for value
 
     // Runtime information
+    bool verbose;
     int return_code=0;
     std::chrono::time_point<std::chrono::system_clock> start_time;
     std::chrono::time_point<std::chrono::system_clock> end_time;

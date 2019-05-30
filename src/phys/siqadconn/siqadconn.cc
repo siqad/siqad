@@ -1,7 +1,7 @@
 // @file:     siqadconn.cc
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2019.04.26 - Samuel
+// @editted:  2019.05.25 - Samuel
 // @license:  Apache License 2.0
 //
 // @desc:     Convenient functions for interacting with SiQAD
@@ -16,13 +16,19 @@
 
 using namespace phys;
 
+#define debugStream \
+  if (!verbose) {}  \
+  else std::cout
+
 boost::bimap<SQCommand::CommandAction, std::string> SQCommand::command_action_string;
 boost::bimap<SQCommand::CommandItem, std::string> SQCommand::command_item_string;
 
 //CONSTRUCTOR
 SiQADConnector::SiQADConnector(const std::string &eng_name,
-  const std::string &input_path, const std::string &output_path)
-  : eng_name(eng_name), input_path(input_path), output_path(output_path)
+  const std::string &input_path, const std::string &output_path, 
+  const bool &verbose)
+  : eng_name(eng_name), input_path(input_path), output_path(output_path),
+    verbose(verbose)
 {
   // initialize variables
   item_tree = std::make_shared<Aggregate>();
@@ -65,8 +71,8 @@ void SiQADConnector::setExport(std::string type, std::vector< std::vector< std::
 void SiQADConnector::addSQCommand(SQCommand *command)
 {
   export_commands.push_back(command->finalCommand());
-  std::cout << "Command added to SiQADConnector: " << std::endl;
-  std::cout << export_commands.back() << std::endl;
+  debugStream << "Command added to SiQADConnector: " << std::endl;
+  debugStream << export_commands.back() << std::endl;
 }
 
 
@@ -86,15 +92,15 @@ void SiQADConnector::readProblem(const std::string &path)
   // TODO read program node
 
   // read simulation parameters
-  std::cout << "Read simulation parameters" << std::endl;
+  debugStream << "Read simulation parameters" << std::endl;
   readSimulationParam(tree.get_child("siqad.sim_params"));
 
   // read layer properties
-  std::cout << "Read layer properties" << std::endl;
+  debugStream << "Read layer properties" << std::endl;
   readLayers(tree.get_child("siqad.layers"));
 
   // read items
-  std::cout << "Read items tree" << std::endl;
+  debugStream << "Read items tree" << std::endl;
   readDesign(tree.get_child("siqad.design"), item_tree);
 }
 
@@ -102,7 +108,7 @@ void SiQADConnector::readProgramProp(const bpt::ptree &program_prop_tree)
 {
   for (bpt::ptree::value_type const &v : program_prop_tree) {
     program_props.insert(std::map<std::string, std::string>::value_type(v.first, v.second.data()));
-    std::cout << "ProgramProp: Key=" << v.first << ", Value=" << program_props[v.first] << std::endl;
+    debugStream << "ProgramProp: Key=" << v.first << ", Value=" << program_props[v.first] << std::endl;
   }
 }
 
@@ -123,7 +129,7 @@ void SiQADConnector::readLayerProp(const bpt::ptree &layer_node)
   lay.zheight = layer_node.get<float>("zheight");
 
   layers.push_back(lay);
-  std::cout << "Retrieved layer " << lay.name << " of type " << lay.type << std::endl;
+  debugStream << "Retrieved layer " << lay.name << " of type " << lay.type << std::endl;
 }
 
 
@@ -131,23 +137,23 @@ void SiQADConnector::readSimulationParam(const bpt::ptree &sim_params_tree)
 {
   for (bpt::ptree::value_type const &v : sim_params_tree) {
     sim_params.insert(std::map<std::string, std::string>::value_type(v.first, v.second.data()));
-    std::cout << "SimParam: Key=" << v.first << ", Value=" << sim_params[v.first] << std::endl;
+    debugStream << "SimParam: Key=" << v.first << ", Value=" << sim_params[v.first] << std::endl;
   }
 }
 
 void SiQADConnector::readDesign(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
 {
-  std::cout << "Beginning to read design" << std::endl;
+  debugStream << "Beginning to read design" << std::endl;
   for (bpt::ptree::value_type const &layer_tree : subtree) {
     std::string layer_type = layer_tree.second.get<std::string>("<xmlattr>.type");
     if ((!layer_type.compare("DB"))) {
-      std::cout << "Encountered node " << layer_tree.first << " with type " << layer_type << ", entering" << std::endl;
+      debugStream << "Encountered node " << layer_tree.first << " with type " << layer_type << ", entering" << std::endl;
       readItemTree(layer_tree.second, agg_parent);
     } else if ( (!layer_type.compare("Electrode"))) {
-      std::cout << "Encountered node " << layer_tree.first << " with type " << layer_type << ", entering" << std::endl;
+      debugStream << "Encountered node " << layer_tree.first << " with type " << layer_type << ", entering" << std::endl;
       readItemTree(layer_tree.second, agg_parent);
     } else {
-      std::cout << "Encountered node " << layer_tree.first << " with type " << layer_type << ", no defined action for this layer. Skipping." << std::endl;
+      debugStream << "Encountered node " << layer_tree.first << " with type " << layer_type << ", no defined action for this layer. Skipping." << std::endl;
     }
   }
 }
@@ -156,7 +162,7 @@ void SiQADConnector::readItemTree(const bpt::ptree &subtree, const std::shared_p
 {
   for (bpt::ptree::value_type const &item_tree : subtree) {
     std::string item_name = item_tree.first;
-    std::cout << "item_name: " << item_name << std::endl;
+    debugStream << "item_name: " << item_name << std::endl;
     if (!item_name.compare("aggregate")) {
       // add aggregate child to tree
       agg_parent->aggs.push_back(std::make_shared<Aggregate>());
@@ -171,7 +177,7 @@ void SiQADConnector::readItemTree(const bpt::ptree &subtree, const std::shared_p
       // add Electrode to tree
       readElectrodePoly(item_tree.second, agg_parent);
     } else {
-      std::cout << "Encountered unknown item node: " << item_tree.first << std::endl;
+      debugStream << "Encountered unknown item node: " << item_tree.first << std::endl;
     }
   }
 }
@@ -199,7 +205,7 @@ void SiQADConnector::readElectrode(const bpt::ptree &subtree, const std::shared_
   y2 = subtree.get<double>("dim.<xmlattr>.y2");
   agg_parent->elecs.push_back(std::make_shared<Electrode>(layer_id,x1,x2,y1,y2,potential,phase,electrode_type,pixel_per_angstrom,net,angle));
 
-  std::cout << "Electrode created with x1=" << agg_parent->elecs.back()->x1 << ", y1=" << agg_parent->elecs.back()->y1 <<
+  debugStream << "Electrode created with x1=" << agg_parent->elecs.back()->x1 << ", y1=" << agg_parent->elecs.back()->y1 <<
     ", x2=" << agg_parent->elecs.back()->x2 << ", y2=" << agg_parent->elecs.back()->y2 <<
     ", potential=" << agg_parent->elecs.back()->potential << std::endl;
 }
@@ -233,7 +239,7 @@ void SiQADConnector::readElectrodePoly(const bpt::ptree &subtree, const std::sha
   }
   agg_parent->elec_polys.push_back(std::make_shared<ElectrodePoly>(layer_id,vertices,potential,phase,electrode_type,pixel_per_angstrom,net));
 
-  std::cout << "ElectrodePoly created with " << agg_parent->elec_polys.back()->vertices.size() <<
+  debugStream << "ElectrodePoly created with " << agg_parent->elec_polys.back()->vertices.size() <<
     " vertices, potential=" << agg_parent->elec_polys.back()->potential << std::endl;
 }
 
@@ -253,7 +259,7 @@ void SiQADConnector::readDBDot(const bpt::ptree &subtree, const std::shared_ptr<
 
   agg_parent->dbs.push_back(std::make_shared<DBDot>(x, y, n, m, l));
 
-  std::cout << "DBDot created with x=" << agg_parent->dbs.back()->x
+  debugStream << "DBDot created with x=" << agg_parent->dbs.back()->x
             << ", y=" << agg_parent->dbs.back()->y
             << ", n=" << agg_parent->dbs.back()->n
             << ", m=" << agg_parent->dbs.back()->m
@@ -263,8 +269,6 @@ void SiQADConnector::readDBDot(const bpt::ptree &subtree, const std::shared_ptr<
 
 void SiQADConnector::writeResultsXml()
 {
-  std::cout << "SiQADConnector::writeResultsXml()" << std::endl;
-
   boost::property_tree::ptree node_root;
 
   std::cout << "Write results to XML..." << std::endl;
@@ -301,7 +305,7 @@ void SiQADConnector::writeResultsXml()
 
   // SQCommands
   if (!export_commands.empty()) {
-    std::cout << "export commands not empty, starting to fill them in." << std::endl;
+    debugStream << "export commands not empty, starting to fill them in." << std::endl;
     node_root.add_child("sqcommands", sqCommandsPropertyTree());
   }
 
@@ -360,11 +364,11 @@ bpt::ptree SiQADConnector::dbChargePropertyTree()
     node_dist.put("", db_charge_data[i][0]);
     node_dist.put("<xmlattr>.energy", db_charge_data[i][1]);
     node_dist.put("<xmlattr>.count", db_charge_data[i][2]);
-    // quick hack to add physically valid boolean support
-    // TODO in the future revamp SiQADConnector to use a class structure
-    if (db_charge_data[i].size() > 3) {
-      node_dist.put("<xmlattr>.physically_valid", db_charge_data[i][3]);
-    }
+    node_dist.put("<xmlattr>.physically_valid", db_charge_data[i][3]);
+    std::string state_count = "2";    // 0 for DB0 and 1 for DB-
+    if (db_charge_data[i].size() > 4)
+      state_count = db_charge_data[i][4]; // if 3, - for DB-, 0 for DB0, + for DB+
+    node_dist.put("<xmlattr>.state_count", state_count);
     node_elec_dist.add_child("dist", node_dist);
   }
   return node_elec_dist;
@@ -424,8 +428,8 @@ bpt::ptree SiQADConnector::sqCommandsPropertyTree()
 {
   bpt::ptree node_sqcommands;
   for (unsigned int i = 0; i < export_commands.size(); i++) {
-    std::cout << "command " << i << ": ";
-    std::cout << export_commands.at(i) << std::endl;
+    debugStream << "command " << i << ": ";
+    debugStream << export_commands.at(i) << std::endl;
     bpt::ptree node_sqc;
     node_sqc.put("", export_commands.at(i).c_str());
     //std::cout << export_commands.at(i)->finalCommand() << std::endl;
