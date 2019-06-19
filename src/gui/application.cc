@@ -137,7 +137,7 @@ void gui::ApplicationGUI::initGUI()
   // Initialize GUI icon
   setWindowIcon(QIcon(":/ico/siqad.svg"));
 
-  // (Windows and macOS): If the system doesn't provide a Qt theme, set the
+  // (Windows and macOS): If the system doesn't provide a Qt theme, set the 
   // bundled Breeze theme as the default.
   // Linux builds don't come bundled with a Qt theme.
   if (QIcon::fromTheme("document-new").isNull()) {

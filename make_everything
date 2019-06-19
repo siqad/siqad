@@ -111,6 +111,6 @@ if [ "$FOR_OS" == "win64" ] || [ "$FOR_OS" == "win32" ] ; then
     # Create an archive
     cd "$make_dir/build/"
     archive_name=siqad_64.zip
-    rm "$archive_name"
+    rm -f "$archive_name"
     zip -r "$archive_name" "release"
 fi
