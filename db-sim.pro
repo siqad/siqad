@@ -319,6 +319,7 @@ sim_poissolver.files = \
     $$PHYS_DIR/poissolver/FEM/src/python/resistance.py \
     $$PHYS_DIR/poissolver/FEM/src/python/res_graph.py \
     $$PHYS_DIR/poissolver/FEM/src/python/charge_density.py \
+    $$PHYS_DIR/poissolver/FEM/src/python/genexp.py \
     $$PHYS_DIR/poissolver/FEM/src/python/subdomains.py \
     $$PHYS_DIR/poissolver/FEM/src/python/mesh_writer_3D.py \
     $$PHYS_DIR/poissolver/FEM/src/python/helpers.py \
