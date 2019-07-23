@@ -3,9 +3,15 @@
   <potential>
     <T>double</T>
     <val>0.0</val>
-    <label>Potential</label>
-    <tip>Electric potential to set on the electrode during simulation.</tip>
+    <label>Potential swing</label>
+    <tip>Electric potential swing centered at the potential offset.</tip>
   </potential>
+  <pot_offset>
+    <T>double</T>
+    <val>0.0</val>
+    <label>Potential offset</label>
+    <tip>Electric potential offset from 0.</tip>
+  </pot_offset>
   <phase>
     <T>double</T>
     <val>0.0</val>
