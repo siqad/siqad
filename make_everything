@@ -36,11 +36,12 @@ then
     cd $qmake_dir/src/phys/siqadconn
     ./swig_generate_and_compile FOR_OS=$FOR_OS
 
-    cp lib/* $qmake_dir/src/phys/exhaustive_gs/src
+    # cp lib/* $qmake_dir/src/phys/exhaustive_gs/src
     cp lib/* $qmake_dir/src/phys/qpuanneal/src
     cp lib/* $qmake_dir/src/phys/afmmarcus/src
     cp lib/* $qmake_dir/src/phys/poissolver/FEM/src/python
     cp lib/* $qmake_dir/src/plugins/db_pattern_recognition
+    cp lib/* $qmake_dir/src/phys/exhaustive_gs/src
 fi
 
 # make simanneal
@@ -68,14 +69,14 @@ make $multicore_compile FOR_OS=$FOR_OS
 #    ./swig_generate_and_compile FOR_OS=$FOR_OS
 #fi
 #
-## make poissolver
-#echo "Building PoisSolver... $FOR_OS"
-#if [[ "$@" == "-swig" ]]
-#then
+# # make poissolver
+# echo "Building PoisSolver... $FOR_OS"
+# if [[ "$@" == "-swig" ]]
+# then
 #    echo "Building swig for PoisSolver"
 #    cd $qmake_dir/src/phys/poissolver/FEM/src/python/swig_siqadconn
 #    ./swig_generate_and_compile FOR_OS=$FOR_OS
-#fi
+# fi
 
 # use qmake to create Make files for the GUI
 cd "$make_dir"

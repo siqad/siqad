@@ -286,15 +286,16 @@ namespace phys{
     int layer_id;
     double x1,x2,y1,y2;      // pixel location of electrode.
     double potential;  // voltage that the electrode is set to
+    double pot_offset;
     double phase;
     int electrode_type;
     int net;
     double angle;
     double pixel_per_angstrom;
     Electrode(int in_layer_id, double in_x1, double in_x2, double in_y1, double in_y2, \
-              double in_potential, double in_phase, int in_electrode_type, double in_pixel_per_angstrom, int in_net, double in_angle)
+              double in_potential, double in_pot_offset, double in_phase, int in_electrode_type, double in_pixel_per_angstrom, int in_net, double in_angle)
       : layer_id(in_layer_id), x1(in_x1), x2(in_x2), y1(in_y1), y2(in_y2), \
-        potential(in_potential), phase(in_phase), electrode_type(in_electrode_type), \
+        potential(in_potential), pot_offset(in_pot_offset), phase(in_phase), electrode_type(in_electrode_type), \
         net(in_net), angle(in_angle), pixel_per_angstrom(in_pixel_per_angstrom) {};
   };
 
@@ -365,7 +366,7 @@ namespace phys{
     // Destructor.
     ~SQCommand() {};
 
-    // TODO need a way to uniquely reference all items in order to implement 
+    // TODO need a way to uniquely reference all items in order to implement
     // movement and removal commands.
 
     // Return the string corresponding to the specified CommandItem.
@@ -423,7 +424,7 @@ namespace phys{
 
     // Constructor taking a vector of DB physical locations that should be
     // contained in a new Aggregate, implies an Add action.
-    AggregateCommand(const std::vector<std::pair<float, float>> &t_db_locs, 
+    AggregateCommand(const std::vector<std::pair<float, float>> &t_db_locs,
                      const int &t_layer=-1)
       : SQCommand(Add, Aggregate), layer(t_layer)
     {
@@ -449,7 +450,7 @@ namespace phys{
     // Return the db_locs vector.
     std::vector<std::pair<float, float>> dbLocations() {return db_locs;}
 
-    // TODO need a way to uniquely reference Aggregates in order to reference 
+    // TODO need a way to uniquely reference Aggregates in order to reference
     // aggregates for forming higher level aggregates, movement or removal.
 
   private:
