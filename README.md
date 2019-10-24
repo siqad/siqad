@@ -32,7 +32,7 @@ On non-Debian systems, packages equivalent to the ones listed above will be need
 First, clone the repository (including submodules) onto your local machine using the following command:
 
 ```
-git clone --recurse-submodules https://github.com/retallickj/qsi-sim.git
+git clone --recurse-submodules https://github.com/retallickj/siqad.git
 ```
 
 Next, run the `make_everything` script from the project root:
