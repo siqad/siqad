@@ -155,7 +155,7 @@ void prim::DBDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWi
       edge_col_state = getCurrentStateColor(edge_col_electron);
     } else {
       fill_col_state = getCurrentStateColor(fill_col_neutral);
-      edge_col_state = getCurrentStateColor(fill_col_neutral);
+      edge_col_state = getCurrentStateColor(edge_col_neutral);
     }
     // TODO figure out a good color explicitly for DB0 sites
   } else {
