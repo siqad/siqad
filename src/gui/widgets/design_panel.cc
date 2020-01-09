@@ -227,6 +227,9 @@ void gui::DesignPanel::resetDesignPanel()
 
   clearDesignPanel(true);
   initDesignPanel();
+
+
+
   // REBUILD
 
   //let application know that design panel has been reset.
@@ -385,7 +388,7 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   layman->addLayer("Metal", prim::Layer::Electrode,1000,100);
 
   // add in the AFM layer for AFM tip travel paths
-  layman->addLayer("AFM", prim::Layer::AFMTip,5,0.5);
+  //layman->addLayer("AFM", prim::Layer::AFMTip,5,0.5);
 
 
   // // add in the metal layer for electrodes
@@ -568,6 +571,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
   resetDesignPanel();
 
   QList<int> layer_order_id;
+  QList<prim::Layer*> loaded_layers;
 
   // read from xml stream and hand nodes off to appropriate functions
   while (rs->readNextStartElement()) {
@@ -578,7 +582,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
     } else if(rs->name() == "gui") {
       loadGUIFlags(rs);
     } else if (rs->name() == "layers") {
-      loadLayers(rs, layer_order_id);
+      loadLayers(rs, loaded_layers, layer_order_id);
     } else if(rs->name() == "layer_prop") {
       // starting version 0.0.2 layer_prop should appear inside the layers level
       loadLayerProps(rs, layer_order_id);
@@ -628,16 +632,17 @@ void gui::DesignPanel::loadGUIFlags(QXmlStreamReader *rs)
 }
 
 
-void gui::DesignPanel::loadLayers(QXmlStreamReader *rs, QList<int> &layer_order_id)
+void gui::DesignPanel::loadLayers(QXmlStreamReader *rs, 
+    QList<prim::Layer*> &loaded_layers, QList<int> &layer_order_id)
 {
   qDebug() << "Loading layers";
   while (rs->readNextStartElement())
     if (rs->name() == "layer_prop")
-      loadLayerProps(rs, layer_order_id);
+      loaded_layers.append(loadLayerProps(rs));
 }
 
 
-void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs, QList<int> &layer_order_id)
+prim::Layer* gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs)
 {
   QString layer_nm;
   float zoffset=0, zheight=0;
@@ -668,8 +673,9 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs, QList<int> &layer_or
   }
   // edit layer if it exists, create new otherwise
   qDebug() << tr("Loading layer %1 with type %2").arg(layer_nm).arg(layer_type);
-  // TODO rethink this layer loading method
-  prim::Layer* load_layer = layman->getLayer(layer_nm);
+  
+  return new prim::Layer(layer_nm, layer_type, zoffset, zheight);
+  /*
   if (!load_layer) {
     qDebug() << tr("Created layer %1 instead").arg(layer_nm);
     layman->addLayer(layer_nm);
@@ -681,6 +687,7 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs, QList<int> &layer_or
   load_layer->setVisible(layer_visible);
   load_layer->setActive(layer_active);
   layer_order_id.append(load_layer->layerID());
+  */
 }
 
 
@@ -706,64 +713,6 @@ void gui::DesignPanel::loadDesign(QXmlStreamReader *rs, QList<int> &layer_order_
 
 
 // SIMULATION RESULT DISPLAY
-void gui::DesignPanel::displaySimResults(comp::SimJob *job, int dist_ind, bool avg_degen)
-{
-  /*
-  // TODO in the future, show results in a pop up windows instead of the result screen itself
-  setDisplayMode(SimDisplayMode);
-
-  if(!job){
-    qDebug() << tr("DisplayPanel: Job pointer invalid");
-    return;
-  } else if (dist_ind > job->filteredElecDists().size() || job->filteredElecDists().size() == 0) {
-    qDebug() << tr("DesignPanel: dist_ind out of range when attempting to display sim results: %1").arg(dist_ind);
-    return;
-  }
-
-  // grab the list of DBDots in the order of job->physlocs
-  db_dots_result.clear();
-  qreal scale_factor = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
-  for(auto job_pl : job->physlocs){
-    QPointF scene_loc;
-    scene_loc.setX(scale_factor*job_pl.first);
-    scene_loc.setY(scale_factor*job_pl.second);
-
-    bool db_exists = false;
-    QList<QGraphicsItem*> items_at_loc = scene->items(scene_loc);
-    for(auto i_at_loc : items_at_loc){
-      if(static_cast<prim::Item*>(i_at_loc)->item_type == prim::Item::DBDot){
-        db_dots_result.append(static_cast<prim::DBDot*>(i_at_loc));
-        db_exists = true;
-        break;
-      }
-    }
-
-    if(!db_exists){
-      qDebug() << tr("DesignPanel: unable to show result, no DBDot is present "
-                     "at location x=%1, y=%2").arg(scene_loc.x()).arg(scene_loc.y());
-      return;
-    }
-  }
-
-  // set their show_elec to the set specified by job->elec_dists
-  for(int i=0; i<db_dots_result.size(); i++){
-    if (dist_ind == -1) {
-      // show average distribution if distribution index is -1
-      db_dots_result[i]->setShowElec(job->elec_dists_avg[i]);
-      //qDebug() << tr("Setting electron %1 to %2").arg(i).arg(job->elec_dists_avg[i]);
-    } else if(db_dots_result[i]) {
-      if (avg_degen) {
-        // show the average distribution of degenerate states
-        db_dots_result[i]->setShowElec(job->elecDistAvgDegenOfDB(dist_ind, i));
-        //qDebug() << tr("Setting electron %1 to %2, averaged").arg(i).arg(job->elecDistAvgDegenOfDB(dist_ind,i));
-      } else {
-        // show the average distribution of the selected index
-        db_dots_result[i]->setShowElec(job->filteredElecDists().at(dist_ind).dist[i]);
-      }
-    }
-  }
-  */
-}
 
 
 void gui::DesignPanel::clearSimResults()
@@ -1466,8 +1415,18 @@ void gui::DesignPanel::copyAction()
 
 void gui::DesignPanel::pasteAction()
 {
-    if(!clipboard.isEmpty() && display_mode == DesignMode)
-      createGhost(true);
+  if(!clipboard.isEmpty() && display_mode == DesignMode)
+    createGhost(true);
+  
+  // new implementation
+  QClipboard *sysclipboard = QApplication::clipboard();
+  const QMimeData *mimedata = sysclipboard->mimeData(clipmode);
+  QByteArray data = mimedata->data("siqad/design_objects");
+  
+  if (!data.isEmpty()) {
+    QXmlStreamReader sr(data);
+    QList<prim::Layer> read_layers;
+  }
 }
 
 void gui::DesignPanel::deleteAction()
@@ -1741,6 +1700,19 @@ void gui::DesignPanel::copySelection()
     clipboard.append(item->deepCopy());
 
   qDebug() << tr("Added to clipboard: %1 items").arg(clipboard.count());
+
+
+  // TODO implement new copy & paste routine for system clipboard
+  QClipboard *sysclipboard = QApplication::clipboard();
+  sysclipboard->clear(clipmode);
+
+  // serialize selected items and write to clipboard
+  QString clipdata;
+  QXmlStreamWriter ws(&clipdata);
+  layman->saveLayerItems(&ws, IncludeSelectedItems);
+  QMimeData mimedata;
+  mimedata.setData("siqad/design_objects", clipdata.toLocal8Bit());
+  sysclipboard->setMimeData(&mimedata, clipmode);
 }
 
 void gui::DesignPanel::createDBPreviews(QList<prim::LatticeCoord> coords)

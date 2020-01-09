@@ -14,17 +14,14 @@
 #include "afmpath.h"
 
 
-// statics
-uint prim::Layer::layer_count = 0;
-
-
 prim::Layer::Layer(const QString &nm, LayerType cnt_type, float z_offset,
     float z_height, int lay_id, QObject *parent)
-  : QObject(parent), layer_id(lay_id), zoffset(z_offset), zheight(z_height),
-        visible(true), active(false)
+  : QObject(parent), layer_id(lay_id), visible(true), active(false)
 {
-  name = nm.isEmpty() ? QString("Layer %1").arg(layer_count++) : nm;
-  content_type = cnt_type;
+  name = nm.isEmpty() ? QString("Layer %1").arg(lay_id) : nm;
+  props.zoffset = z_offset;
+  props.zheight = z_height;
+  props.content_type = cnt_type;
 }
 
 
@@ -42,9 +39,9 @@ prim::Layer::Layer(QXmlStreamReader *rs, int lay_id)
           QMetaEnum::fromType<LayerType>().keyToValue(
           rs->readElementText().toStdString().c_str()));
     } else if (rs->name() == "zoffset") {
-      zoffset = rs->readElementText().toFloat();
+      props.zoffset = rs->readElementText().toFloat();
     } else if (rs->name() == "zheight") {
-      zheight = rs->readElementText().toFloat();
+      props.zheight = rs->readElementText().toFloat();
     } else if (rs->name() == "visible") {
       visible = (rs->readElementText() == "1") ? true : false;
     } else if (rs->name() == "active") {
@@ -57,7 +54,7 @@ prim::Layer::Layer(QXmlStreamReader *rs, int lay_id)
   }
 
   // make layer object using loaded information
-  name = nm.isEmpty() ? nm : QString("Layer %1").arg(layer_count++);
+  name = nm.isEmpty() ? nm : QString("Layer %1").arg(lay_id);
 }
 
 
@@ -73,7 +70,7 @@ prim::Layer::~Layer()
 
 void prim::Layer::resetLayers()
 {
-  layer_count = 0;
+  //layer_count = 0;
 }
 
 

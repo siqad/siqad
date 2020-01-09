@@ -164,19 +164,17 @@ namespace gui{
     void loadGUIFlags(QXmlStreamReader *);
 
     //! Load layers.
-    void loadLayers(QXmlStreamReader *, QList<int> &layer_order_id);
+    void loadLayers(QXmlStreamReader *, QList<prim::Layer*> &loaded_layers, 
+        QList<int> &layer_order_id);
 
     //! Load layer properties.
-    void loadLayerProps(QXmlStreamReader *, QList<int> &layer_order_id);
+    prim::Layer* loadLayerProps(QXmlStreamReader *);
 
     //! Load design (items contained within layers).
     void loadDesign(QXmlStreamReader *, QList<int> &layer_order_id);
 
 
     // SIMULATION RESULT DISPLAY
-
-    //! Display the simulation result from SimAnneal
-    void displaySimResults(comp::SimJob *job, int dist_int, bool avg_degen);
 
     //! Clear the simulation result from SimAnneal
     void clearSimResults();
@@ -346,6 +344,7 @@ namespace gui{
     // TODO layer manager
 
     // copy/paste
+    QClipboard::Mode clipmode=QClipboard::Clipboard;
     QList<prim::Item*> clipboard;   // cached deep copy of a set of items for pasting
     QList<prim::Item*> cache;       // general purpose cache
 

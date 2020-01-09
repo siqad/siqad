@@ -23,6 +23,8 @@
 
 namespace prim{
 
+
+
   //! Base Class for design layers, layers do not delete their items when destroyed
   class Layer : public QObject
   {
@@ -34,6 +36,28 @@ namespace prim{
     enum LayerType{Lattice, DB, Electrode, AFMTip, Misc, NoType};
     Q_ENUM(LayerType)
 
+    struct LayerProps
+    {
+      LayerProps() {};
+      LayerProps(LayerType content_type, float zoffset, float zheight)
+        : content_type(content_type), zoffset(zoffset), zheight(zheight) {};
+      LayerProps(LayerProps &other) {
+        content_type = other.content_type;
+        zoffset = other.zoffset;
+        zheight = other.zheight;
+      }
+
+      bool operator=(LayerProps &other) {
+        return content_type == other.content_type &&
+          zoffset == other.zoffset &&
+          zheight == other.zheight;
+      }
+
+      // layer properties
+      LayerType content_type;
+      float zoffset=0;
+      float zheight=0;
+    };
 
     //! constructor, create a Layer with the given name. If no name is given,
     //! use the default naming scheme with layer_count.
@@ -58,14 +82,14 @@ namespace prim{
     int layerID() {return layer_id;}
 
     //! set the zoffset of the layer
-    void setZOffset(const float z_offset) {zoffset = z_offset;}
+    void setZOffset(const float z_offset) {props.zoffset = z_offset;}
     //! get the zoffset of the layer
-    float zOffset() const {return zoffset;}
+    float zOffset() const {return props.zoffset;}
 
     //! set the zheight of the layer
-    void setZHeight(const float z_height) {zheight = z_height;}
+    void setZHeight(const float z_height) {props.zheight = z_height;}
     //! get the zheight of the layer
-    float zHeight() const {return zheight;}
+    float zHeight() const {return props.zheight;}
 
     //! add a new Item to the current layer. If the Item is already in the layer,
     //! do nothing.
@@ -95,11 +119,11 @@ namespace prim{
     const QString& getName() const {return name;}
 
     //! set the Layer content type
-    void setContentType(LayerType type) {content_type = type;}
+    void setContentType(LayerType type) {props.content_type = type;}
 
     //! get the Layer content type, like "electrode", "dbdots", etc.
-    LayerType contentType() const {return content_type;}
-    const QString contentTypeString() const {return QString(QMetaEnum::fromType<LayerType>().valueToKey(content_type));}
+    LayerType contentType() const {return props.content_type;}
+    const QString contentTypeString() const {return QString(QMetaEnum::fromType<LayerType>().valueToKey(props.content_type));}
 
     //! if i is within bounds, return a pointer to the indexed item in the Layer
     //! item stack; otherwise, return 0
@@ -120,12 +144,13 @@ namespace prim{
   private:
 
     int layer_id;     // layer index in design panel's layers stack
-    static uint layer_count;  // number of created Layer() objects, does not decrement
-    float zoffset=0;  // layer distance from surface. +ve for above, -ve for below.
-    float zheight=0;  // layer height, +ve for height in top direction, -ve for bot direction
+    //static uint layer_count;  // number of created Layer() objects, does not decrement
+    LayerProps props; // layer properties
+    //float zoffset=0;  // layer distance from surface. +ve for above, -ve for below.
+    //float zheight=0;  // layer height, +ve for height in top direction, -ve for bot direction
 
     QString name;     // arbitrary layer name, layers can be selected by name
-    LayerType content_type;
+    //LayerType content_type;
 
     // list of items in order of insertion, should probably be a linked list
     QStack<prim::Item*> items;
@@ -134,6 +159,7 @@ namespace prim{
     bool visible=true;// layer is shown. If false, active should aso be false
     bool active=true; // layer is edittable
   };
+
 
 } // end prim namespace
 

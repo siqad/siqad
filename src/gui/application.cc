@@ -177,8 +177,8 @@ void gui::ApplicationGUI::initGUI()
   initCommander();
 
   // inter-widget signals
-  connect(sim_visualize, &gui::SimVisualizer::showElecDistOnScene,
-          design_pan, &gui::DesignPanel::displaySimResults);
+  //connect(sim_visualize, &gui::SimVisualizer::showElecDistOnScene,
+  //        design_pan, &gui::DesignPanel::displaySimResults);
   connect(sim_visualize, &gui::SimVisualizer::showPotPlotOnScene,
           design_pan, &gui::DesignPanel::displayPotentialPlot);
   connect(sim_visualize, &gui::SimVisualizer::clearPotPlots,
