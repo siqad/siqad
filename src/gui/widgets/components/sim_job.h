@@ -14,7 +14,7 @@
 #include <QtCore>
 #include "plugin_engine.h"
 #include "job_results/job_result_types.h"
-#include "src/settings/settings.h" // TODO probably need this later
+#include "settings/settings.h" // TODO probably need this later
 #include <tuple> //std::tuple for 3+ article data structure, std::get for accessing the tuples
 #include <QDir>
 
@@ -59,6 +59,9 @@ namespace comp{
 
     //! Read job step results.
     bool readResults();
+
+    //! Kill job step
+    void terminateJobStep();
 
     // ACCESSORS
 
@@ -150,6 +153,35 @@ namespace comp{
 
   public:
 
+    struct GuiControlElems {
+      GuiControlElems(SimJob *job) : job(job)
+      {
+        pb_terminate = new QPushButton("Terminate");
+        pb_job_terminal = new QPushButton("Log");
+        pb_sim_visualize = new QPushButton("Visualize Results");
+
+        connect(pb_job_terminal, &QPushButton::pressed,
+                [job](){job->terminalOutputDialog()->show();});
+        connect(pb_terminate, &QPushButton::pressed,
+                [job](){
+                  QMessageBox msg;
+                  msg.setText("Are you sure you want to terminate the job?");
+                  msg.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                  msg.setDefaultButton(QMessageBox::No);
+                  if (msg.exec() == QMessageBox::Yes) {
+                    job->terminateJob();
+                  }
+                });
+        connect(pb_sim_visualize, &QPushButton::pressed,
+                [job](){emit job->sig_requestJobVisualization(job);});
+      }
+
+      SimJob *job=nullptr;
+      QPushButton *pb_terminate=nullptr;
+      QPushButton *pb_job_terminal=nullptr;
+      QPushButton *pb_sim_visualize=nullptr;
+    };
+
     enum JobState{NotInvoked, Running, FinishedWithError, FinishedNormally};
     Q_ENUM(JobState);
 
@@ -206,11 +238,8 @@ namespace comp{
     //! from executing.
     void terminateJob();
 
-    //! Kill the running job step process and prevent remaining job steps from 
-    //! executing. (Terminating is more graceful, letting the process clean up 
-    //! if needed; killing simply kills the process without a chance for any 
-    //! clean up.)
-    void killJob();
+    //! Job finish actions.
+    void jobFinishActions(JobState);
 
     //! Return a list of QStandardItems containing generic information relevant 
     //! to this job.
@@ -244,6 +273,9 @@ namespace comp{
     //! Return the current job state.
     JobState jobState() const {return job_state;}
 
+    //! Return GUI control elements.
+    GuiControlElems guiControlElems() const {return gui_ctrl_elems;}
+
     //! Return a QMap of result types mapped to job steps that have that type
     //! of result.
     QMultiMap<comp::JobResult::ResultType, JobStep*> resultTypeStepMap() {return result_type_step_map;}
@@ -260,6 +292,9 @@ namespace comp{
     //! Emit the job finish state.
     void sig_jobFinishState(SimJob *job, JobState finish_state);
 
+    //! Request the job results to be shown.
+    void sig_requestJobVisualization(SimJob *job);
+
 
   private:
 
@@ -273,6 +308,8 @@ namespace comp{
     QString job_tmp_dir_path;           // job directory for storing runtime data
     QDateTime start_time, end_time;     // start and end times of the job
     QStringList cml_arguments;          // command line arguments when invoking the job
+    JobStep *curr_step=nullptr;
+    GuiControlElems gui_ctrl_elems;     // store GUI control elements
 
     // read xml
     QStringList ignored_xml_elements; // XML elements to ignore when reading results

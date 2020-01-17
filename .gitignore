@@ -6,7 +6,8 @@ db-sim
 *.o
 *.pyc
 qrc_application.cpp
-build
+/w64-build*/**
+/build*/**
 win32
 win64
 

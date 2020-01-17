@@ -1,0 +1,142 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#                                  IMPORTANT                                   #
+#                                                                              #
+# This script is intended for developers to create quick builds, default       #
+# parameters all reflect this purpose. Please refrain from using this script   #
+# before reading through and understanding this script.                        #
+#                                                                              #
+################################################################################
+
+# Accepted input arguments:
+# release/debug:    optional, indicate 'release' or 'debug' to build that
+#                   version. This is ignored when building for WIN32, in that 
+#                   case 'release' is always used.
+# --swig:           optional, compile SWIG wrappers for SiQADConnector and 
+#                   install through pip3
+
+# Accepted ENV variables:
+# FOR_OS:           win64 for cross compilation
+# QMAKE_COMMAND:    qmake binary path, mostly intended for cross compilation
+# CMAKE_COMMAND:    cmake binary path, mostly intended for cross compilation
+# APPEND_TO_PATH:   additional paths that should be appended to PATH, intended 
+#                   for cross compilation. If FOR_OS==win64 and APPEND_TO_PATH 
+#                   is empty, this script automatically adds /opt/mxe/usr/bin to 
+#                   APPEND_TO_PATH if it exists.. Set an empty APPEND_TO_PATH 
+#                   that is not desired.
+# CMAKE_FLAGS:      cmake flags
+
+
+set -e
+
+swig=false
+build_type="Debug"
+install_prefix="debug"
+for arg in "$@"; do
+    case "$arg" in
+        ("--swig")  swig=true ;;
+        ("release") build_type="Release"; install_prefix="release" ;;
+        ("debug")   build_type="Debug"; install_prefix="debug" ;;
+    esac
+done
+
+# Determine number of physical cores to use for compilation
+cpu_cores=$(grep "^core id" /proc/cpuinfo | sort -u | wc -l)
+multicore_compile="-j $cpu_cores"
+
+proj_root=$(cd `dirname $0` && pwd)
+
+if [ "$FOR_OS" == "win64" ]; then
+    build_dir="${proj_root}/build-w64"
+else
+    build_dir="${proj_root}/build"
+fi
+
+# Path to Breeze Qt icon theme for cross-compilation
+# An example is to clone https://github.com/KDE/breeze-icons and point the following variable to the icons directory.
+#qt_theme_path=$HOME/global/siqad-cross-compilation-resources/breeze-icons/icons
+
+if [ ! -z ${APPEND_TO_PATH} ]; then
+    export PATH="$PATH:$APPEND_TO_PATH"
+elif [ "$FOR_OS" == "win64" ]; then
+    MXE_PATH=/opt/mxe/usr/bin
+    if [ -d "${MXE_PATH}" ]; then
+        export PATH="$PATH:$MXE_PATH"
+    fi
+fi
+
+
+if [ "$FOR_OS" == "win64" ]; then
+    if [ -z ${QMAKE_COMMAND} ]; then
+        QMAKE_COMMAND=/opt/mxe/usr/bin/x86_64-w64-mingw32.static-qmake-qt5
+    fi
+    if [ -z ${CMAKE_COMMAND} ]; then
+        CMAKE_COMMAND=/opt/mxe/usr/bin/x86_64-w64-mingw32.static-cmake
+    fi
+    if [ -z ${CMAKE_FLAGS} ]; then
+        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -DWIN32_QMAKE_BIN=${QMAKE_COMMAND}"
+    fi
+else
+    if [ -z ${CMAKE_COMMAND} ]; then
+        CMAKE_COMMAND=cmake
+    fi
+    if [ -z ${CMAKE_FLAGS} ]; then
+        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=$build_type -DCMAKE_INSTALL_PREFIX=$install_prefix"
+    fi
+fi
+
+echo "Project root:"
+echo ${proj_root}
+
+echo "CMake directory:"
+echo ${build_dir}
+
+# Make and install SiQADConn via scikit and SWIG
+# TODO will eventually make this a package available on PyPI
+# NOTE Haven't figured out what to do for cross-compilation yet, probably rely on CI services
+if [[ $swig == true ]] && [[ "$FOR_OS" != "win64" ]]; then
+    echo "Building SWIG SiQADConnector at central location..."
+    cd "${proj_root}/src/phys/siqadconn"
+    ./swig_compile_and_install
+fi
+
+# use cmake to create Makefiles for the project
+mkdir -p "${build_dir}"
+cd "${build_dir}"
+echo "Running cmake..."
+${CMAKE_COMMAND} ${CMAKE_FLAGS} ..
+
+# compile
+echo "Building everything..."
+make $make_flag $multicore_compile
+make install
+
+
+## extra actions if building for Windows
+#if [ "$FOR_OS" == "win64" ] || [ "$FOR_OS" == "win32" ] ; then
+#    cd "$make_dir/build/release/"
+#
+#    # Clean up
+#    rm -rf .moc .obj .qrc
+#
+#    # Copy Qt theme icons since Windows doesn't have one
+#    target_qt_theme_path=icons/breeze
+#    mkdir -p "$target_qt_theme_path"
+#    cp -r "$qt_theme_path/"* "$target_qt_theme_path"
+#
+#    # PoisSolver and QPUAnneal not officially supported on Windows yet
+#    cd "$make_dir/build/release/src/phys/"
+#    rm -rf poissolver
+#    rm -rf qpuanneal
+#
+#    # Change physeng file to include .exe suffix for engines that have compiled binaries
+#    sed -i 's/<\/bin_path>/\.exe&/' ./simanneal/sim_anneal.physeng
+#
+#    # Create an archive
+#    cd "$make_dir/build/"
+#    archive_name=siqad_64.zip
+#    rm -f "$archive_name"
+#    zip -r "$archive_name" "release"
+#fi

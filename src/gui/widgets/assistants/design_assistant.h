@@ -9,8 +9,8 @@
 #define _GUI_DESIGN_ASSISTANT_H_
 
 #include <QtWidgets>
-#include "src/gui/widgets/primitives/items.h"
-#include "src/gui/widgets/components/sim_engine.h"
+#include "gui/widgets/primitives/items.h"
+#include "gui/widgets/components/sim_engine.h"
 
 namespace gui{
 

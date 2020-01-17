@@ -24,7 +24,7 @@ namespace comp{
   public:
 
     //! The result type of this job result set.
-    enum ResultType{UndefinedResult, DBLocationsResult, ElectronConfigsResult, 
+    enum ResultType{UndefinedResult, DBLocationsResult, ChargeConfigsResult, 
       PotentialLandscapeResult, SQCommandsResult};
     
     //! Constructor.

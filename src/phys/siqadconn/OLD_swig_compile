@@ -1,5 +1,12 @@
 #!/bin/bash
 
+################################################################################
+#                                                                              #
+# This script is an old version before moving to scikit.                       #
+# To be deleted when the scikit system fully works for Windows builds.         #
+#                                                                              #
+################################################################################
+
 # A script that generates appropriate siqadconn binaries and Python wrapper with the help of SWIG. If the "FOR_OS" environment variable is set to "win64", then cross-compilation for 64-bit Windows is assumed; else, a native compilation on Linux environment is assumed.
 #
 # When performing cross-compilation for Windows, you need files in the "libs" and "include" directories from a Python installation on Windows (e.g. C:\Users\USERNAME\AppData\Local\Programs\Python\PythonXY\{libs,include}). This script assumes that those files have been copied to the machine performing the cross compilation. The variables WIN_PYTHON_PATH, WIN_PYTHON_VERS and WIN_PYTHON_ARCH indicate the path, available versions and architectures.

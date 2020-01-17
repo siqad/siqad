@@ -1,7 +1,7 @@
 // @file:     siqadconn.cc
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2019.05.25 - Samuel
+// @editted:  2020.01.10 - Samuel
 // @license:  Apache License 2.0
 //
 // @desc:     Convenient functions for interacting with SiQAD
@@ -83,8 +83,8 @@ void SiQADConnector::readProblem(const std::string &path)
 {
   std::cout << "Reading problem file: " << input_path << std::endl;
 
-  bpt::ptree tree; // create empty property tree object
-  bpt::read_xml(path, tree, bpt::xml_parser::no_comments); // parse the input file into property tree
+  boost::property_tree::ptree tree; // create empty property tree object
+  boost::property_tree::read_xml(path, tree, boost::property_tree::xml_parser::no_comments); // parse the input file into property tree
 
   // parse XML
 
@@ -104,23 +104,23 @@ void SiQADConnector::readProblem(const std::string &path)
   readDesign(tree.get_child("siqad.design"), item_tree);
 }
 
-void SiQADConnector::readProgramProp(const bpt::ptree &program_prop_tree)
+void SiQADConnector::readProgramProp(const boost::property_tree::ptree &program_prop_tree)
 {
-  for (bpt::ptree::value_type const &v : program_prop_tree) {
+  for (boost::property_tree::ptree::value_type const &v : program_prop_tree) {
     program_props.insert(std::map<std::string, std::string>::value_type(v.first, v.second.data()));
     debugStream << "ProgramProp: Key=" << v.first << ", Value=" << program_props[v.first] << std::endl;
   }
 }
 
-void SiQADConnector::readLayers(const bpt::ptree &layer_prop_tree)
+void SiQADConnector::readLayers(const boost::property_tree::ptree &layer_prop_tree)
 {
   // if this were structured the same way as readDesign, then only the first layer_prop subtree would be read.
   // TODO: make this more general.
-  for (bpt::ptree::value_type const &v : layer_prop_tree)
+  for (boost::property_tree::ptree::value_type const &v : layer_prop_tree)
     readLayerProp(v.second);
 }
 
-void SiQADConnector::readLayerProp(const bpt::ptree &layer_node)
+void SiQADConnector::readLayerProp(const boost::property_tree::ptree &layer_node)
 {
   Layer lay;
   lay.name = layer_node.get<std::string>("name");
@@ -133,18 +133,18 @@ void SiQADConnector::readLayerProp(const bpt::ptree &layer_node)
 }
 
 
-void SiQADConnector::readSimulationParam(const bpt::ptree &sim_params_tree)
+void SiQADConnector::readSimulationParam(const boost::property_tree::ptree &sim_params_tree)
 {
-  for (bpt::ptree::value_type const &v : sim_params_tree) {
+  for (boost::property_tree::ptree::value_type const &v : sim_params_tree) {
     sim_params.insert(std::map<std::string, std::string>::value_type(v.first, v.second.data()));
     debugStream << "SimParam: Key=" << v.first << ", Value=" << sim_params[v.first] << std::endl;
   }
 }
 
-void SiQADConnector::readDesign(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
+void SiQADConnector::readDesign(const boost::property_tree::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
 {
   debugStream << "Beginning to read design" << std::endl;
-  for (bpt::ptree::value_type const &layer_tree : subtree) {
+  for (boost::property_tree::ptree::value_type const &layer_tree : subtree) {
     std::string layer_type = layer_tree.second.get<std::string>("<xmlattr>.type");
     if ((!layer_type.compare("DB"))) {
       debugStream << "Encountered node " << layer_tree.first << " with type " << layer_type << ", entering" << std::endl;
@@ -158,9 +158,9 @@ void SiQADConnector::readDesign(const bpt::ptree &subtree, const std::shared_ptr
   }
 }
 
-void SiQADConnector::readItemTree(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
+void SiQADConnector::readItemTree(const boost::property_tree::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
 {
-  for (bpt::ptree::value_type const &item_tree : subtree) {
+  for (boost::property_tree::ptree::value_type const &item_tree : subtree) {
     std::string item_name = item_tree.first;
     debugStream << "item_name: " << item_name << std::endl;
     if (!item_name.compare("aggregate")) {
@@ -182,7 +182,7 @@ void SiQADConnector::readItemTree(const bpt::ptree &subtree, const std::shared_p
   }
 }
 
-void SiQADConnector::readElectrode(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
+void SiQADConnector::readElectrode(const boost::property_tree::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
 {
   double x1, x2, y1, y2, pixel_per_angstrom, potential, phase, angle, pot_offset;
   int layer_id, electrode_type=0, net;
@@ -212,7 +212,7 @@ void SiQADConnector::readElectrode(const bpt::ptree &subtree, const std::shared_
     ", pot_offset=" << agg_parent->elecs.back()->pot_offset << std::endl;
 }
 
-void SiQADConnector::readElectrodePoly(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
+void SiQADConnector::readElectrodePoly(const boost::property_tree::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
 {
   double pixel_per_angstrom, potential, phase;
   std::vector<std::pair<double, double>> vertices;
@@ -245,7 +245,7 @@ void SiQADConnector::readElectrodePoly(const bpt::ptree &subtree, const std::sha
     " vertices, potential=" << agg_parent->elec_polys.back()->potential << std::endl;
 }
 
-void SiQADConnector::readDBDot(const bpt::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
+void SiQADConnector::readDBDot(const boost::property_tree::ptree &subtree, const std::shared_ptr<Aggregate> &agg_parent)
 {
   float x, y;
   int n, m, l;
@@ -319,7 +319,7 @@ void SiQADConnector::writeResultsXml()
   std::cout << "Write to XML complete." << std::endl;
 }
 
-bpt::ptree SiQADConnector::engInfoPropertyTree()
+boost::property_tree::ptree SiQADConnector::engInfoPropertyTree()
 {
   boost::property_tree::ptree node_eng_info;
   node_eng_info.put("engine", eng_name);
@@ -338,19 +338,19 @@ bpt::ptree SiQADConnector::engInfoPropertyTree()
   return node_eng_info;
 }
 
-bpt::ptree SiQADConnector::simParamsPropertyTree()
+boost::property_tree::ptree SiQADConnector::simParamsPropertyTree()
 {
-  bpt::ptree node_sim_params;
+  boost::property_tree::ptree node_sim_params;
   for (std::pair<std::string, std::string> param : sim_params)
     node_sim_params.put(param.first, param.second);
   return node_sim_params;
 }
 
-bpt::ptree SiQADConnector::dbLocPropertyTree()
+boost::property_tree::ptree SiQADConnector::dbLocPropertyTree()
 {
-  bpt::ptree node_physloc;
+  boost::property_tree::ptree node_physloc;
   for (unsigned int i = 0; i < dbl_data.size(); i++){
-    bpt::ptree node_dbdot;
+    boost::property_tree::ptree node_dbdot;
     node_dbdot.put("<xmlattr>.x", dbl_data[i].first.c_str());
     node_dbdot.put("<xmlattr>.y", dbl_data[i].second.c_str());
     node_physloc.add_child("dbdot", node_dbdot);
@@ -358,11 +358,11 @@ bpt::ptree SiQADConnector::dbLocPropertyTree()
   return node_physloc;
 }
 
-bpt::ptree SiQADConnector::dbChargePropertyTree()
+boost::property_tree::ptree SiQADConnector::dbChargePropertyTree()
 {
-  bpt::ptree node_elec_dist;
+  boost::property_tree::ptree node_elec_dist;
   for (unsigned int i = 0; i < db_charge_data.size(); i++){
-    bpt::ptree node_dist;
+    boost::property_tree::ptree node_dist;
     node_dist.put("", db_charge_data[i][0]);
     node_dist.put("<xmlattr>.energy", db_charge_data[i][1]);
     node_dist.put("<xmlattr>.count", db_charge_data[i][2]);
@@ -376,9 +376,9 @@ bpt::ptree SiQADConnector::dbChargePropertyTree()
   return node_elec_dist;
 }
 
-bpt::ptree SiQADConnector::electrodePropertyTree()
+boost::property_tree::ptree SiQADConnector::electrodePropertyTree()
 {
-  bpt::ptree node_electrode;
+  boost::property_tree::ptree node_electrode;
   for (unsigned int i = 0; i < elec_data.size(); i++){
     boost::property_tree::ptree node_dim;
     node_dim.put("<xmlattr>.x1", elec_data[i][0].c_str());
@@ -393,9 +393,9 @@ bpt::ptree SiQADConnector::electrodePropertyTree()
   return node_electrode;
 }
 
-bpt::ptree SiQADConnector::potentialPropertyTree()
+boost::property_tree::ptree SiQADConnector::potentialPropertyTree()
 {
-  bpt::ptree node_potential_map;
+  boost::property_tree::ptree node_potential_map;
   for (unsigned int i = 0; i < pot_data.size(); i++){
     boost::property_tree::ptree node_potential_val;
     node_potential_val.put("<xmlattr>.x", pot_data[i][0].c_str());
@@ -406,12 +406,12 @@ bpt::ptree SiQADConnector::potentialPropertyTree()
   return node_potential_map;
 }
 
-bpt::ptree SiQADConnector::dbPotentialPropertyTree()
+boost::property_tree::ptree SiQADConnector::dbPotentialPropertyTree()
 {
-  bpt::ptree node_dbdots;
+  boost::property_tree::ptree node_dbdots;
   for (unsigned int i = 0; i < db_pot_data.size(); i++){
-    bpt::ptree node_dbdot;
-    bpt::ptree node_physloc;
+    boost::property_tree::ptree node_dbdot;
+    boost::property_tree::ptree node_physloc;
     boost::property_tree::ptree node_db_step;
     node_db_step.put("", db_pot_data[i][0].c_str());
     node_dbdot.add_child("step", node_db_step);
@@ -426,13 +426,13 @@ bpt::ptree SiQADConnector::dbPotentialPropertyTree()
   return node_dbdots;
 }
 
-bpt::ptree SiQADConnector::sqCommandsPropertyTree()
+boost::property_tree::ptree SiQADConnector::sqCommandsPropertyTree()
 {
-  bpt::ptree node_sqcommands;
+  boost::property_tree::ptree node_sqcommands;
   for (unsigned int i = 0; i < export_commands.size(); i++) {
     debugStream << "command " << i << ": ";
     debugStream << export_commands.at(i) << std::endl;
-    bpt::ptree node_sqc;
+    boost::property_tree::ptree node_sqc;
     node_sqc.put("", export_commands.at(i).c_str());
     //std::cout << export_commands.at(i)->finalCommand() << std::endl;
     node_sqcommands.add_child("sqc", node_sqc);
@@ -440,11 +440,11 @@ bpt::ptree SiQADConnector::sqCommandsPropertyTree()
   return node_sqcommands;
 }
 
-bpt::ptree SiQADConnector::miscPropertyTree()
+boost::property_tree::ptree SiQADConnector::miscPropertyTree()
 {
-  bpt::ptree node_misc;
+  boost::property_tree::ptree node_misc;
   for (unsigned int i=0; i < misc_data.size(); i++) {
-    bpt::ptree node_misc_item;
+    boost::property_tree::ptree node_misc_item;
     node_misc_item.put("", misc_data[i].second);
     node_misc.add_child(misc_data[i].first, node_misc_item);
   }

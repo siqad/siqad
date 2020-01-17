@@ -10,8 +10,8 @@
 
 #include <QtWidgets>
 #include "../design_panel.h"
-#include "src/gui/widgets/primitives/items.h"
-#include "src/gui/widgets/components/job_results/potential_landscape.h"
+#include "gui/widgets/primitives/items.h"
+#include "gui/widgets/components/job_results/potential_landscape.h"
 
 namespace gui{
 

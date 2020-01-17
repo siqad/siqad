@@ -17,7 +17,7 @@
 #include <QDialog>
 #include <QImage>
 
-#include "src/global.h"
+#include "global.h"
 
 #include "afm_panel.h"
 #include "property_editor.h"

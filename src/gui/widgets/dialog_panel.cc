@@ -8,7 +8,7 @@
 
 
 #include "dialog_panel.h"
-#include "src/settings/settings.h"
+#include "settings/settings.h"
 #include <iostream>
 
 

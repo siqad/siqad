@@ -18,7 +18,7 @@
 
 // gui includes
 #include "application.h"
-#include "src/settings/settings.h"
+#include "settings/settings.h"
 
 
 // init the DialogPanel to NULL until build in constructor
@@ -33,7 +33,7 @@ gui::ApplicationGUI::ApplicationGUI(const QString &f_path, QWidget *parent)
   start_time = QDateTime::currentDateTime();
 
   // initialize default save_dir
-  save_dir = QDir::homePath();
+  save_dir.setPath(QDir::homePath());
 
   // initialise GUI
   initGUI();
@@ -177,12 +177,6 @@ void gui::ApplicationGUI::initGUI()
   initCommander();
 
   // inter-widget signals
-  connect(sim_visualize, &gui::SimVisualizer::showElecDistOnScene,
-          design_pan, &gui::DesignPanel::displaySimResults);
-  connect(sim_visualize, &gui::SimVisualizer::showPotPlotOnScene,
-          design_pan, &gui::DesignPanel::displayPotentialPlot);
-  connect(sim_visualize, &gui::SimVisualizer::clearPotPlots,
-          design_pan, &gui::DesignPanel::clearPlots);
   connect(design_pan, &gui::DesignPanel::sig_quickRunSimulation,
           sim_manager, &gui::SimManager::quickRun);
   connect(design_pan, &gui::DesignPanel::sig_cursorPhysLoc,
@@ -394,13 +388,6 @@ void gui::ApplicationGUI::initTopBar()
 	  this, &gui::ApplicationGUI::repeatSimulation);
   addAction(action_repeat_sim);
 
-  // ground state simulation
-  action_run_ground_state = new QAction(QIcon(":/ico/sim_groundstate.svg"), tr("Run ground state simulation..."));
-  // action_run_ground_state->setShortcut(tr("F11"));
-  connect(action_run_ground_state, &QAction::triggered,
-          this, &gui::ApplicationGUI::runGroundState);
-
-
   // screenshot mode
   action_screenshot_mode = new QAction(QIcon(":/ico/screenshotmode.svg"), tr("Screenshot Mode"));
   connect(action_screenshot_mode, &QAction::triggered,
@@ -408,7 +395,6 @@ void gui::ApplicationGUI::initTopBar()
 
   // add them to top bar
   top_bar->addAction(action_run_sim);
-  //top_bar->addAction(action_run_ground_state); TODO reimplement this when the new plugin manager matures
   top_bar->addAction(action_sim_visualize);           // already initialised in menu bar
   top_bar->addAction(action_layer_sel);               // already initialised in menu bar
   top_bar->addAction(action_dialog_dock_visibility);  // already initialised in menu bar
@@ -569,6 +555,8 @@ void gui::ApplicationGUI::initSimVisualizerDock()
             if (!visible)
               sim_visualize->clearJob();
           });
+  connect(sim_visualize, &gui::SimVisualizer::sig_showJobInvoked,
+          [this]() {sim_visualize_dock->show();});
 
   QScrollArea *sa_sim_vis = new QScrollArea;
   sa_sim_vis->setWidget(sim_visualize);
@@ -913,18 +901,6 @@ void gui::ApplicationGUI::repeatSimulation()
   }
 }
 
-void gui::ApplicationGUI::runGroundState()
-{
-  /* TODO re-implement
-  int index = sim_manager->getComboEngSel()->findText("SimAnneal");
-  if (index != -1) { //if index found
-    sim_manager->getComboEngSel()->setCurrentIndex(index);
-    sim_manager->quickRun();
-  } else {
-    qDebug() << tr("Ground state engine not found.");
-  }
-  */
-}
 
 // TODO remove
 /*

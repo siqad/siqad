@@ -8,7 +8,7 @@
 
 #include <algorithm>
 #include "pot_plot.h"
-#include "src/settings/settings.h"
+#include "settings/settings.h"
 
 // Initialize statics
 qreal prim::PotPlot::edge_width = -1;

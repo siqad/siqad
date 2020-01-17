@@ -7,7 +7,7 @@
 // @desc:     DesignPanel implementation
 
 #include "design_panel.h"
-#include "src/settings/settings.h"
+#include "settings/settings.h"
 
 #include <algorithm>
 
@@ -706,65 +706,6 @@ void gui::DesignPanel::loadDesign(QXmlStreamReader *rs, QList<int> &layer_order_
 
 
 // SIMULATION RESULT DISPLAY
-void gui::DesignPanel::displaySimResults(comp::SimJob *job, int dist_ind, bool avg_degen)
-{
-  /*
-  // TODO in the future, show results in a pop up windows instead of the result screen itself
-  setDisplayMode(SimDisplayMode);
-
-  if(!job){
-    qDebug() << tr("DisplayPanel: Job pointer invalid");
-    return;
-  } else if (dist_ind > job->filteredElecDists().size() || job->filteredElecDists().size() == 0) {
-    qDebug() << tr("DesignPanel: dist_ind out of range when attempting to display sim results: %1").arg(dist_ind);
-    return;
-  }
-
-  // grab the list of DBDots in the order of job->physlocs
-  db_dots_result.clear();
-  qreal scale_factor = settings::GUISettings::instance()->get<qreal>("view/scale_fact");
-  for(auto job_pl : job->physlocs){
-    QPointF scene_loc;
-    scene_loc.setX(scale_factor*job_pl.first);
-    scene_loc.setY(scale_factor*job_pl.second);
-
-    bool db_exists = false;
-    QList<QGraphicsItem*> items_at_loc = scene->items(scene_loc);
-    for(auto i_at_loc : items_at_loc){
-      if(static_cast<prim::Item*>(i_at_loc)->item_type == prim::Item::DBDot){
-        db_dots_result.append(static_cast<prim::DBDot*>(i_at_loc));
-        db_exists = true;
-        break;
-      }
-    }
-
-    if(!db_exists){
-      qDebug() << tr("DesignPanel: unable to show result, no DBDot is present "
-                     "at location x=%1, y=%2").arg(scene_loc.x()).arg(scene_loc.y());
-      return;
-    }
-  }
-
-  // set their show_elec to the set specified by job->elec_dists
-  for(int i=0; i<db_dots_result.size(); i++){
-    if (dist_ind == -1) {
-      // show average distribution if distribution index is -1
-      db_dots_result[i]->setShowElec(job->elec_dists_avg[i]);
-      //qDebug() << tr("Setting electron %1 to %2").arg(i).arg(job->elec_dists_avg[i]);
-    } else if(db_dots_result[i]) {
-      if (avg_degen) {
-        // show the average distribution of degenerate states
-        db_dots_result[i]->setShowElec(job->elecDistAvgDegenOfDB(dist_ind, i));
-        //qDebug() << tr("Setting electron %1 to %2, averaged").arg(i).arg(job->elecDistAvgDegenOfDB(dist_ind,i));
-      } else {
-        // show the average distribution of the selected index
-        db_dots_result[i]->setShowElec(job->filteredElecDists().at(dist_ind).dist[i]);
-      }
-    }
-  }
-  */
-}
-
 
 void gui::DesignPanel::clearSimResults()
 {

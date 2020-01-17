@@ -8,7 +8,7 @@
 //            users to edit.
 
 #include "property_form.h"
-#include "src/settings/settings.h"
+#include "settings/settings.h"
 
 namespace gui{
 

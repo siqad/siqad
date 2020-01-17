@@ -188,8 +188,8 @@ bool JobStep::readResults()
       job_results.insert(comp::JobResult::DBLocationsResult,
                          new comp::DBLocations(&rs));
     } else if (rs.name() == "elec_dist") {
-      job_results.insert(comp::JobResult::ElectronConfigsResult,
-                         new comp::ElectronConfigSet(&rs));
+      job_results.insert(comp::JobResult::ChargeConfigsResult,
+                         new comp::ChargeConfigSet(&rs));
     } else if (rs.name() == "potential_map") {
       job_results.insert(comp::JobResult::PotentialLandscapeResult,
                          new comp::PotentialLandscape(&rs, QFileInfo(resultPath()).absolutePath()));
@@ -204,8 +204,8 @@ bool JobStep::readResults()
   // TODO remove the following workaround after SiQADConn has been updated to
   // put DB physical locations inside electron config set
   if (job_results.keys().contains(comp::JobResult::DBLocationsResult)
-      && job_results.keys().contains(comp::JobResult::ElectronConfigsResult)) {
-    comp::ElectronConfigSet *ecs = static_cast<comp::ElectronConfigSet*>(job_results.value(comp::JobResult::ElectronConfigsResult));
+      && job_results.keys().contains(comp::JobResult::ChargeConfigsResult)) {
+    comp::ChargeConfigSet *ecs = static_cast<comp::ChargeConfigSet*>(job_results.value(comp::JobResult::ChargeConfigsResult));
     ecs->setDBPhysicalLocations(
         static_cast<comp::DBLocations*>(job_results.value(comp::JobResult::DBLocationsResult))->locations());
   }
@@ -222,6 +222,11 @@ bool JobStep::readResults()
 
   results_read = true;
   return true;
+}
+
+void JobStep::terminateJobStep()
+{
+  process->terminate();
 }
 
 void JobStep::processJobStepCompletion(int t_exit_code, QProcess::ExitStatus t_exit_status)
@@ -279,7 +284,7 @@ bool JobStep::commandKeywordReplacement()
 // SimJob implementation
 
 SimJob::SimJob(const QString &nm, QWidget *parent)
-  : QObject(parent), job_state(NotInvoked), job_name(nm)
+  : QObject(parent), job_state(NotInvoked), job_name(nm), gui_ctrl_elems(this)
 {}
 
 SimJob::~SimJob()
@@ -326,6 +331,7 @@ bool SimJob::beginJob()
 
   qDebug() << "Beginning job step invocation.";
   job_state = Running;
+  curr_step = job_steps.at(0);
   return job_steps.at(0)->invokeBinary();
 }
 
@@ -333,8 +339,7 @@ void SimJob::continueJob(int prev_step_ind, bool prev_step_successful)
 {
   if (!prev_step_successful) {
     qDebug() << tr("Last job step finished unsuccessfully, ceasing job.");
-    job_state = FinishedWithError;
-    emit sig_jobFinishState(this, job_state);
+    jobFinishActions(FinishedWithError);
     return;
   }
 
@@ -350,21 +355,35 @@ void SimJob::continueJob(int prev_step_ind, bool prev_step_successful)
   if (i < job_steps.length()) {
     // invoke next step if any
     job_steps.at(i)->invokeBinary();
+    curr_step = job_steps.at(i);
   } else {
     // wrap up job if no more steps
-    job_state = FinishedNormally;
-    emit sig_jobFinishState(this, job_state);
+    curr_step = nullptr;
+    jobFinishActions(FinishedNormally);
   }
 }
 
 void SimJob::terminateJob()
 {
-
+  if (curr_step != nullptr)
+    curr_step->terminateJobStep();
 }
 
-void SimJob::killJob()
+void SimJob::jobFinishActions(JobState job_state)
 {
-
+  switch(job_state)
+  {
+    case FinishedWithError:
+      gui_ctrl_elems.pb_terminate->setText("Error");
+      break;
+    case FinishedNormally:
+      gui_ctrl_elems.pb_terminate->setText("Finished");
+      break;
+    default:
+      break;
+  }
+  gui_ctrl_elems.pb_terminate->setDisabled(true);
+  emit sig_jobFinishState(this, job_state);
 }
 
 QList<QStandardItem*> SimJob::jobInfoStandardItemRow(QList<JobInfoStandardItemField> fields)

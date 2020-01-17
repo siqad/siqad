@@ -7,7 +7,8 @@
 //            them, as well as sending results to the appropriate target widget.
 
 #include "job_manager.h"
-#include "src/global.h"
+#include "global.h"
+#include <initializer_list>
 
 using namespace gui;
 
@@ -39,35 +40,36 @@ void JobManager::addJob(comp::SimJob *job)
           this, &gui::JobManager::sig_exportJobProblem);
   connect(job, &comp::SimJob::sig_jobFinishState, 
           this, &JobManager::processFinishedJob);
-
-  // update job list
-  // TODO better implementation in the future, current implementation is a quick hack
-  QList<QStandardItem*> row_job_info;
-  row_job_info.append(new QStandardItem(job->name()));
-  job_view_model->appendRow(row_job_info);
-
-  QPushButton *pb_job_terminal = new QPushButton("Terminal Output");
-  QPushButton *pb_sim_visualizer = new QPushButton("Visualize Results");
-  QModelIndex mi_back = job_view_model->indexFromItem(row_job_info.back());
-  tv_job_view->setIndexWidget(job_view_model->index(mi_back.row(), mi_back.column()+1), pb_job_terminal);
-  tv_job_view->setIndexWidget(job_view_model->index(mi_back.row(), mi_back.column()+2), pb_sim_visualizer);
-  tv_job_view->resizeColumnToContents(0);
-
-  // show terminal
-  connect(pb_job_terminal, &QPushButton::pressed,
-          [this, job]()
-          {job->terminalOutputDialog(this)->show();});
-
-  // visualize results if eligible
-  connect(pb_sim_visualizer, &QPushButton::pressed,
+  connect(job, &comp::SimJob::sig_requestJobVisualization,
           [this, job]()
           {
             if (eligibleForSimVisualizer(job)) {
               sim_visualizer->showJob(job);
             } else {
-              qWarning() << "Job not eligible for SimVisualizer";
+              qWarning() << "Job not eligible for SimVisualizer.";
             }
           });
+
+  // update job list
+  // TODO better implementation in the future, current implementation is a quick hack
+  QList<QStandardItem*> row_job_info;
+  row_job_info.append(new QStandardItem(job->name()));
+  job_view_model->insertRow(0, row_job_info); // prepend row
+
+  QList<QWidget*> row_widgets({
+        job->guiControlElems().pb_terminate,
+        job->guiControlElems().pb_sim_visualize,
+        job->guiControlElems().pb_job_terminal
+      });
+
+  tv_job_view->resizeColumnToContents(0);
+  QModelIndex mi_back = job_view_model->indexFromItem(row_job_info.back());
+  int col_start = mi_back.column() + 1;
+  for (int col=col_start; col < col_start + row_widgets.size(); col++) {
+    tv_job_view->setIndexWidget(job_view_model->index(mi_back.row(), 
+          col), row_widgets[col-col_start]);
+    tv_job_view->resizeColumnToContents(col);
+  }
 }
 
 void JobManager::runJob(comp::SimJob *job)
@@ -76,10 +78,13 @@ void JobManager::runJob(comp::SimJob *job)
   job->beginJob();
 }
 
-void JobManager::processFinishedJob(comp::SimJob *job, comp::SimJob::JobState finish_state)
+void JobManager::processFinishedJob(comp::SimJob *job, comp::SimJob::JobState)
 {
   // TODO if successful, check that result files are all successfully read (add
   // a flag in job steps to facilitate this)
+
+  // update GUI elements in job manager
+
 
   // execute SQCommands if any is available
   // TODO allow users to make execution manual and prompt user before execution
@@ -98,8 +103,9 @@ void JobManager::processFinishedJob(comp::SimJob *job, comp::SimJob::JobState fi
   // visualized using it
   // TODO check if any of the result types in the job match with any of the result
   // types in sim_visualizer->supportedResultTypes()
-  if (eligibleForSimVisualizer(job))
+  if (eligibleForSimVisualizer(job)) {
     sim_visualizer->showJob(job);
+  }
 }
 
 bool JobManager::eligibleForSimVisualizer(comp::SimJob *job)
@@ -515,8 +521,9 @@ QWidget *JobManager::initJobSetupPanel()
 QWidget *JobManager::initJobViewPanel()
 {
   job_view_model = new QStandardItemModel();
-  job_view_model->setColumnCount(3);  // TODO make dynamic
+  job_view_model->setColumnCount(4);  // TODO make dynamic
   tv_job_view = new QTreeView();
+  tv_job_view->header()->setStretchLastSection(false);
   tv_job_view->setModel(job_view_model);
   // TODO QTreeView with multiple columns
   // TODO job details (start and end times, job step count, list of invocation commands for job steps)

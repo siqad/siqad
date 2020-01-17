@@ -8,7 +8,7 @@
 
 
 #include "textlabel.h"
-#include "src/settings/settings.h"
+#include "settings/settings.h"
 
 #include <QInputDialog>
 

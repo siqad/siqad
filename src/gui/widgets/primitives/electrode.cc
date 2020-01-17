@@ -8,7 +8,7 @@
 
 #include <algorithm>
 #include "electrode.h"
-#include "src/settings/settings.h"
+#include "settings/settings.h"
 
 
 

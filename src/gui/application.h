@@ -83,9 +83,6 @@ namespace gui{
     // Repeat previous simulation
     void repeatSimulation();
 
-    // Run ground state simulation
-    void runGroundState();
-
     // Read simulation results
     bool readSimResult(const QString &result_path);
 

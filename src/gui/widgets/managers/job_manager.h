@@ -94,9 +94,6 @@ namespace gui{
     //! for future use.
     void sig_exportJobProblem(comp::JobStep *job_step, gui::DesignInclusionArea inclusion_area);
 
-    //! Emit instruction for SimVisualizer to show simulation results.
-    void sig_showSimResult(comp::SimJob *job);
-
     //! Emit a SiQAD command for commander to parse.
     void sig_executeSQCommand(QString command);
 

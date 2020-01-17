@@ -8,7 +8,7 @@
 
 
 #include "lattice.h"
-#include "src/settings/settings.h"
+#include "settings/settings.h"
 
 #include <QtMath>
 #include <QDialog>

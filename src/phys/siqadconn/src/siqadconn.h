@@ -1,7 +1,7 @@
 // @file:     siqadconn.h
 // @author:   Samuel
 // @created:  2017.08.23
-// @editted:  2019.05.25 - Samuel
+// @editted:  2020.01.10 - Samuel
 // @license:  Apache License 2.0
 //
 // @desc:     Convenient functions for interacting with SiQAD including
@@ -28,7 +28,7 @@
 #include <chrono>
 
 namespace phys{
-  namespace bpt = boost::property_tree;
+  //namespace bpt = boost::property_tree;
 
   // forward declaration
   struct Layer;
@@ -46,10 +46,10 @@ namespace phys{
   class SQCommand;
   class AggregateCommand;
 
-  typedef std::vector<std::shared_ptr<DBDot>>::const_iterator DBIter;
-  typedef std::vector<std::shared_ptr<Electrode>>::const_iterator ElecIter;
-  typedef std::vector<std::shared_ptr<ElectrodePoly>>::const_iterator ElecPolyIter;
-  typedef std::vector<std::shared_ptr<Aggregate>>::const_iterator AggIter;
+  typedef std::vector< std::shared_ptr<DBDot> >::const_iterator DBIter;
+  typedef std::vector< std::shared_ptr<Electrode> >::const_iterator ElecIter;
+  typedef std::vector< std::shared_ptr<ElectrodePoly> >::const_iterator ElecPolyIter;
+  typedef std::vector< std::shared_ptr<Aggregate> >::const_iterator AggIter;
 
   // SiQAD connector class
   class SiQADConnector
@@ -117,33 +117,33 @@ namespace phys{
     void readProblem(const std::string &path);
 
     // Read program properties
-    void readProgramProp(const bpt::ptree &);
+    void readProgramProp(const boost::property_tree::ptree &);
 
     // Read layer properties
-    void readLayers(const bpt::ptree &);
-    void readLayerProp(const bpt::ptree &);
+    void readLayers(const boost::property_tree::ptree &);
+    void readLayerProp(const boost::property_tree::ptree &);
 
     // Read simulation parameters
-    void readSimulationParam(const bpt::ptree &);
+    void readSimulationParam(const boost::property_tree::ptree &);
 
     // Read design
-    void readDesign(const bpt::ptree &, const std::shared_ptr<Aggregate> &);
-    void readItemTree(const bpt::ptree &, const std::shared_ptr<Aggregate> &);
-    void readElectrode(const bpt::ptree &, const std::shared_ptr<Aggregate> &);
-    void readElectrodePoly(const bpt::ptree &, const std::shared_ptr<Aggregate> &);
-    void readDBDot(const bpt::ptree &, const std::shared_ptr<Aggregate> &);
+    void readDesign(const boost::property_tree::ptree &, const std::shared_ptr<Aggregate> &);
+    void readItemTree(const boost::property_tree::ptree &, const std::shared_ptr<Aggregate> &);
+    void readElectrode(const boost::property_tree::ptree &, const std::shared_ptr<Aggregate> &);
+    void readElectrodePoly(const boost::property_tree::ptree &, const std::shared_ptr<Aggregate> &);
+    void readDBDot(const boost::property_tree::ptree &, const std::shared_ptr<Aggregate> &);
 
     // Generate property trees for writing
-    bpt::ptree engInfoPropertyTree();
-    bpt::ptree simParamsPropertyTree();
-    bpt::ptree dbLocPropertyTree();
-    bpt::ptree dbChargePropertyTree();
-    bpt::ptree electrodePropertyTree();
-    // bpt::ptree electrodePolyPropertyTree();
-    bpt::ptree potentialPropertyTree();
-    bpt::ptree dbPotentialPropertyTree(); // TODO fix up this function, a lot of redundant information
-    bpt::ptree sqCommandsPropertyTree();
-    bpt::ptree miscPropertyTree();
+    boost::property_tree::ptree engInfoPropertyTree();
+    boost::property_tree::ptree simParamsPropertyTree();
+    boost::property_tree::ptree dbLocPropertyTree();
+    boost::property_tree::ptree dbChargePropertyTree();
+    boost::property_tree::ptree electrodePropertyTree();
+    // boost::property_tree::ptree electrodePolyPropertyTree();
+    boost::property_tree::ptree potentialPropertyTree();
+    boost::property_tree::ptree dbPotentialPropertyTree(); // TODO fix up this function, a lot of redundant information
+    boost::property_tree::ptree sqCommandsPropertyTree();
+    boost::property_tree::ptree miscPropertyTree();
 
     // Engine properties
     std::string eng_name;                 // name of simulation engine
@@ -162,14 +162,14 @@ namespace phys{
     std::map<std::string, std::string> sim_params;    // simulation parameters
 
     // Exportable data
-    std::vector<std::vector<std::string>> pot_data;
-    std::vector<std::vector<std::string>> db_pot_data;
+    std::vector< std::vector<std::string> > pot_data;
+    std::vector< std::vector<std::string> > db_pot_data;
     // std::vector<std::vector<std::vector<std::string>>> db_pot_history;
-    std::vector<std::vector<std::string>> elec_data;
-    std::vector<std::pair<std::string, std::string>> dbl_data;  // pair of location x and y
-    std::vector<std::vector<std::string>> db_charge_data;       // pair of elec dist and energy
+    std::vector< std::vector<std::string> > elec_data;
+    std::vector< std::pair<std::string, std::string> > dbl_data;  // pair of location x and y
+    std::vector< std::vector<std::string> > db_charge_data;       // pair of elec dist and energy
     std::vector<std::string> export_commands;                   // SQCommands to be exported
-    std::vector<std::pair<std::string, std::string>> misc_data; // misc data output that is ignored by SiQAD, first string for element name and second string for value
+    std::vector< std::pair<std::string, std::string> > misc_data; // misc data output that is ignored by SiQAD, first string for element name and second string for value
 
     // Runtime information
     bool verbose;
@@ -215,7 +215,7 @@ namespace phys{
 
     DBIter db_iter;                   // points to the current DB
     std::shared_ptr<Aggregate> curr;  // current working Aggregate
-    std::stack<std::pair<std::shared_ptr<Aggregate>, AggIter>> agg_stack;
+    std::stack< std::pair<std::shared_ptr<Aggregate>, AggIter> > agg_stack;
 
     // add a new aggregate pair to the stack
     void push(std::shared_ptr<Aggregate> agg);
@@ -238,13 +238,13 @@ namespace phys{
   // electrode_poly
   struct ElectrodePoly {
     int layer_id;
-    std::vector<std::pair<double, double>> vertices;  // vertex points
+    std::vector< std::pair<double, double> > vertices;  // vertex points
     double potential;
     double phase;
     int electrode_type;
     int net;
     double pixel_per_angstrom;
-    ElectrodePoly(int in_layer_id, std::vector<std::pair<double, double>> in_vertices, \
+    ElectrodePoly(int in_layer_id, std::vector< std::pair<double, double> > in_vertices, \
               double in_potential, double in_phase, int in_electrode_type, double in_pixel_per_angstrom, int in_net)
       : layer_id(in_layer_id), vertices(in_vertices), \
         potential(in_potential), phase(in_phase), electrode_type(in_electrode_type), \
@@ -265,7 +265,7 @@ namespace phys{
   private:
     ElecPolyIter elec_poly_iter;               // points to the current electrode
     std::shared_ptr<Aggregate> curr;  // current working Aggregate
-    std::stack<std::pair<std::shared_ptr<Aggregate>, AggIter>> agg_stack;
+    std::stack<std::pair< std::shared_ptr<Aggregate>, AggIter> > agg_stack;
     // add a new aggregate pair to the stack
     void push(std::shared_ptr<Aggregate> agg);
     // pop the aggregate stack
@@ -314,7 +314,7 @@ namespace phys{
   private:
     ElecIter elec_iter;               // points to the current electrode
     std::shared_ptr<Aggregate> curr;  // current working Aggregate
-    std::stack<std::pair<std::shared_ptr<Aggregate>, AggIter>> agg_stack;
+    std::stack< std::pair<std::shared_ptr<Aggregate>, AggIter> > agg_stack;
     // add a new aggregate pair to the stack
     void push(std::shared_ptr<Aggregate> agg);
     // pop the aggregate stack
@@ -335,10 +335,10 @@ namespace phys{
   struct Aggregate
   {
   public:
-    std::vector<std::shared_ptr<Aggregate>> aggs;
-    std::vector<std::shared_ptr<DBDot>> dbs;
-    std::vector<std::shared_ptr<Electrode>> elecs;
-    std::vector<std::shared_ptr<ElectrodePoly>> elec_polys;
+    std::vector< std::shared_ptr<Aggregate> > aggs;
+    std::vector< std::shared_ptr<DBDot> > dbs;
+    std::vector< std::shared_ptr<Electrode> > elecs;
+    std::vector< std::shared_ptr<ElectrodePoly> > elec_polys;
 
     // Properties
     int size(); // returns the number of contained elecs, including those in children aggs
@@ -425,7 +425,7 @@ namespace phys{
 
     // Constructor taking a vector of DB physical locations that should be
     // contained in a new Aggregate, implies an Add action.
-    AggregateCommand(const std::vector<std::pair<float, float>> &t_db_locs,
+    AggregateCommand(const std::vector< std::pair<float, float> > &t_db_locs,
                      const int &t_layer=-1)
       : SQCommand(Add, Aggregate), layer(t_layer)
     {
@@ -440,16 +440,16 @@ namespace phys{
 
     // Return the Aggregate creation command. The format should be:
     // add Aggregate (db_x1 db_y1) (db_x2 db_y2) ...
-    std::vector<std::string> addActionArguments() override;
+    std::vector<std::string> addActionArguments();
 
     // Add DB physical locations (only successful if the command action is Add.
-    void addDBsToAggregateFormation(const std::vector<std::pair<float, float>> &t_db_locs)
+    void addDBsToAggregateFormation(const std::vector< std::pair<float, float> > &t_db_locs)
     {
       db_locs.insert(db_locs.end(), t_db_locs.begin(), t_db_locs.end());
     }
 
     // Return the db_locs vector.
-    std::vector<std::pair<float, float>> dbLocations() {return db_locs;}
+    std::vector< std::pair<float, float> > dbLocations() {return db_locs;}
 
     // TODO need a way to uniquely reference Aggregates in order to reference
     // aggregates for forming higher level aggregates, movement or removal.
@@ -457,7 +457,7 @@ namespace phys{
   private:
 
     int layer=-1;   // store the layer which this command affects, or auto if -1
-    std::vector<std::pair<float, float>> db_locs;
+    std::vector< std::pair<float, float> > db_locs;
 
   }; // end of AggregateCommand class
 

@@ -8,7 +8,7 @@
  */
 
 #include "screenshot_clip_area.h"
-#include "src/settings/settings.h"
+#include "settings/settings.h"
 
 qreal prim::ScreenshotClipArea::edge_width=-1;
 //prim::ScreenshotClipArea::StateColors fill_col;

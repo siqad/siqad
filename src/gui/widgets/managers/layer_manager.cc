@@ -325,7 +325,7 @@ void LayerManager::initSideWidget()
   QList<QPair<float, prim::Layer*>> sorted_layers;
   for (prim::Layer *layer : layers)
     sorted_layers.append(qMakePair(layer->zOffset(), layer));
-  qSort(sorted_layers.begin(), sorted_layers.end(), QPairFirstReverseComparer());
+  std::sort(sorted_layers.begin(), sorted_layers.end(), QPairFirstReverseComparer());
 
   //create label to show user the current active layer
   label_active_layer = new QLabel(tr("Active layer: "));

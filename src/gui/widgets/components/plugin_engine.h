@@ -13,7 +13,7 @@
 #include <QXmlStreamReader>
 #include <QMetaEnum>
 
-#include "src/gui/property_map.h"
+#include "gui/property_map.h"
 
 namespace comp{
 

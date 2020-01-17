@@ -12,7 +12,7 @@
 
 
 #include "items.h"
-#include "src/settings/settings.h"
+#include "settings/settings.h"
 #include "lattice.h"
 
 namespace prim{

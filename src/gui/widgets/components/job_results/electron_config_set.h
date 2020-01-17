@@ -3,11 +3,11 @@
  *  @created:  2019.03.17
  *  @license:  GNU LGPL v3
  *
- *  @desc:     Stores electron configurations of DB layouts.
+ *  @desc:     Stores charge configurations of DB layouts.
  */
 
-#ifndef _COMP_ELEC_CONFIG_SET_H_
-#define _COMP_ELEC_CONFIG_SET_H_
+#ifndef _COMP_CHRG_CONFIG_SET_H_
+#define _COMP_CHRG_CONFIG_SET_H_
 
 #include <QtWidgets>
 
@@ -15,17 +15,16 @@
 
 namespace comp{
 
-  //! Stores electron configurations of DB layouts.
-  class ElectronConfigSet : public JobResult
+  //! Stores charge configurations of DB layouts.
+  class ChargeConfigSet : public JobResult
   {
     Q_OBJECT
 
   public:
 
 
-    //! Electron configurations (1 for electron, 0 for neutral)
-    //! TODO in the future, add support for positive charge configurations.
-    struct ElectronConfig
+    //! Charge configurations (-1 for DB-, 0 for DB0, +1 for DB+)
+    struct ChargeConfig
     {
       QList<int> config;
       float energy=0;       // energy of this configuration
@@ -36,7 +35,9 @@ namespace comp{
       int state_count=2;    // number of supported states, if 2 then 0=DB0 and 1=DB-; if 3 then {+,0,-} = {DB+, DB0, DB0}
       int config_occ=0;     // number of occurances of this config
 
-      bool operator == (const ElectronConfig &other) const {
+      int netNegCharge() {return dbm_count - dbp_count;}
+
+      bool operator == (const ChargeConfig &other) const {
         if (config.length() != other.config.length()
             || energy != other.energy
             || config_occ != other.config_occ
@@ -48,22 +49,22 @@ namespace comp{
     };
 
     //! Empty constructor.
-    ElectronConfigSet() : JobResult(ElectronConfigsResult) {};
+    ChargeConfigSet() : JobResult(ChargeConfigsResult) {};
 
     //! Constructor taking a QXmlStreamReader to read the results directly. The 
-    //! results are internally sorted in ascending order of electron count.
-    ElectronConfigSet(QXmlStreamReader *rs);
+    //! results are internally sorted in ascending order of charge count.
+    ChargeConfigSet(QXmlStreamReader *rs);
 
     // TODO alternative constructor taking relevant information
     
     //! Destructor.
-    ~ElectronConfigSet() {};
+    ~ChargeConfigSet() {};
 
-    //! Read electron config sets from XML stream.
+    //! Read charge config sets from XML stream.
     void readFromXMLStream(QXmlStreamReader *rs);
 
     //! Return whether this config set is empty.
-    bool isEmpty() {return elec_configs.isEmpty();}
+    bool isEmpty() {return charge_configs.isEmpty();}
 
     //! Return the order of DB physical locations. TODO what unit does SiQADConn return?
     QList<QPointF> dbPhysicalLocations() {return phys_locs;}
@@ -71,45 +72,47 @@ namespace comp{
     //! Set the order of DB physical locations.
     void setDBPhysicalLocations(const QList<QPointF> &t_phys_locs) {phys_locs = t_phys_locs;}
 
-    //! Return a QMap mapping electron count to the number of occurances of 
-    //! configurations with that count.
-    QMap<int, int> electronCountOccurances() {return elec_count_occ;}
+    //! Return a QMap mapping net charge to the number of occurances of 
+    //! configurations with that net charge.
+    QMap<int, int> netChargeOccurances() {return net_charge_occ;}
 
-    //! Return the number of electron configurations (duplicates counted).
+    //! Return the number of charge configurations (duplicates counted).
     int totalConfigCount() {return total_config_count;}
 
-    //! Return the electron count which has the highest accumulated occurances.
-    //! If there's a tie, the configuration with the lower electron count
+    //! Return the net charge which has the highest accumulated occurances.
+    //! If there's a tie, the configuration with the lower net charge
     //! is returned.
-    int mostPopularElectronCount()
+    int mostPopularNetCharge()
     {
-      QMap<int, int>::iterator max_it = elec_count_occ.begin();
+      QMap<int, int>::iterator max_it = net_charge_occ.begin();
       QMap<int, int>::iterator it;
-      for (it = elec_count_occ.begin(); it != elec_count_occ.end(); it++)
+      for (it = net_charge_occ.begin(); it != net_charge_occ.end(); it++)
         if (it.value() > max_it.value())
           max_it = it;
       return max_it.key();
     }
 
-    //! Return all available electron counts.
-    QList<int> electronCounts() const {return elec_configs.uniqueKeys();}
+    //! Return all available net charges.
+    QList<int> netCharges() const {return charge_configs.uniqueKeys();}
 
-    //! Return electron configurations with the specified electron count.
-    //! If the specified electron count is less than 0, assumes that all configs
-    //! are wanted.
-    QList<ElectronConfig> electronConfigs(bool phys_valid_filter=false,
-                                          const int &elec_count=-1) const
+    //! Return charge configurations with the specified net charge.
+    //! If all_configs is set to true, charge_count is ignored and all configs
+    //! are returned. Otherwise, only configs with the specified charge_count
+    //! are returned.
+    QList<ChargeConfig> chargeConfigs(bool phys_valid_filter=false,
+                                      bool all_configs=true,
+                                      const int &net_charge=-1) const
     {
-      QList<ElectronConfig> configs = elec_count < 0 ? elec_configs.values() : elec_configs.values(elec_count);
+      QList<ChargeConfig> configs = all_configs ? charge_configs.values() : charge_configs.values(net_charge);
       if (configs.size() > 0 && phys_valid_filter)
         physicallyValidFilter(configs);
       return configs;
     }
 
     //! Filter out physically invalid states in the provided list reference.
-    void physicallyValidFilter(QList<ElectronConfig> &configs) const
+    void physicallyValidFilter(QList<ChargeConfig> &configs) const
     {
-      QList<ElectronConfig>::iterator it = configs.begin();
+      QList<ChargeConfig>::iterator it = configs.begin();
       while (it != configs.end()) {
         if ((*it).is_valid != 1)
           it = configs.erase(it);
@@ -118,22 +121,22 @@ namespace comp{
       }
     }
 
-    //! Return degenerate states of the given electron configuration including
+    //! Return degenerate states of the given charge configuration including
     //! the given config.
-    QList<ElectronConfig> degenerateConfigs(const ElectronConfig &config) const;
+    QList<ChargeConfig> degenerateConfigs(const ChargeConfig &config) const;
 
     //! Return the index to the lowest energy state which is physically valid 
-    //! in the given list of electron configs. If there is no physically valid
+    //! in the given list of charge configs. If there is no physically valid
     //! index, return -1.
-    static int lowestPhysicallyValidInd(const QList<ElectronConfig> &elec_configs);
+    static int lowestPhysicallyValidInd(const QList<ChargeConfig> &charge_configs);
 
   private:
 
-    //QList<ElectronConfig> elec_configs;   // electron configurations
+    //QList<ChargeConfig> charge_configs;   // charge configurations
     QList<QPointF> phys_locs;                     // physical location of DBs
-    QMultiMap<int, ElectronConfig> elec_configs;  // electron configurations with electron count as key
-    QMap<int, int> elec_count_occ;                // the accumulated occurances of each electron count
-    int total_config_count=0;                     // total number of electron configurations (duplicates counted)
+    QMultiMap<int, ChargeConfig> charge_configs;  // charge configurations with net charge as key
+    QMap<int, int> net_charge_occ;                // the accumulated occurances of each net charge
+    int total_config_count=0;                     // total number of charge configurations (duplicates counted)
   };
 
 } // end of comp namespace

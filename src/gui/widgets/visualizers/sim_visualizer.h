@@ -42,7 +42,7 @@ namespace gui{
     {
       return QList<comp::JobResult::ResultType>({
             comp::JobResult::DBLocationsResult,
-            comp::JobResult::ElectronConfigsResult,
+            comp::JobResult::ChargeConfigsResult,
             comp::JobResult::PotentialLandscapeResult
           });
     }
@@ -81,27 +81,27 @@ namespace gui{
     */
 
   signals:
-    void showElecDistOnScene(comp::SimJob *job, int dist_ind, bool avg_degen=false);
-    void showPotPlotOnScene(QString pot_plot_path, QRectF graph_container, QString pot_anim_plot);
-    void clearPotPlots();
+
+    //! Notify application that showJob has been triggered.
+    void sig_showJobInvoked(comp::SimJob *job);
 
   private:
 
     gui::DesignPanel *design_pan;             // pointer to the design panel
     comp::SimJob *sim_job=nullptr;            // current job result being shown
 
-    ElectronConfigSetVisualizer *elec_config_set_visualizer;
+    ChargeConfigSetVisualizer *charge_config_set_visualizer;
     PotentialLandscapeVisualizer *pot_landscape_visualizer;
 
     QGroupBox *gb_job_info;                   // group box containing job information elements
-    QGroupBox *gb_elec_configs;               // group box containing electron config elements
+    QGroupBox *gb_charge_configs;               // group box containing electron config elements
     QGroupBox *gb_pot_landscape;              // group box containing potential landscape elements
 
     QTableView *tv_job_info;                  // table view showing job details
     QStandardItemModel *job_info_model;       // model storing the job's details
 
     //QComboBox *cb_job_steps_db_locs;          // job steps containing DB locations
-    QComboBox *cb_job_steps_elec_configs;     // job steps containing electron configurations
+    QComboBox *cb_job_steps_charge_configs;     // job steps containing electron configurations
     QComboBox *cb_job_steps_pot_landscape;    // job steps containing potential landscape
 
     /*
@@ -137,13 +137,13 @@ namespace gui{
 
     // electron distribution
     QGroupBox *dist_group;
-    QSlider *slider_elec_count_sel;
+    QSlider *slider_charge_count_sel;
     QSlider *slider_dist_sel;
-    QLabel *text_elec_count;
+    QLabel *text_charge_count;
     QLabel *text_dist_selected;
     QLabel *text_dist_energy;
-    QGroupBox *elec_count_filter_group;
-    QCheckBox *cb_elec_count_filter;
+    QGroupBox *charge_count_filter_group;
+    QCheckBox *cb_charge_count_filter;
 
     // potential viewer
     QGroupBox *view_potential_group;

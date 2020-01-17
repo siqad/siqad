@@ -108,7 +108,7 @@ QSettings *settings::AppSettings::m_defs()
 
   S->setValue("snap/diameter", 5.);             //relative to scale_fact
 
-  S->setValue("dir/lattice", QString("<BINPATH>/src/settings/lattices"));
+  S->setValue("dir/lattice", QString("<BINPATH>/settings/lattices"));
 
   S->setValue("extra_icon_theme_path", QStringList({
         "<BINPATH>/icons/"
@@ -140,11 +140,11 @@ QSettings *settings::AppSettings::m_defs()
   S->setValue("phys/eng_lib_dirs", QStringList({
     "<APPLOCALDATA>/phys/",
     "<APPLOCALDATA>/plugins/",
-    "<BINPATH>/src/phys/",
+    "<BINPATH>/phys/",
     "<BINPATH>/plugins/"
   }));
   //S->setValue("phys/eng_lib_dirs", QString("<APPLOCALDATA>/phys"));
-  //S->setValue("phys/eng_lib_dirs", QString("<BINPATH>/src/phys/"));
+  //S->setValue("phys/eng_lib_dirs", QString("<BINPATH>/phys/"));
   S->setValue("phys/eng_usr_cfg_dir", QString("<CONFIG>/phys/")); // TODO delete
   S->setValue("phys/preset_root_path", QString("<CONFIG>/phys/"));
   S->setValue("phys/runtime_tmp_root_path", QString("<SYSTMP>/phys/"));
@@ -177,16 +177,16 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("DDOCK/mh", 120);     // dialog dock minimum height
   S->setValue("DDOCK/loc", 8);      // dialog dock default to bottom
   S->setValue("LAYDOCK/mw", 120);   // layer dock minimum width
-  S->setValue("LAYDOCK/loc", 2);    // layer dock default to bottom
+  S->setValue("LAYDOCK/loc", 2);    // layer dock default to right
   S->setValue("ITEMDOCK/mw", 120);  // item dock minimum width
-  S->setValue("ITEMDOCK/loc", 2);   // item dock default to bottom
+  S->setValue("ITEMDOCK/loc", 2);   // item dock default to right
   S->setValue("INFODOCK/mw", 120);  // item dock minimum width
   S->setValue("INFODOCK/loc", 8);   // info dock default to bottom
   S->setValue("Panel/logw", 400);
 
   S->setValue("SIMMAN/mw", 100);     // simulation manager minimum width
 
-  S->setValue("lattice/fname", QString("src/settings/lattices/si_100_2x1.ini"));
+  S->setValue("lattice/fname", QString("settings/lattices/si_100_2x1.ini"));
   S->setValue("lattice/minsize", 50);  // minimum lattice n, m size
 
   // QGraphicsView
@@ -251,14 +251,14 @@ QSettings* settings::GUISettings::m_defs()
 
   // lattice dot parameters
   S->setValue("latdot/diameter", 0.8);                    // dot diameter
-  S->setValue("latdot/diameter_pb", 2.0);
+  S->setValue("latdot/diameter_pb", 1.0);
   S->setValue("latdot/edge_width", .15);                  // edge width rel. to diameter
   S->setValue("latdot/edge_width_pb", .2);
   S->setValue("latdot/zoom_vis_threshold", 0.03);         // the zoom threshold (m11 transform) below which the lattice stops being shown
   S->setValue("latdot/edge_col", QColor(0,0,0,0)); // edge color
   S->setValue("latdot/edge_col_pb", QColor("#BABABA"));    // edge color (publish mode)
   S->setValue("latdot/fill_col", QColor(255,255,255,60));        // fill color
-  S->setValue("latdot/fill_col_pb", QColor(0,0,0,0));     // fill color (publish mode)
+  S->setValue("latdot/fill_col_pb", QColor("#BABABA"));     // fill color (publish mode)
   S->setValue("latdot/inner_fill", .5);                   // inner fill factor
   S->setValue("latdot/inner_fill_col", QColor(255, 255, 0));  // inner colour
   S->setValue("latdot/inner_fill_col_pb", QColor(255, 255, 0));  // inner colour (publish mode)

@@ -1,0 +1,43 @@
+# Resources:
+# Good consilidated guide on required components: https://thomastrapp.com/blog/building-a-pypi-package-for-a-modern-cpp-project/
+# Project that uses pypa/manylinux and CIs for cross platform compilation: moderngl/moderngl
+
+# dockcross/manylinux2010-x64 can't build due to some problem with syntax?
+FROM dockcross/manylinux2010-x64:latest as build_x86_64
+
+# dockcross/manylinux2014-x64 can't use yum due to something to do with CRYPTO_num_lock
+#FROM dockcross/manylinux2014-x64:latest as build_x86_64
+
+# quay.io/pypa/manylinux2014_x86_64 can't use cmake whether compiled from source or acquired from PIP
+#FROM quay.io/pypa/manylinux2014_x86_64:latest as build_x86_64
+RUN cat /etc/redhat-release
+
+#RUN CPPFLAGS=-I/usr/local/openssl/include/ LDFLAGS=-L/usr/local/openssl/lib/ pip install --upgrade pycurl --ignore-installed pycurl
+RUN for PYBIN in /opt/python/*/bin; do "${PYBIN}/pip" install --disable-pip-version-check --upgrade pip; "${PYBIN}/pip" install scikit-build; done
+
+# download and compile cmake
+#RUN git clone --branch v3.13.5 https://github.com/Kitware/CMake cmake-build
+#RUN cd cmake-build && ./bootstrap && make -j24 && make -j24 install
+
+# download and compile SWIG 3.0.12
+RUN yum -y install pcre pcre-devel
+RUN curl -L0 'https://sourceforge.net/projects/swig/files/swig/swig-3.0.12/swig-3.0.12.tar.gz/download' > swig-3.0.12.tar.gz
+RUN tar -xzf swig-3.0.12.tar.gz
+RUN cd swig-3.0.12 && ./configure --disable-perl --disable-ruby --disable-csharp --disable-r --disable-java && make -j24 && make -j24 install
+
+#RUN for PYBIN in /opt/python/*/bin; do "${PYBIN}/pip" install --disable-pip-version-check --upgrade pip; "${PYBIN}/pip" install cmake; done
+
+RUN yum -y install boost-devel ninja-build
+
+# unpack siqadtools and compile a wheel for each available Python version
+COPY siqadtools-*.tar.gz siqadtools.tar.gz
+RUN tar --strip-components=1 -zxvf siqadtools.tar.gz
+RUN /opt/python/cp35-cp35m/bin/python setup.py bdist_wheel && auditwheel repair dist/*.whl
+RUN /opt/python/cp36-cp36m/bin/python setup.py bdist_wheel && auditwheel repair dist/*.whl
+RUN /opt/python/cp37-cp37m/bin/python setup.py bdist_wheel && auditwheel repair dist/*.whl
+
+#RUN /opt/python/cp38-cp38m/bin/python setup.py bdist_wheel
+#RUN /opt/python/cp35-cp35m/bin/python setup.py bdist_wheel && auditwheel repair dist/*.whl && rm dist/*.whl
+#RUN /opt/python/cp36-cp36m/bin/python setup.py bdist_wheel && auditwheel repair dist/*.whl && rm dist/*.whl
+#RUN /opt/python/cp37-cp37m/bin/python setup.py bdist_wheel && auditwheel repair dist/*.whl && rm dist/*.whl
+#RUN /opt/python/cp38-cp38m/bin/python setup.py bdist_wheel && auditwheel repair dist/*.whl && rm dist/*.whl

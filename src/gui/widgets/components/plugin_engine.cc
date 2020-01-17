@@ -6,7 +6,7 @@
 // @desc:     Plugin engine implementation.
 
 #include "plugin_engine.h"
-#include "src/settings/settings.h"
+#include "settings/settings.h"
 
 using namespace comp;
 
@@ -48,6 +48,13 @@ PluginEngine::PluginEngine(const QString &desc_file_path, QWidget *parent)
     } else if (rs.name() == "bin_path") {
       // TODO perform path replacement instead
       bin_path = QDir(plugin_root_path).absoluteFilePath(rs.readElementText());
+      // attempt to search for bin_path + ".exe" if running on Windows
+      if (!QFileInfo(bin_path).exists() && QSysInfo::kernelType() == "winnt") {
+        QString alt_bin_path = bin_path + ".exe";
+        if (QFileInfo(alt_bin_path).exists()) {
+          bin_path = alt_bin_path;
+        }
+      }
     } else if (rs.name() == "dep_path") {
       // TODO perform path replacement instead
       dep_path = QDir(plugin_root_path).absoluteFilePath(rs.readElementText());

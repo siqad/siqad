@@ -10,7 +10,7 @@ Please keep in mind that SiQAD is still undergoing rapid development, there are 
 
 Just copy `siqadconn.cc` and `siqadconn.h` to your project directory and include `siqadconn.h` appropriately.
 
-TODO sample code.
+TODO: sample code.
 
 ### Python projects
 
@@ -18,27 +18,27 @@ There are various ways to acquire a Python wrapper for SiQAD Connector (read the
 
 TODO sample code.
 
-#### Pre-compiled binaries
+#### Use pre-compiled binaries
 
 TODO upload pre-compiled Linux, macOS and Windows binaries.
 
 #### Using setup.py
 
-You may use the provided `setup.py` which uses the distutil library to build the wrapper. First, generate the Python and C++ wrapper sources with SWIG:
-```
-swig -v -python -c++ siqadconn.i
-```
+TODO list dependencies. Off the top of my head: from apt `boost` and `swig`, from pip3 `scikit-build`
 
-Then run `setup.py`:
+You may use the provided `setup.py` which uses the distutil library to build the wrapper. Using your preferred Python interpretor (here we use `python3`), run
 ```
-python3 setup.py build_ext --inplace
+python3 setup.py bdist_wheel
 ```
+which creates a Python wrapper of SiQADConnector via SWIG, compiles SiQADConnector, and packages the generated files into a proper Python package in the `dist` directory.
 
-#### Manual compilation
-
-First run:
+You should now find `siqadtools-[version]-[platform_info].whl` inside the `dist` directory. Install this into your system by running
 ```
-swig -v -python -c++ siqadconn.i
+pip3 install siqadtools-[version]-[platform_info].whl
 ```
+substituting `pip3` with your preferred Python package manager, `[version]` and `[platform_info]` with what you see in the generated wheel file.
 
-Then compile `siqadconn.cc` (requires Boost property tree library) and `siqadconn_wrap.cxx` (requires Python library) using your preferred compiler. Lastly, link the compiled binaries to either `_siqadconn.so` (Linux) or `_siqadconn.pyd`.
+To uninstall, run
+```
+pip3 uninstall siqadtools
+```

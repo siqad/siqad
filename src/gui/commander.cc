@@ -7,7 +7,7 @@
 // @desc:     Commander definitions. Handles the commands grabbed by the dialog_panel.
 
 #include "commander.h"
-#include "src/settings/settings.h"
+#include "settings/settings.h"
 #include <iostream>
 
 gui::Commander::Commander()

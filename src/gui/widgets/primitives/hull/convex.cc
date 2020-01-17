@@ -143,7 +143,8 @@ QPolygonF hull::grahamScan(const QVector<QPointF> &points)
     qSwap(points_c[0], points_c[pivot]);
 
   // sort points by polar angle in ccw order about pivot
-  qSort(points_c.begin()+1, points_c.end(), PolarCmp(points_c[0]));
+  //qSort(points_c.begin()+1, points_c.end(), PolarCmp(points_c[0]));
+  std::sort(points_c.begin()+1, points_c.end(), PolarCmp(points_c[0]));
 
   // keep only the furthest points for each angle from pivot
   int m = 1; // number of elements in modified points list

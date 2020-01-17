@@ -8,7 +8,7 @@
 
 
 #include "dbdot.h"
-#include "src/settings/settings.h"
+#include "settings/settings.h"
 // Initialize statics
 
 qreal prim::DBDot::diameter_m = -1;

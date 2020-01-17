@@ -15,9 +15,9 @@
 #include <QMetaEnum>
 
 #include "emitter.h"
-#include "src/global.h"
-#include "src/settings/settings.h"
-#include "src/gui/property_map.h"
+#include "global.h"
+#include "settings/settings.h"
+#include "gui/property_map.h"
 
 namespace prim{
 
@@ -107,7 +107,7 @@ namespace prim{
     virtual void setRotation(qreal angle_in __attribute__((unused))) {}
 
     //Reutrns the current fill color, initially does nothing.
-    virtual QColor getCurrentFillColor(){}
+    virtual QColor getCurrentFillColor(){return QColor();}
     // securing the item type and layer as private isn't worth the copy
     // constructor calls for accessors, make public
 
