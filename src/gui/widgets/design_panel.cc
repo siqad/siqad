@@ -926,9 +926,13 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     }*/
 
   } else if (!clicked && tool_type == DBGenTool) {
-    // show preview location of new DB
-    createDBPreviews({lattice->nearestSite(mapToScene(e->pos()))});
-
+    QPoint cursor_pos = mapToScene(e->pos()).toPoint();
+    QPoint cursor_offset = cursor_pos - press_scene_pos;
+    if (cursor_offset.manhattanLength() > snap_diameter) {
+      // show preview location of new DB
+      createDBPreviews({lattice->nearestSite(mapToScene(e->pos()))});
+      press_scene_pos = cursor_pos;
+    }
   } else if (clicked) {
     // not ghosting, mouse dragging of some sort
     switch(e->buttons()){
