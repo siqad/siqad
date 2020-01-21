@@ -377,6 +377,8 @@ QWidget *JobManager::initJobSetupPanel()
     // wrapper scripts. When that time comes, remove this line.
     si_job_step->setFlags(si_job_step->flags() & ~Qt::ItemIsDropEnabled);
     job_steps_model->appendRow(si_job_step);
+    lv_job_steps->setCurrentIndex(job_steps_model->indexFromItem(si_job_step));
+    emit lv_job_steps->clicked(job_steps_model->indexFromItem(si_job_step));
   };
 
   // move the selected job step up if up_dir, or down if !up_dir.
