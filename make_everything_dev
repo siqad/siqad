@@ -98,7 +98,7 @@ echo ${build_dir}
 # NOTE Haven't figured out what to do for cross-compilation yet, probably rely on CI services
 if [[ $swig == true ]] && [[ "$FOR_OS" != "win64" ]]; then
     echo "Building SWIG SiQADConnector at central location..."
-    cd "${proj_root}/src/phys/siqadconn"
+    cd "${proj_root}/libs/siqadconn"
     ./swig_compile_and_install
 fi
 

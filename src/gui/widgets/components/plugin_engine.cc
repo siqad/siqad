@@ -95,7 +95,7 @@ PluginEngine::PluginEngine(const QString &desc_file_path, QWidget *parent)
 
   // initialize engine preset storage path if it doesn't already exist
   if (preset_dir_path.isEmpty()) {
-    QDir preset_root_dir(settings::AppSettings::instance()->getPath("phys/preset_root_path"));
+    QDir preset_root_dir(settings::AppSettings::instance()->getPath("plugs/preset_root_path"));
     QDir eng_preset_dir(preset_root_dir.filePath(name()));
     if (!eng_preset_dir.mkpath(".")) {
       qWarning() << tr("Unable to create engine preset directory %1").arg(eng_preset_dir.path());

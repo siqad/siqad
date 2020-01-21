@@ -135,19 +135,12 @@ QSettings *settings::AppSettings::m_defs()
     "python"
   }));
 
-  // TODO rename phys to plug where applicable
-
-  S->setValue("phys/eng_lib_dirs", QStringList({
-    "<APPLOCALDATA>/phys/",
+  S->setValue("plugs/eng_lib_dirs", QStringList({
     "<APPLOCALDATA>/plugins/",
-    "<BINPATH>/phys/",
     "<BINPATH>/plugins/"
   }));
-  //S->setValue("phys/eng_lib_dirs", QString("<APPLOCALDATA>/phys"));
-  //S->setValue("phys/eng_lib_dirs", QString("<BINPATH>/phys/"));
-  S->setValue("phys/eng_usr_cfg_dir", QString("<CONFIG>/phys/")); // TODO delete
-  S->setValue("phys/preset_root_path", QString("<CONFIG>/phys/"));
-  S->setValue("phys/runtime_tmp_root_path", QString("<SYSTMP>/phys/"));
+  S->setValue("plugs/preset_root_path", QString("<CONFIG>/plugins/"));
+  S->setValue("plugs/runtime_tmp_root_path", QString("<SYSTMP>/plugins/"));
 
   S->setValue("float_prc", 6);  // float precision specified in QString::setNum; not always obeyed.
   S->setValue("float_fmt", "g");   // float format specified in QString::setNum; not always obeyed.

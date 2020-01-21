@@ -5,6 +5,10 @@ cmake_minimum_required(VERSION 3.10)
 # Add flag `-DCMAKE_BUILD_TYPE=Release` (without back-ticks) for release builds.
 # Add flag "-DCMAKE_INSTALL_PREFIX=/path/to/target" to define installation location.
 
+# Sets cached variables:
+# ${SIQAD_INSTALL_ROOT}     : SiQAD install prefix root
+# ${SIQAD_PLUGINS_ROOT}     : Default plugin installation root, ${SIQAD_INSTALL_ROOT}/plugins
+
 project(siqad_suite)
 
 
@@ -36,6 +40,8 @@ else()
     set(SIQAD_INSTALL_ROOT "./" CACHE STRING "SiQAD install root directory name")
 endif()
 
+set(SIQAD_PLUGINS_ROOT "${SIQAD_INSTALL_ROOT}/plugins" CACHE STRING "SiQAD plugins root directory name")
+
 
 
 #######################
@@ -63,15 +69,4 @@ add_subdirectory(src)
 #  Officially included plugins  #
 #################################
 
-# Exhaustive GS (implements ground state model of SimAnneal and searches 
-# for the ground state charge configuration exhaustively)
-add_subdirectory(src/phys/exhaustive_gs)
-
-# HoppingDynamics
-add_subdirectory(src/phys/afmmarcus)
-
-# PoisSolver
-add_subdirectory(src/phys/poissolver)
-
-# SimAnneal
-add_subdirectory(src/phys/simanneal)
+add_subdirectory(plugins)

@@ -66,7 +66,7 @@ bool PluginManager::findWorkingPythonPath()
     return false;
   }
 
-  QString test_script = QDir(QCoreApplication::applicationDirPath()).filePath("phys/is_python3.py");
+  QString test_script = QDir(QCoreApplication::applicationDirPath()).filePath("helpers/is_python3.py");
   if (!QFile::exists(test_script)) {
     qDebug() << tr("Python version test script %1 not found").arg(test_script);
     return false;
@@ -157,7 +157,7 @@ void PluginManager::initServiceTypes()
 void PluginManager::initPluginEngines()
 {
   // initialize engines
-  QStringList eng_lib_dir_paths = settings::AppSettings::instance()->getPaths("phys/eng_lib_dirs");
+  QStringList eng_lib_dir_paths = settings::AppSettings::instance()->getPaths("plugs/eng_lib_dirs");
 
   // go through all possible plugin locations
   for (QString eng_lib_dir_path : eng_lib_dir_paths) {

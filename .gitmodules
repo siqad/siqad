@@ -1,15 +1,15 @@
-[submodule "src/phys/afmmarcus"]
-	path = src/phys/afmmarcus
+[submodule "plugins/afm-sim"]
+	path = plugins/afm-sim
 	url = https://github.com/retallickj/afm-sim.git
-[submodule "src/phys/poissolver"]
-	path = src/phys/poissolver
-	url = https://github.com/NathanChiu/PoisSolvers.git
-[submodule "src/phys/simanneal"]
-	path = src/phys/simanneal
-	url = https://github.com/samuelngsh/simanneal-sidb.git
-[submodule "src/phys/qpuanneal"]
-	path = src/phys/qpuanneal
-	url = https://github.com/samuelngsh/qpuanneal-sidb
-[submodule "src/phys/exhaustive_gs"]
-	path = src/phys/exhaustive_gs
-	url = https://github.com/samuelngsh/exhaustive-gs-sidb
+[submodule "plugins/poissolver"]
+	path = plugins/poissolver
+	url = https://github.com/siqad/PoisSolvers.git
+[submodule "plugins/simanneal"]
+	path = plugins/simanneal
+	url = https://github.com/siqad/simanneal-sidb.git
+[submodule "plugins/exhaustive_gs"]
+	path = plugins/exhaustive-gs
+	url = https://github.com/siqad/exhaustive-gs-sidb
+[submodule "libs/siqadconn"]
+	path = libs/siqadconn
+	url = https://github.com/siqad/siqadconn

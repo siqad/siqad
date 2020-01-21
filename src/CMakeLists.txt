@@ -58,5 +58,5 @@ else()
     )
 
     install(TARGETS siqad RUNTIME DESTINATION ${SIQAD_INSTALL_ROOT})
-    install(FILES phys/is_python3.py phys/README.md DESTINATION ${SIQAD_INSTALL_ROOT}/phys)
+    install(FILES helpers/is_python3.py DESTINATION ${SIQAD_INSTALL_ROOT}/helpers)
 endif()

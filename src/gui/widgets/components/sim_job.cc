@@ -426,7 +426,7 @@ QList<QStandardItem*> SimJob::jobInfoStandardItemRow(QList<JobInfoStandardItemFi
 
 QString SimJob::runtimeTempPath()
 {
-  QString phys_tmp_rt_path = settings::AppSettings::instance()->getPath("phys/runtime_tmp_root_path");
+  QString phys_tmp_rt_path = settings::AppSettings::instance()->getPath("plugs/runtime_tmp_root_path");
   if(job_tmp_dir_path.isEmpty()){
     QString sub_dir = name().isEmpty() ? QDateTime::currentDateTime().toString("MM-dd_HHmm") : name();
     job_tmp_dir_path = QDir(phys_tmp_rt_path).filePath(sub_dir);
