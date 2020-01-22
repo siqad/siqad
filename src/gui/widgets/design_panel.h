@@ -372,6 +372,7 @@ namespace gui{
     prim::AFMSeg *ghost_afm_seg=0;
 
     // mouse functionality
+    QPoint prev_db_preview_pos;
     QPoint press_scene_pos;   // mouse position on click (view coord)
     QPoint prev_pan_pos;      // mouse position on last panning update (view coord)
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls

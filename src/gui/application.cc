@@ -270,10 +270,18 @@ void gui::ApplicationGUI::initMenuBar()
   QMenu *help = menuBar()->addMenu(tr("&Help"));
 
   // file menu actions
-  QAction *new_file = new QAction(QIcon::fromTheme("document-new"), tr("&New"), this);
-  QAction *open_save = new QAction(QIcon::fromTheme("document-open"), tr("&Open..."), this);
-  QAction *save = new QAction(QIcon::fromTheme("document-save"), tr("&Save"), this);
-  QAction *save_as = new QAction(QIcon::fromTheme("document-save-as"), tr("Save &As..."), this);
+  QAction *new_file = new QAction(
+      QIcon::fromTheme("document-new", QIcon(":/ico/fb/document-new.svg")), 
+      tr("&New"), this);
+  QAction *open_save = new QAction(
+      QIcon::fromTheme("document-open", QIcon(":/ico/fb/document-open.svg")), 
+      tr("&Open..."), this);
+  QAction *save = new QAction(
+      QIcon::fromTheme("document-save", QIcon(":/ico/fb/document-save.svg")), 
+      tr("&Save"), this);
+  QAction *save_as = new QAction(
+      QIcon::fromTheme("document-save-as", QIcon(":/ico/fb/document-save.svg")), 
+      tr("Save &As..."), this);
   QAction *export_lvm = new QAction(tr("&Export to QSi LV"), this);
   QAction *quit = new QAction(QIcon::fromTheme("application-exit"), tr("&Quit"), this);
   new_file->setShortcut(tr("CTRL+N"));
@@ -296,8 +304,12 @@ void gui::ApplicationGUI::initMenuBar()
   action_sim_visualize->setIcon(QIcon(":/ico/simvisual.svg"));
   action_layer_sel->setIcon(QIcon(":/ico/layer.svg"));
   action_dialog_dock_visibility->setIcon(QIcon(":/ico/term.svg"));
-  QAction *rotate_view_cw = new QAction(QIcon::fromTheme("object-rotate-right"), tr("Rotate 90 deg CW"), this);
-  QAction *rotate_view_ccw = new QAction(QIcon::fromTheme("object-rotate-left"), tr("Rotate 90 deg CCW"), this);
+  QAction *rotate_view_cw = new QAction(
+      QIcon::fromTheme("object-rotate-right", QIcon(":/ico/fb/object-rotate-right.svg")),
+      tr("Rotate 90 deg CW"), this);
+  QAction *rotate_view_ccw = new QAction(
+      QIcon::fromTheme("object-rotate-left", QIcon(":/ico/fb/object-rotate-left.svg")), 
+      tr("Rotate 90 deg CCW"), this);
   view->addAction(action_sim_visualize);
   view->addAction(action_layer_sel);
   view->addAction(action_dialog_dock_visibility);
