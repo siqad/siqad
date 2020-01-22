@@ -30,6 +30,17 @@
     <file>ico/screenshotmode.svg</file>
     <file>ico/scalebaranchortool.svg</file>
 
+    <!--fallback icons-->
+    <file>ico/fb/document-new.svg</file>
+    <file>ico/fb/document-open.svg</file>
+    <file>ico/fb/document-save.svg</file>
+    <file>ico/fb/list-add.svg</file>
+    <file>ico/fb/list-remove.svg</file>
+    <file>ico/fb/arrow-up.svg</file>
+    <file>ico/fb/arrow-down.svg</file>
+    <file>ico/fb/object-rotate-right.svg</file>
+    <file>ico/fb/object-rotate-left.svg</file>
+
     <!--settings dialog form generation-->
     <file>settings/general.xml</file>
     <file>settings/visual.xml</file>

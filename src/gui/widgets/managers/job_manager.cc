@@ -140,7 +140,7 @@ void JobManager::initJobManagerGUI()
   QListWidgetItem *lwi_new_job = new QListWidgetItem("New Job");
   QListWidgetItem *lwi_view_jobs = new QListWidgetItem("View Jobs");
 
-  lwi_new_job->setIcon(QIcon::fromTheme("list-add"));
+  lwi_new_job->setIcon(QIcon::fromTheme("list-add", QIcon(":/ico/fb/list-add.svg")));
   lwi_view_jobs->setIcon(QIcon::fromTheme("document-properties"));
 
   lw_job_action->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
@@ -344,14 +344,18 @@ QWidget *JobManager::initJobSetupPanel()
   // JOB STEP LIST
   QGroupBox *gb_job_steps = new QGroupBox("Job Steps");
   QToolBar *tb_job_steps = new QToolBar();
-  QAction *a_add_job_step = new QAction(QIcon::fromTheme("list-add"),
-                                        "Add job step");
-  QAction *a_remove_job_step = new QAction(QIcon::fromTheme("list-remove"),
-                                           "Remove job step");
-  QAction *a_move_up_job_step = new QAction(QIcon::fromTheme("arrow-up"),
-                                            "Move up");
-  QAction *a_move_down_job_step = new QAction(QIcon::fromTheme("arrow-down"),
-                                              "Move down");
+  QAction *a_add_job_step = new QAction(
+      QIcon::fromTheme("list-add", QIcon(":/ico/fb/list-add.svg")), 
+      "Add job step");
+  QAction *a_remove_job_step = new QAction(
+      QIcon::fromTheme("list-remove", QIcon(":/ico/fb/list-remove.svg")),
+      "Remove job step");
+  QAction *a_move_up_job_step = new QAction(
+      QIcon::fromTheme("arrow-up", QIcon(":/ico/fb/arrow-up.svg")),
+      "Move up");
+  QAction *a_move_down_job_step = new QAction(
+      QIcon::fromTheme("arrow-down", QIcon(":/ico/fb/arrow-down.svg")),
+      "Move down");
   tb_job_steps->addAction(a_add_job_step);
   tb_job_steps->addAction(a_remove_job_step);
   tb_job_steps->addAction(a_move_up_job_step);
