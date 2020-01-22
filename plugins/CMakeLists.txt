@@ -11,8 +11,10 @@ add_subdirectory(exhaustive-gs)
 # HoppingDynamics
 add_subdirectory(afm-sim)
 
-# PoisSolver
-add_subdirectory(poissolver)
+# PoisSolver (currently no Windows support)
+if (NOT WIN32)
+    add_subdirectory(poissolver)
+endif()
 
 # SimAnneal
 add_subdirectory(simanneal)
