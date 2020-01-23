@@ -14,11 +14,9 @@
 # release/debug:    optional, indicate 'release' or 'debug' to build that
 #                   version. This is ignored when building for WIN32, in that 
 #                   case 'release' is always used.
-# --swig:           optional, compile SWIG wrappers for SiQADConnector and 
-#                   install through pip3
 
 # Accepted ENV variables:
-# FOR_OS:           win64 for cross compilation
+# FOR_OS:           win64 or win32 for cross compilation
 # QMAKE_COMMAND:    qmake binary path, mostly intended for cross compilation
 # CMAKE_COMMAND:    cmake binary path, mostly intended for cross compilation
 # APPEND_TO_PATH:   additional paths that should be appended to PATH, intended 
@@ -31,12 +29,12 @@
 
 set -e
 
-swig=false
+#swig=false
 build_type="Debug"
 install_prefix="debug"
 for arg in "$@"; do
     case "$arg" in
-        ("--swig")  swig=true ;;
+        #("--swig")  swig=true ;;
         ("release") build_type="Release"; install_prefix="release" ;;
         ("debug")   build_type="Debug"; install_prefix="debug" ;;
     esac
@@ -49,7 +47,9 @@ multicore_compile="-j $cpu_cores"
 proj_root=$(cd `dirname $0` && pwd)
 
 if [ "$FOR_OS" == "win64" ]; then
-    build_dir="${proj_root}/build-w64"
+    build_dir="${proj_root}/build-x64"
+elif [ "$FOR_OS" == "win32" ]; then
+    build_dir="${proj_root}/build-i686"
 else
     build_dir="${proj_root}/build"
 fi
@@ -60,7 +60,7 @@ fi
 
 if [ ! -z ${APPEND_TO_PATH} ]; then
     export PATH="$PATH:$APPEND_TO_PATH"
-elif [ "$FOR_OS" == "win64" ]; then
+elif [[ "$FOR_OS" == "win64" ]] || [[ "$FOR_OS" == "win32" ]]; then
     MXE_PATH=/opt/mxe/usr/bin
     if [ -d "${MXE_PATH}" ]; then
         export PATH="$PATH:$MXE_PATH"
@@ -74,6 +74,16 @@ if [ "$FOR_OS" == "win64" ]; then
     fi
     if [ -z ${CMAKE_COMMAND} ]; then
         CMAKE_COMMAND=/opt/mxe/usr/bin/x86_64-w64-mingw32.static-cmake
+    fi
+    if [ -z ${CMAKE_FLAGS} ]; then
+        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -DWIN32_QMAKE_BIN=${QMAKE_COMMAND}"
+    fi
+elif [ "$FOR_OS" == "win32" ]; then
+    if [ -z ${QMAKE_COMMAND} ]; then
+        QMAKE_COMMAND=/opt/mxe/usr/bin/i686-w64-mingw32.static-qmake-qt5
+    fi
+    if [ -z ${CMAKE_COMMAND} ]; then
+        CMAKE_COMMAND=/opt/mxe/usr/bin/i686-w64-mingw32.static-cmake
     fi
     if [ -z ${CMAKE_FLAGS} ]; then
         CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -DWIN32_QMAKE_BIN=${QMAKE_COMMAND}"
@@ -94,13 +104,12 @@ echo "CMake directory:"
 echo ${build_dir}
 
 # Make and install SiQADConn via scikit and SWIG
-# TODO will eventually make this a package available on PyPI
-# NOTE Haven't figured out what to do for cross-compilation yet, probably rely on CI services
-if [[ $swig == true ]] && [[ "$FOR_OS" != "win64" ]]; then
-    echo "Building SWIG SiQADConnector at central location..."
-    cd "${proj_root}/libs/siqadconn"
-    ./swig_compile_and_install
-fi
+# NOTE this is now integrated into the normal CMake routine
+#if [[ $swig == true ]] && [[ "$FOR_OS" != "win64" ]]; then
+#    echo "Building SWIG SiQADConnector at central location..."
+#    cd "${proj_root}/libs/siqadconn"
+#    ./swig_compile_and_install
+#fi
 
 # use cmake to create Makefiles for the project
 mkdir -p "${build_dir}"
@@ -110,5 +119,5 @@ ${CMAKE_COMMAND} ${CMAKE_FLAGS} ..
 
 # compile
 echo "Building everything..."
-make $make_flag $multicore_compile
+make $multicore_compile
 make install

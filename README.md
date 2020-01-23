@@ -1,24 +1,27 @@
 # SiQAD
 
-SiQAD (Silicon Quantum Atomic Designer) is a next-generation CAD tool that enables the design and simulation of silicon dangling bond (Si-DB) circuits through an intuitive graphical user interface (GUI) and a modular simulation back-end. The tool currently offers simulators that predict ground-state and dynamic electron configuration of given Si-DB configurations, and electrostatics simulation given electrode layouts. Please read the [arXiv paper](https://arxiv.org/abs/1808.04916) for a detailed introduction to the tool and simulators, and visit the [Walus Lab website](https://waluslab.ece.ubc.ca/siqad/) for information about us and other projects that Walus Lab works on!
+SiQAD (Silicon Quantum Atomic Designer) is a next-generation CAD tool that enables the design and simulation of silicon dangling bond (Si-DB) circuits through an intuitive graphical user interface (GUI) and a modular simulation back-end. The tool currently offers simulators that predict ground-state and dynamic electron configuration of given Si-DB configurations, and electrostatics simulation given electrode layouts. Please read the [SiQAD publication on IEEE Transactions on Nanotechnology](https://ieeexplore.ieee.org/document/8963859) for a detailed introduction to the tool and simulators, and visit the [Walus Lab website](https://waluslab.ece.ubc.ca/siqad/) for information about us and other projects that Walus Lab works on!
 
 
 ## Binary releases
 
-Binary builds for Windows are available [here](https://github.com/retallickj/siqad/releases). [Visual C++ Redistributable for Visual Studio 2015](https://www.microsoft.com/en-ca/download/details.aspx?id=48145) is required to run the Hopping Dynamics simulator on Windows. Note that one of the first-party simulators, PoisSolver, is not available on Windows builds due to the lack Windows support of a dependent module, FEniCS. Future support for the Docker or Windows Subsystem for Linux (WSL) versions of FEniCS [has been planned](https://github.com/retallickj/siqad/issues/33).
+Binary builds for Windows are available in the [Releases](https://github.com/retallickj/siqad/releases) page. Note that one of the first-party simulators, PoisSolver, is not available on Windows builds due to incompatibility of its dependencies. Future support via Docker or Windows Subsystem for Linux [has been planned](https://github.com/retallickj/siqad/issues/33).
 
-For now, Linux and macOS binaries are not distributed and requires the user to build from source.
+For now, Linux and macOS binaries are not distributed and requires compilation from source.
 
 ## Building from source on Linux
 
 ### Prerequisites
 
-This tutorial is based on Ubuntu 17.10, and should also work on Ubuntu 18.04 LTS. Install all dependencies on Ubuntu systems:
+This tutorial is based on Ubuntu 18.04 LTS. Install all dependencies using super user privileges:
+
 ```
 # gui, simanneal and hoppingdynamics dependencies
-sudo apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5charts5 libqt5charts5-dev libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev pkg-config
+apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5charts5 libqt5charts5-dev libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev pkg-config cmake
+# siqadconnector dependencies
+pip3 install --user scikit-build
 # poissolver dependencies
-sudo apt install python3-dolfin gmsh swig
+apt install python3-dolfin gmsh swig
 pip3 install --user pillow networkx matplotlib numpy shapely
 # hoppingdynamics python dependencies
 pip3 install --user matplotlib numpy scipy pyside2
@@ -27,77 +30,110 @@ pip3 install --user matplotlib numpy scipy pyside2
 On non-Debian systems, packages equivalent to the ones listed above will be needed. Feel free to contribute to [this issue](https://github.com/retallickj/siqad/issues/32) with dependencies required on other systems.
 
 
-### Quick Compilation
+### Scripted Compilation
 
-First, clone the repository (including submodules) onto your local machine using the following command:
+To quickly test out the tool without installing SiQAD into your system, you may use the quick compilation script with the following instructions.
+
+Clone the repository (including submodules) onto your local machine:
 
 ```
-git clone --recurse-submodules https://github.com/retallickj/siqad.git
+git clone --recurse-submodules https://github.com/siqad/siqad.git
 ```
 
-Next, run the `make_everything` script from the project root:
+Run the `make_everything_dev` script from the project root:
+
 ```
-chmod +x make_everything
-./make_everything --swig
+chmod +x make_everything_dev
+./make_everything_dev release
 ```
 
-If the `make_everything` script returns errors, please jump to the "Detailed Compilation" section and try again. Otherwise, you should be able to run the binary by running `./build/debug/siqad` from the project root.
+(When debugging, change the `release` argument to `debug`.)
+
+If the `make_everything_dev` script returns errors, please jump to the "CMake Compilation" section and try again. If compilation is successful, you should be able to invoke the binary by running 
+
+```
+./build/release/siqad
+```
+
+from the project root. If you've compiled using the `debug` flag, then the binary is located at `./build/debug/siqad` instead.
 
 We don't have a Linux installation process in place yet as the tool is still under active development, but we welcome ideas and contributions on that regard.
 
 
-### Detailed Compilation
+### CMake Compilation
 
-First, clone the repository (including submodules) onto your local machine using the following command:
-
-```
-git clone --recurse-submodules https://github.com/retallickj/qsi-sim.git
-```
-
-Next, compile SimAnneal:
+Clone the repository (including submodules) onto your local machine:
 
 ```
-cd siqad/src/phys/simanneal
-make
+git clone --recurse-submodules https://github.com/siqad/siqad.git
 ```
 
-Compile SWIG wrappers for AFM-Sim and PoisSolver:
-TODO
+In the project root, create a `build` directory and run `cmake`:
 
-Traverse make to the project root and build:
 ```
-cd ../../..
-qmake
+mkdir build && cd build
+cmake -DCMAKE_INSTALL_PREFIX=./siqad -DCMAKE_BUILD_TYPE=Release ..
+```
+
+Set `-DCMAKE_INSTALL_PREFIX` to your preferred installation path. If it is not set, the default prefix will be set to `/opt/siqad`.
+
+If CMake finishes successfully, compile and install.
+
+```
 make
 make install
 ```
 
-Don't be alarmed by `make install`, this won't install the simulator to your system. All it does is compile the binaries and copy the physics simulation files over to the compiled folders. We don't have a Linux installation process in place yet as the tool is still under active development, but we welcome ideas and contributions on that regard.
+For multi-threaded compilation, add the `-j N` flag to `make` where `N` is the number of cores you want to use. `make install` copies the appropriate files to the path set in `CMAKE_INSTALL_PREFIX` in the `cmake` command of the previous step, and may require super user privileges depending on the prefix that you've chosen.
 
-Finally, run `./build/debug/siqad` from the project root to invoke the GUI. In order to run a hopping animation, create a DB layout, click on the play button on the top bar, choose the "Hopping Animator" engine and run.
+To invoke SiQAD, enter the full path to the binary (e.g. `/opt/siqad/siqad` if `CMAKE_INSTALL_PREFIX` was set to `/opt/siqad`). If you would like to simply invoke SiQAD without having to enter the full path, some of your options include:
+
+1. Add the installation prefix to your `$PATH`;
+
+2. Make a symbolic link from one of directories in `$PATH` to the binary. For example, `ln -s /opt/siqad/siqad "${HOME}/.local/bin/siqad"` if `CMAKE_INSTALL_PREFIX` was set to `/opt/siqad`.
 
 
 
-### Cross-compiling for Windows from a Ubuntu server
+### Cross-compiling for Windows from a Ubuntu host
 
-The cross-compiling guide uses [MXE (M Cross Environment)](http://mxe.cc/) for convenient access to pre-compiled cross-compilation binaries and toolchains. First, add their Debian PPA following the guide on their website: [http://pkg.mxe.cc/](http://pkg.mxe.cc/).
+**Before you continue:** pre-compiled Windows binaries are available in the [Releases](https://github.com/siqad/siqad/releases) page which allows you to use SiQAD without compiling your own.
 
-Install the following packages:
+There are two major parts to this:
+
+1. Compiling the SiQAD GUI and associated C++ simulators (so far, only SimAnneal is C++), which is detailed here.
+2. Compiling the SiQADConnector Python wrapper for Python-based simulation engines. We have not attempted cross-compiling SiQADConnector, and have instead opted for using CI pipelines that offer native Windows compilation support. Please read the [SiQADConnector documentation](https://github.com/siqad/siqadconn/blob/master/README.md) for more information.
+
+If you are more interested in compiling on Windows natively, we have had success in the past through the MinGW-w64 toolchain in MSYS2 as well as a native Visual Studio toolchain. We settled with cross-compilation in the end since all SiQAD developers in Walus Lab develop on Ubuntu.
+
+This cross-compiling guide uses [MXE (M Cross Environment)](http://mxe.cc/) for convenient access to pre-compiled cross-compilation binaries and toolchains. First, either install MXE's pre-compiled binaries from their PPA, or compile MXE from source.
+Note that the pre-compiled MXE binaries on the PPA **do not work** due to [this MXE bug](https://github.com/mxe/mxe/issues/2449) at the time of writing. Please check their bug tracker before attempting to use the pre-compiled MXE binaries.
+
+If you opt for their PPA, the following packages are required for 64-bit cross-compilation:
 ```
-sudo apt install mxe-x86-64-w64-mingw32.static-boost mxe-i686-w64-mingw32.static-boost mxe-x86-64-w64-mingw32.static-qtbase mxe-x86-64-w64-mingw32.static-qtsvg mxe-i686-w64-mingw32.static-qtbase mxe-i686-w64-mingw32.static-qtsvg mxe-x86-64-w64-mingw32.static-qttools mxe-i686-w64-mingw32.static-qttools mxe-x86-64-w64-mingw32.static-qtcharts
+apt install mxe-x86-64-w64-mingw32.static-boost mxe-x86-64-w64-mingw32.static-qtbase mxe-x86-64-w64-mingw32.static-qtsvg mxe-x86-64-w64-mingw32.static-qttools mxe-x86-64-w64-mingw32.static-qtcharts
 ```
+Also install i686 cross-compilation packages by changing `x86-64` to `i686` if you would like to compile 32-bit binaries. 
 
-MXE's Qt does not support compiling in DEBUG mode, so take out the `debug` flag from `CONFIG` and add the `release` flag in `db-sim.pro`:
+If you opt for compiling from source, you are strongly encouraged to read their [official instructions](https://mxe.cc/#tutorial). For reference, the MXE compilation command that we use is:
 ```
-CONFIG += release
+make MXE_TARGETS='x86_64-w64-mingw32.static' MXE_USE_CCACHE= cmake boost qtbase qtsvg qttools qtcharts
 ```
+Use `MXE_TARGETS='x86_64-w64-mingw32.static i686-w64-mingw32.static'` if you do plan on cross-compiling 32-bit binaries. The inclusion of `MXE_USE_CCACHE=` disables the use of ccache due to [an MXE bug](https://github.com/mxe/mxe/issues/2449).
 
-From the root directory of siqad, create a `win64` directory. From that directory, run:
+At SiQAD's project root, edit the `make_everything_dev` script, search for `MXE_PATH=` and change it to where your MXE is compiled or installed. Also read the comments at the top of `make_everything_dev` before running it. When everything is set, run:
 ```
-FOR_OS=win64 ../make_everything -swig
+FOR_OS=win64 ./make_everything_dev
 ```
+Use `FOR_OS=win32` for cross-compiling 32-bit binaries.
 
-The `FOR_OS` flag informs the `make_everything` script which platform to cross-compile for, currently supported options are: `FOR_OS=<win32|win64>`. Leave blank if not cross-compiling.
+At this point, you should find `siqad.exe` in `build-x64/release/` or `build-i686/release/` relative to SiQAD's project root. `simanneal.exe` should also be available in `plugins/simanneal/` relative to the directory where `siqad.exe` is located.
+
+For Python-based simulators, you will need to get [SiQADConnector](https://github.com/siqad/siqadconn/blob/master/README.md) working separately.
+
+Note that when compiling the SiQAD GUI for Windows (refer to `src/CMakeLists.txt`), `qmake` is used rather than relying on CMake's Qt handling. The latter generated very buggy Windows binaries for reasons unknown to us, but seems to not be an isolated issue based on a few StackOverflow posts discussing cross-compiling Qt applications via CMake.
+
+If you don't want to use the `make_everything_dev` script for cross-compilation, read `make_everything_dev` to find the general workflow for compiling it manually.
+
 
 
 ## Licensing

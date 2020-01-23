@@ -20,7 +20,7 @@ else()
     find_package(Qt5UiTools ${QT_VERSION_REQ} REQUIRED)
     find_package(Qt5Charts ${QT_VERSION_REQ} REQUIRED)
 
-    add_definitions( -DAPP_VERSION=\"0.1.0\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\" )
+    add_definitions( -DAPP_VERSION=\"0.2.0\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\" )
 
     set(CMAKE_AUTOMOC ON)
     #set(CMAKE_AUTORCC ON)

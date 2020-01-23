@@ -26,31 +26,28 @@ project(siqad_suite)
 # the build process easier on Windows.
 set(WIN32_FORCE_CMAKE_SIQAD_GUI FALSE)
 
+# Set default install prefix path to /opt/siqad if CMAKE_INSTALL_PREFIX is not set.
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX "/opt/siqad" CACHE PATH "Default SiQAD installation path if none specified" FORCE)
+endif()
+
 # Set default CMAKE_BUILD_TYPE to Release if unspecified.
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the build type.")
 endif()
 
-# Set the root subdirectory at which SiQAD will be installed to. Add a `debug`
-# level by default if making a debug build.
-# Relative paths are parsed to be relative to CMAKE_INSTALL_PREFIX.
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-    set(SIQAD_INSTALL_ROOT "./debug" CACHE STRING "SiQAD install root directory name")
-else()
-    set(SIQAD_INSTALL_ROOT "./" CACHE STRING "SiQAD install root directory name")
-endif()
+# Set the root subdirectory at which SiQAD will be installed to.
+set(SIQAD_INSTALL_ROOT "${CMAKE_INSTALL_PREFIX}" CACHE STRING "SiQAD install root directory name")
 
 set(SIQAD_PLUGINS_ROOT "${SIQAD_INSTALL_ROOT}/plugins" CACHE STRING "SiQAD plugins root directory name")
+set(SIQAD_LIBS_ROOT "${SIQAD_INSTALL_ROOT}/libs" CACHE STRING "SiQAD libraries root directory name")
+set(SIQADCONN_ROOT "${SIQAD_LIBS_ROOT}/siqadtools" CACHE STRING "SiQADConnector root directory name")
 
 
 
 #######################
 #  Compile SiQAD GUI  #
 #######################
-
-if(UNIX AND NOT APPLE)
-    set(LINUX TRUE CACHE STRING "Use the LINUX Boolean to check for LINUX system.")
-endif()
 
 add_subdirectory(src)
 
@@ -60,9 +57,21 @@ add_subdirectory(src)
 #  Build SiQADConnector for Python-based Plugins  #
 ###################################################
 
-# NOTE for now, the compilation and installation of SiQADConnector will not 
-# be included in the main CMakeLists.
+if(NOT WIN32)
+    add_subdirectory(libs/siqadconn)
+endif()
 
+# macro for symlinking to siqadtools if not compiling for Windows
+macro(symlink_siqadtools LINK_BASE)
+    if(DEFINED SIQADCONN_ROOT AND NOT WIN32)
+        install(CODE "execute_process( \
+            COMMAND ${CMAKE_COMMAND} -E create_symlink \
+            ${SIQADCONN_ROOT} \
+            ${LINK_BASE}/siqadtools \
+            )"
+        )
+    endif()
+endmacro()
 
 
 #################################
