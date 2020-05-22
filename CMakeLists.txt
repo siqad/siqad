@@ -79,3 +79,10 @@ endmacro()
 #################################
 
 add_subdirectory(plugins)
+
+
+##############
+#  Licenses  #
+##############
+
+add_subdirectory(licenses)

@@ -36,8 +36,7 @@ namespace gui{
   //! IncludeAreaOfInterest: All items within the indiciated area of interest 
   //!                        (NOTE AoE feature not implemented yet).
   //! IncludeSelectedItems: All items that are currently selected.
-  enum DesignInclusionArea{IncludeEntireDesign, IncludeAreaOfInterest,
-                           IncludeSelectedItems};
+  enum DesignInclusionArea{IncludeEntireDesign, IncludeSelectedItems};
   Q_ENUM_NS(DesignInclusionArea)
 
   // Handy unit functions

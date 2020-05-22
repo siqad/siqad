@@ -74,6 +74,10 @@ namespace gui{
     void setToolScaleBarAnchor();
     void setToolLabel();
 
+    // add or remove actions from sidebar
+    void showActionList(QList<QAction*>);
+    void hideActionList(QList<QAction*>);
+
     // change lattice
     void changeLattice();
 
@@ -111,7 +115,7 @@ namespace gui{
     void fullDesignScreenshot();
 
     //! Take an svg capture of the design window in the given QRect (scene coord).
-    void designScreenshot(const QString &target_img_path, const QRectF &rect, bool always_overwrite);
+    void designScreenshot(const QString &target_img_path, QRectF rect, bool always_overwrite);
 
     //! Pop-up dialog to resolve unsaved changes (save or discard).
     bool resolveUnsavedChanges();
@@ -211,7 +215,10 @@ namespace gui{
     QDockWidget *info_dock;   // bottom panel that shows information about items on screen
 
     // action groups
-    QActionGroup *ag_screenshot=nullptr;          // action group containing screenshot related actions
+    QActionGroup *ag_design=nullptr;              // action group containing design related actions
+
+    // action lists
+    QList<QAction*> al_screenshot;                // action list containing screenshot actions
 
     // action pointers
     QAction *action_select_tool=nullptr;          // change cursor tool to select
@@ -226,6 +233,7 @@ namespace gui{
     QAction *action_run_ground_state=nullptr;     // run the current simulation method
     QAction *action_sim_visualize=nullptr;        // show the sim visualize dock which allows simulation visualization
     QAction *action_layer_sel=nullptr;
+    QAction *action_item_manager=nullptr;
     QAction *action_circuit_lib=nullptr;
     QAction *action_dialog_dock_visibility=nullptr;
     QAction *action_screenshot_mode=nullptr;      // toggle screenshot mode

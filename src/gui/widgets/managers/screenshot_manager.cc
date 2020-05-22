@@ -32,8 +32,8 @@ ScreenshotManager::~ScreenshotManager()
 void ScreenshotManager::prepareScreenshotMode(bool entering)
 {
   setVisible(entering);
-  setClipVisibility(entering);
-  setScaleBarVisibility(entering);
+  setClipVisibility(cb_preview_clip->isChecked() && entering);
+  setScaleBarVisibility(cb_scale_bar->isChecked() && entering);
 }
 
 void ScreenshotManager::setClipArea(QRectF area)
@@ -48,11 +48,13 @@ void ScreenshotManager::setClipArea(QRectF area)
   }
 }
 
-void ScreenshotManager::setClipVisibility(const bool &visible)
+void ScreenshotManager::setClipVisibility(const bool &visible, const bool &cb_update)
 {
   if (visible && !clip_area->scene())
     emit sig_addVisualAidToDP(clip_area);
   clip_area->setVisible(visible);
+  if (cb_update)
+    cb_preview_clip->setChecked(visible);
 }
 
 void ScreenshotManager::setScaleBar(float t_length, Unit::DistanceUnit unit)
@@ -68,11 +70,14 @@ void ScreenshotManager::setScaleBar(float t_length, Unit::DistanceUnit unit)
   }
 }
 
-void ScreenshotManager::setScaleBarVisibility(const bool &visible)
+void ScreenshotManager::setScaleBarVisibility(const bool &visible, const bool &cb_update)
 {
   if (visible && !scale_bar->scene())
     emit sig_addVisualAidToDP(scale_bar);
   scale_bar->setVisible(visible);
+
+  if (cb_update)
+    cb_scale_bar->setChecked(visible);
 }
 
 
@@ -90,7 +95,7 @@ void ScreenshotManager::initScreenshotManager()
   // TODO implement style change
   //cb_sim_result_style = new QCheckBox(tr("Simulation Result Style"));
   //cb_publish_style = new QCheckBox(tr("Publish Style"));
-  QCheckBox *cb_scale_bar = new QCheckBox(tr("Show Scale Bar"));
+  cb_scale_bar = new QCheckBox(tr("Show Scale Bar"));
   QLabel *label_scale_bar_length = new QLabel(tr("Length"));
   QLineEdit *le_scale_bar_length = new QLineEdit("1");
   QComboBox *cbb_scale_bar_unit = new QComboBox();
@@ -124,8 +129,7 @@ void ScreenshotManager::initScreenshotManager()
     updateScaleBarFromOptions();
   };
   connect(cb_scale_bar, &QCheckBox::stateChanged, enableScaleBarOptions);
-  enableScaleBarOptions(cb_scale_bar->checkState());
-
+  enableScaleBarOptions(cb_scale_bar->isChecked());
 
   // set scale bar anchor
   connect(button_set_scale_bar_anchor, &QAbstractButton::clicked,
@@ -149,23 +153,25 @@ void ScreenshotManager::initScreenshotManager()
   QGroupBox *group_clip = new QGroupBox(tr("Clipping"));
   QPushButton *button_set_clip = new QPushButton(tr("Set Clip Area"));
   QPushButton *button_reset_clip = new QPushButton(tr("Reset"));
-  QCheckBox *cb_preview_clip = new QCheckBox(tr("Preview Clip Area"));
+  cb_preview_clip = new QCheckBox(tr("Preview Clip Area"));
 
   connect(button_set_clip, &QAbstractButton::clicked,
-          [this, cb_preview_clip]() {
+          [this]() {
             cb_preview_clip->setChecked(true);
             emit sig_clipSelectionTool();
           }
   );
   connect(button_reset_clip, &QAbstractButton::clicked,
-          [this, cb_preview_clip]() {
+          [this]() {
             cb_preview_clip->setChecked(false);
             setClipArea();
           }
   );
   connect(cb_preview_clip, &QCheckBox::stateChanged,
-          this, &gui::ScreenshotManager::setClipVisibility);
-  setClipVisibility(cb_preview_clip->isChecked());  // init to check state
+          [this](bool state) {
+            setClipVisibility(state, false);
+          });
+  setClipVisibility(cb_preview_clip->isChecked(), false);  // init to check state
 
   QFormLayout *fl_clip = new QFormLayout();
   fl_clip->addRow(button_set_clip, button_reset_clip);
@@ -206,7 +212,7 @@ void ScreenshotManager::initScreenshotManager()
     cb_overwrite->setDisabled(disable);
   };
   connect(cb_always_ask_name, &QCheckBox::stateChanged, disableFilePathOptions);
-  disableFilePathOptions(cb_always_ask_name->checkState());
+  disableFilePathOptions(cb_always_ask_name->isChecked());
 
   // emit screenshot signal with relevant settings
   connect(button_take_screenshot, &QAbstractButton::clicked,

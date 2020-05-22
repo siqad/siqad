@@ -184,7 +184,7 @@ QSettings* settings::GUISettings::m_defs()
 
   // QGraphicsView
   S->setValue("view/scale_fact", 100);            // pixels/angstrom in the main view (this is the default value)
-  S->setValue("view/scale_fact_nm", 1000);        // pixels/nm in the main view
+  S->setValue("view/screenshot_px_per_ang", 10);  // pixels/angstrom when taking a screenshot
   S->setValue("view/bg_col", QColor(40,50,60));   // background color
   S->setValue("view/bg_col_pb", QColor(255,255,255)); // background color
   S->setValue("view/zoom_factor", 0.1);           // scaling factor for zoom operations

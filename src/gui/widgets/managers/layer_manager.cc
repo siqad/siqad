@@ -349,6 +349,8 @@ void LayerManager::initSideWidget()
     pb_atv->setCheckable(true);
     pb_atv->setChecked(layer->isActive());
 
+    pb_atv->setHidden(true); // not implemented yet so hide it
+
     if (layer->contentType() == prim::Layer::Lattice) {
       connect(pb_vsb, &QAbstractButton::toggled,
               static_cast<prim::Lattice*>(layer), &prim::Lattice::setVisible);

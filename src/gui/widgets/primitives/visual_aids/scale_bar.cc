@@ -47,7 +47,8 @@ void ScaleBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
   // TODO for now the scale text is not added. When added update this function.
   painter->setPen(QPen(bar_col, bar_thickness));
   painter->setBrush(Qt::NoBrush);
-  painter->drawLine(QLineF(QPointF(0,0), QPointF(bar_length_px,0)));
+  painter->drawLine(QLineF(QPointF(.5*bar_thickness,0), 
+                    QPointF(bar_length_px-.5*bar_thickness,0)));
 
   QString scale_label = QString::number(bar_length) + " " 
     + gui::Unit::distanceUnitString(bar_unit);
@@ -60,7 +61,7 @@ void ScaleBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
 
 QRectF ScaleBar::boundingRect() const
 {
-  return QRectF(0,-.5*bar_thickness,bar_length_px,bar_thickness + 2 * text_height);
+  return QRectF(0, -.5*bar_thickness, bar_length_px, bar_thickness + 2 * text_height);
 }
 
 

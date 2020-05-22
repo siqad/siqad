@@ -258,7 +258,6 @@ void prim::Electrode::mousePressEvent(QGraphicsSceneMouseEvent *e)
       //qDebug() << "Right clicked!";
       break;
     case Qt::LeftButton:
-      qDebug() << "Left clicked!";
       ResizeRotateRect::mousePressEvent(e);
       break;
     default:
@@ -284,7 +283,6 @@ void prim::Electrode::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
       //qDebug() << "Right clicked!";
       break;
     case Qt::LeftButton:
-      qDebug() << "Left clicked!";
       ResizeRotateRect::mouseReleaseEvent(e);
       break;
     default:

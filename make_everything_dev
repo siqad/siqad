@@ -76,7 +76,7 @@ if [ "$FOR_OS" == "win64" ]; then
         CMAKE_COMMAND=/opt/mxe/usr/bin/x86_64-w64-mingw32.static-cmake
     fi
     if [ -z ${CMAKE_FLAGS} ]; then
-        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -DWIN32_QMAKE_BIN=${QMAKE_COMMAND}"
+        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -DWIN32_QMAKE_BIN=${QMAKE_COMMAND} -DWIN32_MAKE_BIN=make"
     fi
 elif [ "$FOR_OS" == "win32" ]; then
     if [ -z ${QMAKE_COMMAND} ]; then
@@ -86,7 +86,7 @@ elif [ "$FOR_OS" == "win32" ]; then
         CMAKE_COMMAND=/opt/mxe/usr/bin/i686-w64-mingw32.static-cmake
     fi
     if [ -z ${CMAKE_FLAGS} ]; then
-        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -DWIN32_QMAKE_BIN=${QMAKE_COMMAND}"
+        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -DWIN32_QMAKE_BIN=${QMAKE_COMMAND} -DWIN32_MAKE_BIN=make"
     fi
 else
     if [ -z ${CMAKE_COMMAND} ]; then

@@ -134,7 +134,7 @@ namespace gui{
     bool stateChanged() const {return !undo_stack->isClean();}
 
     //! take a screenshot of the design at the specified QRect in scene coord
-    void screenshot(QPainter *painter, const QRect &region=QRect());
+    void screenshot(QPainter *painter, const QRectF &region=QRectF(), const QRectF &outrect=QRectF());
 
     //! Return the current display mode.
     DisplayMode displayMode() {return display_mode;}
@@ -376,9 +376,6 @@ namespace gui{
     QPoint press_scene_pos;   // mouse position on click (view coord)
     QPoint prev_pan_pos;      // mouse position on last panning update (view coord)
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
-
-    // screenshot
-    QRect prev_screenshot_area; // store the previous screenshot area for reuse
 
     // sim visualization
     QList<prim::DBDot*> db_dots_result;

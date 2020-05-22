@@ -101,10 +101,10 @@ namespace prim{
     void setProperty(const QString &key, QVariant var) {local_props[key]=var;}
 
     //! Change the color of the item. initially does nothing
-    virtual void setColor(QColor color __attribute__((unused))) {}
+    virtual void setColor(QColor) {}
 
     //! Change the rotation of the item. initially does nothing
-    virtual void setRotation(qreal angle_in __attribute__((unused))) {}
+    virtual void setRotation(qreal) {}
 
     //Reutrns the current fill color, initially does nothing.
     virtual QColor getCurrentFillColor(){return QColor();}

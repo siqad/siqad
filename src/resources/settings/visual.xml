@@ -33,4 +33,14 @@
             <key>view/zoom_max</key>
         </meta>
     </zoom_max>
+    <screenshot_px_per_ang>
+        <T>float</T>
+        <val></val>
+        <label>Screenshot pixels per angs</label>
+        <tip>Pixels per angstrom when taking an svg screenshot (requires restart).</tip>
+        <meta>
+            <category>GUI</category>
+            <key>view/screenshot_px_per_ang</key>
+        </meta>
+    </screenshot_px_per_ang>
 </properties>

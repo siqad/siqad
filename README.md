@@ -5,7 +5,7 @@ SiQAD (Silicon Quantum Atomic Designer) is a next-generation CAD tool that enabl
 
 ## Binary releases
 
-Binary builds for Windows are available in the [Releases](https://github.com/retallickj/siqad/releases) page. Note that one of the first-party simulators, PoisSolver, is not available on Windows builds due to incompatibility of its dependencies. Future support via Docker or Windows Subsystem for Linux [has been planned](https://github.com/retallickj/siqad/issues/33).
+Binary builds for Windows are available in the [Releases](https://github.com/retallickj/siqad/releases) page. Note that one of the first-party simulators, PoisSolver, is not available on Windows builds due to incompatibility of its dependencies. Future support via Docker or Windows Subsystem for Linux [has been planned](https://github.com/retallickj/siqad/issues/33). You also have the option of using a virtual machine (Ubuntu 18.04 LTS recommended) or [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) if you're on Windows 10, in which case you will need to compile from source.
 
 For now, Linux and macOS binaries are not distributed and requires compilation from source.
 
@@ -16,8 +16,8 @@ For now, Linux and macOS binaries are not distributed and requires compilation f
 This tutorial is based on Ubuntu 18.04 LTS. Install all dependencies using super user privileges:
 
 ```
-# gui, simanneal and hoppingdynamics dependencies
-apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5charts5 libqt5charts5-dev libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev pkg-config cmake
+# general dependencies
+apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5charts5 libqt5charts5-dev libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-random-dev pkg-config cmake
 # siqadconnector dependencies
 pip3 install --user scikit-build
 # poissolver dependencies
@@ -26,6 +26,13 @@ pip3 install --user pillow networkx matplotlib numpy shapely
 # hoppingdynamics python dependencies
 pip3 install --user matplotlib numpy scipy pyside2
 ```
+
+---
+**NOTE for Ubuntu 20.04 LTS**
+
+PoisSolver is incompatible due to changes in dependent packages that require further adaptation.
+
+---
 
 On non-Debian systems, packages equivalent to the ones listed above will be needed. Feel free to contribute to [this issue](https://github.com/retallickj/siqad/issues/32) with dependencies required on other systems.
 
@@ -95,6 +102,12 @@ To invoke SiQAD, enter the full path to the binary (e.g. `/opt/siqad/siqad` if `
 
 
 ### Cross-compiling for Windows from a Ubuntu host
+
+---
+
+Due to recent problems with the MXE PPA, we have moved the compilation of our Windows builds over to Visual Studio 2017 on AppVeyor. The cross-compilation guide is kept for reference, but may require changes to the `WIN32` section of [SiQAD GUI's CMake file](src/CMakeLists.txt) for cross-compilation to work.
+
+---
 
 **Before you continue:** pre-compiled Windows binaries are available in the [Releases](https://github.com/siqad/siqad/releases) page which allows you to use SiQAD without compiling your own.
 

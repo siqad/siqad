@@ -172,6 +172,9 @@ SimVisualizer::SimVisualizer(DesignPanel *design_pan, QWidget *parent)
   vl_main->addWidget(gb_pot_landscape);
   vl_main->addStretch();
 
+  // disable GUI by default as no result is shown at launch
+  setEnabled(false);
+
   setLayout(vl_main);
 }
 

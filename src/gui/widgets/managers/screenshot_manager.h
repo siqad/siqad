@@ -43,8 +43,11 @@ namespace gui{
       //! clipping is disabled.
       void setClipArea(QRectF area=QRectF());
 
+      //! Return the clip visibility.
+      bool clipVisible() {return clip_area->isVisible();}
+
       //! Set the visibility of the clip area preview.
-      void setClipVisibility(const bool &visible);
+      void setClipVisibility(const bool &visible, const bool &cb_update=true);
 
       //! Set the scale bar length, or hide it if the length is less than 0.
       void setScaleBar(float t_length, Unit::DistanceUnit unit);
@@ -53,7 +56,7 @@ namespace gui{
       void setScaleBarAnchor(QPointF anchor) {scale_bar->setScenePos(anchor);}
 
       //! Set the visibility of the scale bar.
-      void setScaleBarVisibility(const bool &visible);
+      void setScaleBarVisibility(const bool &visible, const bool &cb_update=true);
 
 
 
@@ -103,6 +106,8 @@ namespace gui{
       QCheckBox *cb_sim_result_style=nullptr;       //! Toggle simulation result style.
       QCheckBox *cb_publish_style=nullptr;          //! Toggle publish style.
       QCheckBox *cb_overwrite=nullptr;              //! Overwrite file without asking.
+      QCheckBox *cb_scale_bar=nullptr;              //! Checkbox for showing scale bar
+      QCheckBox *cb_preview_clip=nullptr;           //! Checkbox for showing preview clip
       // TODO pointer to scale bar item
   };
 

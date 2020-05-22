@@ -1,0 +1,71 @@
+#!/bin/bash
+
+# Create a portable Windows archive for SiQAD
+
+# Expected directories:
+# siqad_x64     <-- contains compiled SiQAD x64 binaries in CMake directory structure (after make install)
+# siqad_x86     <-- ditto but x86
+# sqconn_whls   <-- contains all compiled siqadtool wheels, each wheel is named siqadtools-N.M.P-cpXY-cpXY-{win32,win_amd64}.whl where N.M.P is the SiQAD version number and XY is the Python version X.Y (e.g. 38 for Python 3.8)
+
+# Output files:
+# siqad_x64.zip
+# siqad_x86.zip
+
+# Tmp directories (cleared before and after operation):
+# .tmp/siqad_x64
+# .tmp/siqad_x86
+# .tmp/wheel_extract
+# .tmp/siqadtools
+
+set -e
+
+# directories containing SiQAD builds
+siqad_dirs=(siqad_x64 siqad_x86)
+
+# plugins directories that need siqadtool to be copied into (relative to directory containing siqad binary)
+sqtool_target_dirs=(plugins/afmmarcus)
+
+# script run directory
+rt=$(pwd)
+
+# extract useful files from wheels
+cd "${rt}/sqconn_whls"
+whls=(*)
+tmp_wheel_dir=${rt}/.tmp/wheel_extract
+tmp_siqadtools_dir=${rt}/.tmp/siqadtools
+mkdir -p "${tmp_siqadtools_dir}"
+for whl in ${whls[*]}; do
+    # pre clean up
+    rm -rf "${tmp_wheel_dir}"
+    mkdir -p "${tmp_wheel_dir}"
+    # get wheel version in format cpXY-{win32,win_amd64}
+    whl_ver=$(echo $whl | sed 's/siqadtools-.*-\(cp.*\).whl/\1/')
+    # extract and copy to tmp siqadtools location
+    unzip -q "${whl}" -d "${tmp_wheel_dir}"
+    cp "${tmp_wheel_dir}/siqadtools/"{__init__,siqadconn}.py "${tmp_siqadtools_dir}/"
+    cp "${tmp_wheel_dir}/siqadtools/_siqadconn.pyd" "${tmp_siqadtools_dir}/_siqadconn.${whl_ver}.pyd"
+    # after clean up
+    rm -rf "${tmp_wheel_dir}"
+done
+
+for siqad_dir in ${siqad_dirs[*]}; do
+    cd "${rt}"
+    # prepare tmp dir
+    tmp_siqad_dir=${rt}/.tmp/${siqad_dir}
+    rm -rf "${tmp_siqad_dir}"
+    cp -r "${siqad_dir}" "${tmp_siqad_dir}"
+
+    # copy siqadtool to plugins that need it
+    for plugin_dir in ${sqtool_target_dirs[*]}; do
+        cp -r "${tmp_siqadtools_dir}" "${tmp_siqad_dir}/${plugin_dir}/"
+    done
+
+    # zip tmp dir content and clean up
+    cd "${tmp_siqad_dir}"/..
+    zip -r "${siqad_dir}.zip" "${siqad_dir}"
+    cd "${rt}" && mv "${tmp_siqad_dir}/../${siqad_dir}.zip" .
+    rm -rf "${tmp_siqad_dir}"
+done
+
+# clean up
+rm -rf "${tmp_siqadtools_dir}"

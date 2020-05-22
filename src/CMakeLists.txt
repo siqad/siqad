@@ -2,15 +2,21 @@ cmake_minimum_required(VERSION 3.10)
 
 # for release builds, add flag "-DCMAKE_BUILD_TYPE=Release" (without quotes) when running cmake.
 
-project(siqad VERSION 0.2.0)
+project(siqad VERSION 0.2.1)
 # TODO add way to push version number into source code
 
 if (WIN32)
+    # these paths are chosen for Visual Studio compilation on AppVeyor
+    # local compilation or cross-compilation may require changes, especially to paths within qmake_compile.sh and SIQAD_EXE_TARGET
+    set(CMPL_QMAKE_COMMAND ${WIN32_QMAKE_BIN})
+    set(CMPL_MAKE_COMMAND ${WIN32_MAKE_BIN})
+    set(SIQAD_Q_PRO_FILE ${CMAKE_CURRENT_SOURCE_DIR}/siqad.pro)
+    set(SIQAD_EXE_TARGET ${CMAKE_CURRENT_BINARY_DIR}/siqad.exe)
     add_custom_target(
         siqad ALL
-        COMMAND CMPL_QMAKE_COMMAND=${WIN32_QMAKE_BIN} CMPL_MAKE_COMMAND=make SIQAD_Q_PRO_FILE=${CMAKE_CURRENT_SOURCE_DIR}/siqad.pro ${CMAKE_CURRENT_SOURCE_DIR}/qmake_compile.sh 
+        COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/qmake_compile.sh "${CMPL_QMAKE_COMMAND}" "${CMPL_MAKE_COMMAND}" "${SIQAD_Q_PRO_FILE}" "${SIQAD_EXE_TARGET}"
     )
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/siqad.exe DESTINATION ${SIQAD_INSTALL_ROOT})
+    install(FILES ${SIQAD_EXE_TARGET} DESTINATION ${SIQAD_INSTALL_ROOT})
 else()
     find_package(Qt5Core ${QT_VERSION_REQ} REQUIRED)
     find_package(Qt5Gui ${QT_VERSION_REQ} REQUIRED)
@@ -20,7 +26,7 @@ else()
     find_package(Qt5UiTools ${QT_VERSION_REQ} REQUIRED)
     find_package(Qt5Charts ${QT_VERSION_REQ} REQUIRED)
 
-    add_definitions( -DAPP_VERSION=\"0.2.0\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\" )
+    add_definitions( -DAPP_VERSION=\"0.2.1\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\" )
 
     set(CMAKE_AUTOMOC ON)
     #set(CMAKE_AUTORCC ON)

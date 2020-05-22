@@ -1,0 +1,83 @@
+version: '0.2.{build}'
+
+#image: Visual Studio 2015
+image: Visual Studio 2017
+
+configuration:
+  - Release
+
+environment:
+  BOOST_ROOT: C:\Libraries\boost_1_69_0
+  BOOST_LIBRARYDIR: C:\Libraries\boost_1_69_0\lib32-msvc-14.1
+
+  matrix:
+    - PYTHON: "C:\\Python35"
+      DIST_N: sqconn_cp35-win32
+    - PYTHON: "C:\\Python36"
+      DIST_N: sqconn_cp36-win32
+    - PYTHON: "C:\\Python37"
+      DIST_N: sqconn_cp37-win32
+    - PYTHON: "C:\\Python38"
+      DIST_N: sqconn_cp38-win32
+    - PYTHON: "C:\\Python35-x64"
+      DIST_N: sqconn_cp35-win_amd64
+    - PYTHON: "C:\\Python36-x64"
+      DIST_N: sqconn_cp36-win_amd64
+    - PYTHON: "C:\\Python37-x64"
+      DIST_N: sqconn_cp37-win_amd64
+    - PYTHON: "C:\\Python38-x64"
+      DIST_N: sqconn_cp38-win_amd64
+    - QTDIR: "C:\\Qt\\5.12.6\\msvc2017_64"
+      platform: x86
+    - QTDIR: "C:\\Qt\\5.12.6\\msvc2017_64"
+      platform: x64
+
+install:
+  - git submodule update --init --recursive
+    #- set QTDIR=C:\Qt\5.12.6\msvc2017_64
+    #- set BOOST_ROOT=C:\Libraries\boost_1_69_0
+
+#cache:
+#  - C:\ProgramData\chocolatey\bin -> appveyor.yml
+#  - C:\ProgramData\chocolatey\lib -> appveyor.yml
+
+for:
+  -
+    matrix:
+      except:
+        - QTDIR: "C:\\Qt\\5.12.6\\msvc2017_64"
+
+    before_build:
+      - choco install swig ninja
+      - "%PYTHON%\\python.exe -m pip install scikit-build"
+
+    build_script:
+      - cd %APPVEYOR_BUILD_FOLDER%/libs/siqadconn
+      - "%PYTHON%\\python.exe setup.py test"
+        
+    after_build:
+      - cd %APPVEYOR_BUILD_FOLDER%/libs/siqadconn
+      - "%PYTHON%\\python.exe setup.py bdist_wheel"
+      - mv dist %DIST_N%
+
+    artifacts:
+      - path: libs\siqadconn\%DIST_N%
+  -
+    matrix:
+      only:
+        - QTDIR: "C:\\Qt\\5.12.6\\msvc2017_64"
+
+    before_build:
+      - set WIN32_QMAKE_BIN=%QTDIR%\bin\qmake.exe
+      - set WIN32_MAKE_BIN=nmake
+
+    build_script:
+      - cd %APPVEYOR_BUILD_FOLDER%
+      - mkdir build && cd build
+      - cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -G "Visual Studio 15 2017" -A x64 -DWIN32_QMAKE_BIN="%WIN32_QMAKE_BIN%" -DWIN32_MAKE_BIN="%WIN32_MAKE_BIN%"
+      - cmake --build . --config Release --target install
+      - mv release siqad_%PLATFORM%
+      #- cd %APPVEYOR_BUILD_FOLDER% && dir /s /b /o:gn
+
+    artifacts:
+      - path: build\siqad_%PLATFORM%

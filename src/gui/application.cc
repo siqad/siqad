@@ -214,7 +214,7 @@ void gui::ApplicationGUI::initGUI()
   connect(design_pan, &gui::DesignPanel::sig_undoStackCleanChanged,
           this, &gui::ApplicationGUI::updateWindowTitle);
   connect(design_pan, &gui::DesignPanel::sig_screenshot,
-          this, QOverload<const QString&, const QRectF&, bool>::of(&gui::ApplicationGUI::designScreenshot));
+          this, QOverload<const QString&, QRectF, bool>::of(&gui::ApplicationGUI::designScreenshot));
   //connect(design_pan, &gui::DesignPanel::sig_showSimulationSetup,
   //        [this](){sim_manager->showSimSetupDialog();});
   connect(design_pan, &gui::DesignPanel::sig_cancelScreenshot,
@@ -264,8 +264,7 @@ void gui::ApplicationGUI::initMenuBar()
   // initialise menus
   QMenu *file = menuBar()->addMenu(tr("&File"));
   QMenu *view = menuBar()->addMenu(tr("&View"));
-  QMenu *edit = menuBar()->addMenu(tr("&Edit"));
-  // menuBar()->addMenu(tr("&Edit"));
+  //QMenu *edit = menuBar()->addMenu(tr("&Edit"));
   QMenu *tools = menuBar()->addMenu(tr("&Tools"));
   QMenu *help = menuBar()->addMenu(tr("&Help"));
 
@@ -300,6 +299,7 @@ void gui::ApplicationGUI::initMenuBar()
   // view menu actions
   action_sim_visualize = sim_visualize_dock->toggleViewAction();
   action_layer_sel = layer_dock->toggleViewAction();
+  action_item_manager = item_dock->toggleViewAction();
   action_dialog_dock_visibility = dialog_dock->toggleViewAction();
   action_sim_visualize->setIcon(QIcon(":/ico/simvisual.svg"));
   action_layer_sel->setIcon(QIcon(":/ico/layer.svg"));
@@ -312,26 +312,31 @@ void gui::ApplicationGUI::initMenuBar()
       tr("Rotate 90 deg CCW"), this);
   view->addAction(action_sim_visualize);
   view->addAction(action_layer_sel);
+  view->addAction(action_item_manager);
   view->addAction(action_dialog_dock_visibility);
   view->addSeparator();
   view->addAction(rotate_view_cw);
   view->addAction(rotate_view_ccw);
 
   //edit menu actions
-  QAction *action_color = new QAction(tr("Color..."), this);
-  edit->addAction(action_color);
+  //QAction *action_color = new QAction(tr("Color..."), this);
+  //edit->addAction(action_color);
 
   // tools menu actions
   QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
   QAction *select_color = new QAction(tr("Select Color..."), this);
   QAction *window_screenshot = new QAction(tr("Window Screenshot..."), this);
+  action_screenshot_mode = new QAction(QIcon(":/ico/screenshotmode.svg"), tr("Screenshot Mode"));
   QAction *action_settings_dialog = new QAction(tr("Settings"), this);
+
+  action_screenshot_mode->setCheckable(true);
 
   // TODO add lattice button back in the future when updated support is implemented
   //tools->addAction(change_lattice);
   // tools->addAction(select_color);
   //tools->addSeparator();
   tools->addAction(window_screenshot);
+  tools->addAction(action_screenshot_mode);
   tools->addSeparator();
   tools->addAction(action_settings_dialog);
 
@@ -358,9 +363,11 @@ void gui::ApplicationGUI::initMenuBar()
   connect(rotate_view_cw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCw);
   connect(rotate_view_ccw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCcw);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
-  connect(action_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
+  //connect(action_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(window_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
+  connect(action_screenshot_mode, &QAction::triggered,
+          this, &gui::ApplicationGUI::toggleScreenshotMode);
   connect(action_settings_dialog, &QAction::triggered,
       [this](){settings_dialog->show();});
   connect(about_version, &QAction::triggered, this, &gui::ApplicationGUI::aboutVersion);
@@ -400,10 +407,6 @@ void gui::ApplicationGUI::initTopBar()
 	  this, &gui::ApplicationGUI::repeatSimulation);
   addAction(action_repeat_sim);
 
-  // screenshot mode
-  action_screenshot_mode = new QAction(QIcon(":/ico/screenshotmode.svg"), tr("Screenshot Mode"));
-  connect(action_screenshot_mode, &QAction::triggered,
-          this, &gui::ApplicationGUI::toggleScreenshotMode);
 
   // add them to top bar
   top_bar->addAction(action_run_sim);
@@ -443,8 +446,7 @@ void gui::ApplicationGUI::initSideBar()
   side_bar->setIconSize(QSize(ico_scale, ico_scale));
 
   // actions
-  QActionGroup *action_group = new QActionGroup(side_bar);
-  ag_screenshot = new QActionGroup(side_bar);
+  QActionGroup *ag_design = new QActionGroup(side_bar);
 
   action_select_tool = side_bar->addAction(QIcon(":/ico/select.svg"),
       tr("Select tool"));
@@ -467,19 +469,21 @@ void gui::ApplicationGUI::initSideBar()
   action_scale_bar_anchor_tool = side_bar->addAction(QIcon(":/ico/scalebaranchortool.svg"),
       tr("Scale bar anchor tool"));
 
-  action_group->addAction(action_select_tool);
-  action_group->addAction(action_drag_tool);
-  action_group->addAction(action_dbgen_tool);
-  action_group->addAction(action_electrode_tool);
+  ag_design->addAction(action_select_tool);
+  ag_design->addAction(action_drag_tool);
+  ag_design->addAction(action_dbgen_tool);
+  ag_design->addAction(action_electrode_tool);
   /*
-  action_group->addAction(action_afmarea_tool);
-  action_group->addAction(action_afmpath_tool);
-  action_group->addAction(action_label_tool);
+  ag_design->addAction(action_afmarea_tool);
+  ag_design->addAction(action_afmpath_tool);
+  ag_design->addAction(action_label_tool);
   */
-  ag_screenshot->addAction(action_screenshot_area_tool);
-  ag_screenshot->addAction(action_scale_bar_anchor_tool);
+  ag_design->addAction(action_screenshot_area_tool);
+  ag_design->addAction(action_scale_bar_anchor_tool);
 
-  ag_screenshot->setVisible(false); // hide screenshot action group by default
+  al_screenshot.append(action_screenshot_area_tool);
+  al_screenshot.append(action_scale_bar_anchor_tool);
+  hideActionList(al_screenshot);
 
   action_select_tool->setCheckable(true);
   action_drag_tool->setCheckable(true);
@@ -881,6 +885,22 @@ void gui::ApplicationGUI::setToolLabel()
   design_pan->setTool(gui::ToolType::LabelTool);
 }
 
+
+void gui::ApplicationGUI::showActionList(QList<QAction*> al)
+{
+  for (QAction *ac : al) {
+    ac->setVisible(true);
+  }
+}
+
+void gui::ApplicationGUI::hideActionList(QList<QAction*> al)
+{
+  for (QAction *ac : al) {
+    ac->setVisible(false);
+  }
+}
+
+
 void gui::ApplicationGUI::changeLattice()
 {
   settings::AppSettings *app_settings = settings::AppSettings::instance();
@@ -1003,16 +1023,17 @@ void gui::ApplicationGUI::selectColor()
 
 void gui::ApplicationGUI::beginScreenshotMode()
 {
+  action_screenshot_mode->setChecked(true);
   display_mode_cache = design_pan->displayMode();
   design_pan->setDisplayMode(ScreenshotMode);
-  ag_screenshot->setVisible(true);
-  //setTool(ScreenshotAreaTool);
+  showActionList(al_screenshot);
 }
 
 void gui::ApplicationGUI::endScreenshotMode()
 {
+  action_screenshot_mode->setChecked(false);
   design_pan->setDisplayMode(display_mode_cache);
-  ag_screenshot->setVisible(false);
+  hideActionList(al_screenshot);
   setTool(SelectTool);
 }
 
@@ -1079,10 +1100,12 @@ void gui::ApplicationGUI::fullDesignScreenshot()
 }
 
 
-void gui::ApplicationGUI::designScreenshot(const QString &target_img_path, const QRectF &rect, bool always_overwrite)
+void gui::ApplicationGUI::designScreenshot(const QString &target_img_path, QRectF rect, bool always_overwrite)
 {
   qDebug() << tr("taking screenshot for rect (%1, %2) (%3, %4)")
       .arg(rect.left()).arg(rect.top()).arg(rect.right()).arg(rect.bottom());
+
+  settings::GUISettings *S = settings::GUISettings::instance();
 
   // check if target directory is writable
   if (!QFileInfo(QFileInfo(target_img_path).dir().absolutePath()).isWritable()) {
@@ -1105,14 +1128,27 @@ void gui::ApplicationGUI::designScreenshot(const QString &target_img_path, const
     }
   }
 
+  // take screenshot of full display panel view if rect is null
+  if (rect.isNull()) {
+    qDebug() << "No screenshot clip area specified, taking full design screenshot";
+    gui::DesignPanel *dp = this->design_pan;
+    QRect dp_frame = dp->frameRect();
+    QPointF dp_tl = dp->mapToScene(dp->mapFromParent(dp_frame.topLeft()));
+    QPointF dp_br = dp->mapToScene(dp->mapFromParent(dp_frame.bottomRight()));
+    rect = QRectF(dp_tl, dp_br);
+  }
+
   QSvgGenerator gen;
   gen.setFileName(target_img_path);
-  //gen.setSize(rect.size());
-  gen.setViewBox(rect);
+  qreal screenshot_px_per_ang = S->get<qreal>("view/screenshot_px_per_ang");
+  qreal sf = screenshot_px_per_ang / prim::Item::scale_factor; // shrink factor
+  QRectF svgrect = QRectF(rect.x(), rect.y(), rect.width()*sf, rect.height()*sf);
+  gen.setViewBox(svgrect);
 
   QPainter painter;
   painter.begin(&gen);
-  design_pan->screenshot(&painter, rect.toAlignedRect());
+  design_pan->screenshot(&painter, rect, svgrect);
+
   painter.end();
 
   //endScreenshotMode();

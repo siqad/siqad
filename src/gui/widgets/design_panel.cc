@@ -459,9 +459,11 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
       break;
     case gui::ToolType::ScreenshotAreaTool:
       setInteractive(true);
+      screenman->setClipVisibility(true);
       break;
     case gui::ToolType::ScaleBarAnchorTool:
       setInteractive(true);
+      screenman->setScaleBarVisibility(true);
       break;
     case gui::ToolType::LabelTool:
       setInteractive(true);
@@ -487,7 +489,7 @@ void gui::DesignPanel::setFills(float *fills)
 }
 
 
-void gui::DesignPanel::screenshot(QPainter *painter, const QRect &region)
+void gui::DesignPanel::screenshot(QPainter *painter, const QRectF &region, const QRectF &outrect)
 {
   // add lattice dot previews (vector graphics) instead of using the bitmap
   // include lattice background if layer is not hidden
@@ -505,9 +507,15 @@ void gui::DesignPanel::screenshot(QPainter *painter, const QRect &region)
     }
   }
 
+  bool clip_reactivate = screenman->clipVisible();
+  if (clip_reactivate)
+    screenman->setClipVisibility(false, false);
+
   // render scene onto painter
-  prev_screenshot_area = region;
-  scene->render(painter, region, region);
+  scene->render(painter, outrect, region);
+
+  if (clip_reactivate)
+    screenman->setClipVisibility(true, false);
 
   // remove lattice dot previews
   while (!latdot_previews.isEmpty()) {

@@ -19,8 +19,8 @@ INCLUDEPATH += .
 ###########################
 
 # TODO read all these from environment
-VERSION = 0.1.0
-DEFINES += APP_VERSION=\\\"0.1.0\\\"
+VERSION = 0.2.1
+DEFINES += APP_VERSION=\\\"0.2.1\\\"
 DEFINES += APPLICATION_NAME=\\\"SiQAD\\\"
 DEFINES += ORGANIZATION_NAME=\\\"WalusLab\\\"
 
