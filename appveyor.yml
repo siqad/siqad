@@ -84,7 +84,7 @@ for:
 
     after_build:
       - cd %APPVEYOR_BUILD_FOLDER%/build/siqad_%PLATFORM
-      - "%WINDEPLOYQT%" siqad.exe
+      - $env:WINDEPLOYQT siqad.exe
 
     artifacts:
       - path: build\siqad_%PLATFORM%
