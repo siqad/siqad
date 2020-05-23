@@ -102,6 +102,10 @@ namespace gui{
     //! to handle the cleanup if so desired.
     void removeItemFromScene(prim::Item *item);
 
+    //! Update scene rect based on the existing items and preexisting buffer 
+    //! areas.
+    void updateSceneRect(const QRectF &expand_to_include=QRectF());
+
     //! return a list of selected prim::Items
     QList<prim::Item*> selectedItems();
 
@@ -161,7 +165,7 @@ namespace gui{
     void loadFromFile(QXmlStreamReader *);
 
     //! Load GUI flags.
-    void loadGUIFlags(QXmlStreamReader *);
+    void loadGUIFlags(QXmlStreamReader *, QRectF &);
 
     //! Load layers.
     void loadLayers(QXmlStreamReader *, QList<int> &layer_order_id);

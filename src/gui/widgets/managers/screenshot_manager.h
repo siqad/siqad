@@ -85,6 +85,9 @@ namespace gui{
       //! Remove visual aid (scale bar, clip area preview) from display panel.
       void sig_removeVisualAidFromDP(prim::Item *t_item);
 
+      //! Inform design panel of closing.
+      void sig_closeEventTriggered();
+
       // TODO include display options such as disabling publish mode, inclusion
       // of scale bar, etc.
 
@@ -93,7 +96,8 @@ namespace gui{
       //! Initialize the screenshot manager.
       void initScreenshotManager();
 
-
+      //! Override close event to also end screenshot mode.
+      void closeEvent(QCloseEvent *bar);
 
       // Variables
       int misc_layer_id=-1;                         //! layer id of the misc layer

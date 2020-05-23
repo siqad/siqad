@@ -249,6 +249,14 @@ void ScreenshotManager::initScreenshotManager()
 }
 
 
+void ScreenshotManager::closeEvent(QCloseEvent *bar)
+{
+  // emit signal informing design panel of closing
+  emit sig_closeEventTriggered();
+
+  bar->accept();
+}
+
 
 
 } // end gui namespace

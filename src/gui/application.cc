@@ -1248,7 +1248,7 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag,
 
   QString file_purpose = flag==SaveSimulationProblem ? "simulation" : "save";
   ws.writeTextElement("file_purpose", file_purpose);
-  ws.writeTextElement("version", "TBD");
+  ws.writeTextElement("version", QCoreApplication::applicationVersion());
   ws.writeTextElement("date", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
 
   ws.writeEndElement();

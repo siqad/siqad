@@ -156,6 +156,8 @@ void gui::DesignPanel::initDesignPanel() {
           [this](prim::Item *t_item) {removeItem(t_item, layman->getMRULayerID(prim::Layer::Misc), true);});
   connect(screenman, &gui::ScreenshotManager::sig_scaleBarAnchorTool,
           [this]() {sig_toolChangeRequest(gui::ScaleBarAnchorTool);});
+  connect(screenman, &gui::ScreenshotManager::sig_closeEventTriggered,
+          [this]() {emit sig_cancelScreenshot();});
 
   connect(itman, &gui::ItemManager::sig_deselect,
           this, &gui::DesignPanel::deselectAll);
@@ -258,11 +260,7 @@ void gui::DesignPanel::addItem(prim::Item *item, int layer_index, int ind)
   layer->addItem(item, ind);
   scene->addItem(item);
 
-  // update scene rect
-  QRectF sbr = scene->itemsBoundingRect();
-  QRectF vp = mapToScene(viewport()->rect()).boundingRect();
-  setSceneRect(min_scene_rect | sbr | vp);
-  scene->setSceneRect(min_scene_rect | sbr);
+  updateSceneRect();
 
   // update item manager
   itman->updateTableAdd();
@@ -301,6 +299,18 @@ void gui::DesignPanel::removeItemFromScene(prim::Item *item)
 {
   scene->removeItem(item);
   // item pointer delete should be handled by the caller
+}
+
+void gui::DesignPanel::updateSceneRect(const QRectF &expand_to_include)
+{
+  QRectF sbr = scene->itemsBoundingRect();
+  QRectF vp = mapToScene(viewport()->rect()).boundingRect();
+  if (expand_to_include.isNull()) {
+    setSceneRect(min_scene_rect | sbr | vp);
+  } else {
+    setSceneRect(min_scene_rect | sbr | vp | expand_to_include);
+  }
+  scene->setSceneRect(min_scene_rect | sbr);
 }
 
 
@@ -553,6 +563,15 @@ void gui::DesignPanel::writeToXmlStream(QXmlStreamWriter *ws,
 
   // save zoom and scroll bar position
   ws->writeTextElement("zoom", QString::number(transform().m11() + transform().m12())); // m11 of qtransform
+  // save center scene position in angstroms (>= v0.2.2)
+  ws->writeEmptyElement("displayed_region");
+  QPointF tlpt = mapToScene(mapFromParent(rect().topLeft()));
+  QPointF brpt = mapToScene(mapFromParent(rect().bottomRight()));
+  ws->writeAttribute("x1", QString::number(tlpt.x() / prim::Item::scale_factor));
+  ws->writeAttribute("y1", QString::number(tlpt.y() / prim::Item::scale_factor));
+  ws->writeAttribute("x2", QString::number(brpt.x() / prim::Item::scale_factor));
+  ws->writeAttribute("y2", QString::number(brpt.y() / prim::Item::scale_factor));
+  // scroll position for legacy support (<= v0.2.1)
   ws->writeEmptyElement("scroll");
   ws->writeAttribute("x", QString::number(verticalScrollBar()->value()));
   ws->writeAttribute("y", QString::number(horizontalScrollBar()->value()));
@@ -579,6 +598,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
   resetDesignPanel();
 
   QList<int> layer_order_id;
+  QRectF visrect;
 
   // read from xml stream and hand nodes off to appropriate functions
   while (rs->readNextStartElement()) {
@@ -587,7 +607,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
       // TODO implement
       rs->skipCurrentElement();
     } else if(rs->name() == "gui") {
-      loadGUIFlags(rs);
+      loadGUIFlags(rs, visrect);
     } else if (rs->name() == "layers") {
       loadLayers(rs, layer_order_id);
     } else if(rs->name() == "layer_prop") {
@@ -602,6 +622,18 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
     }
   }
 
+  updateSceneRect(visrect);
+
+  // apply visual settings last if relying on display area (>= v0.2.2)
+  if (!visrect.isNull()) {
+    fitInView(visrect, Qt::KeepAspectRatio);
+    qDebug() << "Display area set to top left=" << visrect.topLeft() 
+      << " and bottom right=" << visrect.bottomRight();
+  }
+
+  // inform zoom level
+  emit sig_zoom(qAbs(transform().m11() + transform().m12())); // inform new zoom
+
   // show error if any
   if(rs->hasError()){
     qCritical() << tr("XML error: ") << rs->errorString().data();
@@ -613,10 +645,11 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
 }
 
 
-void gui::DesignPanel::loadGUIFlags(QXmlStreamReader *rs)
+void gui::DesignPanel::loadGUIFlags(QXmlStreamReader *rs, QRectF &visrect)
 {
   qDebug() << "Loading GUI flags";
   qreal zoom=0.1, scroll_v=0, scroll_h=0;
+  QPointF tlpt, brpt;
   while (rs->readNextStartElement()) {
     if (rs->name() == "zoom") {
       zoom = rs->readElementText().toDouble();
@@ -625,17 +658,28 @@ void gui::DesignPanel::loadGUIFlags(QXmlStreamReader *rs)
       scroll_h = rs->attributes().value("y").toInt();
       // no text is being read so the current element has to be explicitly skipped
       rs->skipCurrentElement();
+    } else if (rs->name() == "displayed_region") {
+      tlpt.setX(rs->attributes().value("x1").toFloat());
+      tlpt.setY(rs->attributes().value("y1").toFloat());
+      brpt.setX(rs->attributes().value("x2").toFloat());
+      brpt.setY(rs->attributes().value("y2").toFloat());
+      rs->skipCurrentElement();
     } else {
       qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2")
           .arg(rs->lineNumber()).arg(rs->name().toString());
       rs->skipCurrentElement();
     }
   }
-  setTransform(QTransform(zoom,0,0,zoom,0,0));
-  verticalScrollBar()->setValue(scroll_v);
-  horizontalScrollBar()->setValue(scroll_h);
+  // set scene position: use scene center point if present, else use scroll bar pos
+  if (!(tlpt.isNull() && brpt.isNull())) {
+    visrect = QRectF(tlpt * prim::Item::scale_factor, brpt * prim::Item::scale_factor);
+  } else {
+    setTransform(QTransform(zoom,0,0,zoom,0,0));
+    verticalScrollBar()->setValue(scroll_v);
+    horizontalScrollBar()->setValue(scroll_h);
+    qDebug() << tr("Set zoom=%1, scrollbar positions v=%2, h=%3").arg(zoom).arg(scroll_v).arg(scroll_h);
+  }
   updateBackground();
-  qDebug() << tr("Zoom set to %1, scroll v=%2, h=%3").arg(zoom).arg(scroll_v).arg(scroll_h);
 }
 
 
