@@ -185,6 +185,9 @@ void gui::DesignPanel::deselectAll()
 // clear design panel
 void gui::DesignPanel::clearDesignPanel(bool reset)
 {
+  // destroy DB previews
+  destroyDBPreviews();
+
   // delete child widgets
   delete screenman;
   delete afm_panel;
