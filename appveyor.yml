@@ -72,7 +72,7 @@ for:
       - set WIN32_MAKE_BIN=nmake
 
     build_script:
-      - cd C:/Qt && ls
+      - cd C:/Qt/5.12.6 && ls
       #- cd %APPVEYOR_BUILD_FOLDER%
       #- mkdir build && cd build
       #- cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -G "Visual Studio 15 2017" -A x64 -DWIN32_QMAKE_BIN="%WIN32_QMAKE_BIN%" -DWIN32_MAKE_BIN="%WIN32_MAKE_BIN%"
