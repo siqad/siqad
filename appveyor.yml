@@ -10,20 +10,20 @@ environment:
   BOOST_ROOT: C:\Libraries\boost_1_69_0
 
   matrix:
-    - PYTHON: "C:\\Python35"
-      DIST_N: sqconn_cp35-win32
-    - PYTHON: "C:\\Python36"
-      DIST_N: sqconn_cp36-win32
-    - PYTHON: "C:\\Python37"
-      DIST_N: sqconn_cp37-win32
+    #- PYTHON: "C:\\Python35"
+    #  DIST_N: sqconn_cp35-win32
+    #- PYTHON: "C:\\Python36"
+    #  DIST_N: sqconn_cp36-win32
+    #- PYTHON: "C:\\Python37"
+    #  DIST_N: sqconn_cp37-win32
     - PYTHON: "C:\\Python38"
       DIST_N: sqconn_cp38-win32
-    - PYTHON: "C:\\Python35-x64"
-      DIST_N: sqconn_cp35-win_amd64
-    - PYTHON: "C:\\Python36-x64"
-      DIST_N: sqconn_cp36-win_amd64
-    - PYTHON: "C:\\Python37-x64"
-      DIST_N: sqconn_cp37-win_amd64
+    #- PYTHON: "C:\\Python35-x64"
+    #  DIST_N: sqconn_cp35-win_amd64
+    #- PYTHON: "C:\\Python36-x64"
+    #  DIST_N: sqconn_cp36-win_amd64
+    #- PYTHON: "C:\\Python37-x64"
+    #  DIST_N: sqconn_cp37-win_amd64
     - PYTHON: "C:\\Python38-x64"
       DIST_N: sqconn_cp38-win_amd64
     - QTDIR: "C:\\Qt\\5.12.6\\msvc2017"
@@ -46,6 +46,7 @@ for:
   -
     matrix:
       except:
+        - QTDIR: "C:\\Qt\\5.12.6\\msvc2017"
         - QTDIR: "C:\\Qt\\5.12.6\\msvc2017_64"
 
     before_build:
@@ -66,6 +67,7 @@ for:
   -
     matrix:
       only:
+        - QTDIR: "C:\\Qt\\5.12.6\\msvc2017"
         - QTDIR: "C:\\Qt\\5.12.6\\msvc2017_64"
 
     before_build:
