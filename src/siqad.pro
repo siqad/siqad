@@ -7,6 +7,7 @@
 
 CONFIG += qt c++11
 CONFIG += release
+CONFIG += static
 
 QT += core gui widgets svg printsupport uitools charts
 
