@@ -48,8 +48,8 @@ for:
   -
     matrix:
       except:
-        - QTDIR: "C:\\Qt\\5.12.6\\msvc2017"
-        - QTDIR: "C:\\Qt\\5.12.6\\msvc2017_64"
+        - QTDIR: "C:\\Qt\\5.13.2\\msvc2017"
+        - QTDIR: "C:\\Qt\\5.13.2\\msvc2017_64"
 
     before_build:
       - choco install swig ninja
@@ -69,8 +69,8 @@ for:
   -
     matrix:
       only:
-        - QTDIR: "C:\\Qt\\5.12.6\\msvc2017"
-        - QTDIR: "C:\\Qt\\5.12.6\\msvc2017_64"
+        - QTDIR: "C:\\Qt\\5.13.2\\msvc2017"
+        - QTDIR: "C:\\Qt\\5.13.2\\msvc2017_64"
 
     before_build:
       - set WIN32_QMAKE_BIN=%QTDIR%\bin\qmake.exe
