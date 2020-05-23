@@ -29,10 +29,12 @@ environment:
     - QTDIR: "C:\\Qt\\5.12.6\\msvc2017"
       BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_69_0\\lib32-msvc-14.1"
       WINDEPLOYQT: "C:\\Qt\\5.12.6\\msvc2017\\bin\\windeployqt.exe"
+      CMAKE_ARCH: Win32
       platform: x86
     - QTDIR: "C:\\Qt\\5.12.6\\msvc2017_64"
       BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_69_0\\lib64-msvc-14.1"
       WINDEPLOYQT: "C:\\Qt\\5.12.6\\msvc2017_64\\bin\\windeployqt.exe"
+      CMAKE_ARCH: x64
       platform: x64
 
 install:
@@ -79,7 +81,7 @@ for:
       #- cd C:/Libraries/boost_1_69_0 && ls
       - cd %APPVEYOR_BUILD_FOLDER%
       - mkdir build && cd build
-      - cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -G "Visual Studio 15 2017" -A x64 -DWIN32_QMAKE_BIN="%WIN32_QMAKE_BIN%" -DWIN32_MAKE_BIN="%WIN32_MAKE_BIN%"
+      - cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -G "Visual Studio 15 2017" -A %CMAKE_ARCH% -DWIN32_QMAKE_BIN="%WIN32_QMAKE_BIN%" -DWIN32_MAKE_BIN="%WIN32_MAKE_BIN%"
       - cmake --build . --config Release --target install
       - mv release siqad_%PLATFORM%
       #- cd %APPVEYOR_BUILD_FOLDER% && dir /s /b /o:gn
