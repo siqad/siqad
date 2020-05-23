@@ -26,10 +26,10 @@ environment:
     #  DIST_N: sqconn_cp37-win_amd64
     #- PYTHON: "C:\\Python38-x64"
     #  DIST_N: sqconn_cp38-win_amd64
-    #- QTDIR: "C:\\Qt\\5.12.6\\msvc2017"
-    #  BOOST_LIBRARYDIR: C:\Libraries\boost_1_69_0\lib32-msvc-14.1
-    #  WINDEPLOYQT: "C:\\Qt\\5.12.6\\msvc2017\\bin\\windeployqt.exe"
-    #  platform: x86
+    - QTDIR: "C:\\Qt\\5.12.6\\msvc2017"
+      BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_69_0\\lib32-msvc-14.1"
+      WINDEPLOYQT: "C:\\Qt\\5.12.6\\msvc2017\\bin\\windeployqt.exe"
+      platform: x86
     - QTDIR: "C:\\Qt\\5.12.6\\msvc2017_64"
       BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_69_0\\lib64-msvc-14.1"
       WINDEPLOYQT: "C:\\Qt\\5.12.6\\msvc2017_64\\bin\\windeployqt.exe"
