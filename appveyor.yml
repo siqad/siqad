@@ -8,7 +8,6 @@ configuration:
 
 environment:
   BOOST_ROOT: C:\Libraries\boost_1_69_0
-  BOOST_LIBRARYDIR: C:\Libraries\boost_1_69_0\lib32-msvc-14.1
 
   matrix:
     - PYTHON: "C:\\Python35"
@@ -27,15 +26,19 @@ environment:
       DIST_N: sqconn_cp37-win_amd64
     - PYTHON: "C:\\Python38-x64"
       DIST_N: sqconn_cp38-win_amd64
-    - QTDIR: "C:\\Qt\\5.12.6\\msvc2017_64"
+    - QTDIR: "C:\\Qt\\5.13.2\\msvc2017"
+      WINDEPLOYQT: "C:\\Qt\\5.13.2\\msvc2017\\bin\\windeployqt.exe"
+      BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_69_0\\lib32-msvc-14.1"
+      CMAKE_ARCH: Win32
       platform: x86
-    - QTDIR: "C:\\Qt\\5.12.6\\msvc2017_64"
+    - QTDIR: "C:\\Qt\\5.13.2\\msvc2017_64"
+      WINDEPLOYQT: "C:\\Qt\\5.13.2\\msvc2017_64\\bin\\windeployqt.exe"
+      BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_69_0\\lib64-msvc-14.1"
+      CMAKE_ARCH: x64
       platform: x64
 
 install:
   - git submodule update --init --recursive
-    #- set QTDIR=C:\Qt\5.12.6\msvc2017_64
-    #- set BOOST_ROOT=C:\Libraries\boost_1_69_0
 
 #cache:
 #  - C:\ProgramData\chocolatey\bin -> appveyor.yml
@@ -45,7 +48,8 @@ for:
   -
     matrix:
       except:
-        - QTDIR: "C:\\Qt\\5.12.6\\msvc2017_64"
+        - QTDIR: "C:\\Qt\\5.13.2\\msvc2017"
+        - QTDIR: "C:\\Qt\\5.13.2\\msvc2017_64"
 
     before_build:
       - choco install swig ninja
@@ -65,7 +69,8 @@ for:
   -
     matrix:
       only:
-        - QTDIR: "C:\\Qt\\5.12.6\\msvc2017_64"
+        - QTDIR: "C:\\Qt\\5.13.2\\msvc2017"
+        - QTDIR: "C:\\Qt\\5.13.2\\msvc2017_64"
 
     before_build:
       - set WIN32_QMAKE_BIN=%QTDIR%\bin\qmake.exe
@@ -74,10 +79,14 @@ for:
     build_script:
       - cd %APPVEYOR_BUILD_FOLDER%
       - mkdir build && cd build
-      - cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -G "Visual Studio 15 2017" -A x64 -DWIN32_QMAKE_BIN="%WIN32_QMAKE_BIN%" -DWIN32_MAKE_BIN="%WIN32_MAKE_BIN%"
+      - cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -G "Visual Studio 15 2017" -A %CMAKE_ARCH% -DWIN32_QMAKE_BIN="%WIN32_QMAKE_BIN%" -DWIN32_MAKE_BIN="%WIN32_MAKE_BIN%"
       - cmake --build . --config Release --target install
       - mv release siqad_%PLATFORM%
       #- cd %APPVEYOR_BUILD_FOLDER% && dir /s /b /o:gn
+
+    after_build:
+      - cd %APPVEYOR_BUILD_FOLDER%/build/siqad_%PLATFORM%
+      - "%WINDEPLOYQT% siqad.exe"
 
     artifacts:
       - path: build\siqad_%PLATFORM%
