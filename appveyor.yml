@@ -29,7 +29,7 @@ environment:
     #  DIST_N: sqconn_cp38-win_amd64
     #- QTDIR: "C:\\Qt\\5.12.6\\msvc2017"
     #  platform: x86
-    - QTDIR: C:\Qt\5.12.6\msvc2017_64
+    - QTDIR: C:/Qt/5.12.6/msvc2017_64
       platform: x64
 
 install:
@@ -80,7 +80,7 @@ for:
 
     after_build:
       - cd %APPVEYOR_BUILD_FOLDER%\build\siqad_%PLATFORM
-      - %QTDIR%\bin\windeployqt.exe siqad.exe
+      - %QTDIR%/bin/windeployqt.exe siqad.exe
 
     artifacts:
       - path: build\siqad_%PLATFORM%
