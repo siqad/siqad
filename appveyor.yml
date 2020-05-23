@@ -79,8 +79,8 @@ for:
       #- cd %APPVEYOR_BUILD_FOLDER% && dir /s /b /o:gn
 
     after_build:
-      - cd %APPVEYOR_BUILD_FOLDER%/build/siqad_%PLATFORM
-      - %QTDIR%/bin/windeployqt.exe siqad.exe
+      - cd %APPVEYOR_BUILD_FOLDER%\build\siqad_%PLATFORM
+      - %QTDIR%\bin\windeployqt.exe siqad.exe
 
     artifacts:
       - path: build\siqad_%PLATFORM%
