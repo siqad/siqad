@@ -83,7 +83,7 @@ for:
       #- cd %APPVEYOR_BUILD_FOLDER% && dir /s /b /o:gn
 
     after_build:
-      - cd %APPVEYOR_BUILD_FOLDER%/build/siqad_%PLATFORM
+      - cd %APPVEYOR_BUILD_FOLDER%/build/siqad_%PLATFORM%
       - $env:WINDEPLOYQT siqad.exe
 
     artifacts:
