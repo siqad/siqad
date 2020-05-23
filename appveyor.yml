@@ -10,20 +10,20 @@ environment:
   BOOST_ROOT: C:\Libraries\boost_1_69_0
 
   matrix:
-    #- PYTHON: "C:\\Python35"
-    #  DIST_N: sqconn_cp35-win32
-    #- PYTHON: "C:\\Python36"
-    #  DIST_N: sqconn_cp36-win32
-    #- PYTHON: "C:\\Python37"
-    #  DIST_N: sqconn_cp37-win32
+    - PYTHON: "C:\\Python35"
+      DIST_N: sqconn_cp35-win32
+    - PYTHON: "C:\\Python36"
+      DIST_N: sqconn_cp36-win32
+    - PYTHON: "C:\\Python37"
+      DIST_N: sqconn_cp37-win32
     - PYTHON: "C:\\Python38"
       DIST_N: sqconn_cp38-win32
-    #- PYTHON: "C:\\Python35-x64"
-    #  DIST_N: sqconn_cp35-win_amd64
-    #- PYTHON: "C:\\Python36-x64"
-    #  DIST_N: sqconn_cp36-win_amd64
-    #- PYTHON: "C:\\Python37-x64"
-    #  DIST_N: sqconn_cp37-win_amd64
+    - PYTHON: "C:\\Python35-x64"
+      DIST_N: sqconn_cp35-win_amd64
+    - PYTHON: "C:\\Python36-x64"
+      DIST_N: sqconn_cp36-win_amd64
+    - PYTHON: "C:\\Python37-x64"
+      DIST_N: sqconn_cp37-win_amd64
     - PYTHON: "C:\\Python38-x64"
       DIST_N: sqconn_cp38-win_amd64
     - QTDIR: "C:\\Qt\\5.13.2\\msvc2017"
@@ -77,8 +77,6 @@ for:
       - set WIN32_MAKE_BIN=nmake
 
     build_script:
-      #- cd C:/Qt/5.12.6/msvc2017_64 && ls
-      #- cd C:/Libraries/boost_1_69_0 && ls
       - cd %APPVEYOR_BUILD_FOLDER%
       - mkdir build && cd build
       - cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -G "Visual Studio 15 2017" -A %CMAKE_ARCH% -DWIN32_QMAKE_BIN="%WIN32_QMAKE_BIN%" -DWIN32_MAKE_BIN="%WIN32_MAKE_BIN%"
