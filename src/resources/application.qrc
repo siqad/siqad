@@ -50,6 +50,9 @@
     <file>ico/fb/cut.svg</file>
     <file>ico/fb/copy.svg</file>
     <file>ico/fb/paste.svg</file>
+    <file>ico/fb/zoom-fit-all.svg</file>
+    <file>ico/fb/zoom-in.svg</file>
+    <file>ico/fb/zoom-out.svg</file>
 
     <!--settings dialog form generation-->
     <file>settings/general.xml</file>

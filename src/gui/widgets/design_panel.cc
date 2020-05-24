@@ -313,6 +313,20 @@ void gui::DesignPanel::updateSceneRect(const QRectF &expand_to_include)
   scene->setSceneRect(min_scene_rect | sbr);
 }
 
+void gui::DesignPanel::fitItemsInView(const bool &include_hidden)
+{
+  QRectF rect;
+  for (QGraphicsItem *item : scene->items()) {
+    if (include_hidden || item->isVisible()) {
+      rect |= item->sceneBoundingRect();
+      qDebug() << rect;
+    }
+  }
+  fitInView(rect, Qt::KeepAspectRatio);
+  updateBackground();
+  informZoomUpdate();
+}
+
 
 QList<prim::Item*> gui::DesignPanel::selectedItems()
 {
@@ -631,8 +645,9 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
       << " and bottom right=" << visrect.bottomRight();
   }
 
-  // inform zoom level
-  emit sig_zoom(qAbs(transform().m11() + transform().m12())); // inform new zoom
+  // zoom related
+  updateBackground();
+  informZoomUpdate();
 
   // show error if any
   if(rs->hasError()){
@@ -1276,6 +1291,22 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
   if(boost)
     ds *= gui_settings->get<qreal>("view/zoom_boost");
 
+  applyZoom(ds, e);
+
+  // reset both scrolls (avoid repeat from |x|>=120)
+  wheel_deg.setX(0);
+  wheel_deg.setY(0);
+}
+
+void gui::DesignPanel::stepZoom(const bool &zoom_in)
+{
+  settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  qreal ds = (zoom_in ? 1 : -1) * gui_settings->get<qreal>("view/zoom_factor");
+  applyZoom(ds);
+}
+
+void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e)
+{
   // assert scale limitations
   boundZoom(ds);
 
@@ -1284,7 +1315,12 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
 
   if(ds!=0){
     // zoom under mouse, should be indep of transformationAnchor
-    QPointF old_pos = mapToScene(e->pos());
+    QPointF old_pos, new_pos;
+    if (e != nullptr) {
+      old_pos = mapToScene(e->pos());
+    } else {
+      old_pos = mapToScene(mapFromParent(rect().center()));
+    }
 
     // pre-zoom scene rect update
     QRectF sbr = scene->itemsBoundingRect();
@@ -1297,7 +1333,12 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
     scale(1+ds,1+ds);
 
     // move to anchor
-    QPointF delta = mapToScene(e->pos()) - old_pos;
+    if (e != nullptr) {
+      new_pos = mapToScene(e->pos());
+    } else {
+      new_pos = mapToScene(mapFromParent(rect().center()));
+    }
+    QPointF delta = new_pos - old_pos;
     scrollDelta(delta); // scroll with anchoring
 
     // post-zoom scene rect update
@@ -1305,18 +1346,13 @@ void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
     setSceneRect(min_scene_rect | sbr | vp);
   }
 
-  // reset both scrolls (avoid repeat from |x|>=120)
-  wheel_deg.setX(0);
-  wheel_deg.setY(0);
-
   // update background if lattice visibility threshold has been crossed
   qreal new_zoom = qAbs(transform().m11() + transform().m12());
   if ((old_zoom < zoom_visibility_threshold && zoom_visibility_threshold <= new_zoom)
       || (new_zoom < zoom_visibility_threshold && zoom_visibility_threshold <= old_zoom))
     updateBackground();
 
-  emit sig_zoom(new_zoom);
-  //qDebug() << tr("Zoom: QTransform m11 = %1, m12 = %2, m21 = %3, m22 = %4, dx = %5, dy = %6").arg(transform().m11()).arg(transform().m12()).arg(transform().m21()).arg(transform().m22()).arg(transform().dx()).arg(transform().dy());
+  informZoomUpdate();
 }
 
 

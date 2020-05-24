@@ -106,6 +106,15 @@ namespace gui{
     //! areas.
     void updateSceneRect(const QRectF &expand_to_include=QRectF());
 
+    //! Programmed zoom in.
+    void stepZoom(const bool &zoom_in);
+
+    //! Fit graphics items into design panel view.
+    void fitItemsInView(const bool &include_hidden);
+
+    //! Inform new zoom level.
+    void informZoomUpdate() {emit sig_zoom(qAbs(transform().m11() + transform().m12()));}
+
     //! return a list of selected prim::Items
     QList<prim::Item*> selectedItems();
 
@@ -397,6 +406,11 @@ namespace gui{
 
     // perform scene zoom based on wheel rotation
     void wheelZoom(QWheelEvent *e, bool boost);
+
+    //! Apply scene zoom from parameters.
+    //! @ds zoom factor, usually taken from settings.
+    //! @anchor point which should stay consistent on scene.
+    void applyZoom(qreal ds, QWheelEvent *e=nullptr);
 
     // perform scene pan based on wheel rotation, swap x and y if shift is pressed
     void wheelPan(bool shift_scroll, bool boost);

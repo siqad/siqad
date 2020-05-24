@@ -305,6 +305,15 @@ void gui::ApplicationGUI::initMenuBar()
   action_sim_visualize->setIcon(QIcon(":/ico/simvis.svg"));
   action_layer_sel->setIcon(QIcon(":/ico/layer.svg"));
   action_dialog_dock_visibility->setIcon(QIcon(":/ico/term.svg"));
+  QAction *zoom_in = new QAction(
+      QIcon::fromTheme("zoom-in", QIcon(":/ico/fb/zoom-in.svg")),
+      tr("Zoom In"));
+  QAction *zoom_out = new QAction(
+      QIcon::fromTheme("zoom-fit-best", QIcon(":/ico/fb/zoom-out.svg")),
+      tr("Zoom Out"));
+  QAction *fit_items_in_view = new QAction(
+      QIcon::fromTheme("zoom-fit-best", QIcon(":/ico/fb/zoom-fit-all.svg")),
+      tr("Fit Items in View"));
   QAction *rotate_view_cw = new QAction(
       QIcon::fromTheme("object-rotate-right", QIcon(":/ico/fb/object-rotate-right.svg")),
       tr("Rotate 90 deg CW"), this);
@@ -316,8 +325,16 @@ void gui::ApplicationGUI::initMenuBar()
   view->addAction(action_item_manager);
   view->addAction(action_dialog_dock_visibility);
   view->addSeparator();
+  view->addAction(zoom_in);
+  view->addAction(zoom_out);
+  view->addAction(fit_items_in_view);
+  view->addSeparator();
   view->addAction(rotate_view_cw);
   view->addAction(rotate_view_ccw);
+
+  zoom_in->setShortcuts({Qt::Key_Equal, Qt::Key_Plus});
+  zoom_out->setShortcut(Qt::Key_Minus);
+  fit_items_in_view->setShortcut(Qt::CTRL + Qt::Key_Equal);
 
   //edit menu actions
   //QAction *action_color = new QAction(tr("Color..."), this);
@@ -361,6 +378,12 @@ void gui::ApplicationGUI::initMenuBar()
   connect(open_save, &QAction::triggered,
       [this](){openFromFile();});
   connect(export_lvm, &QAction::triggered, this, &gui::ApplicationGUI::exportToLabview);
+  connect(zoom_in, &QAction::triggered,
+      [this](){design_pan->stepZoom(true);});
+  connect(zoom_out, &QAction::triggered,
+      [this](){design_pan->stepZoom(false);});
+  connect(fit_items_in_view, &QAction::triggered,
+      [this](){design_pan->fitItemsInView(false);});
   connect(rotate_view_cw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCw);
   connect(rotate_view_ccw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCcw);
   connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
