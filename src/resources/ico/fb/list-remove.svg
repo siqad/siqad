@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -9,35 +7,36 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="64"
-   height="64"
-   viewBox="0 0 16.933333 16.933333"
-   version="1.1"
+   sodipodi:docname="list-remove.svg"
+   inkscape:version="1.0 (6e3e5246a0, 2020-05-07)"
    id="svg8"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="list-remove.svg">
+   version="1.1"
+   viewBox="0 0 16.933333 16.933333"
+   height="64"
+   width="64">
   <defs
      id="defs2" />
   <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="-25.018791"
-     inkscape:cy="-191.22554"
-     inkscape:document-units="mm"
-     inkscape:current-layer="g821"
-     showgrid="false"
-     units="px"
+     inkscape:document-rotation="0"
+     inkscape:window-maximized="0"
+     inkscape:window-y="126"
+     inkscape:window-x="0"
+     inkscape:window-height="2028"
+     inkscape:window-width="3828"
      inkscape:object-paths="true"
-     inkscape:window-width="1908"
-     inkscape:window-height="1909"
-     inkscape:window-x="3840"
-     inkscape:window-y="245"
-     inkscape:window-maximized="0" />
+     units="px"
+     showgrid="false"
+     inkscape:current-layer="g821"
+     inkscape:document-units="mm"
+     inkscape:cy="29.705713"
+     inkscape:cx="26.368164"
+     inkscape:zoom="7.919596"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -51,25 +50,25 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
+     transform="translate(0,-280.06667)"
      id="layer1"
-     transform="translate(0,-280.06667)">
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
     <g
-       id="g825"
-       transform="translate(0.77815958,0.28612188)">
+       transform="translate(0.77815958,0.28612188)"
+       id="g825">
       <g
-         id="g821"
-         transform="matrix(1.2173579,0,0,1.2173579,-3.9994421,-65.523942)">
+         transform="matrix(1.2173579,0,0,1.2173579,-3.9994421,-65.523942)"
+         id="g821">
         <rect
-           style="fill:#ff5a5a;fill-opacity:1;stroke:#ff5a5a;stroke-width:1.87709165;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-           id="rect831"
-           width="9.8043823"
-           height="1.8533438"
-           x="4.6988878"
+           rx="0.11698082"
+           ry="0.11698082"
            y="289.67905"
-           ry="0.60067928"
-           rx="0.60067928" />
+           x="4.6988878"
+           height="1.8533437"
+           width="9.8043823"
+           id="rect11"
+           style="fill:#ff5a5a;fill-opacity:1;stroke:#ff5a5a;stroke-width:1.87709;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
       </g>
     </g>
   </g>

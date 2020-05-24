@@ -99,7 +99,7 @@ void ScreenshotManager::initScreenshotManager()
   QLabel *label_scale_bar_length = new QLabel(tr("Length"));
   QLineEdit *le_scale_bar_length = new QLineEdit("1");
   QComboBox *cbb_scale_bar_unit = new QComboBox();
-  QPushButton *button_set_scale_bar_anchor = new QPushButton(tr("Set Scale Bar Anchor"));
+  QPushButton *pb_set_scale_bar_anchor = new QPushButton(tr("Set Scale Bar Anchor"));
   
   // populate scale bar length unit dropdown menu
   cbb_scale_bar_unit->addItems(Unit::distanceUnitStringList(Unit::pm,Unit::m));
@@ -119,12 +119,12 @@ void ScreenshotManager::initScreenshotManager()
 
   // enable or disable scale bar options depending on the check state of cb_scale_bar
   auto enableScaleBarOptions = [this, le_scale_bar_length, cbb_scale_bar_unit, 
-                                button_set_scale_bar_anchor, 
+                                pb_set_scale_bar_anchor, 
                                 updateScaleBarFromOptions](int cb_state) {
     bool show_scale_bar_settings = cb_state == Qt::Checked;
     le_scale_bar_length->setEnabled(show_scale_bar_settings);
     cbb_scale_bar_unit->setEnabled(show_scale_bar_settings);
-    button_set_scale_bar_anchor->setEnabled(show_scale_bar_settings);
+    pb_set_scale_bar_anchor->setEnabled(show_scale_bar_settings);
     scale_bar->setVisible(show_scale_bar_settings);
     updateScaleBarFromOptions();
   };
@@ -132,7 +132,7 @@ void ScreenshotManager::initScreenshotManager()
   enableScaleBarOptions(cb_scale_bar->isChecked());
 
   // set scale bar anchor
-  connect(button_set_scale_bar_anchor, &QAbstractButton::clicked,
+  connect(pb_set_scale_bar_anchor, &QAbstractButton::clicked,
           [this]() {emit sig_scaleBarAnchorTool();});
 
   QHBoxLayout *hl_scale_bar = new QHBoxLayout();
@@ -145,23 +145,23 @@ void ScreenshotManager::initScreenshotManager()
   //vl_visual->addWidget(cb_publish_style);
   vl_visual->addWidget(cb_scale_bar);
   vl_visual->addLayout(hl_scale_bar);
-  vl_visual->addWidget(button_set_scale_bar_anchor);
+  vl_visual->addWidget(pb_set_scale_bar_anchor);
   group_scale_bar->setLayout(vl_visual);
 
 
   // Clip Setting Group
   QGroupBox *group_clip = new QGroupBox(tr("Clipping"));
-  QPushButton *button_set_clip = new QPushButton(tr("Set Clip Area"));
-  QPushButton *button_reset_clip = new QPushButton(tr("Reset"));
+  QPushButton *pb_set_clip = new QPushButton(tr("Set Clip Area"));
+  QPushButton *pb_reset_clip = new QPushButton(tr("Reset"));
   cb_preview_clip = new QCheckBox(tr("Preview Clip Area"));
 
-  connect(button_set_clip, &QAbstractButton::clicked,
+  connect(pb_set_clip, &QAbstractButton::clicked,
           [this]() {
             cb_preview_clip->setChecked(true);
             emit sig_clipSelectionTool();
           }
   );
-  connect(button_reset_clip, &QAbstractButton::clicked,
+  connect(pb_reset_clip, &QAbstractButton::clicked,
           [this]() {
             cb_preview_clip->setChecked(false);
             setClipArea();
@@ -174,7 +174,7 @@ void ScreenshotManager::initScreenshotManager()
   setClipVisibility(cb_preview_clip->isChecked(), false);  // init to check state
 
   QFormLayout *fl_clip = new QFormLayout();
-  fl_clip->addRow(button_set_clip, button_reset_clip);
+  fl_clip->addRow(pb_set_clip, pb_reset_clip);
   fl_clip->addRow(cb_preview_clip);
   group_clip->setLayout(fl_clip);
         
@@ -185,29 +185,36 @@ void ScreenshotManager::initScreenshotManager()
   QGroupBox *group_screenshot = new QGroupBox(tr("Screenshot"));
   QLabel *label_save_dir = new QLabel(tr("Directory"));
   le_save_dir = new QLineEdit(QDir::currentPath());  // TODO initialize to current working path
-  QPushButton *button_browse = new QPushButton(tr("..."));
+  QPushButton *pb_browse = new QPushButton(tr("..."));
   QLabel *label_name = new QLabel(tr("Name"));
   le_name = new QLineEdit(tr("siqad-screenshot.svg"));
   // TODO tooltip for name formatting
   cb_overwrite = new QCheckBox(tr("Overwrite without asking"));
   QCheckBox *cb_always_ask_name = new QCheckBox(tr("Browse for file path every time"));
-  QPushButton *button_take_screenshot = new QPushButton(tr("Take Screenshot"));
+  QPushButton *pb_screenshot = new QPushButton(tr("Take Screenshot"));
+  QPushButton *pb_close = new QPushButton(tr("Close"));
+  QDialogButtonBox *dbb_ss_buttons = new QDialogButtonBox();
+  dbb_ss_buttons->addButton(pb_screenshot, QDialogButtonBox::AcceptRole);
+  dbb_ss_buttons->addButton(pb_close, QDialogButtonBox::RejectRole);
+
+  pb_screenshot->setShortcut(Qt::Key_Return);
+  pb_close->setShortcut(Qt::Key_Escape);
 
   // browse for path and fill into le_save_dir
-  connect(button_browse, &QAbstractButton::clicked,
-          [this]() {
-            QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-                "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-            if (!dir.isEmpty())
-              le_save_dir->setText(dir);
-          }
+  connect(pb_browse, &QAbstractButton::clicked,
+      [this]() {
+        QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+            "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        if (!dir.isEmpty())
+        le_save_dir->setText(dir);
+      }
   );
 
   // disable relevant fields when user opts to ask for path and name every time
-  auto disableFilePathOptions = [this, button_browse](int cb_state) {
+  auto disableFilePathOptions = [this, pb_browse](int cb_state) {
     bool disable = cb_state == Qt::Checked;
     le_save_dir->setDisabled(disable);
-    button_browse->setDisabled(disable);
+    pb_browse->setDisabled(disable);
     le_name->setDisabled(disable);
     cb_overwrite->setDisabled(disable);
   };
@@ -215,33 +222,38 @@ void ScreenshotManager::initScreenshotManager()
   disableFilePathOptions(cb_always_ask_name->isChecked());
 
   // emit screenshot signal with relevant settings
-  connect(button_take_screenshot, &QAbstractButton::clicked,
-          [this]() {
-            QString fpath = QDir(le_save_dir->text()).absoluteFilePath(le_name->text());
-            emit sig_takeScreenshot(fpath, clip_area->sceneRect(), cb_overwrite->isChecked());
-          }
+  connect(pb_screenshot, &QAbstractButton::clicked,
+      [this]() {
+        QString fpath = QDir(le_save_dir->text()).absoluteFilePath(le_name->text());
+        emit sig_takeScreenshot(fpath, clip_area->sceneRect(), cb_overwrite->isChecked());
+      }
+  );
+
+  // close dialog
+  connect(pb_close, &QAbstractButton::clicked,
+      [this]() {
+        close();
+      }
   );
       
-
   QHBoxLayout *hl_save_dir = new QHBoxLayout();
   hl_save_dir->addWidget(label_save_dir);
   hl_save_dir->addWidget(le_save_dir);
-  hl_save_dir->addWidget(button_browse);
+  hl_save_dir->addWidget(pb_browse);
 
   QFormLayout *fl_screenshot = new QFormLayout();
   fl_screenshot->addRow(hl_save_dir);
   fl_screenshot->addRow(label_name, le_name);
   fl_screenshot->addRow(cb_overwrite);
   fl_screenshot->addRow(cb_always_ask_name);
-  fl_screenshot->addRow(button_take_screenshot);
   group_screenshot->setLayout(fl_screenshot);
-
 
   // Add them to this widget
   QVBoxLayout *vl_widget = new QVBoxLayout();
   vl_widget->addWidget(group_scale_bar);
   vl_widget->addWidget(group_clip);
   vl_widget->addWidget(group_screenshot);
+  vl_widget->addWidget(dbb_ss_buttons);
   setLayout(vl_widget);
 
 

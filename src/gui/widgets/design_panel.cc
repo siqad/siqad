@@ -472,11 +472,11 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
       break;
     case gui::ToolType::ScreenshotAreaTool:
       setInteractive(true);
-      screenman->setClipVisibility(true);
+      screenman->setClipVisibility(true, true);
       break;
     case gui::ToolType::ScaleBarAnchorTool:
       setInteractive(true);
-      screenman->setScaleBarVisibility(true);
+      screenman->setScaleBarVisibility(true, true);
       break;
     case gui::ToolType::LabelTool:
       setInteractive(true);

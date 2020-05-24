@@ -47,7 +47,7 @@ namespace gui{
       bool clipVisible() {return clip_area->isVisible();}
 
       //! Set the visibility of the clip area preview.
-      void setClipVisibility(const bool &visible, const bool &cb_update=true);
+      void setClipVisibility(const bool &visible, const bool &cb_update=false);
 
       //! Set the scale bar length, or hide it if the length is less than 0.
       void setScaleBar(float t_length, Unit::DistanceUnit unit);
@@ -56,7 +56,7 @@ namespace gui{
       void setScaleBarAnchor(QPointF anchor) {scale_bar->setScenePos(anchor);}
 
       //! Set the visibility of the scale bar.
-      void setScaleBarVisibility(const bool &visible, const bool &cb_update=true);
+      void setScaleBarVisibility(const bool &visible, const bool &cb_update=false);
 
 
 
