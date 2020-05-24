@@ -34,7 +34,7 @@ PoisSolver is incompatible due to changes in dependent packages that require fur
 
 ---
 
-On non-Debian systems, packages equivalent to the ones listed above will be needed. Feel free to contribute to [this issue](https://github.com/retallickj/siqad/issues/32) with dependencies required on other systems.
+On non-Debian systems, packages equivalent to the ones listed above will be needed. Feel free to create a GitHub issue to contribute dependencies required on other systems.
 
 
 ### Scripted Compilation
