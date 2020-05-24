@@ -229,6 +229,7 @@ namespace gui{
     QAction *action_afmpath_tool=nullptr;         // change cursor tool to AFM Path tool
     QAction *action_label_tool=nullptr;           // change cursor tool to label
     QAction *action_run_sim=nullptr;              // run the current simulation method
+    QAction *action_job_log=nullptr;              // view the job log
     QAction *action_repeat_sim=nullptr;           // repeat the previous simulation
     QAction *action_run_ground_state=nullptr;     // run the current simulation method
     QAction *action_sim_visualize=nullptr;        // show the sim visualize dock which allows simulation visualization

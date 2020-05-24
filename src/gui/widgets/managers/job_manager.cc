@@ -134,11 +134,11 @@ void JobManager::initJobManagerGUI()
   //    if previous jobs:
   //        big table with filters
 
-  QListWidget *lw_job_action = new QListWidget();
+  lw_job_action = new QListWidget();
   QStackedWidget *sw_job_action = new QStackedWidget();
 
-  QListWidgetItem *lwi_new_job = new QListWidgetItem("New Job");
-  QListWidgetItem *lwi_view_jobs = new QListWidgetItem("View Jobs");
+  lwi_new_job = new QListWidgetItem("New Job");
+  lwi_view_jobs = new QListWidgetItem("View Jobs");
 
   lwi_new_job->setIcon(QIcon::fromTheme("list-add", QIcon(":/ico/fb/list-add.svg")));
   lwi_view_jobs->setIcon(QIcon::fromTheme("document-properties"));

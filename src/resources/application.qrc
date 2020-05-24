@@ -17,8 +17,11 @@
     <file>ico/drawafmarea.svg</file>
     <file>ico/drawafmpath.svg</file>
     <file>ico/drawlabel.svg</file>
-    <file>ico/runsim.svg</file>
-   	<file>ico/simvisual.svg</file>
+    <file>ico/jobnew.svg</file>
+    <file>ico/jobnew_cond.svg</file>
+    <file>ico/joblog.svg</file>
+    <file>ico/joblog_cond.svg</file>
+   	<file>ico/simvis.svg</file>
    	<file>ico/sim_groundstate.svg</file>
     <file>ico/layer.svg</file>
     <file>ico/term.svg</file>
@@ -40,6 +43,13 @@
     <file>ico/fb/arrow-down.svg</file>
     <file>ico/fb/object-rotate-right.svg</file>
     <file>ico/fb/object-rotate-left.svg</file>
+    <file>ico/fb/undo.svg</file>
+    <file>ico/fb/redo.svg</file>
+    <file>ico/fb/delete.svg</file>
+    <file>ico/fb/exit.svg</file>
+    <file>ico/fb/cut.svg</file>
+    <file>ico/fb/copy.svg</file>
+    <file>ico/fb/paste.svg</file>
 
     <!--settings dialog form generation-->
     <file>settings/general.xml</file>

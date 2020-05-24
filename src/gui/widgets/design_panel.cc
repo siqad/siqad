@@ -1253,10 +1253,7 @@ void gui::DesignPanel::constructStatics()
 
 void gui::DesignPanel::duplicateSelection()
 {
-  // get list of selected items
-  cache.clear();
-  cache = selectedItems();
-  if(cache.count()==0)
+  if (selectedItems().isEmpty())
     return;
 
   // raise prompt
@@ -1504,12 +1501,18 @@ void gui::DesignPanel::dummyAction()
 
 void gui::DesignPanel::initActions()
 {
-  action_undo = new QAction(QIcon::fromTheme("edit-undo"), tr("&Undo"), this);
-  action_redo = new QAction(QIcon::fromTheme("edit-redo"), tr("&Redo"), this);
-  action_cut = new QAction(QIcon::fromTheme("edit-cut"), tr("Cut"), this);
-  action_copy = new QAction(QIcon::fromTheme("edit-copy"), tr("&Copy"), this);
-  action_paste = new QAction(QIcon::fromTheme("edit-paste"), tr("&Paste"), this);
-  action_delete = new QAction(QIcon::fromTheme("edit-delete"), tr("&Delete"), this);
+  action_undo = new QAction(QIcon::fromTheme("edit-undo", 
+        QIcon(":/ico/fb/undo.svg")), tr("&Undo"), this);
+  action_redo = new QAction(QIcon::fromTheme("edit-redo", 
+        QIcon(":/ico/fb/redo.svg")), tr("&Redo"), this);
+  action_cut = new QAction(QIcon::fromTheme("edit-cut",
+        QIcon(":/ico/fb/cut.svg")), tr("Cut"), this);
+  action_copy = new QAction(QIcon::fromTheme("edit-copy",
+        QIcon(":/ico/fb/copy.svg")), tr("&Copy"), this);
+  action_paste = new QAction(QIcon::fromTheme("edit-paste",
+        QIcon(":/ico/fb/paste.svg")), tr("&Paste"), this);
+  action_delete = new QAction(QIcon::fromTheme("edit-delete",
+        QIcon(":/ico/fb/delete.svg")), tr("&Delete"), this);
   action_form_agg = new QAction(tr("Form A&ggregate"), this);
   action_split_agg = new QAction(tr("Split Aggregate"), this);
   action_dup = new QAction(tr("Duplicate"), this);
@@ -1522,7 +1525,7 @@ void gui::DesignPanel::initActions()
   action_delete->setShortcuts({ tr("DELETE"), tr("BACKSPACE") });
   action_form_agg->setShortcut(tr("CTRL+G"));
   action_split_agg->setShortcut(tr("CTRL+SHIFT+G"));
-  action_dup->setShortcut(tr("D"));
+  action_dup->setShortcut(tr("CTRL+D"));
 
   connect(action_undo, &QAction::triggered, this, &gui::DesignPanel::undoAction);
   connect(action_redo, &QAction::triggered, this, &gui::DesignPanel::redoAction);
@@ -2900,9 +2903,6 @@ bool gui::DesignPanel::pasteAtGhost()
       pasteItem(ghost, i, item);
   }
   undo_stack->endMacro();
-
-  for(prim::Item *item: cache)
-    item->setSelected(true);
 
   pasting=false;
   return true;

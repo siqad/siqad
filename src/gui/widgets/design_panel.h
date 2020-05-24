@@ -351,7 +351,6 @@ namespace gui{
 
     // copy/paste
     QList<prim::Item*> clipboard;   // cached deep copy of a set of items for pasting
-    QList<prim::Item*> cache;       // general purpose cache
 
     prim::Lattice *lattice=0;       // lattice for reference
 

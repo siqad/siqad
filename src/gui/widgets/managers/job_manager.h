@@ -87,6 +87,12 @@ namespace gui{
     //! this a SimVisualizer function instead).
     bool eligibleForSimVisualizer(comp::SimJob *job);
 
+    //! Show job manager and set pane to New Job directly.
+    void showNewJob() {show(); lw_job_action->setCurrentItem(lwi_new_job);}
+
+    //! Show job manager and set pane to View Jobs directly.
+    void showViewJobs() {show(); lw_job_action->setCurrentItem(lwi_view_jobs);}
+
   signals:
 
     //! Request application to save a job problem file to the specified path, 
@@ -157,6 +163,11 @@ namespace gui{
     QStandardItemModel *job_steps_model;  // data model storing the job steps engine sequence
     QStandardItemModel *job_view_model;   // data model storing the list of submitted and completed jobs
     QList<comp::PluginEngine::StandardItemField> eng_list_fields; // order of fields in eng_model
+
+    // GUI elements that need class-wide access
+    QListWidget *lw_job_action;           // current main action in JM
+    QListWidgetItem *lwi_new_job;         // list item for new job
+    QListWidgetItem *lwi_view_jobs;       // list item for viewing jobs
 
   };
 

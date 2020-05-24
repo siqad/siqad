@@ -282,7 +282,8 @@ void gui::ApplicationGUI::initMenuBar()
       QIcon::fromTheme("document-save-as", QIcon(":/ico/fb/document-save.svg")), 
       tr("Save &As..."), this);
   QAction *export_lvm = new QAction(tr("&Export to QSi LV"), this);
-  QAction *quit = new QAction(QIcon::fromTheme("application-exit"), tr("&Quit"), this);
+  QAction *quit = new QAction(QIcon::fromTheme("application-exit",
+        QIcon(":/ico/fb/exit.svg")), tr("&Quit"), this);
   new_file->setShortcut(tr("CTRL+N"));
   save->setShortcut(tr("CTRL+S"));
   save_as->setShortcut(tr("CTRL+SHIFT+S"));
@@ -301,7 +302,7 @@ void gui::ApplicationGUI::initMenuBar()
   action_layer_sel = layer_dock->toggleViewAction();
   action_item_manager = item_dock->toggleViewAction();
   action_dialog_dock_visibility = dialog_dock->toggleViewAction();
-  action_sim_visualize->setIcon(QIcon(":/ico/simvisual.svg"));
+  action_sim_visualize->setIcon(QIcon(":/ico/simvis.svg"));
   action_layer_sel->setIcon(QIcon(":/ico/layer.svg"));
   action_dialog_dock_visibility->setIcon(QIcon(":/ico/term.svg"));
   QAction *rotate_view_cw = new QAction(
@@ -396,20 +397,28 @@ void gui::ApplicationGUI::initTopBar()
   // initialize QActions
 
   // run simulation
-  action_run_sim = new QAction(QIcon(":/ico/runsim.svg"), tr("Run Simulation..."));
+  action_run_sim = new QAction(QIcon(":/ico/jobnew.svg"), tr("New Job..."));
   action_run_sim->setShortcut(tr("CTRL+R"));
   connect(action_run_sim, &QAction::triggered,
-          [this](){job_manager->show();});
+          [this](){job_manager->showNewJob();});
 
+  action_job_log = new QAction(QIcon(":/ico/joblog.svg"), tr("View Jobs"));
+  action_job_log->setShortcut(tr("CTRL+L"));
+  connect(action_job_log, &QAction::triggered,
+          [this](){job_manager->showViewJobs();});
+
+  /*
   action_repeat_sim = new QAction(tr("Repeat Previous Simulation"), this);
   action_repeat_sim->setShortcut(tr("CTRL+SHIFT+R"));
   connect(action_repeat_sim, &QAction::triggered,
 	  this, &gui::ApplicationGUI::repeatSimulation);
   addAction(action_repeat_sim);
+  */
 
 
   // add them to top bar
   top_bar->addAction(action_run_sim);
+  top_bar->addAction(action_job_log);
   top_bar->addAction(action_sim_visualize);           // already initialised in menu bar
   top_bar->addAction(action_layer_sel);               // already initialised in menu bar
   top_bar->addAction(action_dialog_dock_visibility);  // already initialised in menu bar
@@ -468,6 +477,9 @@ void gui::ApplicationGUI::initSideBar()
       tr("Screenshot area tool"));
   action_scale_bar_anchor_tool = side_bar->addAction(QIcon(":/ico/scalebaranchortool.svg"),
       tr("Scale bar anchor tool"));
+
+  action_dbgen_tool->setShortcut(tr("D"));
+  action_electrode_tool->setShortcut(tr("E"));
 
   ag_design->addAction(action_select_tool);
   ag_design->addAction(action_drag_tool);
