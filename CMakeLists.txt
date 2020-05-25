@@ -42,6 +42,7 @@ set(SIQAD_INSTALL_ROOT "${CMAKE_INSTALL_PREFIX}" CACHE STRING "SiQAD install roo
 set(SIQAD_PLUGINS_ROOT "${SIQAD_INSTALL_ROOT}/plugins" CACHE STRING "SiQAD plugins root directory name")
 set(SIQAD_LIBS_ROOT "${SIQAD_INSTALL_ROOT}/libs" CACHE STRING "SiQAD libraries root directory name")
 set(SIQADCONN_ROOT "${SIQAD_LIBS_ROOT}/siqadtools" CACHE STRING "SiQADConnector root directory name")
+set(SQCONN_REL_SQBIN "libs/siqadtools" CACHE STRING "SiQADConnector root directory relative to SiQAD binary directory")
 
 
 
@@ -62,11 +63,11 @@ if(NOT WIN32)
 endif()
 
 # macro for symlinking to siqadtools if not compiling for Windows
-macro(symlink_siqadtools LINK_BASE)
+macro(symlink_siqadtools SQBIN_REL_PLUG LINK_BASE)
     if(DEFINED SIQADCONN_ROOT AND NOT WIN32)
         install(CODE "execute_process( \
             COMMAND ${CMAKE_COMMAND} -E create_symlink \
-            ${SIQADCONN_ROOT} \
+            ${SQBIN_REL_PLUG}/${SQCONN_REL_SQBIN} \
             ${LINK_BASE}/siqadtools \
             )"
         )
