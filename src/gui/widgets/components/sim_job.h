@@ -165,7 +165,11 @@ namespace comp{
         connect(pb_terminate, &QPushButton::pressed,
                 [job](){
                   QMessageBox msg;
-                  msg.setText("Are you sure you want to terminate the job?");
+#ifdef _WIN32
+                  msg.setText("Are you sure you want to terminate the job (this might not work on Windows)?");
+#else
+                  msg.setText("Are you sure you want to terminate the job (children processes of multi-threaded plugins require programmer support for proper termination)?");
+#endif
                   msg.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
                   msg.setDefaultButton(QMessageBox::No);
                   if (msg.exec() == QMessageBox::Yes) {
