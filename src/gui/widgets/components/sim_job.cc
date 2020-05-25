@@ -226,7 +226,11 @@ bool JobStep::readResults()
 
 void JobStep::terminateJobStep()
 {
+#ifdef _WIN32
+  process->kill();
+#else
   process->terminate();
+#endif
 }
 
 void JobStep::processJobStepCompletion(int t_exit_code, QProcess::ExitStatus t_exit_status)

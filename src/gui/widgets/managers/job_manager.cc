@@ -140,8 +140,8 @@ void JobManager::initJobManagerGUI()
   lwi_new_job = new QListWidgetItem("New Job");
   lwi_view_jobs = new QListWidgetItem("View Jobs");
 
-  lwi_new_job->setIcon(QIcon::fromTheme("list-add", QIcon(":/ico/fb/list-add.svg")));
-  lwi_view_jobs->setIcon(QIcon::fromTheme("document-properties"));
+  lwi_new_job->setIcon(QIcon(":/ico/jobnew_cond.svg"));
+  lwi_view_jobs->setIcon(QIcon(":/ico/joblog_cond.svg"));
 
   lw_job_action->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
 

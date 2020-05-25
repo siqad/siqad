@@ -176,6 +176,8 @@ void gui::DesignPanel::initDesignPanel() {
   // set display mode
   setDisplayMode(DesignMode);
 
+  // initialize scene rect for the current viewport
+  updateSceneRect();
 }
 
 void gui::DesignPanel::deselectAll()
@@ -256,11 +258,19 @@ void gui::DesignPanel::addItem(prim::Item *item, int layer_index, int ind)
     qCritical() << tr("Invalid item index");
     return;
   }
+
+  // record position for screen drift correction
+  QPointF old_pos(mapToScene(mapFromParent(rect().center())));
+
   // add Item
   layer->addItem(item, ind);
   scene->addItem(item);
 
   updateSceneRect();
+
+  // correct screen shift
+  QPointF new_pos(mapToScene(mapFromParent(rect().center())));
+  scrollDelta(new_pos - old_pos);
 
   // update item manager
   itman->updateTableAdd();
@@ -276,13 +286,20 @@ void gui::DesignPanel::removeItem(prim::Item *item, prim::Layer *layer, bool ret
   // if layer contains the item, delete and remove froms scene, otherwise
   // do nothing
   if(layer->removeItem(item)){
+    // record position for screen drift correction
+    QPointF old_pos(mapToScene(mapFromParent(rect().center())));
+
+    // remove the item
     scene->removeItem(item);
     if (!retain_item)
       delete item;
-    QRectF sbr = scene->itemsBoundingRect();
-    QRectF vp = mapToScene(viewport()->rect()).boundingRect();
-    setSceneRect(min_scene_rect | sbr | vp);
-    scene->setSceneRect(min_scene_rect | sbr);
+
+    updateSceneRect();
+
+    // correct screen shift
+    QPointF new_pos(mapToScene(mapFromParent(rect().center())));
+    scrollDelta(new_pos - old_pos);
+
     emit sig_itemRemoved(item);
   }
 
@@ -304,13 +321,18 @@ void gui::DesignPanel::removeItemFromScene(prim::Item *item)
 void gui::DesignPanel::updateSceneRect(const QRectF &expand_to_include)
 {
   QRectF sbr = scene->itemsBoundingRect();
-  QRectF vp = mapToScene(viewport()->rect()).boundingRect();
+  QPointF vp_tl = mapToScene(mapFromParent(rect().topLeft()));
+  QPointF vp_br = mapToScene(mapFromParent(rect().bottomRight()));
+  //QRectF vp = mapToScene(viewport()->rect()).boundingRect();
+  //qDebug() << "Old style:" << vp;
+  QRectF vp(vp_tl, vp_br);
+  //qDebug() << "New style:" << vp;
   if (expand_to_include.isNull()) {
-    setSceneRect(min_scene_rect | sbr | vp);
+    scene->setSceneRect(min_scene_rect | sbr | vp);
   } else {
-    setSceneRect(min_scene_rect | sbr | vp | expand_to_include);
+    scene->setSceneRect(min_scene_rect | sbr | vp | expand_to_include);
   }
-  scene->setSceneRect(min_scene_rect | sbr);
+  //scene->setSceneRect(min_scene_rect | sbr);
 }
 
 void gui::DesignPanel::fitItemsInView(const bool &include_hidden)
@@ -435,7 +457,7 @@ void gui::DesignPanel::setSceneMinSize()
   min_scene_rect = QRectF(QPoint(0,0),bot_right);
   min_scene_rect.moveCenter(QPoint(0,0));
   //scene->addItem(new QGraphicsRectItem(scene_rect));
-  scene->setSceneRect(min_scene_rect); // TODO reenable this line when implementing minimum set scene rect
+  scene->setSceneRect(min_scene_rect);
 }
 
 
@@ -1323,11 +1345,15 @@ void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e)
     }
 
     // pre-zoom scene rect update
-    QRectF sbr = scene->itemsBoundingRect();
-    QRectF vp = mapToScene(viewport()->rect()).boundingRect();
+    //QRectF sbr = scene->itemsBoundingRect();
+    //QRectF vp = mapToScene(viewport()->rect()).boundingRect();
+    QPointF vp_tl = mapToScene(mapFromParent(rect().topLeft()));
+    QPointF vp_br = mapToScene(mapFromParent(rect().bottomRight()));
+    QRectF vp = QRectF(vp_tl, vp_br);
     if (ds < 0)
       vp.adjust(-vp.width(), -vp.height(), vp.width(), vp.height()); // account for zoom out viewport size
-    setSceneRect(min_scene_rect | sbr | vp);
+    //setSceneRect(min_scene_rect | sbr | vp);
+    updateSceneRect(vp);
 
     // perform zoom
     scale(1+ds,1+ds);
@@ -1338,12 +1364,12 @@ void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e)
     } else {
       new_pos = mapToScene(mapFromParent(rect().center()));
     }
-    QPointF delta = new_pos - old_pos;
-    scrollDelta(delta); // scroll with anchoring
+    scrollDelta(new_pos - old_pos); // scroll with anchoring
 
     // post-zoom scene rect update
-    vp = mapToScene(viewport()->rect()).boundingRect();
-    setSceneRect(min_scene_rect | sbr | vp);
+    //vp = mapToScene(viewport()->rect()).boundingRect();
+    //setSceneRect(min_scene_rect | sbr | vp);
+    updateSceneRect();
   }
 
   // update background if lattice visibility threshold has been crossed
