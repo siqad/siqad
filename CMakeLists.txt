@@ -37,7 +37,12 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Set the root subdirectory at which SiQAD will be installed to.
-set(SIQAD_INSTALL_ROOT "${DESTDIR}/${CMAKE_INSTALL_PREFIX}" CACHE STRING "SiQAD install root directory name")
+if(SNAPCRAFT_PART_INSTALL)
+    set(SIQAD_INSTALL_ROOT "${SNAPCRAFT_PART_INSTALL}/${CMAKE_INSTALL_PREFIX}" CACHE STRING "SiQAD install root directory name")
+else()
+    set(SIQAD_INSTALL_ROOT "${CMAKE_INSTALL_PREFIX}" CACHE STRING "SiQAD install root directory name")
+endif()
+
 
 set(SIQAD_PLUGINS_ROOT "${SIQAD_INSTALL_ROOT}/plugins" CACHE STRING "SiQAD plugins root directory name")
 set(SIQAD_LIBS_ROOT "${SIQAD_INSTALL_ROOT}/libs" CACHE STRING "SiQAD libraries root directory name")
@@ -72,15 +77,6 @@ macro(symlink_siqadtools SQBIN_REL_PLUG LINK_BASE)
             )"
         )
     endif()
-endmacro()
-
-macro(install_siqadtools SQBIN_REL_PLUG PLUG_INSTALL_DIR)
-    set(SQCONN_FILES
-        ${SQBIN_REL_PLUG}/${SQCONN_REL_SQBIN}/__init__.py
-        ${SQBIN_REL_PLUG}/${SQCONN_REL_SQBIN}/siqadconn.py
-        ${SQBIN_REL_PLUG}/${SQCONN_REL_SQBIN}/_siqadconn.so
-        )
-    install(FILES ${SQCONN_FILES} DESTINATION ${PLUG_INSTALL_DIR}/siqadtools)
 endmacro()
 
 
