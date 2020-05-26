@@ -38,7 +38,9 @@ endif()
 
 # Set the root subdirectory at which SiQAD will be installed to.
 set(SIQAD_INSTALL_ROOT "${CMAKE_INSTALL_PREFIX}" CACHE STRING "SiQAD install root directory name")
+message(STATUS "SIQAD_INSTALL_ROOT is ${SIQAD_INSTALL_ROOT}")
 
+# Directories for plugins and libs
 set(SIQAD_PLUGINS_ROOT "${SIQAD_INSTALL_ROOT}/plugins" CACHE STRING "SiQAD plugins root directory name")
 set(SIQAD_LIBS_ROOT "${SIQAD_INSTALL_ROOT}/libs" CACHE STRING "SiQAD libraries root directory name")
 set(SIQADCONN_ROOT "${SIQAD_LIBS_ROOT}/siqadtools" CACHE STRING "SiQADConnector root directory name")

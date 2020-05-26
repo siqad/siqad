@@ -1,0 +1,20 @@
+# Created by https://www.gitignore.io/api/snapcraft
+# Edit at https://www.gitignore.io/?templates=snapcraft
+
+### Snapcraft ###
+/parts/
+/stage/
+/prime/
+/*.snap
+
+# Snapcraft global state tracking data(automatically generated)
+# https://forum.snapcraft.io/t/location-to-save-global-state/768
+/snap/.snapcraft/
+
+# Source archive packed by `snapcraft cleanbuild` before pushing to the LXD container
+/*_source.tar.bz2
+
+# End of https://www.gitignore.io/api/snapcraft
+
+# Ignore local zip archives
+/*.zip

@@ -12,7 +12,7 @@ add_subdirectory(exhaustive-gs)
 add_subdirectory(afm-sim)
 
 # PoisSolver (currently no Windows support)
-if (NOT WIN32)
+if (NOT WIN32 AND NOT SKIP_POISSOLVER)
     add_subdirectory(poissolver)
 endif()
 

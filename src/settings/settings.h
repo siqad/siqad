@@ -166,7 +166,7 @@ private:
     }
     path_map["<HOME>"] = QDir::homePath();
     path_map["<ROOT>"] = QDir::rootPath();
-    path_map["<SYSTMP>"] = QDir::tempPath() + "/siqad";
+    path_map["<SYSTMP>"] = QDir::tempPath() + "/siqad_" + QDir::home().dirName();
     path_map["<CONFIG>"] = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/siqad";
   }
 
