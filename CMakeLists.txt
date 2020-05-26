@@ -37,8 +37,9 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Set the root subdirectory at which SiQAD will be installed to.
-if(SNAPCRAFT_PART_INSTALL)
-    set(SIQAD_INSTALL_ROOT "${SNAPCRAFT_PART_INSTALL}/${CMAKE_INSTALL_PREFIX}" CACHE STRING "SiQAD install root directory name")
+if(DEFINED ENV{SNAPCRAFT_PART_INSTALL})
+    message(STATUS "Using SNAPCRAFT_PART_INSTALL path")
+    set(SIQAD_INSTALL_ROOT "$ENV{SNAPCRAFT_PART_INSTALL}/${CMAKE_INSTALL_PREFIX}" CACHE STRING "SiQAD install root directory name")
 else()
     set(SIQAD_INSTALL_ROOT "${CMAKE_INSTALL_PREFIX}" CACHE STRING "SiQAD install root directory name")
 endif()
