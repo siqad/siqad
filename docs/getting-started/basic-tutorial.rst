@@ -23,7 +23,7 @@ In this example, we recreate |ORMod| from :cite:`Ng2020_siqad`. The expected cha
 .. figure:: ../figs/or00_despan.png
    :align: center
 
-2. We would like to find the ground state charge configuration for this DB layout. Click on |runsim| (hotkey: ``Ctrl+r``) in the top toolbar to access the |jobman|. Double click on ExhaustiveGS on the |englist| to add it to the |jslist|. The |jobman| should now look like this:
+2. We would like to find the ground state charge configuration for this DB layout. Click on |jobnew| (hotkey: ``Ctrl+r``) in the top toolbar to access the |jobman|. Double click on ExhaustiveGS on the |englist| to add it to the |jslist|. The |jobman| should now look like this:
 
 .. figure:: ../figs/or00_jobman.png
    :align: center
@@ -32,16 +32,16 @@ In this example, we recreate |ORMod| from :cite:`Ng2020_siqad`. The expected cha
 
     ExhaustiveGS exhaustively searches through all possible charge configurations to find the ground state charge configuration. It scales at :math:`\text{O}(N^3)` where :math:`N` is the number of DBs. Do not use it for large (~15+ DBs) problems.
 
-3. Without altering any other settings, run the simulation. The resulting simulation result should be identical to the following figure. At the right, the |simviz| panel containing information related to the simulation also appears. When the |simviz| panel is active, |sim_viz_mode| is also active in the design panel which prevents design changes to be made.
+3. Without altering any other settings, run the simulation. The resulting simulation result should be identical to the following figure. At the right, the |simvis| panel containing information related to the simulation also appears. When the |simvis| panel is active, |sim_viz_mode| is also active in the design panel which prevents design changes to be made.
 
 .. figure:: ../figs/or00_simviz.png
    :align: center
 
 .. note::
 
-    Since this is a simple simulation, you should receive the result almost instantaneously on a modern machine. If this is not the case, open the |jobman| again, go to "View Jobs", and check the simulation log for the potential cause.
+    Since this is a simple simulation, you should receive the result almost instantaneously on a modern machine. If this is not the case, view the |joblogs| and check the latest log (top) for the potential cause.
 
-4. Close the |simviz| panel in order to exit |sim_viz_mode| (hotkey: ``v``). Add an input perturber to create the 10 input combination, and run the simulation again with identical settings. The resulting charge configuration disagrees with the expected configuration, we are one negative charge short:
+4. Close the |simvis| panel in order to exit |sim_viz_mode| (hotkey: ``v``). Add an input perturber to create the 10 input combination, and run the simulation again with identical settings. The resulting charge configuration disagrees with the expected configuration, we are one negative charge short:
 
 .. figure:: ../figs/or10_mu25_simviz.png
    :align: center

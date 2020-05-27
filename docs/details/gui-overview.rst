@@ -12,8 +12,9 @@ The SiQAD GUI consists of a few key components:
 * Top menu bar containing standard application toggles and features.
 * Top toolbar providing access to key manager widgets, panels, and modes:
 
-    - |runsim|: Open the job management dialog for creating new simulation jobs and inspecting previous ones.
-    - |simviz|: Toggle the simulation visualization panel for accessing simulation results.
+    - |jobnew|: Open the job manager dialog for creating new simulation jobs.
+    - |joblogs|: View job logs in the job manager.
+    - |simvis|: Toggle the simulation visualization panel for accessing simulation results.
     - |layman|: Toggle the layer manager panel which enables layer manipulation. Currently most useful for adding more Electrode layers for multi-layer electrode simulations.
     - |term|: Toggle the terminal dialog which provides real time debug output and accepts SQCommands (to be documented).
 
@@ -63,7 +64,7 @@ For guidance on selecting and interpreting simulation results, please refer to t
 Simulation Job
 ==============
 
-In SiQAD, simulators are implemented as plugins. Any interaction with plugins is treated as a Job. Simulations can be invoked through the |jobman|, which is accessed through the |runsim| button in the top toolbar.
+In SiQAD, simulators are implemented as plugins. Any interaction with plugins is treated as a Job. Simulations can be invoked through the |jobman|, which is accessed through the |jobnew| button in the top toolbar.
 
 Below is a screenshot of the |jobman| interface:
 

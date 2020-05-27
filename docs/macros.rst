@@ -34,14 +34,17 @@
 .. |plug_invocation| replace:: Plugin Invocation
 .. |plug_params| replace:: Plugin Runtime Parameters
 
-.. |runsim| replace:: Run Simulation |runsim_fig|
-.. |simviz| replace:: Sim Visualize |simviz_fig|
+.. |jobnew| replace:: New Job |jobnew_fig|
+.. |joblogs| replace:: Job Logs |joblogs_fig|
+.. |simvis| replace:: Sim Visualize |simvis_fig|
 .. |layman| replace:: Layer Manager |layman_fig|
 .. |term| replace:: Terminal Dialog |term_fig|
 
-.. |runsim_fig| image:: ../figs/runsim.png
+.. |jobnew_fig| image:: ../figs/jobnew.png
    :height: 1em
-.. |simviz_fig| image:: ../figs/simvisual.png
+.. |joblogs_fig| image:: ../figs/joblog.png
+   :height: 1em
+.. |simvis_fig| image:: ../figs/simvis.png
    :height: 1em
 .. |layman_fig| image:: ../figs/layer.png
    :height: 1em

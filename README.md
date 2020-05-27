@@ -1,6 +1,13 @@
 # SiQAD
 
-SiQAD (Silicon Quantum Atomic Designer) is a next-generation CAD tool that enables the design and simulation of silicon dangling bond (Si-DB) circuits through an intuitive graphical user interface (GUI) and a modular simulation back-end. The tool currently offers simulators that predict ground-state and dynamic electron configuration of given Si-DB configurations, and electrostatics simulation given electrode layouts. Please read the [SiQAD publication on IEEE Transactions on Nanotechnology](https://ieeexplore.ieee.org/document/8963859) for a detailed introduction to the tool and simulators, and visit the [Walus Lab website](https://waluslab.ece.ubc.ca/siqad/) for information about us and other projects that Walus Lab works on!
+SiQAD (Silicon Quantum Atomic Designer) is a next-generation CAD tool that enables the design and simulation of silicon dangling bond (Si-DB) circuits through an intuitive graphical user interface (GUI) and a modular simulation back-end. The tool currently offers simulators that predict ground-state and dynamic electron configuration of given Si-DB configurations, and electrostatics simulation given electrode layouts. There are a few key resources available:
+
+* Feel free to join our [official Slack team](https://join.slack.com/t/siqad/shared_invite/zt-enavwvlg-anRYYpslNbpxXI96zx4Wxg) for SiQAD-related discussion and support!
+* Please read [the SiQAD Documentation](https://siqad.readthedocs.io/) hosted on Read the Docs. A helpful [Basic Tutorial](https://siqad.readthedocs.io/en/latest/getting-started/basic-tutorial.html) is provided to get you started through a step-by-step tutorial. Other details regarding SiQAD are also documented on the site.
+* Please read the [SiQAD publication on IEEE Transactions on Nanotechnology](https://ieeexplore.ieee.org/document/8963859) (open access) for a detailed introduction to the tool and simulators.
+* The [Walus Lab website](https://waluslab.ece.ubc.ca/siqad/) contains information about us and other projects that we work on.
+
+We are transitioning most of the information present in the rest of this README onto the documentation webpage. However, the information is still largely relevant at this time.
 
 
 ## Binary releases

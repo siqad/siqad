@@ -11,7 +11,7 @@ From the parent directory of `snapcraft.yaml` (which, in this repository, is the
 SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=[INSERT_VALUE] snapcraft
 ```
 
-where `[INSERT_VALUE]` must be replaced by the memory size that you would allocate to the [multipass](https://github.com/canonical/multipass) virtual machine used for the build. Without setting it, the default allocated memory for the virtual machine is insufficient for performing this build. `SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=8G` works for me but I imagine smaller values should also suffice. Please choose a value that is sensible for your build machine. Beware of your network data limits as a clean build fetches a great number of sizable packages from apt.
+where `[INSERT_VALUE]` must be replaced by the memory size that you would allocate to the [multipass](https://github.com/canonical/multipass) virtual machine used for the build. Without setting it, the default allocated memory for the virtual machine is insufficient for performing this build. `SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=4G` works for me, I don't know what the lower limit should be. Please choose a value that is sensible for your build machine. Beware of your network data limits as a clean build fetches a great number of sizable packages from apt.
 
 If the build finishes without error, you may install the build by:
 

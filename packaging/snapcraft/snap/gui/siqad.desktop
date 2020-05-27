@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=SiQAD
+Exec=siqad %F
+TryExec=siqad
+Terminal=false
+Type=Application
+Icon=${SNAP}/meta/gui/siqad.png
+StartupWMClass=SiQAD
+Comment=
+Categories=Science;Physics;Engineering
+MimeType=application/sqd
