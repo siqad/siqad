@@ -107,10 +107,8 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene, int lay_
     else
       ls->readNext();
   }
-  if(ls->hasError())
+  if(ls->hasError()) {
     qCritical() << QObject::tr("XML error: ") << ls->errorString().data();
-  if(lay_id != 2){
-    qWarning() << "Electrode lay_id is at" << lay_id << ", should be at 2.";
   }
   if(ld_point1.isNull()){
     qWarning() << "ld_point1 is null";

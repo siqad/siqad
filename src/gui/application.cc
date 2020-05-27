@@ -43,7 +43,18 @@ gui::ApplicationGUI::ApplicationGUI(const QString &f_path, QWidget *parent)
 
   // load the specified file
   if (!f_path.isEmpty() && QFile(f_path).exists()) {
-    openFromFile(f_path);
+    QMessageBox *msg = new QMessageBox(this);
+    msg->setAttribute(Qt::WA_DeleteOnClose);
+    msg->setText("Wait to load file...");
+    msg->setModal(false);
+    msg->open();
+    cli_load_timer.start(1000);
+    connect(&cli_load_timer, &QTimer::timeout,
+        [this,f_path,msg](){
+          openFromFile(f_path);
+          cli_load_timer.stop();
+          msg->close();
+    });
   }
 }
 

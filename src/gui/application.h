@@ -188,6 +188,7 @@ namespace gui{
 
     // save start time for instance recognition
     QDateTime start_time;
+    QTimer cli_load_timer;  // timer for loading file from command line, delayed to wait for GUI init
 
     // directory path persistence
     QDir img_dir;
