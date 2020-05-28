@@ -8,7 +8,7 @@
 
 #include "layer_manager.h"
 
-namespace gui {
+using namespace gui;
 
 // constructor
 LayerManager::LayerManager(QWidget *parent)
@@ -33,42 +33,41 @@ void LayerManager::addLattice(prim::Lattice *lattice)
   layers.append(lattice);
 }
 
-void LayerManager::addLayer(const QString &name, const prim::Layer::LayerType cnt_type, const float zoffset, const float zheight)
+bool LayerManager::addLayer(const QString &name, const prim::Layer::LayerType cnt_type,
+    const prim::Layer::LayerRole role, const float zoffset, const float zheight)
 {
-  // there can only be one layer of misc type
-  for (prim::Layer *layer : layers) {
-    if (cnt_type == prim::Layer::Misc && layer->contentType() == prim::Layer::Misc) {
-      qWarning() << tr("A layer with type Misc already exists, more cannot be created.");
-      return;
-    }
-  }
-
   // check if name already taken
   for(prim::Layer *layer : layers) {
     if(layer->getName() == name){
       qWarning() << tr("A layer already exists with the name : %1").arg(name);
-      return;
+      return false;
     }
   }
 
   // layer is added to the end of layers stack, so ID = layers.size() before it was added
-  prim::Layer *layer = new prim::Layer(name, cnt_type, zoffset, zheight, layers.size());
-  layers.append(layer);
+  prim::Layer *layer = new prim::Layer(name, cnt_type, role, zoffset, zheight, layers.size());
+
+  if (role == prim::Layer::LayerRole::Result) {
+    simvislayers.append(layer);
+  } else {
+    layers.append(layer);
+  }
+
+  // refresh side widget
+  if (side_widget != nullptr)
+    side_widget->refreshLists(layers);
+
+  return true;
 }
 
 void LayerManager::removeLayer(const QString &name)
 {
-  bool removed = false;
   for (prim::Layer *layer : layers) {
     if (layer->getName() == name) {
       removeLayer(layer);
-      removed=true;
       break;
     }
   }
-
-  if(!removed)
-    qWarning() << tr("Requested layer removal of %1 failed").arg(name);
 }
 
 void LayerManager::removeLayer(int n)
@@ -86,6 +85,10 @@ void LayerManager::removeLayer(int n)
   // if active layer was removed, default to surface if available else 0
   if (active_layer == layer)
     active_layer = layers.count() > 1 ? layers.at(1) : 0;
+
+  // update side widget
+  if (side_widget != nullptr)
+    side_widget->refreshLists(layers);
 }
 
 void LayerManager::removeLayer(prim::Layer *layer)
@@ -155,9 +158,10 @@ void LayerManager::setActiveLayer(int n)
 void LayerManager::setActiveLayer(prim::Layer *layer)
 {
   active_layer = layer;
-  // TODO GUI stuff
+  mru_layers[layer->contentType()] = layer;
+
   //update active layer indicator
-  label_active_layer->setText(tr("Active layer: %1").arg(activeLayer()->getName()));
+  side_widget->updateCurrentLayer(layer);
 }
 
 int LayerManager::indexOf(prim::Layer *layer) const
@@ -187,10 +191,8 @@ void LayerManager::saveLayers(QXmlStreamWriter *ws) const
 
 void LayerManager::saveLayerItems(QXmlStreamWriter *ws, DesignInclusionArea inclusion_area) const
 {
-  for(prim::Layer *layer : layers){
-    ws->writeComment(layer->getName());
+  for(prim::Layer *layer : layers)
     layer->saveItems(ws, inclusion_area);
-  }
 }
 
 void LayerManager::tableSelectionChanged(int row)
@@ -299,15 +301,19 @@ void LayerManager::initWizard()
 }
 
 void LayerManager::addByWizard(){
-  QMetaObject layer_mojb = prim::Layer::staticMetaObject;
-  QMetaEnum layer_types = layer_mojb.enumerator(layer_mojb.indexOfEnumerator("LayerType"));
+  //QMetaObject layer_mojb = prim::Layer::staticMetaObject;
+  //QMetaEnum layer_types = layer_mojb.enumerator(layer_mojb.indexOfEnumerator("LayerType"));
   //grab the data from the dialog
   QString layer_name = le_layer_name->text();
   prim::Layer::LayerType content_type = static_cast<prim::Layer::LayerType>(cb_layer_content->currentIndex());
   float offset = le_layer_offset->text().toFloat();
   float height = le_layer_height->text().toFloat();
-  //create a new layer
-  addLayer(layer_name, content_type, offset, height);
+  //create a new layer (for now, assume that user-created layers always take Design role
+  bool success = addLayer(layer_name, content_type, prim::Layer::LayerRole::Design, offset, height);
+  if (!success) {
+    qDebug() << "Layer add unsuccessful, layer list won't be updated.";
+    return;
+  }
   //get the newly created layer
   prim::Layer* layer = getLayer(layerCount()-1);
   //add it to the layer table
@@ -322,86 +328,13 @@ void LayerManager::addByWizard(){
 
 void LayerManager::initSideWidget()
 {
-  QList<QPair<float, prim::Layer*>> sorted_layers;
-  for (prim::Layer *layer : layers)
-    sorted_layers.append(qMakePair(layer->zOffset(), layer));
-  std::sort(sorted_layers.begin(), sorted_layers.end(), QPairFirstReverseComparer());
-
-  //create label to show user the current active layer
-  label_active_layer = new QLabel(tr("Active layer: "));
-  QHBoxLayout *active_layer_hl = new QHBoxLayout;
-  active_layer_hl->addWidget(label_active_layer);
-
-  // construct layer widgets row by row
-  QVBoxLayout *layers_vl = new QVBoxLayout;
-  layers_vl->setAlignment(Qt::AlignTop);
-  QHBoxLayout *row_hl = new QHBoxLayout;
-  layers_vl->addLayout(active_layer_hl);
-  for (int i=0; i<sorted_layers.size(); i++) {
-    prim::Layer *layer = sorted_layers[i].second;
-    QLabel *lb_layer_nm = new QLabel(layer->getName());
-    QPushButton *pb_vsb = new QPushButton(QIcon(":/ico/visible.svg"), "", this);
-    QPushButton *pb_atv = new QPushButton(QIcon(":/ico/editable.svg"), "", this);
-    qDebug() << tr("Creating entry for %1 with zOffset %2").arg(layer->getName()).arg(layer->zOffset());
-
-    pb_vsb->setCheckable(true);
-    pb_vsb->setChecked(layer->isVisible());
-    pb_atv->setCheckable(true);
-    pb_atv->setChecked(layer->isActive());
-
-    pb_atv->setHidden(true); // not implemented yet so hide it
-
-    if (layer->contentType() == prim::Layer::Lattice) {
-      connect(pb_vsb, &QAbstractButton::toggled,
-              static_cast<prim::Lattice*>(layer), &prim::Lattice::setVisible);
-    } else {
-      connect(pb_vsb, &QAbstractButton::toggled, layer, &prim::Layer::setVisible);
-    }
-    connect(pb_atv, &QAbstractButton::toggled, layer, &prim::Layer::setActive);
-
-    QHBoxLayout *layer_hl = new QHBoxLayout;
-    layer_hl->addWidget(lb_layer_nm);
-    layer_hl->addStretch();
-    layer_hl->addWidget(pb_vsb);
-    layer_hl->addWidget(pb_atv);
-
-    QGroupBox *layer_wg = new QGroupBox;
-    layer_wg->setLayout(layer_hl);
-
-    if (i > 0 && layer->zOffset() == sorted_layers[i-1].second->zOffset()) {
-      // add to the same row as before
-      row_hl->addWidget(layer_wg);
-      if (i == sorted_layers.size()-1) {
-        layers_vl->addLayout(row_hl);
-      }
-    } else if (i == sorted_layers.size()-1) {
-      // last layer to add
-      layers_vl->addLayout(row_hl);
-      row_hl = new QHBoxLayout;
-      row_hl->addWidget(layer_wg);
-      layers_vl->addLayout(row_hl);
-    } else {
-      layers_vl->addLayout(row_hl);
-      row_hl = new QHBoxLayout;
-      row_hl->addWidget(layer_wg);
-    }
-  }
-
-  QPushButton *pb_adv = new QPushButton("Advanced");
-  connect(pb_adv, &QAbstractButton::clicked, this, &QWidget::show);
-  QPushButton *pb_add = new QPushButton("Add Layer");
-  connect(pb_add, SIGNAL(clicked()),
-            this, SLOT(addLayerRow()));
-
-  QHBoxLayout *btn_hl = new QHBoxLayout;
-  btn_hl->addStretch();
-  btn_hl->addWidget(pb_adv);
-  btn_hl->addWidget(pb_add);
-  layers_vl->addLayout(btn_hl);
-
-  side_widget = new QWidget(0, Qt::Widget);
-  side_widget->setLayout(layers_vl);
-
+  side_widget = new LayerManagerSidebar(layers, this);
+  connect(side_widget, &LayerManagerSidebar::sig_showAdvancedPanel, 
+      [this](){show();});
+  connect(side_widget, &LayerManagerSidebar::sig_showAddLayerDialog,
+      [this](){addLayerRow();});
+  connect(side_widget, &LayerManagerSidebar::sig_requestLayerSelection,
+      [this](prim::Layer *layer){setActiveLayer(layer);});
 }
 
 void LayerManager::initLayerTableHeaders()
@@ -600,11 +533,150 @@ QIcon LayerManager::layerType2Icon(const prim::Layer::LayerType layer_type)
     return QIcon(":/ico/unknown.svg");
 }
 
-// TODO
-// z-height of db-surface is 0
-// +ve for overhanging layers, -ve for buried
-// ability to edit z-height for non-surface layers
-// option to "always show layer distance from surface"
-// states (checkboxes): visible, editable
 
+
+LayerManagerSidebar::LayerManagerSidebar(const QStack<prim::Layer*> layers,
+    QWidget *parent)
+  : QWidget(parent, Qt::Widget)
+{
+  initialize();
+  refreshLists(layers);
+}
+
+void LayerManagerSidebar::refreshLists(const QStack<prim::Layer*> layers)
+{
+  // clear original layers
+  clearLayout(vl_overlays);
+  clearLayout(vl_layers);
+  lay_widgets.clear();
+
+  if (layers.size() == 0)
+    return;
+
+  // make a list of layers sorted by z index
+  QList<QPair<float, prim::Layer*>> sorted_layers;
+  for (prim::Layer *layer : layers)
+    sorted_layers.append(qMakePair(layer->zOffset(), layer));
+  std::sort(sorted_layers.begin(), sorted_layers.end(), QPairFirstReverseComparer());
+
+  float last_z_offset;
+  QHBoxLayout *hl_row;
+  for (int i=0; i<sorted_layers.size(); i++) {
+    prim::Layer *layer = sorted_layers[i].second;
+    LayerControlWidget *laywid = new LayerControlWidget(layer);
+    lay_widgets.insert(layer, laywid);
+    connect(laywid, &LayerControlWidget::sig_requestLayerSelection,
+        this, &LayerManagerSidebar::sig_requestLayerSelection);
+    if (layer->role() == prim::Layer::LayerRole::Overlay) {
+      vl_overlays->addWidget(laywid);
+    } else {
+      if (i > 0 && layer->zOffset() == last_z_offset) {
+        hl_row->addWidget(laywid);
+      } else {
+        hl_row = new QHBoxLayout();
+        hl_row->addWidget(laywid);
+        vl_layers->addLayout(hl_row);
+      }
+    }
+    last_z_offset = sorted_layers[i].first;
+  }
+}
+
+void LayerManagerSidebar::updateCurrentLayer(prim::Layer *layer)
+{
+  l_curr_lay->setText("Current layer: " + layer->getName());
+
+  // reset all widgets
+  for (auto it=lay_widgets.begin(); it != lay_widgets.end(); it++)
+    it.value()->setCurrent(it.key() == layer);
+}
+
+void LayerManagerSidebar::initialize()
+{
+  l_curr_lay = new QLabel("Current layer: (initializing)");
+  
+  QVBoxLayout *vl_lmsb = new QVBoxLayout;
+  vl_lmsb->setAlignment(Qt::AlignTop);
+
+  // skeleton Overlay and Layer lists to be populated by refreshLists
+  vl_overlays = new QVBoxLayout;
+  vl_layers = new QVBoxLayout;
+  QGroupBox *gb_overlays = new QGroupBox("Overlays");
+  QGroupBox *gb_layers = new QGroupBox("Layers");
+  gb_overlays->setLayout(vl_overlays);
+  gb_layers->setLayout(vl_layers);
+
+  // buttons
+  QHBoxLayout *hl_btns = new QHBoxLayout;
+  QPushButton *pb_adv = new QPushButton("Advanced");
+  QPushButton *pb_add_lay = new QPushButton("Add Layer");
+  connect(pb_adv, &QAbstractButton::clicked, 
+      [this](){emit sig_showAdvancedPanel();});
+  connect(pb_add_lay, &QAbstractButton::clicked, 
+      [this](){emit sig_showAddLayerDialog();});
+  hl_btns->addStretch();
+  hl_btns->addWidget(pb_adv);
+  hl_btns->addWidget(pb_add_lay);
+
+  // wrap up
+  vl_lmsb->addWidget(l_curr_lay);
+  vl_lmsb->addWidget(gb_overlays);
+  vl_lmsb->addWidget(gb_layers);
+  vl_lmsb->addLayout(hl_btns);
+  setLayout(vl_lmsb);
+}
+
+LayerControlWidget::LayerControlWidget(prim::Layer *layer)
+  : layer(layer)
+{
+  // name
+  QLabel *lb_lay_nm = new QLabel(layer->getName());
+
+  // visibility and activity
+  QPushButton *pb_vsb = new QPushButton(QIcon(":/ico/visible.svg"), "");
+  QPushButton *pb_atv = new QPushButton(QIcon(":/ico/editable.svg"), "");
+  pb_vsb->setCheckable(true);
+  pb_atv->setCheckable(true);
+  pb_vsb->setChecked(layer->isVisible());
+  pb_atv->setChecked(layer->isActive());
+  connect(pb_vsb, &QAbstractButton::toggled,
+      [layer](bool vis){
+        if (layer->contentType() == prim::Layer::Lattice) {
+          static_cast<prim::Lattice*>(layer)->setVisible(vis);
+        } else {
+          layer->setVisible(vis);
+        }
+      });
+  connect(pb_atv, &QAbstractButton::toggled,
+      [layer](bool atv){layer->setActive(atv);});
+  pb_atv->setVisible(false); // this still doesn't really work
+
+  // wrap
+  QHBoxLayout *hl_layer = new QHBoxLayout;
+  hl_layer->addWidget(lb_lay_nm);
+  hl_layer->addStretch();
+  hl_layer->addWidget(pb_vsb);
+  hl_layer->addWidget(pb_atv);
+
+  setFrameShape(QFrame::Panel);
+  setFrameShadow(QFrame::Raised);
+  setLineWidth(1);
+  setLayout(hl_layer);
+}
+
+void LayerControlWidget::setCurrent(const bool &selected)
+{
+  setFrameShadow(selected ? QFrame::Sunken : QFrame::Raised);
+}
+
+void LayerControlWidget::mousePressEvent(QMouseEvent *e)
+{
+  switch(e->button()) {
+    case Qt::LeftButton:
+      emit sig_requestLayerSelection(layer);
+      break;
+    default:
+      QFrame::mousePressEvent(e);
+      break;
+  }
 }

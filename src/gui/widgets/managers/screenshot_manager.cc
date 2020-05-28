@@ -19,7 +19,7 @@ ScreenshotManager::ScreenshotManager(int misc_layer_id, QWidget *parent)
 
 ScreenshotManager::~ScreenshotManager()
 {
-  // TODO safely remove clip_area and scale_bar
+  // safely remove clip_area and scale_bar
   if (clip_area->scene() != 0) 
     emit sig_removeVisualAidFromDP(clip_area);
   delete clip_area;

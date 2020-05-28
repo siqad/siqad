@@ -19,7 +19,6 @@
 
 #include "global.h"
 
-#include "afm_panel.h"
 #include "property_editor.h"
 #include "managers/layer_manager.h"
 #include "managers/item_manager.h"
@@ -154,9 +153,6 @@ namespace gui{
 
     //! Set the current display mode. DisplayMode is defined in global.h.
     void setDisplayMode(DisplayMode mode);
-
-    //! get afm_panel pointer
-    AFMPanel *afmPanel() {return afm_panel;}
 
     // SAVE
 
@@ -355,8 +351,6 @@ namespace gui{
     QAction *action_dup;        // duplicate selected objects
 
     // children panels
-    AFMPanel *afm_panel;
-    // TODO layer manager
 
     // copy/paste
     QList<prim::Item*> clipboard;   // cached deep copy of a set of items for pasting
@@ -378,10 +372,6 @@ namespace gui{
     prim::LatticeCoord snap_coord;  // current snap target, lattice coordinate
     prim::LatticeCoord coord_start; // lattice coordinate of mouse click location
     QPointF snap_cache;             // cursor position of last snap update
-
-    // AFM ghost
-    prim::AFMNode *ghost_afm_node=0;
-    prim::AFMSeg *ghost_afm_seg=0;
 
     // mouse functionality
     QPoint prev_db_preview_pos;
@@ -499,9 +489,6 @@ namespace gui{
 
     class CreatePotPlot;  // create an electrode at the given points
 
-    class CreateAFMPath;    // create an empty AFMPath that should later contain AFMNodes
-    class CreateAFMNode;    // create AFMNodes that should be children of AFMPath
-
     class CreateTextLabel;  // create a text label
     class EditTextLabel;
 
@@ -524,13 +511,6 @@ namespace gui{
     //create potential plot on panel
     void createPotPlot(QString pot_plot_path, QRectF graph_container, QString pot_anim_path);
 
-    //! Create AFM area with rubberband selected area, assumes the given rect is
-    //! already in scene coordinates.
-    void createAFMArea(QRect scene_rect);
-
-    // create AFM node in focused path after focused node
-    void createAFMNode();
-
     //! Create a text label
     void createTextLabel(const QRect &scene_rect);
 
@@ -539,9 +519,6 @@ namespace gui{
 
     void resizeItemRect(prim::Item *item, const QRectF &orig_rect,
         const QRectF &new_rect);
-
-    // destroy AFM path and included nodes
-    void destroyAFMPath(prim::AFMPath *afm_path);
 
     // delete all selected items
     void deleteSelection();
@@ -563,7 +540,6 @@ namespace gui{
     void pasteDBDot(prim::Ghost *ghost, int n, prim::DBDot *db);
     void pasteAggregate(prim::Ghost *ghost, int n, prim::Aggregate *agg);
     void pasteElectrode(prim::Ghost *ghost, int n, prim::Electrode *elec);
-    void pasteAFMArea(prim::Ghost *ghost, int n, prim::AFMArea *afm_area);
 
     // move the selected items to the current Ghost, returns True if successful
     bool moveToGhost(bool kill=false);
@@ -698,61 +674,6 @@ namespace gui{
     bool invert;
   };
 
-
-
-  class DesignPanel::CreateAFMPath : public QUndoCommand
-  {
-  public:
-    // create an empty AFMPath
-    CreateAFMPath(int layer_index, DesignPanel *dp, prim::AFMPath *afm_path=0,
-                    bool invert=false, QUndoCommand *parent=0);
-
-    // destroy the AFMPath, which is not necessarily empty
-    virtual void undo();
-
-    // re-create the AFMPath
-    virtual void redo();
-
-  private:
-    void create();    // create the AFMPath
-    void destroy();   // destroy the AFMPath
-
-    bool invert;      // swaps create/delete on redo/undo
-
-    DesignPanel *dp;  // DesignPanel pointer
-    int layer_index;  // index of layer in dp->layers stack
-
-    int index;        // index of this path in the items stack
-  };
-
-
-  class DesignPanel::CreateAFMNode : public QUndoCommand
-  {
-  public:
-    // create an AFMNode with the given AFMPath and index in path
-    CreateAFMNode(int layer_index, DesignPanel *dp, QPointF scenepos, float z_offset,
-          int afm_index, int index_in_path=-1, bool invert=false,
-          QUndoCommand *parent=0);
-
-    // remove the AFMNode from its Path and destroy the node
-    virtual void undo();
-
-    // re-create the node
-    virtual void redo();
-
-  private:
-    void create();    // create the AFMNode
-    void destroy();   // destroy the AFMNode
-
-    bool invert;      // swaps create/delete on redo/undo
-
-    int layer_index;
-    DesignPanel *dp;
-    int afm_index;    // the Path's index in its layer
-    int node_index;   // the Node's index in the path
-    QPointF scenepos;
-    float z_offset;
-  };
 
 
   class DesignPanel::CreateTextLabel : public QUndoCommand

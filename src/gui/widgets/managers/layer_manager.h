@@ -17,6 +17,109 @@
 
 namespace gui{
 
+  //! Mini widget for controlling layer
+  class LayerControlWidget : public QFrame
+  {
+    Q_OBJECT
+
+  public:
+
+    //! Construct the widget.
+    LayerControlWidget(prim::Layer *layer);
+
+    //! Update this widget to reflect whether it's the currently selected layer.
+    void setCurrent(const bool &selected);
+
+  protected:
+
+    //! Override mouse press event to allow users to select this layer as the 
+    //! current layer.
+    void mousePressEvent(QMouseEvent *) override;
+
+  signals:
+
+    //! Request for the layer represented by this widget to be selected.
+    void sig_requestLayerSelection(prim::Layer *);
+
+  private:
+
+    //! Store the layer pointer.
+    prim::Layer *layer;
+
+  };
+
+  class LayerManagerSidebar : public QWidget
+  {
+    Q_OBJECT
+
+  public:
+    
+    //! Construct the layer manager sidebar widget.
+    LayerManagerSidebar(const QStack<prim::Layer*> layers, QWidget *parent);
+
+    //! Refresh layer manager sidebar contents (each layer addition/removal 
+    //! requires the full list to be updated.
+    //! @layers list of existing layers.
+    void refreshLists(const QStack<prim::Layer*> layers);
+
+    //! Update current layer. The information text is updated and the layer 
+    //! is highlighted.
+    //! @layer pointer to the layer
+    void updateCurrentLayer(prim::Layer *layer);
+
+    //! Activate simulation result display. Original layers are hidden.
+    //! TODO implement
+    //! TODO GUI interaction with original layers should be disabled
+    void activateSimVisLayers(const QStack<prim::Layer*>) {};
+
+    //! Deactivate simulation result display, original layers are restored to 
+    //! their cached states.
+    //! TODO implement
+    void deactivateSimVisLayers() {};
+
+  public slots:
+
+
+  signals:
+
+    //! Tell layer manager to show advanced layer panel.
+    void sig_showAdvancedPanel();
+
+    //! Tell layer manager to show add layer dialog.
+    void sig_showAddLayerDialog();
+
+    //! Request layer manager to select the specified layer.
+    void sig_requestLayerSelection(prim::Layer *);
+
+  private:
+
+    //! Initialize the widget.
+    void initialize();
+
+    //! Clear a layout.
+    void clearLayout(QLayout *layout)
+    {
+      QLayoutItem *item;
+      while((item = layout->takeAt(0))) {
+        if (item->layout()) {
+          clearLayout(item->layout());
+          delete item->layout();
+        }
+        if (item->widget()) {
+          delete item->widget();
+        }
+      }
+    }
+
+    // VARS
+    QMap<prim::Layer*, LayerControlWidget*> lay_widgets;
+
+    // GUI VARS
+    QLabel *l_curr_lay;
+    QVBoxLayout *vl_overlays;
+    QVBoxLayout *vl_layers;
+  };
+
   class LayerManager : public QWidget
   {
     Q_OBJECT
@@ -37,21 +140,25 @@ namespace gui{
 
     //! Add a new layer with the given name. If no name is given, a default scheme
     //! is used. Checks if the layer already exists.
-    void addLayer(const QString &name = QString(),
+    bool addLayer(const QString &name = QString(),
                   const prim::Layer::LayerType cnt_type=prim::Layer::DB,
+                  const prim::Layer::LayerRole role=prim::Layer::LayerRole::Design,
                   const float zoffset = 0, const float zheight = 0);
 
-    //! Attempt to remove a layer, by name.
+    //! Attempt to remove a layer, by name (everything except for Result layers).
     void removeLayer(const QString &name);
 
-    //! Attempt to remove a layer, by index.
+    //! Attempt to remove a layer, by index (everything except for Result layers).
     void removeLayer(int n);
 
-    //! Attempt to remove a layer, by pointer.
+    //! Attempt to remove a layer, by pointer (everything except for Result layers).
     void removeLayer(prim::Layer *layer);
 
-    //! Attempt to remove all layers.
+    //! Attempt to remove all layers (everything except for Result layers).
     void removeAllLayers();
+
+    //! Remove all result layers.
+    void removeResultLayers();
 
     //! Returns a pointer to the requested layer if it exists, else 0.
     prim::Layer* getLayer(const QString &name) const;
@@ -146,11 +253,12 @@ namespace gui{
     // vars
     prim::Layer *active_layer=0;
     QStack<prim::Layer*> layers;
+    QStack<prim::Layer*> simvislayers;
     QHash<prim::Layer::LayerType, prim::Layer*> mru_layers;
     // TODO table column order (mapped with string)
 
     // GUI
-    QWidget *side_widget=0;
+    LayerManagerSidebar *side_widget=nullptr;
     QWidget *add_layer_dialog=0;
     QList<LayerTableRowContent*> table_row_contents;
 
@@ -166,9 +274,9 @@ namespace gui{
     QComboBox *cb_layer_content;
     QLineEdit *le_layer_offset;
     QLineEdit *le_layer_height;
-    QLabel *label_active_layer;
 
   };
+
 
 }
 

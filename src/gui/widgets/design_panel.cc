@@ -131,16 +131,10 @@ void gui::DesignPanel::initDesignPanel() {
 
 
   // construct widgets
-  afm_panel = new AFMPanel(layman->indexOf(layman->getMRULayer(prim::Layer::AFMTip)), this);
-  scene->addItem(afm_panel->ghostNode());
-  scene->addItem(afm_panel->ghostSegment());
-  connect(this, &gui::DesignPanel::sig_toolChanged,
-            afm_panel, &gui::AFMPanel::toolChangeResponse);
-
 
   // initialize widgets which depend on other things to be initialized first
 
-  screenman = new ScreenshotManager(layman->getMRULayerID(prim::Layer::Misc), this);
+  screenman = new ScreenshotManager(layman->indexOf(layman->getLayer("Screenshot Overlay")), this);
 
   // ScreenshotManager signals
   connect(screenman, &gui::ScreenshotManager::sig_takeScreenshot,
@@ -194,7 +188,6 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
 
   // delete child widgets
   delete screenman;
-  delete afm_panel;
   delete property_editor;
   delete layman;
   delete itman;
@@ -202,7 +195,6 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   delete rotate_dialog;
 
   screenman=nullptr;
-  afm_panel=nullptr;
   property_editor=nullptr;
   layman=nullptr;
   itman=nullptr;
@@ -424,21 +416,14 @@ void gui::DesignPanel::buildLattice(const QString &fname)
   // add the lattice to the layers, as layer 0
   layman->addLattice(lattice);
 
-  // add the misc layer as layer 1
-  layman->addLayer("Misc", prim::Layer::Misc,0,0);
-
   // add in the dangling bond surface
-  layman->addLayer("Surface", prim::Layer::DB,0,0);
+  layman->addLayer("Surface", prim::Layer::DB, prim::Layer::LayerRole::Design, 0, 0);
 
   // add in the metal layer for electrodes
-  layman->addLayer("Metal", prim::Layer::Electrode,1000,100);
+  layman->addLayer("Metal", prim::Layer::Electrode, prim::Layer::LayerRole::Design, 1000, 100);
 
-  // add in the AFM layer for AFM tip travel paths
-  layman->addLayer("AFM", prim::Layer::AFMTip,5,0.5);
-
-
-  // // add in the metal layer for electrodes
-  // layman->addLayer("Metal2", prim::Layer::Electrode,100E-9,10E-9);
+  // add the screenshot misc items layer
+  layman->addLayer("Screenshot Overlay", prim::Layer::Misc, prim::Layer::LayerRole::Overlay, 0, 0);
 
   layman->populateLayerTable();
   layman->initSideWidget();
@@ -496,14 +481,6 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
     case gui::ToolType::ElectrodeTool:
       layman->setActiveLayer(layman->getMRULayer(prim::Layer::Electrode));
       setDragMode(QGraphicsView::NoDrag);
-      setInteractive(true);
-      break;
-    case gui::ToolType::AFMAreaTool:
-      layman->setActiveLayer(layman->getMRULayer(prim::Layer::AFMTip));
-      setInteractive(true);
-      break;
-    case gui::ToolType::AFMPathTool:
-      layman->setActiveLayer(layman->getMRULayer(prim::Layer::AFMTip));
       setInteractive(true);
       break;
     case gui::ToolType::ScreenshotAreaTool:
@@ -734,6 +711,7 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs, QList<int> &layer_or
   QString layer_nm;
   float zoffset=0, zheight=0;
   prim::Layer::LayerType layer_type = prim::Layer::DB;
+  prim::Layer::LayerRole layer_role = prim::Layer::LayerRole::Design;
   bool layer_visible=false, layer_active=false;
 
   // keep reading until end of layer_prop tag
@@ -742,8 +720,12 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs, QList<int> &layer_or
       layer_nm = rs->readElementText();
     } else if (rs->name() == "type") {
       layer_type = static_cast<prim::Layer::LayerType>(
-        QMetaEnum::fromType<prim::Layer::LayerType>().keyToValue(
-          rs->readElementText().toStdString().c_str()));
+          QMetaEnum::fromType<prim::Layer::LayerType>().keyToValue(
+            rs->readElementText().toStdString().c_str()));
+    } else if (rs->name() == "role") {
+      layer_role = static_cast<prim::Layer::LayerRole>(
+          QMetaEnum::fromType<prim::Layer::LayerRole>().keyToValue(
+            rs->readElementText().toStdString().c_str()));
     } else if (rs->name() == "zoffset") {
       zoffset = rs->readElementText().toFloat();
     } else if (rs->name() == "zheight") {
@@ -949,7 +931,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
       } else if (tool_type == SelectTool || tool_type == ElectrodeTool ||
-          tool_type == AFMAreaTool || tool_type == LabelTool) {
+          tool_type == LabelTool) {
         // rubber band variables
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
@@ -1003,20 +985,6 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     prim::LatticeCoord offset;
     if (snapGhost(scene_pos, offset)) // if there are db dots
       prim::Ghost::instance()->moveByCoord(offset, lattice);
-  } else if (tool_type == AFMPathTool) {
-    // update ghost node and ghost segment if there is a focused node, only update
-    // ghost node if there's none.
-    /* TODO re-enable it later
-    QList<prim::Item::ItemType> target_types;
-    target_types.append(prim::Item::LatticeDot);
-    target_types.append(prim::I
-    tem::DBDot);
-    prim::Item *snap_target = filteredSnapTarget(mapToScene(e->pos()), target_types, snap_diameter);
-    if (snap_target) {
-      afm_panel->ghostNode()->setPos(snap_target->scenePos());
-      afm_panel->showGhost(true);
-    }*/
-
   } else if (!clicked && tool_type == DBGenTool) {
     QPoint cursor_pos = mapToScene(e->pos()).toPoint();
     QPoint cursor_offset = cursor_pos - press_scene_pos;
@@ -1030,8 +998,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     switch(e->buttons()){
       case Qt::LeftButton:
         if (tool_type == SelectTool || tool_type == ElectrodeTool ||
-            tool_type == AFMAreaTool || tool_type == ScreenshotAreaTool ||
-            tool_type == LabelTool) {
+            tool_type == ScreenshotAreaTool || tool_type == LabelTool) {
           rubberBandUpdate(e->pos());
         } else if (tool_type == DBGenTool) {
           createDBPreviews(lattice->enclosedSites(coord_start, lattice->nearestSite(mapToScene(e->pos()))));
@@ -1109,13 +1076,6 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
           case gui::ToolType::ElectrodeTool:
             // get start and end locations, and create the electrode.
             createElectrode(rb_scene_rect);
-            break;
-          case gui::ToolType::AFMAreaTool:
-            createAFMArea(rb_scene_rect);
-            break;
-          case gui::ToolType::AFMPathTool:
-            // Make node at the ghost position
-            createAFMNode();
             break;
           case gui::ToolType::ScreenshotAreaTool:
           {
@@ -1695,7 +1655,6 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, prim::LatticeCoord &offset)
   // check if holding any non-floating objects
   for (prim::Item *item : pasting ? clipboard : selectedItems()) {
     if (item->item_type != prim::Item::Electrode &&
-        item->item_type != prim::Item::AFMArea &&
         item->item_type != prim::Item::TextLabel) {
       is_all_floating = false;
       break;
@@ -1956,91 +1915,6 @@ void gui::DesignPanel::CreatePotPlot::destroy()
   }
 }
 
-
-
-// CreateAFMPath class
-
-gui::DesignPanel::CreateAFMPath::CreateAFMPath(int layer_index, gui::DesignPanel *dp,
-                        prim::AFMPath *afm_path, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(invert), dp(dp), layer_index(layer_index)
-{
-  //qDebug() << tr("Entered CreateAFMPath");
-  prim::Layer *layer = dp->layman->getLayer(layer_index);
-  index = invert ? layer->getItemIndex(afm_path) : layer->getItems().size();
-  if (index == -1)
-    qCritical() << tr("Index for AFMPath is -1, this shouldn't happen.");
-}
-
-void gui::DesignPanel::CreateAFMPath::undo()
-{
-  invert ? create() : destroy();
-}
-
-void gui::DesignPanel::CreateAFMPath::redo()
-{
-  invert ? destroy() : create();
-}
-
-void gui::DesignPanel::CreateAFMPath::create()
-{
-  //qDebug() << tr("Entered CreateAFMPath::create()");
-  prim::AFMPath *new_path = new prim::AFMPath(layer_index);
-  dp->addItem(new_path, layer_index, index);
-  dp->afmPanel()->setFocusedPath(new_path);
-}
-
-void gui::DesignPanel::CreateAFMPath::destroy()
-{
-  //qDebug() << tr("Entered CreateAFMPath::destroy()");
-  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->layman->getLayer(layer_index)->getItem(index));
-
-  // contained nodes and segments should be deleted automatically when deleting the path
-  // since they're children items to the path.
-  dp->removeItem(afm_path, dp->layman->getLayer(afm_path->layer_id));
-  dp->afmPanel()->setFocusedPath(0);
-}
-
-
-// CreateAFMNode class
-
-gui::DesignPanel::CreateAFMNode::CreateAFMNode(int layer_index, gui::DesignPanel *dp,
-                        QPointF scenepos, float z_offset, int afm_index,
-                        int index_in_path, bool invert, QUndoCommand *parent)
-  : QUndoCommand(parent), invert(invert), layer_index(layer_index), dp(dp),
-      afm_index(afm_index), scenepos(scenepos), z_offset(z_offset)
-{
-  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->layman->getLayer(layer_index)->getItem(afm_index));
-  node_index = (index_in_path == -1) ? afm_path->nodeCount() : index_in_path;
-}
-
-void gui::DesignPanel::CreateAFMNode::undo()
-{
-  invert ? create() : destroy();
-}
-
-void gui::DesignPanel::CreateAFMNode::redo()
-{
-  invert ? destroy() : create();
-}
-
-void gui::DesignPanel::CreateAFMNode::create()
-{
-  //qDebug() << tr("Entered CreateAFMNode::create()");
-  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->layman->getLayer(layer_index)->getItem(afm_index));
-  prim::AFMNode *new_node = new prim::AFMNode(layer_index, scenepos, z_offset);
-  afm_path->insertNode(new_node, node_index);
-
-  dp->afmPanel()->setFocusedPath(afm_path);
-  dp->afmPanel()->setFocusedNodeIndex(node_index);
-}
-
-void gui::DesignPanel::CreateAFMNode::destroy()
-{
-  //qDebug() << tr("Entered CreateAFMNode::destroy()");
-  prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(dp->layman->getLayer(layer_index)->getItem(afm_index));
-  afm_path->removeNode(node_index); // pointer cleanup is done by AFMPath
-  dp->afmPanel()->setFocusedNodeIndex(node_index-1);
-}
 
 
 // Create Text Label class
@@ -2517,17 +2391,6 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
       return true;
       break;
     }
-    case prim::Item::AFMArea:
-      if (item_args.size()==4) {
-        setTool(gui::ToolType::AFMAreaTool);
-        emit sig_toolChangeRequest(gui::ToolType::AFMAreaTool);
-        int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
-        prim::AFMArea* afm_area = new prim::AFMArea(layer_index, item_args);
-        undo_stack->push(new CreateItem(layer_index, this, afm_area));
-        emit sig_toolChangeRequest(gui::ToolType::SelectTool);
-        return true;
-      }
-      break;
     default:
       return false;
   }
@@ -2651,6 +2514,10 @@ QPointF gui::DesignPanel::findMoveOffset(QStringList args)
 void gui::DesignPanel::createDBs(prim::LatticeCoord lat_coord)
 {
   int layer_index = layman->indexOf(layman->activeLayer());
+  if (layman->getLayer(layer_index)->contentType() != prim::Layer::DB) {
+    qWarning() << "Current layer type is not DB, cannot create DBs.";
+    return;
+  }
   // save list of lattice coords where DBs should be created
   QList<prim::LatticeCoord> lat_list = QList<prim::LatticeCoord>();
   if (!lat_coord.isValid()) {
@@ -2670,9 +2537,22 @@ void gui::DesignPanel::createDBs(prim::LatticeCoord lat_coord)
 
 void gui::DesignPanel::createElectrode(QRect scene_rect)
 {
-  if (scene_rect.isNull())
+  settings::GUISettings *S = settings::GUISettings::instance();
+  qreal electrode_min_dim = S->get<qreal>("electrode/min_dim");
+  if (scene_rect.isNull()) {
     return;
+  } else if (scene_rect.width() / prim::Item::scale_factor < electrode_min_dim
+      || scene_rect.width() / prim::Item::scale_factor < electrode_min_dim) {
+    qWarning() << tr("Cannot create electrodes with one of the dimensions less "
+        " than %1 angstrom").arg(electrode_min_dim);
+    return;
+  }
+
   int layer_index = layman->indexOf(layman->activeLayer());
+  if (layman->getLayer(layer_index)->contentType() != prim::Layer::Electrode) {
+    qWarning() << "Current layer type is not Electrode, cannot create electrode.";
+    return;
+  }
   //only ever create one electrode at a time
   undo_stack->beginMacro(tr("create electrode with given corners"));
   undo_stack->push(new CreateItem(layer_index, this,
@@ -2689,43 +2569,6 @@ void gui::DesignPanel::createPotPlot(QString pot_plot_path, QRectF graph_contain
   undo_stack->endMacro();
 }
 
-void gui::DesignPanel::createAFMArea(QRect scene_rect)
-{
-  if (scene_rect.isNull())
-    return;
-  int layer_index = layman->indexOf(layman->activeLayer());
-
-  // create the AFM area
-  undo_stack->beginMacro(tr("create AFM area with given corners"));
-  undo_stack->push(new CreateItem(layer_index, this,
-                                  new prim::AFMArea(layer_index, scene_rect)));
-  undo_stack->endMacro();
-}
-
-void gui::DesignPanel::createAFMNode()
-{
-  //qDebug() << tr("Entered createAFMNode()");
-  int layer_index = layman->indexOf(layman->activeLayer());
-  QPointF scene_pos;
-  if (afm_panel->ghostNode())
-    scene_pos = afm_panel->ghostNode()->scenePos();
-  else
-    scene_pos = press_scene_pos;
-
-  // TODO UNDOable version
-  undo_stack->beginMacro(tr("create AFMNode in the focused AFMPath after the focused AFMNode"));
-  if (!afm_panel->focusedPath()) {
-    // create new path if there's no focused path
-    prim::AFMPath *new_path = new prim::AFMPath(layer_index);
-    afm_panel->setFocusedPath(new_path);
-    undo_stack->push(new CreateAFMPath(layer_index, this));
-  }
-  prim::Layer *afm_layer = layman->activeLayer();
-  int afm_path_index = afm_layer->getItemIndex(afm_panel->focusedPath());
-  undo_stack->push(new CreateAFMNode(layer_index, this, scene_pos, afm_layer->zOffset(),
-                                        afm_path_index));
-  undo_stack->endMacro();
-}
 
 void gui::DesignPanel::createTextLabel(const QRect &scene_rect)
 {
@@ -2774,31 +2617,6 @@ void gui::DesignPanel::resizeItemRect(prim::Item *item,
   }
 }
 
-void gui::DesignPanel::destroyAFMPath(prim::AFMPath *afm_path)
-{
-  undo_stack->beginMacro(tr("Remove AFM Path and contained nodes"));
-
-  // destroy children nodes
-  qDebug() << "delete children nodes";
-  prim::AFMNode *afm_node;
-  while (afm_path->getLastNode()) {
-    //qDebug() << "getting last node";
-    afm_node = afm_path->getLastNode();
-
-    //qDebug() << "getting afm and node indices";
-    int afm_index = layman->getLayer(afm_node->layer_id)->getItemIndex(afm_path);
-    int node_index = afm_path->getNodeIndex(afm_node);
-    //qDebug() << tr("pushing to undo stack. layer_id=%1, zoffset=%2, afm_index=%3, node_index=%4").arg(afm_node->layer_id).arg(afm_node->zOffset()).arg(afm_index).arg(node_index);
-    undo_stack->push(new CreateAFMNode(afm_node->layer_id, this, afm_node->scenePos(),
-          afm_node->zOffset(), afm_index, node_index, true));
-  }
-
-  // destroy empty path
-  //qDebug() << "delete afmpath";
-  undo_stack->push(new CreateAFMPath(afm_path->layer_id, this, afm_path, true));
-
-  undo_stack->endMacro();
-}
 
 void gui::DesignPanel::deleteSelection()
 {
@@ -2819,20 +2637,6 @@ void gui::DesignPanel::deleteSelection()
       case prim::Item::Aggregate:
         destroyAggregate(static_cast<prim::Aggregate*>(item));
         break;
-      case prim::Item::AFMPath:
-        destroyAFMPath(static_cast<prim::AFMPath*>(item));
-        break;
-      case prim::Item::AFMNode:
-        {
-        prim::AFMNode *afm_node = static_cast<prim::AFMNode*>(item);
-        prim::AFMPath *afm_path = static_cast<prim::AFMPath*>(afm_node->parentItem());
-        int afm_index = layman->getLayer(afm_node->layer_id)->getItemIndex(afm_path);
-        int node_index = afm_path->getNodeIndex(afm_node);
-        undo_stack->push(new CreateAFMNode(afm_node->layer_id, this,
-            afm_node->scenePos(), afm_node->zOffset(), afm_index, node_index, true));
-        qDebug() << "shouldn't be here yet";
-        break;
-        }
       case prim::Item::PotPlot:
         {
         prim::PotPlot *pp = static_cast<prim::PotPlot*>(item);
@@ -2942,7 +2746,6 @@ bool gui::DesignPanel::pasteAtGhost()
   bool is_all_floating = true;
   for(QGraphicsItem *gitem : clipboard){
     if (static_cast<prim::Item*>(gitem)->item_type != prim::Item::Electrode &&
-        static_cast<prim::Item*>(gitem)->item_type != prim::Item::AFMArea &&
         reinterpret_cast<prim::TextLabel*>(gitem)->item_type != prim::Item::TextLabel){
       is_all_floating = false;
       break;
@@ -2981,9 +2784,6 @@ void gui::DesignPanel::pasteItem(prim::Ghost *ghost, int n, prim::Item *item)
       break;
     case prim::Item::Electrode:
       pasteElectrode(ghost, n, static_cast<prim::Electrode*>(item));
-      break;
-    case prim::Item::AFMArea:
-      pasteAFMArea(ghost, n, static_cast<prim::AFMArea*>(item));
       break;
     default:
       qCritical() << tr("No functionality for pasting given item... update pasteItem");
@@ -3029,17 +2829,6 @@ void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, int n, prim::Electrode
 }
 
 
-void gui::DesignPanel::pasteAFMArea(prim::Ghost *ghost, int n, prim::AFMArea *afm_area)
-{
-  QRectF rect = afm_area->sceneRect();
-  rect.moveTopLeft(ghost->pos()+rect.topLeft());
-  undo_stack->beginMacro(tr("create AFMArea with given afm_area params"));
-  // TODO copy AFM tip attributes
-  undo_stack->push(new CreateItem(afm_area->layer_id, this,
-                                  new prim::AFMArea(afm_area->layer_id, rect)));
-  undo_stack->endMacro();
-}
-
 // NOTE: currently item move relies on there being a snap target (i.e. at least
 //       one dangling bond is being moved). Should modify in future to be more
 //       general. If no move is made, need to make originial lattice dots
@@ -3057,7 +2846,6 @@ bool gui::DesignPanel::moveToGhost(bool kill)
     // reset the original lattice dot selectability and return false
     for (prim::Item *item : selectedItems()) {
       if (item->item_type != prim::Item::Electrode &&
-          item->item_type != prim::Item::AFMArea &&
           item->item_type != prim::Item::TextLabel) {
         is_all_floating = false;
       }

@@ -28,7 +28,7 @@ QColor prim::Lattice::lat_fill_col;
 QColor prim::Lattice::lat_fill_col_pb;
 
 prim::Lattice::Lattice(const QString &fname, int lay_id)
-  : Layer(tr("Lattice"),Layer::Lattice,0)
+  : Layer(tr("Lattice"), Layer::Lattice, LayerRole::Design, 0)
 {
   if (lat_diam == -1)
     constructStatics();

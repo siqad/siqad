@@ -31,13 +31,28 @@ namespace prim{
   public:
 
     //! enum type for different layer contents
-    enum LayerType{Lattice, DB, Electrode, AFMTip, Misc, NoType};
+    enum LayerType{Lattice, DB, Electrode, Misc, NoType};
     Q_ENUM(LayerType)
 
+    //! enum type for layer roles
+    //! Design:   the layer holds designs that can be manipulated and are 
+    //!           intended to be written to save files.
+    //! Overlay:  predominantly used to hold programmed overlays, but in 
+    //!           principle can be manipulated by users such as Screenshot 
+    //!           props. Not intended to be written to save files.
+    //! Result:   the layer display simulation results and cannot be 
+    //!           manipulated. Not intended to be written to save files.
+    enum class LayerRole{Design, Overlay, NonVolatileOverlay, Result};
+    Q_ENUM(LayerRole)
 
-    //! constructor, create a Layer with the given name. If no name is given,
-    //! use the default naming scheme with layer_count.
-    Layer(const QString &nm = QString(), const LayerType cnt_type=DB, float z_offset=0, float z_height=0, int lay_id=-1, QObject *parent=0);
+
+    //! Constructor, create a Layer with the given name. If no name is given,
+    //! use the default naming scheme with layer_count. The Layer base class 
+    //! assumes the LayerRole of Design, other role types should be in
+    //! subclasses.
+    Layer(const QString &nm = QString(), const LayerType cnt_type=DB, 
+        const LayerRole role=LayerRole::Design, float z_offset=0,
+        float z_height=0, int lay_id=-1, QObject *parent=0);
 
     //! Construct layer from XML stream.
     Layer(QXmlStreamReader *, int lay_id=-1);
@@ -101,6 +116,10 @@ namespace prim{
     LayerType contentType() const {return content_type;}
     const QString contentTypeString() const {return QString(QMetaEnum::fromType<LayerType>().valueToKey(content_type));}
 
+    //! Get the layer role.
+    LayerRole role() const {return layer_role;}
+    const QString roleString() const {return QVariant::fromValue(layer_role).toString();}
+
     //! if i is within bounds, return a pointer to the indexed item in the Layer
     //! item stack; otherwise, return 0
     prim::Item *getItem(int i) { return i >= 0 && i<items.size() ? items.at(i) : 0;}
@@ -126,6 +145,7 @@ namespace prim{
 
     QString name;     // arbitrary layer name, layers can be selected by name
     LayerType content_type;
+    LayerRole layer_role;
 
     // list of items in order of insertion, should probably be a linked list
     QStack<prim::Item*> items;

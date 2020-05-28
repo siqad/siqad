@@ -499,14 +499,6 @@ void gui::ApplicationGUI::initSideBar()
       tr("DB tool"));
   action_electrode_tool = side_bar->addAction(QIcon(":/ico/drawelectrode.svg"),
       tr("Electrode tool"));
-  /*
-  action_afmarea_tool = side_bar->addAction(QIcon(":/ico/drawafmarea.svg"),
-      tr("AFM Area tool"));
-  action_afmpath_tool = side_bar->addAction(QIcon(":/ico/drawafmpath.svg"),
-      tr("AFM Path tool"));
-  action_label_tool = side_bar->addAction(QIcon(":/ico/drawlabel.svg"),
-      tr("Label tool"));
-      */
   action_screenshot_area_tool = side_bar->addAction(QIcon(":/ico/screenshotarea.svg"),
       tr("Screenshot area tool"));
   action_scale_bar_anchor_tool = side_bar->addAction(QIcon(":/ico/scalebaranchortool.svg"),
@@ -520,8 +512,6 @@ void gui::ApplicationGUI::initSideBar()
   ag_design->addAction(action_dbgen_tool);
   ag_design->addAction(action_electrode_tool);
   /*
-  ag_design->addAction(action_afmarea_tool);
-  ag_design->addAction(action_afmpath_tool);
   ag_design->addAction(action_label_tool);
   */
   ag_design->addAction(action_screenshot_area_tool);
@@ -536,8 +526,6 @@ void gui::ApplicationGUI::initSideBar()
   action_dbgen_tool->setCheckable(true);
   action_electrode_tool->setCheckable(true);
   /*
-  action_afmarea_tool->setCheckable(true);
-  action_afmpath_tool->setCheckable(true);
   action_label_tool->setCheckable(true);
   */
   action_screenshot_area_tool->setCheckable(true);
@@ -551,14 +539,6 @@ void gui::ApplicationGUI::initSideBar()
           this, &gui::ApplicationGUI::setToolDBGen);
   connect(action_electrode_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolElectrode);
-  /*
-  connect(action_afmarea_tool, &QAction::triggered,
-          this, &gui::ApplicationGUI::setToolAFMArea);
-  connect(action_afmpath_tool, &QAction::triggered,
-          this, &gui::ApplicationGUI::setToolAFMPath);
-  connect(action_label_tool, &QAction::triggered,
-          this, &gui::ApplicationGUI::setToolLabel);
-          */
   connect(action_screenshot_area_tool, &QAction::triggered,
           this, &gui::ApplicationGUI::setToolScreenshotArea);
   connect(action_scale_bar_anchor_tool, &QAction::triggered,
@@ -844,16 +824,6 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
       action_electrode_tool->setChecked(true);
       setToolElectrode();
       break;
-      /*
-    case gui::ToolType::AFMAreaTool:
-      action_afmarea_tool->setChecked(true);
-      setToolAFMArea();
-      break;
-    case gui::ToolType::AFMPathTool:
-      action_afmpath_tool->setChecked(true);
-      setToolAFMPath();
-      break;
-      */
     case gui::ToolType::ScreenshotAreaTool:
       action_screenshot_area_tool->setChecked(true);
       setToolScreenshotArea();
@@ -899,18 +869,6 @@ void gui::ApplicationGUI::setToolElectrode()
 {
   qDebug() << tr("selecting electrode tool");
   design_pan->setTool(gui::ToolType::ElectrodeTool);
-}
-
-void gui::ApplicationGUI::setToolAFMArea()
-{
-  qDebug() << tr("selecting afmarea tool");
-  design_pan->setTool(gui::ToolType::AFMAreaTool);
-}
-
-void gui::ApplicationGUI::setToolAFMPath()
-{
-  qDebug() << tr("selecting afmpath tool");
-  design_pan->setTool(gui::ToolType::AFMPathTool);
 }
 
 void gui::ApplicationGUI::setToolScreenshotArea()

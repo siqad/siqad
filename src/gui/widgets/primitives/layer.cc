@@ -10,21 +10,19 @@
 #include "aggregate.h"
 #include "dbdot.h"
 #include "electrode.h"
-#include "afmarea.h"
-#include "afmpath.h"
 
 
 // statics
 uint prim::Layer::layer_count = 0;
 
 
-prim::Layer::Layer(const QString &nm, LayerType cnt_type, float z_offset,
-    float z_height, int lay_id, QObject *parent)
+prim::Layer::Layer(const QString &nm, LayerType cnt_type, LayerRole role, 
+    float z_offset, float z_height, int lay_id, QObject *parent)
   : QObject(parent), layer_id(lay_id), zoffset(z_offset), zheight(z_height),
-        visible(true), active(false)
+        content_type(cnt_type), layer_role(role), visible(true), 
+        active(false)
 {
   name = nm.isEmpty() ? QString("Layer %1").arg(layer_count++) : nm;
-  content_type = cnt_type;
 }
 
 
@@ -32,7 +30,8 @@ prim::Layer::Layer(QXmlStreamReader *rs, int lay_id)
   : layer_id(lay_id), visible(true), active(false)
 {
   QString nm;
-  prim::Layer::LayerType type = prim::Layer::NoType;
+  LayerType type = NoType;
+  layer_role = LayerRole::Design;
 
   while (rs->readNextStartElement()) {
     if (rs->name() == "name") {
@@ -40,7 +39,12 @@ prim::Layer::Layer(QXmlStreamReader *rs, int lay_id)
     } else if (rs->name() == "type") {
       type = static_cast<LayerType>(
           QMetaEnum::fromType<LayerType>().keyToValue(
-          rs->readElementText().toStdString().c_str()));
+            rs->readElementText().toStdString().c_str()));
+    } else if (rs->name() == "role") {
+      // added in SiQAD v0.2.2
+      layer_role = static_cast<LayerRole>(
+          QMetaEnum::fromType<LayerRole>().keyToValue(
+            rs->readElementText().toStdString().c_str()));
     } else if (rs->name() == "zoffset") {
       zoffset = rs->readElementText().toFloat();
     } else if (rs->name() == "zheight") {
@@ -145,6 +149,12 @@ void prim::Layer::setActive(bool act)
 
 void prim::Layer::saveLayer(QXmlStreamWriter *ws) const
 {
+  if (layer_role != LayerRole::Design && layer_role != LayerRole::NonVolatileOverlay) {
+    qDebug() << tr("Skipping layer %1: %2 as the role is volatile.")
+      .arg(layer_id).arg(name);
+    return;
+  }
+
   ws->writeStartElement("layer_prop");
   saveLayerProperties(ws);
   ws->writeEndElement();
@@ -159,6 +169,7 @@ void prim::Layer::saveLayerProperties(QXmlStreamWriter *ws) const
 
   ws->writeTextElement("name", getName());
   ws->writeTextElement("type", contentTypeString());
+  ws->writeTextElement("role", roleString()); // added in SiQAD v0.2.2
   ws->writeTextElement("zoffset", str.setNum(zOffset(), fmt, fp));
   ws->writeTextElement("zheight", str.setNum(zHeight(), fmt, fp));
   ws->writeTextElement("visible", QString::number(isVisible()));
@@ -167,6 +178,14 @@ void prim::Layer::saveLayerProperties(QXmlStreamWriter *ws) const
 
 void prim::Layer::saveItems(QXmlStreamWriter *ws, gui::DesignInclusionArea inclusion_area) const
 {
+  if (layer_role != LayerRole::Design && layer_role != LayerRole::NonVolatileOverlay) {
+    qDebug() << tr("Skipping layer %1: %2 as the role is volatile.")
+      .arg(layer_id).arg(name);
+    return;
+  }
+
+  ws->writeComment(getName());
+
   ws->writeStartElement("layer");
   ws->writeAttribute("type", contentTypeString());
 
@@ -203,12 +222,6 @@ void prim::Layer::loadItems(QXmlStreamReader *ws, QGraphicsScene *scene)
       } else if (ws->name() == "electrode") {
         ws->readNext();
         addItem(new prim::Electrode(ws, scene, layer_id));
-      } else if (ws->name() == "afmarea") {
-        ws->readNext();
-        addItem(new prim::AFMArea(ws, scene, layer_id));
-      } else if (ws->name() == "afmpath") {
-        ws->readNext();
-        addItem(new prim::AFMPath(ws, scene, layer_id));
       } else {
         qDebug() << QObject::tr("Layer load item: invalid element encountered on line %1 - %2").arg(ws->lineNumber()).arg(ws->name().toString());
         ws->readNext();
