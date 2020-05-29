@@ -76,11 +76,12 @@ namespace prim{
     QPoint sceneSiteVector(int ind) const {return b_scene[ind];}
 
     //! Identify the nearest lattice site to the given scene position.
-    LatticeCoord nearestSite(const QPointF &scene_pos) const;
+    LatticeCoord nearestSite(const QPointF &pos, bool is_scene_pos) const;
 
     //! Identify the nearest lattice site to the given scene position, returns
     //! it in lattice coordinates and updates the reference QPointF site_pos.
-    LatticeCoord nearestSite(const QPointF &scene_pos, QPointF &nearest_site_pos) const;
+    LatticeCoord nearestSite(const QPointF &pos, QPointF &nearest_site_pos,
+        bool is_scene_pos) const;
 
     //! Return a QList of lattice site coordinates enclosed in a given QRectF 
     //! in scene coordinates. WARNING this won't work with rotated lattices!
@@ -104,12 +105,18 @@ namespace prim{
 
     //! Set lattice dot location to be occupied
     void setOccupied(const prim::LatticeCoord &l_coord, prim::DBDot *dbdot) {
+      qDebug() << tr("set occupied %1, %2, %3").arg(l_coord.n).arg(l_coord.m).arg(l_coord.l);
       occ_latdots.insert(l_coord, dbdot);
     }
 
     //! Set lattice dot location to be unoccupied
     void setUnoccupied(const prim::LatticeCoord &l_coord) {
       occ_latdots.remove(l_coord);
+    }
+
+    //! Clear occupation list (the pointers aren't actually deleted).
+    void clearOccupation() {
+      occ_latdots.clear();
     }
 
     //! Return whether lattice dot location is occupied.
@@ -127,6 +134,9 @@ namespace prim{
       return occ_latdots.contains(l_coord) ? occ_latdots.value(l_coord) : nullptr;
     }
 
+    //! Return a list of DBDot pointers at specified physical locations (angstrom).
+    QList<prim::DBDot*> dbsAtPhysLocs(const QList<QPointF> &physlocs);
+
     //! identify the bounding rect of an approximately rectangular supercell
     QRectF tileApprox();
 
@@ -137,8 +147,6 @@ namespace prim{
     void setVisible(bool);
 
   private:
-
-    int layer_id;       // index of this layer in design panel's stack
 
     int n_cell;         // number of atoms in unit cell
 

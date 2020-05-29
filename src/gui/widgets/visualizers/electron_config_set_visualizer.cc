@@ -15,8 +15,8 @@ using namespace gui;
 typedef comp::ChargeConfigSet ECS;
 typedef gui::ChargeConfigSetVisualizer ECSVisualizer;
 
-ECSVisualizer::ChargeConfigSetVisualizer(DesignPanel *design_pan, QWidget *parent)
-  : QWidget(parent), design_pan(design_pan)
+ECSVisualizer::ChargeConfigSetVisualizer(prim::Lattice *lattice, QWidget *parent)
+  : QWidget(parent), lattice(lattice)
 {
   // config set selection
   l_energy_val = new QLabel();
@@ -235,11 +235,8 @@ void ECSVisualizer::showChargeConfigResult(const ECS::ChargeConfig &charge_confi
 
   curr_charge_config = charge_config;
 
-  // design panel display mode
-  design_pan->setDisplayMode(DisplayMode::SimDisplayMode);
-
   // set the charge fill state of the provided set of DBs
-  showing_db_sites = design_pan->getDBsAtLocs(db_phys_locs);
+  showing_db_sites = lattice->dbsAtPhysLocs(db_phys_locs);
   if (db_phys_locs.size() != 0 && showing_db_sites.empty()) {
     qCritical() << tr("Failed to retrieve all DB locations, aborting charge \
         config result display.");

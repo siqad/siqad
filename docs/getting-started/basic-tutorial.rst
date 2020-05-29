@@ -1,5 +1,7 @@
 .. include:: ../macros.rst
 
+.. _basic_tutorial_doc:
+
 Basic Tutorial
 **************
 

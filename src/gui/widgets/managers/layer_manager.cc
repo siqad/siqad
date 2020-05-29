@@ -12,7 +12,7 @@ using namespace gui;
 
 // constructor
 LayerManager::LayerManager(QWidget *parent)
-  : QWidget(parent, Qt::Dialog)
+  : QWidget(parent, Qt::Dialog), simlayermode(false)
 {
   initLayerManager();
   //initDockWidget();
@@ -27,37 +27,106 @@ LayerManager::~LayerManager()
   removeAllLayers();
 }
 
-void LayerManager::addLattice(prim::Lattice *lattice)
+void LayerManager::setSimVisualizeMode(const bool &enable)
 {
-  lattice->setLayerID(layers.size());
-  layers.append(lattice);
+  qDebug() << tr("Setting sim visualize mode in layer widget to: %1").arg(enable);
+
+  simlayermode=enable;
+
+  if (!enable) {
+    removeAllResultLayers(true);
+  }
+
+  auto setLayersVisibility = [](QStack<prim::Layer*> &laylist, bool vis) {
+    for (prim::Layer *layer : laylist) {
+      layer->setVisible(vis);
+    }
+  };
+
+  setLayersVisibility(layers, !enable);
+  setLayersVisibility(simvislayers, enable);
+
+  if (!enable) {
+    static_cast<prim::Lattice*>(simvislayers[0])->clearOccupation();
+  }
+
+  side_widget->setSimVisualizeMode(enable);
 }
 
-bool LayerManager::addLayer(const QString &name, const prim::Layer::LayerType cnt_type,
-    const prim::Layer::LayerRole role, const float zoffset, const float zheight)
+void LayerManager::addLattice(prim::Lattice *lattice, prim::Layer::LayerRole role)
 {
-  // check if name already taken
-  for(prim::Layer *layer : layers) {
-    if(layer->getName() == name){
-      qWarning() << tr("A layer already exists with the name : %1").arg(name);
-      return false;
+  bool design_role = role==prim::Layer::Design;
+  QStack<prim::Layer*> &laylist = design_role ? layers : simvislayers;
+  // for now, there must only be one lattice so do such a check
+  if (role == prim::Layer::Design && getLayers(prim::Layer::Lattice, design_role).size() != 0) {
+    qFatal("Only one lattice is allowed, but program attempted to create more.");
+  }
+
+  lattice->setLayerID(laylist.size());
+  lattice->setRole(role);
+  laylist.append(lattice);
+}
+
+prim::Lattice *LayerManager::getLattice(bool design_role)
+{
+  QStack<prim::Layer*> &laylist = design_role ? layers : simvislayers;
+  for (prim::Layer *lay : laylist) {
+    if (lay->contentType() == prim::Layer::Lattice) {
+      return static_cast<prim::Lattice*>(lay);
     }
   }
+  return nullptr;
+}
 
-  // layer is added to the end of layers stack, so ID = layers.size() before it was added
-  prim::Layer *layer = new prim::Layer(name, cnt_type, role, zoffset, zheight, layers.size());
+prim::Layer *LayerManager::addLayer(const QString &name, const prim::Layer::LayerType &cnt_type,
+    const prim::Layer::LayerRole &role, const float &zoffset, const float &zheight)
+{
+  QStack<prim::Layer*> &laylist = (role == prim::Layer::Result) ? simvislayers : layers;
 
-  if (role == prim::Layer::LayerRole::Result) {
-    simvislayers.append(layer);
-  } else {
-    layers.append(layer);
+  // check if name already taken
+  if (nameExists(name, laylist)) {
+    qWarning() << tr("A layer already exists with the name : %1").arg(name);
+    return nullptr;
   }
+
+  // layer is added to the end of layers stack, so ID = layers.size() before it is added
+  int layer_id = (laylist.size() > 0) ? laylist.back()->layerID()+1 : 0;
+  if (cnt_type == prim::Layer::DB || cnt_type == prim::Layer::Lattice) {
+    qFatal("Not allowed to make DB or Lattice layer through addLayer function, "
+        "please use their corresponding adders instead.");
+  }
+  prim::Layer *layer = new prim::Layer(name, cnt_type, role, zoffset, zheight, 
+      layer_id);
+
+  laylist.append(layer);
 
   // refresh side widget
   if (side_widget != nullptr)
-    side_widget->refreshLists(layers);
+    side_widget->refreshLists(layers, simvislayers);
 
-  return true;
+  return layer;
+}
+
+prim::DBLayer *LayerManager::addDBLayer(prim::Lattice *lattice, 
+    const QString &name, const prim::Layer::LayerRole &role)
+{
+  QStack<prim::Layer*> &laylist = (role == prim::Layer::Result) ? simvislayers : layers;
+
+  // check if name already taken
+  if (nameExists(name, laylist)) {
+    qWarning() << tr("A layer already exists with the name : %1").arg(name);
+    return nullptr;
+  }
+  
+  int layer_id = (laylist.size() > 0) ? laylist.back()->layerID()+1 : 0;
+  prim::DBLayer *layer = new prim::DBLayer(lattice, name, role, 
+      lattice->zOffset(), lattice->zHeight(), layer_id);
+  laylist.append(layer);
+
+  if (side_widget != nullptr)
+    side_widget->refreshLists(layers, simvislayers);
+
+  return layer;
 }
 
 void LayerManager::removeLayer(const QString &name)
@@ -88,7 +157,7 @@ void LayerManager::removeLayer(int n)
 
   // update side widget
   if (side_widget != nullptr)
-    side_widget->refreshLists(layers);
+    side_widget->refreshLists(layers, simvislayers);
 }
 
 void LayerManager::removeLayer(prim::Layer *layer)
@@ -101,13 +170,40 @@ void LayerManager::removeLayer(prim::Layer *layer)
 
 void LayerManager::removeAllLayers()
 {
+  qDebug() << "Removing all Design layers.";
+
+  // remove simulation result layers
+  removeAllResultLayers(false);
+
+  // remove design layers
   while (!layers.isEmpty())
     removeLayer(layers.count()-1);
 }
 
-prim::Layer* LayerManager::getLayer(const QString &name) const
+void LayerManager::removeAllResultLayers(bool keep_lattice)
 {
-  for(prim::Layer *layer : layers)
+  qDebug() << "Removing all Result layers.";
+
+  while (!simvislayers.isEmpty()) {
+    if (keep_lattice && simvislayers.size() == 1) {
+      if (simvislayers[0]->contentType() != prim::Layer::Lattice) {
+        qFatal("First sim result layer must be lattice but it is not.");
+      }
+      break;
+    }
+    prim::Layer *layer = simvislayers.takeLast();
+    delete layer;
+  }
+
+  if (side_widget != nullptr) {
+    side_widget->refreshLists(layers, simvislayers);
+  }
+}
+
+prim::Layer* LayerManager::getLayer(const QString &name, bool design_role) const
+{
+  QStack<prim::Layer*> laylist = design_role ? layers : simvislayers;
+  for(prim::Layer *layer : laylist)
     if(layer->getName() == name)
       return layer;
 
@@ -116,20 +212,24 @@ prim::Layer* LayerManager::getLayer(const QString &name) const
   return 0;
 }
 
-prim::Layer* LayerManager::getLayer(int n) const
+prim::Layer* LayerManager::getLayer(int n, bool design_role) const
 {
-  if(n<0 || n>=layers.count()){
+  QStack<prim::Layer*> laylist = design_role ? layers : simvislayers;
+  if(n<0 || n>=laylist.count()){
     qWarning() << tr("Layer index %1 out of bounds...").arg(n);
     return 0;
   }
   else
-    return layers.at(n);
+    return laylist.at(n);
 }
 
-QList<prim::Layer*> LayerManager::getLayers(prim::Layer::LayerType type)
+QList<prim::Layer*> LayerManager::getLayers(prim::Layer::LayerType type,
+    bool design_layers)
 {
+  QStack<prim::Layer*> &laylist = design_layers ? layers : simvislayers;
+
   QList<prim::Layer*> layers_found;
-  for (prim::Layer *layer : layers)
+  for (prim::Layer *layer : laylist)
     if (layer->contentType() == type)
       layers_found.append(layer);
   return layers_found;
@@ -169,7 +269,7 @@ int LayerManager::indexOf(prim::Layer *layer) const
   return layer==0 ? layers.indexOf(active_layer) : layers.indexOf(layer);
 }
 
-prim::Layer *LayerManager::getMRULayer(prim::Layer::LayerType type)
+prim::Layer *LayerManager::getMRULayer(prim::Layer::LayerType type) const
 {
   // find that layer in the MRU hash table
   if (mru_layers.contains(type))
@@ -328,7 +428,7 @@ void LayerManager::addByWizard(){
 
 void LayerManager::initSideWidget()
 {
-  side_widget = new LayerManagerSidebar(layers, this);
+  side_widget = new LayerManagerSidebar(layers, simvislayers, this);
   connect(side_widget, &LayerManagerSidebar::sig_showAdvancedPanel, 
       [this](){show();});
   connect(side_widget, &LayerManagerSidebar::sig_showAddLayerDialog,
@@ -519,6 +619,16 @@ void LayerManager::addLayerRow(LayerTableRowContent *row_content)
 
 }
 
+bool LayerManager::nameExists(const QString &nm, const QStack<prim::Layer*> &laylist)
+{
+  for(prim::Layer *layer : laylist) {
+    if(layer->getName() == nm){
+      return true;
+    }
+  }
+  return false;
+}
+
 
 QIcon LayerManager::layerType2Icon(const prim::Layer::LayerType layer_type)
 {
@@ -536,50 +646,57 @@ QIcon LayerManager::layerType2Icon(const prim::Layer::LayerType layer_type)
 
 
 LayerManagerSidebar::LayerManagerSidebar(const QStack<prim::Layer*> layers,
-    QWidget *parent)
+    const QStack<prim::Layer*> simvislayers, QWidget *parent)
   : QWidget(parent, Qt::Widget)
 {
   initialize();
-  refreshLists(layers);
+  refreshLists(layers, simvislayers);
 }
 
-void LayerManagerSidebar::refreshLists(const QStack<prim::Layer*> layers)
+void LayerManagerSidebar::refreshLists(const QStack<prim::Layer*> layers,
+    const QStack<prim::Layer*> simvislayers)
 {
   // clear original layers
   clearLayout(vl_overlays);
   clearLayout(vl_layers);
+  clearLayout(vl_result_layers);
   lay_widgets.clear();
 
-  if (layers.size() == 0)
+  if (layers.size() == 0 && simvislayers.size() == 0)
     return;
 
-  // make a list of layers sorted by z index
-  QList<QPair<float, prim::Layer*>> sorted_layers;
-  for (prim::Layer *layer : layers)
-    sorted_layers.append(qMakePair(layer->zOffset(), layer));
-  std::sort(sorted_layers.begin(), sorted_layers.end(), QPairFirstReverseComparer());
+  auto populateLayerList = [this](const QStack<prim::Layer*> &laylist, QVBoxLayout *vl_list) {
+    // make a list of layers sorted by z index
+    QList<QPair<float, prim::Layer*>> sorted_layers;
+    for (prim::Layer *layer : laylist)
+      sorted_layers.append(qMakePair(layer->zOffset(), layer));
+    std::sort(sorted_layers.begin(), sorted_layers.end(), QPairFirstReverseComparer());
 
-  float last_z_offset;
-  QHBoxLayout *hl_row;
-  for (int i=0; i<sorted_layers.size(); i++) {
-    prim::Layer *layer = sorted_layers[i].second;
-    LayerControlWidget *laywid = new LayerControlWidget(layer);
-    lay_widgets.insert(layer, laywid);
-    connect(laywid, &LayerControlWidget::sig_requestLayerSelection,
-        this, &LayerManagerSidebar::sig_requestLayerSelection);
-    if (layer->role() == prim::Layer::LayerRole::Overlay) {
-      vl_overlays->addWidget(laywid);
-    } else {
-      if (i > 0 && layer->zOffset() == last_z_offset) {
-        hl_row->addWidget(laywid);
+    float last_z_offset;
+    QHBoxLayout *hl_row;
+    for (int i=0; i<sorted_layers.size(); i++) {
+      prim::Layer *layer = sorted_layers[i].second;
+      LayerControlWidget *laywid = new LayerControlWidget(layer);
+      lay_widgets.insert(layer, laywid);
+      connect(laywid, &LayerControlWidget::sig_requestLayerSelection,
+          this, &LayerManagerSidebar::sig_requestLayerSelection);
+      if (layer->role() == prim::Layer::LayerRole::Overlay) {
+        vl_overlays->addWidget(laywid);
       } else {
-        hl_row = new QHBoxLayout();
-        hl_row->addWidget(laywid);
-        vl_layers->addLayout(hl_row);
+        if (i > 0 && layer->zOffset() == last_z_offset) {
+          hl_row->addWidget(laywid);
+        } else {
+          hl_row = new QHBoxLayout();
+          hl_row->addWidget(laywid);
+          vl_list->addLayout(hl_row);
+        }
       }
+      last_z_offset = sorted_layers[i].first;
     }
-    last_z_offset = sorted_layers[i].first;
-  }
+  };
+
+  populateLayerList(layers, vl_layers);
+  populateLayerList(simvislayers, vl_result_layers);
 }
 
 void LayerManagerSidebar::updateCurrentLayer(prim::Layer *layer)
@@ -589,6 +706,12 @@ void LayerManagerSidebar::updateCurrentLayer(prim::Layer *layer)
   // reset all widgets
   for (auto it=lay_widgets.begin(); it != lay_widgets.end(); it++)
     it.value()->setCurrent(it.key() == layer);
+}
+
+void LayerManagerSidebar::setSimVisualizeMode(const bool &enable)
+{
+  gb_layers->setEnabled(!enable);
+  gb_result_layers->setVisible(enable);
 }
 
 void LayerManagerSidebar::initialize()
@@ -601,10 +724,13 @@ void LayerManagerSidebar::initialize()
   // skeleton Overlay and Layer lists to be populated by refreshLists
   vl_overlays = new QVBoxLayout;
   vl_layers = new QVBoxLayout;
-  QGroupBox *gb_overlays = new QGroupBox("Overlays");
-  QGroupBox *gb_layers = new QGroupBox("Layers");
+  vl_result_layers = new QVBoxLayout;
+  gb_overlays = new QGroupBox("Overlays");
+  gb_layers = new QGroupBox("Layers");
+  gb_result_layers = new QGroupBox("Sim Layers");
   gb_overlays->setLayout(vl_overlays);
   gb_layers->setLayout(vl_layers);
+  gb_result_layers->setLayout(vl_result_layers);
 
   // buttons
   QHBoxLayout *hl_btns = new QHBoxLayout;
@@ -622,6 +748,7 @@ void LayerManagerSidebar::initialize()
   vl_lmsb->addWidget(l_curr_lay);
   vl_lmsb->addWidget(gb_overlays);
   vl_lmsb->addWidget(gb_layers);
+  vl_lmsb->addWidget(gb_result_layers);
   vl_lmsb->addLayout(hl_btns);
   setLayout(vl_lmsb);
 }
@@ -647,9 +774,11 @@ LayerControlWidget::LayerControlWidget(prim::Layer *layer)
           layer->setVisible(vis);
         }
       });
+  connect(layer, &prim::Layer::sig_visibilityChanged,
+      pb_vsb, &QAbstractButton::setChecked);
   connect(pb_atv, &QAbstractButton::toggled,
       [layer](bool atv){layer->setActive(atv);});
-  pb_atv->setVisible(false); // this still doesn't really work
+  pb_atv->setVisible(false); // hiding because this isn't fully implemented
 
   // wrap
   QHBoxLayout *hl_layer = new QHBoxLayout;

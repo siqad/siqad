@@ -9,9 +9,9 @@
 #define _GUI_CHRG_CONFIG_SET_VIS_H_
 
 #include <QtWidgets>
-#include "../design_panel.h"
 #include "gui/widgets/components/job_results/electron_config_set.h"
 #include "gui/widgets/primitives/dbdot.h"
+#include "gui/widgets/primitives/dblayer.h"
 
 namespace gui{
 
@@ -25,13 +25,16 @@ namespace gui{
     enum PreferredSelection{LowestPhysicallyValidState, LowestInMostPopularNetCharge};
 
     //! Constructor.
-    ChargeConfigSetVisualizer(DesignPanel *design_pan, QWidget *parent=nullptr);
+    ChargeConfigSetVisualizer(prim::Lattice *lattice, QWidget *parent=nullptr);
 
     //! Destructor.
     ~ChargeConfigSetVisualizer() {};
 
     //! Reset the widget, clearing out all existing information.
     void clearVisualizer();
+
+    //! Update the lattice pointer.
+    void setLattice(prim::Lattice *lat) {lattice=lat;}
 
     //! Set a new ChargeConfigSet (which contains all charge configurations).
     //! most_popular_elec_count instructs whether to default to filtering for 
@@ -95,7 +98,7 @@ namespace gui{
 
 
     // non-GUI variables
-    DesignPanel *design_pan;                    // pointer to the design panel
+    prim::Lattice *lattice;
     // current charge config set (contains all information about this config)
     comp::ChargeConfigSet *charge_config_set=nullptr;
     // current charge config list (filtered/sorted/etc.)

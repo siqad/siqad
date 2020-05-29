@@ -10,6 +10,7 @@ gui/widgets/primitives/aggregate.cc
 gui/widgets/primitives/dbdot.cc
 gui/widgets/primitives/ghost.cc
 gui/widgets/primitives/layer.cc
+gui/widgets/primitives/dblayer.cc
 gui/widgets/primitives/lattice.cc
 gui/widgets/primitives/electrode.cc
 gui/widgets/primitives/afmarea.cc

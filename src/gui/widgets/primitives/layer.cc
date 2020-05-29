@@ -10,14 +10,17 @@
 #include "aggregate.h"
 #include "dbdot.h"
 #include "electrode.h"
+#include "dblayer.h"
+#include "lattice.h"
 
 
 // statics
 uint prim::Layer::layer_count = 0;
 
 
-prim::Layer::Layer(const QString &nm, LayerType cnt_type, LayerRole role, 
-    float z_offset, float z_height, int lay_id, QObject *parent)
+prim::Layer::Layer(const QString &nm, const LayerType &cnt_type, 
+    const LayerRole &role, float z_offset, float z_height, int lay_id, 
+    QObject *parent)
   : QObject(parent), layer_id(lay_id), zoffset(z_offset), zheight(z_height),
         content_type(cnt_type), layer_role(role), visible(true), 
         active(false)
@@ -70,7 +73,6 @@ prim::Layer::~Layer()
   while (!items.isEmpty()) {
     prim::Item *item = items.pop();
     delete item;
-    //prim::Emitter::instance()->removeItemFromScene(item);
   }
 }
 
@@ -135,6 +137,7 @@ void prim::Layer::setVisible(bool vis)
     for(prim::Item *item : items)
       item->setVisible(vis);
   }
+  emit sig_visibilityChanged(vis);
 }
 
 
@@ -149,7 +152,7 @@ void prim::Layer::setActive(bool act)
 
 void prim::Layer::saveLayer(QXmlStreamWriter *ws) const
 {
-  if (layer_role != LayerRole::Design && layer_role != LayerRole::NonVolatileOverlay) {
+  if (layer_role != LayerRole::Design) {
     qDebug() << tr("Skipping layer %1: %2 as the role is volatile.")
       .arg(layer_id).arg(name);
     return;
@@ -178,7 +181,7 @@ void prim::Layer::saveLayerProperties(QXmlStreamWriter *ws) const
 
 void prim::Layer::saveItems(QXmlStreamWriter *ws, gui::DesignInclusionArea inclusion_area) const
 {
-  if (layer_role != LayerRole::Design && layer_role != LayerRole::NonVolatileOverlay) {
+  if (layer_role != LayerRole::Design) {
     qDebug() << tr("Skipping layer %1: %2 as the role is volatile.")
       .arg(layer_id).arg(name);
     return;
@@ -215,7 +218,12 @@ void prim::Layer::loadItems(QXmlStreamReader *ws, QGraphicsScene *scene)
     if (ws->isStartElement()) {
       if (ws->name() == "dbdot") {
         ws->readNext();
-        addItem(new prim::DBDot(ws, scene, layer_id));
+        prim::DBDot *dbdot = new prim::DBDot(ws, scene, layer_id);
+        addItem(dbdot);
+        prim::Emitter::instance()->addItemToScene(dbdot);
+        static_cast<prim::DBLayer*>(this)->getLattice()->setOccupied(dbdot->latticeCoord(), dbdot);
+        prim::LatticeCoord lc = dbdot->latticeCoord();
+        prim::Emitter::instance()->sig_moveDBToLatticeCoord(dbdot, lc.n, lc.m, lc.l);
       } else if (ws->name() == "aggregate") {
         ws->readNext();
         addItem(new prim::Aggregate(ws, scene, layer_id));

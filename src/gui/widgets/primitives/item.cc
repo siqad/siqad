@@ -26,8 +26,9 @@ void prim::Item::init()
   scale_factor_nm = scale_factor*10;
 }
 
-prim::Item::Item(ItemType type, int lay_id, QGraphicsItem *parent)
-  : QGraphicsItem(parent), item_type(type), layer_id(lay_id), hovered(false)
+prim::Item::Item(ItemType type, int lay_id, bool is_design_obj, QGraphicsItem *parent)
+  : QGraphicsItem(parent), item_type(type), layer_id(lay_id), 
+    is_design_object(is_design_obj), hovered(false)
 {
   if(scale_factor<0)
     init();

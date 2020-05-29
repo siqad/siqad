@@ -59,7 +59,7 @@ SimVisualizer::SimVisualizer(DesignPanel *design_pan, QWidget *parent)
   // TODO the following can probably be templated
 
   // charge configuration results
-  charge_config_set_visualizer = new ChargeConfigSetVisualizer(design_pan);
+  charge_config_set_visualizer = new ChargeConfigSetVisualizer(design_pan->getLattice(false));
   gb_charge_configs = new QGroupBox("Charge Configurations");
   cb_job_steps_charge_configs = new QComboBox();
   QToolButton *tb_refresh_job_steps_charge_configs = new QToolButton();
@@ -75,9 +75,11 @@ SimVisualizer::SimVisualizer(DesignPanel *design_pan, QWidget *parent)
   vl_charge_configs->addWidget(charge_config_set_visualizer);
   gb_charge_configs->setLayout(vl_charge_configs);
 
-  auto setChargeConfigSetJobStep = [this](const int &job_step_ind)
+  auto setChargeConfigSetJobStep = [this, design_pan](const int &job_step_ind)
   {
     comp::JobStep *js = sim_job->getJobStep(job_step_ind);
+    emit sig_loadProblemFile(js->problemPath());
+    charge_config_set_visualizer->setLattice(design_pan->getLattice(false));
     ECS *charge_config_set = static_cast<ECS*>(
         js->jobResults().value(comp::JobResult::ChargeConfigsResult));
     charge_config_set_visualizer->setChargeConfigSet(charge_config_set);
@@ -131,6 +133,7 @@ SimVisualizer::SimVisualizer(DesignPanel *design_pan, QWidget *parent)
   auto setPotentialLandscapeJobStep = [this](const int &job_step_ind)
   {
     comp::JobStep *js = sim_job->getJobStep(job_step_ind);
+    emit sig_loadProblemFile(js->problemPath());
     PL *pot_landscape = static_cast<PL*>(
         js->jobResults().value(comp::JobResult::PotentialLandscapeResult));
     pot_landscape_visualizer->setPotentialLandscape(pot_landscape);
@@ -180,10 +183,14 @@ SimVisualizer::SimVisualizer(DesignPanel *design_pan, QWidget *parent)
 
 void SimVisualizer::showJob(comp::SimJob *job)
 {
+  // clear previous job first
+  clearJob();
+
   sim_job = job;
   qDebug() << tr("Showing job %1").arg(job->name());
   setEnabled(true);
 
+  // tell application to show virualization side dock and load Result layers
   emit sig_showJobInvoked(job);
 
   // generic job information
@@ -250,4 +257,9 @@ void SimVisualizer::clearJob()
 
   // TODO doesn't belong here but move it to the appropriate location: terminal
   // output dialog button somewhere
+}
+
+void SimVisualizer::designPanelResetActions()
+{
+  charge_config_set_visualizer->setLattice(design_pan->getLattice(false));
 }

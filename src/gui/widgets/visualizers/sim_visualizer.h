@@ -37,6 +37,9 @@ namespace gui{
     //! Clear the job result from this and children visualizers.
     void clearJob();
 
+    //! Take actions after design panel reset
+    void designPanelResetActions();
+
     //! Return the result types supported by this class.
     QList<comp::JobResult::ResultType> supportedResultTypes()
     {
@@ -84,6 +87,9 @@ namespace gui{
 
     //! Notify application that showJob has been triggered.
     void sig_showJobInvoked(comp::SimJob *job);
+
+    //! Tell application to load the design of a problem file.
+    void sig_loadProblemFile(const QString &fpath);
 
   private:
 

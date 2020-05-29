@@ -9,6 +9,9 @@
 
 #include "item.h"
 
+#ifndef _GUI_PR_AGG_H_
+#define _GUI_PR_AGG_H_
+
 namespace prim{
 
   // forward declaration of prim::Layer
@@ -72,3 +75,5 @@ namespace prim{
   };
 
 } // end prim namespace
+
+#endif
