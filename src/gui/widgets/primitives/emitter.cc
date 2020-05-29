@@ -52,6 +52,11 @@ void prim::Emitter::physLoc2LatticeCoord(QPointF physloc, int &n, int &m, int &l
   emit sig_physLoc2LatticeCoord(physloc, n, m, l);
 }
 
+void prim::Emitter::latticeCoord2PhysLoc(int n, int m, int l, QPointF &physloc)
+{
+  emit sig_latticeCoord2PhysLoc(n, m, l, physloc);
+}
+
 void prim::Emitter::editTextLabel(Item *item, const QString &new_text)
 {
   emit sig_editTextLabel(item, new_text);

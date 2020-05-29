@@ -6,8 +6,12 @@
 SiQAD Documentation
 ===================
 
-SiQAD (**Si**\ licon **Q**\ uantum **A**\ tomic **D**\ esigner) is a next-generation CAD tool that enables the design and simulation of silicon dangling bond (DB) circuits through an intuitive graphical user interface (GUI) and a modular simulation back-end. The tool currently offers simulators that predict ground-state and dynamic electron configuration of given DB configurations, and electrostatics simulation given electrode layouts. Please read the `SiQAD publication on IEEE Transactions on Nanotechnology <https://ieeexplore.ieee.org/document/8963859>`_ (open access) for a detailed introduction to the tool and simulators, and visit the `Walus Lab website <https://waluslab.ece.ubc.ca/siqad/>`_ for information about us and other projects that Walus Lab works on!
+SiQAD (**Si**\ licon **Q**\ uantum **A**\ tomic **D**\ esigner) is a next-generation CAD tool that enables the design and simulation of silicon dangling bond (DB) circuits through an intuitive graphical user interface (GUI) and a modular simulation back-end. The tool currently offers simulators that predict ground-state and dynamic electron configuration of given DB configurations, and electrostatics simulation given electrode layouts. There are a few key resources available:
 
+* Feel free to join our `official Slack team <https://join.slack.com/t/siqad/shared_invite/zt-enavwvlg-anRYYpslNbpxXI96zx4Wxg>`_ for SiQAD-related discussion and support!
+* Please read the `SiQAD publication on IEEE Transactions on Nanotechnology <https://ieeexplore.ieee.org/document/8963859>`_ (open access) for a detailed introduction to the tool and simulators.
+* Please read the :ref:`basic_tutorial_doc` to familiarize with basic SiQAD features through a step-by-step tutorial.
+* The `Walus Lab website <https://waluslab.ece.ubc.ca/siqad/>`_ contains information about us and other projects that we work on.
 
 
 .. toctree::
@@ -37,6 +41,7 @@ SiQAD (**Si**\ licon **Q**\ uantum **A**\ tomic **D**\ esigner) is a next-genera
    refs.rst
    Design Files Repo <https://github.com/samuelngsh/published-resources/>
    SiQAD GitHub Repo <https://github.com/siqad/siqad/>
+   Public Slack Team <https://join.slack.com/t/siqad/shared_invite/zt-enavwvlg-anRYYpslNbpxXI96zx4Wxg>
 
 .. |github_fig| image:: figs/github_logo.png
    :height: 1em

@@ -9,6 +9,7 @@ gui/widgets/primitives/aggregate.h
 gui/widgets/primitives/dbdot.h
 gui/widgets/primitives/ghost.h
 gui/widgets/primitives/layer.h
+gui/widgets/primitives/dblayer.h
 gui/widgets/primitives/lattice.h
 gui/widgets/primitives/electrode.h
 gui/widgets/primitives/afmarea.h

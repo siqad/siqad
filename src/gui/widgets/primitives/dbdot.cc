@@ -83,7 +83,6 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *, int lay_id)
   } else {
     settings::GUISettings::instance()->get<QColor>("dbdot/fill_col");
   }
-  prim::Emitter::instance()->addItemToScene(this);
 }
 
 void prim::DBDot::setColor(QColor color)
@@ -98,7 +97,8 @@ void prim::DBDot::setColor(QColor color)
 void prim::DBDot::setLatticeCoord(prim::LatticeCoord l_coord)
 {
   lat_coord = l_coord;
-  prim::Emitter::instance()->moveDBToLatticeCoord(this, lat_coord.n, lat_coord.m, lat_coord.l);
+  prim::Emitter::instance()->latticeCoord2PhysLoc(lat_coord.n, lat_coord.m, lat_coord.l, physloc);
+  //prim::Emitter::instance()->moveDBToLatticeCoord(this, lat_coord.n, lat_coord.m, lat_coord.l);
 }
 
 

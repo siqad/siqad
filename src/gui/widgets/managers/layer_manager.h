@@ -14,6 +14,7 @@
 #include "../primitives/items.h"
 #include "../primitives/layer.h"
 #include "../primitives/lattice.h"
+#include "../primitives/dblayer.h"
 
 namespace gui{
 
@@ -55,27 +56,24 @@ namespace gui{
   public:
     
     //! Construct the layer manager sidebar widget.
-    LayerManagerSidebar(const QStack<prim::Layer*> layers, QWidget *parent);
+    LayerManagerSidebar(const QStack<prim::Layer*> layers, 
+        const QStack<prim::Layer*> simvislayers, QWidget *parent);
 
     //! Refresh layer manager sidebar contents (each layer addition/removal 
     //! requires the full list to be updated.
     //! @layers list of existing layers.
-    void refreshLists(const QStack<prim::Layer*> layers);
+    void refreshLists(const QStack<prim::Layer*> layers, 
+        const QStack<prim::Layer*> simvislayers);
 
     //! Update current layer. The information text is updated and the layer 
     //! is highlighted.
     //! @layer pointer to the layer
     void updateCurrentLayer(prim::Layer *layer);
 
-    //! Activate simulation result display. Original layers are hidden.
-    //! TODO implement
-    //! TODO GUI interaction with original layers should be disabled
-    void activateSimVisLayers(const QStack<prim::Layer*>) {};
-
-    //! Deactivate simulation result display, original layers are restored to 
-    //! their cached states.
-    //! TODO implement
-    void deactivateSimVisLayers() {};
+    //! Activate/deactivate simulation result display. Original layers are 
+    //! hidden. When result display is enabled.
+    //! Result display cannot be enabled if no simvislayers had been provided.
+    void setSimVisualizeMode(const bool &enable);
 
   public slots:
 
@@ -116,8 +114,12 @@ namespace gui{
 
     // GUI VARS
     QLabel *l_curr_lay;
+    QGroupBox *gb_overlays;
+    QGroupBox *gb_layers;
+    QGroupBox *gb_result_layers;
     QVBoxLayout *vl_overlays;
     QVBoxLayout *vl_layers;
+    QVBoxLayout *vl_result_layers;
   };
 
   class LayerManager : public QWidget
@@ -135,15 +137,32 @@ namespace gui{
     //! Destructor.
     ~LayerManager();
 
+    //! Activate/deactivate simulation result display. Hide all design layers
+    //! and show result layers.
+    //! When deactivating, the simvislayers content is cleared.
+    void setSimVisualizeMode(const bool &enable);
+
     //! Add a lattice.
-    void addLattice(prim::Lattice *lattice);
+    void addLattice(prim::Lattice *lattice, prim::Layer::LayerRole role=prim::Layer::Design);
+
+    //! Return the lattice in the specified role (design or simvis).
+    //! Assumes that only one lattice is present in either role.
+    //! If that list doesn't have a lattice, return a nullptr.
+    prim::Lattice *getLattice(bool design_role);
 
     //! Add a new layer with the given name. If no name is given, a default scheme
     //! is used. Checks if the layer already exists.
-    bool addLayer(const QString &name = QString(),
-                  const prim::Layer::LayerType cnt_type=prim::Layer::DB,
-                  const prim::Layer::LayerRole role=prim::Layer::LayerRole::Design,
-                  const float zoffset = 0, const float zheight = 0);
+    //! Layers with Result role are tracked on a separate list, name clashes
+    //! between Result role layers and other layer roles are allowed.
+    //! Returns the pointer to the layer, or nullptr if unsuccessful.
+    prim::Layer *addLayer(const QString &name = QString(),
+        const prim::Layer::LayerType &cnt_type=prim::Layer::DB,
+        const prim::Layer::LayerRole &role=prim::Layer::LayerRole::Design,
+        const float &zoffset = 0, const float &zheight = 0);
+
+    //! Add a DB layer.
+    prim::DBLayer *addDBLayer(prim::Lattice *lattice, const QString &name=QString(),
+        const prim::Layer::LayerRole &role=prim::Layer::Design);
 
     //! Attempt to remove a layer, by name (everything except for Result layers).
     void removeLayer(const QString &name);
@@ -158,20 +177,20 @@ namespace gui{
     void removeAllLayers();
 
     //! Remove all result layers.
-    void removeResultLayers();
+    void removeAllResultLayers(bool keep_lattice=true);
 
     //! Returns a pointer to the requested layer if it exists, else 0.
-    prim::Layer* getLayer(const QString &name) const;
+    prim::Layer* getLayer(const QString &name, bool design_role=true) const;
 
     //! Returns a pointer to the requested layer if it exists, else 0.
-    prim::Layer* getLayer(int n) const;
+    prim::Layer* getLayer(int n, bool design_role=true) const;
 
     //! Returns all layer pointers for the specified layer type, or an empty list
     //! if none exists.
-    QList<prim::Layer*> getLayers(prim::Layer::LayerType);
+    QList<prim::Layer*> getLayers(prim::Layer::LayerType, bool design_layers=true);
 
     //! Returns the number of layers in the layers stack.
-    int layerCount() {return layers.count();}
+    int layerCount() const {return layers.count();}
 
     //! Returns the pointer to the active layer.
     prim::Layer* activeLayer() {return active_layer;}
@@ -192,10 +211,13 @@ namespace gui{
     //! Return the most recently used layer of the indicated type, or return
     //! the layer of that type with the smallest index if there isn't an MRU one.
     //! Returns 0 if none is found.
-    prim::Layer *getMRULayer(prim::Layer::LayerType);
+    prim::Layer *getMRULayer(prim::Layer::LayerType) const;
 
     //! Similar to getMRULayer but return the ID.
-    int getMRULayerID(prim::Layer::LayerType lt) {return indexOf(getMRULayer(lt));}
+    int getMRULayerID(prim::Layer::LayerType lt) const {return indexOf(getMRULayer(lt));}
+
+    //! Return whether the layer manager is in simlayermode
+    bool isSimLayerMode() {return simlayermode;}
 
     // SAVE / LOAD
 
@@ -246,6 +268,9 @@ namespace gui{
     void addLayerRow(LayerTableRowContent *row_content); // actually adds the layer
     void removeLayerRow(prim::Layer *layer);
 
+    //! Return whether this layer name exists in the provided list of layers.
+    bool nameExists(const QString &nm, const QStack<prim::Layer*> &laylist);
+
     // return the icon corresponding to a layer type
     QIcon layerType2Icon(const prim::Layer::LayerType);
 
@@ -255,6 +280,7 @@ namespace gui{
     QStack<prim::Layer*> layers;
     QStack<prim::Layer*> simvislayers;
     QHash<prim::Layer::LayerType, prim::Layer*> mru_layers;
+    bool simlayermode;
     // TODO table column order (mapped with string)
 
     // GUI

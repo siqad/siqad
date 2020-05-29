@@ -23,7 +23,7 @@
 
 namespace prim{
 
-  //! Base Class for design layers, layers do not delete their items when destroyed
+  //! Base Class for design layers
   class Layer : public QObject
   {
     Q_OBJECT  // enables tr without using QObject::tr
@@ -42,7 +42,7 @@ namespace prim{
     //!           props. Not intended to be written to save files.
     //! Result:   the layer display simulation results and cannot be 
     //!           manipulated. Not intended to be written to save files.
-    enum class LayerRole{Design, Overlay, NonVolatileOverlay, Result};
+    enum LayerRole{Design, Overlay, Result};
     Q_ENUM(LayerRole)
 
 
@@ -50,8 +50,8 @@ namespace prim{
     //! use the default naming scheme with layer_count. The Layer base class 
     //! assumes the LayerRole of Design, other role types should be in
     //! subclasses.
-    Layer(const QString &nm = QString(), const LayerType cnt_type=DB, 
-        const LayerRole role=LayerRole::Design, float z_offset=0,
+    Layer(const QString &nm = QString(), const LayerType &cnt_type=DB, 
+        const LayerRole &role=LayerRole::Design, float z_offset=0,
         float z_height=0, int lay_id=-1, QObject *parent=0);
 
     //! Construct layer from XML stream.
@@ -116,6 +116,9 @@ namespace prim{
     LayerType contentType() const {return content_type;}
     const QString contentTypeString() const {return QString(QMetaEnum::fromType<LayerType>().valueToKey(content_type));}
 
+    //! Set the Layer role.
+    void setRole(LayerRole r) {layer_role = r;}
+
     //! Get the layer role.
     LayerRole role() const {return layer_role;}
     const QString roleString() const {return QVariant::fromValue(layer_role).toString();}
@@ -136,16 +139,22 @@ namespace prim{
     virtual void saveItems(QXmlStreamWriter *, gui::DesignInclusionArea) const;
     virtual void loadItems(QXmlStreamReader *, QGraphicsScene *);
 
-  private:
+  signals:
+
+    void sig_visibilityChanged(bool visible);
+
+  protected:
 
     int layer_id;     // layer index in design panel's layers stack
-    static uint layer_count;  // number of created Layer() objects, does not decrement
     float zoffset=0;  // layer distance from surface. +ve for above, -ve for below.
     float zheight=0;  // layer height, +ve for height in top direction, -ve for bot direction
-
     QString name;     // arbitrary layer name, layers can be selected by name
     LayerType content_type;
     LayerRole layer_role;
+
+  private:
+
+    static uint layer_count;  // number of created Layer() objects, does not decrement
 
     // list of items in order of insertion, should probably be a linked list
     QStack<prim::Item*> items;

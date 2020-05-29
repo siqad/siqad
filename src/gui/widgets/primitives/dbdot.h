@@ -34,10 +34,6 @@ namespace prim{
 
     // accessors
 
-    //! Set the physical location of the DB (Design panel calls this when the
-    //! moveDBToLatticeCoord signal is emitted, don't call this otherwise).
-    void setPhysLoc(QPointF loc) {physloc = loc;}
-
     //! Get the physical location of the DB
     QPointF physLoc() const {return physloc;}
 

@@ -172,10 +172,10 @@ void gui::ApplicationGUI::initGUI()
   settings_dialog = new settings::SettingsDialog(this);
 
   // initialise docks
-  initSimVisualizerDock();
   initDialogDock();
   initLayerDock();
   initItemDock();
+  initSimVisualizerDock();
   initInfoDock();
   tabifyDockWidget(item_dock, layer_dock);
 
@@ -590,15 +590,31 @@ void gui::ApplicationGUI::initSimVisualizerDock()
   sim_visualize_dock->setMinimumWidth(gui_settings->get<int>("SIMVDOCK/mw"));
 
   connect(sim_visualize_dock, &QDockWidget::visibilityChanged,
-          design_pan, &gui::DesignPanel::simVisualizeDockVisibilityChanged);
-  connect(sim_visualize_dock, &QDockWidget::visibilityChanged,
           [this](const bool &visible)
           {
-            if (!visible)
+            if (!visible) {
               sim_visualize->clearJob();
+              design_pan->clearSimResults();
+            }
           });
   connect(sim_visualize, &gui::SimVisualizer::sig_showJobInvoked,
-          [this]() {sim_visualize_dock->show();});
+          [this]() {
+            sim_visualize_dock->show();
+          });
+  connect(sim_visualize, &gui::SimVisualizer::sig_loadProblemFile,
+          [this](const QString &fpath) {
+            design_pan->clearSimResults();
+            QFile file(fpath);
+            QXmlStreamReader rs(&file);
+            if(!file.open(QFile::ReadOnly | QFile::Text)){
+              qDebug() << tr("Error when opening file to read: %1").arg(file.errorString());
+              return;
+            }
+            rs.readNextStartElement();
+            design_pan->loadFromFile(&rs, true);
+            design_pan->enableSimVis();
+            design_pan->setDisplayMode(DisplayMode::SimDisplayMode);
+          });
 
   QScrollArea *sa_sim_vis = new QScrollArea;
   sa_sim_vis->setWidget(sim_visualize);
@@ -723,6 +739,7 @@ void gui::ApplicationGUI::initState()
   setTool(gui::ToolType::SelectTool);
   updateWindowTitle();
   autosave_timer.start(1000*app_settings->get<int>("save/autosaveinterval"));
+  sim_visualize->designPanelResetActions();
 }
 
 
@@ -867,6 +884,10 @@ void gui::ApplicationGUI::setToolDBGen()
 
 void gui::ApplicationGUI::setToolElectrode()
 {
+  if(design_pan->displayMode() != gui::DisplayMode::DesignMode){
+    qDebug() << tr("electrode tool not allowed outside of design mode");
+    return;
+  }
   qDebug() << tr("selecting electrode tool");
   design_pan->setTool(gui::ToolType::ElectrodeTool);
 }
@@ -937,34 +958,6 @@ void gui::ApplicationGUI::repeatSimulation()
   }
 }
 
-
-// TODO remove
-/*
-void gui::ApplicationGUI::runSimulation(comp::SimJob *job)
-{
-  if(!job){
-    qWarning() << tr("ApplicationGUI: Received job is not a valid pointer.");
-    return;
-  }
-
-  setTool(gui::ToolType::SelectTool);
-
-  qDebug() << tr("ApplicationGUI: About to run job '%1'").arg(job->name());
-
-  // call saveToFile
-  for (int i=0; i<job->jobSteps().length(); i++) {
-    saveToFile(SaveSimulationProblem, job->problemFilePath(i), job->getJobStep(i));
-  }
-
-  // call job binary and read output when done
-  job->invokeBinary();
-  job->readResults();
-
-  // show side dock for user to look at sim result
-  sim_visualize_dock->show();
-  sim_visualize->updateJobSelCombo(); // TODO make sim_visualize capture job completion signals, so it updates the field on its own
-}
-*/
 
 bool gui::ApplicationGUI::readSimResult(const QString &result_path)
 {
@@ -1368,7 +1361,7 @@ bool gui::ApplicationGUI::exportToLabview()
   // TODO implement some sort of check for lattice type
 
   // fetch list of all dbdots
-  QList<prim::DBDot*> dbdots = design_pan->getSurfaceDBs(); // NOTE only gets visible layer
+  QList<prim::DBDot*> dbdots = design_pan->getAllDBs(); // NOTE only gets visible layer
   if(dbdots.size() == 0){
     qDebug() << tr("ApplicationGUI: There are no DBDots, nothing can be exported.");
     return false;
@@ -1379,7 +1372,8 @@ bool gui::ApplicationGUI::exportToLabview()
   QPointF phys_loc;
   QMap<int, QList<int>> db_y_map; // [y,x] y is already sorted by QMap, x needs to be further sorted
   for(auto db : dbdots){
-    phys_loc = db->physLoc();
+    prim::LatticeCoord lc = db->latticeCoord();
+    design_pan->latticeCoord2PhysLoc(lc.n, lc.m, lc.l, phys_loc);
     //qDebug() << tr("x=%1, y=%2");
     //qDebug() << tr("  2*floor(%1 / %2) = %3").arg(phys_loc.x()).arg(h_dimer_len).arg(2*floor(phys_loc.x() / h_dimer_len));
     //qDebug() << tr("  %1 % %2 / %3 = %4").arg(phys_loc.x()).arg(h_dimer_len).arg(dimer_width).arg(fmod(phys_loc.x(), h_dimer_len) / dimer_width);

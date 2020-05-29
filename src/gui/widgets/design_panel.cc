@@ -49,6 +49,8 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
           this, &gui::DesignPanel::moveDBToLatticeCoord);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_physLoc2LatticeCoord,
           this, &gui::DesignPanel::physLoc2LatticeCoord);
+  connect(prim::Emitter::instance(), &prim::Emitter::sig_latticeCoord2PhysLoc,
+          this, &gui::DesignPanel::latticeCoord2PhysLoc);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_setLatticeVisibility,
           this, &gui::DesignPanel::updateBackground);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_editTextLabel,
@@ -67,7 +69,7 @@ gui::DesignPanel::~DesignPanel()
 }
 
 // initialise design panel on first init or after reset
-void gui::DesignPanel::initDesignPanel() {
+void gui::DesignPanel::initDesignPanel(bool init_layers) {
   undo_stack = new QUndoStack();
   connect(undo_stack, SIGNAL(cleanChanged(bool)),
           this, SLOT(emitUndoStackCleanChanged(bool)));
@@ -118,6 +120,9 @@ void gui::DesignPanel::initDesignPanel() {
 
   // make lattice and surface layer
   buildLattice();
+  if (init_layers) {
+    initLayers();
+  }
   setSceneMinSize();
 
   // initialise the Ghost and set the scene
@@ -145,9 +150,13 @@ void gui::DesignPanel::initDesignPanel() {
   connect(screenman, &gui::ScreenshotManager::sig_clipSelectionTool,
           [this]() {emit sig_toolChangeRequest(gui::ScreenshotAreaTool);});
   connect(screenman, &gui::ScreenshotManager::sig_addVisualAidToDP,
-          [this](prim::Item *t_item) {addItem(t_item, layman->getMRULayerID(prim::Layer::Misc));});
+          [this](prim::Item *t_item) {
+            addItem(t_item, layman->getLayer("Screenshot Overlay")->layerID());
+          });
   connect(screenman, &gui::ScreenshotManager::sig_removeVisualAidFromDP,
-          [this](prim::Item *t_item) {removeItem(t_item, layman->getMRULayerID(prim::Layer::Misc), true);});
+          [this](prim::Item *t_item) {
+            removeItem(t_item, layman->getLayer("Screenshot Overlay")->layerID(), true);
+          });
   connect(screenman, &gui::ScreenshotManager::sig_scaleBarAnchorTool,
           [this]() {sig_toolChangeRequest(gui::ScaleBarAnchorTool);});
   connect(screenman, &gui::ScreenshotManager::sig_closeEventTriggered,
@@ -198,6 +207,7 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
   property_editor=nullptr;
   layman=nullptr;
   itman=nullptr;
+  lattice=nullptr;
 
   // delete layers and contained items
   if(reset) prim::Layer::resetLayers(); // reset layer counter
@@ -205,7 +215,6 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
 
   // delete all graphical items from the scene
   scene->clear();
-  //if(!reset) delete scene;
   delete scene;
 
   // purge the clipboard
@@ -219,13 +228,13 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
 }
 
 // reset
-void gui::DesignPanel::resetDesignPanel()
+void gui::DesignPanel::resetDesignPanel(bool init_layers)
 {
   // tell application to perform pre-reset clean-ups
   emit sig_preDPResetCleanUp();
 
   clearDesignPanel(true);
-  initDesignPanel();
+  initDesignPanel(init_layers);
   // REBUILD
 
   //let application know that design panel has been reset.
@@ -352,7 +361,7 @@ QList<prim::Item*> gui::DesignPanel::selectedItems()
 }
 
 
-QList<prim::DBDot*> gui::DesignPanel::getSurfaceDBs() const
+QList<prim::DBDot*> gui::DesignPanel::getAllDBs() const
 {
   QList<prim::Layer*> db_layers = layman->getLayers(prim::Layer::DB);
   if (db_layers.isEmpty()) {
@@ -360,37 +369,22 @@ QList<prim::DBDot*> gui::DesignPanel::getSurfaceDBs() const
     return QList<prim::DBDot*>();
   }
 
-  // extract all DBDot items from the DB layers
-  QList<prim::DBDot *> dbs;
-  for (prim::Layer* layer : db_layers)
-    for(prim::Item *item : layer->getItems())
-      if(item->item_type==prim::Item::DBDot)
-        dbs.append(static_cast<prim::DBDot *>(item));
-
-  return dbs;
-}
-
-
-QList<prim::DBDot*> gui::DesignPanel::getDBsAtLocs(QList<QPointF> phys_locs)
-{
   QList<prim::DBDot*> dbs;
-
-  for (QPointF phys_loc : phys_locs) {
-    QPointF scene_pos = phys_loc * prim::Item::scale_factor;
-    prim::DBDot *db = lattice->dbAt(lattice->nearestSite(scene_pos));
-    if (db == nullptr) {
-      qCritical() << tr("Invalid DB location (%1, %2), aborting DB gathering.").arg(phys_loc.x()).arg(phys_loc.y());
-      return QList<prim::DBDot*>();
-    }
-    dbs.append(db);
+  for (prim::Layer *lay : db_layers) {
+    if (lay->role() != prim::Layer::Design)
+      continue;
+    dbs += static_cast<prim::DBLayer*>(lay)->getDBs();
   }
-
   return dbs;
 }
 
 
 void gui::DesignPanel::buildLattice(const QString &fname)
 {
+  if (layman->layerCount() != 0) {
+    // if layer manager not empty, clear it
+    layman->removeAllLayers();
+  }
 
   if(!fname.isEmpty() && DEFAULT_OVERRIDE){
     qWarning() << tr("Cannot change lattice when DEFAULT_OVERRIDE set");
@@ -399,31 +393,43 @@ void gui::DesignPanel::buildLattice(const QString &fname)
       return;
   }
 
-  // destroy all layers if they exist
-  layman->removeAllLayers();
+  // LATTICE MUST BE LAYER 0
 
   // build the new lattice
-  lattice = new prim::Lattice(fname, layman->layerCount());
-  updateBackground();
-
-  // add the lattice dots to the scene
-  for(prim::Item *const item : lattice->getItems())
-    scene->addItem(item);
-
-  // LATTICE MUST BE LAYER 0
-  // MISC MUST BE LAYER 1
+  lattice = new prim::Lattice(fname, 0);
 
   // add the lattice to the layers, as layer 0
+  // the 2nd lattice is for result display
   layman->addLattice(lattice);
+  layman->addLattice(new prim::Lattice(fname, 0), prim::Layer::Result);
+  updateBackground();
+}
+
+
+void gui::DesignPanel::initLayers()
+{
+  bool only_add_missing_defaults = false;
+
+  if (layman->layerCount() != 0) {
+    qDebug() << tr("Layers already exist on the design panel, therefore only "
+      "missing basic layers are added.");
+    only_add_missing_defaults = true;
+  }
 
   // add in the dangling bond surface
-  layman->addLayer("Surface", prim::Layer::DB, prim::Layer::LayerRole::Design, 0, 0);
+  if (!only_add_missing_defaults || layman->getLayers(prim::Layer::DB).size() == 0) {
+    layman->addDBLayer(lattice, "Surface", prim::Layer::Design);
+  }
 
   // add in the metal layer for electrodes
-  layman->addLayer("Metal", prim::Layer::Electrode, prim::Layer::LayerRole::Design, 1000, 100);
+  if (!only_add_missing_defaults || layman->getLayers(prim::Layer::Electrode).size() == 0) {
+    layman->addLayer("Metal", prim::Layer::Electrode, prim::Layer::Design, 1000, 100);
+  }
 
   // add the screenshot misc items layer
-  layman->addLayer("Screenshot Overlay", prim::Layer::Misc, prim::Layer::LayerRole::Overlay, 0, 0);
+  if (!only_add_missing_defaults || layman->getLayer("Screenshot Overlay") == 0) {
+    layman->addLayer("Screenshot Overlay", prim::Layer::Misc, prim::Layer::Overlay, 0, 0);
+  }
 
   layman->populateLayerTable();
   layman->initSideWidget();
@@ -505,7 +511,7 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
 
 void gui::DesignPanel::setFills(float *fills)
 {
-  QList<prim::DBDot *> dbs = getSurfaceDBs();
+  QList<prim::DBDot *> dbs = getAllDBs();
   for (int i=0; i<dbs.count(); i++) {
     if(qAbs(fills[i])>1.)
       qWarning() << tr("Given fill invalid");
@@ -520,13 +526,14 @@ void gui::DesignPanel::screenshot(QPainter *painter, const QRectF &region, const
   // add lattice dot previews (vector graphics) instead of using the bitmap
   // include lattice background if layer is not hidden
   QList<prim::LatticeDotPreview*> latdot_previews;
-  if (layman->getMRULayer(prim::Layer::Lattice)->isVisible()) {
-    QList<prim::LatticeCoord> coords = lattice->enclosedSites(region);
+  prim::Lattice *lat = static_cast<prim::Lattice*>(layman->getLayer(0, !layman->isSimLayerMode()));
+  if (lat->isVisible()) {
+    QList<prim::LatticeCoord> coords = lat->enclosedSites(region);
     for (prim::LatticeCoord coord : coords) {
-      if (lattice->isOccupied(coord))
+      if (lat->isOccupied(coord))
         continue;
       prim::LatticeDotPreview *ldp = new prim::LatticeDotPreview(coord);
-      ldp->setPos(lattice->latticeCoord2ScenePos(coord));
+      ldp->setPos(lat->latticeCoord2ScenePos(coord));
       ldp->setZValue(INT_MIN);
       latdot_previews.append(ldp);
       scene->addItem(ldp);
@@ -605,10 +612,12 @@ void gui::DesignPanel::writeToXmlStream(QXmlStreamWriter *ws,
   ws->writeEndElement(); // end of design node
 }
 
-void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
+void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs, bool is_sim_result)
 {
-  // reset the design panel state
-  resetDesignPanel();
+  if (!is_sim_result) {
+    // reset the design panel state
+    resetDesignPanel(false);
+  }
 
   QList<int> layer_order_id;
   QRectF visrect;
@@ -620,14 +629,19 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
       // TODO implement
       rs->skipCurrentElement();
     } else if(rs->name() == "gui") {
-      loadGUIFlags(rs, visrect);
+      if (!is_sim_result) {
+        loadGUIFlags(rs, visrect);
+      } else {
+        rs->skipCurrentElement();
+      }
     } else if (rs->name() == "layers") {
-      loadLayers(rs, layer_order_id);
+      loadLayers(rs, layer_order_id, is_sim_result);
     } else if(rs->name() == "layer_prop") {
-      // starting version 0.0.2 layer_prop should appear inside the layers level
-      loadLayerProps(rs, layer_order_id);
+      // LEGACY support for files < v0.0.2
+      // starting from v0.0.2 layer_prop should appear inside the layers level
+      loadLayerProps(rs, layer_order_id, is_sim_result);
     } else if(rs->name() == "design") {
-      loadDesign(rs, layer_order_id);
+      loadDesign(rs, layer_order_id, is_sim_result);
     } else {
       qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2")
           .arg(rs->lineNumber()).arg(rs->name().toString());
@@ -635,27 +649,34 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs)
     }
   }
 
-  updateSceneRect(visrect);
-
-  // apply visual settings last if relying on display area (>= v0.2.2)
-  if (!visrect.isNull()) {
-    fitInView(visrect, Qt::KeepAspectRatio);
-    qDebug() << "Display area set to top left=" << visrect.topLeft() 
-      << " and bottom right=" << visrect.bottomRight();
-  }
-
-  // zoom related
-  updateBackground();
-  informZoomUpdate();
-
   // show error if any
   if(rs->hasError()){
     qCritical() << tr("XML error: ") << rs->errorString().data();
   }
 
-  //make sure all layers from the loaded file are present in the advanced layer table
-  layman->populateLayerTable();
+  if (!is_sim_result) {
+    initLayers();   // init missing layers
+  }
 
+  if (!is_sim_result) {
+    updateSceneRect(visrect);
+
+    // apply visual settings last if relying on display area (>= v0.2.2)
+    if (!visrect.isNull()) {
+      fitInView(visrect, Qt::KeepAspectRatio);
+      qDebug() << "Display area set to top left=" << visrect.topLeft() 
+        << " and bottom right=" << visrect.bottomRight();
+    }
+
+    // zoom related
+    updateBackground();
+    informZoomUpdate();
+  }
+
+  //make sure all layers from the loaded file are present in the advanced layer table
+  if (!is_sim_result) {
+    layman->populateLayerTable();
+  }
 }
 
 
@@ -697,21 +718,25 @@ void gui::DesignPanel::loadGUIFlags(QXmlStreamReader *rs, QRectF &visrect)
 }
 
 
-void gui::DesignPanel::loadLayers(QXmlStreamReader *rs, QList<int> &layer_order_id)
+void gui::DesignPanel::loadLayers(QXmlStreamReader *rs, 
+    QList<int> &layer_order_id, bool is_sim_result)
 {
   qDebug() << "Loading layers";
-  while (rs->readNextStartElement())
-    if (rs->name() == "layer_prop")
-      loadLayerProps(rs, layer_order_id);
+  while (rs->readNextStartElement()) {
+    if (rs->name() == "layer_prop") {
+      loadLayerProps(rs, layer_order_id, is_sim_result);
+    }
+  }
 }
 
 
-void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs, QList<int> &layer_order_id)
+void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs, 
+    QList<int> &layer_order_id, bool is_sim_result)
 {
   QString layer_nm;
   float zoffset=0, zheight=0;
   prim::Layer::LayerType layer_type = prim::Layer::DB;
-  prim::Layer::LayerRole layer_role = prim::Layer::LayerRole::Design;
+  prim::Layer::LayerRole layer_role = prim::Layer::Design;
   bool layer_visible=false, layer_active=false;
 
   // keep reading until end of layer_prop tag
@@ -740,25 +765,92 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs, QList<int> &layer_or
       rs->skipCurrentElement();
     }
   }
-  // edit layer if it exists, create new otherwise
-  qDebug() << tr("Loading layer %1 with type %2").arg(layer_nm).arg(layer_type);
-  // TODO rethink this layer loading method
-  prim::Layer* load_layer = layman->getLayer(layer_nm);
-  if (!load_layer) {
-    qDebug() << tr("Created layer %1 instead").arg(layer_nm);
-    layman->addLayer(layer_nm);
-    load_layer = layman->getLayer(layman->layerCount()-1);
+
+  if (is_sim_result) {
+    if (layer_role != prim::Layer::Design) {
+      qDebug() << tr("Loading design from simulation problem, skipping layer %1"
+          " as it is not of Design role.").arg(layer_nm);
+      return;
+    } else {
+      layer_role = prim::Layer::Result;
+    }
   }
-  load_layer->setContentType(layer_type);
-  load_layer->setZOffset(zoffset);
-  load_layer->setZHeight(zheight);
-  load_layer->setVisible(layer_visible);
-  load_layer->setActive(layer_active);
-  layer_order_id.append(load_layer->layerID());
+
+  prim::Layer *lay;
+  switch(layer_type){
+    case prim::Layer::Lattice:
+    {
+      lay = layman->getLattice(!is_sim_result);
+      lay->setZOffset(zoffset);
+      lay->setZHeight(zheight);
+      break;
+    }
+    case prim::Layer::DB:
+    {
+      prim::Lattice *lat = layman->getLattice(!is_sim_result);
+      if (lat==nullptr) {
+        qFatal("Lattice must not be a null pointer at the creation of a DB layer.");
+      }
+      lay = layman->addDBLayer(lat, layer_nm, layer_role);
+      break;
+    }
+    default:
+    {
+      lay = layman->addLayer(layer_nm, layer_type, layer_role, zoffset, zheight);
+      break;
+    }
+  }
+
+  if (lay==nullptr) {
+    qFatal("Layer initialization unsuccessful, please check the logs.");
+  }
+
+  lay->setVisible(layer_visible);
+  lay->setActive(layer_active);
+
+  layer_order_id.append(lay->layerID());
+  qDebug() << tr("Loaded Layer %1 at ID %2").arg(lay->getName()).arg(lay->layerID());
+
+  /*
+  // edit layer if it exists, create new otherwise
+  if (!is_sim_result) {
+    qDebug() << tr("Loading layer %1 with type %2").arg(layer_nm).arg(layer_type);
+    // TODO rethink this layer loading method
+    prim::Layer* load_layer = layman->getLayer(layer_nm);
+    if (!load_layer) {
+      qDebug() << tr("Created layer %1 instead").arg(layer_nm);
+      layman->addLayer(layer_nm);
+      load_layer = layman->getLayer(layman->layerCount()-1);
+    }
+    load_layer->setContentType(layer_type);
+    load_layer->setZOffset(zoffset);
+    load_layer->setZHeight(zheight);
+    load_layer->setVisible(layer_visible);
+    load_layer->setActive(layer_active);
+    layer_order_id.append(load_layer->layerID());
+  } else {
+    if (layer_role != prim::Layer::Design) {
+      qDebug() << tr("Loading design from simulation problem, skipping layer %1"
+          " as it is not of Design role.").arg(layer_nm);
+      return;
+    }
+    prim::Layer *lay;
+    switch(layer_type){
+      case prim::Layer::Lattice:
+        break;
+      case prim::Layer::DB:
+        break;
+      default:
+        lay = new Layer(
+        break;
+    }
+  }
+  */
 }
 
 
-void gui::DesignPanel::loadDesign(QXmlStreamReader *rs, QList<int> &layer_order_id)
+void gui::DesignPanel::loadDesign(QXmlStreamReader *rs, QList<int> &layer_order_id,
+    bool is_sim_result)
 {
   qDebug() << "Loading design";
   int layer_load_order=0;
@@ -766,7 +858,7 @@ void gui::DesignPanel::loadDesign(QXmlStreamReader *rs, QList<int> &layer_order_
     if (rs->name() == "layer") {
       // recursively populate layer with items
       rs->readNext();
-      layman->getLayer(layer_order_id[layer_load_order])->loadItems(rs, scene);
+      layman->getLayer(layer_order_id[layer_load_order], !is_sim_result)->loadItems(rs, scene);
       layer_load_order++;
     } else {
       qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2")
@@ -781,18 +873,20 @@ void gui::DesignPanel::loadDesign(QXmlStreamReader *rs, QList<int> &layer_order_
 
 // SIMULATION RESULT DISPLAY
 
+void gui::DesignPanel::enableSimVis()
+{
+  layman->setSimVisualizeMode(true);
+}
+
 void gui::DesignPanel::clearSimResults()
 {
+  layman->setSimVisualizeMode(false);
+
   setDisplayMode(DesignMode);
 
   // TODO remove the following code when all simulation related item handling
   // are moved over to SimVisualizer
   // set show_elec of all DBDots to 0
-  if(!db_dots_result.isEmpty()) {
-    for(auto *db : db_dots_result)
-      db->setShowElec(0);
-    db_dots_result.clear();
-  }
   while(!sim_results_items.isEmpty()){
     prim::Item* temp_item = sim_results_items.takeFirst();
     removeItemFromScene(temp_item);
@@ -836,12 +930,6 @@ void gui::DesignPanel::selectClicked(prim::Item *)
 
 }
 
-void gui::DesignPanel::simVisualizeDockVisibilityChanged(bool visible)
-{
-  if(!visible && display_mode == SimDisplayMode)
-    clearSimResults();
-}
-
 void gui::DesignPanel::resizeBegin()
 {
   qDebug() << "resizeBegin()";
@@ -871,29 +959,35 @@ void gui::DesignPanel::rotateCcw()
 void gui::DesignPanel::moveDBToLatticeCoord(prim::Item *item, int n, int m, int l)
 {
   item->setPos(lattice->latticeCoord2ScenePos(prim::LatticeCoord(n,m,l)));
-  static_cast<prim::DBDot*>(item)->setPhysLoc(lattice->latticeCoord2PhysLoc(prim::LatticeCoord(n,m,l)));
-  setLatticeSiteOccupancy(item, true);
 }
 
 void gui::DesignPanel::physLoc2LatticeCoord(QPointF physloc, int &n, int &m, int &l)
 {
-  prim::LatticeCoord coord = lattice->nearestSite(physloc * prim::Item::scale_factor);
+  prim::LatticeCoord coord = lattice->nearestSite(physloc, false);
   n = coord.n;
   m = coord.m;
   l = coord.l;
+}
+
+void gui::DesignPanel::latticeCoord2PhysLoc(int n, int m, int l, QPointF &physloc)
+{
+  prim::LatticeCoord coord(n, m, l);
+  physloc = lattice->latticeCoord2PhysLoc(coord);
 }
 
 void gui::DesignPanel::updateBackground()
 {
   QColor col = (display_mode == gui::ScreenshotMode) ? background_col_publish : background_col;
   bool lattice_visible = true;
+  prim::Lattice *lat = layman->getLattice(!layman->isSimLayerMode());
 
   if (qAbs(transform().m11() + transform().m12()) < zoom_visibility_threshold
-      || !lattice->isVisible())
+      || !lat->isVisible()) {
     lattice_visible = false;
+  }
 
   if (lattice_visible)
-    scene->setBackgroundBrush(QBrush(lattice->tileableLatticeImage(col, display_mode == gui::ScreenshotMode)));
+    scene->setBackgroundBrush(QBrush(lat->tileableLatticeImage(col, display_mode == gui::ScreenshotMode)));
   else
     scene->setBackgroundBrush(QBrush(col));
 }
@@ -952,7 +1046,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
         else*/
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
-        coord_start = lattice->nearestSite(mapToScene(e->pos()));
+        coord_start = lattice->nearestSite(mapToScene(e->pos()), true);
 
       } else {
         QGraphicsView::mousePressEvent(e);
@@ -990,7 +1084,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     QPoint cursor_offset = cursor_pos - press_scene_pos;
     if (cursor_offset.manhattanLength() > snap_diameter) {
       // show preview location of new DB
-      createDBPreviews({lattice->nearestSite(mapToScene(e->pos()))});
+      createDBPreviews({lattice->nearestSite(mapToScene(e->pos()), true)});
       press_scene_pos = cursor_pos;
     }
   } else if (clicked) {
@@ -1001,7 +1095,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
             tool_type == ScreenshotAreaTool || tool_type == LabelTool) {
           rubberBandUpdate(e->pos());
         } else if (tool_type == DBGenTool) {
-          createDBPreviews(lattice->enclosedSites(coord_start, lattice->nearestSite(mapToScene(e->pos()))));
+          createDBPreviews(lattice->enclosedSites(coord_start, lattice->nearestSite(mapToScene(e->pos()), true)));
         }
         // use default behaviour for left mouse button
         QGraphicsView::mouseMoveEvent(e);
@@ -1693,7 +1787,7 @@ bool gui::DesignPanel::snapGhost(QPointF scene_pos, prim::LatticeCoord &offset)
     QPointF free_anchor = ghost->freeAnchor(scene_pos);
 
     // get the nearest lattice site to the free anchor
-    prim::LatticeCoord nearest_site = lattice->nearestSite(free_anchor);
+    prim::LatticeCoord nearest_site = lattice->nearestSite(free_anchor, true);
 
     // do nothing if target site is not valid or has not changed
     if (!lattice->isValid(nearest_site) || nearest_site == snap_coord)
@@ -1866,6 +1960,7 @@ void gui::DesignPanel::CreateDB::create()
   prim::DBDot *new_db = new prim::DBDot(lat_coord, layer_index);
   dp->lattice->setOccupied(lat_coord, new_db);
   dp->addItem(new_db, layer_index, index);
+  dp->moveDBToLatticeCoord(new_db, lat_coord.n, lat_coord.m, lat_coord.l);
   db_at_loc=new_db;
 }
 
@@ -2308,12 +2403,13 @@ void gui::DesignPanel::MoveItem::moveDBDot(prim::DBDot *dot, const QPointF &delt
   // get the target lattice site coordinate
   QPointF new_pos = dot->scenePos() + delta;
   QPointF nearest_site_pos;
-  prim::LatticeCoord coord = dp->lattice->nearestSite(new_pos, nearest_site_pos);
+  prim::LatticeCoord coord = dp->lattice->nearestSite(new_pos, nearest_site_pos, true);
   if (dp->lattice->collidesWithLatticeSite(new_pos, coord)) {
     // set the previous site as unoccupied if that site still points to this dot
     if (dp->lattice->dbAt(dot->latticeCoord()) == dot)
       dp->lattice->setUnoccupied(dot->latticeCoord());
     dot->setLatticeCoord(coord);
+    dp->moveDBToLatticeCoord(dot, coord.n, coord.m, coord.l);
     dp->lattice->setOccupied(coord, dot);
   } else {
     qCritical() << tr("Failed to move DBDot");
@@ -2374,7 +2470,7 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
       while (item_args.size() != 0) {
         float x = item_args.takeFirst().toFloat();
         float y = item_args.takeFirst().toFloat();
-        prim::LatticeCoord l_coord = lattice->nearestSite(QPointF(x,y)*prim::Item::scale_factor);
+        prim::LatticeCoord l_coord = lattice->nearestSite(QPointF(x,y), false);
         prim::DBDot *db = lattice->dbAt(l_coord);
         if (db == nullptr) {
           qWarning() << tr("Location (%1, %2) does not contain a DB, ceasing aggregate creation.").arg(x).arg(y);
@@ -2513,30 +2609,51 @@ QPointF gui::DesignPanel::findMoveOffset(QStringList args)
 
 void gui::DesignPanel::createDBs(prim::LatticeCoord lat_coord)
 {
-  int layer_index = layman->indexOf(layman->activeLayer());
-  if (layman->getLayer(layer_index)->contentType() != prim::Layer::DB) {
-    qWarning() << "Current layer type is not DB, cannot create DBs.";
+  if (displayMode() != gui::DisplayMode::DesignMode) {
+    qDebug() << "DB creation not allowed outside of design mode.";
+      return;
+  }
+  prim::Layer *layer = layman->activeLayer();
+  int layer_index = layman->indexOf(layer);
+  if (layer->contentType() != prim::Layer::DB) {
+    qWarning() << "Current layer type is incompatible with DB creation.";
+    return;
+  } else if (layer->role() == prim::Layer::Result) {
+    qWarning() << "Current layer role is Result, cannot create DBs.";
     return;
   }
   // save list of lattice coords where DBs should be created
   QList<prim::LatticeCoord> lat_list = QList<prim::LatticeCoord>();
   if (!lat_coord.isValid()) {
     // multiple creation, from using tool
-    for (prim::DBDotPreview *db_prev : db_previews)
-      lat_list.append(db_prev->latticeCoord());
+    for (prim::DBDotPreview *db_prev : db_previews) {
+      if (!lattice->isOccupied(db_prev->latticeCoord())) {
+        lat_list.append(db_prev->latticeCoord());
+      }
+    }
     destroyDBPreviews();
   } else {
     //single creation, using command
-    lat_list.append(lat_coord);
+    if (!lattice->isOccupied(lat_coord)) {
+      lat_list.append(lat_coord);
+    }
+  }
+  if (lat_list.isEmpty()) {
+    return;
   }
   undo_stack->beginMacro(tr("create dangling bonds"));
-  for (prim::LatticeCoord lc: lat_list)
+  for (prim::LatticeCoord lc: lat_list) {
     undo_stack->push(new CreateDB(lc, layer_index, this));
+  }
   undo_stack->endMacro();
 }
 
 void gui::DesignPanel::createElectrode(QRect scene_rect)
 {
+  if (displayMode() != gui::DisplayMode::DesignMode) {
+    qDebug() << "Electrode creation not allowed outside of design mode.";
+      return;
+  }
   settings::GUISettings *S = settings::GUISettings::instance();
   qreal electrode_min_dim = S->get<qreal>("electrode/min_dim");
   if (scene_rect.isNull()) {
@@ -2548,9 +2665,13 @@ void gui::DesignPanel::createElectrode(QRect scene_rect)
     return;
   }
 
-  int layer_index = layman->indexOf(layman->activeLayer());
-  if (layman->getLayer(layer_index)->contentType() != prim::Layer::Electrode) {
-    qWarning() << "Current layer type is not Electrode, cannot create electrode.";
+  prim::Layer *layer = layman->activeLayer();
+  int layer_index = layman->indexOf(layer);
+  if (layer->contentType() != prim::Layer::Electrode) {
+    qWarning() << "Current layer type is incompatible with electrode creation.";
+    return;
+  } else if (layer->role() == prim::Layer::Result) {
+    qWarning() << "Current layer role is Result, cannot create electrodes.";
     return;
   }
   //only ever create one electrode at a time

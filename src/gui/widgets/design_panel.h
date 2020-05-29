@@ -28,6 +28,7 @@
 
 #include "primitives/layer.h"
 #include "primitives/lattice.h"
+#include "primitives/dblayer.h"
 #include "primitives/items.h"
 #include "primitives/emitter.h"
 #include "components/sim_job.h"
@@ -55,14 +56,23 @@ namespace gui{
     ~DesignPanel();
 
     // clear and reset
-    void initDesignPanel();              //!< used on first init or after reset
-    void clearDesignPanel(bool reset=false);  //!< used on exit or before reset
-    void resetDesignPanel();             //!< call for reset
+    void initDesignPanel(bool init_layers=true);  //!< used on first init or after reset
+    void clearDesignPanel(bool reset=false);      //!< used on exit or before reset
+    void resetDesignPanel(bool init_layers=true); //!< call for reset
 
     // ACCESSORS
 
+    //! Return the layer manager.
+    LayerManager *layerManager() {return layman;}
+
+    //! Return the layer manager side widget.
     QWidget *layerManagerSideWidget() {return layman->sideWidget();}
-    QWidget *itemManagerWidget() {return itman;} //ItemManager fits the side bar at the moment.
+
+    //! Return the item manager widget.
+    QWidget *itemManagerWidget() {return itman;}
+
+    //! Return the lattice pointer.
+    prim::Lattice *getLattice(bool design_role) {return layman->getLattice(design_role);}
 
     //! add a new Item using a command from the dialog panel.
     bool commandCreateItem(QString item_type, QString layer_id, QStringList item_args);
@@ -117,16 +127,16 @@ namespace gui{
     //! return a list of selected prim::Items
     QList<prim::Item*> selectedItems();
 
-    //! get a list of all the surface dangling bonds
-    QList<prim::DBDot*> getSurfaceDBs() const;
-
-    //! Return a list of DBDot pointers at the provided physical locations. If
-    //! any of the locations are not valid DB sites, an exception is thrown.
-    QList<prim::DBDot*> getDBsAtLocs(QList<QPointF> phys_locs);
+    //! Return a list of all DBs residing in Design role DB layers.
+    QList<prim::DBDot*> getAllDBs() const;
 
     //! resets the drawing layer and builds a lattice from the given <lattice>.ini
     //! file. If no file is given, the default lattice is used
     void buildLattice(const QString &fname=QString());
+
+    //! Initialize layers other than the lattice
+    void initLayers();
+
     void setSceneMinSize();
 
     //! Check if given QPointF falls within a lattice dot
@@ -167,25 +177,30 @@ namespace gui{
     // LOAD
 
     //! Load layers and items from the given read stream.
-    void loadFromFile(QXmlStreamReader *);
+    //! If is_sim_result is true, then the load does not alter design content 
+    //! and instead only load into separately tracked Result layers.
+    void loadFromFile(QXmlStreamReader *, bool is_sim_result=false);
 
     //! Load GUI flags.
     void loadGUIFlags(QXmlStreamReader *, QRectF &);
 
     //! Load layers.
-    void loadLayers(QXmlStreamReader *, QList<int> &layer_order_id);
+    void loadLayers(QXmlStreamReader *, QList<int> &layer_order_id, 
+        bool is_sim_result);
 
     //! Load layer properties.
-    void loadLayerProps(QXmlStreamReader *, QList<int> &layer_order_id);
+    void loadLayerProps(QXmlStreamReader *, QList<int> &layer_order_id, 
+        bool is_sim_result);
 
     //! Load design (items contained within layers).
-    void loadDesign(QXmlStreamReader *, QList<int> &layer_order_id);
+    void loadDesign(QXmlStreamReader *, QList<int> &layer_order_id, 
+        bool is_sim_result);
 
 
     // SIMULATION RESULT DISPLAY
 
-    //! Display the simulation result from SimAnneal
-    void displaySimResults(comp::SimJob *job, int dist_int, bool avg_degen);
+    //! Prepare design panel and relevant widgets for displaying simulation result
+    void enableSimVis();
 
     //! Clear the simulation result from SimAnneal
     void clearSimResults();
@@ -213,9 +228,6 @@ namespace gui{
     //! Begin resizing an item.
     void resizeBegin();
 
-    // simulation
-    void simVisualizeDockVisibilityChanged(bool visible);
-
     // gui
     void rotateCw();
     void rotateCcw();
@@ -231,6 +243,8 @@ namespace gui{
     void moveDBToLatticeCoord(prim::Item *, int, int, int);
 
     void physLoc2LatticeCoord(QPointF physloc, int &n, int &m, int &l);
+
+    void latticeCoord2PhysLoc(int n, int m, int l, QPointF &physloc);
 
     //! Emitted when the undo stack clean stage has changed.
     void emitUndoStackCleanChanged(bool c) {emit sig_undoStackCleanChanged(c);}
@@ -380,7 +394,6 @@ namespace gui{
     QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
 
     // sim visualization
-    QList<prim::DBDot*> db_dots_result;
     QList<prim::Item*> sim_results_items;  // holding temporary items
 
     // INTERNAL METHODS

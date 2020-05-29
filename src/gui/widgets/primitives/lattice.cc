@@ -72,14 +72,16 @@ void prim::Lattice::saveLayer(QXmlStreamWriter *ws) const
 }
 
 
-prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos) const
+prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &pos, 
+    bool is_scene_pos) const
 {
   QPointF dummy_site_pos;
-  return nearestSite(scene_pos, dummy_site_pos);
+  return nearestSite(pos, dummy_site_pos, is_scene_pos);
 }
 
 
-prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos, QPointF &nearest_site_pos) const
+prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &pos, 
+    QPointF &nearest_site_pos, bool is_scene_pos) const
 {
   // TODO ask Jake if these calculations should be done using the scene integer
   //      version of the variables
@@ -87,7 +89,7 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos, QPointF 
 
   int n0[2];
   qreal proj;
-  QPointF x = scene_pos/prim::Item::scale_factor;
+  QPointF x = is_scene_pos ? pos/prim::Item::scale_factor : pos;
 
   for(int i=0; i<2; i++){
     proj = QPointF::dotProduct(x, a[i])/a2[i];
@@ -129,8 +131,8 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &scene_pos, QPointF 
 
 QList<prim::LatticeCoord> prim::Lattice::enclosedSites(const QRectF &scene_rect) const
 {
-  LatticeCoord coord1 = nearestSite(scene_rect.topLeft());
-  LatticeCoord coord2 = nearestSite(scene_rect.bottomRight());
+  LatticeCoord coord1 = nearestSite(scene_rect.topLeft(), true);
+  LatticeCoord coord2 = nearestSite(scene_rect.bottomRight(), true);
   return enclosedSites(coord1, coord2);
 }
 
@@ -202,6 +204,22 @@ bool prim::Lattice::collidesWithLatticeSite(const QPointF &scene_pos,
       get<qreal>("latdot/diameter") * prim::Item::scale_factor)
     return true;
   return false;
+}
+
+
+QList<prim::DBDot*> prim::Lattice::dbsAtPhysLocs(const QList<QPointF> &physlocs)
+{
+  QList<prim::DBDot*> dbs;
+
+  for (const QPointF &physloc : physlocs) {
+    prim::DBDot *db = dbAt(nearestSite(physloc, false));
+    if (db == nullptr) {
+      qFatal("No DB at specified location, aborting DB gathering.");
+      return QList<prim::DBDot*>();
+    }
+    dbs.append(db);
+  }
+  return dbs;
 }
 
 
