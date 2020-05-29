@@ -44,7 +44,7 @@ namespace prim{
 
     //! constructor, layer = 0 should indicate temporary objects that do not
     //! belong to any particular layer
-    Item(ItemType type, int lay_id=-1, bool is_design_obj=true, QGraphicsItem *parent=0);
+    Item(ItemType type, int lay_id=-1, QGraphicsItem *parent=0);
 
     //! destructor
     ~Item(){}
@@ -113,7 +113,6 @@ namespace prim{
 
     ItemType item_type;       // the ItemType of the Item
     int layer_id;             // the layer id of the Item
-    bool is_design_object;    // false if this belongs to a layer with Result role
 
     // static class variables
     static qreal scale_factor;            // pixels/angstrom scaling factor

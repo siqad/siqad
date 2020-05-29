@@ -2409,6 +2409,7 @@ void gui::DesignPanel::MoveItem::moveDBDot(prim::DBDot *dot, const QPointF &delt
     if (dp->lattice->dbAt(dot->latticeCoord()) == dot)
       dp->lattice->setUnoccupied(dot->latticeCoord());
     dot->setLatticeCoord(coord);
+    dp->moveDBToLatticeCoord(dot, coord.n, coord.m, coord.l);
     dp->lattice->setOccupied(coord, dot);
   } else {
     qCritical() << tr("Failed to move DBDot");
