@@ -979,7 +979,7 @@ void gui::DesignPanel::updateBackground()
 {
   QColor col = (display_mode == gui::ScreenshotMode) ? background_col_publish : background_col;
   bool lattice_visible = true;
-  prim::Lattice *lat = (display_mode == gui::SimDisplayMode && layman->getLattice(false) != nullptr) ? layman->getLattice(false) : lattice;
+  prim::Lattice *lat = layman->getLattice(!layman->isSimLayerMode());
 
   if (qAbs(transform().m11() + transform().m12()) < zoom_visibility_threshold
       || !lat->isVisible()) {
@@ -987,7 +987,7 @@ void gui::DesignPanel::updateBackground()
   }
 
   if (lattice_visible)
-    scene->setBackgroundBrush(QBrush(lattice->tileableLatticeImage(col, display_mode == gui::ScreenshotMode)));
+    scene->setBackgroundBrush(QBrush(lat->tileableLatticeImage(col, display_mode == gui::ScreenshotMode)));
   else
     scene->setBackgroundBrush(QBrush(col));
 }
@@ -2609,6 +2609,10 @@ QPointF gui::DesignPanel::findMoveOffset(QStringList args)
 
 void gui::DesignPanel::createDBs(prim::LatticeCoord lat_coord)
 {
+  if (displayMode() != gui::DisplayMode::DesignMode) {
+    qDebug() << "DB creation not allowed outside of design mode.";
+      return;
+  }
   prim::Layer *layer = layman->activeLayer();
   int layer_index = layman->indexOf(layer);
   if (layer->contentType() != prim::Layer::DB) {
@@ -2646,6 +2650,10 @@ void gui::DesignPanel::createDBs(prim::LatticeCoord lat_coord)
 
 void gui::DesignPanel::createElectrode(QRect scene_rect)
 {
+  if (displayMode() != gui::DisplayMode::DesignMode) {
+    qDebug() << "Electrode creation not allowed outside of design mode.";
+      return;
+  }
   settings::GUISettings *S = settings::GUISettings::instance();
   qreal electrode_min_dim = S->get<qreal>("electrode/min_dim");
   if (scene_rect.isNull()) {

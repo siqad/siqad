@@ -884,6 +884,10 @@ void gui::ApplicationGUI::setToolDBGen()
 
 void gui::ApplicationGUI::setToolElectrode()
 {
+  if(design_pan->displayMode() != gui::DisplayMode::DesignMode){
+    qDebug() << tr("electrode tool not allowed outside of design mode");
+    return;
+  }
   qDebug() << tr("selecting electrode tool");
   design_pan->setTool(gui::ToolType::ElectrodeTool);
 }
