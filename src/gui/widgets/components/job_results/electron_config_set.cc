@@ -121,7 +121,7 @@ QList<ECS::ChargeConfig> ECS::degenerateConfigs(const ECS::ChargeConfig &t_confi
 int ECS::lowestPhysicallyValidInd(const QList<ChargeConfig> &charge_configs)
 {
   for (int i=0; i<charge_configs.size(); i++) {
-    if (charge_configs.at(i).is_valid == true) {
+    if (charge_configs.at(i).is_valid == 1) {
       return i;
     }
   }

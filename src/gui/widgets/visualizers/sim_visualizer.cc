@@ -78,6 +78,7 @@ SimVisualizer::SimVisualizer(DesignPanel *design_pan, QWidget *parent)
   auto setChargeConfigSetJobStep = [this, design_pan](const int &job_step_ind)
   {
     comp::JobStep *js = sim_job->getJobStep(job_step_ind);
+    charge_config_set_visualizer->clearVisualizer();
     emit sig_loadProblemFile(js->problemPath());
     charge_config_set_visualizer->setLattice(design_pan->getLattice(false));
     ECS *charge_config_set = static_cast<ECS*>(

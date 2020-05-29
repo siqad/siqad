@@ -291,6 +291,9 @@ void prim::DBDot::mousePressEvent(QGraphicsSceneMouseEvent *e)
   qDebug() << QObject::tr("DBDot (%1, %2) has seen the mousePressEvent").arg(x()).arg(y());
   //qDebug() << QObject::tr("Latdot of this DB (%1, %2)").arg(source->x()).arg(source->y());
   qDebug() << QObject::tr("lay_id: %1").arg(layer_id);
+
+  // previous right click behavior removed, keeping for reference as below:
+  /*
   switch(e->buttons()){
     // toggling currently handled by context menu.
     // case Qt::RightButton:
@@ -301,6 +304,8 @@ void prim::DBDot::mousePressEvent(QGraphicsSceneMouseEvent *e)
       prim::Item::mousePressEvent(e);
       break;
   }
+  */
+  prim::Item::mousePressEvent(e);
 }
 
 

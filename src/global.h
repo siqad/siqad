@@ -52,10 +52,10 @@ namespace gui{
 
     //! Return the corresponding float value for the given distance unit. Upon
     //! error, return -1.
-    static float distanceUnitValue(DistanceUnit);
+    static double distanceUnitValue(DistanceUnit);
 
     //! Convert the value from one distance unit to another distance unit.
-    static float valueConvertDistanceUnit(float val, DistanceUnit from_unit, DistanceUnit to_unit);
+    static double valueConvertDistanceUnit(double val, DistanceUnit from_unit, DistanceUnit to_unit);
 
     //! Return the QString of a unit.
     static QString distanceUnitString(DistanceUnit du);

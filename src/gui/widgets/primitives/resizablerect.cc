@@ -162,11 +162,7 @@ void ResizeFrame::paint(QPainter *, const QStyleOptionGraphicsItem*,
 
 void ResizeFrame::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
-  switch(e->buttons()) {
-    default:
-      prim::Item::mousePressEvent(e);
-      break;
-  }
+  prim::Item::mousePressEvent(e);
 }
 
 // Initialize static class variables

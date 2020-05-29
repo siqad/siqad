@@ -2451,7 +2451,7 @@ bool gui::DesignPanel::commandCreateItem(QString type, QString layer_id, QString
         int l = item_args.takeFirst().toInt();
         if ((l == 0) || (l == 1)) {  // Check for valid
           setTool(gui::ToolType::DBGenTool);
-          int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
+          //int layer_index = (layer_id == "auto") ? layman->indexOf(layman->activeLayer()) : layer_id.toInt();
           emit sig_toolChangeRequest(gui::ToolType::DBGenTool);
           createDBs(prim::LatticeCoord(n, m, l));
           emit sig_toolChangeRequest(gui::ToolType::SelectTool);
@@ -2940,7 +2940,7 @@ void gui::DesignPanel::pasteAggregate(prim::Ghost *ghost, int n, prim::Aggregate
 
 }
 
-void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, int n, prim::Electrode *elec)
+void gui::DesignPanel::pasteElectrode(prim::Ghost *ghost, int, prim::Electrode *elec)
 {
   QRectF rect = elec->sceneRect();
   rect.moveTopLeft(ghost->pos()+rect.topLeft());

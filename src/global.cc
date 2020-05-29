@@ -4,7 +4,7 @@
 
 namespace gui{
 
-float Unit::distanceUnitValue(DistanceUnit du) {
+double Unit::distanceUnitValue(DistanceUnit du) {
   switch (du) {
     case pm:
       return 1e-12;
@@ -30,9 +30,9 @@ float Unit::distanceUnitValue(DistanceUnit du) {
   }
 }
 
-float Unit::valueConvertDistanceUnit(float val, DistanceUnit from_unit, DistanceUnit to_unit)
+double Unit::valueConvertDistanceUnit(double val, DistanceUnit from_unit, DistanceUnit to_unit)
 {
-  float conv_scale = distanceUnitValue(from_unit) / distanceUnitValue(to_unit);
+  double conv_scale = distanceUnitValue(from_unit) / distanceUnitValue(to_unit);
   assert(conv_scale > 0);
   return val * conv_scale;
 }

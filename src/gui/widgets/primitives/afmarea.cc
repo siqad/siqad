@@ -189,13 +189,7 @@ Item *AFMArea::deepCopy() const
 
 void AFMArea::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
-  switch(e->buttons()) {
-    default: {
-      prim::Item::mousePressEvent(e);
-      qDebug() << h_speed;
-      break;
-    }
-  }
+  prim::Item::mousePressEvent(e);
 }
 
 

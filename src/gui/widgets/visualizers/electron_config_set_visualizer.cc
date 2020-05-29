@@ -50,7 +50,7 @@ ECSVisualizer::ChargeConfigSetVisualizer(prim::Lattice *lattice, QWidget *parent
   // filter
   pb_degenerate_states = new QPushButton("Degenerate states");
   cb_net_charge_filter = new QCheckBox("Filter: all configs");
-  cb_phys_valid_filter = new QCheckBox("Only physically valid states\n(Beware: buggy)");
+  cb_phys_valid_filter = new QCheckBox("Only physically valid states");
   s_net_charge_filter = new QSlider(Qt::Horizontal);
   QPushButton *pb_net_charge_filter_left = new QPushButton("<");
   QPushButton *pb_net_charge_filter_right = new QPushButton(">");
@@ -135,8 +135,12 @@ ECSVisualizer::ChargeConfigSetVisualizer(prim::Lattice *lattice, QWidget *parent
   fl_charge_configs->addRow(new QLabel("Config set"), l_charge_config_set_ind);
   fl_charge_configs->addRow(pb_degenerate_states);
   fl_charge_configs->addRow(w_config_slider_complex);
+  /*
+    NOTE: removed net charge filter for now because it is kind of buggy and 
+          probably has to be improved to deal with coexistence of DB+ and DB-
   fl_charge_configs->addRow(cb_net_charge_filter);
   fl_charge_configs->addRow(w_net_charge_slider_complex);
+  */
   fl_charge_configs->addRow(cb_phys_valid_filter);
   setLayout(fl_charge_configs);
   show();
@@ -285,7 +289,7 @@ void ECSVisualizer::applyNetChargeFilter(const bool &use_slider, const int &net_
 {
   bool phys_valid_filter = cb_phys_valid_filter->isChecked();
   if (!use_slider) {
-    setChargeConfigList(charge_config_set->chargeConfigs(phys_valid_filter, false, net_charge));
+    setChargeConfigList(charge_config_set->chargeConfigs(phys_valid_filter, true, net_charge));
     s_net_charge_filter->setValue(charge_config_set->netCharges().indexOf(net_charge));
   } else {
     setChargeConfigList(charge_config_set->chargeConfigs(phys_valid_filter));
