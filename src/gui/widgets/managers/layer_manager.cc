@@ -408,7 +408,14 @@ void LayerManager::addByWizard(){
   prim::Layer::LayerType content_type = static_cast<prim::Layer::LayerType>(cb_layer_content->currentIndex());
   float offset = le_layer_offset->text().toFloat();
   float height = le_layer_height->text().toFloat();
-  //create a new layer (for now, assume that user-created layers always take Design role
+  // do not allow the creation of non-electrode layers
+  if (content_type != prim::Layer::Electrode) {
+    QString s = "For now, only Electrode type layers are allowed for creation.";
+    qWarning() << s;
+    QMessageBox::information(this, "SiQAD", s);
+    return;
+  }
+  // create a new layer (for now, assume that user-created layers always take Design role
   bool success = addLayer(layer_name, content_type, prim::Layer::LayerRole::Design, offset, height);
   if (!success) {
     qDebug() << "Layer add unsuccessful, layer list won't be updated.";

@@ -124,6 +124,7 @@ void gui::DesignPanel::initDesignPanel(bool init_layers) {
     initLayers();
   }
   setSceneMinSize();
+  layman->setSimVisualizeMode(false);
 
   // initialise the Ghost and set the scene
   prim::Ghost::instance()->setScene(scene);
