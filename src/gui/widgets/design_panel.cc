@@ -32,7 +32,6 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
   // initialize actions
   initActions();
 
-
   connect(prim::Emitter::instance(), &prim::Emitter::sig_selectClicked,
           this, &gui::DesignPanel::selectClicked);
   connect(prim::Emitter::instance(), &prim::Emitter::sig_showProperty,
@@ -124,7 +123,6 @@ void gui::DesignPanel::initDesignPanel(bool init_layers) {
     initLayers();
   }
   setSceneMinSize();
-  layman->setSimVisualizeMode(false);
 
   // initialise the Ghost and set the scene
   prim::Ghost::instance()->setScene(scene);

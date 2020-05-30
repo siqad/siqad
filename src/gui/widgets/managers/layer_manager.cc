@@ -436,6 +436,7 @@ void LayerManager::addByWizard(){
 void LayerManager::initSideWidget()
 {
   side_widget = new LayerManagerSidebar(layers, simvislayers, this);
+  side_widget->setSimVisualizeMode(simlayermode);
   connect(side_widget, &LayerManagerSidebar::sig_showAdvancedPanel, 
       [this](){show();});
   connect(side_widget, &LayerManagerSidebar::sig_showAddLayerDialog,
