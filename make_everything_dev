@@ -14,6 +14,7 @@
 # release/debug:    optional, indicate 'release' or 'debug' to build that
 #                   version. This is ignored when building for WIN32, in that 
 #                   case 'release' is always used.
+# notest:           optional, skip SiQAD unit tests
 
 # Accepted ENV variables:
 # FOR_OS:           win64 or win32 for cross compilation
@@ -32,11 +33,13 @@ set -e
 #swig=false
 build_type="Debug"
 install_prefix="debug"
+skip_tests=false
 for arg in "$@"; do
     case "$arg" in
         #("--swig")  swig=true ;;
         ("release") build_type="Release"; install_prefix="release" ;;
         ("debug")   build_type="Debug"; install_prefix="debug" ;;
+        ("notest")  skip_tests=true ;;
     esac
 done
 
@@ -95,6 +98,11 @@ else
     if [ -z ${CMAKE_FLAGS} ]; then
         CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=$build_type -DCMAKE_INSTALL_PREFIX=$install_prefix"
     fi
+fi
+
+if [ $skip_tests == true ]; then
+    echo "Skip SiQAD tests."
+    CMAKE_FLAGS+=" -DSKIP_SIQAD_TESTS=TRUE"
 fi
 
 echo "Project root:"

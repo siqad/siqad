@@ -37,9 +37,11 @@ else()
     )
 
     # QtTest related: (should probably add a flag to disable testing)
-    enable_testing()
-    find_package(Qt5Test ${QT_VERSION_REQ} REQUIRED)
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+    if(NOT SKIP_SIQAD_TESTS)
+        enable_testing()
+        find_package(Qt5Test ${QT_VERSION_REQ} REQUIRED)
+        set(CMAKE_INCLUDE_CURRENT_DIR ON)
+    endif()
 
     add_definitions( -DAPP_VERSION=\"0.2.2\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\" )
 
@@ -84,12 +86,14 @@ else()
     target_link_libraries(${PROJECT_NAME} ${BIN_LINKS})
 
     # SiQAD unit tests:
-    add_executable(siqad_tests tests/siqad_tests.cpp ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
-    target_link_libraries(siqad_tests Qt5::Test ${BIN_LINKS})
-    add_test(siqad_tests siqad_tests)
-    add_custom_command(TARGET siqad_tests
-        POST_BUILD
-        COMMAND ctest -C $<CONFIGURATION> --output-on-failure)
+    if(NOT SKIP_SIQAD_TESTS)
+        add_executable(siqad_tests tests/siqad_tests.cpp ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
+        target_link_libraries(siqad_tests Qt5::Test ${BIN_LINKS})
+        add_test(siqad_tests siqad_tests)
+        add_custom_command(TARGET siqad_tests
+            POST_BUILD
+            COMMAND ctest -C $<CONFIGURATION> --output-on-failure)
+    endif()
 
     install(TARGETS siqad RUNTIME DESTINATION ${SIQAD_INSTALL_ROOT})
     if (USE_SIQAD_LIB)

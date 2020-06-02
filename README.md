@@ -28,18 +28,11 @@ apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5
 # siqadconnector dependencies
 pip3 install --user scikit-build
 # poissolver dependencies
-apt install python3-dolfin gmsh swig
+apt install python3-dolfin gmsh swig python3-meshio python3-h5py
 pip3 install --user pillow networkx matplotlib numpy shapely
 # hoppingdynamics python dependencies
 pip3 install --user matplotlib numpy scipy pyside2
 ```
-
----
-**NOTE for Ubuntu 20.04 LTS**
-
-PoisSolver is incompatible due to changes in dependent packages that require further adaptation.
-
----
 
 On non-Debian systems, packages equivalent to the ones listed above will be needed. Feel free to create a GitHub issue to contribute dependencies required on other systems.
 
@@ -58,10 +51,10 @@ Run the `make_everything_dev` script from the project root:
 
 ```
 chmod +x make_everything_dev
-./make_everything_dev release
+./make_everything_dev release notest
 ```
 
-(When debugging, change the `release` argument to `debug`.)
+(When debugging, change the `release` argument to `debug`. When developing, exclude `notest`.)
 
 If the `make_everything_dev` script returns errors, please jump to the "CMake Compilation" section and try again. If compilation is successful, you should be able to invoke the binary by running 
 
