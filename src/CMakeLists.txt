@@ -26,7 +26,7 @@ else()
     find_package(Qt5UiTools ${QT_VERSION_REQ} REQUIRED)
     find_package(Qt5Charts ${QT_VERSION_REQ} REQUIRED)
 
-    set(LINK_LIBS
+    set(LIB_LINKS
         Qt5::Core
         Qt5::Gui
         Qt5::Widgets
@@ -50,40 +50,51 @@ else()
 
     set(CMAKE_CXX_STANDARD 11)
     set(CMAKE_CXX_STANDARD_REQUIRED True)
-    #set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-    #set(CMAKE_CXX_FLAGS_DEBUG "-g")
-    #set(CMAKE_CXX_FLAGS_RELEASE "-O3")
     set(QT_VERSION_REQ "5.2")
 
     # This explicit loading of header files, rather than include_directories, is to
-    # apeace qmake which also reads the following file lists.
-    file(STRINGS source_files SOURCES)
-    file(STRINGS header_files HEADERS)
+    # apeace qmake (windows routine) which also reads the following file lists.
+    file(STRINGS source_files LIB_SOURCES)
+    file(STRINGS header_files LIB_HEADERS)
+    if(${CMAKE_VERSION} VERSION_LESS "3.12")
+        set(USE_SIQAD_LIB FALSE)
+        set(BIN_SOURCES ${LIB_SOURCES})
+        set(BIN_HEADERS ${LIB_HEADERS})
+        set(BIN_CUSTOM_RSC ${CUSTOM_RSC})
+        set(BIN_LINKS ${LIB_LINKS})
+    else()
+        set(USE_SIQAD_LIB TRUE)
+        set(BIN_LINKS siqad_lib)
+    endif()
     include_directories(.)
+
+    if (USE_SIQAD_LIB)
+        add_library(siqad_lib OBJECT ${LIB_SOURCES} ${LIB_HEADERS} ${CUSTOM_RSC})
+        target_link_libraries(siqad_lib ${LIB_LINKS})
+    endif()
 
     # SiQAD binary:
     if (WIN32)
         set(ENV{SIQAD_INSTALL_ROOT} ${SIQAD_INSTALL_ROOT})
-        add_executable(siqad WIN32 main.cc ${SOURCES} ${HEADERS} ${CUSTOM_RSC})
+        add_executable(siqad WIN32 main.cc ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
     else()
-        #add_executable(siqad main.cc ${SOURCES} ${HEADERS} ${CUSTOM_RSC})
-        add_library(siqad_lib OBJECT ${SOURCES} ${HEADERS} ${CUSTOM_RSC})
-        add_executable(siqad main.cc)
+        add_executable(siqad main.cc ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
     endif()
 
-    target_link_libraries(siqad_lib ${LINK_LIBS})
-    target_link_libraries(${PROJECT_NAME} siqad_lib ${LINK_LIBS})
+    target_link_libraries(${PROJECT_NAME} ${BIN_LINKS})
 
     # SiQAD unit tests:
-    add_executable(siqad_tests tests/siqad_tests.cpp)
-    target_link_libraries(siqad_tests siqad_lib Qt5::Test ${LINK_LIBS})
+    add_executable(siqad_tests tests/siqad_tests.cpp ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
+    target_link_libraries(siqad_tests Qt5::Test ${BIN_LINKS})
     add_test(siqad_tests siqad_tests)
     add_custom_command(TARGET siqad_tests
         POST_BUILD
         COMMAND ctest -C $<CONFIGURATION> --output-on-failure)
 
     install(TARGETS siqad RUNTIME DESTINATION ${SIQAD_INSTALL_ROOT})
-    install(TARGETS siqad_lib RUNTIME DESTINATION ${SIQAD_INSTALL_ROOT})
+    if (USE_SIQAD_LIB)
+        install(TARGETS siqad_lib RUNTIME DESTINATION ${SIQAD_INSTALL_ROOT})
+    endif()
 endif()
 
 install(FILES helpers/is_python3.py DESTINATION ${SIQAD_INSTALL_ROOT}/helpers)
