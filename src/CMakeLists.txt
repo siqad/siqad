@@ -26,10 +26,25 @@ else()
     find_package(Qt5UiTools ${QT_VERSION_REQ} REQUIRED)
     find_package(Qt5Charts ${QT_VERSION_REQ} REQUIRED)
 
+    set(LINK_LIBS
+        Qt5::Core
+        Qt5::Gui
+        Qt5::Widgets
+        Qt5::Svg
+        Qt5::PrintSupport
+        Qt5::UiTools
+        Qt5::Charts
+    )
+
+    # QtTest related: (should probably add a flag to disable testing)
+    enable_testing()
+    find_package(Qt5Test ${QT_VERSION_REQ} REQUIRED)
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
     add_definitions( -DAPP_VERSION=\"0.2.2\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\" )
 
     set(CMAKE_AUTOMOC ON)
-    #set(CMAKE_AUTORCC ON)
+
 
     qt5_add_resources(CUSTOM_RSC resources/application.qrc)
 
@@ -46,24 +61,29 @@ else()
     file(STRINGS header_files HEADERS)
     include_directories(.)
 
+    # SiQAD binary:
     if (WIN32)
         set(ENV{SIQAD_INSTALL_ROOT} ${SIQAD_INSTALL_ROOT})
-        add_executable(siqad WIN32 ${SOURCES} ${HEADERS} ${CUSTOM_RSC})
+        add_executable(siqad WIN32 main.cc ${SOURCES} ${HEADERS} ${CUSTOM_RSC})
     else()
-        add_executable(siqad ${SOURCES} ${HEADERS} ${CUSTOM_RSC})
+        #add_executable(siqad main.cc ${SOURCES} ${HEADERS} ${CUSTOM_RSC})
+        add_library(siqad_lib OBJECT ${SOURCES} ${HEADERS} ${CUSTOM_RSC})
+        add_executable(siqad main.cc)
     endif()
 
-    target_link_libraries(${PROJECT_NAME}
-        Qt5::Core
-        Qt5::Gui
-        Qt5::Widgets
-        Qt5::Svg
-        Qt5::PrintSupport
-        Qt5::UiTools
-        Qt5::Charts
-    )
+    target_link_libraries(siqad_lib ${LINK_LIBS})
+    target_link_libraries(${PROJECT_NAME} siqad_lib ${LINK_LIBS})
+
+    # SiQAD unit tests:
+    add_executable(siqad_tests tests/siqad_tests.cpp)
+    target_link_libraries(siqad_tests siqad_lib Qt5::Test ${LINK_LIBS})
+    add_test(siqad_tests siqad_tests)
+    add_custom_command(TARGET siqad_tests
+        POST_BUILD
+        COMMAND ctest -C $<CONFIGURATION> --output-on-failure)
 
     install(TARGETS siqad RUNTIME DESTINATION ${SIQAD_INSTALL_ROOT})
+    install(TARGETS siqad_lib RUNTIME DESTINATION ${SIQAD_INSTALL_ROOT})
 endif()
 
 install(FILES helpers/is_python3.py DESTINATION ${SIQAD_INSTALL_ROOT}/helpers)

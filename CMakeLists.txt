@@ -53,6 +53,7 @@ set(SQCONN_REL_SQBIN "libs/siqadtools" CACHE STRING "SiQADConnector root directo
 #######################
 
 add_subdirectory(src)
+#add_subdirectory(tests)
 
 
 

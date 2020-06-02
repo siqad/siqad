@@ -1190,6 +1190,20 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag,
                                      gui::DesignInclusionArea inclusion_area,
                                      comp::JobStep *job_step)
 {
+  if (design_pan->displayMode() == gui::SimDisplayMode
+      && (flag == Save || flag == SaveAs)) {
+    // Don't allow saving to file when displaying simulation results. This is 
+    // due to the ability to visualize previous simulation results, which may
+    // include different components in the design. Allowing users to save in
+    // SimVis mode could lead to confusion.
+    QMessageBox *msg = new QMessageBox(this);
+    msg->setAttribute(Qt::WA_DeleteOnClose);
+    msg->setText("Please exit Simulation Visualization before saving.");
+    msg->setModal(false);
+    msg->open();
+    return false;
+  }
+
   QString write_path;
 
   QFileDialog save_dialog;
@@ -1243,7 +1257,19 @@ bool gui::ApplicationGUI::saveToFile(gui::ApplicationGUI::SaveFlag flag,
   ws.writeComment("Program Flags");
   ws.writeStartElement("program");
 
-  QString file_purpose = flag==SaveSimulationProblem ? "simulation" : "save";
+  QString file_purpose;
+  switch(flag){
+    case SaveSimulationProblem:
+      file_purpose = "simulation";
+      break;
+    case AutoSave:
+      // Introduced in SiQAD v0.2.2
+      file_purpose = "autosave";
+      break;
+    default:
+      file_purpose = "save";
+      break;
+  }
   ws.writeTextElement("file_purpose", file_purpose);
   ws.writeTextElement("version", QCoreApplication::applicationVersion());
   ws.writeTextElement("date", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));

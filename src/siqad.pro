@@ -38,6 +38,7 @@ win32:RC_ICONS = resources/ico/siqad.ico
 # INPUT GUI HEADERS AND SOURCES #
 #################################
 
+SOURCES += main.cc
 for(F, $$list($$cat(./source_files))) {
     SOURCES += "$$F"
 }

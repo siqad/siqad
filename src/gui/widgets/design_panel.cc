@@ -625,7 +625,10 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs, bool is_sim_result)
   while (rs->readNextStartElement()) {
     // read program flags
     if (rs->name() == "program") {
-      // TODO implement
+      // TODO implement:
+      // file_purpose: pop-up message when loading simulation or autosave, also unhide layers as needed (e.g. if autosaved in sim display mode where all designs are hidden)
+      // version: no action needed so far
+      // date: no action needed so far
       rs->skipCurrentElement();
     } else if(rs->name() == "gui") {
       if (!is_sim_result) {
