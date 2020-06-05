@@ -112,7 +112,7 @@ namespace comp{
 
     //! Return the Python interpreter in the virtual environment.
     //! Empty string if not set.
-    QString pythonBin() {return py_use_virtualenv ? QDir(virtualenvPath()).filePath("bin/python3") : gui::python_path;}
+    QString pythonBin();
 
     //! Return the plugin version.
     QString version() const {return plugin_version;}

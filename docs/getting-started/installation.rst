@@ -61,7 +61,7 @@ Prerequisites
 This tutorial works on both Ubuntu 18.04 LTS and Ubuntu 20.04 LTS. Install the following prerequisites::
 
     # general dependencies
-    sudo apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5charts5 libqt5charts5-dev libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-random-dev pkg-config cmake
+    sudo apt install python3-pip python3-tk python3-venv make gcc g++ qtchooser qt5-default libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5charts5 libqt5charts5-dev libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-random-dev pkg-config cmake
     # poissolver dependencies
     sudo apt install python3-dolfin gmsh swig
 

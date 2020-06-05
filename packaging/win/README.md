@@ -1,5 +1,11 @@
 # Windows Portable Build Script
 
+---
+
+This build script is no longer needed with SiQADConnector having been moved to pip and automatically downloaded into the plugins' venv on demand.
+
+---
+
 To create a portable Windows archive for SiQAD, read the comments at the top of the `win_portable` script file for instructions.
 
 This assumes that you already have the SiQAD Windows executable (`siqad.exe`) and siqadtools wheels (`*.whl`) compiled and ready for deployment. For the developers' workflow, we compile Windows binaries on CI platform AppVeyor. Please consult [appveyor.yml](../../appveyor.yml) for relevant setup parameters and compilation scripts if you would like to adapt that workflow to a native Windows 10 installation.
