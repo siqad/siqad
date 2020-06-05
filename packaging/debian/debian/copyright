@@ -1,0 +1,23 @@
+Files: src/*
+Copyright: 2017, Walus Lab
+License: LGPL-3.0
+
+Files: libs/siqadconn/*
+Copyright: 2020, Walus Lab
+License: Apache-2.0
+
+Files: plugins/afm-sim/*
+Copyright: 2018, Walus Lab
+License: Apache-2.0
+
+Files: plugins/exhaustive-gs/*
+Copyright: 2019, Walus Lab
+License: Apache-2.0
+
+Files: plugins/poissolver/*
+Copyright: 2018, Walus Lab
+License: LGPL-3.0
+
+Files: plugins/simanneal/*
+Copyright: 2018, Walus Lab
+License: Apache-2.0

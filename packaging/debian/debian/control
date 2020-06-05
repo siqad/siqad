@@ -1,0 +1,20 @@
+Source: siqad
+Section: devel
+Standards-Version: 4.5.0
+Priority: optional
+Maintainer: Samuel S. H. Ng <samueln@ece.ubc.ca>
+Build-Depends: cmake, make (>= 4.1), gcc (>= 7.5.0), g++ (>= 7.5.0), qtchooser, 
+ qtbase5-dev, libqt5svg5-dev, qttools5-dev, qttools5-dev-tools, libqt5charts5, 
+ libqt5charts5-dev, libboost-dev, libboost-filesystem-dev, libboost-system-dev, 
+ libboost-thread-dev, libboost-random-dev, pkg-config, debhelper (>= 9)
+Homepage: https://waluslab.ece.ubc.ca
+
+Package: siqad
+Architecture: any
+Depends: python3-pip, python3-venv, python3-dolfin, gmsh, ${shlibs:Depends}, 
+ ${misc:Depends}
+Description: CAD tool for designing atomic silicon quantum dot assemblies.
+ SiQAD (Silicon Quantum Atomic Designer) is a CAD tool that enables the design 
+ and simulation of silicon dangling bond (Si-DB) circuits through an intuitive 
+ graphical user interface (GUI) and a modular simulation back-end. Please read 
+ our publication on IEEE TNANO (doi 10.1109/TNANO.2020.2966162).
