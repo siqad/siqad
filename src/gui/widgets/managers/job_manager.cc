@@ -561,6 +561,7 @@ JobSetupDetailsPane::JobSetupDetailsPane(QWidget *parent)
   // main groups
   QGroupBox *gb_job_props = new QGroupBox("Job");
   QGroupBox *gb_plugin_props = new QGroupBox("Plugin Invocation");
+  QGroupBox *gb_plugin_status = new QGroupBox("Plugin Status");
   QGroupBox *gb_plugin_params = new QGroupBox("Plugin Runtime Parameters");
 
   // Job
@@ -636,6 +637,15 @@ JobSetupDetailsPane::JobSetupDetailsPane(QWidget *parent)
             te_command->setText(chosen_cmd);
           });
 
+  // Plugin Status
+  l_plugin_name = new QLabel();
+  l_plugin_status = new QLabel();
+  pb_refresh_status = new QPushButton("Refresh Status");
+  QVBoxLayout *vb_plugin_status = new QVBoxLayout;
+  vb_plugin_status->addWidget(l_plugin_name);
+  vb_plugin_status->addWidget(l_plugin_status);
+  vb_plugin_status->addWidget(pb_refresh_status);
+  gb_plugin_status->setLayout(vb_plugin_status);
 
   // Plugin Params
   vl_plugin_params = new QVBoxLayout();
@@ -644,6 +654,7 @@ JobSetupDetailsPane::JobSetupDetailsPane(QWidget *parent)
   QVBoxLayout *vl_pane = new QVBoxLayout();
   vl_pane->addWidget(gb_job_props);
   vl_pane->addWidget(gb_plugin_props);
+  vl_pane->addWidget(gb_plugin_status);
   vl_pane->addWidget(gb_plugin_params);
   vl_pane->addStretch();
   setLayout(vl_pane);
@@ -652,6 +663,14 @@ JobSetupDetailsPane::JobSetupDetailsPane(QWidget *parent)
 void JobSetupDetailsPane::setEngineDataset(JobManager::EngineDataset *t_eng_dataset)
 {
   eng_dataset = t_eng_dataset;
+
+  l_plugin_name->setText(eng_dataset->engine->name());
+  l_plugin_status->setText(tr("Status: %1").arg(eng_dataset->engine->pluginStatusStr()));
+
+  connect(pb_refresh_status, &QPushButton::pressed,
+      [this](){
+        l_plugin_status->setText(tr("Status: %1").arg(eng_dataset->engine->pluginStatusStr()));
+      });
 
   if (eng_dataset == nullptr) {
     // no dataset selected, clear GUI elements

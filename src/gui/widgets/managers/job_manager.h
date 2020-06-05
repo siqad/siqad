@@ -239,6 +239,9 @@ namespace gui{
     JobManager::EngineDataset *eng_dataset=nullptr; // currently used engine dataset
     QLineEdit *le_job_name;                         // job name
     QComboBox *cbb_inclusion_area;                  // inclusion area
+    QLabel *l_plugin_name;                          // plugin name
+    QLabel *l_plugin_status;                        // plugin status
+    QPushButton *pb_refresh_status;                 // refresh the plugin status
     QMenu *menu_command_preset;                     // command format preset selection menu
     QTextEdit *te_command;                          // command format edit field
     QVBoxLayout *vl_plugin_params;                  // layout holding engine property form

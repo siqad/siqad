@@ -16,7 +16,8 @@ QList<PluginEngine::Service> PluginEngine::official_services;
 PluginEngine::PluginEngine(const QString &desc_file_path, QWidget *parent)
   : QObject(parent), desc_file_path(desc_file_path)
 {
-  l_venv_status = new QLabel("Not needed");
+  venv_status_str = "Not needed";
+  l_venv_status = new QLabel(venv_status_str);
   pb_venv_init_log = new QPushButton;
 
   QFileInfo desc_file_info(desc_file_path);
@@ -64,7 +65,8 @@ PluginEngine::PluginEngine(const QString &desc_file_path, QWidget *parent)
     } else if (rs.name() == "py_use_virtualenv") {
       // introduced in SiQAD v0.2.2
       py_use_virtualenv = rs.readElementText() == "1";
-      l_venv_status->setText("Pending init");
+      venv_status_str = "Pending init";
+      l_venv_status->setText(venv_status_str);
     } else if (rs.name() == "venv_use_system_site_packages") {
       // introduced in SiQAD v0.2.2
       venv_use_system_site = rs.readElementText() == "1";
@@ -128,7 +130,8 @@ void PluginEngine::prepareVirtualenv()
     return;
   }
 
-  l_venv_status->setText("Initializing");
+  venv_status_str = "Initializing venv";
+  l_venv_status->setText(venv_status_str);
 
   auto term_out = [this](QProcess *p) {
     connect(p, &QProcess::readyReadStandardOutput,
@@ -142,7 +145,8 @@ void PluginEngine::prepareVirtualenv()
   };
 
   auto venv_pip = [this, term_out]() {
-    l_venv_status->setText("Downloading pip packages");
+    venv_status_str = "Downloading pip packages";
+    l_venv_status->setText(venv_status_str);
 
     // install pip dependencies
     QProcess *dep_process = new QProcess;
@@ -164,11 +168,13 @@ void PluginEngine::prepareVirtualenv()
           if (ecode != 0 || estatus != QProcess::NormalExit) {
             qWarning() << tr("Plugin %1 failed to install all pip dependencies, "
                 "exit code %2.").arg(name()).arg(ecode);
-            l_venv_status->setText("Pip failed");
+            venv_status_str = "Pip download failed";
+            l_venv_status->setText(venv_status_str);
           } else {
             qDebug() << tr("Plugin %1 finished installing pip dependencies.").arg(name());
             venv_init_success = true;
-            l_venv_status->setText("Completed");
+            venv_status_str = "Ready";
+            l_venv_status->setText(venv_status_str);
           }
         });
 
@@ -205,6 +211,14 @@ void PluginEngine::prepareVirtualenv()
       });
 
   term_out(venv_process);
+}
+
+QString PluginEngine::pluginStatusStr()
+{
+  if (py_use_virtualenv && !venv_init_success) {
+    return venv_status_str;
+  }
+  return "Ready";
 }
 
 QList<QStandardItem*> PluginEngine::standardItemRow(QList<StandardItemField> fields) const

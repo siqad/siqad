@@ -64,8 +64,8 @@ namespace comp{
     //! Initialize virtualenv and install requirements if needed.
     void prepareVirtualenv();
 
-    //! Initialization terminal output text.
-    
+    //! Return the current plugin status in text.
+    QString pluginStatusStr();
 
     //! Return a list of standard items representing a row of engine properties.
     //! The fields variable is a list indicating which fields are wanted. If an 
@@ -175,6 +175,7 @@ namespace comp{
     QString venv_init_stderr;     // std err from virtualenv initialization
 
     // widgets served to Plugin Manager
+    QString venv_status_str;
     QLabel *l_venv_status;          // label for venv init status (or N/A if not needed)
     QPushButton *pb_venv_init_log;  // pushbutton for viewing venv init log
   };
