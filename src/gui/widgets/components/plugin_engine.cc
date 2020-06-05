@@ -160,7 +160,7 @@ void PluginEngine::prepareVirtualenv()
           QDir(pluginRootPath()).filePath("requirements.txt")
           }));
     dep_process->start();
-    qDebug() << tr("Installing pip dependencies for venv %1...").arg(virtualenvPath());
+    qDebug() << tr("(This may take some time) installing pip dependencies for venv %1...").arg(virtualenvPath());
 
     connect(dep_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
         [this](int ecode, QProcess::ExitStatus estatus)
