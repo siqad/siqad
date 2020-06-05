@@ -206,7 +206,7 @@ void PluginEngine::prepareVirtualenv()
           l_venv_status->setText(venv_status_str);
         } else if (pythonBin().isEmpty()) {
           qWarning() << tr("No venv Python executable found under the provided "
-              "venv base path %1. This plugin will not be able to function.");
+              "venv base path %1. This plugin will not be able to function.").arg(virtualenvPath());
           venv_status_str = "Py bin not found after init";
           l_venv_status->setText(venv_status_str);
         } else {
@@ -296,7 +296,7 @@ QString PluginEngine::pythonBin()
       });
 
   for (QString venv_py_path : venv_py_paths) {
-    if (QDir(virtualenvPath()).exists("bin/python3")) {
+    if (QDir(virtualenvPath()).exists(venv_py_path)) {
       return QDir(virtualenvPath()).filePath(venv_py_path);
     }
   }
