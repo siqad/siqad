@@ -7,9 +7,17 @@ Basic Tutorial
 
 Here, a step-by-step tutorial making use of basic SiQAD design features and ground state charge simulation tools is provided. After going through this tutorial, feel free to experiment with our `previously published design files <https://github.com/samuelngsh/published-resources/>`_ from :cite:`Ng2020_siqad`.
 
+Common Operations
+=================
 
-|ORMod| Example
-===============
+First, let's go over some common GUI operations:
+
+* Document saving and loading can be accessed through the "File" entry on the menu bar.
+* When |select_tool| is active, common operations such as cut, copy, paste, and delete are present either through keyboard shortcuts or through the right-click menu.
+* DBs can be grouped together by ``Ctrl+g`` for convenient group manipulation; they can be ungrouped by ``Ctrl+Shift+g``. Grouped DBs are called Aggregates.
+
+|ORMod| Ground State Finding Example
+====================================
 
 This is a basic tutorial which aims to walk through a simple silicon dangling bond (DB) design and simulation use case. This knowledge is sufficient to get researchers started with DB gate and circuit design. We assume that you have already acquired SiQAD on your machine; if not, please refer to the preceding document.
 
@@ -59,11 +67,3 @@ In this example, we recreate |ORMod| from :cite:`Ng2020_siqad`. The expected cha
    :align: center
 
 From here, you can experiment with SimAnneal, a ground state charge configuration finder which implements a custom simulated annealing algorithm. The default settings generally work well for DB layouts with :math:`\lesssim 80` DBs, the :math:`\mu_-` and "Instance count" values are generally the ones that are modified. Please refer to :ref:`gs_finders_doc` for more information related to SimAnneal.
-
-
-Other Common Operations
-=======================
-
-* Document saving and loading can be accessed through the "File" entry on the menu bar.
-* When |select_tool| is active, common operations such as cut, copy, paste, and delete are present either through keyboard shortcuts or through the right-click menu.
-* DBs can be grouped together by ``Ctrl+g`` for convenient group manipulation; they can be ungrouped by ``Ctrl+Shift+g``. Grouped DBs are called Aggregates.

@@ -9,11 +9,10 @@ First, we need to make this tool available on your machine:
 
 .. note::
 
-    The electrostatic landscape solver, PoisSolver, is currently **only** available on Ubuntu 18.04 LTS. It is unavailable on other platforms for various reasons:
+    The electrostatic landscape solver, PoisSolver, is currently only available on Ubuntu.04 LTS. It is unavailable on other platforms for various reasons:
 
-    * Windows pre-compiled binaries: PoisSolver's dependent package, `FENiCS <https://fenicsproject.org/>`_, does not offer native Windows support. Use Windows Subsystem for Linux instead.
-    * Ubuntu 20.04 LTS: Breaking changes in dependent libraries have left PoisSolver unuseable on new Ubuntu versions for now. Some temporary remedies include: running SiQAD in a docker container, running SiQAD in a 18.04 LTS virtual machine, contribute to implementing a fix, etc.
-    * macOS: Currently untested.
+    * **Windows pre-compiled binaries:** PoisSolver's dependent package, `FENiCS <https://fenicsproject.org/>`_, does not offer native Windows support. Use Windows Subsystem for Linux instead.
+    * **macOS:** Currently untested.
 
     If you are just getting started with SiQAD, there is still much to explore in SimAnneal and HoppingDynamics to get you started. However, advanced designs involving clocking electrodes will certainly require the use of PoisSolver.
 
@@ -23,7 +22,7 @@ Windows
 Pre-compiled Binaries
 ---------------------
 
-Pre-compiled binaries are available for Windows 10. They can be downloaded on the official `SiQAD GitHub releases page <https://github.com/siqad/siqad/releases>`_ with both x86 (32-bit) and x86-64 (64-bit) builds available. For now, the binaries are packaged in portable form, installer support will be added in the future.
+Pre-compiled binaries are available for Windows 10. They can be downloaded on the official `SiQAD GitHub releases page <https://github.com/siqad/siqad/releases>`_ with both x86 (32-bit) and x86-64 (64-bit) builds available. For now, the binaries are packaged in portable form; installer support will be added in the future.
 
 See the note at the top of the page regarding the lack of PoisSolver support in the pre-compiled binaries as well as possible remedies.
 
@@ -40,7 +39,7 @@ which can be acquired via pip (`pip module installation guide <https://docs.pyth
 Windows Subsystem for Linux
 ---------------------------
 
-Windows Subsystem for Linux (WSL) enables the execution of Linux binaries within Windows provided that you have an up-to-date copy of Windows 10. You may refer to the `official guide from Microsoft <https://docs.microsoft.com/en-us/windows/wsl/install-win10>`_ for enabling WSL. **Please use the Ubuntu 18.04 LTS image if you require the use of PoisSolver**.
+Windows Subsystem for Linux (WSL) enables the execution of Linux binaries within Windows provided that you have an up-to-date copy of Windows 10. You may refer to the `official guide from Microsoft <https://docs.microsoft.com/en-us/windows/wsl/install-win10>`_ for enabling WSL. We recommend either the `Ubuntu 18.04 LTS <https://www.microsoft.com/en-us/p/ubuntu-1804-lts/9n9tngvndl3q?activetab=pivot:overviewtab>`_ image or `Ubuntu 20.04 LTS <https://www.microsoft.com/en-us/p/ubuntu-2004-lts/9n6svws3rx71?activetab=pivot:overviewtab>`_.
 
 You will also need an X11 server to display graphical applications. We have tested Xming and it works, but other alternatives out there should also be functional.
 
@@ -59,17 +58,22 @@ Building from Source
 Prerequisites
 +++++++++++++
 
-This tutorial is based on Ubuntu 18.04 LTS, but should also work on Ubuntu 20.04 LTS (see note at the top of the page regarding problems with PoisSolver on 20.04 LTS). Install the following prerequisites::
+This tutorial works on both Ubuntu 18.04 LTS and Ubuntu 20.04 LTS. Install the following prerequisites::
 
     # general dependencies
     sudo apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5charts5 libqt5charts5-dev libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-random-dev pkg-config cmake
     # siqadconnector dependencies
     pip3 install --user scikit-build
     # poissolver dependencies
-    sudo apt install python3-dolfin gmsh swig
-    pip3 install --user pillow networkx matplotlib numpy shapely
+    sudo apt install python3-dolfin gmsh swig python3-h5py
+    pip3 install --user pillow networkx matplotlib numpy shapely meshio
     # hoppingdynamics python dependencies
     pip3 install --user matplotlib numpy scipy pyside2
+
+Note that some packages listed in ``pip3`` here can also be acquired from ``apt`` instead and vice versa. Some special notes regarding ``meshio`` and ``h5py``:
+
+* On Ubuntu 18.04 LTS, please follow the above snippet with ``h5py`` being acquired through ``apt`` and ``meshio`` being acquired through ``pip3``.
+* On Ubuntu 20.04 LTS, acquiring both ``h5py`` and ``meshio`` from ``pip3`` or both ``python3-h5py`` and ``python3-meshio`` from ``apt`` have been tested to work.
 
 On non-Debian systems, packages equivalent to the ones listed above will be needed.
 
@@ -86,9 +90,9 @@ Clone the repository (including submodules) onto your local machine::
 Run the make_everything_dev script from the project root::
 
     chmod +x make_everything_dev
-    ./make_everything_dev release
+    ./make_everything_dev release notest
 
-(When debugging, change the release argument to debug.)
+(When debugging, change the release argument to debug. When developing, exclude ``notest``.)
 
 If the ``make_everything_dev`` script returns with errors, please jump to the `Step-by-step Cmake Compilation`_ section and try again. If compilation is successful, you should be able to invoke the binary by running::
 
