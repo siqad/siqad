@@ -13,6 +13,7 @@
 #include <QXmlStreamReader>
 #include <QMetaEnum>
 
+#include "global.h"
 #include "gui/property_map.h"
 
 namespace comp{
@@ -60,6 +61,12 @@ namespace comp{
     //! Destructor.
     ~PluginEngine() {};
 
+    //! Initialize virtualenv and install requirements if needed.
+    void prepareVirtualenv();
+
+    //! Initialization terminal output text.
+    
+
     //! Return a list of standard items representing a row of engine properties.
     //! The fields variable is a list indicating which fields are wanted. If an 
     //! empty list is received, all possible fields are returned.
@@ -97,6 +104,16 @@ namespace comp{
     //! Return the plugin name.
     QString name() const {return plugin_name;}
 
+    //! Return the use virtualenv bool.
+    bool useVirtualenv() {return py_use_virtualenv;}
+
+    //! Return the virtual environment path.
+    QString virtualenvPath();
+
+    //! Return the Python interpreter in the virtual environment.
+    //! Empty string if not set.
+    QString pythonBin() {return py_use_virtualenv ? QDir(virtualenvPath()).filePath("bin/python3") : gui::python_path;}
+
     //! Return the plugin version.
     QString version() const {return plugin_version;}
 
@@ -122,6 +139,14 @@ namespace comp{
     //! that aren't on this list are binned under "Custom" in filters and lists.
     static QList<Service> official_services;
 
+    //! Return a QLabel which reflects the venv init status.
+    QLabel *widgetVenvStatus() {return l_venv_status;}
+
+    //! Return a QPushButton which creates a pop-up box showing the venv init
+    //! log when pressed.
+    QPushButton *widgetVenvInitLog();
+
+
   private:
 
     // default runtime properties
@@ -134,6 +159,8 @@ namespace comp{
     QSet<ReturnableDataset> returnable_datasets;
 
     uint unique_identifier;       // a unique identifier for this engine
+    bool py_use_virtualenv;       // use virtualenv for python scripts
+    bool venv_use_system_site;    // use system site packages for venv
     QString plugin_name;          // plugin name
     QString plugin_version;       // plugin version
     QStringList plugin_services;  // plugin service types
@@ -143,6 +170,13 @@ namespace comp{
     QString desc_file_path;       // description file path (normally *.sqplug)
     QString preset_dir_path;      // user configuration directory path
 
+    bool venv_init_success;       // holds whether venv initialization was successful
+    QString venv_init_stdout;     // std out from virtualenv initialization
+    QString venv_init_stderr;     // std err from virtualenv initialization
+
+    // widgets served to Plugin Manager
+    QLabel *l_venv_status;          // label for venv init status (or N/A if not needed)
+    QPushButton *pb_venv_init_log;  // pushbutton for viewing venv init log
   };
 
 }; // end of comp namespace

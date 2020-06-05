@@ -61,21 +61,21 @@ add_subdirectory(src)
 #  Build SiQADConnector for Python-based Plugins  #
 ###################################################
 
-if(NOT WIN32)
-    add_subdirectory(libs/siqadconn)
-endif()
-
-# macro for symlinking to siqadtools if not compiling for Windows
-macro(symlink_siqadtools SQBIN_REL_PLUG LINK_BASE)
-    if(DEFINED SIQADCONN_ROOT AND NOT WIN32)
-        install(CODE "execute_process( \
-            COMMAND ${CMAKE_COMMAND} -E create_symlink \
-            ${SQBIN_REL_PLUG}/${SQCONN_REL_SQBIN} \
-            ${LINK_BASE}/siqadtools \
-            )"
-        )
-    endif()
-endmacro()
+#if(NOT WIN32)
+#    add_subdirectory(libs/siqadconn)
+#endif()
+#
+## macro for symlinking to siqadtools if not compiling for Windows
+#macro(symlink_siqadtools SQBIN_REL_PLUG LINK_BASE)
+#    if(DEFINED SIQADCONN_ROOT AND NOT WIN32)
+#        install(CODE "execute_process( \
+#            COMMAND ${CMAKE_COMMAND} -E create_symlink \
+#            ${SQBIN_REL_PLUG}/${SQCONN_REL_SQBIN} \
+#            ${LINK_BASE}/siqadtools \
+#            )"
+#        )
+#    endif()
+#endmacro()
 
 
 #################################
@@ -90,3 +90,10 @@ add_subdirectory(plugins)
 ##############
 
 add_subdirectory(licenses)
+
+
+# CPack
+
+#set(CPACK_GENERATOR "DEB")
+#set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Samuel S. H. Ng")
+#include(CPack)

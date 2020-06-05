@@ -356,6 +356,7 @@ void gui::ApplicationGUI::initMenuBar()
   QAction *select_color = new QAction(tr("Select Color..."), this);
   QAction *window_screenshot = new QAction(tr("Window Screenshot..."), this);
   action_screenshot_mode = new QAction(QIcon(":/ico/screenshotmode.svg"), tr("Screenshot Mode"));
+  QAction *action_plugin_man = new QAction(tr("Plugin Manager"), this);
   QAction *action_settings_dialog = new QAction(tr("Settings"), this);
 
   action_screenshot_mode->setCheckable(true);
@@ -366,6 +367,8 @@ void gui::ApplicationGUI::initMenuBar()
   //tools->addSeparator();
   tools->addAction(window_screenshot);
   tools->addAction(action_screenshot_mode);
+  tools->addSeparator();
+  tools->addAction(action_plugin_man);
   tools->addSeparator();
   tools->addAction(action_settings_dialog);
 
@@ -401,6 +404,10 @@ void gui::ApplicationGUI::initMenuBar()
   //connect(action_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(window_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
+  connect(action_plugin_man, &QAction::triggered,
+      [this](){
+        plugin_manager->show();
+      });
   connect(action_screenshot_mode, &QAction::triggered,
           this, &gui::ApplicationGUI::toggleScreenshotMode);
   connect(action_settings_dialog, &QAction::triggered,

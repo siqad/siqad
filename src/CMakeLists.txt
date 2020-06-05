@@ -90,6 +90,8 @@ else()
         add_executable(siqad_tests tests/siqad_tests.cpp ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
         target_link_libraries(siqad_tests Qt5::Test ${BIN_LINKS})
         add_test(siqad_tests siqad_tests)
+	set_tests_properties(siqad_tests PROPERTIES
+		ENVIRONMENT QT_QPA_PLATFORM=offscreen)
         add_custom_command(TARGET siqad_tests
             POST_BUILD
             COMMAND ctest -C $<CONFIGURATION> --output-on-failure)

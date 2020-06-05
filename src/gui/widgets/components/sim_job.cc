@@ -13,8 +13,6 @@
 #include "sim_job.h"
 #include "../../../global.h"
 
-extern QString gui::python_path;
-
 using namespace comp;
 
 // JobStep implementation
@@ -259,7 +257,8 @@ bool JobStep::commandKeywordReplacement()
   }
 
   QMap<QString, QString> replace_map;
-  replace_map["@PYTHON@"] = gui::python_path; // TODO needs further splitting for comma separated calls
+  //replace_map["@PYTHON@"] = gui::python_path; // TODO needs further splitting for comma separated calls
+  replace_map["@PYTHON@"] = engine->pythonBin();
   replace_map["@BINPATH@"] = engine->binaryPath();
   replace_map["@PHYSENGPATH@"] = QFileInfo(engine->descriptionFilePath()).absolutePath();
   replace_map["@PROBLEMPATH@"] = problem_path;

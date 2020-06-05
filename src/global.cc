@@ -2,6 +2,8 @@
 #include "global.h"
 #include "assert.h"
 
+QString gui::python_path;
+
 namespace gui{
 
 double Unit::distanceUnitValue(DistanceUnit du) {

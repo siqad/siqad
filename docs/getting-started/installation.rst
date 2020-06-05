@@ -62,18 +62,24 @@ This tutorial works on both Ubuntu 18.04 LTS and Ubuntu 20.04 LTS. Install the f
 
     # general dependencies
     sudo apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5charts5 libqt5charts5-dev libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-random-dev pkg-config cmake
+    # poissolver dependencies
+    sudo apt install python3-dolfin gmsh swig
+
+..
+    # general dependencies
+    sudo apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5charts5 libqt5charts5-dev libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-random-dev pkg-config cmake
     # siqadconnector dependencies
     pip3 install --user scikit-build
     # poissolver dependencies
-    sudo apt install python3-dolfin gmsh swig python3-h5py
-    pip3 install --user pillow networkx matplotlib numpy shapely meshio
+    sudo apt install python3-dolfin gmsh swig
+    pip3 install --user pillow networkx matplotlib numpy shapely meshio h5py
     # hoppingdynamics python dependencies
     pip3 install --user matplotlib numpy scipy pyside2
 
-Note that some packages listed in ``pip3`` here can also be acquired from ``apt`` instead and vice versa. Some special notes regarding ``meshio`` and ``h5py``:
+    Note that some packages listed in ``pip3`` here can also be acquired from ``apt`` instead and vice versa. Some special notes regarding ``meshio`` and ``h5py``:
 
-* On Ubuntu 18.04 LTS, please follow the above snippet with ``h5py`` being acquired through ``apt`` and ``meshio`` being acquired through ``pip3``.
-* On Ubuntu 20.04 LTS, acquiring both ``h5py`` and ``meshio`` from ``pip3`` or both ``python3-h5py`` and ``python3-meshio`` from ``apt`` have been tested to work.
+    * On Ubuntu 18.04 LTS, please download ``python3-h5py`` from follow the above snippet with ``h5py`` being acquired through ``apt`` and ``meshio`` being acquired through ``pip3``.
+    * On Ubuntu 20.04 LTS, acquiring both ``h5py`` and ``meshio`` from ``pip3`` or both ``python3-h5py`` and ``python3-meshio`` from ``apt`` have been tested to work.
 
 On non-Debian systems, packages equivalent to the ones listed above will be needed.
 

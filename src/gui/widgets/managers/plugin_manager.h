@@ -26,6 +26,9 @@ namespace gui{
     //! Destructor.
     ~PluginManager();
 
+    //! Refresh the plugin list.
+    void refreshPluginList();
+
     //! Return the plugin count.
     int count() const {return plugin_engines.count();}
 
@@ -62,9 +65,18 @@ namespace gui{
     //! Initialize engines.
     void initPluginEngines();
 
+    //! Initialize GUI.
+    void initGui();
+
     // Map of plugin unique identifier to plugin engine pointers. This map 
     // contains all plugin engines.
     QMap<uint, comp::PluginEngine*> plugin_engines;
+
+    // GUI elements
+    QTreeView *tv_plugins;              // tree view of all plugins
+
+    // GUI data models
+    QStandardItemModel *plugins_model;  // programmed model for tv_plugins
   };
 
 }

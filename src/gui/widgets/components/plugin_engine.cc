@@ -8,6 +8,7 @@
 #include "plugin_engine.h"
 #include "settings/settings.h"
 
+
 using namespace comp;
 
 QList<PluginEngine::Service> PluginEngine::official_services;
@@ -15,8 +16,13 @@ QList<PluginEngine::Service> PluginEngine::official_services;
 PluginEngine::PluginEngine(const QString &desc_file_path, QWidget *parent)
   : QObject(parent), desc_file_path(desc_file_path)
 {
+  l_venv_status = new QLabel("Not needed");
+  pb_venv_init_log = new QPushButton;
+
   QFileInfo desc_file_info(desc_file_path);
   plugin_root_path = desc_file_info.absolutePath();
+  py_use_virtualenv = false; // only set to true if the physeng file requests
+  venv_init_success = false; // only set to true after initialization succeeds
 
   QFile desc_file(desc_file_path);
   if (!desc_file.open(QFile::ReadOnly | QFile::Text)) {
@@ -55,6 +61,13 @@ PluginEngine::PluginEngine(const QString &desc_file_path, QWidget *parent)
           bin_path = alt_bin_path;
         }
       }
+    } else if (rs.name() == "py_use_virtualenv") {
+      // introduced in SiQAD v0.2.2
+      py_use_virtualenv = rs.readElementText() == "1";
+      l_venv_status->setText("Pending init");
+    } else if (rs.name() == "venv_use_system_site_packages") {
+      // introduced in SiQAD v0.2.2
+      venv_use_system_site = rs.readElementText() == "1";
     } else if (rs.name() == "dep_path") {
       // TODO perform path replacement instead
       dep_path = QDir(plugin_root_path).absoluteFilePath(rs.readElementText());
@@ -102,6 +115,96 @@ PluginEngine::PluginEngine(const QString &desc_file_path, QWidget *parent)
     }
     preset_dir_path = eng_preset_dir.path();
   }
+
+  // prepare virtual environment if needed
+  if (py_use_virtualenv) {
+    prepareVirtualenv();
+  }
+}
+
+void PluginEngine::prepareVirtualenv()
+{
+  if (!py_use_virtualenv) {
+    return;
+  }
+
+  l_venv_status->setText("Initializing");
+
+  auto term_out = [this](QProcess *p) {
+    connect(p, &QProcess::readyReadStandardOutput,
+        [this,p](){
+          venv_init_stdout.append(QString::fromUtf8(p->readAllStandardOutput()));
+        });
+    connect(p, &QProcess::readyReadStandardError,
+        [this,p](){
+          venv_init_stderr.append(QString::fromUtf8(p->readAllStandardError()));
+        });
+  };
+
+  auto venv_pip = [this, term_out]() {
+    l_venv_status->setText("Downloading pip packages");
+
+    // install pip dependencies
+    QProcess *dep_process = new QProcess;
+    dep_process->setProcessChannelMode(QProcess::MergedChannels);
+    dep_process->setProgram(pythonBin());
+    dep_process->setArguments(QStringList({
+          "-m",
+          "pip",
+          "install",
+          "-r",
+          QDir(pluginRootPath()).filePath("requirements.txt")
+          }));
+    dep_process->start();
+    qDebug() << tr("Installing pip dependencies for venv %1...").arg(virtualenvPath());
+
+    connect(dep_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+        [this](int ecode, QProcess::ExitStatus estatus)
+        {
+          if (ecode != 0 || estatus != QProcess::NormalExit) {
+            qWarning() << tr("Plugin %1 failed to install all pip dependencies, "
+                "exit code %2.").arg(name()).arg(ecode);
+            l_venv_status->setText("Pip failed");
+          } else {
+            qDebug() << tr("Plugin %1 finished installing pip dependencies.").arg(name());
+            venv_init_success = true;
+            l_venv_status->setText("Completed");
+          }
+        });
+
+    term_out(dep_process);
+  };
+  
+  QProcess *venv_process = new QProcess();
+  venv_process->setProcessChannelMode(QProcess::MergedChannels);
+  venv_process->setProgram(gui::python_path); 
+  QStringList venv_args = {
+      "-m",
+      "venv",
+      virtualenvPath()
+      };
+  if (venv_use_system_site) {
+    venv_args << "--system-site-packages";
+  }
+  venv_process->setArguments(venv_args);
+  venv_process->start();
+  qDebug() << tr("Creating Python venv at %1...").arg(virtualenvPath());
+
+  connect(venv_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+      [this,venv_pip](int ecode, QProcess::ExitStatus estatus)
+      {
+        if (ecode != 0 || estatus != QProcess::NormalExit) {
+          qWarning() << tr("Plugin %1 failed to initialize Python venv, exit "
+              "code %2.").arg(name()).arg(ecode);
+          l_venv_status->setText("Init failed");
+        } else {
+          qDebug() << tr("Plugin %1 finished initializing Python venv, moving "
+              "onto pip dependency installation.").arg(name());
+          venv_pip();
+        }
+      });
+
+  term_out(venv_process);
 }
 
 QList<QStandardItem*> PluginEngine::standardItemRow(QList<StandardItemField> fields) const
@@ -150,4 +253,31 @@ QList<QStandardItem*> PluginEngine::standardItemRow(QList<StandardItemField> fie
   }
 
   return row_si;
+}
+
+
+QString PluginEngine::virtualenvPath()
+{
+  // TODO might be better to make this dev configurable in the physeng file
+  QDir eng_preset_dir(userPresetDirectoryPath());
+  return eng_preset_dir.filePath("venv");
+}
+
+QPushButton *PluginEngine::widgetVenvInitLog()
+{
+  // TODO make required connections for pop-op box creation
+  pb_venv_init_log->setText("Venv Init Log");
+  
+  connect(pb_venv_init_log, &QPushButton::pressed,
+      [this](){
+        QWidget *wid = new QWidget();
+        wid->setWindowFlag(Qt::Dialog);
+        QPlainTextEdit *te_term_out = new QPlainTextEdit();
+        te_term_out->setPlainText(venv_init_stdout);
+        QVBoxLayout *vb = new QVBoxLayout;
+        vb->addWidget(te_term_out);
+        wid->setLayout(vb);
+        wid->show();
+      });
+  return pb_venv_init_log;
 }

@@ -8,9 +8,7 @@
 #include "plugin_manager.h"
 #include "settings/settings.h"
 
-namespace gui{
-
-QString python_path;
+using namespace gui;
 
 PluginManager::PluginManager(QWidget *parent)
   : QWidget(parent, Qt::Dialog)
@@ -19,6 +17,7 @@ PluginManager::PluginManager(QWidget *parent)
     initPythonPath();
   initServiceTypes();
   initPluginEngines();
+  initGui();
 }
 
 PluginManager::~PluginManager()
@@ -28,6 +27,32 @@ PluginManager::~PluginManager()
   plugin_engines.clear();
 
   // TODO delete all plugin jobs
+}
+
+void PluginManager::refreshPluginList()
+{
+  plugins_model->clear();
+  plugins_model->setColumnCount(3);
+  for (comp::PluginEngine *eng : plugin_engines) {
+    QList<QStandardItem*> row_plug_info;
+    row_plug_info.append(new QStandardItem(eng->name()));
+    //row_plug_info.append(new QStandardItem(eng->pluginRootPath()));
+    plugins_model->appendRow(row_plug_info);
+    tv_plugins->resizeColumnToContents(0);
+
+    QList<QWidget*> row_widgets({
+        eng->widgetVenvStatus(),
+        eng->widgetVenvInitLog()
+        });
+
+    QModelIndex mi_back = plugins_model->indexFromItem(row_plug_info.back());
+    int col_start = mi_back.column() + 1;
+    for (int col=col_start; col < col_start + row_widgets.size(); col++) {
+      tv_plugins->setIndexWidget(plugins_model->index(mi_back.row(),
+            col), row_widgets[col-col_start]);
+      tv_plugins->resizeColumnToContents(col);
+    }
+  }
 }
 
 
@@ -195,4 +220,25 @@ void PluginManager::initPluginEngines()
   qDebug() << tr("Finished reading plugin files.");
 }
 
+void PluginManager::initGui()
+{
+  // init viewing model and viewport
+  plugins_model = new QStandardItemModel();
+  tv_plugins = new QTreeView();
+  tv_plugins->setModel(plugins_model);
+
+  // header texts
+  plugins_model->setHorizontalHeaderLabels({"Name", "Python venv status",
+      "venv init log"
+      });
+
+  refreshPluginList();
+
+  // init other GUI elements
+  // TODO
+
+  // aggregate in layout
+  QVBoxLayout *vl_pm = new QVBoxLayout;
+  vl_pm->addWidget(tv_plugins);
+  setLayout(vl_pm);
 }
