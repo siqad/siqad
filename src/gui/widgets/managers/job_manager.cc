@@ -638,8 +638,8 @@ JobSetupDetailsPane::JobSetupDetailsPane(QWidget *parent)
           });
 
   // Plugin Status
-  l_plugin_name = new QLabel();
-  l_plugin_status = new QLabel();
+  l_plugin_name = new QLabel("No engine selected");
+  l_plugin_status = new QLabel("Status: N/A");
   pb_refresh_status = new QPushButton("Refresh Status");
   QVBoxLayout *vb_plugin_status = new QVBoxLayout;
   vb_plugin_status->addWidget(l_plugin_name);
@@ -664,14 +664,23 @@ void JobSetupDetailsPane::setEngineDataset(JobManager::EngineDataset *t_eng_data
 {
   eng_dataset = t_eng_dataset;
 
-  l_plugin_name->setText(eng_dataset->engine->name());
-  l_plugin_status->setText(tr("Status: %1").arg(eng_dataset->engine->pluginStatusStr()));
+  // update engine status
+  if (eng_dataset == nullptr) {
+    l_plugin_name->setText("No engine selected");
+    l_plugin_status->setText("Status: N/A");
+  } else {
+    l_plugin_name->setText(eng_dataset->engine->name());
+    l_plugin_status->setText(tr("Status: %1").arg(eng_dataset->engine->pluginStatusStr()));
+  }
 
   connect(pb_refresh_status, &QPushButton::pressed,
       [this](){
-        l_plugin_status->setText(tr("Status: %1").arg(eng_dataset->engine->pluginStatusStr()));
+        if (eng_dataset != nullptr) {
+          l_plugin_status->setText(tr("Status: %1").arg(eng_dataset->engine->pluginStatusStr()));
+        }
       });
 
+  // update engine parameters
   if (eng_dataset == nullptr) {
     // no dataset selected, clear GUI elements
     te_command->setText("");
