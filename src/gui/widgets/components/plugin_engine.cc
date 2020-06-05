@@ -180,6 +180,14 @@ void PluginEngine::prepareVirtualenv()
 
     term_out(dep_process);
   };
+
+  if (gui::python_path.isEmpty()) {
+    venv_status_str = "No Python interpreter found";
+    l_venv_status->setText(venv_status_str);
+    qWarning() << tr("No Python interpreter found, cannot initialize venv for "
+        "plugin %1").arg(name());
+    return;
+  }
   
   QProcess *venv_process = new QProcess();
   venv_process->setProcessChannelMode(QProcess::MergedChannels);

@@ -6,6 +6,9 @@ image: Visual Studio 2017
 configuration:
   - Release
 
+build:
+  parallel: true
+
 environment:
   BOOST_ROOT: C:\Libraries\boost_1_69_0
 
