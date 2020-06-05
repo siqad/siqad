@@ -160,7 +160,7 @@ void PluginEngine::prepareVirtualenv()
           QDir(pluginRootPath()).filePath("requirements.txt")
           }));
     dep_process->start();
-    qDebug() << tr("Installing pip dependencies for venv %1...").arg(virtualenvPath());
+    qDebug() << tr("(This may take some time) installing pip dependencies for venv %1...").arg(virtualenvPath());
 
     connect(dep_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
         [this](int ecode, QProcess::ExitStatus estatus)
@@ -180,6 +180,14 @@ void PluginEngine::prepareVirtualenv()
 
     term_out(dep_process);
   };
+
+  if (gui::python_path.isEmpty()) {
+    venv_status_str = "No Python interpreter found";
+    l_venv_status->setText(venv_status_str);
+    qWarning() << tr("No Python interpreter found, cannot initialize venv for "
+        "plugin %1").arg(name());
+    return;
+  }
   
   QProcess *venv_process = new QProcess();
   venv_process->setProcessChannelMode(QProcess::MergedChannels);
@@ -202,7 +210,13 @@ void PluginEngine::prepareVirtualenv()
         if (ecode != 0 || estatus != QProcess::NormalExit) {
           qWarning() << tr("Plugin %1 failed to initialize Python venv, exit "
               "code %2.").arg(name()).arg(ecode);
-          l_venv_status->setText("Init failed");
+          venv_status_str = "Init failed";
+          l_venv_status->setText(venv_status_str);
+        } else if (pythonBin().isEmpty()) {
+          qWarning() << tr("No venv Python executable found under the provided "
+              "venv base path %1. This plugin will not be able to function.").arg(virtualenvPath());
+          venv_status_str = "Py bin not found after init";
+          l_venv_status->setText(venv_status_str);
         } else {
           qDebug() << tr("Plugin %1 finished initializing Python venv, moving "
               "onto pip dependency installation.").arg(name());
@@ -275,6 +289,28 @@ QString PluginEngine::virtualenvPath()
   // TODO might be better to make this dev configurable in the physeng file
   QDir eng_preset_dir(userPresetDirectoryPath());
   return eng_preset_dir.filePath("venv");
+}
+
+QString PluginEngine::pythonBin()
+{
+  if (!py_use_virtualenv) {
+    return gui::python_path;
+  }
+
+  QStringList venv_py_paths({
+      "bin/python3",
+      "bin/python",
+      "Scripts/python.exe"
+      });
+
+  for (QString venv_py_path : venv_py_paths) {
+    if (QDir(virtualenvPath()).exists(venv_py_path)) {
+      return QDir(virtualenvPath()).filePath(venv_py_path);
+    }
+  }
+
+  qWarning() << "No venv Python executable found.";
+  return "";
 }
 
 QPushButton *PluginEngine::widgetVenvInitLog()

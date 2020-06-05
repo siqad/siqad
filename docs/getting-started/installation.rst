@@ -26,14 +26,9 @@ Pre-compiled binaries are available for Windows 10. They can be downloaded on th
 
 See the note at the top of the page regarding the lack of PoisSolver support in the pre-compiled binaries as well as possible remedies.
 
-Some of the bundled simulators require a Python interpreter (`official download page <https://www.python.org/downloads/>`_). Supported versions include Python 3.5 to 3.8. The following PyPI packages are also required:
+Some of the bundled simulators require a Python interpreter (`official download page <https://www.python.org/downloads/>`_). Supported versions include Python 3.5 to 3.8. **Python 3.7 acquired from Windows Store doesn't seem to work** for us, but 3.8 seems to work. For now, we recommend sticking with acquiring Python from the official website.
 
-* matplotlib
-* numpy
-* scipy
-* pyside2
-
-which can be acquired via pip (`pip module installation guide <https://docs.python.org/3/installing/index.html>`_).
+Additional packages that are needed by Python-based plugins are acquired automatically through ``pip`` and installed into virtual environments via ``venv`` such that they do not interfere with system Python packages. Both ``pip`` and ``venv`` come with a standard Python installation.
 
 
 Windows Subsystem for Linux
@@ -61,7 +56,7 @@ Prerequisites
 This tutorial works on both Ubuntu 18.04 LTS and Ubuntu 20.04 LTS. Install the following prerequisites::
 
     # general dependencies
-    sudo apt install python3-pip python3-tk make gcc g++ qtchooser qt5-default libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5charts5 libqt5charts5-dev libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-random-dev pkg-config cmake
+    sudo apt install python3-pip python3-tk python3-venv make gcc g++ qtchooser qt5-default libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5charts5 libqt5charts5-dev libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-random-dev pkg-config cmake
     # poissolver dependencies
     sudo apt install python3-dolfin gmsh swig
 
@@ -82,6 +77,8 @@ This tutorial works on both Ubuntu 18.04 LTS and Ubuntu 20.04 LTS. Install the f
     * On Ubuntu 20.04 LTS, acquiring both ``h5py`` and ``meshio`` from ``pip3`` or both ``python3-h5py`` and ``python3-meshio`` from ``apt`` have been tested to work.
 
 On non-Debian systems, packages equivalent to the ones listed above will be needed.
+
+Additional packages that are needed by Python-based plugins are acquired automatically through ``pip`` and installed into virtual environments via ``venv`` such that they do not interfere with system Python packages. They are provided by the listed prerequisites ``python3-pip`` and ``python3-venv``.
 
 
 Scripted Compilation
