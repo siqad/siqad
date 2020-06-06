@@ -6,13 +6,15 @@ BUILDDIR = build_dir
 build:
 	mkdir $(BUILDDIR)
 	cd $(BUILDDIR); cmake -DCMAKE_INSTALL_PREFIX=../debian/tmp/usr/lib/siqad -DCMAKE_BUILD_TYPE=Release ..
-	make -j24 -C $(BUILDDIR)
+	make -C $(BUILDDIR)
 
 build-indep:
 	# nothing to be done
 
 build-arch:
-	# nothing to be done
+	mkdir $(BUILDDIR)
+	cd $(BUILDDIR); cmake -DCMAKE_INSTALL_PREFIX=../debian/tmp/usr/lib/siqad -DCMAKE_BUILD_TYPE=Release ..
+	make -C $(BUILDDIR)
 
 # thirdly called by launchpad
 binary: binary-indep binary-arch

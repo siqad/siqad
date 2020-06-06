@@ -9,7 +9,7 @@ First, we need to make this tool available on your machine:
 
 .. note::
 
-    The electrostatic landscape solver, PoisSolver, is currently only available on Ubuntu.04 LTS. It is unavailable on other platforms for various reasons:
+    The electrostatic landscape solver, PoisSolver, is currently only available on Ubuntu. It is unavailable on other platforms for various reasons:
 
     * **Windows pre-compiled binaries:** PoisSolver's dependent package, `FENiCS <https://fenicsproject.org/>`_, does not offer native Windows support. Use Windows Subsystem for Linux instead.
     * **macOS:** Currently untested.
@@ -34,17 +34,34 @@ Additional packages that are needed by Python-based plugins are acquired automat
 Windows Subsystem for Linux
 ---------------------------
 
-Windows Subsystem for Linux (WSL) enables the execution of Linux binaries within Windows provided that you have an up-to-date copy of Windows 10. You may refer to the `official guide from Microsoft <https://docs.microsoft.com/en-us/windows/wsl/install-win10>`_ for enabling WSL. We recommend either the `Ubuntu 18.04 LTS <https://www.microsoft.com/en-us/p/ubuntu-1804-lts/9n9tngvndl3q?activetab=pivot:overviewtab>`_ image or `Ubuntu 20.04 LTS <https://www.microsoft.com/en-us/p/ubuntu-2004-lts/9n6svws3rx71?activetab=pivot:overviewtab>`_.
+Windows Subsystem for Linux (WSL) enables the execution of Linux binaries within Windows provided that you have an up-to-date copy of Windows 10. You may refer to the `official guide from Microsoft <https://docs.microsoft.com/en-us/windows/wsl/install-win10>`_ for enabling WSL. We recommend the `Ubuntu 20.04 LTS <https://www.microsoft.com/en-us/p/ubuntu-2004-lts/9n6svws3rx71?activetab=pivot:overviewtab>`_ image, but Ubuntu 18.04 LTS is also supported.
 
 You will also need an X11 server to display graphical applications. We have tested Xming and it works, but other alternatives out there should also be functional.
 
-After setting up WSL, you may refer to the `Linux`_ section for compiling the binaries from source within the WSL environment.
+After setting up WSL, you may refer to the `Linux`_ section for either downloading SiQAD from the PPA or compiling the binaries from source within the WSL environment.
 
 
 Linux
 =====
 
-We intend to submit SiQAD to package maintainers for binary distribution when the source code becomes more mature. For now, SiQAD needs to be compiled from source.
+A Ubuntu PPA is available containing the latest stable version. If you prefer compiling from source or using a development version, you would have to build from source.
+
+Ubuntu PPA
+----------
+
+This applies to Ubuntu 18.04 LTS and Ubuntu 20.04 LTS.
+
+Add the SiQAD PPA to Ubuntu and install::
+
+    sudo add-apt-repository ppa:siqad/ppa
+    sudo apt update
+    sudo apt install siqad
+
+You may then invoke SiQAD from the terminal::
+
+    siqad
+
+Future updates will add appropriate desktop icons.
 
 
 Building from Source
@@ -56,7 +73,7 @@ Prerequisites
 This tutorial works on both Ubuntu 18.04 LTS and Ubuntu 20.04 LTS. Install the following prerequisites::
 
     # general dependencies
-    sudo apt install python3-pip python3-tk python3-venv make gcc g++ qtchooser qt5-default libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5charts5 libqt5charts5-dev libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-random-dev pkg-config cmake
+    sudo apt install python3-pip python3-tk python3-venv make gcc g++ qtchooser qt5-default libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5charts5 libqt5charts5-dev libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-random-dev pkg-config cmake git
     # poissolver dependencies
     sudo apt install python3-dolfin gmsh
 

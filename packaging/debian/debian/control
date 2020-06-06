@@ -10,7 +10,8 @@ Build-Depends: cmake, make (>= 4.1), gcc (>= 7.5.0), g++ (>= 7.5.0), qtchooser,
 Homepage: https://waluslab.ece.ubc.ca
 
 Package: siqad
-Architecture: any
+#Architecture: any
+Architecture: all
 Depends: python3-pip, python3-venv, python3-dolfin, gmsh, ${shlibs:Depends}, 
  ${misc:Depends}
 Description: CAD tool for designing atomic silicon quantum dot assemblies.
