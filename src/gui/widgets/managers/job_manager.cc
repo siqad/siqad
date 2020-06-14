@@ -492,8 +492,21 @@ QWidget *JobManager::initJobSetupPanel()
             for (int i=0; i<job_steps_model->rowCount(); i++) {
               QStandardItem *si_job_step = job_steps_model->item(i);
               EngineDataset *eng_dataset = static_cast<JobStepViewListItem*>(si_job_step)->eng_dataset;
-              if (eng_dataset == nullptr || eng_dataset->isEmpty())
+              if (eng_dataset == nullptr || eng_dataset->isEmpty()) {
                 continue;
+              } else if (!eng_dataset->engine->readyToUse()) {
+                delete new_job;
+
+                QMessageBox *msg = new QMessageBox(this);
+                msg->setAttribute(Qt::WA_DeleteOnClose);
+                msg->setText(tr("Plugin %1 is not ready to use, aborting job. "
+                      "You may check the plugin status under Tools -> Plugin "
+                      "Manager.")
+                    .arg(eng_dataset->engine->name()));
+                msg->open();
+
+                return;
+              }
               // create a sim job step and add it to the job
               new_job->addJobStep(new comp::JobStep(eng_dataset->engine,
                                                     eng_dataset->command_format.split("\n"),

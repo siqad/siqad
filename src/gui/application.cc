@@ -361,11 +361,11 @@ void gui::ApplicationGUI::initMenuBar()
 
   action_screenshot_mode->setCheckable(true);
 
-  // TODO add lattice button back in the future when updated support is implemented
-  //tools->addAction(change_lattice);
-  // tools->addAction(select_color);
+  
+  //tools->addAction(change_lattice);     // TODO add lattice button back in the future when updated support is implemented
+  //tools->addAction(select_color);
   //tools->addSeparator();
-  tools->addAction(window_screenshot);
+  //tools->addAction(window_screenshot);  // TODO disabled due to imperfect screenshot results
   tools->addAction(action_screenshot_mode);
   tools->addSeparator();
   tools->addAction(action_plugin_man);
@@ -373,8 +373,13 @@ void gui::ApplicationGUI::initMenuBar()
   tools->addAction(action_settings_dialog);
 
   // help menu actions
+  QAction *open_log_dir = new QAction(tr("Open Log Directory"), this);
+  QAction *open_autosave_dir = new QAction(tr("Open Autosave Directory"), this);
   QAction *about_version = new QAction(tr("About"), this);
 
+  help->addAction(open_log_dir);
+  help->addAction(open_autosave_dir);
+  help->addSeparator();
   help->addAction(about_version);
 
   connect(new_file, &QAction::triggered, this, &gui::ApplicationGUI::newFile);
@@ -407,6 +412,16 @@ void gui::ApplicationGUI::initMenuBar()
   connect(action_plugin_man, &QAction::triggered,
       [this](){
         plugin_manager->show();
+      });
+  connect(open_log_dir, &QAction::triggered,
+      []() {
+        settings::AppSettings *s = settings::AppSettings::instance();
+        QString log_path = s->getPath("log/logdir");
+        QDesktopServices::openUrl(QUrl::fromLocalFile(log_path));
+      });
+  connect(open_autosave_dir, &QAction::triggered,
+      [this]() {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(autosave_dir.absolutePath()));
       });
   connect(action_screenshot_mode, &QAction::triggered,
           this, &gui::ApplicationGUI::toggleScreenshotMode);

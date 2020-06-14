@@ -64,7 +64,7 @@ static void messageHandler(QtMsgType type, const QMessageLogContext &context, co
         gui::ApplicationGUI::dialog_pan->echo("Critical: " + msg);
         break;
       case QtFatalMsg:
-        gui::ApplicationGUI::dialog_pan->echo("Fatal error");
+        gui::ApplicationGUI::dialog_pan->echo("Fatal error: " + msg);
         abort();
     }
   }

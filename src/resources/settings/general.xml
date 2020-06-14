@@ -22,6 +22,26 @@
             <key>log/keepcount</key>
         </meta>
     </log_file_keep_count>
+    <autosave_num>
+        <T>int</T>
+        <val></val>
+        <label>Autosave count</label>
+        <tip>Number of autosave files to keep, once past this number older ones get overwritten.</tip>
+        <meta>
+            <category>App</category>
+            <key>save/autosavenum</key>
+        </meta>
+    </autosave_num>
+    <autosave_interval>
+        <T>int</T>
+        <val></val>
+        <label>Autosave interval (seconds)</label>
+        <tip>Interval between autosaves in seconds.</tip>
+        <meta>
+            <category>App</category>
+            <key>save/autosaveinterval</key>
+        </meta>
+    </autosave_interval>
     <python_path>
         <T>string</T>
         <val></val>

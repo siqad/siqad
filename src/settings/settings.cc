@@ -146,8 +146,8 @@ QSettings *settings::AppSettings::m_defs()
   S->setValue("float_fmt", "g");   // float format specified in QString::setNum; not always obeyed.
 
   S->setValue("save/autosaveroot", QString("<SYSTMP>/autosave/"));
-  S->setValue("save/autosavenum", 3);
-  S->setValue("save/autosaveinterval", 300); // in seconds
+  S->setValue("save/autosavenum", 10);
+  S->setValue("save/autosaveinterval", 60); // in seconds
 
   return S;
 }
