@@ -16,7 +16,16 @@ We are transitioning most of the information present in the rest of this README 
 
 Binary builds for Windows are available in the [Releases](https://github.com/retallickj/siqad/releases) page. Note that one of the first-party simulators, PoisSolver, is not available on Windows builds due to incompatibility of its dependencies. For more information, please refer to the [Windows installation](https://siqad.readthedocs.io/en/latest/getting-started/installation.html#windows) section in our official documentation.
 
-For now, Linux and macOS binaries are not distributed and requires compilation from source.
+For Linux, a Ubuntu PPA is available:
+```
+sudo add-apt-repository ppa:siqad/ppa
+sudo apt-get update
+sudo apt-get install siqad
+```
+You may then invoke SiQAD through the command line: `siqad`. Users of other Linux distributions would have to build from source.
+
+For now, macOS binaries are not distributed and requires compilation from source.
+
 
 ## Building from source on Linux
 
