@@ -137,6 +137,9 @@ namespace gui{
     //! Initialize layers other than the lattice
     void initLayers();
 
+    //! Initialize overlays
+    void initOverlays();
+
     void setSceneMinSize();
 
     //! Check if given QPointF falls within a lattice dot

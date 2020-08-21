@@ -119,6 +119,7 @@ void gui::DesignPanel::initDesignPanel(bool init_layers) {
 
   // make lattice and surface layer
   buildLattice();
+  initOverlays();
   if (init_layers) {
     initLayers();
   }
@@ -137,29 +138,29 @@ void gui::DesignPanel::initDesignPanel(bool init_layers) {
   // construct widgets
 
   // initialize widgets which depend on other things to be initialized first
-
+  
   screenman = new ScreenshotManager(layman->indexOf(layman->getLayer("Screenshot Overlay")), this);
 
   // ScreenshotManager signals
   connect(screenman, &gui::ScreenshotManager::sig_takeScreenshot,
-          [this](const QString &target_img_path, const QRectF &scene_rect, bool always_overwrite) {
-            emit sig_screenshot(target_img_path, scene_rect, always_overwrite);
-          }
-  );
+      [this](const QString &target_img_path, const QRectF &scene_rect, bool always_overwrite) {
+        emit sig_screenshot(target_img_path, scene_rect, always_overwrite);
+      }
+      );
   connect(screenman, &gui::ScreenshotManager::sig_clipSelectionTool,
-          [this]() {emit sig_toolChangeRequest(gui::ScreenshotAreaTool);});
+      [this]() {emit sig_toolChangeRequest(gui::ScreenshotAreaTool);});
   connect(screenman, &gui::ScreenshotManager::sig_addVisualAidToDP,
-          [this](prim::Item *t_item) {
-            addItem(t_item, layman->getLayer("Screenshot Overlay")->layerID());
-          });
+      [this](prim::Item *t_item) {
+        addItem(t_item, layman->getLayer("Screenshot Overlay")->layerID());
+      });
   connect(screenman, &gui::ScreenshotManager::sig_removeVisualAidFromDP,
-          [this](prim::Item *t_item) {
-            removeItem(t_item, layman->getLayer("Screenshot Overlay")->layerID(), true);
-          });
+      [this](prim::Item *t_item) {
+        removeItem(t_item, layman->getLayer("Screenshot Overlay")->layerID(), true);
+      });
   connect(screenman, &gui::ScreenshotManager::sig_scaleBarAnchorTool,
-          [this]() {sig_toolChangeRequest(gui::ScaleBarAnchorTool);});
+      [this]() {sig_toolChangeRequest(gui::ScaleBarAnchorTool);});
   connect(screenman, &gui::ScreenshotManager::sig_closeEventTriggered,
-          [this]() {emit sig_cancelScreenshot();});
+      [this]() {emit sig_cancelScreenshot();});
 
   connect(itman, &gui::ItemManager::sig_deselect,
           this, &gui::DesignPanel::deselectAll);
@@ -425,16 +426,21 @@ void gui::DesignPanel::initLayers()
     layman->addLayer("Metal", prim::Layer::Electrode, prim::Layer::Design, 1000, 100);
   }
 
-  // add the screenshot misc items layer
-  if (!only_add_missing_defaults || layman->getLayer("Screenshot Overlay") == 0) {
-    layman->addLayer("Screenshot Overlay", prim::Layer::Misc, prim::Layer::Overlay, 0, 0);
-  }
-
   layman->populateLayerTable();
   layman->initSideWidget();
   emit sig_setLayerManagerWidget(layman->sideWidget());
 
   layman->setActiveLayer(layman->getLayer("Surface"));
+}
+
+void gui::DesignPanel::initOverlays()
+{
+  // add the screenshot misc items layer
+  if (layman->getLayer("Screenshot Overlay") != 0) {
+    qWarning() << "Screenshot Overlay layer already exists during overlay "
+      "initialization, shouldn't be the case.";
+  }
+  layman->addLayer("Screenshot Overlay", prim::Layer::Misc, prim::Layer::Overlay, 0, 0);
 }
 
 
