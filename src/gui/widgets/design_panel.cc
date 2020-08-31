@@ -877,7 +877,7 @@ void gui::DesignPanel::loadDesign(QXmlStreamReader *rs, QList<int> &layer_order_
         continue;
       }
       // recursively populate layer with items
-      rs->readNext();
+      //rs->readNext();
       layman->getLayer(layer_order_id[layer_load_order], !is_sim_result)->loadItems(rs, scene);
       layer_load_order++;
     } else {
@@ -2308,23 +2308,28 @@ void gui::DesignPanel::FormAggregate::form()
   // all items should be in the same layer as the aggregate was and have no parents
   prim::Item *item=0;
   QStack<prim::Item*> layer_items = layer->getItems();
-  for(const int &ind : item_inds){
-    if(ind >= layer_items.size())
+  for(const int &ind : item_inds) {
+    if(ind >= layer_items.size()) {
       qFatal("Undo/Redo mismatch... something went wrong");
+    }
     item = layer_items.at(ind);
-    if(item->layer_id != layer_index || item->parentItem() != 0)
+    if(item->layer_id != layer_index || item->parentItem() != 0) {
       qFatal("Undo/Redo mismatch... something went wrong");
+    }
   }
 
   // remove the items from the Layer stack in reverse order
   QStack<prim::Item*> items;
-  for(int i=item_inds.count()-1; i>=0; i--)
+  for(int i=item_inds.count()-1; i>=0; i--) {
     items.push(layer->takeItem(item_inds.at(i)));
+  }
 
   // remove all Items from the scene
-  for(prim::Item *item : items)
-    if(item != 0)
+  for(prim::Item *item : items) {
+    if(item != 0) {
       item->scene()->removeItem(item);
+    }
+  }
 
   // add new aggregate to system
   dp->addItem(new prim::Aggregate(layer_index, items), layer_index, agg_index);
