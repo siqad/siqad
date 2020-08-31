@@ -152,8 +152,8 @@ void prim::Layer::setActive(bool act)
 
 void prim::Layer::saveLayer(QXmlStreamWriter *ws) const
 {
-  if (layer_role != LayerRole::Design) {
-    qDebug() << tr("Skipping layer %1: %2 as the role is volatile.")
+  if (layer_role == LayerRole::Result) {
+    qDebug() << tr("Skipping layer %1: %2 as the role is Simulation Result.")
       .arg(layer_id).arg(name);
     return;
   }
@@ -181,8 +181,8 @@ void prim::Layer::saveLayerProperties(QXmlStreamWriter *ws) const
 
 void prim::Layer::saveItems(QXmlStreamWriter *ws, gui::DesignInclusionArea inclusion_area) const
 {
-  if (layer_role != LayerRole::Design) {
-    qDebug() << tr("Skipping layer %1: %2 as the role is volatile.")
+  if (layer_role == LayerRole::Result) {
+    qDebug() << tr("Skipping layer %1: %2 as the role is Simulation Result.")
       .arg(layer_id).arg(name);
     return;
   }

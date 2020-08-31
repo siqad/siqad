@@ -778,10 +778,17 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs,
     if (layer_role != prim::Layer::Design) {
       qDebug() << tr("Loading design from simulation problem, skipping layer %1"
           " as it is not of Design role.").arg(layer_nm);
+      layer_order_id.append(-1);
       return;
     } else {
       layer_role = prim::Layer::Result;
     }
+  }
+
+  if (layer_role == prim::Layer::Overlay) {
+    layer_order_id.append(-1);
+    qDebug() << tr("Overlay layer role encountered, skipping this load.");
+    return;
   }
 
   prim::Layer *lay;
@@ -864,6 +871,11 @@ void gui::DesignPanel::loadDesign(QXmlStreamReader *rs, QList<int> &layer_order_
   int layer_load_order=0;
   while (rs->readNextStartElement()) {
     if (rs->name() == "layer") {
+      if (layer_order_id[layer_load_order] == -1) {
+        layer_load_order++;
+        rs->skipCurrentElement();
+        continue;
+      }
       // recursively populate layer with items
       rs->readNext();
       layman->getLayer(layer_order_id[layer_load_order], !is_sim_result)->loadItems(rs, scene);
