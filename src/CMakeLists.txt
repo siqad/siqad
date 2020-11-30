@@ -34,6 +34,7 @@ else()
         Qt5::PrintSupport
         Qt5::UiTools
         Qt5::Charts
+        staticZipper
     )
 
     # QtTest related: (should probably add a flag to disable testing)
@@ -70,9 +71,13 @@ else()
     endif()
     include_directories(.)
 
+    # Zipper library
+    add_subdirectory(libs/zipper)
+    include_directories(libs/zipper)
+
     if (USE_SIQAD_LIB)
         add_library(siqad_lib OBJECT ${LIB_SOURCES} ${LIB_HEADERS} ${CUSTOM_RSC})
-        target_link_libraries(siqad_lib ${LIB_LINKS})
+        target_link_libraries(siqad_lib PUBLIC ${LIB_LINKS})
     endif()
 
     # SiQAD binary:
@@ -83,7 +88,7 @@ else()
         add_executable(siqad main.cc ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
     endif()
 
-    target_link_libraries(${PROJECT_NAME} ${BIN_LINKS})
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${BIN_LINKS})
 
     # SiQAD unit tests:
     if(NOT SKIP_SIQAD_TESTS)

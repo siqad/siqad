@@ -103,6 +103,9 @@ namespace gui{
     //! Emit a SiQAD command for commander to parse.
     void sig_executeSQCommand(QString command);
 
+    //! Request a job to be shown.
+    void sig_showJob(comp::SimJob *job);
+
   protected:
 
     void showEvent(QShowEvent *e) override
@@ -156,6 +159,7 @@ namespace gui{
     QList<comp::SimJob*> sim_jobs;        // list of all jobs
     QListView *lv_engines;                // list view of engines in the engine list
     QListView *lv_job_steps;              // list view of job steps
+    QVBoxLayout *vl_job_view;             // vertical layout of job view with the tree view and useful buttons
     QTreeView *tv_job_view;               // tree view of all jobs
     QStandardItemModel *eng_model;        // data model storing the engines in lv_engines
     QSortFilterProxyModel *eng_filter_proxy_model;    // proxy model for filtering eng_model

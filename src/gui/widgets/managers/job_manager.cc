@@ -59,7 +59,8 @@ void JobManager::addJob(comp::SimJob *job)
   QList<QWidget*> row_widgets({
         job->guiControlElems().pb_terminate,
         job->guiControlElems().pb_sim_visualize,
-        job->guiControlElems().pb_job_terminal
+        job->guiControlElems().pb_job_terminal,
+        job->guiControlElems().pb_export_results
       });
 
   tv_job_view->resizeColumnToContents(0);
@@ -487,7 +488,7 @@ QWidget *JobManager::initJobSetupPanel()
               job_details.name = comp::SimJob::defaultJobName();
             }
             // create sim job and submit to application
-            comp::SimJob *new_job = new comp::SimJob(job_details.name);
+            comp::SimJob *new_job = new comp::SimJob(job_details.name, nullptr);
             new_job->setInclusionArea(job_details.inclusion_area);
             for (int i=0; i<job_steps_model->rowCount(); i++) {
               QStandardItem *si_job_step = job_steps_model->item(i);
@@ -540,17 +541,41 @@ QWidget *JobManager::initJobSetupPanel()
 QWidget *JobManager::initJobViewPanel()
 {
   job_view_model = new QStandardItemModel();
-  job_view_model->setColumnCount(4);  // TODO make dynamic
+  job_view_model->setColumnCount(5);  // TODO make dynamic
   tv_job_view = new QTreeView();
   tv_job_view->header()->setStretchLastSection(false);
   tv_job_view->setModel(job_view_model);
   // TODO QTreeView with multiple columns
   // TODO job details (start and end times, job step count, list of invocation commands for job steps)
-  // TODO view terminal output
-  // TODO view sim results where appropriate
   // TODO allow sorting, sort by newest by default
 
-  return tv_job_view;
+  QPushButton *pb_close = new QPushButton("Close", this);
+  QPushButton *pb_import_job_results = new QPushButton("Import Past Results", this);
+  pb_close->setShortcut(Qt::Key_Escape);
+  QDialogButtonBox *dbb_job_view_buttons = new QDialogButtonBox();
+  dbb_job_view_buttons->addButton(pb_close, QDialogButtonBox::RejectRole);
+  dbb_job_view_buttons->addButton(pb_import_job_results, QDialogButtonBox::ActionRole);
+
+  vl_job_view = new QVBoxLayout();
+  vl_job_view->addWidget(tv_job_view);
+  vl_job_view->addWidget(dbb_job_view_buttons);
+
+  QWidget *vl_job_view_widget = new QWidget();
+  vl_job_view_widget->setLayout(vl_job_view);
+
+  connect(pb_close, &QPushButton::clicked, this, &QWidget::hide);
+  connect(pb_import_job_results, &QPushButton::clicked,
+      [this]()
+      {
+        comp::SimJob *j = comp::SimJob::importSimJob();
+        if (j != nullptr) {
+          addJob(j);
+          emit sig_showJob(j);
+        }
+      });
+
+  //return tv_job_view;
+  return vl_job_view_widget;
 }
 
 comp::PluginEngine *JobManager::selectedEngine()

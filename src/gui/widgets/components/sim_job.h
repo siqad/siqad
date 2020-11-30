@@ -17,6 +17,8 @@
 #include "settings/settings.h" // TODO probably need this later
 #include <tuple> //std::tuple for 3+ article data structure, std::get for accessing the tuples
 #include <QDir>
+#include <libs/zipper/zipper/unzipper.h>
+#include <libs/zipper/zipper/zipper.h>
 
 namespace comp{
 
@@ -30,13 +32,20 @@ namespace comp{
   public:
 
     enum JobStepState{NotInvoked, Running, FinishedWithError, FinishedNormally};
+    Q_ENUM(JobStepState);
 
     //! Constructor.
     JobStep(PluginEngine *t_engine, QStringList t_command_format, 
             gui::PropertyMap t_job_prop_map);
+    
+    //! XML import constructor.
+    JobStep(QXmlStreamReader *rs, QDir job_root_dir);
 
     //! Destructor.
     ~JobStep();
+
+    //! Write the manifest of this job step to the provided XML Stream.
+    void writeManifest(QXmlStreamWriter *ws);
 
     //! Prepare job step by setting the step placement within the job and 
     //! various paths.
@@ -58,7 +67,10 @@ namespace comp{
     void processJobStepCompletion(int t_exit_code, QProcess::ExitStatus t_exit_status);
 
     //! Read job step results.
-    bool readResults();
+    bool readResults(bool attempt_import_logs=false);
+
+    //! Write the terminal outputs to files.
+    void exportTerminalOutputs(QString std_out_path, QString std_err_path);
 
     //! Kill job step
     void terminateJobStep();
@@ -101,6 +113,9 @@ namespace comp{
 
     //! Return the job results.
     QMap <comp::JobResult::ResultType, comp::JobResult*> jobResults() {return job_results;}
+
+    //! Return the job step tmp directory path.
+    QString jobStepTempDirPath() const {return js_tmp_dir_path;}
 
   signals:
 
@@ -159,10 +174,11 @@ namespace comp{
         pb_terminate = new QPushButton("Terminate");
         pb_job_terminal = new QPushButton("Log");
         pb_sim_visualize = new QPushButton("Visualize Results");
+        pb_export_results = new QPushButton("Export Results");
 
-        connect(pb_job_terminal, &QPushButton::pressed,
+        connect(pb_job_terminal, &QPushButton::clicked,
                 [job](){job->terminalOutputDialog()->show();});
-        connect(pb_terminate, &QPushButton::pressed,
+        connect(pb_terminate, &QPushButton::clicked,
                 [job](){
                   QMessageBox msg;
                   msg.setText("Are you sure that you would like to terminate the job?\nNote: multi-threaded plugins may leave behind orphaned children processes depending on implementation.");
@@ -172,14 +188,17 @@ namespace comp{
                     job->terminateJob();
                   }
                 });
-        connect(pb_sim_visualize, &QPushButton::pressed,
+        connect(pb_sim_visualize, &QPushButton::clicked,
                 [job](){emit job->sig_requestJobVisualization(job);});
+        connect(pb_export_results, &QPushButton::clicked,
+                [job](){job->exportJob();});
       }
 
       SimJob *job=nullptr;
       QPushButton *pb_terminate=nullptr;
       QPushButton *pb_job_terminal=nullptr;
       QPushButton *pb_sim_visualize=nullptr;
+      QPushButton *pb_export_results=nullptr;
     };
 
     enum JobState{NotInvoked, Running, FinishedWithError, FinishedNormally};
@@ -190,7 +209,16 @@ namespace comp{
     Q_ENUM(JobInfoStandardItemField);
 
     //! Constructor.
-    SimJob(const QString &nm, QWidget *parent=0);
+    SimJob(const QString &nm, QWidget *parent=nullptr);
+
+    //! XML import constructor.
+    //! If dcmp is true, then assume that fpath is an archive; if dcmp is false,
+    //! then assume that fpath is the manifest XML path.
+    //! For name_override, use string @IMPORTED_NAME@ to denote the original
+    //! name in the manifest. For example, you can provide:
+    //! "IMPORTED_@IMPORTED_NAME@"
+    SimJob(const QString &fpath, bool dcmp, QString name_override=QString(),
+        QWidget *parent=nullptr);
 
     //! Destructor.
     ~SimJob();
@@ -207,6 +235,11 @@ namespace comp{
     //! Return a pointer to the list of all job steps.
     QList<JobStep*> jobSteps() {return job_steps;}
 
+    //! Write the manifest of this job step to the default file location.
+    void writeManifest(QString fpath="");
+
+    //! Write the job manifest.
+    void writeManifest(QXmlStreamWriter *ws);
 
     // OTHER SETTINGS
 
@@ -244,6 +277,20 @@ namespace comp{
     //! Return a list of QStandardItems containing generic information relevant 
     //! to this job.
     QList<QStandardItem*> jobInfoStandardItemRow(QList<JobInfoStandardItemField> fields=QList<JobInfoStandardItemField>());
+
+    //! Static method to show a dialog to choose a job to import.
+    static SimJob *importSimJob(QString fname=QString())
+    {
+      if (fname.isNull()) {
+        qDebug() << "No path was provided for import, prompt to choose from dialog.";
+        fname = QFileDialog::getOpenFileName(nullptr, tr("Open File"));
+        if (fname.isNull()) {
+          qDebug() << "No path was provided in the dialog. Import halted.";
+          return nullptr;
+        }
+      }
+      return new SimJob(fname, true, "IMP_@IMPORTED_NAME@", nullptr);
+    }
 
 
     // ACCESSORS
@@ -283,6 +330,10 @@ namespace comp{
     //! Show a dialog containing the job's terminal output.
     QWidget *terminalOutputDialog(QWidget *parent=nullptr, Qt::WindowFlags w_flags=Qt::Dialog);
 
+    //! Export the finished SimJob into an archive and return whether the export 
+    //! was successful.
+    bool exportJob(QString outpath=QString());
+
 
   signals:
 
@@ -307,9 +358,9 @@ namespace comp{
     QString job_name;                   // job name for identification
     QString job_tmp_dir_path;           // job directory for storing runtime data
     QDateTime start_time, end_time;     // start and end times of the job
-    QStringList cml_arguments;          // command line arguments when invoking the job
     JobStep *curr_step=nullptr;
     GuiControlElems gui_ctrl_elems;     // store GUI control elements
+    bool imported=false;
 
     // read xml
     QStringList ignored_xml_elements; // XML elements to ignore when reading results
