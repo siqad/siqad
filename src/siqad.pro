@@ -13,6 +13,8 @@ QT += core gui widgets svg printsupport uitools charts
 TEMPLATE = app
 TARGET = siqad
 INCLUDEPATH += .
+INCLUDEPATH += libs/zipper/zipper
+LIBS += -L"$$(ZLIB_LIBRARYDIR)" -lzlib -L"$$(ZIPPER_LIB_PATH)" -lZipper
 
 ###########################
 # APPLICATION INFORMATION #

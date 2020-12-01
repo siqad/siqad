@@ -5,6 +5,17 @@ cmake_minimum_required(VERSION 3.10)
 project(siqad VERSION 0.2.2)
 # TODO add way to push version number into source code
 
+# Zipper library
+if (WIN32)
+    add_compile_definitions(NOMINMAX)
+endif()
+add_subdirectory(libs/zipper)
+include_directories(libs/zipper)
+set(ZIPPER_LIB_PATH ${CMAKE_CURRENT_BINARY_DIR}/libs/zipper/Release)
+message(STATUS "Zipper Lib path set to: ${ZIPPER_LIB_PATH}")
+
+set(USE_QMAKE_ON_LINUX FALSE)
+
 if (WIN32)
     # these paths are chosen for Visual Studio compilation on AppVeyor
     # local compilation or cross-compilation may require changes, especially to paths within qmake_compile.sh and SIQAD_EXE_TARGET
@@ -14,8 +25,21 @@ if (WIN32)
     set(SIQAD_EXE_TARGET ${CMAKE_CURRENT_BINARY_DIR}/siqad.exe)
     add_custom_target(
         siqad ALL
-        COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/qmake_compile.sh "${CMPL_QMAKE_COMMAND}" "${CMPL_MAKE_COMMAND}" "${SIQAD_Q_PRO_FILE}" "${SIQAD_EXE_TARGET}"
+        COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/qmake_compile.sh "${CMPL_QMAKE_COMMAND}" "${CMPL_MAKE_COMMAND}" "${SIQAD_Q_PRO_FILE}" "${SIQAD_EXE_TARGET}" "${ZIPPER_LIB_PATH}"
     )
+    add_dependencies(siqad staticZipper)
+    install(FILES ${SIQAD_EXE_TARGET} DESTINATION ${SIQAD_INSTALL_ROOT})
+    install(FILES $ENV{ZLIB_DLL} DESTINATION ${SIQAD_INSTALL_ROOT})
+elseif (USE_QMAKE_ON_LINUX)
+    set(CMPL_QMAKE_COMMAND qmake)
+    set(CMPL_MAKE_COMMAND make)
+    set(SIQAD_Q_PRO_FILE ${CMAKE_CURRENT_SOURCE_DIR}/siqad.pro)
+    set(SIQAD_EXE_TARGET ${CMAKE_CURRENT_BINARY_DIR}/siqad)
+    add_custom_target(
+        siqad ALL
+        COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/qmake_compile.sh "${CMPL_QMAKE_COMMAND}" "${CMPL_MAKE_COMMAND}" "${SIQAD_Q_PRO_FILE}" "${SIQAD_EXE_TARGET}" "${ZIPPER_LIB_PATH}"
+    )
+    add_dependencies(siqad Zipper)
     install(FILES ${SIQAD_EXE_TARGET} DESTINATION ${SIQAD_INSTALL_ROOT})
 else()
     find_package(Qt5Core ${QT_VERSION_REQ} REQUIRED)
@@ -70,10 +94,6 @@ else()
         set(BIN_LINKS siqad_lib)
     endif()
     include_directories(.)
-
-    # Zipper library
-    add_subdirectory(libs/zipper)
-    include_directories(libs/zipper)
 
     if (USE_SIQAD_LIB)
         add_library(siqad_lib OBJECT ${LIB_SOURCES} ${LIB_HEADERS} ${CUSTOM_RSC})
