@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 # for release builds, add flag "-DCMAKE_BUILD_TYPE=Release" (without quotes) when running cmake.
 
-project(siqad VERSION 0.2.2)
+project(siqad VERSION 0.3.0)
 # TODO add way to push version number into source code
 
 # Zipper library
@@ -68,7 +68,7 @@ else()
         set(CMAKE_INCLUDE_CURRENT_DIR ON)
     endif()
 
-    add_definitions( -DAPP_VERSION=\"0.2.2\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\" )
+    add_definitions( -DAPP_VERSION=\"0.3.0\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\" )
 
     set(CMAKE_AUTOMOC ON)
 

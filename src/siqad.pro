@@ -21,8 +21,8 @@ LIBS += -L"$$(ZLIB_LIBRARYDIR)" -lzlib -L"$$(ZIPPER_LIB_PATH)" -lZipper
 ###########################
 
 # TODO read all these from environment
-VERSION = 0.2.2
-DEFINES += APP_VERSION=\\\"0.2.2\\\"
+VERSION = 0.3.0
+DEFINES += APP_VERSION=\\\"0.3.0\\\"
 DEFINES += APPLICATION_NAME=\\\"SiQAD\\\"
 DEFINES += ORGANIZATION_NAME=\\\"WalusLab\\\"
 
