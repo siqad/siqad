@@ -22,8 +22,9 @@ PluginEngine::PluginEngine(const QString &desc_file_path, QWidget *parent)
 
   QFileInfo desc_file_info(desc_file_path);
   plugin_root_path = desc_file_info.absolutePath();
-  py_use_virtualenv = false; // only set to true if the physeng file requests
-  venv_init_success = false; // only set to true after initialization succeeds
+  ready_to_use = true;        // normally immediately ready to use unless venv is needed
+  py_use_virtualenv = false;  // only set to true if the physeng file requests
+  venv_init_success = false;  // only set to true after initialization succeeds
 
   QFile desc_file(desc_file_path);
   if (!desc_file.open(QFile::ReadOnly | QFile::Text)) {
@@ -67,6 +68,7 @@ PluginEngine::PluginEngine(const QString &desc_file_path, QWidget *parent)
       py_use_virtualenv = rs.readElementText() == "1";
       venv_status_str = "Pending init";
       l_venv_status->setText(venv_status_str);
+      ready_to_use = false;
     } else if (rs.name() == "venv_use_system_site_packages") {
       // introduced in SiQAD v0.2.2
       venv_use_system_site = rs.readElementText() == "1";
@@ -172,6 +174,7 @@ void PluginEngine::prepareVirtualenv()
             l_venv_status->setText(venv_status_str);
           } else {
             qDebug() << tr("Plugin %1 finished installing pip dependencies.").arg(name());
+            ready_to_use = true;
             venv_init_success = true;
             venv_status_str = "Ready";
             l_venv_status->setText(venv_status_str);

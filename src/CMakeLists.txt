@@ -2,8 +2,19 @@ cmake_minimum_required(VERSION 3.10)
 
 # for release builds, add flag "-DCMAKE_BUILD_TYPE=Release" (without quotes) when running cmake.
 
-project(siqad VERSION 0.2.2)
+project(siqad VERSION 0.3.0)
 # TODO add way to push version number into source code
+
+# Zipper library
+if (WIN32)
+    add_compile_definitions(NOMINMAX)
+endif()
+add_subdirectory(libs/zipper EXCLUDE_FROM_ALL)  # EXCLUDE_FROM_ALL should impede zipper's install calls from working
+include_directories(libs/zipper)
+set(ZIPPER_LIB_PATH ${CMAKE_CURRENT_BINARY_DIR}/libs/zipper/Release)
+message(STATUS "Zipper Lib path set to: ${ZIPPER_LIB_PATH}")
+
+set(USE_QMAKE_ON_LINUX FALSE)
 
 if (WIN32)
     # these paths are chosen for Visual Studio compilation on AppVeyor
@@ -14,8 +25,21 @@ if (WIN32)
     set(SIQAD_EXE_TARGET ${CMAKE_CURRENT_BINARY_DIR}/siqad.exe)
     add_custom_target(
         siqad ALL
-        COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/qmake_compile.sh "${CMPL_QMAKE_COMMAND}" "${CMPL_MAKE_COMMAND}" "${SIQAD_Q_PRO_FILE}" "${SIQAD_EXE_TARGET}"
+        COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/qmake_compile.sh "${CMPL_QMAKE_COMMAND}" "${CMPL_MAKE_COMMAND}" "${SIQAD_Q_PRO_FILE}" "${SIQAD_EXE_TARGET}" "${ZIPPER_LIB_PATH}"
     )
+    add_dependencies(siqad staticZipper)
+    install(FILES ${SIQAD_EXE_TARGET} DESTINATION ${SIQAD_INSTALL_ROOT})
+    install(FILES $ENV{ZLIB_DLL} DESTINATION ${SIQAD_INSTALL_ROOT})
+elseif (USE_QMAKE_ON_LINUX)
+    set(CMPL_QMAKE_COMMAND qmake)
+    set(CMPL_MAKE_COMMAND make)
+    set(SIQAD_Q_PRO_FILE ${CMAKE_CURRENT_SOURCE_DIR}/siqad.pro)
+    set(SIQAD_EXE_TARGET ${CMAKE_CURRENT_BINARY_DIR}/siqad)
+    add_custom_target(
+        siqad ALL
+        COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/qmake_compile.sh "${CMPL_QMAKE_COMMAND}" "${CMPL_MAKE_COMMAND}" "${SIQAD_Q_PRO_FILE}" "${SIQAD_EXE_TARGET}" "${ZIPPER_LIB_PATH}"
+    )
+    add_dependencies(siqad Zipper)
     install(FILES ${SIQAD_EXE_TARGET} DESTINATION ${SIQAD_INSTALL_ROOT})
 else()
     find_package(Qt5Core ${QT_VERSION_REQ} REQUIRED)
@@ -34,6 +58,7 @@ else()
         Qt5::PrintSupport
         Qt5::UiTools
         Qt5::Charts
+        staticZipper
     )
 
     # QtTest related: (should probably add a flag to disable testing)
@@ -43,7 +68,7 @@ else()
         set(CMAKE_INCLUDE_CURRENT_DIR ON)
     endif()
 
-    add_definitions( -DAPP_VERSION=\"0.2.2\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\" )
+    add_definitions( -DAPP_VERSION=\"0.3.0\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\" )
 
     set(CMAKE_AUTOMOC ON)
 
@@ -72,7 +97,7 @@ else()
 
     if (USE_SIQAD_LIB)
         add_library(siqad_lib OBJECT ${LIB_SOURCES} ${LIB_HEADERS} ${CUSTOM_RSC})
-        target_link_libraries(siqad_lib ${LIB_LINKS})
+        target_link_libraries(siqad_lib PUBLIC ${LIB_LINKS})
     endif()
 
     # SiQAD binary:
@@ -83,15 +108,23 @@ else()
         add_executable(siqad main.cc ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
     endif()
 
-    target_link_libraries(${PROJECT_NAME} ${BIN_LINKS})
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${BIN_LINKS})
+
+    add_dependencies(siqad_lib staticZipper Zipper-static)
+    add_dependencies(siqad staticZipper Zipper-static)
+    if (BUILD_TEST)
+        add_dependencies(siqad_lib Zipper-test)
+        add_dependencies(siqad Zipper-test)
+    endif()
 
     # SiQAD unit tests:
-    if(NOT SKIP_SIQAD_TESTS)
+    option(BUILD_TEST "Build the test program." ON)
+    if(BUILD_TEST)
         add_executable(siqad_tests tests/siqad_tests.cpp ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
         target_link_libraries(siqad_tests Qt5::Test ${BIN_LINKS})
         add_test(siqad_tests siqad_tests)
-	set_tests_properties(siqad_tests PROPERTIES
-		ENVIRONMENT QT_QPA_PLATFORM=offscreen)
+        set_tests_properties(siqad_tests PROPERTIES
+            ENVIRONMENT QT_QPA_PLATFORM=offscreen)
         add_custom_command(TARGET siqad_tests
             POST_BUILD
             COMMAND ctest -C $<CONFIGURATION> --output-on-failure)

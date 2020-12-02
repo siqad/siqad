@@ -1,4 +1,4 @@
-version: '0.2.2.{build}'
+version: '0.3.0.{build}'
 
 #image: Visual Studio 2015
 image: Visual Studio 2017
@@ -11,20 +11,31 @@ build:
 
 environment:
   BOOST_ROOT: C:\Libraries\boost_1_69_0
+  VCPKG_ROOT: C:\Tools\vcpkg
 
   matrix:
     - QTDIR: "C:\\Qt\\5.13.2\\msvc2017"
       WINDEPLOYQT: "C:\\Qt\\5.13.2\\msvc2017\\bin\\windeployqt.exe"
       BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_69_0\\lib32-msvc-14.1"
+      VCPKG_TRIPLET: "x86-windows"
+      ZLIB_LIBRARYDIR: "%VCPKG_ROOT%\\packages\\zlib_%VCPKG_TRIPLET%\\lib"
+      ZLIB_DLL: "%VCPKG_ROOT%\\packages\\zlib_%VCPKG_TRIPLET%\\bin\\zlib1.dll"
       CMAKE_ARCH: Win32
       platform: x86
     - QTDIR: "C:\\Qt\\5.13.2\\msvc2017_64"
       WINDEPLOYQT: "C:\\Qt\\5.13.2\\msvc2017_64\\bin\\windeployqt.exe"
       BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_69_0\\lib64-msvc-14.1"
+      VCPKG_TRIPLET: "x64-windows"
+      ZLIB_LIBRARYDIR: "%VCPKG_ROOT%\\packages\\zlib_%VCPKG_TRIPLET%\\lib"
+      ZLIB_DLL: "%VCPKG_ROOT%\\packages\\zlib_%VCPKG_TRIPLET%\\bin\\zlib1.dll"
       CMAKE_ARCH: x64
       platform: x64
 
 install:
+  - cd "%VCPKG_ROOT%"
+  - vcpkg install zlib:%VCPKG_TRIPLET%
+  - vcpkg integrate install
+  - cd %APPVEYOR_BUILD_FOLDER%
   - git submodule update --init --recursive
 
 before_build:
@@ -34,7 +45,7 @@ before_build:
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir build && cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -G "Visual Studio 15 2017" -A %CMAKE_ARCH% -DWIN32_QMAKE_BIN="%WIN32_QMAKE_BIN%" -DWIN32_MAKE_BIN="%WIN32_MAKE_BIN%"
+  - cmake .. -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -G "Visual Studio 15 2017" -A %CMAKE_ARCH% -DWIN32_QMAKE_BIN="%WIN32_QMAKE_BIN%" -DWIN32_MAKE_BIN="%WIN32_MAKE_BIN%"
   - cmake --build . --config Release --target install
   - mv release siqad_%PLATFORM%
   #- cd %APPVEYOR_BUILD_FOLDER% && dir /s /b /o:gn

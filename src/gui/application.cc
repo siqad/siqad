@@ -201,6 +201,8 @@ void gui::ApplicationGUI::initGUI()
           {
             commander->parseInputs(command);
           });
+  connect(job_manager, &gui::JobManager::sig_showJob,
+          sim_visualize, &gui::SimVisualizer::showJob);
 
   // widget-app gui signals
   connect(job_manager, &gui::JobManager::sig_exportJobProblem,
@@ -292,6 +294,7 @@ void gui::ApplicationGUI::initMenuBar()
   QAction *save_as = new QAction(
       QIcon::fromTheme("document-save-as", QIcon(":/ico/fb/document-save.svg")), 
       tr("Save &As..."), this);
+  QAction *import_job_results = new QAction(tr("Import Past Results"), this);
   QAction *export_lvm = new QAction(tr("&Export to QSi LV"), this);
   QAction *quit = new QAction(QIcon::fromTheme("application-exit",
         QIcon(":/ico/fb/exit.svg")), tr("&Quit"), this);
@@ -305,7 +308,10 @@ void gui::ApplicationGUI::initMenuBar()
   file->addAction(open_save);
   file->addAction(save);
   file->addAction(save_as);
+  file->addSeparator();
+  file->addAction(import_job_results);
   //file->addAction(export_lvm);
+  file->addSeparator();
   file->addAction(quit);
 
   // view menu actions
@@ -361,11 +367,11 @@ void gui::ApplicationGUI::initMenuBar()
 
   action_screenshot_mode->setCheckable(true);
 
-  // TODO add lattice button back in the future when updated support is implemented
-  //tools->addAction(change_lattice);
-  // tools->addAction(select_color);
+  
+  //tools->addAction(change_lattice);     // TODO add lattice button back in the future when updated support is implemented
+  //tools->addAction(select_color);
   //tools->addSeparator();
-  tools->addAction(window_screenshot);
+  //tools->addAction(window_screenshot);  // TODO disabled due to imperfect screenshot results
   tools->addAction(action_screenshot_mode);
   tools->addSeparator();
   tools->addAction(action_plugin_man);
@@ -373,8 +379,13 @@ void gui::ApplicationGUI::initMenuBar()
   tools->addAction(action_settings_dialog);
 
   // help menu actions
+  QAction *open_log_dir = new QAction(tr("Open Log Directory"), this);
+  QAction *open_autosave_dir = new QAction(tr("Open Autosave Directory"), this);
   QAction *about_version = new QAction(tr("About"), this);
 
+  help->addAction(open_log_dir);
+  help->addAction(open_autosave_dir);
+  help->addSeparator();
   help->addAction(about_version);
 
   connect(new_file, &QAction::triggered, this, &gui::ApplicationGUI::newFile);
@@ -392,6 +403,14 @@ void gui::ApplicationGUI::initMenuBar()
   connect(open_save, &QAction::triggered,
       [this](){openFromFile();});
   connect(export_lvm, &QAction::triggered, this, &gui::ApplicationGUI::exportToLabview);
+  connect(import_job_results, &QAction::triggered,
+      [this](){
+        comp::SimJob *j = comp::SimJob::importSimJob();
+        if (j != nullptr) {
+          job_manager->addJob(j);
+          sim_visualize->showJob(j);
+        }
+      });
   connect(zoom_in, &QAction::triggered,
       [this](){design_pan->stepZoom(true);});
   connect(zoom_out, &QAction::triggered,
@@ -407,6 +426,16 @@ void gui::ApplicationGUI::initMenuBar()
   connect(action_plugin_man, &QAction::triggered,
       [this](){
         plugin_manager->show();
+      });
+  connect(open_log_dir, &QAction::triggered,
+      []() {
+        settings::AppSettings *s = settings::AppSettings::instance();
+        QString log_path = s->getPath("log/logdir");
+        QDesktopServices::openUrl(QUrl::fromLocalFile(log_path));
+      });
+  connect(open_autosave_dir, &QAction::triggered,
+      [this]() {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(autosave_dir.absolutePath()));
       });
   connect(action_screenshot_mode, &QAction::triggered,
           this, &gui::ApplicationGUI::toggleScreenshotMode);

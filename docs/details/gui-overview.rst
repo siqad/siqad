@@ -100,3 +100,16 @@ Four panes are shown:
 
 Simulation Visualization
 ========================
+
+.. todo::
+
+   TBA
+
+
+
+Exporting and Importing Simulation Results
+==========================================
+
+After performing a simulation, you can export the results for archival and import them for future inspection. Simulation jobs may include one or multiple job steps; both cases can be handled by the exporter. Results can either be exported from the Sim Visualizer (when the job is being displayed) or from the |joblogs| page in the |jobman|. Exported results can be imported either from |joblogs| or *File -> Import Job Results*.
+
+It is a good idea to export simulation results of novel circuit designs for archival purposes especially if you have eventual publication in mind.

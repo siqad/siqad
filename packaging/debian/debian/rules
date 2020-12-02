@@ -5,7 +5,7 @@ BUILDDIR = build_dir
 # secondly called by launchpad
 build:
 	mkdir $(BUILDDIR)
-	cd $(BUILDDIR); cmake -DCMAKE_INSTALL_PREFIX=../debian/tmp/usr/lib/siqad -DCMAKE_BUILD_TYPE=Release ..
+	cd $(BUILDDIR); cmake -DBUILD_TEST=OFF -DCMAKE_INSTALL_PREFIX=../debian/tmp/usr/lib/siqad -DCMAKE_BUILD_TYPE=Release ..
 	make -C $(BUILDDIR)
 
 build-indep:
@@ -13,7 +13,7 @@ build-indep:
 
 build-arch:
 	mkdir $(BUILDDIR)
-	cd $(BUILDDIR); cmake -DCMAKE_INSTALL_PREFIX=../debian/tmp/usr/lib/siqad -DCMAKE_BUILD_TYPE=Release ..
+	cd $(BUILDDIR); cmake -DBUILD_TEST=OFF -DCMAKE_INSTALL_PREFIX=../debian/tmp/usr/lib/siqad -DCMAKE_BUILD_TYPE=Release ..
 	make -C $(BUILDDIR)
 
 # thirdly called by launchpad

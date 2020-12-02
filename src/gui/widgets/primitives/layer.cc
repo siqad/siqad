@@ -152,8 +152,8 @@ void prim::Layer::setActive(bool act)
 
 void prim::Layer::saveLayer(QXmlStreamWriter *ws) const
 {
-  if (layer_role != LayerRole::Design) {
-    qDebug() << tr("Skipping layer %1: %2 as the role is volatile.")
+  if (layer_role == LayerRole::Result) {
+    qDebug() << tr("Skipping layer %1: %2 as the role is Simulation Result.")
       .arg(layer_id).arg(name);
     return;
   }
@@ -181,8 +181,8 @@ void prim::Layer::saveLayerProperties(QXmlStreamWriter *ws) const
 
 void prim::Layer::saveItems(QXmlStreamWriter *ws, gui::DesignInclusionArea inclusion_area) const
 {
-  if (layer_role != LayerRole::Design) {
-    qDebug() << tr("Skipping layer %1: %2 as the role is volatile.")
+  if (layer_role == LayerRole::Result) {
+    qDebug() << tr("Skipping layer %1: %2 as the role is Simulation Result.")
       .arg(layer_id).arg(name);
     return;
   }
@@ -210,44 +210,88 @@ void prim::Layer::saveItems(QXmlStreamWriter *ws, gui::DesignInclusionArea inclu
   ws->writeEndElement();
 }
 
-void prim::Layer::loadItems(QXmlStreamReader *ws, QGraphicsScene *scene)
+void prim::Layer::loadItems(QXmlStreamReader *rs, QGraphicsScene *scene)
 {
   qDebug() << QObject::tr("Loading layer items for %1").arg(name);
   // create items according to hierarchy
-  while (!ws->atEnd()) {
-    if (ws->isStartElement()) {
-      if (ws->name() == "dbdot") {
-        ws->readNext();
+  while(rs->readNextStartElement()) {
+    qDebug() << rs->name();
+    if (rs->name() == "dbdot") {
+      //rs->readNext();
+      prim::DBDot *dbdot = new prim::DBDot(rs, scene, layer_id);
+      addItem(dbdot);
+      prim::Emitter::instance()->addItemToScene(dbdot);
+      static_cast<prim::DBLayer*>(this)->getLattice()->setOccupied(dbdot->latticeCoord(), dbdot);
+      prim::LatticeCoord lc = dbdot->latticeCoord();
+      prim::Emitter::instance()->sig_moveDBToLatticeCoord(dbdot, lc.n, lc.m, lc.l);
+    } else if (rs->name() == "aggregate") {
+      // TODO pass a blank list to Aggregate 
+      QList<prim::Item*> new_items;
+      addItem(new prim::Aggregate(rs, scene, new_items, layer_id));
+      for (prim::Item *item : new_items) {
+        if (item->item_type == prim::Item::DBDot) {
+          prim::DBDot *dbdot = static_cast<prim::DBDot*>(item);
+          static_cast<prim::DBLayer*>(this)->getLattice()->setOccupied(dbdot->latticeCoord(), dbdot);
+          prim::LatticeCoord lc = dbdot->latticeCoord();
+          prim::Emitter::instance()->sig_moveDBToLatticeCoord(dbdot, lc.n, lc.m, lc.l);
+        }
+      }
+      new_items.clear();
+    } else if (rs->name() == "electrode") {
+      rs->readNext();
+      addItem(new prim::Electrode(rs, scene, layer_id));
+    } else {
+      qDebug() << QObject::tr("Layer load item: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
+      rs->skipCurrentElement();
+    }
+  }
+
+  /*
+  while (!rs->atEnd()) {
+    if (rs->isStartElement()) {
+      if (rs->name() == "dbdot") {
+        rs->readNext();
         prim::DBDot *dbdot = new prim::DBDot(ws, scene, layer_id);
         addItem(dbdot);
         prim::Emitter::instance()->addItemToScene(dbdot);
         static_cast<prim::DBLayer*>(this)->getLattice()->setOccupied(dbdot->latticeCoord(), dbdot);
         prim::LatticeCoord lc = dbdot->latticeCoord();
         prim::Emitter::instance()->sig_moveDBToLatticeCoord(dbdot, lc.n, lc.m, lc.l);
-      } else if (ws->name() == "aggregate") {
-        ws->readNext();
-        addItem(new prim::Aggregate(ws, scene, layer_id));
-      } else if (ws->name() == "electrode") {
-        ws->readNext();
+      } else if (rs->name() == "aggregate") {
+        // TODO pass a blank list to Aggregate 
+        QList<prim::Item*> new_items;
+        addItem(new prim::Aggregate(ws, scene, new_items, layer_id));
+        for (prim::Item *item : new_items) {
+          if (item->item_type == prim::Item::DBDot) {
+            prim::DBDot *dbdot = static_cast<prim::DBDot*>(item);
+            static_cast<prim::DBLayer*>(this)->getLattice()->setOccupied(dbdot->latticeCoord(), dbdot);
+            prim::LatticeCoord lc = dbdot->latticeCoord();
+            qDebug() << tr("Lattice coord in agg: (%1, %2, %3)").arg(lc.n).arg(lc.m).arg(lc.l);
+            prim::Emitter::instance()->sig_moveDBToLatticeCoord(dbdot, lc.n, lc.m, lc.l);
+          }
+        }
+        new_items.clear();
+      } else if (rs->name() == "electrode") {
+        rs->readNext();
         addItem(new prim::Electrode(ws, scene, layer_id));
       } else {
-        qDebug() << QObject::tr("Layer load item: invalid element encountered on line %1 - %2").arg(ws->lineNumber()).arg(ws->name().toString());
-        ws->readNext();
+        qDebug() << QObject::tr("Layer load item: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
+        rs->readNext();
       }
-    } else if (ws->isEndElement()) {
+    } else if (rs->isEndElement()) {
       // break out of stream if the end of this element has been reached
-      if (ws->name() == "layer") {
-        ws->readNext();
+      if (rs->name() == "layer") {
+        rs->readNext();
         break;
       }
-      ws->readNext();
+      rs->readNext();
     } else {
-      ws->readNext();
+      rs->readNext();
     }
   }
-
+  */
   // show error if any
-  if(ws->hasError()){
-    qCritical() << QObject::tr("XML error: ") << ws->errorString().data();
+  if(rs->hasError()){
+    qCritical() << QObject::tr("XML error: ") << rs->errorString().data();
   }
 }

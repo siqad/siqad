@@ -146,6 +146,11 @@ namespace comp{
     //! log when pressed.
     QPushButton *widgetVenvInitLog();
 
+    //! Return whether the plugin engine is ready to use. For now, this is 
+    //! only relevant when venv is needed; compiled plugins are always assumed 
+    //! to be ready.
+    bool readyToUse() {return ready_to_use;}
+
 
   private:
 
@@ -170,6 +175,7 @@ namespace comp{
     QString desc_file_path;       // description file path (normally *.sqplug)
     QString preset_dir_path;      // user configuration directory path
 
+    bool ready_to_use;            // holds whether the plugin is ready to use
     bool venv_init_success;       // holds whether venv initialization was successful
     QString venv_init_stdout;     // std out from virtualenv initialization
     QString venv_init_stderr;     // std err from virtualenv initialization

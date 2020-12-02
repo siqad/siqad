@@ -53,69 +53,42 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene, int lay_
   QPointF ld_point1, ld_point2;
   qreal angle_in;
   QColor color;
-  while(!ls->atEnd()){
-    if(ls->isStartElement()){
-      if(ls->name() == "electrode")
-        ls->readNext();
-      else if(ls->name() == "layer_id"){
-        qDebug() << QObject::tr("The layer_id tag in designs are no longer used in loading. Using the lay_id supplied to the constructor instead.");
-        ls->readNext();
-        /*
-        lay_id = ls->readElementText().toInt();
-        ls->readNext();
-        */
-      }
-      else if(ls->name() == "color"){
-        color = QColor(ls->readElementText());
-        ls->readNext();
-      }
-      else if(ls->name() == "angle"){
-        angle_in = ls->readElementText().toFloat();
-        ls->readNext();
-      }
-      else if(ls->name() == "dim"){
-        for(QXmlStreamAttribute &attr : ls->attributes()){
-          if(attr.name().toString() == QLatin1String("x1"))
-            ld_point1.setX(attr.value().toFloat()*scale_factor); //convert from angstrom to pixel
-          else if(attr.name().toString() == QLatin1String("y1"))
-            ld_point1.setY(attr.value().toFloat()*scale_factor);
-          else if(attr.name().toString() == QLatin1String("x2"))
-            ld_point2.setX(attr.value().toFloat()*scale_factor);
-          else if(attr.name().toString() == QLatin1String("y2"))
-            ld_point2.setY(attr.value().toFloat()*scale_factor);
-        }
-        ls->readNext();
-      }
-      else if(ls->name() == "property_map"){
-        propMapFromXml(ls);
-        ls->readNext();
-      }
-      // TODO the rest of the variables
-      else{
-        qDebug() << QObject::tr("Electrode: invalid element encountered on line %1 - %2").arg(ls->lineNumber()).arg(ls->name().toString());
-        ls->readNext();
-      }
+  while(ls->readNextStartElement()) {
+    if (ls->name() == "layer_id") {
+      qDebug() << QObject::tr("The layer_id tag in designs are no longer used in loading. Using the lay_id supplied to the constructor instead.");
+      ls->skipCurrentElement();
+    } else if (ls->name() == "color") {
+      color = QColor(ls->readElementText());
+    } else if (ls->name() == "angle") {
+      angle_in = ls->readElementText().toFloat();
+    } else if (ls->name() == "dim") {
+      ld_point1.setX(ls->attributes().value("x1").toFloat()*scale_factor); //convert from angstrom to pixel
+      ld_point1.setY(ls->attributes().value("y1").toFloat()*scale_factor);
+      ld_point2.setX(ls->attributes().value("x2").toFloat()*scale_factor);
+      ld_point2.setY(ls->attributes().value("y2").toFloat()*scale_factor);
+      ls->skipCurrentElement();
+    } else if (ls->name() == "property_map") {
+      propMapFromXml(ls);
     }
-    else if(ls->isEndElement()){
-      // break out of ls if the end of this element has been reached
-      if(ls->name() == "electrode"){
-        ls->readNext();
-        break;
-      }
-      ls->readNext();
+    // TODO the rest of the variables
+    else{
+      qDebug() << QObject::tr("Electrode: invalid element encountered on line %1 - %2").arg(ls->lineNumber()).arg(ls->name().toString());
+      ls->skipCurrentElement();
     }
-    else
-      ls->readNext();
   }
+
   if(ls->hasError()) {
     qCritical() << QObject::tr("XML error: ") << ls->errorString().data();
   }
+
   if(ld_point1.isNull()){
     qWarning() << "ld_point1 is null";
   }
+
   if(ld_point2.isNull()){
     qWarning() << "ld_point2 is null";
   }
+
   //load all read data into init_electrode
   QRectF rect(ld_point1, ld_point2);
   initElectrode(lay_id, rect.normalized());

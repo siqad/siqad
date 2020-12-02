@@ -83,8 +83,6 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &pos,
 prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &pos, 
     QPointF &nearest_site_pos, bool is_scene_pos) const
 {
-  // TODO ask Jake if these calculations should be done using the scene integer
-  //      version of the variables
   LatticeCoord coord(0,0,-1);
 
   int n0[2];
@@ -118,8 +116,9 @@ prim::LatticeCoord prim::Lattice::nearestSite(const QPointF &pos,
     }
   }
 
-  if (coord.l == -1)
+  if (coord.l == -1) {
     qFatal("No result for nearest site");
+  }
 
   //qDebug() << tr("Nearest Lattice Site: %1 :: %2").arg(mp.x()).arg(mp.y());
 

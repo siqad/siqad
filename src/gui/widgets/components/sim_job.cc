@@ -25,10 +25,57 @@ JobStep::JobStep(PluginEngine *t_engine, QStringList t_command_format,
   }
 }
 
+JobStep::JobStep(QXmlStreamReader *rs, QDir job_root_dir)
+{
+  job_tmp_dir_path = job_root_dir.absolutePath();
+  while (rs->readNextStartElement()) {
+    if (rs->name() == "placement") {
+      placement = rs->readElementText().toInt();
+    } else if (rs->name() == "state") {
+      auto&& meta_enum = QMetaEnum::fromType<JobStepState>();
+      job_step_state = static_cast<JobStepState>(meta_enum.keyToValue(
+            rs->readElementText().toLocal8Bit()));
+    } else if (rs->name() == "command") {
+      // TODO implement
+      rs->skipCurrentElement();
+    } else if (rs->name() == "step_dir") {
+      js_tmp_dir_path = job_root_dir.absoluteFilePath(rs->readElementText());
+    } else if (rs->name() == "problem_path") {
+      problem_path = job_root_dir.absoluteFilePath(rs->readElementText());
+    } else if (rs->name() == "result_path") {
+      result_path = job_root_dir.absoluteFilePath(rs->readElementText());
+    } else {
+      qWarning() << tr("Unknown XML element encountered when importing JobStep:"
+         " %1").arg(rs->name());
+      rs->skipCurrentElement();
+    }
+  }
+  qDebug() << tr("JobStep info: problem path %1, result_path %2").arg(problem_path).arg(result_path);
+}
+
 JobStep::~JobStep()
 {
   if (process != nullptr)
     delete process;
+}
+
+void JobStep::writeManifest(QXmlStreamWriter *ws)
+{
+  ws->writeStartElement("job_step");
+  ws->writeTextElement("placement", QString::number(placement));
+  ws->writeTextElement("state", QVariant::fromValue(job_step_state).toString());
+
+  ws->writeStartElement("command");
+  for (QString line : command)
+    ws->writeTextElement("line", line);
+  ws->writeEndElement();
+
+  QDir job_root_dir = QDir(job_tmp_dir_path);
+  ws->writeComment("Paths below are relative to SimJob manifest");
+  ws->writeTextElement("step_dir", job_root_dir.relativeFilePath(js_tmp_dir_path));
+  ws->writeTextElement("problem_path", job_root_dir.relativeFilePath(problem_path));
+  ws->writeTextElement("result_path", job_root_dir.relativeFilePath(result_path));
+  ws->writeEndElement();
 }
 
 void JobStep::prepareJobStep(const int &t_placement, 
@@ -127,7 +174,7 @@ bool JobStep::invokeBinary()
   return true;
 }
 
-bool JobStep::readResults()
+bool JobStep::readResults(bool attempt_import_logs)
 {
   if (results_read) {
     qDebug() << "Results have already been read.";
@@ -215,11 +262,46 @@ bool JobStep::readResults()
     return false;
   }
 
+  // try to read std out and std error from log files if indicated (normally 
+  // these are acquired from the QProcess, so only applicable when importing 
+  // a job from manifest.)
+  auto importLogFromFilePath = [](QString &s, const QString &fpath)
+  {
+    QFile file(fpath);
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+      qWarning() << tr("File cannot be opened for reading: %1").arg(fpath);
+      return;
+    }
+    s = QString(file.readAll());
+  };
+  if (attempt_import_logs) {
+    QDir js_tmp_dir(js_tmp_dir_path);
+    importLogFromFilePath(std_out, js_tmp_dir.absoluteFilePath("runtime_stdout.log"));
+    importLogFromFilePath(std_err, js_tmp_dir.absoluteFilePath("runtime_stderr.log"));
+  }
+
   qDebug() << tr("Successfully read job step result.");
   result_file.close();
 
   results_read = true;
   return true;
+}
+
+void JobStep::exportTerminalOutputs(QString std_out_path, QString std_err_path)
+{
+  // store std out and std error into file log
+  auto writeToFilePath = [](const QString &s, const QString &fpath)
+  {
+    QFile file(fpath);
+    if (!file.open(QFile::WriteOnly)) {
+      qWarning() << tr("Failed to open file to write: %1").arg(fpath);
+      return;
+    }
+    file.write(s.toLocal8Bit());
+    file.close();
+  };
+  writeToFilePath(std_out, std_out_path);
+  writeToFilePath(std_err, std_err_path);
 }
 
 void JobStep::terminateJobStep()
@@ -290,11 +372,172 @@ SimJob::SimJob(const QString &nm, QWidget *parent)
   : QObject(parent), job_state(NotInvoked), job_name(nm), gui_ctrl_elems(this)
 {}
 
+SimJob::SimJob(const QString &fpath, bool dcmp, QString name_override, 
+    QWidget *parent)
+  : QObject(parent), job_state(FinishedNormally), gui_ctrl_elems(this),
+    imported(true)
+{
+  QString manifest_path;
+  gui_ctrl_elems.pb_terminate->setDisabled(true);
+
+  auto find_manifest = [](QDir xdir)
+  {
+    QDirIterator it(xdir, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+      it.next();
+      if (it.fileInfo().fileName() == "manifest.xml") {
+        return it.fileInfo().absoluteFilePath();
+      }
+    }
+    return QString();
+  };
+
+  // lambda function for importing job steps
+  auto importJobSteps = [this](QXmlStreamReader &rs, QFile &file)
+  {
+    while (rs.readNextStartElement()) {
+      if (rs.name() == "job_step") {
+        job_steps.append(new JobStep(&rs, QFileInfo(file).dir()));
+      } else {
+        qWarning() << tr("Unknown XML tag encountered when importing job steps:"
+           " %1").arg(rs.name());
+        rs.skipCurrentElement();
+      }
+    }
+  };
+
+  // decompress the archive if dcmp flag is true
+  if (dcmp) {
+    qDebug() << "Decompressing SimJob archive...";
+    QString tmpd = settings::AppSettings::instance()->getPath("plugs/runtime_tmp_root_path");
+    QDir xdir(QDir(tmpd).absoluteFilePath("IM_" + QDateTime::currentDateTime().toString("yyMMdd_HHmmss")));
+    zipper::Unzipper unzipper(fpath.toStdString());
+    unzipper.extract(xdir.absolutePath().toStdString());
+    qDebug() << "Searching for SimJob manifest...";
+    manifest_path = find_manifest(xdir);
+    if (manifest_path.isEmpty()) {
+      QMessageBox msg;
+      msg.setText("manifest.xml not found in the provided archive. Import halted.");
+      msg.exec();
+      job_state = FinishedWithError;
+      gui_ctrl_elems.pb_terminate->setText("Import Error");
+      return;
+    }
+  } else {
+    manifest_path = fpath;
+  }
+
+  // get file and XML stream
+  QFile file(manifest_path);
+  if (!file.open(QFile::ReadOnly | QFile::Text)) {
+    qWarning() << tr("Error when opening file to read: %1").arg(file.errorString());
+    return;
+  }
+  QXmlStreamReader rs(&file);
+
+  // read manifest from stream
+  qDebug() << "Reading SimJob manifest";
+  QString name_read = "";
+  job_name = "IMP_UNTITLED";
+  rs.readNextStartElement();  // enter root element
+  if (rs.name() != "simjob") {
+    QString msgstr = tr("Manifest file at %1 does not have the appropriate "
+        "root node. Import halted.").arg(manifest_path);
+    qWarning() << msgstr;
+    QMessageBox msg;
+    msg.setText(msgstr);
+    msg.show();
+    return;
+  }
+  while (rs.readNextStartElement()) {
+    if (rs.name() == "name") {
+      name_read = rs.readElementText();
+    } else if (rs.name() == "state") {
+      auto&& meta_enum = QMetaEnum::fromType<JobState>();
+      job_state = static_cast<JobState>(meta_enum.keyToValue(rs.readElementText().toLocal8Bit()));
+    } else if (rs.name() == "time_start") {
+      // TODO implement
+      rs.skipCurrentElement();
+    } else if (rs.name() == "time_end") {
+      // TODO implement
+      rs.skipCurrentElement();
+    } else if (rs.name() == "job_steps") {
+      importJobSteps(rs, file);
+    } else {
+      qWarning() << tr("Unknown XML tag encountered when importing SimJob: %1")
+        .arg(rs.name());
+      rs.skipCurrentElement();
+    }
+  }
+  if (!name_override.isEmpty()) {
+    if (!name_read.isEmpty()) {
+      QRegExp regex("@IMPORTED_NAME@");
+      name_override.replace(QRegExp("@IMPORTED_NAME@"), name_read);
+    }
+    job_name = name_override;
+  }
+
+  // import results
+  qDebug() << "Reading JobStep results";
+  for (JobStep *js : job_steps) {
+    js->readResults(true);
+    for (comp::JobResult::ResultType type : js->jobResults().keys()) {
+      result_type_step_map.insert(type, js);
+    }
+  }
+  gui_ctrl_elems.pb_terminate->setText("Imported");
+
+  // clean up
+  file.close();
+}
+
 SimJob::~SimJob()
 {
   for (JobStep *job_step : job_steps) {
     delete job_step;
   }
+}
+
+void SimJob::writeManifest(QString fpath)
+{
+  qDebug() << "Writing/updating job manifest...";
+  if (fpath.isEmpty()) {
+    fpath = job_tmp_dir_path+"/manifest.xml";
+  }
+  QFile file(fpath);
+  if(!file.open(QIODevice::WriteOnly)){
+    qDebug() << tr("Save: Error when opening manifest file to export: %1").arg(file.errorString());
+  }
+  QXmlStreamWriter ws(&file);
+  ws.setAutoFormatting(true);
+  ws.writeStartDocument();
+  writeManifest(&ws);
+  file.close();
+  qDebug() << tr("Manifest written to %1").arg(job_tmp_dir_path+"/manifest.xml");
+}
+
+void SimJob::writeManifest(QXmlStreamWriter *ws)
+{
+  // root element
+  ws->writeStartElement("simjob");
+  ws->writeTextElement("name", job_name);
+  ws->writeTextElement("state", QVariant::fromValue(job_state).toString());
+  if (start_time.isValid()) {
+    ws->writeTextElement("time_start", QVariant::fromValue(start_time).toString());
+  }
+  if (end_time.isValid()) {
+    ws->writeTextElement("time_end", QVariant::fromValue(end_time).toString());
+  }
+
+  // all job steps
+  ws->writeStartElement("job_steps");
+  for (JobStep *js : job_steps) {
+    js->writeManifest(ws);
+  }
+  ws->writeEndElement();
+
+  // close root elem
+  ws->writeEndElement();
 }
 
 void SimJob::confirmJobStepsPlacement()
@@ -325,6 +568,9 @@ void SimJob::prepareJob()
     connect(job_step, &comp::JobStep::sig_jobStepFinishState,
             this, &SimJob::continueJob);
   }
+
+  // write job manifest
+  writeManifest();
 }
 
 bool SimJob::beginJob()
@@ -364,6 +610,7 @@ void SimJob::continueJob(int prev_step_ind, bool prev_step_successful)
     curr_step = nullptr;
     jobFinishActions(FinishedNormally);
   }
+  writeManifest();
 }
 
 void SimJob::terminateJob()
@@ -372,16 +619,20 @@ void SimJob::terminateJob()
     curr_step->terminateJobStep();
 }
 
-void SimJob::jobFinishActions(JobState job_state)
+void SimJob::jobFinishActions(JobState t_job_state)
 {
+  job_state = t_job_state;
   switch(job_state)
   {
     case FinishedWithError:
       gui_ctrl_elems.pb_terminate->setText("Error");
       break;
     case FinishedNormally:
+    {
       gui_ctrl_elems.pb_terminate->setText("Finished");
+      gui_ctrl_elems.pb_export_results->setEnabled(true);
       break;
+    }
     default:
       break;
   }
@@ -496,4 +747,46 @@ QWidget *SimJob::terminalOutputDialog(QWidget *parent, Qt::WindowFlags w_flags)
   w_job_term_out->setWindowTitle(tr("%1 Terminal Output").arg(name()));
   w_job_term_out->setLayout(hl_job_term_out);
   return w_job_term_out;
+}
+
+bool SimJob::exportJob(QString out_path)
+{
+  if (imported) {
+    QMessageBox msg;
+    msg.setText("The job you are attempting to export was an imported job. "
+        "Imported jobs cannot be exported again.");
+    msg.exec();
+    return false;
+  }
+  if (job_state != FinishedNormally) {
+    QMessageBox msg;
+    msg.setText("The SimJob that you are attempting to export is not one that "
+        "completed successfully. Export halted.");
+    msg.exec();
+    return false;
+  }
+  if (out_path.isNull()) {
+    out_path = QFileDialog::getSaveFileName(nullptr, 
+        tr("Export SimJob"), name() + ".sqjx.zip");
+    if (out_path.isEmpty()) {
+      qWarning() << "No output path was chosen. Halting export.";
+      return false;
+    }
+  }
+
+  // tell job steps to write their terminal outputs to file
+  for (JobStep *js : job_steps) {
+    QDir js_tmp_dir(js->jobStepTempDirPath());
+    js->exportTerminalOutputs(js_tmp_dir.absoluteFilePath("runtime_stdout.log"),
+        js_tmp_dir.absoluteFilePath("runtime_stderr.log"));
+  }
+
+  // throw everything to archive
+  zipper::Zipper zipper(out_path.toStdString());
+  zipper.add(job_tmp_dir_path.toStdString());
+  zipper.close();
+
+  qDebug() << tr("SimJob exported successfully to %1").arg(out_path);
+
+  return true;
 }

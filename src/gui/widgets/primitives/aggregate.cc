@@ -20,44 +20,33 @@ prim::Aggregate::Aggregate(int lay_id, QStack<Item*> &items, QGraphicsItem *pare
   initAggregate(items, parent);
 }
 
-prim::Aggregate::Aggregate(QXmlStreamReader *stream, QGraphicsScene *scene, int lay_id)
+prim::Aggregate::Aggregate(QXmlStreamReader *rs, QGraphicsScene *scene, QList<prim::Item*> &new_items, int lay_id)
   : prim::Item(prim::Item::Aggregate)
 {
   //qDebug() << QObject::tr("Aggregate: constructing aggregate from XML");
   QStack<Item*> ld_children;
 
   // read from XML stream (children will be created recursively, add those children to stack)
-  while(!stream->atEnd()){
-    if(stream->isStartElement()){
-      if(stream->name() == "dbdot"){
-        //stream->readNext();
-        ld_children.push(new prim::DBDot(stream, scene, lay_id));
-      }
-      else if(stream->name() == "aggregate"){
-        stream->readNext();
-        ld_children.push(new prim::Aggregate(stream, scene, lay_id));
-      }
-      else{
-        qDebug() << QObject::tr("Aggregate: invalid element encountered on line %1 - %2").arg(stream->lineNumber()).arg(stream->name().toString());
-        stream->readNext();
-      }
+  while(rs->readNextStartElement()) {
+    if(rs->name() == "dbdot"){
+      //rs->readNext();
+      prim::DBDot *db = new prim::DBDot(rs, scene, lay_id);
+      new_items.append(db);
+      ld_children.push(db);
     }
-    else if(stream->isEndElement()){
-      // break out of stream if the end of this element has been reached
-      if(stream->name() == "aggregate"){
-        stream->readNext();
-        break;
-      }
-      stream->readNext();
+    else if(rs->name() == "aggregate"){
+      //rs->readNext();
+      ld_children.push(new prim::Aggregate(rs, scene, new_items, lay_id));
     }
-    else {
-      stream->readNext();
+    else{
+      qDebug() << QObject::tr("Aggregate: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
+      rs->skipCurrentElement();
     }
   }
 
   // show error if any
-  if(stream->hasError()){
-    qCritical() << QObject::tr("XML error: ") << stream->errorString().data();
+  if(rs->hasError()){
+    qCritical() << QObject::tr("XML error: ") << rs->errorString().data();
   }
 
   // fill in aggregate properties

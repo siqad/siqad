@@ -6,7 +6,8 @@ Maintainer: Samuel S. H. Ng <samueln@ece.ubc.ca>
 Build-Depends: cmake, make (>= 4.1), gcc (>= 7.5.0), g++ (>= 7.5.0), qtchooser, 
  qtbase5-dev, libqt5svg5-dev, qttools5-dev, qttools5-dev-tools, libqt5charts5, 
  libqt5charts5-dev, libboost-dev, libboost-filesystem-dev, libboost-system-dev, 
- libboost-thread-dev, libboost-random-dev, pkg-config, debhelper (>= 9)
+ libboost-thread-dev, libboost-random-dev, zlib1g-dev, pkg-config, 
+ debhelper (>= 9)
 Homepage: https://waluslab.ece.ubc.ca
 
 Package: siqad

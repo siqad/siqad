@@ -49,6 +49,7 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *, int lay_id)
       read_coord.n = rs->attributes().value("n").toInt();
       read_coord.m = rs->attributes().value("m").toInt();
       read_coord.l = rs->attributes().value("l").toInt();
+      qDebug() << QObject::tr("Read latcoord of DB: (%1, %2, %3)").arg(read_coord.n).arg(read_coord.m).arg(read_coord.l);
       rs->skipCurrentElement();
     } else if (rs->name() == "physloc") {
       loc.setX(rs->attributes().value("x").toFloat());

@@ -13,14 +13,16 @@ QT += core gui widgets svg printsupport uitools charts
 TEMPLATE = app
 TARGET = siqad
 INCLUDEPATH += .
+INCLUDEPATH += libs/zipper/zipper
+LIBS += -L"$$(ZLIB_LIBRARYDIR)" -lzlib -L"$$(ZIPPER_LIB_PATH)" -lZipper
 
 ###########################
 # APPLICATION INFORMATION #
 ###########################
 
 # TODO read all these from environment
-VERSION = 0.2.2
-DEFINES += APP_VERSION=\\\"0.2.2\\\"
+VERSION = 0.3.0
+DEFINES += APP_VERSION=\\\"0.3.0\\\"
 DEFINES += APPLICATION_NAME=\\\"SiQAD\\\"
 DEFINES += ORGANIZATION_NAME=\\\"WalusLab\\\"
 

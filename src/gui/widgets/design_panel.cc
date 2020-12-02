@@ -119,6 +119,7 @@ void gui::DesignPanel::initDesignPanel(bool init_layers) {
 
   // make lattice and surface layer
   buildLattice();
+  initOverlays();
   if (init_layers) {
     initLayers();
   }
@@ -137,29 +138,29 @@ void gui::DesignPanel::initDesignPanel(bool init_layers) {
   // construct widgets
 
   // initialize widgets which depend on other things to be initialized first
-
+  
   screenman = new ScreenshotManager(layman->indexOf(layman->getLayer("Screenshot Overlay")), this);
 
   // ScreenshotManager signals
   connect(screenman, &gui::ScreenshotManager::sig_takeScreenshot,
-          [this](const QString &target_img_path, const QRectF &scene_rect, bool always_overwrite) {
-            emit sig_screenshot(target_img_path, scene_rect, always_overwrite);
-          }
-  );
+      [this](const QString &target_img_path, const QRectF &scene_rect, bool always_overwrite) {
+        emit sig_screenshot(target_img_path, scene_rect, always_overwrite);
+      }
+      );
   connect(screenman, &gui::ScreenshotManager::sig_clipSelectionTool,
-          [this]() {emit sig_toolChangeRequest(gui::ScreenshotAreaTool);});
+      [this]() {emit sig_toolChangeRequest(gui::ScreenshotAreaTool);});
   connect(screenman, &gui::ScreenshotManager::sig_addVisualAidToDP,
-          [this](prim::Item *t_item) {
-            addItem(t_item, layman->getLayer("Screenshot Overlay")->layerID());
-          });
+      [this](prim::Item *t_item) {
+        addItem(t_item, layman->getLayer("Screenshot Overlay")->layerID());
+      });
   connect(screenman, &gui::ScreenshotManager::sig_removeVisualAidFromDP,
-          [this](prim::Item *t_item) {
-            removeItem(t_item, layman->getLayer("Screenshot Overlay")->layerID(), true);
-          });
+      [this](prim::Item *t_item) {
+        removeItem(t_item, layman->getLayer("Screenshot Overlay")->layerID(), true);
+      });
   connect(screenman, &gui::ScreenshotManager::sig_scaleBarAnchorTool,
-          [this]() {sig_toolChangeRequest(gui::ScaleBarAnchorTool);});
+      [this]() {sig_toolChangeRequest(gui::ScaleBarAnchorTool);});
   connect(screenman, &gui::ScreenshotManager::sig_closeEventTriggered,
-          [this]() {emit sig_cancelScreenshot();});
+      [this]() {emit sig_cancelScreenshot();});
 
   connect(itman, &gui::ItemManager::sig_deselect,
           this, &gui::DesignPanel::deselectAll);
@@ -425,16 +426,21 @@ void gui::DesignPanel::initLayers()
     layman->addLayer("Metal", prim::Layer::Electrode, prim::Layer::Design, 1000, 100);
   }
 
-  // add the screenshot misc items layer
-  if (!only_add_missing_defaults || layman->getLayer("Screenshot Overlay") == 0) {
-    layman->addLayer("Screenshot Overlay", prim::Layer::Misc, prim::Layer::Overlay, 0, 0);
-  }
-
   layman->populateLayerTable();
   layman->initSideWidget();
   emit sig_setLayerManagerWidget(layman->sideWidget());
 
   layman->setActiveLayer(layman->getLayer("Surface"));
+}
+
+void gui::DesignPanel::initOverlays()
+{
+  // add the screenshot misc items layer
+  if (layman->getLayer("Screenshot Overlay") != 0) {
+    qWarning() << "Screenshot Overlay layer already exists during overlay "
+      "initialization, shouldn't be the case.";
+  }
+  layman->addLayer("Screenshot Overlay", prim::Layer::Misc, prim::Layer::Overlay, 0, 0);
 }
 
 
@@ -772,10 +778,17 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs,
     if (layer_role != prim::Layer::Design) {
       qDebug() << tr("Loading design from simulation problem, skipping layer %1"
           " as it is not of Design role.").arg(layer_nm);
+      layer_order_id.append(-1);
       return;
     } else {
       layer_role = prim::Layer::Result;
     }
+  }
+
+  if (layer_role == prim::Layer::Overlay) {
+    layer_order_id.append(-1);
+    qDebug() << tr("Overlay layer role encountered, skipping this load.");
+    return;
   }
 
   prim::Layer *lay;
@@ -858,8 +871,13 @@ void gui::DesignPanel::loadDesign(QXmlStreamReader *rs, QList<int> &layer_order_
   int layer_load_order=0;
   while (rs->readNextStartElement()) {
     if (rs->name() == "layer") {
+      if (layer_order_id[layer_load_order] == -1) {
+        layer_load_order++;
+        rs->skipCurrentElement();
+        continue;
+      }
       // recursively populate layer with items
-      rs->readNext();
+      //rs->readNext();
       layman->getLayer(layer_order_id[layer_load_order], !is_sim_result)->loadItems(rs, scene);
       layer_load_order++;
     } else {
@@ -2290,23 +2308,28 @@ void gui::DesignPanel::FormAggregate::form()
   // all items should be in the same layer as the aggregate was and have no parents
   prim::Item *item=0;
   QStack<prim::Item*> layer_items = layer->getItems();
-  for(const int &ind : item_inds){
-    if(ind >= layer_items.size())
+  for(const int &ind : item_inds) {
+    if(ind >= layer_items.size()) {
       qFatal("Undo/Redo mismatch... something went wrong");
+    }
     item = layer_items.at(ind);
-    if(item->layer_id != layer_index || item->parentItem() != 0)
+    if(item->layer_id != layer_index || item->parentItem() != 0) {
       qFatal("Undo/Redo mismatch... something went wrong");
+    }
   }
 
   // remove the items from the Layer stack in reverse order
   QStack<prim::Item*> items;
-  for(int i=item_inds.count()-1; i>=0; i--)
+  for(int i=item_inds.count()-1; i>=0; i--) {
     items.push(layer->takeItem(item_inds.at(i)));
+  }
 
   // remove all Items from the scene
-  for(prim::Item *item : items)
-    if(item != 0)
+  for(prim::Item *item : items) {
+    if(item != 0) {
       item->scene()->removeItem(item);
+    }
+  }
 
   // add new aggregate to system
   dp->addItem(new prim::Aggregate(layer_index, items), layer_index, agg_index);

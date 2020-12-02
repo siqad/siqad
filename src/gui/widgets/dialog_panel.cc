@@ -105,7 +105,7 @@ void gui::DialogPanel::purgeOldLogs()
       QDir::NoFilter, QDir::Time|QDir::Reversed);
 
   // remove closed logs until the file count is below the desired count
-  while (closed_logs.length() >= keep_count && closed_logs.length() != 0) {
+  while (closed_logs.length() > keep_count && closed_logs.length() != 0) {
     qDebug() << tr("Removing closed log %1").arg(closed_logs[0]);
     if (!log_dir.remove(closed_logs[0])) {
       qWarning() << tr("Unable to remove closed log %1. Will not attempt \

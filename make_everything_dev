@@ -102,7 +102,7 @@ fi
 
 if [ $skip_tests == true ]; then
     echo "Skip SiQAD tests."
-    CMAKE_FLAGS+=" -DSKIP_SIQAD_TESTS=TRUE"
+    CMAKE_FLAGS+=" -DBUILD_TEST=OFF"
 fi
 
 echo "Project root:"
