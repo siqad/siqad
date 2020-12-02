@@ -46,7 +46,7 @@ JobStep::JobStep(QXmlStreamReader *rs, QDir job_root_dir)
       result_path = job_root_dir.absoluteFilePath(rs->readElementText());
     } else {
       qWarning() << tr("Unknown XML element encountered when importing JobStep:"
-         " %1").arg(rs->name());
+         " %1").arg(rs->name().toString());
       rs->skipCurrentElement();
     }
   }
@@ -400,7 +400,7 @@ SimJob::SimJob(const QString &fpath, bool dcmp, QString name_override,
         job_steps.append(new JobStep(&rs, QFileInfo(file).dir()));
       } else {
         qWarning() << tr("Unknown XML tag encountered when importing job steps:"
-           " %1").arg(rs.name());
+           " %1").arg(rs.name().toString());
         rs.skipCurrentElement();
       }
     }
@@ -465,7 +465,7 @@ SimJob::SimJob(const QString &fpath, bool dcmp, QString name_override,
       importJobSteps(rs, file);
     } else {
       qWarning() << tr("Unknown XML tag encountered when importing SimJob: %1")
-        .arg(rs.name());
+        .arg(rs.name().toString());
       rs.skipCurrentElement();
     }
   }

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 # for release builds, add flag "-DCMAKE_BUILD_TYPE=Release" (without quotes) when running cmake.
 
-project(siqad VERSION 0.3.0)
+project(siqad VERSION 0.3.3)
 # TODO add way to push version number into source code
 
 # Zipper library
@@ -68,7 +68,7 @@ else()
         set(CMAKE_INCLUDE_CURRENT_DIR ON)
     endif()
 
-    add_definitions( -DAPP_VERSION=\"0.3.0\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\" )
+    add_definitions( -DAPP_VERSION=\"0.3.3\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\" )
 
     set(CMAKE_AUTOMOC ON)
 
@@ -110,11 +110,16 @@ else()
 
     target_link_libraries(${PROJECT_NAME} PUBLIC ${BIN_LINKS})
 
-    add_dependencies(siqad_lib staticZipper Zipper-static)
-    add_dependencies(siqad staticZipper Zipper-static)
+    set(ZIPPER_LIBS
+        staticZipper
+        Zipper-static
+    )
     if (BUILD_TEST)
-        add_dependencies(siqad_lib Zipper-test)
-        add_dependencies(siqad Zipper-test)
+        list(APPEND ZIPPER_LIBS Zipper-test)
+    endif()
+    add_dependencies(siqad ${ZIPPER_LIBS})
+    if (USE_SIQAD_LIB)
+        add_dependencies(siqad_lib ${ZIPPER_LIBS})
     endif()
 
     # SiQAD unit tests:
