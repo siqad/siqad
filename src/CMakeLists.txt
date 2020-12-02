@@ -9,7 +9,7 @@ project(siqad VERSION 0.3.0)
 if (WIN32)
     add_compile_definitions(NOMINMAX)
 endif()
-add_subdirectory(libs/zipper)
+add_subdirectory(libs/zipper EXCLUDE_FROM_ALL)  # EXCLUDE_FROM_ALL should impede zipper's install calls from working
 include_directories(libs/zipper)
 set(ZIPPER_LIB_PATH ${CMAKE_CURRENT_BINARY_DIR}/libs/zipper/Release)
 message(STATUS "Zipper Lib path set to: ${ZIPPER_LIB_PATH}")
@@ -110,13 +110,21 @@ else()
 
     target_link_libraries(${PROJECT_NAME} PUBLIC ${BIN_LINKS})
 
+    add_dependencies(siqad_lib staticZipper Zipper-static)
+    add_dependencies(siqad staticZipper Zipper-static)
+    if (BUILD_TEST)
+        add_dependencies(siqad_lib Zipper-test)
+        add_dependencies(siqad Zipper-test)
+    endif()
+
     # SiQAD unit tests:
-    if(NOT SKIP_SIQAD_TESTS)
+    option(BUILD_TEST "Build the test program." ON)
+    if(BUILD_TEST)
         add_executable(siqad_tests tests/siqad_tests.cpp ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
         target_link_libraries(siqad_tests Qt5::Test ${BIN_LINKS})
         add_test(siqad_tests siqad_tests)
-	set_tests_properties(siqad_tests PROPERTIES
-		ENVIRONMENT QT_QPA_PLATFORM=offscreen)
+        set_tests_properties(siqad_tests PROPERTIES
+            ENVIRONMENT QT_QPA_PLATFORM=offscreen)
         add_custom_command(TARGET siqad_tests
             POST_BUILD
             COMMAND ctest -C $<CONFIGURATION> --output-on-failure)

@@ -18,7 +18,7 @@ apt install devscripts dephelper
 
 ## Packaging Procedure
 
-First, prepare a clean archive of the SiQAD source code. The SiQAD repository contains submodules but the `git archive` command doesn't archive submodules work out of the box. My lazy approaching of acquiring clean SiQAD source code is just to clone the repository recursively:
+First, prepare a clean archive of the SiQAD source code. The SiQAD repository contains submodules but the `git archive` command doesn't archive submodules work out of the box. My lazy approach of acquiring clean SiQAD source code is just to clone the repository recursively:
 
 ```
 git clone --recurse-submodules https://github.com/siqad/siqad.git siqad-0.2.2
