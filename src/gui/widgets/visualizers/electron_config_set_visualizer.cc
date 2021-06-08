@@ -125,9 +125,14 @@ ECSVisualizer::ChargeConfigSetVisualizer(prim::Lattice *lattice, QWidget *parent
           updateNetChargeFilterState);
 
   // whole layout
+  QLabel *help_text = new QLabel("<a href=\"https://siqad.readthedocs.io/en/latest/details/gs-finders.html#interpreting-results\">Interpreting the results</a>");
+  help_text->setTextFormat(Qt::RichText);
+  help_text->setTextInteractionFlags(Qt::TextBrowserInteraction);
+  help_text->setOpenExternalLinks(true);
   QFormLayout *fl_charge_configs = new QFormLayout();
   fl_charge_configs->setLabelAlignment(Qt::AlignLeft);
-  fl_charge_configs->addRow(new QLabel("Energy"), l_energy_val);
+  fl_charge_configs->addRow(help_text);
+  fl_charge_configs->addRow(new QLabel("Config energy (not power cost)"), l_energy_val);
   fl_charge_configs->addRow(new QLabel("Net negative charge"), l_net_charge_val);
   fl_charge_configs->addRow(new QLabel("Physically valid"), l_is_valid);
   fl_charge_configs->addRow(new QLabel("Config occurance"), l_config_occ);

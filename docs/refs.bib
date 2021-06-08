@@ -86,3 +86,25 @@
     ISSN={1941-0085},
     month={},
 }
+
+
+@mastersthesis{Ng2020_thes,
+  title = {Computer-aided design of atomic silicon quantum dots and computational applications},
+  author = {Ng, Samuel Sze Hang},
+  year = {2020},
+  abstract = {The ability for dangling bonds (DBs) to encode bit-information and perform logic computation has been demonstrated in recent works. This was made possible by the ability to fabricate DBs with atomic precision as well as to observe and control their charge states. An observed tendency for charge reconfiguration to occur among an array of DBs as the system relaxes to the ground state was utilized to create logic wires and gates. Building on these novel advances, this thesis explores a breadth of topics surrounding the DB computation platform. A computer-aided design tool, SiQAD, was developed as part of a greater research effort to enable the rapid design and simulation of DB layouts. Among the simulation tools included in SiQAD, this work most extensively contributed to the development of multiple ground state charge configuration finders, enabling the exploration of prospective DB logic gate and circuit designs. Similarities have been drawn between DB circuit scaling properties with those of existing field-coupled nanocomputing (FCN) research, justifying the use of FCN architectures as blueprints for DB logic research. As such, this thesis proposes and analyzes DB logic implementations from the gate level to the application level. This work identifies hardware acceleration of machine learning inference as a novel prospective application on the DB computational platform. Matrix multiplication is a common operation in the inference stage of many neural network implementations, and presents a bottleneck to inference performance. Recent works have proposed, or even made commercially available, various hardware inference acceleration frameworks. Among them, the matrix multiply unit (MXU) found in Google's Tensor Processing Unit (TPU) has been indentified to be architecturally favorable for implementation on the DB platform. This work proposes a DB adaptation of the MXU with logic layouts and clocking configurations optimized for the platform. Comparing the DB MXU to Google's MXU, this work estimates an improvement of 1 order of magnitude in area efficiency and up to 7 orders of magnitude in power efficiency when pegged to the same clock rate.},
+  copyright = {https://creativecommons.org/licenses/by-nc-nd/4.0/},
+  file = {/home/samuelshng/Zotero/storage/3GCGKGQW/Ng - Computer-Aided Design of Atomic Silicon Quantum Do.pdf},
+  keywords = {ground state,SiQAD},
+  school = {University of British Columbia}
+}
+
+
+@mastersthesis{Chiu2020_thes,
+  title = {Simulation and analysis of clocking and control for field-coupled quantum-dot nanostructures},
+  author = {Chiu, Hsi Nien},
+  year = {2020},
+  abstract = {Novel advancements in silicon dangling bond (SiDB) fabrication has led to logical circuitry at the atomic scale, with crucial building blocks including binary wires and logic gates experimentally demonstrated on the SiDB platform. However, complex SiDB circuitry will require clocking control for signal propagation and timing. This work proposes the use of control and clocking electrodes commonly presented in quantum-dot cellular automata (QCA) implementations for the SiDB platform and introduces PoisSolver, a simulation engine used to obtain clocking potentials in a SiDB system with complementary metal-oxide semiconductor (CMOS) metal layers. PoisSolver is built into the SiQAD computer aided design (CAD) tool, aiding circuit design by visualising electric potentials and providing potential solutions to other built-in SiQAD simulation engines. Utilising PoisSolver's output and the electrode design in SiQAD, geometry agnostic methods are employed to estimate power characteristics for QCA's columnar, wave, and USE clocking schemes. Parasitic power densities of these clocking schemes are estimated to be on the order of 10-100{$\mu$}W cm{$^{-2}$} at 1GHz and 77K. The potentially low power dissipation of SiDBs is extremely attractive for low power applications. As a result, a novel CMOS-to-SiDB flash analog-to-digital converter (ADC) proof-of-concept is designed using PoisSolver and SiQAD as a case study. A 2-bit implementation of the flash ADC is estimated to perform on par with thermal-noise limited CMOS ADCs in the worst case, and approximately four orders of magnitude better in the best case, depending on the elasticity of SiDB relaxations.},
+  file = {/home/samuelshng/Zotero/storage/KGGHUWEP/Chiu - 2020 - Simulation and analysis of clocking and control fo.pdf},
+  school = {University of British Columbia}
+}

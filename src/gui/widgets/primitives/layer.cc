@@ -246,50 +246,6 @@ void prim::Layer::loadItems(QXmlStreamReader *rs, QGraphicsScene *scene)
     }
   }
 
-  /*
-  while (!rs->atEnd()) {
-    if (rs->isStartElement()) {
-      if (rs->name() == "dbdot") {
-        rs->readNext();
-        prim::DBDot *dbdot = new prim::DBDot(ws, scene, layer_id);
-        addItem(dbdot);
-        prim::Emitter::instance()->addItemToScene(dbdot);
-        static_cast<prim::DBLayer*>(this)->getLattice()->setOccupied(dbdot->latticeCoord(), dbdot);
-        prim::LatticeCoord lc = dbdot->latticeCoord();
-        prim::Emitter::instance()->sig_moveDBToLatticeCoord(dbdot, lc.n, lc.m, lc.l);
-      } else if (rs->name() == "aggregate") {
-        // TODO pass a blank list to Aggregate 
-        QList<prim::Item*> new_items;
-        addItem(new prim::Aggregate(ws, scene, new_items, layer_id));
-        for (prim::Item *item : new_items) {
-          if (item->item_type == prim::Item::DBDot) {
-            prim::DBDot *dbdot = static_cast<prim::DBDot*>(item);
-            static_cast<prim::DBLayer*>(this)->getLattice()->setOccupied(dbdot->latticeCoord(), dbdot);
-            prim::LatticeCoord lc = dbdot->latticeCoord();
-            qDebug() << tr("Lattice coord in agg: (%1, %2, %3)").arg(lc.n).arg(lc.m).arg(lc.l);
-            prim::Emitter::instance()->sig_moveDBToLatticeCoord(dbdot, lc.n, lc.m, lc.l);
-          }
-        }
-        new_items.clear();
-      } else if (rs->name() == "electrode") {
-        rs->readNext();
-        addItem(new prim::Electrode(ws, scene, layer_id));
-      } else {
-        qDebug() << QObject::tr("Layer load item: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
-        rs->readNext();
-      }
-    } else if (rs->isEndElement()) {
-      // break out of stream if the end of this element has been reached
-      if (rs->name() == "layer") {
-        rs->readNext();
-        break;
-      }
-      rs->readNext();
-    } else {
-      rs->readNext();
-    }
-  }
-  */
   // show error if any
   if(rs->hasError()){
     qCritical() << QObject::tr("XML error: ") << rs->errorString().data();

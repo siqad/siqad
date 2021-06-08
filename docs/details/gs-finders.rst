@@ -61,17 +61,39 @@ The following additional variables are related to schedule restarting. It is sti
 * Reset V_freeze: V_freeze value to reset to, leave at :math:`-1` for SimAnneal to decide automatically.
 * Physical validity check cycles: after V_freeze has reached the maximum value, reset V_freeze if the charge configurations do not fit metastability criteria for this many cycles consecutively.
 
-.. todo::
-
-    Include a plot showing some key variables affecting temperature and v_freeze schedules.
-
 
 QUBO Mapping
 ------------
 
-.. todo::
+We have attempted to map the ground state model to QUBO. The effort resulted in some success but accuracy and performance was subpar. More information regarding the QUBO mapping can be found in Chapter 3.2.3 in :cite:`Ng2020_thes`.
 
-    We have attempted to map the ground state model to QUBO. The effort resulted in some success but accuracy and performance was far behind SimAnneal. More information regarding the QUBO mapping will be provided in the future.
+
+Interpreting Results
+--------------------
+
+After a ground state simulation has been performed, SiQAD displays the lowest energy physically valid configuration. A full guide on interpreting the simulation results will be provided in the future. For now, please pay attention to the following important notes:
+
+* **"Config energy"** provided in the ground state simulation results **do not** represent the energy dissipation to reach this configuration, it is merely the accumulated screened Coulombic potentials (Eq. (1) in :cite:`Ng2020_siqad`). There is currently no known method to accurately estimate the energy cost of SiDBs in actual operation, but attempts at providing pessimistic approximations have been made (expected upper bound in energy use). Please see Chapter 5.2 of :cite:`Chiu2020_thes` and Chapter 4.3 of :cite:`Ng2020_thes` for relevant discussions.
+
+* **"Config occurance"** informs how many times a particular configuration was encountered by the ground state simulator. However, it **does not** represent the physical probability of reaching this state in actual operation. In a physical setting, many considerations need to be taken into account -- the exact layout, nearby defects, rate and method of clocking, etc.
+
+* **"Physically valid"** informs whether the charge configuration is deemed to be metastable. In SimAnneal and ExhaustiveGS, metastability is defined by two criteria (reprinted verbatim from :cite:`Ng2020_thes`):
+
+  * *configuration stability*, where no lower energy charge configurations exist that can be reached within a single hop event; and
+
+  * *population stability*, where the charge state of each DB must be consistent with the energetic position of the charge transition levels relative to the Fermi energy after accounting for band bending effects.
+
+
+.. todo::
+    
+   Refine the explanations and link more relevant resources.
+
+
+Time-to-solution Benchmarks
+---------------------------
+
+Time-to-solution (TTS) benchmarks are available in Chapter 3.2.5 in :cite:`Ng2020_thes`.
+
 
 
 Inter-plugin Transfer
@@ -80,3 +102,5 @@ Inter-plugin Transfer
 .. todo::
     
    Workflow for exporting PoisSolver potentials to SimAnneal.
+
+
