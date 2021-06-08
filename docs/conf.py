@@ -28,6 +28,7 @@ author = 'Walus Lab'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinxcontrib.bibtex', 'sphinx.ext.todo']
+bibtex_bibfiles = ['refs.bib']
 todo_include_todos = True
 
 # Add any paths that contain templates here, relative to this directory.
