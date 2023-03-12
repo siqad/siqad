@@ -18,3 +18,6 @@ endif()
 
 # SimAnneal
 add_subdirectory(simanneal)
+
+# QuickSim
+add_subdirectory(quicksim-siqad-plugin)
