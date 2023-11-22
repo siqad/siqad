@@ -598,12 +598,16 @@ JobSetupDetailsPane::JobSetupDetailsPane(QWidget *parent)
 {
   // main groups
   QGroupBox *gb_job_props = new QGroupBox("Job");
+  QGroupBox *gb_plugin_info = new QGroupBox("Plugin Information");
   QGroupBox *gb_plugin_props = new QGroupBox("Plugin Invocation");
   QGroupBox *gb_plugin_status = new QGroupBox("Plugin Status");
   QGroupBox *gb_plugin_params = new QGroupBox("Plugin Runtime Parameters");
 
   // Job
   le_job_name = new QLineEdit();
+  l_plugin_logo = new QLabel();
+  l_author_names = new QLabel();
+  vl_institutions = new QVBoxLayout();
   QFormLayout *fl_job_props = new QFormLayout();
   QCheckBox *cb_auto_job_name = new QCheckBox("Auto job name");
   cb_auto_job_name->setChecked(true);
@@ -626,6 +630,7 @@ JobSetupDetailsPane::JobSetupDetailsPane(QWidget *parent)
     cbb_inclusion_area->addItem(inclusion_area_enum.key(i));
   }
 
+  // Job
   QHBoxLayout *hl_auto_job_name = new QHBoxLayout();
   hl_auto_job_name->addStretch();
   hl_auto_job_name->addWidget(cb_auto_job_name);
@@ -636,6 +641,13 @@ JobSetupDetailsPane::JobSetupDetailsPane(QWidget *parent)
   fl_job_props->setSizeConstraint(QLayout::SetMinimumSize);
   gb_job_props->setLayout(fl_job_props);
 
+
+  // Plugin Information
+  QFormLayout *fl_plugin_info = new QFormLayout();
+  fl_plugin_info->addRow(new QLabel("Logo"), l_plugin_logo);
+  fl_plugin_info->addRow(new QLabel("Authors"), l_author_names);
+  fl_plugin_info->addRow(new QLabel("Institutions"), vl_institutions);
+  gb_plugin_info->setLayout(fl_plugin_info);
 
   // Plugin Invocation
   te_command = new QTextEdit();
@@ -691,6 +703,7 @@ JobSetupDetailsPane::JobSetupDetailsPane(QWidget *parent)
 
   QVBoxLayout *vl_pane = new QVBoxLayout();
   vl_pane->addWidget(gb_job_props);
+  vl_pane->addWidget(gb_plugin_info);
   vl_pane->addWidget(gb_plugin_props);
   vl_pane->addWidget(gb_plugin_status);
   vl_pane->addWidget(gb_plugin_params);
@@ -702,13 +715,60 @@ void JobSetupDetailsPane::setEngineDataset(JobManager::EngineDataset *t_eng_data
 {
   eng_dataset = t_eng_dataset;
 
+  auto clearVlInstitutions = [this]() {
+    QLayoutItem *child;
+    while ((child = vl_institutions->takeAt(0)) != nullptr) {
+      QWidget *widget = child->widget();
+      if (widget) {
+        delete widget;        // delete the widget
+      }
+      delete child;           // delete the child
+    }
+  };
+
   // update engine status
   if (eng_dataset == nullptr) {
     l_plugin_name->setText("No engine selected");
     l_plugin_status->setText("Status: N/A");
+    l_plugin_logo->clear();
+    l_author_names->setText("");
+    clearVlInstitutions();
   } else {
     l_plugin_name->setText(eng_dataset->engine->name());
     l_plugin_status->setText(tr("Status: %1").arg(eng_dataset->engine->pluginStatusStr()));
+    // list authors
+    auto authors = eng_dataset->engine->getAuthors();
+    QString author_str = authors.join("\n");
+    l_plugin_logo->clear();
+    if (!eng_dataset->engine->getLogoPath().isEmpty()) {
+      QPixmap pixmap(eng_dataset->engine->getLogoPath());
+      if (!pixmap.isNull()) {
+        QSize maxSize(200, 100);
+        QPixmap scaled_pixmap = pixmap.scaled(maxSize, Qt::KeepAspectRatio);
+        l_plugin_logo->setPixmap(scaled_pixmap);
+      } else {
+        qDebug() << tr("Unable to load pixmap at path: %1").arg(eng_dataset->engine->getLogoPath());
+      }
+    }
+    l_author_names->setText(author_str);
+    // list institutions
+    clearVlInstitutions();
+    auto institutions = eng_dataset->engine->getInstitutions();
+    for (auto inst : institutions) {
+      QLabel *l_inst = new QLabel();
+      QString inst_str = inst.content_lines.join("<br>");
+      if (inst.website_text != "") {
+        if (inst_str != "") {
+          inst_str += "<br>";
+        }
+        inst_str += tr("<a href=\"%1\">%2</a>").arg(inst.url).arg(inst.website_text);
+      }
+      l_inst->setText(inst_str);
+      l_inst->setOpenExternalLinks(true);
+      l_inst->setTextFormat(Qt::RichText);
+      l_inst->setTextInteractionFlags(Qt::TextBrowserInteraction);
+      vl_institutions->addWidget(l_inst);
+    }
   }
 
   connect(pb_refresh_status, &QPushButton::pressed,
