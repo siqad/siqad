@@ -98,13 +98,12 @@ namespace gui{
     void clearLayout(QLayout *layout)
     {
       QLayoutItem *item;
-      while((item = layout->takeAt(0))) {
-        if (item->layout()) {
-          clearLayout(item->layout());
-          delete item->layout();
-        }
-        if (item->widget()) {
-          delete item->widget();
+      while ((item = layout->takeAt(0)) != nullptr) {
+        if (QLayout *childLayout = item->layout()) {
+          clearLayout(childLayout);
+          delete childLayout;
+        } else if (QWidget *widget = item->widget()) {
+          delete widget;
         }
       }
     }

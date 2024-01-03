@@ -44,7 +44,12 @@ for arg in "$@"; do
 done
 
 # Determine number of physical cores to use for compilation
-cpu_cores=$(grep "^core id" /proc/cpuinfo | sort -u | wc -l)
+cpu_cores=1
+if [[ $(uname) == "Darwin" ]]; then
+    cpu_cores=$(sysctl -n hw.logicalcpu)
+elif [[ $(uname) == "Linux" ]]; then
+    cpu_cores=$(grep "^core id" /proc/cpuinfo | sort -u | wc -l)
+fi
 multicore_compile="-j $cpu_cores"
 
 proj_root=$(cd `dirname $0` && pwd)

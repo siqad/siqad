@@ -31,6 +31,19 @@ namespace comp{
       QString label;
     };
 
+    struct Institution
+    {
+      QStringList content_lines;
+      QString website_text;
+      QString url;
+    };
+
+    struct Link
+    {
+      QString display_text;
+      QString url;
+    };
+
     //! Data that can be requested from SiQAD by plugins.
     //! TODO might not really need this, it isn't too much of an overhead to 
     //! just always save everything like before.
@@ -66,6 +79,14 @@ namespace comp{
 
     //! Return the current plugin status in text.
     QString pluginStatusStr();
+
+    QString getLogoPath() const { return plugin_logo_path; }
+
+    //! Return the author list.
+    QStringList getAuthors() const { return authors; }
+
+    //! Return the institution list.
+    QList<Institution> getInstitutions() const { return institutions; }
 
     //! Return a list of standard items representing a row of engine properties.
     //! The fields variable is a list indicating which fields are wanted. If an 
@@ -174,6 +195,10 @@ namespace comp{
     QString dep_path;             // dependencies path
     QString desc_file_path;       // description file path (normally *.sqplug)
     QString preset_dir_path;      // user configuration directory path
+    QString plugin_logo_path;     // plugin logo path
+    QStringList authors;          // list of authors
+    QList<Institution> institutions;  // list of institutions
+    QList<Link> links;            // list of relevant links
 
     bool ready_to_use;            // holds whether the plugin is ready to use
     bool venv_init_success;       // holds whether venv initialization was successful

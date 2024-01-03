@@ -8,7 +8,6 @@
 #include "plugin_engine.h"
 #include "settings/settings.h"
 
-
 using namespace comp;
 
 QList<PluginEngine::Service> PluginEngine::official_services;
@@ -51,6 +50,58 @@ PluginEngine::PluginEngine(const QString &desc_file_path, QWidget *parent)
       plugin_name = rs.readElementText();
     } else if (rs.name() == "version") {
       plugin_version = rs.readElementText();
+    } else if (rs.name() == "plugin_info") {
+      while (rs.readNextStartElement()) {
+        if (rs.name() == "plugin_logo") {
+          QString logo_path = rs.readElementText();
+          if (!logo_path.isEmpty()) {
+            plugin_logo_path = QDir(plugin_root_path).absoluteFilePath(logo_path);
+          }
+        } else if (rs.name() == "authors") {
+          while (rs.readNextStartElement()) {
+            if (rs.name() == "name") {
+              authors.append(rs.readElementText());
+              qDebug() << tr("author read: %1").arg(authors.last());
+            } else {
+              unrecognizedXMLElement(rs);
+            }
+          }
+        } else if (rs.name() == "institutions") {
+          while (rs.readNextStartElement()) {
+            if (rs.name() == "institution") {
+              Institution inst;
+              while (rs.readNextStartElement()) {
+                if (rs.name() == "content") {
+                  while(rs.readNextStartElement()) {
+                    inst.content_lines.append(rs.readElementText());
+                  }
+                } else if (rs.name() == "website") {
+                  inst.url = rs.attributes().value("href").toString();
+                  inst.website_text = rs.readElementText();
+                } else {
+                  unrecognizedXMLElement(rs);
+                }
+              }
+              institutions.append(inst);
+            } else {
+              unrecognizedXMLElement(rs);
+            }
+          }
+        } else if (rs.name() == "links") {
+          while (rs.readNextStartElement()) {
+            Link link;
+            if (rs.name() == "website") {
+              link.url = rs.attributes().value("href").toString();
+              link.display_text = rs.readElementText();
+            } else {
+              unrecognizedXMLElement(rs);
+            }
+            links.append(link);
+          }
+        } else {
+          unrecognizedXMLElement(rs);
+        }
+      }
     } else if (rs.name() == "services") {
       plugin_services = rs.readElementText().split(",");
     } else if (rs.name() == "bin_path") {

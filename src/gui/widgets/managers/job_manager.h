@@ -242,6 +242,9 @@ namespace gui{
 
     JobManager::EngineDataset *eng_dataset=nullptr; // currently used engine dataset
     QLineEdit *le_job_name;                         // job name
+    QLabel *l_plugin_logo;                          // plugin logo display
+    QLabel *l_author_names;                         // list of author names
+    QVBoxLayout *vl_institutions;                   // list of institutions
     QComboBox *cbb_inclusion_area;                  // inclusion area
     QLabel *l_plugin_name;                          // plugin name
     QLabel *l_plugin_status;                        // plugin status
