@@ -608,6 +608,7 @@ JobSetupDetailsPane::JobSetupDetailsPane(QWidget *parent)
   l_plugin_logo = new QLabel();
   l_author_names = new QLabel();
   vl_institutions = new QVBoxLayout();
+  vl_links = new QVBoxLayout();
   QFormLayout *fl_job_props = new QFormLayout();
   QCheckBox *cb_auto_job_name = new QCheckBox("Auto job name");
   cb_auto_job_name->setChecked(true);
@@ -647,6 +648,7 @@ JobSetupDetailsPane::JobSetupDetailsPane(QWidget *parent)
   fl_plugin_info->addRow(new QLabel("Logo"), l_plugin_logo);
   fl_plugin_info->addRow(new QLabel("Authors"), l_author_names);
   fl_plugin_info->addRow(new QLabel("Institutions"), vl_institutions);
+  fl_plugin_info->addRow(new QLabel("Links"), vl_links);
   gb_plugin_info->setLayout(fl_plugin_info);
 
   // Plugin Invocation
@@ -715,9 +717,9 @@ void JobSetupDetailsPane::setEngineDataset(JobManager::EngineDataset *t_eng_data
 {
   eng_dataset = t_eng_dataset;
 
-  auto clearVlInstitutions = [this]() {
+  auto clearVl = [this](QVBoxLayout *vl) {
     QLayoutItem *child;
-    while ((child = vl_institutions->takeAt(0)) != nullptr) {
+    while ((child = vl->takeAt(0)) != nullptr) {
       QWidget *widget = child->widget();
       if (widget) {
         delete widget;        // delete the widget
@@ -732,7 +734,8 @@ void JobSetupDetailsPane::setEngineDataset(JobManager::EngineDataset *t_eng_data
     l_plugin_status->setText("Status: N/A");
     l_plugin_logo->clear();
     l_author_names->setText("");
-    clearVlInstitutions();
+    clearVl(vl_institutions);
+    clearVl(vl_links);
   } else {
     l_plugin_name->setText(eng_dataset->engine->name());
     l_plugin_status->setText(tr("Status: %1").arg(eng_dataset->engine->pluginStatusStr()));
@@ -752,7 +755,7 @@ void JobSetupDetailsPane::setEngineDataset(JobManager::EngineDataset *t_eng_data
     }
     l_author_names->setText(author_str);
     // list institutions
-    clearVlInstitutions();
+    clearVl(vl_institutions);
     auto institutions = eng_dataset->engine->getInstitutions();
     for (auto inst : institutions) {
       QLabel *l_inst = new QLabel();
@@ -769,6 +772,18 @@ void JobSetupDetailsPane::setEngineDataset(JobManager::EngineDataset *t_eng_data
       l_inst->setTextInteractionFlags(Qt::TextBrowserInteraction);
       vl_institutions->addWidget(l_inst);
     }
+    // add links
+    clearVl(vl_links);
+    auto links = eng_dataset->engine->getLinks();
+    for (auto link : links) {
+      QLabel *l_link = new QLabel();
+      QString link_str = tr("<a href=\"%1\">%2</a>").arg(link.url).arg(link.display_text);
+      l_link->setText(link_str);
+      l_link->setOpenExternalLinks(true);
+      l_link->setTextFormat(Qt::RichText);
+      l_link->setTextInteractionFlags(Qt::TextBrowserInteraction);
+      vl_links->addWidget(l_link);
+    };
   }
 
   connect(pb_refresh_status, &QPushButton::pressed,

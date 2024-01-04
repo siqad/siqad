@@ -245,6 +245,7 @@ namespace gui{
     QLabel *l_plugin_logo;                          // plugin logo display
     QLabel *l_author_names;                         // list of author names
     QVBoxLayout *vl_institutions;                   // list of institutions
+    QVBoxLayout *vl_links;                          // list of links
     QComboBox *cbb_inclusion_area;                  // inclusion area
     QLabel *l_plugin_name;                          // plugin name
     QLabel *l_plugin_status;                        // plugin status

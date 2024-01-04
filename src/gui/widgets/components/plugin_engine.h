@@ -88,6 +88,9 @@ namespace comp{
     //! Return the institution list.
     QList<Institution> getInstitutions() const { return institutions; }
 
+    //! Return the link list.
+    QList<Link> getLinks() const { return links; }
+
     //! Return a list of standard items representing a row of engine properties.
     //! The fields variable is a list indicating which fields are wanted. If an 
     //! empty list is received, all possible fields are returned.
