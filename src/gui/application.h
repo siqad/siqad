@@ -76,9 +76,6 @@ namespace gui{
     void showActionList(QList<QAction*>);
     void hideActionList(QList<QAction*>);
 
-    // change lattice
-    void changeLattice();
-
     // parse input field and act accordingly
     void parseInputField();
 
@@ -119,7 +116,10 @@ namespace gui{
     bool resolveUnsavedChanges();
 
     //! Close current design and start new design.
-    void newFile();
+    void newFile(QString lattice_file_path=QString());
+
+    // choose lattice for new file
+    void chooseLatticeForNewFile();
 
     //! Save design to file.
     bool saveToFile(SaveFlag flag=Save, const QString &path=QString(),
@@ -132,9 +132,6 @@ namespace gui{
     //! Open a previous save. A file chooser dialog would be presented if no
     //! file path is given.
     void openFromFile(const QString &f_path=QString());
-
-    // Export to Labview
-    bool exportToLabview();
 
     // About and Version
     void aboutVersion();

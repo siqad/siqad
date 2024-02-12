@@ -350,13 +350,20 @@ QSettings* settings::LatticeSettings::m_defs()
       QSettings::IniFormat
   );
 
-  S->setValue("cell/N", 2);
+  S->setValue("lattice/default_lattice_file_path", QString(":/lattices/si_100_2x1.xml"));
 
+  // Si(100) 2x1 defaults
+  S->setValue("cell/N", 2);
   S->setValue("cell/b1", QPointF(0, 0));
   S->setValue("cell/b2", QPointF(0, 2.25));
-
   S->setValue("lattice/a1", QPointF(3.84, 0));
   S->setValue("lattice/a2", QPointF(0, 7.68));
+
+  // S->setValue("cell/N", 2);
+  // S->setValue("cell/b1", QPointF(0, 0));
+  // S->setValue("cell/b2", QPointF(1.92, 3.3255));
+  // S->setValue("lattice/a1", QPointF(3.84, 0));
+  // S->setValue("lattice/a2", QPointF(0, 6.65));
 
   return S;
 }

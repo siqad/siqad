@@ -27,17 +27,100 @@ QColor prim::Lattice::lat_edge_col_pb;
 QColor prim::Lattice::lat_fill_col;
 QColor prim::Lattice::lat_fill_col_pb;
 
-prim::Lattice::Lattice(const QString &fname, int lay_id)
+prim::Lattice::Lattice(QXmlStreamReader *rs, int lay_id)
   : Layer(tr("Lattice"), Layer::Lattice, LayerRole::Design, 0)
 {
   if (lat_diam == -1)
     constructStatics();
 
   layer_id = lay_id;
-  settings::LatticeSettings::updateLattice(fname);
+  constructFromXml(rs);
+}
 
-  construct();
-  //tileApprox();
+prim::Lattice::Lattice(const Lattice &other, int lay_id)
+  : Layer(tr("Lattice"), Layer::Lattice, LayerRole::Design, 0)
+{
+  if (lat_diam == -1)
+    constructStatics();
+
+  layer_id = lay_id;
+  QVector<QPointF> other_lat_vec({other.a[0], other.a[1]});
+  constructFromParams(other.lattice_name, other.b, other_lat_vec);
+}
+
+void prim::Lattice::constructFromXml(QXmlStreamReader *rs)
+{
+  QString read_name;
+  int read_n = -1;
+  QList<QPair<int, QPointF>> read_atoms_raw;
+  QVector<QPointF> read_a(2);
+
+  while (rs->readNextStartElement()) {
+    if (rs->name() == "name") {
+      read_name = rs->readElementText();
+    } else if (rs->name() == "N") {
+      read_n = rs->readElementText().toInt();
+    } else if (rs->name() == "a1") {
+      read_a[0] = QPointF(rs->attributes().value("x").toFloat(), rs->attributes().value("y").toFloat());
+      rs->skipCurrentElement();
+    } else if (rs->name() == "a2") {
+      read_a[1] = QPointF(rs->attributes().value("x").toFloat(), rs->attributes().value("y").toFloat());
+      rs->skipCurrentElement();
+    } else if (rs->name().startsWith("b")) {
+      QString elem_name = rs->name().toString();
+      read_atoms_raw.append(qMakePair(elem_name.mid(1).toInt(), QPointF(rs->attributes().value("x").toFloat(), rs->attributes().value("y").toFloat())));
+      rs->skipCurrentElement();
+    } else {
+      qDebug() << QObject::tr("Lattice: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
+      rs->skipCurrentElement();
+    }
+  }
+
+  // sort read_atoms_raw by the int value of the pair and then extract the sorted QPointFs into a read_atoms list
+  std::sort(read_atoms_raw.begin(), read_atoms_raw.end(), [](const QPair<int, QPointF> &a, const QPair<int, QPointF> &b) {
+      return a.first < b.first;
+      });
+  QList<QPointF> read_atoms;
+  for (QPair<int, QPointF> pair : read_atoms_raw) {
+    read_atoms.append(pair.second);
+  }
+
+  qDebug() << "Lattice parameters:";
+  qDebug() << "Name" << read_name;
+  qDebug() << "Atoms" << read_atoms;
+  qDebug() << tr("Tiling vectors: a1=(%1, %2), a2=(%3, %4)").arg(read_a[0].x()).arg(read_a[0].y()).arg(read_a[1].x()).arg(read_a[1].y());
+
+  if (read_atoms.length() != read_n) {
+    qCritical() << QObject::tr("Lattice: N does not match number of atoms in b. N: %1, b length: %2").arg(read_n).arg(read_atoms.length());
+  }
+
+  constructFromParams(read_name, read_atoms, read_a);
+}
+
+void prim::Lattice::constructFromParams(const QString &in_lattice_name,
+    const QList<QPointF> &read_atoms, const QVector<QPointF> &read_lat_vec)
+{
+  lattice_name = in_lattice_name;
+
+  // build lattice from read values
+  n_cell = read_atoms.length();
+  b = read_atoms;
+  for (int i=0; i<2; i++) {
+    a[i] = read_lat_vec[i];
+    a2[i] = QPointF::dotProduct(a[i], a[i]);
+  }
+
+  qreal dtrm = a[0].x()*a[1].y() - a[0].y()*a[1].x();
+  coth = QPointF::dotProduct(a[0], a[1]) / dtrm;
+
+  orthog = qAbs(coth) < 1e-4;
+
+  // generate lattice and site vectors for display (all integer)
+  a_scene[0] = QPointF(tileApprox().topRight() * prim::Item::scale_factor).toPoint();
+  a_scene[1] = QPointF(tileApprox().bottomLeft() * prim::Item::scale_factor).toPoint();
+  b_scene.clear();
+  for (QPointF site : b)
+    b_scene.append(QPointF(site * prim::Item::scale_factor).toPoint());
 }
 
 
@@ -55,6 +138,7 @@ void prim::Lattice::saveLayer(QXmlStreamWriter *ws) const
 
   // lattice specific properties
   ws->writeStartElement("lat_vec");
+  ws->writeTextElement("name", lattice_name);
   for (int i=0; i<2; i++) {
     ws->writeEmptyElement(QObject::tr("a%1").arg(i+1));
     ws->writeAttribute("x", str.setNum(a[i].x(), fmt, fp));

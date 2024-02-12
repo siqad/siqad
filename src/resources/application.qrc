@@ -3,6 +3,10 @@
     <file>blank_save.xml</file>
     <file>plugin_services.xml</file>
 
+    <!--lattice unit cells-->
+    <file>lattices/si_100_2x1.xml</file>
+    <file>lattices/si_111_1x1.xml</file>
+
     <!--property maps-->
    	<file>properties/afmarea.xml</file>
    	<file>properties/electrode.xml</file>

@@ -27,7 +27,7 @@ gui::DesignPanel::DesignPanel(QWidget *parent)
     constructStatics();
 
   // initialize design panel
-  initDesignPanel();
+  initDesignPanel("");
 
   // initialize actions
   initActions();
@@ -68,7 +68,7 @@ gui::DesignPanel::~DesignPanel()
 }
 
 // initialise design panel on first init or after reset
-void gui::DesignPanel::initDesignPanel(bool init_layers) {
+void gui::DesignPanel::initDesignPanel(QString lattice_file_path, bool init_layers) {
   undo_stack = new QUndoStack();
   connect(undo_stack, SIGNAL(cleanChanged(bool)),
           this, SLOT(emitUndoStackCleanChanged(bool)));
@@ -118,7 +118,7 @@ void gui::DesignPanel::initDesignPanel(bool init_layers) {
   setCacheMode(QGraphicsView::CacheBackground);
 
   // make lattice and surface layer
-  buildLattice();
+  buildLattice(lattice_file_path);
   initOverlays();
   if (init_layers) {
     initLayers();
@@ -228,13 +228,13 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
 }
 
 // reset
-void gui::DesignPanel::resetDesignPanel(bool init_layers)
+void gui::DesignPanel::resetDesignPanel(QString lattice_file_path, bool init_layers)
 {
   // tell application to perform pre-reset clean-ups
   emit sig_preDPResetCleanUp();
 
   clearDesignPanel(true);
-  initDesignPanel(init_layers);
+  initDesignPanel(lattice_file_path, init_layers);
   // REBUILD
 
   //let application know that design panel has been reset.
@@ -379,29 +379,37 @@ QList<prim::DBDot*> gui::DesignPanel::getAllDBs() const
 }
 
 
-void gui::DesignPanel::buildLattice(const QString &fname)
+void gui::DesignPanel::buildLattice(QString fname)
 {
+  if (fname.isEmpty()) {
+    fname = settings::LatticeSettings::instance()->get<QString>("lattice/default_lattice_file_path");
+  }
+  qDebug() << tr("Build lattice from file: %1").arg(fname);
+
   if (layman->layerCount() != 0) {
     // if layer manager not empty, clear it
     layman->removeAllLayers();
   }
 
-  if(!fname.isEmpty() && DEFAULT_OVERRIDE){
-    qWarning() << tr("Cannot change lattice when DEFAULT_OVERRIDE set");
-    // do nothing if the lattice has previously been defined
-    if(layman->layerCount() != 0)
-      return;
+  QFile lattice_file(fname);
+  QXmlStreamReader rs(&lattice_file);
+  if (!lattice_file.open(QFile::ReadOnly | QFile::Text)) {
+    qCritical() << tr("Cannot open lattice file at path: %1").arg(fname);
+    return;
   }
 
   // LATTICE MUST BE LAYER 0
 
   // build the new lattice
-  lattice = new prim::Lattice(fname, 0);
+  // lattice = new prim::Lattice(fname, 0);
+  rs.readNextStartElement();
+  lattice = new prim::Lattice(&rs);
 
   // add the lattice to the layers, as layer 0
-  // the 2nd lattice is for result display
   layman->addLattice(lattice);
-  layman->addLattice(new prim::Lattice(fname, 0), prim::Layer::Result);
+
+  // the 2nd lattice is for result display
+  layman->addLattice(new prim::Lattice((*lattice), 0), prim::Layer::Result);
   updateBackground();
 }
 
@@ -621,7 +629,7 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs, bool is_sim_result)
 {
   if (!is_sim_result) {
     // reset the design panel state
-    resetDesignPanel(false);
+    resetDesignPanel("", false);
   }
 
   QList<int> layer_order_id;
@@ -767,6 +775,9 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs,
       layer_visible = (rs->readElementText() == "1") ? true : false;
     } else if (rs->name() == "active") {
       layer_active = (rs->readElementText() == "1") ? true : false;
+    } else if (rs->name() == "lat_vec") {
+      prim::Lattice *lat_lay = layman->getLattice(!is_sim_result);
+      lat_lay->constructFromXml(rs);
     } else {
       qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2")
           .arg(rs->lineNumber()).arg(rs->name().toString());

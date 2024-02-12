@@ -56,9 +56,9 @@ namespace gui{
     ~DesignPanel();
 
     // clear and reset
-    void initDesignPanel(bool init_layers=true);  //!< used on first init or after reset
+    void initDesignPanel(QString lattice_file_path, bool init_layers=true);  //!< used on first init or after reset
     void clearDesignPanel(bool reset=false);      //!< used on exit or before reset
-    void resetDesignPanel(bool init_layers=true); //!< call for reset
+    void resetDesignPanel(QString lattice_file_path, bool init_layers=true); //!< call for reset
 
     // ACCESSORS
 
@@ -132,7 +132,7 @@ namespace gui{
 
     //! resets the drawing layer and builds a lattice from the given <lattice>.ini
     //! file. If no file is given, the default lattice is used
-    void buildLattice(const QString &fname=QString());
+    void buildLattice(QString fname=QString());
 
     //! Initialize layers other than the lattice
     void initLayers();

@@ -281,10 +281,29 @@ void gui::ApplicationGUI::initMenuBar()
   QMenu *tools = menuBar()->addMenu(tr("&Tools"));
   QMenu *help = menuBar()->addMenu(tr("&Help"));
 
+  // inline function to load all lattice files from the lattice directory
+  auto loadLatticeFiles = [this](QMenu *menu)
+  {
+    QDir lattice_dir(":/lattices");
+    QStringList lattice_files = lattice_dir.entryList(QStringList("*.xml"), QDir::Files);
+    for (QString f : lattice_files) {
+      QAction *a = new QAction(f, this);
+      menu->addAction(a);
+      connect(a, &QAction::triggered,
+          [this, f](){
+            newFile(tr(":/lattices/%1").arg(f));
+          });
+    }
+  };
+
   // file menu actions
-  QAction *new_file = new QAction(
-      QIcon::fromTheme("document-new", QIcon(":/ico/fb/document-new.svg")), 
-      tr("&New"), this);
+  QMenu *new_file_menu = new QMenu(tr("&New"), this);
+  new_file_menu->setIcon(QIcon::fromTheme("document-new", QIcon(":/ico/fb/document-new.svg")));
+  loadLatticeFiles(new_file_menu);
+  new_file_menu->addSeparator();
+  QAction *browse_lattice_file = new QAction(tr("Browse Lattice..."), this);
+  new_file_menu->addAction(browse_lattice_file);
+
   QAction *open_save = new QAction(
       QIcon::fromTheme("document-open", QIcon(":/ico/fb/document-open.svg")), 
       tr("&Open..."), this);
@@ -295,22 +314,20 @@ void gui::ApplicationGUI::initMenuBar()
       QIcon::fromTheme("document-save-as", QIcon(":/ico/fb/document-save.svg")), 
       tr("Save &As..."), this);
   QAction *import_job_results = new QAction(tr("Import Past Results"), this);
-  QAction *export_lvm = new QAction(tr("&Export to QSi LV"), this);
   QAction *quit = new QAction(QIcon::fromTheme("application-exit",
         QIcon(":/ico/fb/exit.svg")), tr("&Quit"), this);
-  new_file->setShortcut(tr("CTRL+N"));
+  // new_file->setShortcut(tr("CTRL+N"));
   save->setShortcut(tr("CTRL+S"));
   save_as->setShortcut(tr("CTRL+SHIFT+S"));
   open_save->setShortcut(tr("CTRL+O"));
-  //export_lvm->setShortcut(tr("CTRL+E"));
   quit->setShortcut(tr("CTRL+Q"));
-  file->addAction(new_file);
+  file->addMenu(new_file_menu);
+  // file->addAction(new_file);
   file->addAction(open_save);
   file->addAction(save);
   file->addAction(save_as);
   file->addSeparator();
   file->addAction(import_job_results);
-  //file->addAction(export_lvm);
   file->addSeparator();
   file->addAction(quit);
 
@@ -358,7 +375,6 @@ void gui::ApplicationGUI::initMenuBar()
   //edit->addAction(action_color);
 
   // tools menu actions
-  QAction *change_lattice = new QAction(tr("Change Lattice..."), this);
   QAction *select_color = new QAction(tr("Select Color..."), this);
   QAction *window_screenshot = new QAction(tr("Window Screenshot..."), this);
   action_screenshot_mode = new QAction(QIcon(":/ico/screenshotmode.svg"), tr("Screenshot Mode"));
@@ -368,7 +384,6 @@ void gui::ApplicationGUI::initMenuBar()
   action_screenshot_mode->setCheckable(true);
 
   
-  //tools->addAction(change_lattice);     // TODO add lattice button back in the future when updated support is implemented
   //tools->addAction(select_color);
   //tools->addSeparator();
   //tools->addAction(window_screenshot);  // TODO disabled due to imperfect screenshot results
@@ -381,14 +396,16 @@ void gui::ApplicationGUI::initMenuBar()
   // help menu actions
   QAction *open_log_dir = new QAction(tr("Open Log Directory"), this);
   QAction *open_autosave_dir = new QAction(tr("Open Autosave Directory"), this);
+  QAction *open_config_dir = new QAction(tr("Open Config Directory"), this);
   QAction *about_version = new QAction(tr("About"), this);
 
   help->addAction(open_log_dir);
   help->addAction(open_autosave_dir);
+  help->addAction(open_config_dir);
   help->addSeparator();
   help->addAction(about_version);
 
-  connect(new_file, &QAction::triggered, this, &gui::ApplicationGUI::newFile);
+  // connect(new_file, &QAction::triggered, this, &gui::ApplicationGUI::newFile);
   connect(quit, &QAction::triggered, this, &QWidget::close);
   connect(save, &QAction::triggered,
       [this](){
@@ -402,7 +419,6 @@ void gui::ApplicationGUI::initMenuBar()
       });
   connect(open_save, &QAction::triggered,
       [this](){openFromFile();});
-  connect(export_lvm, &QAction::triggered, this, &gui::ApplicationGUI::exportToLabview);
   connect(import_job_results, &QAction::triggered,
       [this](){
         comp::SimJob *j = comp::SimJob::importSimJob();
@@ -419,7 +435,7 @@ void gui::ApplicationGUI::initMenuBar()
       [this](){design_pan->fitItemsInView(false);});
   connect(rotate_view_cw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCw);
   connect(rotate_view_ccw, &QAction::triggered, design_pan, &gui::DesignPanel::rotateCcw);
-  connect(change_lattice, &QAction::triggered, this, &gui::ApplicationGUI::changeLattice);
+  connect(browse_lattice_file, &QAction::triggered, this, &gui::ApplicationGUI::chooseLatticeForNewFile);
   //connect(action_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(select_color, &QAction::triggered, this, &gui::ApplicationGUI::selectColor);
   connect(window_screenshot, &QAction::triggered, this, &gui::ApplicationGUI::screenshot);
@@ -436,6 +452,10 @@ void gui::ApplicationGUI::initMenuBar()
   connect(open_autosave_dir, &QAction::triggered,
       [this]() {
         QDesktopServices::openUrl(QUrl::fromLocalFile(autosave_dir.absolutePath()));
+      });
+  connect(open_config_dir, &QAction::triggered,
+      [this]() {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(settings::AppSettings::instance()->pathReplacement("<CONFIG>")));
       });
   connect(action_screenshot_mode, &QAction::triggered,
           this, &gui::ApplicationGUI::toggleScreenshotMode);
@@ -962,15 +982,12 @@ void gui::ApplicationGUI::hideActionList(QList<QAction*> al)
 }
 
 
-void gui::ApplicationGUI::changeLattice()
+void gui::ApplicationGUI::chooseLatticeForNewFile()
 {
-  settings::AppSettings *app_settings = settings::AppSettings::instance();
-
-  QString dir = app_settings->get<QString>("dir/lattice");
   QString fname = QFileDialog::getOpenFileName(
-    this, tr("Select lattice file"), dir, tr("INI (*.ini)"));
+    this, tr("Select lattice file"), QString(), tr("XML (*.xml)"));
 
-  design_pan->buildLattice(fname);
+  newFile(fname);
 }
 
 void gui::ApplicationGUI::parseInputField()
@@ -1206,7 +1223,7 @@ bool gui::ApplicationGUI::resolveUnsavedChanges()
 
 
 // make new file
-void gui::ApplicationGUI::newFile()
+void gui::ApplicationGUI::newFile(QString lattice_file_path)
 {
   // prompt user to resolve unsaved changes if program has been modified
   if(design_pan->stateChanged())
@@ -1215,7 +1232,7 @@ void gui::ApplicationGUI::newFile()
 
   // reset widgets and reinitialize GUI state
   working_path.clear();
-  design_pan->resetDesignPanel();
+  design_pan->resetDesignPanel(lattice_file_path);
   initState();
 }
 
@@ -1410,138 +1427,6 @@ void gui::ApplicationGUI::openFromFile(const QString &f_path)
   file.close();
   qDebug() << tr("Load complete");
 }
-
-
-bool gui::ApplicationGUI::exportToLabview()
-{
-  settings::LatticeSettings *lat_settings = settings::LatticeSettings::instance();
-
-  qreal h_dimer_len = lat_settings->get<QPointF>("lattice/a1").x();
-  qreal v_dimer_len = lat_settings->get<QPointF>("lattice/a2").y();
-  qreal dimer_width = lat_settings->get<QPointF>("cell/b2").x();
-
-  // TODO implement some sort of check for lattice type
-
-  // fetch list of all dbdots
-  QList<prim::DBDot*> dbdots = design_pan->getAllDBs(); // NOTE only gets visible layer
-  if(dbdots.size() == 0){
-    qDebug() << tr("ApplicationGUI: There are no DBDots, nothing can be exported.");
-    return false;
-  }
-
-  // convert from coord to index (make use of %)
-  int x,y;
-  QPointF phys_loc;
-  QMap<int, QList<int>> db_y_map; // [y,x] y is already sorted by QMap, x needs to be further sorted
-  for(auto db : dbdots){
-    prim::LatticeCoord lc = db->latticeCoord();
-    design_pan->latticeCoord2PhysLoc(lc.n, lc.m, lc.l, phys_loc);
-    //qDebug() << tr("x=%1, y=%2");
-    //qDebug() << tr("  2*floor(%1 / %2) = %3").arg(phys_loc.x()).arg(h_dimer_len).arg(2*floor(phys_loc.x() / h_dimer_len));
-    //qDebug() << tr("  %1 % %2 / %3 = %4").arg(phys_loc.x()).arg(h_dimer_len).arg(dimer_width).arg(fmod(phys_loc.x(), h_dimer_len) / dimer_width);
-    x = round(2*floor(phys_loc.x() / h_dimer_len) + fmod(phys_loc.x(), h_dimer_len) / dimer_width);
-    //qDebug() << tr("  %1").arg(x);
-    y = round(phys_loc.y() / v_dimer_len);
-    auto insert_y = db_y_map.find(y);
-    if(insert_y == db_y_map.end())
-      db_y_map.insert(y, QList<int>({x}));
-    else
-      insert_y->append(x);
-  }
-
-  // sort
-  bool sort_asc = true;
-  int max_x=0, max_x_local=0; // find max x while performing the sort
-  for(auto it = db_y_map.begin(); it != db_y_map.end(); ++it){
-    if(sort_asc){
-      std::sort((*it).begin(), (*it).end());
-      max_x_local = (*it).last();
-    }
-    else{
-      std::sort((*it).begin(), (*it).end(), std::greater<int>());
-      max_x_local = (*it).first();
-    }
-    max_x = max_x > max_x_local ? max_x : max_x_local;
-    sort_asc = !sort_asc; // flip the sorting order for the next column
-  }
-  int max_y = db_y_map.lastKey();
-
-  // construct array with determined samples and channels
-  int size_x = max_x+1;
-  int size_y = max_y+1;
-  int** grid = new int* [size_x];
-  for(int i=0; i<size_x; i++)
-    grid[i] = new int[size_y]();
-
-  int db_i=1;
-  for(auto y_key : db_y_map.keys())
-    for(auto x : db_y_map.value(y_key))
-      grid[x][y_key] = db_i++;
-
-
-  // write to file
-  QString fn = QFileDialog::getSaveFileName(this, tr("Export to QSi LabView"),
-                save_dir.filePath("qsi_labview.lvm"), tr("LabView files (*.lvm)"));
-
-  QFile ef(fn);
-  if(!ef.open(QIODevice::WriteOnly)){
-    qDebug() << tr("Export to LVM: Error when opening file to export, %1").arg(ef.errorString());
-    return false;
-  }
-
-  QTextStream output(&ef);
-
-  // Channels
-  output << tr("Channels\t%1\n").arg(size_y);   // channels = max y
-
-  // Header info
-  QString sample_date = QDateTime::currentDateTime().toString("yyyy/MM/dd");
-  QString sample_time = QDateTime::currentDateTime().toString("HH:mm:ss.z");
-  QList<QString> out_header;
-  out_header.append("Samples");
-  out_header.append("Date");
-  out_header.append("Time");
-  out_header.append("X_Dimension");
-  out_header.append("X0");
-  out_header.append("Delta_X");
-  out_header.append("***End_of_Header***");
-  out_header.append("");  // column names of grid
-  for(int i=0; i<size_y; i++){
-    out_header[0] += tr("\t%1\t").arg(size_x);        // Samples
-    out_header[1] += tr("\t%1\t").arg(sample_date);   // Date
-    out_header[2] += tr("\t%1\t").arg(sample_time);   // Time
-    out_header[3] += "\tTime\t";                      // X_Dimension
-    out_header[4] += "\t0\t";                         // X0
-    out_header[5] += "\t1\t";                         // Delta_X
-    // *** End_of_Header ***
-    out_header[7] += tr("X_Value\tUntitled%1\t").arg(i>0 ? tr(" %1").arg(i) : "");  // col names of grid
-  }
-  out_header[7] += "Comment";
-
-  for(QString text_row : out_header)
-    output << tr("%1\n").arg(text_row);
-
-  QString out_grid = "";
-  for(int x_ind = 0; x_ind < size_x; x_ind++){
-    for(int y_ind = 0; y_ind < size_y; y_ind++){
-      out_grid += tr("%1\t%2").arg(x_ind).arg(grid[x_ind][y_ind]);
-      if(y_ind != size_y - 1)
-        out_grid += "\t"; // don't add extra tab if it's the last column
-      else
-        out_grid += "\n";
-    }
-  }
-
-  output << out_grid;
-
-  // idea for format for where to start: what if we just always start at the left dimer row?
-  ef.close();
-
-  qDebug() << tr("Export to LVM: Write completed for %1").arg(ef.fileName());
-
-  return true;
-}
-
 
 void gui::ApplicationGUI::aboutVersion()
 {

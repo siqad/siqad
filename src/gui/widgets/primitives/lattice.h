@@ -61,10 +61,24 @@ namespace prim{
   public:
 
     //! Construct layer from given properties.
-    Lattice(const QString &fname = QString(), int lay_id=-1);
+    // Lattice(const QString &fname = QString(), int lay_id=-1);
+    Lattice(QXmlStreamReader *rs, int lay_id=-1);
+
+    //! Construct layer from another lattice.
+    Lattice(const Lattice &other, int lay_id=-1);
 
     //! destructor
     ~Lattice() {}
+
+    //! construct lattice from provided lattice definition file
+    void constructFromXml(QXmlStreamReader *rs);
+
+    //! construct lattice from provided lattice parameters
+    void constructFromParams(const QString &in_lattice_name,
+        const QList<QPointF> &read_atoms, const QVector<QPointF> &read_lat_vec);
+    
+    // //! construct lattice by replicating parameters from another lattice
+    // void constructFromLattice(const Lattice &other);
 
     //! Save the lattice layer to XML stream.
     void saveLayer(QXmlStreamWriter *) const override;
@@ -148,6 +162,7 @@ namespace prim{
 
   private:
 
+    QString lattice_name;
     int n_cell;         // number of atoms in unit cell
 
     QPointF a[2];       // lattice vectors
