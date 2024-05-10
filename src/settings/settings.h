@@ -14,7 +14,6 @@
 
 #include <QtWidgets>
 #include <QtCore>
-#include <QRegExp>
 
 #ifdef QT_NO_DEBUG
 #define DEFAULT_OVERRIDE false  // use user settings for release compilation
@@ -96,55 +95,26 @@ public:
     return paths;
   }
 
-  // returns a QStringList with each of the included replaceable paths replaced
-  // by all possible paths given by QStandardPaths::standardLocations
-  /*
-  QStringList getAllPossiblePaths(const QString &key)
-  {
-    QStringList val_split = get<QString>(key).split(';', QString::SkipEmptyParts);
-    QStringList paths_return;
-
-    // perform replacement
-    QRegExp regex("<(.*)?>");
-    regex.setMinimal(true);
-
-    for (QString val : val_split) {
-      //qDebug() << tr("val: %1").arg(val);
-      // assumes that there is only one replacement per splitted value
-      if (val.indexOf(regex) != -1) {
-        QString found_tag = regex.capturedTexts().first();
-        for (QString loc : standardLocations(found_tag)) {
-          QString new_val = val;
-          new_val.replace(val.indexOf(regex), found_tag.length(), loc);
-          paths_return.append(new_val);
-          qDebug() << tr("Standard path added: %1").arg(new_val);
-        }
-      } else {
-        // no tag to replace, add without modification
-        paths_return.append(val);
-      }
-    }
-
-    return paths_return;
-  }
-  */
-
   static QString pathReplacement(QString path)
   {
     if (!path_map.contains("BINPATH"))
       constructPathMap();
 
     // perform replacement
-    QRegExp regex("<(.*)?>");
-    regex.setMinimal(true);
-    while (path.indexOf(regex) != -1) {
-      QString found_path = regex.capturedTexts().first();
+    QRegularExpression regex("<(.*)?>");
+    regex.setPatternOptions(QRegularExpression::InvertedGreedinessOption); // make the match non-greedy
+    auto it = regex.globalMatch(path);
+
+    while (it.hasNext()) {
+      auto match = it.next();
+      QString found_path = match.captured(0);
       if (!path_map.contains(found_path)) {
-        qFatal(tr("Path replacement failed, key '%1' not found.")
-            .arg(found_path).toLatin1().constData(),0);
+        qFatal(tr("Settings path replacement failed, key '%1' not found in string %2.")
+            .arg(found_path).arg(path).toLatin1().constData(),0);
       }
-      path.replace(path.indexOf(regex), found_path.length(), path_map[found_path]);
+      path.replace(match.capturedStart(0), found_path.length(), path_map[found_path]);
     }
+
     return path;
   }
 

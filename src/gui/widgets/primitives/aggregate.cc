@@ -28,18 +28,19 @@ prim::Aggregate::Aggregate(QXmlStreamReader *rs, QGraphicsScene *scene, QList<pr
 
   // read from XML stream (children will be created recursively, add those children to stack)
   while(rs->readNextStartElement()) {
-    if(rs->name() == "dbdot"){
+    QString elem_name = rs->name().toString();
+    if(elem_name == "dbdot"){
       //rs->readNext();
       prim::DBDot *db = new prim::DBDot(rs, scene, lay_id);
       new_items.append(db);
       ld_children.push(db);
     }
-    else if(rs->name() == "aggregate"){
+    else if(elem_name == "aggregate"){
       //rs->readNext();
       ld_children.push(new prim::Aggregate(rs, scene, new_items, lay_id));
     }
     else{
-      qDebug() << QObject::tr("Aggregate: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
+      qDebug() << QObject::tr("Aggregate: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(elem_name);
       rs->skipCurrentElement();
     }
   }

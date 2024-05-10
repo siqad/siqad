@@ -51,11 +51,12 @@ AFMArea::AFMArea(QXmlStreamReader *rs, QGraphicsScene *scene, int lay_id)
 
   while (!rs->atEnd()) {
     if (rs->isStartElement()) {
-      if (rs->name() == "afmarea") {
+      QString elem_name = rs->name().toString();
+      if (elem_name == "afmarea") {
         // do nothing
-      } else if (rs->name() == "layer_id") {
+      } else if (elem_name == "layer_id") {
         qDebug() << QObject::tr("The layer_id tag in designs are no longer used in loading. Using the lay_id supplied to the constructor instead.");
-      } else if (rs->name() == "dimensions") {
+      } else if (elem_name == "dimensions") {
         for (QXmlStreamAttribute &attr : rs->attributes()) {
           if (attr.name().toString() == QLatin1String("x1"))
             point1.setX(scale_factor*attr.value().toFloat());
@@ -66,24 +67,24 @@ AFMArea::AFMArea(QXmlStreamReader *rs, QGraphicsScene *scene, int lay_id)
           else if (attr.name().toString() == QLatin1String("y2"))
             point2.setY(scale_factor*attr.value().toFloat());
         }
-      } else if (rs->name() == "h_orientation") {
+      } else if (elem_name == "h_orientation") {
         orientation = static_cast<bool>(rs->readElementText().toInt());
-      } else if (rs->name() == "z_speed") {
+      } else if (elem_name == "z_speed") {
         z_spd = rs->readElementText().toFloat();
-      } else if (rs->name() == "h_speed") {
+      } else if (elem_name == "h_speed") {
         h_spd = rs->readElementText().toFloat();
-      } else if (rs->name() == "v_speed") {
+      } else if (elem_name == "v_speed") {
         v_spd = rs->readElementText().toFloat();
-      } else if (rs->name() == "v_displacement") {
+      } else if (elem_name == "v_displacement") {
         v_disp = rs->readElementText().toFloat();
       } else {
         qDebug() << QObject::tr("AFMArea: invalid element encountered on line "
-            "%1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
+            "%1 - %2").arg(rs->lineNumber()).arg(elem_name);
       }
       rs->readNext();
     } else if (rs->isEndElement()) {
       // break out of stream if the end of the element has been reached
-      if (rs->name() == "afmarea") {
+      if (rs->name().toString() == "afmarea") {
         rs->readNext();
         break;
       }

@@ -54,27 +54,25 @@ QStringList gui::Commander::cleanNumbers(QString* input)
 {
   // Captures ONLY numerical sequences not immediate
   // preceded or succeeded by letters.
-  QRegExp rx("[^a-zA-Z0-9./_](-?[\\d.]+)(?![a-zA-Z])(?![0-9])");
+  QRegularExpression rx("[^a-zA-Z0-9./_](-?[\\d.]+)(?![a-zA-Z])(?![0-9])");
   QStringList list;
-  int pos = 0;
-  while ((pos = rx.indexIn(*input, pos)) != -1) {
-    list << rx.cap(1);
-    pos += rx.matchedLength();
-  }
-  for (QString item : list) {
-    input->remove(item);
+  auto it = rx.globalMatch(*input);
+  while (it.hasNext()) {
+    auto match = it.next();
+    list << match.captured(1);
+    input->remove(match.captured(1));
   }
   return list;
 }
 
 QStringList gui::Commander::cleanAlphas(QString* input)
 {
-  QRegExp rx("([a-zA-Z0-9./_]+)");
+  QRegularExpression rx("([a-zA-Z0-9./_]+)");
   QStringList list;
-  int pos = 0;
-  while ((pos = rx.indexIn(*input, pos)) != -1) {
-    list << rx.cap(1);
-    pos += rx.matchedLength();
+  auto it = rx.globalMatch(*input);
+  while (it.hasNext()) {
+    auto match = it.next();
+    list << match.captured(1);
   }
   return list;
 }

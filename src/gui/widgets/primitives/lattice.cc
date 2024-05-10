@@ -56,22 +56,22 @@ void prim::Lattice::constructFromXml(QXmlStreamReader *rs)
   QVector<QPointF> read_a(2);
 
   while (rs->readNextStartElement()) {
-    if (rs->name() == "name") {
+    QString elem_name = rs->name().toString();
+    if (elem_name == "name") {
       read_name = rs->readElementText();
-    } else if (rs->name() == "N") {
+    } else if (elem_name == "N") {
       read_n = rs->readElementText().toInt();
-    } else if (rs->name() == "a1") {
+    } else if (elem_name == "a1") {
       read_a[0] = QPointF(rs->attributes().value("x").toFloat(), rs->attributes().value("y").toFloat());
       rs->skipCurrentElement();
-    } else if (rs->name() == "a2") {
+    } else if (elem_name == "a2") {
       read_a[1] = QPointF(rs->attributes().value("x").toFloat(), rs->attributes().value("y").toFloat());
       rs->skipCurrentElement();
-    } else if (rs->name().startsWith("b")) {
-      QString elem_name = rs->name().toString();
+    } else if (elem_name.startsWith("b")) {
       read_atoms_raw.append(qMakePair(elem_name.mid(1).toInt(), QPointF(rs->attributes().value("x").toFloat(), rs->attributes().value("y").toFloat())));
       rs->skipCurrentElement();
     } else {
-      qDebug() << QObject::tr("Lattice: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
+      qDebug() << QObject::tr("Lattice: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(elem_name);
       rs->skipCurrentElement();
     }
   }
@@ -338,7 +338,7 @@ QImage prim::Lattice::tileableLatticeImage(QColor bkg_col, bool publish)
   bkg_pixmap.fill(bkg_col);
   QPainter painter(&bkg_pixmap);
   //painter.setRenderHint(QPainter::Antialiasing);
-  painter.setRenderHint(QPainter::HighQualityAntialiasing);
+  painter.setRenderHint(QPainter::Antialiasing, true);
   for (QPoint site : b_scene) {
     QRect circ(site.x()+lat_edge_width_paint,site.y()+lat_edge_width_paint,
                lat_diam_paint, lat_diam_paint);

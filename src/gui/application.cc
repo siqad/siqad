@@ -1028,22 +1028,23 @@ bool gui::ApplicationGUI::readSimResult(const QString &result_path)
   // TODO might just be better to pass this whole block to simulator class
   while(!rs.atEnd()){
     if(rs.isStartElement()){
-      if(rs.name() == "eng_info"){
+      QString elem_name = rs.name().toString();
+      if(elem_name == "eng_info"){
         rs.readNext();
         // basic engine info
-        while(rs.name() != "eng_info"){
+        while(rs.name().toString() != "eng_info"){
           // TODO read engine info
           // can't get rid of this because there's no guarantee that the result file is being
           // read by a machine that has the simulator installed.
         }
       }
-      else if(rs.name() == "sim_param"){
+      else if(elem_name == "sim_param"){
         // TODO simulator class
       }
-      else if(rs.name() == "physloc"){
+      else if(elem_name == "physloc"){
         // TODO simulator class
       }
-      else if(rs.name() == "elec_dist"){
+      else if(elem_name == "elec_dist"){
         // TODO simulator class
       }
       else{
