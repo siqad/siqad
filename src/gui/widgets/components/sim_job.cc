@@ -29,20 +29,21 @@ JobStep::JobStep(QXmlStreamReader *rs, QDir job_root_dir)
 {
   job_tmp_dir_path = job_root_dir.absolutePath();
   while (rs->readNextStartElement()) {
-    if (rs->name() == "placement") {
+    QString elemName = rs->name().toString();
+    if (elemName == "placement") {
       placement = rs->readElementText().toInt();
-    } else if (rs->name() == "state") {
+    } else if (elemName == "state") {
       auto&& meta_enum = QMetaEnum::fromType<JobStepState>();
       job_step_state = static_cast<JobStepState>(meta_enum.keyToValue(
             rs->readElementText().toLocal8Bit()));
-    } else if (rs->name() == "command") {
+    } else if (elemName == "command") {
       // TODO implement
       rs->skipCurrentElement();
-    } else if (rs->name() == "step_dir") {
+    } else if (elemName == "step_dir") {
       js_tmp_dir_path = job_root_dir.absoluteFilePath(rs->readElementText());
-    } else if (rs->name() == "problem_path") {
+    } else if (elemName == "problem_path") {
       problem_path = job_root_dir.absoluteFilePath(rs->readElementText());
-    } else if (rs->name() == "result_path") {
+    } else if (elemName == "result_path") {
       result_path = job_root_dir.absoluteFilePath(rs->readElementText());
     } else {
       qWarning() << tr("Unknown XML element encountered when importing JobStep:"
@@ -207,38 +208,40 @@ bool JobStep::readResults(bool attempt_import_logs)
   };
 
   while (rs.readNextStartElement()) {
-    if (rs.name() == "eng_info") {
+    QString elemName = rs.name().toString();
+    if (elemName == "eng_info") {
       while (rs.readNextStartElement()) {
-        if (rs.name() == "engine") {
+        QString innerElemName = rs.name().toString();
+        if (innerElemName == "engine") {
           engine_name = rs.readElementText();
-        } else if (rs.name() == "version") {
+        } else if (innerElemName == "version") {
           version = rs.readElementText();
-        } else if (rs.name() == "return_code") {
+        } else if (innerElemName == "return_code") {
           // TODO remove this from SiQADConn
           rs.skipCurrentElement();
-        } else if (rs.name() == "timestamp") {
+        } else if (innerElemName == "timestamp") {
           // TODO implement
           rs.skipCurrentElement();
-        } else if (rs.name() == "time_elapsed_s") {
+        } else if (innerElemName == "time_elapsed_s") {
           // TODO implement
           rs.skipCurrentElement();
         } else {
           unrecognizedXMLElement(rs);
         }
       }
-    } else if (rs.name() == "sim_params") {
+    } else if (elemName == "sim_params") {
       // params already stored in job_params, don't need to read again.
       rs.skipCurrentElement();
-    } else if (rs.name() == "physloc") {
+    } else if (elemName == "physloc") {
       job_results.insert(comp::JobResult::DBLocationsResult,
                          new comp::DBLocations(&rs));
-    } else if (rs.name() == "elec_dist") {
+    } else if (elemName == "elec_dist") {
       job_results.insert(comp::JobResult::ChargeConfigsResult,
                          new comp::ChargeConfigSet(&rs));
-    } else if (rs.name() == "potential_map") {
+    } else if (elemName == "potential_map") {
       job_results.insert(comp::JobResult::PotentialLandscapeResult,
                          new comp::PotentialLandscape(&rs, QFileInfo(resultPath()).absolutePath()));
-    } else if (rs.name() == "sqcommands") {
+    } else if (elemName == "sqcommands") {
       job_results.insert(comp::JobResult::SQCommandsResult,
                         new comp::SQCommands(&rs));
     } else {
@@ -339,7 +342,6 @@ bool JobStep::commandKeywordReplacement()
   }
 
   QMap<QString, QString> replace_map;
-  //replace_map["@PYTHON@"] = gui::python_path; // TODO needs further splitting for comma separated calls
   replace_map["@PYTHON@"] = engine->pythonBin();
   replace_map["@BINPATH@"] = engine->binaryPath();
   replace_map["@PHYSENGPATH@"] = QFileInfo(engine->descriptionFilePath()).absolutePath();
@@ -348,18 +350,20 @@ bool JobStep::commandKeywordReplacement()
   replace_map["@JOBTMP@"] = job_tmp_dir_path;
   replace_map["@STEPTMP@"] = js_tmp_dir_path;
 
-  QRegExp regex("@(.*)?@");
-  regex.setMinimal(true);
+  QRegularExpression regex("@([^@]+)@");
+  regex.setPatternOptions(QRegularExpression::InvertedGreedinessOption); // make the match non-greedy
 
   command = command_format; // start from the command format
   for (int i=0; i<command.length(); i++) {
-    while (command[i].indexOf(regex) != -1) {
-      QString found_replace = regex.capturedTexts().first();
+    auto it = regex.globalMatch(command[i]);
+    while (it.hasNext()) {
+      auto match = it.next();
+      QString found_replace = match.captured(0);  // entire matched string
       if (!replace_map.contains(found_replace)) {
-        qFatal(tr("Path replacement failed, key '%1' not found.")
+        qFatal(tr("SimJob path replacement failed, key '%1' not found.")
             .arg(found_replace).toLatin1().constData(),0);
       }
-      command[i].replace(command[i].indexOf(regex), found_replace.length(), replace_map[found_replace]);
+      command[i].replace(match.capturedStart(0), found_replace.length(), replace_map[found_replace]);
     }
   }
   return true;
@@ -396,11 +400,12 @@ SimJob::SimJob(const QString &fpath, bool dcmp, QString name_override,
   auto importJobSteps = [this](QXmlStreamReader &rs, QFile &file)
   {
     while (rs.readNextStartElement()) {
-      if (rs.name() == "job_step") {
+      QString elemName = rs.name().toString();
+      if (elemName == "job_step") {
         job_steps.append(new JobStep(&rs, QFileInfo(file).dir()));
       } else {
         qWarning() << tr("Unknown XML tag encountered when importing job steps:"
-           " %1").arg(rs.name().toString());
+           " %1").arg(elemName);
         rs.skipCurrentElement();
       }
     }
@@ -440,7 +445,7 @@ SimJob::SimJob(const QString &fpath, bool dcmp, QString name_override,
   QString name_read = "";
   job_name = "IMP_UNTITLED";
   rs.readNextStartElement();  // enter root element
-  if (rs.name() != "simjob") {
+  if (rs.name().toString() != "simjob") {
     QString msgstr = tr("Manifest file at %1 does not have the appropriate "
         "root node. Import halted.").arg(manifest_path);
     qWarning() << msgstr;
@@ -450,29 +455,30 @@ SimJob::SimJob(const QString &fpath, bool dcmp, QString name_override,
     return;
   }
   while (rs.readNextStartElement()) {
-    if (rs.name() == "name") {
+    QString elemName = rs.name().toString();
+    if (elemName == "name") {
       name_read = rs.readElementText();
-    } else if (rs.name() == "state") {
+    } else if (elemName == "state") {
       auto&& meta_enum = QMetaEnum::fromType<JobState>();
       job_state = static_cast<JobState>(meta_enum.keyToValue(rs.readElementText().toLocal8Bit()));
-    } else if (rs.name() == "time_start") {
+    } else if (elemName == "time_start") {
       // TODO implement
       rs.skipCurrentElement();
-    } else if (rs.name() == "time_end") {
+    } else if (elemName == "time_end") {
       // TODO implement
       rs.skipCurrentElement();
-    } else if (rs.name() == "job_steps") {
+    } else if (elemName == "job_steps") {
       importJobSteps(rs, file);
     } else {
       qWarning() << tr("Unknown XML tag encountered when importing SimJob: %1")
-        .arg(rs.name().toString());
+        .arg(elemName);
       rs.skipCurrentElement();
     }
   }
   if (!name_override.isEmpty()) {
     if (!name_read.isEmpty()) {
-      QRegExp regex("@IMPORTED_NAME@");
-      name_override.replace(QRegExp("@IMPORTED_NAME@"), name_read);
+      QRegularExpression regex("@IMPORTED_NAME@");
+      name_override.replace(regex, name_read);
     }
     job_name = name_override;
   }

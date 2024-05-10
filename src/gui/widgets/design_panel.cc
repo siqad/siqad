@@ -70,8 +70,8 @@ gui::DesignPanel::~DesignPanel()
 // initialise design panel on first init or after reset
 void gui::DesignPanel::initDesignPanel(QString lattice_file_path, bool init_layers) {
   undo_stack = new QUndoStack();
-  connect(undo_stack, SIGNAL(cleanChanged(bool)),
-          this, SLOT(emitUndoStackCleanChanged(bool)));
+  connect(undo_stack, &QUndoStack::cleanChanged,
+          this, &DesignPanel::emitUndoStackCleanChanged);
 
   // initialize contained widgets
   layman = new LayerManager(this);
@@ -105,11 +105,10 @@ void gui::DesignPanel::initDesignPanel(QString lattice_file_path, bool init_laye
   // set view behaviour
   setTransformationAnchor(QGraphicsView::NoAnchor);
   setResizeAnchor(QGraphicsView::AnchorViewCenter);
-  resetMatrix(); // resets QTransform, which undoes the zoom
+  resetTransform(); // resets QTransform, which undoes the zoom
   scale(0.1, 0.1);
 
-  setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing |
-            QPainter::HighQualityAntialiasing | QPainter::SmoothPixmapTransform);
+  setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 
   // color scheme
   QColor col;
@@ -222,6 +221,9 @@ void gui::DesignPanel::clearDesignPanel(bool reset)
     delete item;
   clipboard.clear();
 
+  // disconnect this signal first otherwise segfaults
+  disconnect(undo_stack, &QUndoStack::cleanChanged,
+           this, &DesignPanel::emitUndoStackCleanChanged);
   delete undo_stack;
 
   qDebug() << tr("Finished clearing design panel");
@@ -637,30 +639,31 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs, bool is_sim_result)
 
   // read from xml stream and hand nodes off to appropriate functions
   while (rs->readNextStartElement()) {
+    QString elem_name = rs->name().toString();
     // read program flags
-    if (rs->name() == "program") {
+    if (elem_name == "program") {
       // TODO implement:
       // file_purpose: pop-up message when loading simulation or autosave, also unhide layers as needed (e.g. if autosaved in sim display mode where all designs are hidden)
       // version: no action needed so far
       // date: no action needed so far
       rs->skipCurrentElement();
-    } else if(rs->name() == "gui") {
+    } else if(elem_name == "gui") {
       if (!is_sim_result) {
         loadGUIFlags(rs, visrect);
       } else {
         rs->skipCurrentElement();
       }
-    } else if (rs->name() == "layers") {
+    } else if (elem_name == "layers") {
       loadLayers(rs, layer_order_id, is_sim_result);
-    } else if(rs->name() == "layer_prop") {
+    } else if(elem_name == "layer_prop") {
       // LEGACY support for files < v0.0.2
       // starting from v0.0.2 layer_prop should appear inside the layers level
       loadLayerProps(rs, layer_order_id, is_sim_result);
-    } else if(rs->name() == "design") {
+    } else if(elem_name == "design") {
       loadDesign(rs, layer_order_id, is_sim_result);
     } else {
       qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2")
-          .arg(rs->lineNumber()).arg(rs->name().toString());
+          .arg(rs->lineNumber()).arg(elem_name);
       rs->skipCurrentElement();
     }
   }
@@ -702,14 +705,15 @@ void gui::DesignPanel::loadGUIFlags(QXmlStreamReader *rs, QRectF &visrect)
   qreal zoom=0.1, scroll_v=0, scroll_h=0;
   QPointF tlpt, brpt;
   while (rs->readNextStartElement()) {
-    if (rs->name() == "zoom") {
+    QString elem_name = rs->name().toString();
+    if (elem_name == "zoom") {
       zoom = rs->readElementText().toDouble();
-    } else if (rs->name() == "scroll") {
+    } else if (elem_name == "scroll") {
       scroll_v = rs->attributes().value("x").toInt();
       scroll_h = rs->attributes().value("y").toInt();
       // no text is being read so the current element has to be explicitly skipped
       rs->skipCurrentElement();
-    } else if (rs->name() == "displayed_region") {
+    } else if (elem_name == "displayed_region") {
       tlpt.setX(rs->attributes().value("x1").toFloat());
       tlpt.setY(rs->attributes().value("y1").toFloat());
       brpt.setX(rs->attributes().value("x2").toFloat());
@@ -717,7 +721,7 @@ void gui::DesignPanel::loadGUIFlags(QXmlStreamReader *rs, QRectF &visrect)
       rs->skipCurrentElement();
     } else {
       qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2")
-          .arg(rs->lineNumber()).arg(rs->name().toString());
+          .arg(rs->lineNumber()).arg(elem_name);
       rs->skipCurrentElement();
     }
   }
@@ -739,7 +743,7 @@ void gui::DesignPanel::loadLayers(QXmlStreamReader *rs,
 {
   qDebug() << "Loading layers";
   while (rs->readNextStartElement()) {
-    if (rs->name() == "layer_prop") {
+    if (rs->name().toString() == "layer_prop") {
       loadLayerProps(rs, layer_order_id, is_sim_result);
     }
   }
@@ -757,30 +761,31 @@ void gui::DesignPanel::loadLayerProps(QXmlStreamReader *rs,
 
   // keep reading until end of layer_prop tag
   while (rs->readNextStartElement()) {
-    if (rs->name() == "name") {
+    QString elem_name = rs->name().toString();
+    if (elem_name == "name") {
       layer_nm = rs->readElementText();
-    } else if (rs->name() == "type") {
+    } else if (elem_name == "type") {
       layer_type = static_cast<prim::Layer::LayerType>(
           QMetaEnum::fromType<prim::Layer::LayerType>().keyToValue(
             rs->readElementText().toStdString().c_str()));
-    } else if (rs->name() == "role") {
+    } else if (elem_name == "role") {
       layer_role = static_cast<prim::Layer::LayerRole>(
           QMetaEnum::fromType<prim::Layer::LayerRole>().keyToValue(
             rs->readElementText().toStdString().c_str()));
-    } else if (rs->name() == "zoffset") {
+    } else if (elem_name == "zoffset") {
       zoffset = rs->readElementText().toFloat();
-    } else if (rs->name() == "zheight") {
+    } else if (elem_name == "zheight") {
       zheight = rs->readElementText().toFloat();
-    } else if (rs->name() == "visible") {
+    } else if (elem_name == "visible") {
       layer_visible = (rs->readElementText() == "1") ? true : false;
-    } else if (rs->name() == "active") {
+    } else if (elem_name == "active") {
       layer_active = (rs->readElementText() == "1") ? true : false;
-    } else if (rs->name() == "lat_vec") {
+    } else if (elem_name == "lat_vec") {
       prim::Lattice *lat_lay = layman->getLattice(!is_sim_result);
       lat_lay->constructFromXml(rs);
     } else {
       qDebug() << tr("Design Panel: invalid element encountered on line %1 - %2")
-          .arg(rs->lineNumber()).arg(rs->name().toString());
+          .arg(rs->lineNumber()).arg(elem_name);
       rs->skipCurrentElement();
     }
   }
@@ -881,7 +886,7 @@ void gui::DesignPanel::loadDesign(QXmlStreamReader *rs, QList<int> &layer_order_
   qDebug() << "Loading design";
   int layer_load_order=0;
   while (rs->readNextStartElement()) {
-    if (rs->name() == "layer") {
+    if (rs->name().toString() == "layer") {
       if (layer_order_id[layer_load_order] == -1) {
         layer_load_order++;
         rs->skipCurrentElement();
@@ -1131,7 +1136,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
         // use default behaviour for left mouse button
         QGraphicsView::mouseMoveEvent(e);
         break;
-      case Qt::MidButton:
+      case Qt::MiddleButton:
         {
         // middle button always pans
         mouse_pos_del = e->pos()-prev_pan_pos;
@@ -1424,7 +1429,7 @@ void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e)
     // zoom under mouse, should be indep of transformationAnchor
     QPointF old_pos, new_pos;
     if (e != nullptr) {
-      old_pos = mapToScene(e->pos());
+      old_pos = mapToScene(e->position().toPoint());
     } else {
       old_pos = mapToScene(mapFromParent(rect().center()));
     }
@@ -1445,7 +1450,7 @@ void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e)
 
     // move to anchor
     if (e != nullptr) {
-      new_pos = mapToScene(e->pos());
+      new_pos = mapToScene(e->position().toPoint());
     } else {
       new_pos = mapToScene(mapFromParent(rect().center()));
     }
@@ -1720,9 +1725,10 @@ void gui::DesignPanel::rubberBandSelect(){
   // select items that are enclosed by the rubberband
   QPainterPath painter_path;
   painter_path.addRect(rb_scene_rect);
-  scene->setSelectionArea(painter_path, Qt::ContainsItemShape);
+  scene->setSelectionArea(painter_path, Qt::ReplaceSelection, Qt::ContainsItemShape);
 
   // append shift-selected items if they're still visible
+  // TODO: it might be possible to simplify this by using Qt::AddToSelection in the above call when Shift is held
   for(QGraphicsItem* shift_selected_item : rb_shift_selected)
     if (shift_selected_item->isVisible())
       shift_selected_item->setSelected(true);

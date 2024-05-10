@@ -314,7 +314,6 @@ void ECSVisualizer::clearChargeConfigResult()
 
 QWidget *ECSVisualizer::scatterPlotChargeConfigSet()
 {
-  using namespace QtCharts;
   QScatterSeries *series = new QScatterSeries();
   series->setMarkerShape(QScatterSeries::MarkerShapeCircle);
   series->setMarkerSize(15.0);

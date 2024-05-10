@@ -11,22 +11,22 @@
 // VALIDATOR CLASS
 
 // constructor
-gui::Validator::Validator(QObject *parent)
-  : QRegExpValidator(parent)
-{
+// gui::Validator::Validator(QObject *parent)
+//   : QRegExpValidator(parent)
+// {
 
-}
+// }
 
-// destructor
-gui::Validator::~Validator()
-{}
+// // destructor
+// gui::Validator::~Validator()
+// {}
 
 // INPUTFIELD CLASS
 
 gui::InputField::InputField(QWidget *parent)
   : QLineEdit(parent)
 {
-  this->validator = new gui::Validator();
+  // this->validator = new gui::Validator();
   this->cmd_history = new QStringList();
   max_history = 100;
   position = 0;
@@ -86,7 +86,7 @@ QStringList gui::InputField::commandStringList()
 
 gui::InputField::~InputField()
 {
-  delete validator;
+  // delete validator;
   delete cmd_history;
   delete fsm;
   delete dir_comp;
@@ -153,7 +153,7 @@ QStringList gui::InputField::getSuggestions()
       return dir.entryList();
     } else if (completer == item_comp) {
       QString pattern = QString("^") + words.last();
-      QRegExp rx(pattern);
+      QRegularExpression rx(pattern);
       return itemTypeList().filter(rx);
     }
   }
@@ -162,7 +162,7 @@ QStringList gui::InputField::getSuggestions()
 
 QStringList gui::InputField::getWords()
 {
-  return text().split(QRegExp("(\\s|\\n|\\r)+"), QString::SkipEmptyParts);
+  return text().split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
 }
 
 bool gui::InputField::eventFilter(QObject *obj, QEvent *event)
