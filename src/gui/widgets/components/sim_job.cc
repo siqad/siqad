@@ -12,6 +12,7 @@
 #include <algorithm>
 #include "sim_job.h"
 #include "../../../global.h"
+#include "../../../helpers/zip_helper.h"
 
 using namespace comp;
 
@@ -416,8 +417,16 @@ SimJob::SimJob(const QString &fpath, bool dcmp, QString name_override,
     qDebug() << "Decompressing SimJob archive...";
     QString tmpd = settings::AppSettings::instance()->getPath("plugs/runtime_tmp_root_path");
     QDir xdir(QDir(tmpd).absoluteFilePath("IM_" + QDateTime::currentDateTime().toString("yyMMdd_HHmmss")));
-    zipper::Unzipper unzipper(fpath.toStdString());
-    unzipper.extract(xdir.absolutePath().toStdString());
+
+    if (!xdir.exists()) {
+      xdir.mkpath(".");
+    }
+
+    if (!extract_all_from_zip(fpath, xdir.absolutePath())) {
+      QMessageBox::critical(nullptr, "Extraction Error", "Failed to extract the SimJob archive.");
+      return;
+    }
+
     qDebug() << "Searching for SimJob manifest...";
     manifest_path = find_manifest(xdir);
     if (manifest_path.isEmpty()) {
@@ -788,9 +797,29 @@ bool SimJob::exportJob(QString out_path)
   }
 
   // throw everything to archive
-  zipper::Zipper zipper(out_path.toStdString());
-  zipper.add(job_tmp_dir_path.toStdString());
-  zipper.close();
+  mz_zip_archive zip_archive;
+  memset(&zip_archive, 0, sizeof(zip_archive));
+
+  // Initialize a new zip archive
+  if (!mz_zip_writer_init_file(&zip_archive, out_path.toStdString().c_str(), 0)) {
+    qWarning() << "Could not initialize zip archive";
+    return false;
+  }
+
+  // Add the directory to the zip
+  if (!add_directory_to_zip(zip_archive, job_tmp_dir_path.toStdString())) {
+    mz_zip_writer_end(&zip_archive);
+    return false;
+  }
+
+  // Finalize the archive
+  if (!mz_zip_writer_finalize_archive(&zip_archive)) {
+    qWarning() << "Could not finalize zip archive";
+    mz_zip_writer_end(&zip_archive);
+    return false;
+  }
+
+  mz_zip_writer_end(&zip_archive);
 
   qDebug() << tr("SimJob exported successfully to %1").arg(out_path);
 

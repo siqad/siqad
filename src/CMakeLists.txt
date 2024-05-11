@@ -5,15 +5,6 @@ cmake_minimum_required(VERSION 3.10)
 project(siqad VERSION 0.3.3)
 # TODO add way to push version number into source code
 
-# Zipper library
-if (WIN32)
-    add_compile_definitions(NOMINMAX)
-endif()
-add_subdirectory(libs/zipper EXCLUDE_FROM_ALL)  # EXCLUDE_FROM_ALL should impede zipper's install calls from working
-include_directories(libs/zipper)
-set(ZIPPER_LIB_PATH ${CMAKE_CURRENT_BINARY_DIR}/libs/zipper/Release)
-message(STATUS "Zipper Lib path set to: ${ZIPPER_LIB_PATH}")
-
 find_package(Qt6 COMPONENTS Core Gui Widgets Svg PrintSupport UiTools Charts REQUIRED)
 
 set(LIB_LINKS
@@ -24,7 +15,6 @@ set(LIB_LINKS
     Qt6::PrintSupport
     Qt6::UiTools
     Qt6::Charts
-    staticZipper
 )
 
 # QtTest related:
@@ -75,18 +65,6 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${BIN_LINKS})
-
-set(ZIPPER_LIBS
-    staticZipper
-    Zipper-static
-)
-if (BUILD_TEST)
-    list(APPEND ZIPPER_LIBS Zipper-test)
-endif()
-add_dependencies(siqad ${ZIPPER_LIBS})
-if (USE_SIQAD_LIB)
-    add_dependencies(siqad_lib ${ZIPPER_LIBS})
-endif()
 
 # SiQAD unit tests:
 # option(BUILD_TEST "Build the test program." ON)
