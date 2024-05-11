@@ -17,8 +17,6 @@
 #include "settings/settings.h" // TODO probably need this later
 #include <tuple> //std::tuple for 3+ article data structure, std::get for accessing the tuples
 #include <QDir>
-#include <libs/zipper/zipper/unzipper.h>
-#include <libs/zipper/zipper/zipper.h>
 
 namespace comp{
 
