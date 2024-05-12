@@ -11,6 +11,7 @@ db-sim
 qrc_application.cpp
 /w64-build*/**
 /build*/**
+/install*/**
 win32
 win64
 

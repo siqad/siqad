@@ -41,7 +41,7 @@ set(SIQAD_INSTALL_ROOT "${CMAKE_INSTALL_PREFIX}" CACHE STRING "SiQAD install roo
 message(STATUS "SIQAD_INSTALL_ROOT is ${SIQAD_INSTALL_ROOT}")
 
 # Directories for plugins and libs
-set(SIQAD_PLUGINS_ROOT "${SIQAD_INSTALL_ROOT}/plugins" CACHE STRING "SiQAD plugins root directory name")
+set(SIQAD_PLUGINS_ROOT "${SIQAD_INSTALL_ROOT}/sqplugins" CACHE STRING "SiQAD plugins root directory name")
 set(SIQAD_LIBS_ROOT "${SIQAD_INSTALL_ROOT}/libs" CACHE STRING "SiQAD libraries root directory name")
 set(SIQADCONN_ROOT "${SIQAD_LIBS_ROOT}/siqadtools" CACHE STRING "SiQADConnector root directory name")
 set(SQCONN_REL_SQBIN "libs/siqadtools" CACHE STRING "SiQADConnector root directory relative to SiQAD binary directory")

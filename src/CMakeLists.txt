@@ -1,11 +1,16 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 
 # for release builds, add flag "-DCMAKE_BUILD_TYPE=Release" (without quotes) when running cmake.
 
 project(siqad VERSION 0.3.3)
 # TODO add way to push version number into source code
 
-find_package(Qt6 COMPONENTS Core Gui Widgets Svg PrintSupport UiTools Charts REQUIRED)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(QT_VERSION_REQ "6.0")
+
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Svg PrintSupport UiTools Charts)
+qt_standard_project_setup()
 
 set(LIB_LINKS
     Qt6::Core
@@ -30,10 +35,6 @@ set(CMAKE_AUTOMOC ON)
 
 
 qt6_add_resources(CUSTOM_RSC resources/application.qrc)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(QT_VERSION_REQ "6.0")
 
 # This explicit loading of header files, rather than include_directories, is to
 # apeace qmake (windows routine) which also reads the following file lists.
@@ -60,9 +61,26 @@ endif()
 if (WIN32)
     set(ENV{SIQAD_INSTALL_ROOT} ${SIQAD_INSTALL_ROOT})
     add_executable(siqad WIN32 main.cc ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
+
+    set(deploy_tool_options_args --no-system-d3d-compiler --libdir ${SIQAD_INSTALL_ROOT})
+
+    # Generate windeployqt script and run it
+    qt_generate_deploy_app_script(
+        TARGET siqad
+        OUTPUT_SCRIPT QT_DEPLOY_SCRIPT
+        NO_TRANSLATIONS
+        # NO_COMPILER_RUNTIME
+        NO_UNSUPPORTED_PLATFORM_ERROR
+        DEPLOY_TOOL_OPTIONS ${deploy_tool_options_args}
+    )
+    install(SCRIPT ${QT_DEPLOY_SCRIPT})
 else()
     add_executable(siqad main.cc ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
 endif()
+
+set_target_properties(siqad PROPERTIES
+    WIN32_EXECUTABLE ON
+)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${BIN_LINKS})
 

@@ -137,7 +137,8 @@ QSettings *settings::AppSettings::m_defs()
 
   S->setValue("plugs/eng_lib_dirs", QStringList({
     "<APPLOCALDATA>/plugins/",
-    "<BINPATH>/plugins/"
+    "<BINPATH>/sqplugins/",
+    "<BINPATH>/plugins/",
   }));
   S->setValue("plugs/preset_root_path", QString("<CONFIG>/plugins/"));
   S->setValue("plugs/runtime_tmp_root_path", QString("<SYSTMP>/plugins/"));
