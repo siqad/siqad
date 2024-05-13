@@ -1,0 +1,79 @@
+name: Build and Package on Windows
+
+on:
+  push:
+    branches:
+      - windows-github-action-test
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: 'true'
+
+    - name: Set up MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: "14.29"
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip' # caching pip dependencies
+
+    - name: Install CMake
+      uses: lukka/get-cmake@v3.29.3
+
+    - name: Setup Ninja
+      uses: seanmiddleditch/gha-setup-ninja@v4
+
+    # Go to this website if the Qt version config needs to be updated:
+    # https://ddalcino.github.io/aqt-list-server/
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        aqtversion: '==3.1.*'
+        version: '6.7.0'
+        host: 'windows'
+        target: 'desktop'
+        arch: 'win64_msvc2019_64'
+        modules: 'qtcharts'
+    
+    - name: Install boost
+      uses: MarkusJx/install-boost@v2.4.5
+      id: install-boost
+      with:
+        boost_version: 1.85.0
+        platform_version: 2019
+        toolset: msvc
+      if: runner.os == 'Windows'
+
+
+    - name: Configure
+      run: |
+        cmake . -G "Ninja" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/install" \
+        -DQt6_DIR="${{QT_ROOT_DIR}}/lib/cmake/Qt6" \
+        -DBOOST_INCLUDE_DIR="${{steps.install-boost.outputs.BOOST_ROOT}}/include"
+      env:
+        BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+
+    - name: Build
+      run: ninja -f build.ninja
+
+    - name: Install
+      run: ninja -f build.ninja install
+
+    - name: Archive Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: siqad-package
+        path: ${{ github.workspace }}/install/**
+        retention-days: 5  # Optional: adjust as necessary
+
