@@ -36,6 +36,7 @@ jobs:
     # https://ddalcino.github.io/aqt-list-server/
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
+      id: install-qt
       with:
         aqtversion: '==3.1.*'
         version: '6.7.0'
@@ -59,7 +60,7 @@ jobs:
         cmake . -G "Ninja" \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/install" \
-        -DQt6_DIR="${{QT_ROOT_DIR}}/lib/cmake/Qt6" \
+        -DQt6_DIR="${{steps.install-qt.outputs.QT_ROOT_DIR}}/lib/cmake/Qt6" \
         -DBOOST_INCLUDE_DIR="${{steps.install-boost.outputs.BOOST_ROOT}}/include"
       env:
         BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
