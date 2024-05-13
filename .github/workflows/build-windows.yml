@@ -28,9 +28,6 @@ jobs:
     - name: Install CMake
       uses: lukka/get-cmake@v3.29.3
 
-    - name: Setup Ninja
-      uses: seanmiddleditch/gha-setup-ninja@v4
-
     # Go to this website if the Qt version config needs to be updated:
     # https://ddalcino.github.io/aqt-list-server/
     - name: Install Qt
@@ -71,9 +68,11 @@ jobs:
       run: ninja -f build.ninja install
 
     - name: Archive Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: siqad-package
+        # if using matrix build in the future
+        # name: siqad-package-${{ matrix.runs-on }}
         path: ${{ github.workspace }}/install/**
         retention-days: 5  # Optional: adjust as necessary
 
