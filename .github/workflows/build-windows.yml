@@ -9,9 +9,6 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    defaults:
-      run:
-        working-directory: build
     steps:
     - uses: actions/checkout@v4
       with:
@@ -56,16 +53,21 @@ jobs:
         toolset: msvc
       if: runner.os == 'Windows'
 
+    - name: Create build directory
+      run: mkdir build
 
     - name: Configure
-      run: cmake . -G "Ninja" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/install" -DBOOST_INCLUDE_DIR="${{steps.install-boost.outputs.BOOST_ROOT}}/include"
+      working-directory: ./build
+      run: cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/install" -DBOOST_INCLUDE_DIR="${{steps.install-boost.outputs.BOOST_ROOT}}/include"
       env:
         BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
     - name: Build
+      working-directory: ./build
       run: ninja -f build.ninja
 
     - name: Install
+      working-directory: ./build
       run: ninja -f build.ninja install
 
     - name: Archive Artifacts
