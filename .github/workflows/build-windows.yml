@@ -55,11 +55,7 @@ jobs:
 
 
     - name: Configure
-      run: >
-        cmake . -G "Ninja"
-          -DCMAKE_BUILD_TYPE="Release"
-          -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/install"
-          -DBOOST_INCLUDE_DIR="${{steps.install-boost.outputs.BOOST_ROOT}}/include"
+      run: cmake . -G "Ninja" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/install" -DBOOST_INCLUDE_DIR="${{steps.install-boost.outputs.BOOST_ROOT}}/include"
       env:
         BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
