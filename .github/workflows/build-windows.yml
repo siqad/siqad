@@ -11,7 +11,7 @@ jobs:
     runs-on: windows-latest
     defaults:
       run:
-        working-directory: ./build
+        working-directory: build
     steps:
     - uses: actions/checkout@v4
       with:
