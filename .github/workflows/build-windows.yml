@@ -12,7 +12,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        fetch-depth: 0
         submodules: 'true'
 
     - name: Set up MSVC
@@ -58,10 +57,9 @@ jobs:
     - name: Configure
       run: |
         cmake . -G "Ninja" \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/install" \
-        -DQt6_DIR="${{steps.install-qt.outputs.QT_ROOT_DIR}}/lib/cmake/Qt6" \
-        -DBOOST_INCLUDE_DIR="${{steps.install-boost.outputs.BOOST_ROOT}}/include"
+          -DCMAKE_BUILD_TYPE="Release" \
+          -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/install" \
+          -DBOOST_INCLUDE_DIR="${{steps.install-boost.outputs.BOOST_ROOT}}/include"
       env:
         BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
