@@ -1,0 +1,78 @@
+name: Build and Package on Windows
+
+on:
+  push:
+    branches:
+      - windows-github-action-test
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+
+    - name: Set up MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: "14.29"
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip' # caching pip dependencies
+
+    - name: Install CMake
+      uses: lukka/get-cmake@v3.29.3
+
+    # Go to this website if the Qt version config needs to be updated:
+    # https://ddalcino.github.io/aqt-list-server/
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      id: install-qt
+      with:
+        aqtversion: '==3.1.*'
+        version: '6.7.0'
+        host: 'windows'
+        target: 'desktop'
+        arch: 'win64_msvc2019_64'
+        modules: 'qtcharts'
+    
+    - name: Install boost
+      uses: MarkusJx/install-boost@v2.4.5
+      id: install-boost
+      with:
+        boost_version: 1.84.0
+        platform_version: 2019
+        toolset: msvc
+      if: runner.os == 'Windows'
+
+    - name: Create build directory
+      run: mkdir build
+
+    - name: Configure
+      working-directory: ./build
+      run: cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/install" -DBOOST_INCLUDE_DIR="${{steps.install-boost.outputs.BOOST_ROOT}}/include"
+      env:
+        BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+
+    - name: Build
+      working-directory: ./build
+      run: ninja -f build.ninja
+
+    - name: Install
+      working-directory: ./build
+      run: ninja -f build.ninja install
+
+    - name: Archive Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: siqad-package
+        # if using matrix build in the future
+        # name: siqad-package-${{ matrix.runs-on }}
+        path: ${{ github.workspace }}/install/**
+        retention-days: 5  # Optional: adjust as necessary
+
