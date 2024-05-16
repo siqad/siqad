@@ -3,7 +3,8 @@ name: Build and Package on Windows
 on:
   push:
     branches:
-      - windows-github-action-test
+      - main
+      - dev
   workflow_dispatch:
 
 jobs:
