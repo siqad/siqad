@@ -65,7 +65,7 @@ protected:
   void manageCompleters();
   QStringList getSuggestions();
   virtual void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
-  bool eventFilter(QObject *obj, QEvent *event);
+  bool eventFilter(QObject *obj, QEvent *event) Q_DECL_OVERRIDE;
 
 private:
   void insertCompletion(QString completion);
