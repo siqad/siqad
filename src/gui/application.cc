@@ -368,7 +368,7 @@ void gui::ApplicationGUI::initMenuBar()
 
   zoom_in->setShortcuts({Qt::Key_Equal, Qt::Key_Plus});
   zoom_out->setShortcut(Qt::Key_Minus);
-  fit_items_in_view->setShortcut(Qt::CTRL + Qt::Key_Equal);
+  fit_items_in_view->setShortcut(Qt::CTRL | Qt::Key_Equal);
 
   //edit menu actions
   //QAction *action_color = new QAction(tr("Color..."), this);

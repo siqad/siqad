@@ -104,8 +104,6 @@ QSettings *settings::AppSettings::m_defs()
   S->setValue("log/logdir", QString("<SYSTMP>/log/"));
   S->setValue("log/keepcount", 10);
 
-  S->setValue("view/hidpi_support", false);     // Qt HiDPI support
-
   S->setValue("snap/diameter", 1.);             //relative to scale_fact
 
   S->setValue("dir/lattice", QString("<BINPATH>/settings/lattices"));
