@@ -13,4 +13,3 @@ This checklist serves as a reminder of a couple of things that ensure your pull 
 
 - [ ] The pull request only contains commits that are related to it.
 - [ ] I have added appropriate tests and documentation.
-- 
