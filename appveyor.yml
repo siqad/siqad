@@ -1,7 +1,7 @@
 version: '0.3.3.{build}'
 
 #image: Visual Studio 2015
-image: Visual Studio 2017
+image: Visual Studio 2019
 
 configuration:
   - Release
@@ -45,7 +45,7 @@ before_build:
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir build && cd build
-  - cmake .. -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -G "Visual Studio 15 2017" -A %CMAKE_ARCH% -DWIN32_QMAKE_BIN="%WIN32_QMAKE_BIN%" -DWIN32_MAKE_BIN="%WIN32_MAKE_BIN%"
+  - cmake .. -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -G "Visual Studio 15 2019" -A %CMAKE_ARCH% -DWIN32_QMAKE_BIN="%WIN32_QMAKE_BIN%" -DWIN32_MAKE_BIN="%WIN32_MAKE_BIN%"
   - cmake --build . --config Release --target install
   - mv release siqad_%PLATFORM%
   #- cd %APPVEYOR_BUILD_FOLDER% && dir /s /b /o:gn
