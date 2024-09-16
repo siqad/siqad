@@ -7,6 +7,7 @@ db-sim
 
 # compiled source
 *.o
+*.so
 *.pyc
 qrc_application.cpp
 /w64-build*/**
