@@ -167,7 +167,7 @@ def plot_tts(tts_data, param1_values, param2_values, param1_name, param2_name, p
         ax.bar3d(X.flatten(), Y.flatten(), np.zeros_like(X.flatten()),
                  dx=(param1_values[-1] - param1_values[0]) / len(param1_values),
                  dy=(param2_values[-1] - param2_values[0]) / len(param2_values),
-                 dz=tts_data.flatten(), color='c', alpha=0.7)
+                 dz=tts_data.T.flatten(), color='c', alpha=0.7)
 
         ax.set_xlabel(param1_name)
         ax.set_ylabel(param2_name)
@@ -251,12 +251,11 @@ def main():
 
     # Generate layout parameters
     generate_params = generate_random_sidb_layout_params()
-    generate_params.number_of_sidbs = 15
+    generate_params.number_of_sidbs = 30
     generate_params.positive_sidbs = positive_charges.OFF
     generate_params.coordinate_pair = ((0, 0), (20, 20))
 
     layout, cds = generate_layout(generate_params, physical_parameters)
-
 
     # Convert coordinates from nm to angstroms
     all_positions_nm = cds.get_all_sidb_locations_in_nm()
@@ -290,7 +289,7 @@ def main():
 
     if param1 in param_types:
         param1_type = param_types[param1]
-        param1_values = np.linspace(200, 10000, num=10).astype(param1_type)
+        param1_values = np.linspace(200, 600, num=10).astype(param1_type)
 
     if param2 in param_types:
         param2_type = param_types[param2]
