@@ -42,36 +42,72 @@ elseif (USE_QMAKE_ON_LINUX)
     add_dependencies(siqad Zipper)
     install(FILES ${SIQAD_EXE_TARGET} DESTINATION ${SIQAD_INSTALL_ROOT})
 else()
-    find_package(Qt5Core ${QT_VERSION_REQ} REQUIRED)
-    find_package(Qt5Gui ${QT_VERSION_REQ} REQUIRED)
-    find_package(Qt5Widgets ${QT_VERSION_REQ} REQUIRED)
-    find_package(Qt5Svg ${QT_VERSION_REQ} REQUIRED)
-    find_package(Qt5PrintSupport ${QT_VERSION_REQ} REQUIRED)
-    find_package(Qt5UiTools ${QT_VERSION_REQ} REQUIRED)
-    find_package(Qt5Charts ${QT_VERSION_REQ} REQUIRED)
+    # Set hints for common Qt5 installation paths (e.g., Homebrew on macOS)
+    set(QT5_HINTS
+            "/opt/homebrew/Cellar/qt@5"        # Apple Silicon Homebrew with qt@5 (your case)
+            "/opt/homebrew/Cellar/qt"          # Apple Silicon Homebrew standard
+            "/usr/local/Cellar/qt@5"           # Intel macOS Homebrew with qt@5
+            "/usr/local/Cellar/qt"             # Intel macOS Homebrew standard
+            "/usr/local/opt/qt"                # Homebrew symlink (if applicable)
+            "/usr/lib/qt"                      # Linux default
+            "C:/Qt"                            # Windows default
+            "$ENV{HOME}/Qt"                    # User-local Qt installation
+    )
+
+    # If Qt5_DIR is not set, try to find Qt5 automatically
+    if(NOT Qt5_DIR)
+        foreach(hint ${QT5_HINTS})
+            file(GLOB QT_VERSIONS "${hint}/5.*")  # Look for Qt5 versions (e.g., 5.15.16)
+            if(QT_VERSIONS)
+                list(GET QT_VERSIONS 0 QT5_PATH)  # Pick the first found version
+                set(Qt5_DIR "${QT5_PATH}/lib/cmake/Qt5" CACHE PATH "Path to Qt5 config directory")
+                break()
+            endif()
+        endforeach()
+
+        # If still not found, check the system PATH or qmake location
+        if(NOT Qt5_DIR)
+            find_program(QMAKE_EXECUTABLE qmake)
+            if(QMAKE_EXECUTABLE)
+                get_filename_component(QT_BIN_DIR "${QMAKE_EXECUTABLE}" DIRECTORY)
+                get_filename_component(QT_ROOT_DIR "${QT_BIN_DIR}/.." ABSOLUTE)
+                set(Qt5_DIR "${QT_ROOT_DIR}/lib/cmake/Qt5" CACHE PATH "Path to Qt5 config directory")
+            endif()
+        endif()
+
+        if(NOT Qt5_DIR)
+            message(FATAL_ERROR "Could not find Qt5. Please install Qt5 (e.g., 'brew install qt@5' on macOS) or specify -DQt5_DIR=<path> manually.")
+        else()
+            message(STATUS "Found Qt5_DIR: ${Qt5_DIR}")
+        endif()
+    endif()
+
+    # Find Qt5 components using the detected or specified Qt5_DIR
+    find_package(Qt5 ${QT_VERSION_REQ} REQUIRED COMPONENTS Core Gui Widgets Svg PrintSupport UiTools Charts PATHS ${Qt5_DIR})
+    if(NOT SKIP_SIQAD_TESTS)
+        find_package(Qt5 ${QT_VERSION_REQ} REQUIRED COMPONENTS Test PATHS ${Qt5_DIR})
+    endif()
 
     set(LIB_LINKS
-        Qt5::Core
-        Qt5::Gui
-        Qt5::Widgets
-        Qt5::Svg
-        Qt5::PrintSupport
-        Qt5::UiTools
-        Qt5::Charts
-        staticZipper
+            Qt5::Core
+            Qt5::Gui
+            Qt5::Widgets
+            Qt5::Svg
+            Qt5::PrintSupport
+            Qt5::UiTools
+            Qt5::Charts
+            staticZipper
     )
 
     # QtTest related: (should probably add a flag to disable testing)
     if(NOT SKIP_SIQAD_TESTS)
         enable_testing()
-        find_package(Qt5Test ${QT_VERSION_REQ} REQUIRED)
         set(CMAKE_INCLUDE_CURRENT_DIR ON)
     endif()
 
     add_definitions( -DAPP_VERSION=\"0.3.3\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\" )
 
     set(CMAKE_AUTOMOC ON)
-
 
     qt5_add_resources(CUSTOM_RSC resources/application.qrc)
 
