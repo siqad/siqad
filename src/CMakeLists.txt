@@ -151,49 +151,49 @@ else()
     endif()
     include_directories(.)
 
-    if(USE_SIQAD_LIB)
-        add_library(siqad_lib OBJECT ${LIB_SOURCES} ${LIB_HEADERS} ${BIN_CUSTOM_RSC})
+    if (USE_SIQAD_LIB)
+        add_library(siqad_lib OBJECT ${LIB_SOURCES} ${LIB_HEADERS} ${CUSTOM_RSC})
         target_link_libraries(siqad_lib PUBLIC ${LIB_LINKS})
     endif()
 
     # SiQAD binary
-    if(WIN32)
+    if (WIN32)
         set(ENV{SIQAD_INSTALL_ROOT} ${SIQAD_INSTALL_ROOT})
         add_executable(siqad WIN32 main.cc ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
     else()
         add_executable(siqad main.cc ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
     endif()
 
-    target_link_libraries(siqad PUBLIC ${BIN_LINKS})
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${BIN_LINKS})
 
     set(ZIPPER_LIBS
-            staticZipper
-            Zipper-static
+        staticZipper
+        Zipper-static
     )
     if (BUILD_TEST)
         list(APPEND ZIPPER_LIBS Zipper-test)
     endif()
     add_dependencies(siqad ${ZIPPER_LIBS})
-    if(USE_SIQAD_LIB)
+    if (USE_SIQAD_LIB)
         add_dependencies(siqad_lib ${ZIPPER_LIBS})
     endif()
 
-    # SiQAD unit tests
-    option(BUILD_TEST "Build the test program" ON)
+    # SiQAD unit tests:
+    option(BUILD_TEST "Build the test program." ON)
     if(BUILD_TEST)
         add_executable(siqad_tests tests/siqad_tests.cpp ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
         target_link_libraries(siqad_tests PUBLIC Qt5::Test ${BIN_LINKS})
         add_test(NAME siqad_tests COMMAND siqad_tests)
         set_tests_properties(siqad_tests PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
         add_custom_command(TARGET siqad_tests
-                POST_BUILD
-                COMMAND ctest -C $<CONFIGURATION> --output-on-failure)
+            POST_BUILD
+            COMMAND ctest -C $<CONFIGURATION> --output-on-failure)
     endif()
 
     # Installation
     install(TARGETS siqad RUNTIME DESTINATION ${SIQAD_INSTALL_ROOT})
-    if(USE_SIQAD_LIB)
-        install(TARGETS siqad_lib LIBRARY DESTINATION ${SIQAD_INSTALL_ROOT})
+    if (USE_SIQAD_LIB)
+        install(TARGETS siqad_lib RUNTIME DESTINATION ${SIQAD_INSTALL_ROOT})
     endif()
 endif()
 
