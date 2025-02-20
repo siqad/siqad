@@ -89,7 +89,7 @@ else()
         endif()
 
         if(NOT Qt5_DIR)
-            message(FATAL_ERROR "Could not find Qt5. Please install Qt5 (e.g., 'brew install qt@5' on macOS, 'apt-get install qtbase5-dev' on Ubuntu) or specify -DQt5_DIR=<path> manually.")
+            message(FATAL_ERROR "Could not find Qt5. Please install Qt5 (e.g., 'brew install qt@5' on macOS, 'apt-get install qtbase5-dev qttools5-dev' on Ubuntu) or specify -DQt5_DIR=<path> manually.")
         else()
             message(STATUS "Found Qt5_DIR: ${Qt5_DIR}")
         endif()
@@ -101,18 +101,26 @@ else()
         find_package(Qt5 ${QT_VERSION_REQ} REQUIRED COMPONENTS Test PATHS ${Qt5_DIR})
     endif()
 
+    # Find additional system libraries
+    find_package(OpenGL REQUIRED)
+    find_package(ZLIB REQUIRED)
+
+    # Define library links in a more explicit order
     set(LIB_LINKS
-            Qt5::Core
-            Qt5::Gui
-            Qt5::Widgets
-            Qt5::Svg
-            Qt5::PrintSupport
-            Qt5::UiTools
             Qt5::Charts
+            Qt5::UiTools
+            Qt5::PrintSupport
+            Qt5::Svg
+            Qt5::Widgets
+            Qt5::Gui
+            Qt5::Core
             staticZipper
+            ${OPENGL_LIBRARIES}
+            ${ZLIB_LIBRARIES}
     )
 
-    # QtTest related: (should probably add a flag to disable testing)
+    # QtTest related: Add option to disable testing
+    option(SKIP_SIQAD_TESTS "Skip building and running SiQAD tests" OFF)
     if(NOT SKIP_SIQAD_TESTS)
         enable_testing()
         set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -121,17 +129,16 @@ else()
     add_definitions(-DAPP_VERSION=\"0.3.3\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\")
 
     set(CMAKE_AUTOMOC ON)
-
     qt5_add_resources(CUSTOM_RSC resources/application.qrc)
 
     set(CMAKE_CXX_STANDARD 11)
     set(CMAKE_CXX_STANDARD_REQUIRED True)
     set(QT_VERSION_REQ "5.2")
 
-    # This explicit loading of header files, rather than include_directories, is to
-    # appease qmake (Windows routine) which also reads the following file lists.
+    # Explicit loading of source and header files for qmake compatibility
     file(STRINGS source_files LIB_SOURCES)
     file(STRINGS header_files LIB_HEADERS)
+
     if(${CMAKE_VERSION} VERSION_LESS "3.12")
         set(USE_SIQAD_LIB FALSE)
         set(BIN_SOURCES ${LIB_SOURCES})
@@ -144,20 +151,20 @@ else()
     endif()
     include_directories(.)
 
-    if (USE_SIQAD_LIB)
+    if(USE_SIQAD_LIB)
         add_library(siqad_lib OBJECT ${LIB_SOURCES} ${LIB_HEADERS} ${CUSTOM_RSC})
         target_link_libraries(siqad_lib PUBLIC ${LIB_LINKS})
     endif()
 
-    # SiQAD binary:
-    if (WIN32)
+    # SiQAD binary
+    if(WIN32)
         set(ENV{SIQAD_INSTALL_ROOT} ${SIQAD_INSTALL_ROOT})
         add_executable(siqad WIN32 main.cc ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
     else()
         add_executable(siqad main.cc ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
     endif()
 
-    target_link_libraries(${PROJECT_NAME} PUBLIC ${LIB_LINKS})
+    target_link_libraries(siqad PUBLIC ${BIN_LINKS})
 
     set(ZIPPER_LIBS
             staticZipper
@@ -167,26 +174,26 @@ else()
         list(APPEND ZIPPER_LIBS Zipper-test)
     endif()
     add_dependencies(siqad ${ZIPPER_LIBS})
-    if (USE_SIQAD_LIB)
+    if(USE_SIQAD_LIB)
         add_dependencies(siqad_lib ${ZIPPER_LIBS})
     endif()
 
-    # SiQAD unit tests:
-    option(BUILD_TEST "Build the test program." ON)
+    # SiQAD unit tests
+    option(BUILD_TEST "Build the test program" ON)
     if(BUILD_TEST)
         add_executable(siqad_tests tests/siqad_tests.cpp ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
-        target_link_libraries(siqad_tests Qt5::Test ${BIN_LINKS})
-        add_test(siqad_tests siqad_tests)
-        set_tests_properties(siqad_tests PROPERTIES
-                ENVIRONMENT QT_QPA_PLATFORM=offscreen)
+        target_link_libraries(siqad_tests PUBLIC Qt5::Test ${BIN_LINKS})
+        add_test(NAME siqad_tests COMMAND siqad_tests)
+        set_tests_properties(siqad_tests PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
         add_custom_command(TARGET siqad_tests
                 POST_BUILD
                 COMMAND ctest -C $<CONFIGURATION> --output-on-failure)
     endif()
 
+    # Installation
     install(TARGETS siqad RUNTIME DESTINATION ${SIQAD_INSTALL_ROOT})
-    if (USE_SIQAD_LIB)
-        install(TARGETS siqad_lib RUNTIME DESTINATION ${SIQAD_INSTALL_ROOT})
+    if(USE_SIQAD_LIB)
+        install(TARGETS siqad_lib LIBRARY DESTINATION ${SIQAD_INSTALL_ROOT})
     endif()
 endif()
 
