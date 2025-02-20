@@ -24,8 +24,8 @@ if (WIN32)
     set(SIQAD_Q_PRO_FILE ${CMAKE_CURRENT_SOURCE_DIR}/siqad.pro)
     set(SIQAD_EXE_TARGET ${CMAKE_CURRENT_BINARY_DIR}/siqad.exe)
     add_custom_target(
-        siqad ALL
-        COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/qmake_compile.sh "${CMPL_QMAKE_COMMAND}" "${CMPL_MAKE_COMMAND}" "${SIQAD_Q_PRO_FILE}" "${SIQAD_EXE_TARGET}" "${ZIPPER_LIB_PATH}"
+            siqad ALL
+            COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/qmake_compile.sh "${CMPL_QMAKE_COMMAND}" "${CMPL_MAKE_COMMAND}" "${SIQAD_Q_PRO_FILE}" "${SIQAD_EXE_TARGET}" "${ZIPPER_LIB_PATH}"
     )
     add_dependencies(siqad staticZipper)
     install(FILES ${SIQAD_EXE_TARGET} DESTINATION ${SIQAD_INSTALL_ROOT})
@@ -36,20 +36,23 @@ elseif (USE_QMAKE_ON_LINUX)
     set(SIQAD_Q_PRO_FILE ${CMAKE_CURRENT_SOURCE_DIR}/siqad.pro)
     set(SIQAD_EXE_TARGET ${CMAKE_CURRENT_BINARY_DIR}/siqad)
     add_custom_target(
-        siqad ALL
-        COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/qmake_compile.sh "${CMPL_QMAKE_COMMAND}" "${CMPL_MAKE_COMMAND}" "${SIQAD_Q_PRO_FILE}" "${SIQAD_EXE_TARGET}" "${ZIPPER_LIB_PATH}"
+            siqad ALL
+            COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/qmake_compile.sh "${CMPL_QMAKE_COMMAND}" "${CMPL_MAKE_COMMAND}" "${SIQAD_Q_PRO_FILE}" "${SIQAD_EXE_TARGET}" "${ZIPPER_LIB_PATH}"
     )
     add_dependencies(siqad Zipper)
     install(FILES ${SIQAD_EXE_TARGET} DESTINATION ${SIQAD_INSTALL_ROOT})
 else()
-    # Set hints for common Qt5 installation paths (e.g., Homebrew on macOS)
+    # Set hints for common Qt5 installation paths
     set(QT5_HINTS
-            "/opt/homebrew/Cellar/qt@5"        # Apple Silicon Homebrew with qt@5 (your case)
+            "/opt/homebrew/Cellar/qt@5"        # Apple Silicon Homebrew with qt@5
             "/opt/homebrew/Cellar/qt"          # Apple Silicon Homebrew standard
             "/usr/local/Cellar/qt@5"           # Intel macOS Homebrew with qt@5
             "/usr/local/Cellar/qt"             # Intel macOS Homebrew standard
             "/usr/local/opt/qt"                # Homebrew symlink (if applicable)
-            "/usr/lib/qt"                      # Linux default
+            "/usr/lib/x86_64-linux-gnu"        # Ubuntu x86_64 default
+            "/usr/lib/aarch64-linux-gnu"       # Ubuntu ARM64 default
+            "/usr/lib64"                       # Other Linux distros (e.g., Fedora)
+            "/usr/lib"                         # Generic Linux fallback
             "C:/Qt"                            # Windows default
             "$ENV{HOME}/Qt"                    # User-local Qt installation
     )
@@ -57,11 +60,19 @@ else()
     # If Qt5_DIR is not set, try to find Qt5 automatically
     if(NOT Qt5_DIR)
         foreach(hint ${QT5_HINTS})
-            file(GLOB QT_VERSIONS "${hint}/5.*")  # Look for Qt5 versions (e.g., 5.15.16)
+            file(GLOB QT_VERSIONS "${hint}/qt5/*" "${hint}/5.*")  # Look for Qt5 versions or qt5 directory
             if(QT_VERSIONS)
                 list(GET QT_VERSIONS 0 QT5_PATH)  # Pick the first found version
-                set(Qt5_DIR "${QT5_PATH}/lib/cmake/Qt5" CACHE PATH "Path to Qt5 config directory")
-                break()
+                if(EXISTS "${QT5_PATH}/lib/cmake/Qt5")
+                    set(Qt5_DIR "${QT5_PATH}/lib/cmake/Qt5" CACHE PATH "Path to Qt5 config directory")
+                elseif(EXISTS "${hint}/cmake/Qt5")
+                    set(Qt5_DIR "${hint}/cmake/Qt5" CACHE PATH "Path to Qt5 config directory")
+                elseif(EXISTS "${hint}/Qt5Config.cmake")
+                    get_filename_component(Qt5_DIR "${hint}" ABSOLUTE CACHE PATH "Path to Qt5 config directory")
+                endif()
+                if(Qt5_DIR)
+                    break()
+                endif()
             endif()
         endforeach()
 
@@ -71,12 +82,14 @@ else()
             if(QMAKE_EXECUTABLE)
                 get_filename_component(QT_BIN_DIR "${QMAKE_EXECUTABLE}" DIRECTORY)
                 get_filename_component(QT_ROOT_DIR "${QT_BIN_DIR}/.." ABSOLUTE)
-                set(Qt5_DIR "${QT_ROOT_DIR}/lib/cmake/Qt5" CACHE PATH "Path to Qt5 config directory")
+                if(EXISTS "${QT_ROOT_DIR}/lib/cmake/Qt5")
+                    set(Qt5_DIR "${QT_ROOT_DIR}/lib/cmake/Qt5" CACHE PATH "Path to Qt5 config directory")
+                endif()
             endif()
         endif()
 
         if(NOT Qt5_DIR)
-            message(FATAL_ERROR "Could not find Qt5. Please install Qt5 (e.g., 'brew install qt@5' on macOS) or specify -DQt5_DIR=<path> manually.")
+            message(FATAL_ERROR "Could not find Qt5. Please install Qt5 (e.g., 'brew install qt@5' on macOS, 'apt-get install qtbase5-dev' on Ubuntu) or specify -DQt5_DIR=<path> manually.")
         else()
             message(STATUS "Found Qt5_DIR: ${Qt5_DIR}")
         endif()
@@ -105,7 +118,7 @@ else()
         set(CMAKE_INCLUDE_CURRENT_DIR ON)
     endif()
 
-    add_definitions( -DAPP_VERSION=\"0.3.3\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\" )
+    add_definitions(-DAPP_VERSION=\"0.3.3\" -DAPPLICATION_NAME=\"SiQAD\" -DORGANIZATION_NAME=\"WalusLab\")
 
     set(CMAKE_AUTOMOC ON)
 
@@ -116,7 +129,7 @@ else()
     set(QT_VERSION_REQ "5.2")
 
     # This explicit loading of header files, rather than include_directories, is to
-    # apeace qmake (windows routine) which also reads the following file lists.
+    # appease qmake (Windows routine) which also reads the following file lists.
     file(STRINGS source_files LIB_SOURCES)
     file(STRINGS header_files LIB_HEADERS)
     if(${CMAKE_VERSION} VERSION_LESS "3.12")
@@ -144,11 +157,11 @@ else()
         add_executable(siqad main.cc ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
     endif()
 
-    target_link_libraries(${PROJECT_NAME} PUBLIC ${BIN_LINKS})
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${LIB_LINKS})
 
     set(ZIPPER_LIBS
-        staticZipper
-        Zipper-static
+            staticZipper
+            Zipper-static
     )
     if (BUILD_TEST)
         list(APPEND ZIPPER_LIBS Zipper-test)
@@ -165,10 +178,10 @@ else()
         target_link_libraries(siqad_tests Qt5::Test ${BIN_LINKS})
         add_test(siqad_tests siqad_tests)
         set_tests_properties(siqad_tests PROPERTIES
-            ENVIRONMENT QT_QPA_PLATFORM=offscreen)
+                ENVIRONMENT QT_QPA_PLATFORM=offscreen)
         add_custom_command(TARGET siqad_tests
-            POST_BUILD
-            COMMAND ctest -C $<CONFIGURATION> --output-on-failure)
+                POST_BUILD
+                COMMAND ctest -C $<CONFIGURATION> --output-on-failure)
     endif()
 
     install(TARGETS siqad RUNTIME DESTINATION ${SIQAD_INSTALL_ROOT})
