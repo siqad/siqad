@@ -152,7 +152,7 @@ else()
     include_directories(.)
 
     if(USE_SIQAD_LIB)
-        add_library(siqad_lib OBJECT ${LIB_SOURCES} ${LIB_HEADERS} ${CUSTOM_RSC})
+        add_library(siqad_lib OBJECT ${LIB_SOURCES} ${LIB_HEADERS} ${BIN_CUSTOM_RSC})
         target_link_libraries(siqad_lib PUBLIC ${LIB_LINKS})
     endif()
 
