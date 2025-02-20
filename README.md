@@ -1,5 +1,9 @@
 # SiQAD
 
+[![Ubuntu CI](https://img.shields.io/github/actions/workflow/status/siqad/ubuntu.yml?label=Ubuntu&logo=ubuntu&style=flat-square)](https://github.com/siqad/actions/workflows/ubuntu.yml)
+[![macOS CI](https://img.shields.io/github/actions/workflow/status/siqad/macos.yml?label=macOS&logo=apple&style=flat-square)](https://github.com/siqad/actions/workflows/macos.yml)
+[![IEEEXplore](https://img.shields.io/static/v1?label=IEEEXplore&message=SiQAD&color=informational&style=flat-square)](https://ieeexplore.ieee.org/document/8963859)
+
 SiQAD (Silicon Quantum Atomic Designer) is a next-generation CAD tool that enables the design and simulation of silicon dangling bond (Si-DB) circuits through an intuitive graphical user interface (GUI) and a modular simulation back-end. The tool currently offers simulators that predict ground-state and dynamic electron configuration of given Si-DB configurations, and electrostatics simulation given electrode layouts. There are a few key resources available:
 
 * Feel free to join our [official Slack team](https://join.slack.com/t/siqad/shared_invite/zt-enavwvlg-anRYYpslNbpxXI96zx4Wxg) for SiQAD-related discussion and support!
