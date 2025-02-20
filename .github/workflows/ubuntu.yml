@@ -9,7 +9,7 @@ on:
       - '**/*.cmake'
       - '**/CMakeLists.txt'
       - 'libs/**'
-      - '.github/workflows/macos.yml'  # Adjust if this should be ubuntu.yml
+      - '.github/workflows/ubuntu.yml'
   pull_request:
     paths:
       - "**/*.py"
@@ -18,7 +18,7 @@ on:
       - '**/*.cmake'
       - '**/CMakeLists.txt'
       - 'libs/**'
-      - '.github/workflows/macos.yml'  # Adjust if this should be ubuntu.yml
+      - '.github/workflows/ubuntu.yml'
   merge_group:
 
 defaults:
@@ -75,6 +75,7 @@ jobs:
             qtdeclarative5-dev \
             libqt5svg5-dev \
             libqt5charts5-dev \
+            libqt5uitools5-dev \
             qt5-qmake \
             qtbase5-dev-tools
 
@@ -96,7 +97,7 @@ jobs:
       - name: Create Build Environment (Debug)
         run: cmake -E make_directory ${{github.workspace}}/build_debug
 
-      - name: Configure CMake
+      - name: Configure CMake (Debug)
         working-directory: ${{github.workspace}}/build_debug
         run: >
           cmake ${{github.workspace}}
@@ -105,13 +106,12 @@ jobs:
 
       - name: Build and test (Debug)
         working-directory: ${{github.workspace}}/build_debug
-        run: cmake --build . --config Release -j4
-
+        run: cmake --build . --config Debug -j4
 
       - name: Create Build Environment (Release)
         run: cmake -E make_directory ${{github.workspace}}/build_release
 
-      - name: Configure CMake
+      - name: Configure CMake (Release)
         working-directory: ${{github.workspace}}/build_release
         run: >
           cmake ${{github.workspace}}
