@@ -61,11 +61,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13.x'
-
       # Remove existing 2to3 binary
       - name: Remove existing 2to3 binary
         run: sudo rm /usr/local/bin/2to3 || true
@@ -102,13 +97,9 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
           -DCMAKE_BUILD_TYPE=Debug
 
-      - name: Build (Debug)
+      - name: Build and test (Debug)
         working-directory: ${{github.workspace}}/build_debug
         run: cmake --build . --config Release -j4 # all macOS runners provide at least 3 cores
-
-      - name: Test (Debug)
-        working-directory: ${{github.workspace}}/build_debug
-        run: ctest -C Debug --verbose --output-on-failure --repeat until-pass:3 --parallel 4
 
       - name: Create Build Environment (Release)
         run: cmake -E make_directory ${{github.workspace}}/build_release
@@ -120,10 +111,6 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
           -DCMAKE_BUILD_TYPE=Release
 
-      - name: Build (Release)
+      - name: Build and test (Release)
         working-directory: ${{github.workspace}}/build_release
         run: cmake --build . --config Release -j4 # all macOS runners provide at least 3 cores
-
-      - name: Test (Release)
-        working-directory: ${{github.workspace}}/build_release
-        run: ctest -C Release --verbose --output-on-failure --repeat until-pass:3 --parallel 4

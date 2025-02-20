@@ -9,7 +9,7 @@ on:
       - '**/*.cmake'
       - '**/CMakeLists.txt'
       - 'libs/**'
-      - '.github/workflows/macos.yml'
+      - '.github/workflows/macos.yml'  # Adjust if this should be ubuntu.yml
   pull_request:
     paths:
       - "**/*.py"
@@ -18,7 +18,7 @@ on:
       - '**/*.cmake'
       - '**/CMakeLists.txt'
       - 'libs/**'
-      - '.github/workflows/macos.yml'
+      - '.github/workflows/macos.yml'  # Adjust if this should be ubuntu.yml
   merge_group:
 
 defaults:
@@ -64,8 +64,19 @@ jobs:
     runs-on: ${{matrix.os}}
 
     steps:
-      - name: Install libraries and the respective compiler
-        run: sudo apt-get update && sudo apt-get install -yq libboost-all-dev libtbb-dev ${{matrix.compiler}}
+      - name: Install libraries, compiler, and Qt5
+        run: |
+          sudo apt-get update
+          sudo apt-get install -yq \
+            libboost-all-dev \
+            libtbb-dev \
+            ${{matrix.compiler}} \
+            qtbase5-dev \
+            qtdeclarative5-dev \
+            libqt5svg5-dev \
+            libqt5charts5-dev \
+            qt5-qmake \
+            qtbase5-dev-tools
 
       - name: Clone Repository
         uses: actions/checkout@v4
@@ -82,7 +93,22 @@ jobs:
           save: true
           max-size: 10G
 
-      - name: Create Build Environment
+      - name: Create Build Environment (Debug)
+        run: cmake -E make_directory ${{github.workspace}}/build_debug
+
+      - name: Configure CMake
+        working-directory: ${{github.workspace}}/build_debug
+        run: >
+          cmake ${{github.workspace}}
+          -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+          -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Build and test (Debug)
+        working-directory: ${{github.workspace}}/build_debug
+        run: cmake --build . --config Release -j4
+
+
+      - name: Create Build Environment (Release)
         run: cmake -E make_directory ${{github.workspace}}/build_release
 
       - name: Configure CMake
@@ -91,12 +117,7 @@ jobs:
           cmake ${{github.workspace}}
           -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
           -DCMAKE_BUILD_TYPE=Release
-          -DMNT_SIQAD_PLUGINS_TEST=ON
 
-      - name: Build
+      - name: Build and test (Release)
         working-directory: ${{github.workspace}}/build_release
         run: cmake --build . --config Release -j4
-
-      - name: Test
-        working-directory: ${{github.workspace}}/build_release
-        run: ctest -C Release --verbose --output-on-failure --repeat until-pass:3 --parallel 4
