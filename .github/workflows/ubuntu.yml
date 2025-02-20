@@ -2,6 +2,7 @@ name: 🐧 • CI
 
 on:
   push:
+    branches: ["main"]
     paths:
       - "**/*.py"
       - '**/*.h'
@@ -11,6 +12,7 @@ on:
       - 'libs/**'
       - '.github/workflows/ubuntu.yml'
   pull_request:
+    branches: ["main"]
     paths:
       - "**/*.py"
       - '**/*.h'
