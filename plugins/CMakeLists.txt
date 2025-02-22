@@ -19,5 +19,5 @@ endif()
 # SimAnneal
 add_subdirectory(simanneal)
 
-# QuickSim
-add_subdirectory(quicksim-siqad-plugin)
+# MNT
+add_subdirectory(mnt-siqad-plugins)
