@@ -16,6 +16,6 @@
 [submodule "src/libs/zipper"]
 	path = src/libs/zipper
 	url = https://github.com/sebastiandev/zipper
-[submodule "mnt-siqad-plugins"]
+[submodule "plugins/mnt-siqad-plugins"]
 	path = mnt-siqad-plugins
 	url = https://github.com/cda-tum/mnt-siqad-plugins
