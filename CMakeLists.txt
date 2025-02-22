@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 
+# Only set the CMAKE_CXX_STANDARD if it is not set by someone else
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+    # Set C++ standard; at least C++17 is required
+    set(CMAKE_CXX_STANDARD 17)
+endif()
+
 # It is highly recommended not to run cmake in this directory. Create a `build`
 # directory first and run `cmake [OPTIONS] ..`.
 # Add flag `-DCMAKE_BUILD_TYPE=Release` (without back-ticks) for release builds.
