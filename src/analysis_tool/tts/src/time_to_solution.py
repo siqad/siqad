@@ -251,14 +251,15 @@ def main():
 
     # Generate layout parameters
     generate_params = generate_random_sidb_layout_params()
-    generate_params.number_of_sidbs = 30
-    generate_params.positive_sidbs = positive_charges.OFF
+    generate_params.number_of_sidbs = 10
+    generate_params.positive_sidbs = positive_charges.FORBIDDEN
     generate_params.coordinate_pair = ((0, 0), (20, 20))
 
     layout, cds = generate_layout(generate_params, physical_parameters)
 
     # Convert coordinates from nm to angstroms
     all_positions_nm = cds.get_all_sidb_locations_in_nm()
+    print(all_positions_nm)
     layout_coordinates_angstrom = [[pos[0] * 10, pos[1] * 10] for pos in all_positions_nm]
 
     param_types = {
