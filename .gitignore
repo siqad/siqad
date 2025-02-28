@@ -1,4 +1,80 @@
-# specific patterns
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.pyc
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# LaTeX files
+*.aux
+*.log
+*.pdf
+*.synctex.gz
+
+# Doxygen files
+*.bak
+doxygen
+
+# Build directories
+cmake-build-*
+build/
+w64-build*/**
+build*/**
+
+# IDE files
+*.directory
+*.idea
+*.vs
+.vscode/
+
+# Experiment files
+*.json
+*.csv
+
+# Coverage files
+lcov.info
+
+# Python
+__pycache__
+venv/
+*.egg-info
+*.env
+.ycm*.py
+
+# Archive files
+*.zip
+*.tar.*
+*.7z
+*.rar
+
+# Specific patterns
 moc_*
 db-sim
 
@@ -6,9 +82,6 @@ db-sim
 .DS_Store
 
 # compiled source
-*.o
-*.so
-*.pyc
 qrc_application.cpp
 /w64-build*/**
 /build*/**
@@ -17,25 +90,19 @@ win64
 
 # logs and databases
 src/log/
-*.log
 Makefile
 
-#documentation
-doxygen
-
-#PoissonSolver outputs
+# PoissonSolver outputs
 *outfile.txt
 *outrho.txt
 *outcorr.txt
 
-#save files
+# Save files
 /*.xml
 *.sqd
 
-# other
+# Other
 *.swp
 .qmake.stash
 tempfig.pdf
 .temp/
-.vscode/
-.ycm*.py
