@@ -624,7 +624,7 @@ JobSetupDetailsPane::JobSetupDetailsPane(QWidget *parent)
       le_job_name->setText("");
     }
   };
-  connect(cb_auto_job_name, &QCheckBox::stateChanged, autoJobNameResponse);
+  connect(cb_auto_job_name, &QCheckBox::checkStateChanged, autoJobNameResponse);
   autoJobNameResponse(cb_auto_job_name->checkState());
 
   // fill in inclusion area combo box

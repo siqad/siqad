@@ -128,7 +128,7 @@ void ScreenshotManager::initScreenshotManager()
     scale_bar->setVisible(show_scale_bar_settings);
     updateScaleBarFromOptions();
   };
-  connect(cb_scale_bar, &QCheckBox::stateChanged, enableScaleBarOptions);
+  connect(cb_scale_bar, &QCheckBox::checkStateChanged, enableScaleBarOptions);
   enableScaleBarOptions(cb_scale_bar->isChecked());
 
   // set scale bar anchor
@@ -167,7 +167,7 @@ void ScreenshotManager::initScreenshotManager()
             setClipArea();
           }
   );
-  connect(cb_preview_clip, &QCheckBox::stateChanged,
+  connect(cb_preview_clip, &QCheckBox::checkStateChanged,
           [this](bool state) {
             setClipVisibility(state, false);
           });
@@ -218,7 +218,7 @@ void ScreenshotManager::initScreenshotManager()
     le_name->setDisabled(disable);
     cb_overwrite->setDisabled(disable);
   };
-  connect(cb_always_ask_name, &QCheckBox::stateChanged, disableFilePathOptions);
+  connect(cb_always_ask_name, &QCheckBox::checkStateChanged, disableFilePathOptions);
   disableFilePathOptions(cb_always_ask_name->isChecked());
 
   // emit screenshot signal with relevant settings

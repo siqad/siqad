@@ -91,7 +91,7 @@ ECSVisualizer::ChargeConfigSetVisualizer(prim::Lattice *lattice, QWidget *parent
   };
 
   // update net charge filter state
-  connect(cb_net_charge_filter, &QCheckBox::stateChanged,
+  connect(cb_net_charge_filter, &QCheckBox::checkStateChanged,
           [this, updateNetChargeFilterState, netChargeSliderPositionOfValue]()
           {
             updateGUIFilterStateChange();
@@ -121,7 +121,7 @@ ECSVisualizer::ChargeConfigSetVisualizer(prim::Lattice *lattice, QWidget *parent
           });
 
   // physically valid state filter
-  connect(cb_phys_valid_filter, &QCheckBox::stateChanged,
+  connect(cb_phys_valid_filter, &QCheckBox::checkStateChanged,
           updateNetChargeFilterState);
 
   // whole layout
