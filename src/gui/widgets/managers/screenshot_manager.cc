@@ -128,7 +128,11 @@ void ScreenshotManager::initScreenshotManager()
     scale_bar->setVisible(show_scale_bar_settings);
     updateScaleBarFromOptions();
   };
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+  connect(cb_scale_bar, &QCheckBox::checkStateChanged, enableScaleBarOptions);
+#else
   connect(cb_scale_bar, &QCheckBox::stateChanged, enableScaleBarOptions);
+#endif
   enableScaleBarOptions(cb_scale_bar->isChecked());
 
   // set scale bar anchor
@@ -167,10 +171,17 @@ void ScreenshotManager::initScreenshotManager()
             setClipArea();
           }
   );
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+  connect(cb_preview_clip, &QCheckBox::checkStateChanged,
+          [this](bool state) {
+            setClipVisibility(state, false);
+          });
+#else
   connect(cb_preview_clip, &QCheckBox::stateChanged,
           [this](bool state) {
             setClipVisibility(state, false);
           });
+#endif
   setClipVisibility(cb_preview_clip->isChecked(), false);  // init to check state
 
   QFormLayout *fl_clip = new QFormLayout();
@@ -218,7 +229,11 @@ void ScreenshotManager::initScreenshotManager()
     le_name->setDisabled(disable);
     cb_overwrite->setDisabled(disable);
   };
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+  connect(cb_always_ask_name, &QCheckBox::checkStateChanged, disableFilePathOptions);
+#else
   connect(cb_always_ask_name, &QCheckBox::stateChanged, disableFilePathOptions);
+#endif
   disableFilePathOptions(cb_always_ask_name->isChecked());
 
   // emit screenshot signal with relevant settings

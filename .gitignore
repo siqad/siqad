@@ -81,7 +81,17 @@ db-sim
 # macOS
 .DS_Store
 
-# Logs and databases
+# compiled source
+*.o
+*.pyc
+qrc_application.cpp
+/w64-build*/**
+/build*/**
+/install*/**
+win32
+win64
+
+# logs and databases
 src/log/
 Makefile
 

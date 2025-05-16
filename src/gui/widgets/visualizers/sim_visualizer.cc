@@ -107,12 +107,12 @@ SimVisualizer::SimVisualizer(DesignPanel *design_pan, QWidget *parent)
           });
 
   // same as above but explicitly for user manual activation
-  connect(cb_job_steps_charge_configs, QOverload<const QString &>::of(&QComboBox::activated),
-          [setChargeConfigSetJobStep](const QString &str_job_step_ind)
+  connect(cb_job_steps_charge_configs, &QComboBox::activated,
+          [setChargeConfigSetJobStep](int job_step_ind)
           {
-            if (str_job_step_ind.isEmpty())
+            if (job_step_ind < 0)
               return;
-            setChargeConfigSetJobStep(str_job_step_ind.toInt());
+            setChargeConfigSetJobStep(job_step_ind);
           });
 
   // map refresh button to reactivate the currently selected electron config set step
@@ -162,12 +162,12 @@ SimVisualizer::SimVisualizer(DesignPanel *design_pan, QWidget *parent)
           });
 
   // same as above but explicitly for user manual activation
-  connect(cb_job_steps_pot_landscape, QOverload<const QString &>::of(&QComboBox::activated),
-          [setPotentialLandscapeJobStep](const QString &str_job_step_ind)
+  connect(cb_job_steps_pot_landscape, &QComboBox::activated,
+          [setPotentialLandscapeJobStep](int job_step_ind)
           {
-            if (str_job_step_ind.isEmpty())
+            if (job_step_ind < 0)
               return;
-            setPotentialLandscapeJobStep(str_job_step_ind.toInt());}
+            setPotentialLandscapeJobStep(job_step_ind);}
           );
 
   // map refresh button to reactivate the currently selected potential landscape step

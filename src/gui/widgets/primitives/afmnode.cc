@@ -37,10 +37,11 @@ AFMNode::AFMNode(QXmlStreamReader *rs, QGraphicsScene *)
 
   while (!rs->atEnd()) {
     if (rs->isStartElement()) {
-      if (rs->name() == "layer_id") {
+      QString elem_name = rs->name().toString();
+      if (elem_name == "layer_id") {
         lay_id = rs->readElementText().toInt();
         rs->readNext();
-      } else if (rs->name() == "physloc") {
+      } else if (elem_name == "physloc") {
         for (QXmlStreamAttribute &attr : rs->attributes()) {
           if (attr.name().toString() == QLatin1String("x")) {
             scenepos.setX(attr.value().toFloat()*scale_factor);
@@ -50,7 +51,7 @@ AFMNode::AFMNode(QXmlStreamReader *rs, QGraphicsScene *)
         }
         qDebug() << QObject::tr("Found x=%1 and y=%2 for node").arg(scenepos.x()).arg(scenepos.y());
         rs->readNext();
-      } else if (rs->name() == "zoffset") {
+      } else if (elem_name == "zoffset") {
         z_offset = rs->readElementText().toFloat();
         qDebug() << QObject::tr("Found node zoffset=%1").arg(z_offset);
         rs->readNext();
@@ -59,7 +60,7 @@ AFMNode::AFMNode(QXmlStreamReader *rs, QGraphicsScene *)
       }
     } else if (rs->isEndElement()) {
       // break out of read stream if the end of this element has been reached
-      if (rs->name() == "afmnode") {
+      if (rs->name().toString() == "afmnode") {
         rs->readNext();
         break;
       }

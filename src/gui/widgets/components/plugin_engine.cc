@@ -46,36 +46,38 @@ PluginEngine::PluginEngine(const QString &desc_file_path, QWidget *parent)
   };
 
   while (rs.readNextStartElement()) {
-    if (rs.name() == "name") {
+    QString elem_name = rs.name().toString();
+    if (elem_name == "name") {
       plugin_name = rs.readElementText();
-    } else if (rs.name() == "version") {
+    } else if (elem_name == "version") {
       plugin_version = rs.readElementText();
-    } else if (rs.name() == "plugin_info") {
+    } else if (elem_name == "plugin_info") {
       while (rs.readNextStartElement()) {
-        if (rs.name() == "plugin_logo") {
+        QString inner_elem_name = rs.name().toString();
+        if (inner_elem_name == "plugin_logo") {
           QString logo_path = rs.readElementText();
           if (!logo_path.isEmpty()) {
             plugin_logo_path = QDir(plugin_root_path).absoluteFilePath(logo_path);
           }
-        } else if (rs.name() == "authors") {
+        } else if (inner_elem_name == "authors") {
           while (rs.readNextStartElement()) {
-            if (rs.name() == "name") {
+            if (rs.name().toString() == "name") {
               authors.append(rs.readElementText());
               qDebug() << tr("author read: %1").arg(authors.last());
             } else {
               unrecognizedXMLElement(rs);
             }
           }
-        } else if (rs.name() == "institutions") {
+        } else if (inner_elem_name == "institutions") {
           while (rs.readNextStartElement()) {
-            if (rs.name() == "institution") {
+            if (rs.name().toString() == "institution") {
               Institution inst;
               while (rs.readNextStartElement()) {
-                if (rs.name() == "content") {
+                if (rs.name().toString() == "content") {
                   while(rs.readNextStartElement()) {
                     inst.content_lines.append(rs.readElementText());
                   }
-                } else if (rs.name() == "website") {
+                } else if (rs.name().toString() == "website") {
                   inst.url = rs.attributes().value("href").toString();
                   inst.website_text = rs.readElementText();
                 } else {
@@ -87,10 +89,10 @@ PluginEngine::PluginEngine(const QString &desc_file_path, QWidget *parent)
               unrecognizedXMLElement(rs);
             }
           }
-        } else if (rs.name() == "links") {
+        } else if (inner_elem_name == "links") {
           while (rs.readNextStartElement()) {
             Link link;
-            if (rs.name() == "website") {
+            if (rs.name().toString() == "website") {
               link.url = rs.attributes().value("href").toString();
               link.display_text = rs.readElementText();
             } else {
@@ -102,9 +104,9 @@ PluginEngine::PluginEngine(const QString &desc_file_path, QWidget *parent)
           unrecognizedXMLElement(rs);
         }
       }
-    } else if (rs.name() == "services") {
+    } else if (elem_name == "services") {
       plugin_services = rs.readElementText().split(",");
-    } else if (rs.name() == "bin_path") {
+    } else if (elem_name == "bin_path") {
       // TODO perform path replacement instead
       bin_path = QDir(plugin_root_path).absoluteFilePath(rs.readElementText());
       // attempt to search for bin_path + ".exe" if running on Windows
@@ -114,25 +116,25 @@ PluginEngine::PluginEngine(const QString &desc_file_path, QWidget *parent)
           bin_path = alt_bin_path;
         }
       }
-    } else if (rs.name() == "py_use_virtualenv") {
+    } else if (elem_name == "py_use_virtualenv") {
       // introduced in SiQAD v0.2.2
       py_use_virtualenv = rs.readElementText() == "1";
       venv_status_str = "Pending init";
       l_venv_status->setText(venv_status_str);
       ready_to_use = false;
-    } else if (rs.name() == "venv_use_system_site_packages") {
+    } else if (elem_name == "venv_use_system_site_packages") {
       // introduced in SiQAD v0.2.2
       venv_use_system_site = rs.readElementText() == "1";
-    } else if (rs.name() == "dep_path") {
+    } else if (elem_name == "dep_path") {
       // TODO perform path replacement instead
       dep_path = QDir(plugin_root_path).absoluteFilePath(rs.readElementText());
-    } else if (rs.name() == "commands") {
+    } else if (elem_name == "commands") {
       while (rs.readNextStartElement()) {
-        if (rs.name() == "command") {
+        if (rs.name().toString() == "command") {
           QString cmd_label = rs.attributes().value("label").toString();
           QStringList cmd_list;
           while (rs.readNextStartElement()) {
-            if (rs.name() == "program" || rs.name() == "arg") {
+            if (rs.name().toString() == "program" || rs.name().toString() == "arg") {
               cmd_list.append(rs.readElementText());
             } else {
               unrecognizedXMLElement(rs);
@@ -143,14 +145,14 @@ PluginEngine::PluginEngine(const QString &desc_file_path, QWidget *parent)
           unrecognizedXMLElement(rs);
         }
       }
-    } else if (rs.name() == "requested_datasets") {
+    } else if (elem_name == "requested_datasets") {
       // TODO remove or implement
       rs.skipCurrentElement();
-    } else if (rs.name() == "return_datasets") {
+    } else if (elem_name == "return_datasets") {
       QMetaEnum req_enum = QMetaEnum::fromType<ReturnableDataset>();
       returnable_datasets.insert(static_cast<ReturnableDataset>(
             req_enum.keyToValue(rs.readElementText().toLatin1())));
-    } else if (rs.name() == "sim_params") {
+    } else if (elem_name == "sim_params") {
       default_prop_map.readPropertiesFromXMLStream(&rs);
     } else {
       unrecognizedXMLElement(rs);

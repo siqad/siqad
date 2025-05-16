@@ -30,7 +30,7 @@ void ECS::readFromXMLStream(QXmlStreamReader *rs)
   // read from stream
   QList<ChargeConfig> charge_configs_read;  // read charge configs
   while (rs->readNextStartElement()) {
-    if (rs->name() == "dist") {
+    if (rs->name().toString() == "dist") {
       ChargeConfig charge_config;
 
       for (QXmlStreamAttribute &attr : rs->attributes()) {

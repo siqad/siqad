@@ -155,7 +155,7 @@ void PluginManager::initServiceTypes()
 
   // read service list
   while (rs.readNextStartElement()) {
-    if (rs.name() != "service") {
+    if (rs.name().toString() != "service") {
       unrecognizedXMLElement(rs);
       rs.skipCurrentElement();
       continue;
@@ -163,11 +163,12 @@ void PluginManager::initServiceTypes()
     // read service details
     comp::PluginEngine::Service service;
     while (rs.readNextStartElement()) {
-      if (rs.name() == "name") {
+      QString elem_name = rs.name().toString();
+      if (elem_name == "name") {
         service.name = rs.readElementText();
-      } else if (rs.name() == "category") {
+      } else if (elem_name == "category") {
         service.category = rs.readElementText();
-      } else if (rs.name() == "label") {
+      } else if (elem_name == "label") {
         service.label = rs.readElementText();
       } else {
         unrecognizedXMLElement(rs);

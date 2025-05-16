@@ -6,6 +6,11 @@
 //
 // @desc:     Shortcut to include all hull types
 
+#ifndef _HULL_HULLS_H_
+#define _HULL_HULLS_H_
+
 #include "hull.h"
 #include "convex.h"
 //#include "concave.h"
+
+#endif

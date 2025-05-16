@@ -8,6 +8,7 @@
 
 #include "job_manager.h"
 #include "global.h"
+#include "helpers/map_helper.h"
 #include <initializer_list>
 
 using namespace gui;
@@ -90,7 +91,8 @@ void JobManager::processFinishedJob(comp::SimJob *job, comp::SimJob::JobState)
   // execute SQCommands if any is available
   // TODO allow users to make execution manual and prompt user before execution
   for (comp::JobStep *js : job->jobSteps()) {
-    if (js->jobResults().uniqueKeys().contains(comp::JobResult::SQCommandsResult)) {
+    QSet<comp::JobResult::ResultType> uniqueKeys = getUniqueKeySet(js->jobResults());
+    if (uniqueKeys.contains(comp::JobResult::SQCommandsResult)) {
       comp::JobResult *sq_commands_result = js->jobResults().value(comp::JobResult::SQCommandsResult);
       QStringList commands = static_cast<comp::SQCommands*>(sq_commands_result)->sqCommands();
       for (const QString &command : commands) {
@@ -321,7 +323,7 @@ QWidget *JobManager::initJobSetupPanel()
       }
     }
     qDebug() << tr("filter: %1").arg(filter_exp);
-    eng_filter_proxy_model->setFilterRegExp(filter_exp);
+    eng_filter_proxy_model->setFilterRegularExpression(QRegularExpression(filter_exp));
   };
 
   // apply engine filter
@@ -622,7 +624,11 @@ JobSetupDetailsPane::JobSetupDetailsPane(QWidget *parent)
       le_job_name->setText("");
     }
   };
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+  connect(cb_auto_job_name, &QCheckBox::checkStateChanged, autoJobNameResponse);
+#else
   connect(cb_auto_job_name, &QCheckBox::stateChanged, autoJobNameResponse);
+#endif
   autoJobNameResponse(cb_auto_job_name->checkState());
 
   // fill in inclusion area combo box

@@ -28,7 +28,6 @@ namespace hull{
 
     // constructors
     BBHull(const QVector<QPointF> points): Hull(points) {}
-    BBHull(const QList<prim::Item*> &items): Hull(items) {}
     BBHull(const QVector<prim::Item*> &items): Hull(items) {}
 
     // find the hull
@@ -44,7 +43,6 @@ namespace hull{
 
     // constructors
     ConvexHull(const QVector<QPointF> points): Hull(points) {}
-    ConvexHull(const QList<prim::Item*> &items): Hull(items) {}
     ConvexHull(const QVector<prim::Item*> &items): Hull(items) {}
 
     // find the hull

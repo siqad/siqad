@@ -38,11 +38,12 @@ AFMPath::AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene, int lay_id)
 
   while (!rs->atEnd()) {
     if (rs->isStartElement()) {
-      if (rs->name() == "layer_id") {
+      QString elem_name = rs->name().toString();
+      if (elem_name == "layer_id") {
         qDebug() << QObject::tr("The layer_id tag in designs are no longer used in loading. Using the lay_id supplied to the constructor instead.");
         //lay_id = rs->readElementText().toInt();
         rs->readNext();
-      } else if (rs->name() == "afmnode") {
+      } else if (elem_name == "afmnode") {
         qDebug() << QObject::tr("Adding node to path...");
         ld_nodes.append(new prim::AFMNode(rs, scene));
         qDebug() << QObject::tr("Added node to path");
@@ -51,7 +52,7 @@ AFMPath::AFMPath(QXmlStreamReader *rs, QGraphicsScene *scene, int lay_id)
       }
     } else if (rs->isEndElement()) {
       // break out of read stream if the end of this element has been reached
-      if (rs->name() == "afmpath") {
+      if (rs->name().toString() == "afmpath") {
         rs->readNext();
         break;
       }
