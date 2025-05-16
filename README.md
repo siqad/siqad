@@ -27,10 +27,10 @@ For Linux, our PPA is out of date. For now please compile from source.
 
 ```
 # 22.04 LTS
-sudo apt install cmake pkg-config python3-pip python3-tk python3-venv make gcc g++ qt6-base-dev qt6-tools-dev libqt6charts6-dev libqt6uitools6 libqt6svg6-dev libboost-dev libboost-filesystem-dev libboost-sytem-dev libboost-thread-dev libboost-random-dev libxkbcommon-dev
+sudo apt install cmake pkg-config python3-pip python3-tk python3-venv make gcc g++ qt6-base-dev qt6-tools-dev libqt6charts6-dev libqt6uitools6 libqt6svg6-dev libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-random-dev libxkbcommon-dev
 
 # 24.04 LTS
-sudo apt install cmake pkg-config python3-pip python3-tk python3-venv make gcc g++ qt6-base-dev qt6-tools-dev qt6-svg-dev qt6-charts-dev libqt6charts6 libqt6uitools6 libqt6svg6 libboost-dev libboost-filesystem-dev libboost-sytem-dev libboost-thread-dev libboost-random-dev
+sudo apt install cmake pkg-config python3-pip python3-tk python3-venv make gcc g++ qt6-base-dev qt6-tools-dev qt6-svg-dev qt6-charts-dev libqt6charts6 libqt6uitools6 libqt6svg6 libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-random-dev
 ```
 
 2. Run the build script from project root
