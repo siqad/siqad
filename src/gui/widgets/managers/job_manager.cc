@@ -624,7 +624,11 @@ JobSetupDetailsPane::JobSetupDetailsPane(QWidget *parent)
       le_job_name->setText("");
     }
   };
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
   connect(cb_auto_job_name, &QCheckBox::checkStateChanged, autoJobNameResponse);
+#else
+  connect(cb_auto_job_name, &QCheckBox::stateChanged, autoJobNameResponse);
+#endif
   autoJobNameResponse(cb_auto_job_name->checkState());
 
   // fill in inclusion area combo box
