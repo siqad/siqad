@@ -10,7 +10,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(QT_VERSION_REQ "6.0")
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Svg PrintSupport UiTools Charts)
-qt_standard_project_setup()
+if(COMMAND qt_standard_project_setup)
+  # Qt >= 6.3
+  qt_standard_project_setup()
+else()
+  # Qt < 6.3 fallback
+  set(CMAKE_AUTOMOC   ON)
+  set(CMAKE_AUTOUIC   ON)
+  set(CMAKE_AUTORCC   ON)
+endif()
 
 set(LIB_LINKS
     Qt6::Core
