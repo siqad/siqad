@@ -2,9 +2,26 @@ name: Build and Package on Windows
 
 on:
   push:
-    branches:
-      - main
-      - dev
+    branches: ["master"]
+    paths:
+      - "**/*.py"
+      - '**/*.h'
+      - '**/*.cc'
+      - '**/*.cmake'
+      - '**/CMakeLists.txt'
+      - 'libs/**'
+      - '.github/workflows/macos.yml'
+  pull_request:
+    branches: ["master"]
+    paths:
+      - "**/*.py"
+      - '**/*.h'
+      - '**/*.cc'
+      - '**/*.cmake'
+      - '**/CMakeLists.txt'
+      - 'libs/**'
+      - '.github/workflows/macos.yml'
+
   workflow_dispatch:
 
 jobs:

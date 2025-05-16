@@ -71,9 +71,9 @@ jobs:
       - name: Install Homebrew Dependencies
         run: |
           brew update
-          brew install boost qt@5
-          # Ensure Qt5 is available in PATH
-          echo "/opt/homebrew/opt/qt@5/bin" >> $GITHUB_PATH
+          brew install boost qt@6
+          # Ensure Qt6 is available in PATH
+          echo "/opt/homebrew/opt/qt@6/bin" >> $GITHUB_PATH
 
       - if: matrix.os == 'macos-13'
         name: Setup XCode version

@@ -66,25 +66,25 @@ jobs:
     runs-on: ${{matrix.os}}
 
     steps:
-      - name: Install libraries, compiler, and Qt5
+      - name: Install libraries, compiler, and Qt6
         run: |
           sudo apt-get update
           sudo apt-get install -yq \
             libboost-all-dev \
             libtbb-dev \
-            ${{matrix.compiler}} \
-            qtbase5-dev \
-            qtdeclarative5-dev \
-            libqt5svg5-dev \
-            libqt5charts5-dev \
-            qttools5-dev \
-            qt5-qmake \
-            qtbase5-dev-tools
+            ${{matrix.compiler}}
+          if [ "${{matrix.os}}" = "ubuntu-22.04" ]; then
+            sudo apt-get install -yq \
+              qt6-base-dev qt6-tools-dev libqt6charts6-dev libqt6uitools6 libqt6svg6-dev
+          elif [ "${{matrix.os}}" = "ubuntu-24.04" ] || [ "${{matrix.os}}" = "ubuntu-24.04-arm" ]; then
+            sudo apt-get install -yq \
+              qt6-base-dev qt6-tools-dev libqt6charts6 libqt6uitools6 libqt6svg6
+          fi
 
-      - name: Verify Qt5UiTools Installation
-        run: |
-          dpkg -l | grep qttools5-dev || echo "qttools5-dev not installed"
-          ls /usr/lib/$(uname -m)-linux-gnu/cmake/Qt5UiTools/Qt5UiToolsConfig.cmake || echo "Qt5UiToolsConfig.cmake not found"
+      # - name: Verify Qt5UiTools Installation
+      #   run: |
+      #     dpkg -l | grep qttools5-dev || echo "qttools5-dev not installed"
+      #     ls /usr/lib/$(uname -m)-linux-gnu/cmake/Qt5UiTools/Qt5UiToolsConfig.cmake || echo "Qt5UiToolsConfig.cmake not found"
 
       - name: Clone Repository
         uses: actions/checkout@v4
