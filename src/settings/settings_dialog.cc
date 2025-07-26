@@ -138,7 +138,7 @@ void SettingsDialog::setPropertyWithUserSetting(gui::Property &t_prop) {
 
   settings::Settings *s_cat = settingsCategory(t_prop.meta["category"]);
   QVariant s_val = s_cat->get(t_prop.meta["key"]);
-  int s_type = t_prop.value.type();
+  QMetaType s_type = t_prop.value.metaType();
   s_val.convert(s_type);
   t_prop.value.setValue(s_val);
 }

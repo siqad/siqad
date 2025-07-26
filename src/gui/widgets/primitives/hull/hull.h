@@ -20,7 +20,6 @@ namespace hull{
 
     // constructors
     Hull(const QVector<QPointF> points);
-    Hull(const QList<prim::Item*> &items);
     Hull(const QVector<prim::Item*> &items);
 
     ~Hull() {}

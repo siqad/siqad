@@ -77,7 +77,7 @@ QVariant PropertyForm::formValue(const QString &key)
         qWarning() << tr("Cannot find property field with key %1").arg(key);
       }
       new_val = PropertyMap::string2Type2QVariant(prop_field->text(),
-                                                  orig_map[key].value.type());
+                                                  orig_map[key].value.typeId());
       break;
     }
     default:
@@ -118,7 +118,7 @@ void PropertyForm::initForm()
       }
       case LineEdit:
       {
-        if (prop.dp != -1 && static_cast<QMetaType::Type>(prop.value.type()) == QMetaType::Float) {
+        if (prop.dp != -1 && static_cast<QMetaType::Type>(prop.value.typeId()) == QMetaType::Float) {
           prop_val_widget = new QLineEdit(QString::number(prop.value.value<float>(), 'f', prop.dp));
         } else {
           prop_val_widget = new QLineEdit(prop.value.value<QString>());

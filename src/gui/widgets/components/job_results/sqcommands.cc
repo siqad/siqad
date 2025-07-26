@@ -26,7 +26,7 @@ void SQCommands::readFromXMLStream(QXmlStreamReader *rs)
   };
 
   while (rs->readNextStartElement()) {
-    if (rs->name() == "sqc") {
+    if (rs->name().toString() == "sqc") {
       sq_commands.append(rs->readElementText());
     } else {
       unrecognizedXMLElement(*rs);

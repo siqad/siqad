@@ -49,11 +49,11 @@ void PropertyMap::readPropertiesFromXML(const QString &fname)
 
   // enter the root node and read relevant attributes
   rs.readNextStartElement();
-  if (rs.attributes().value("preserve_order") == "true")
+  if (rs.attributes().value("preserve_order").toString() == "true")
     preserve_order = true;
 
   // start reading properties
-  if (rs.name() == "properties") {
+  if (rs.name().toString() == "properties") {
     map_label = rs.attributes().value("map_label").toString();
     readPropertiesFromXMLStream(&rs);
   }
@@ -85,7 +85,7 @@ void PropertyMap::readValsFromXML(QXmlStreamReader *rs)
     }
     // traverse through property content
     while (rs->readNextStartElement()) {
-      if (rs->name() == "val") {
+      if (rs->name().toString() == "val") {
         QVariant new_val = string2Type2QVariant(rs->readElementText(),
                                                 value(key).value.userType());
         (*this)[key].value = new_val;
@@ -111,32 +111,33 @@ void PropertyMap::readProperty(const QString &node_name, QXmlStreamReader *rs)
 
   // keep reading until the end of this property node
   while (rs->readNextStartElement()) {
-    if (rs->name() == "T") {
+    QString elem_name = rs->name().toString();
+    if (elem_name == "T") {
       p_type_id = string2type[rs->readElementText()];
       //qDebug() << QObject::tr("%1 type=%2").arg(node_name).arg(p_type_id);
-    } else if (rs->name() == "val") {
+    } else if (elem_name == "val") {
       p_val = rs->readElementText();
       //qDebug() << QObject::tr("%1 val=%2").arg(node_name).arg(p_val);
-    } else if (rs->name() == "dp") {
+    } else if (elem_name == "dp") {
       prop.dp = rs->readElementText().toInt();
-    } else if (rs->name() == "label") {
+    } else if (elem_name == "label") {
       prop.form_label = rs->readElementText();
       //qDebug() << QObject::tr("%1 label=%2").arg(node_name).arg(prop.form_label);
-    } else if (rs->name() == "tip") {
+    } else if (elem_name == "tip") {
       prop.form_tip = rs->readElementText();
       //qDebug() << QObject::tr("%1 tip=%2").arg(node_name).arg(prop.form_tip);
-    } else if (rs->name() == "value_selection") {
-      QStringRef sel_type = rs->attributes().value("type");
+    } else if (elem_name == "value_selection") {
+      QString sel_type = rs->attributes().value("type").toString();
       if (sel_type == "ComboBox") {
         readComboOptions(&prop, p_type_id, rs);
       } else if (sel_type == "CheckBox") {
         prop.value_selection.type = CheckBox;
         rs->skipCurrentElement();
       }
-    } else if (rs->name() == "meta") {
+    } else if (elem_name == "meta") {
       readMeta(&prop, rs);
     } else {
-      qDebug() << QObject::tr("Unknown element '%1' when reading property map from XML").arg(rs->name().toString());
+      qDebug() << QObject::tr("Unknown element '%1' when reading property map from XML").arg(elem_name);
       rs->skipCurrentElement();
     }
   }
@@ -203,7 +204,7 @@ void PropertyMap::updateValuesFromXML(const QString &fname)
     }
     // traverse through property content
     while (rs.readNextStartElement()) {
-      if (rs.name() == "val") {
+      if (rs.name().toString() == "val") {
         QVariant new_val = string2Type2QVariant(rs.readElementText(),
                                                 value(key).value.userType());
         (*this)[key].value = new_val;

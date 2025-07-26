@@ -21,7 +21,7 @@ PotentialLandscape::PotentialLandscape(QXmlStreamReader *rs, const QString &resu
   };
 
   while (rs->readNextStartElement()) {
-    if (rs->name() == "potential_val") {
+    if (rs->name().toString() == "potential_val") {
       QVector<float> potentials_vec;
       float x = rs->attributes().value("x").toFloat();
       float y = rs->attributes().value("y").toFloat();

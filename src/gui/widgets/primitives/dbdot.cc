@@ -39,25 +39,26 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *, int lay_id)
   QPointF loc;
   QColor color;
   while (rs->readNextStartElement()) {
-    if (rs->name() == "layer_id") {
+    QString elem_name = rs->name().toString();
+    if (elem_name == "layer_id") {
       qDebug() << QObject::tr("The layer_id tag in designs are no longer used in loading. Using the lay_id supplied to the constructor instead.");
       rs->skipCurrentElement();
-    } else if (rs->name() == "color") {
+    } else if (elem_name == "color") {
       color = QColor(rs->readElementText());
       // rs->skipCurrentElement();
-    } else if (rs->name() == "latcoord") {
+    } else if (elem_name == "latcoord") {
       read_coord.n = rs->attributes().value("n").toInt();
       read_coord.m = rs->attributes().value("m").toInt();
       read_coord.l = rs->attributes().value("l").toInt();
       qDebug() << QObject::tr("Read latcoord of DB: (%1, %2, %3)").arg(read_coord.n).arg(read_coord.m).arg(read_coord.l);
       rs->skipCurrentElement();
-    } else if (rs->name() == "physloc") {
+    } else if (elem_name == "physloc") {
       loc.setX(rs->attributes().value("x").toFloat());
       loc.setY(rs->attributes().value("y").toFloat());
       qDebug() << QObject::tr("Read physloc of DB: (%1, %2)").arg(loc.x()).arg(loc.y());
       rs->skipCurrentElement();
     } else {
-      qDebug() << QObject::tr("DBDot: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
+      qDebug() << QObject::tr("DBDot: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(elem_name);
       rs->skipCurrentElement();
     }
   }

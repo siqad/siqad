@@ -15,21 +15,6 @@ hull::Hull::Hull(const QVector<QPointF> points)
  : points(points)
 {}
 
-hull::Hull::Hull(const QList<prim::Item *> &items)
-{
-  for(QGraphicsItem *item : items){
-    QPolygonF poly = item->shape().toFillPolygon();
-    poly.translate(item->scenePos());
-    bool first=true;
-    for(const QPointF &pf : poly){
-      if(!first)
-        points.append(pf);
-      else
-        first = false;
-    }
-  }
-}
-
 hull::Hull::Hull(const QVector<prim::Item *> &items)
 {
   for(QGraphicsItem *item : items){
