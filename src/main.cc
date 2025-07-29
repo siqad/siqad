@@ -96,8 +96,6 @@ int main(int argc, char **argv){
 
   // pre-launch setup
   settings::AppSettings *app_settings = settings::AppSettings::instance();
-  if(app_settings->get<bool>("view/hidpi_support"))
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
   // call the message handler only if the override flag is set
   // note that if the override is set and the log file is suppressed there will

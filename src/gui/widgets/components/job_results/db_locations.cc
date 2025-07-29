@@ -21,7 +21,7 @@ DBLocations::DBLocations(QXmlStreamReader *rs)
   };
 
   while (rs->readNextStartElement()) {
-    if (rs->name() == "dbdot") {
+    if (rs->name().toString() == "dbdot") {
       float x = rs->attributes().value("x").toFloat();
       float y = rs->attributes().value("y").toFloat();
       rs->skipCurrentElement(); // TODO check whether this leads to unintentional skips

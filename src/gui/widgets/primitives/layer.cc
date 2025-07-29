@@ -37,28 +37,29 @@ prim::Layer::Layer(QXmlStreamReader *rs, int lay_id)
   layer_role = LayerRole::Design;
 
   while (rs->readNextStartElement()) {
-    if (rs->name() == "name") {
+    QString elem_name = rs->name().toString();
+    if (elem_name == "name") {
       nm = rs->readElementText();
-    } else if (rs->name() == "type") {
+    } else if (elem_name == "type") {
       type = static_cast<LayerType>(
           QMetaEnum::fromType<LayerType>().keyToValue(
             rs->readElementText().toStdString().c_str()));
-    } else if (rs->name() == "role") {
+    } else if (elem_name == "role") {
       // added in SiQAD v0.2.2
       layer_role = static_cast<LayerRole>(
           QMetaEnum::fromType<LayerRole>().keyToValue(
             rs->readElementText().toStdString().c_str()));
-    } else if (rs->name() == "zoffset") {
+    } else if (elem_name == "zoffset") {
       zoffset = rs->readElementText().toFloat();
-    } else if (rs->name() == "zheight") {
+    } else if (elem_name == "zheight") {
       zheight = rs->readElementText().toFloat();
-    } else if (rs->name() == "visible") {
+    } else if (elem_name == "visible") {
       visible = (rs->readElementText() == "1") ? true : false;
-    } else if (rs->name() == "active") {
+    } else if (elem_name == "active") {
       active = (rs->readElementText() == "1") ? true : false;
     } else {
       qDebug() << tr("Layer: invalid element encountered on line %1 - %2")
-          .arg(rs->lineNumber()).arg(rs->name().toString());
+          .arg(rs->lineNumber()).arg(elem_name);
       rs->skipCurrentElement();
     }
   }
@@ -215,8 +216,8 @@ void prim::Layer::loadItems(QXmlStreamReader *rs, QGraphicsScene *scene)
   qDebug() << QObject::tr("Loading layer items for %1").arg(name);
   // create items according to hierarchy
   while(rs->readNextStartElement()) {
-    qDebug() << rs->name();
-    if (rs->name() == "dbdot") {
+    QString elem_name = rs->name().toString();
+    if (elem_name == "dbdot") {
       //rs->readNext();
       prim::DBDot *dbdot = new prim::DBDot(rs, scene, layer_id);
       addItem(dbdot);
@@ -224,7 +225,7 @@ void prim::Layer::loadItems(QXmlStreamReader *rs, QGraphicsScene *scene)
       static_cast<prim::DBLayer*>(this)->getLattice()->setOccupied(dbdot->latticeCoord(), dbdot);
       prim::LatticeCoord lc = dbdot->latticeCoord();
       prim::Emitter::instance()->sig_moveDBToLatticeCoord(dbdot, lc.n, lc.m, lc.l);
-    } else if (rs->name() == "aggregate") {
+    } else if (elem_name == "aggregate") {
       // TODO pass a blank list to Aggregate 
       QList<prim::Item*> new_items;
       addItem(new prim::Aggregate(rs, scene, new_items, layer_id));
@@ -237,11 +238,11 @@ void prim::Layer::loadItems(QXmlStreamReader *rs, QGraphicsScene *scene)
         }
       }
       new_items.clear();
-    } else if (rs->name() == "electrode") {
+    } else if (elem_name == "electrode") {
       rs->readNext();
       addItem(new prim::Electrode(rs, scene, layer_id));
     } else {
-      qDebug() << QObject::tr("Layer load item: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(rs->name().toString());
+      qDebug() << QObject::tr("Layer load item: invalid element encountered on line %1 - %2").arg(rs->lineNumber()).arg(elem_name);
       rs->skipCurrentElement();
     }
   }

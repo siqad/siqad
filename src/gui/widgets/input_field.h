@@ -15,7 +15,7 @@
 #include <QDebug>
 #include <QKeyEvent>
 #include <QtCore>
-#include <QRegExpValidator>
+// #include <QRegExpValidator>
 #include <QLineEdit>
 #include <QCompleter>
 #include <QFileSystemModel>
@@ -33,19 +33,19 @@
 namespace gui{
 
 // customized validator for masking the input
-class Validator : public QRegExpValidator
-{
-  Q_OBJECT
+// class Validator : public QRegExpValidator
+// {
+//   Q_OBJECT
 
-public:
+// public:
 
-  // constructor
-  Validator(QObject *parent=0);
+//   // constructor
+//   Validator(QObject *parent=0);
 
-  // destructor
-  ~Validator();
+//   // destructor
+//   ~Validator();
 
-};
+// };
 
 // customized QLineEdit object for handling command inputs
 class InputField : public QLineEdit
@@ -65,14 +65,14 @@ protected:
   void manageCompleters();
   QStringList getSuggestions();
   virtual void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
-  bool eventFilter(QObject *obj, QEvent *event);
+  bool eventFilter(QObject *obj, QEvent *event) Q_DECL_OVERRIDE;
 
 private:
   void insertCompletion(QString completion);
   QStringList commandStringList();
   QStringList itemTypeList();
   void initCompleters();
-  Validator *validator;
+  // Validator *validator;
   QStringList *cmd_history;
   int max_history;
   int position;

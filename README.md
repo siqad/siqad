@@ -11,29 +11,60 @@ SiQAD (Silicon Quantum Atomic Designer) is a next-generation CAD tool that enabl
 * Please read the [SiQAD publication on IEEE Transactions on Nanotechnology](https://ieeexplore.ieee.org/document/8963859) (open access) for a detailed introduction to the tool and simulators.
 * The [Walus Lab website](https://waluslab.ece.ubc.ca/siqad/) contains information about us and other projects that we work on.
 
-We are transitioning most of the information present in the rest of this README onto the documentation webpage. However, the information is still largely relevant at this time.
-
-[![Documentation Status](https://readthedocs.org/projects/siqad/badge/?version=latest)](https://siqad.readthedocs.io/en/latest/?badge=latest)
-
 
 ## Binary releases
 
 Binary builds for Windows are available in the [Releases](https://github.com/retallickj/siqad/releases) page. Note that one of the first-party simulators, PoisSolver, is not available on Windows builds due to incompatibility of its dependencies. For more information, please refer to the [Windows installation](https://siqad.readthedocs.io/en/latest/getting-started/installation.html#windows) section in our official documentation.
 
-For Linux, a Ubuntu PPA is available:
+For Linux, our PPA is out of date. For now please compile from source.
+
+
+## Building from source
+
+### Ubuntu
+
+1. Install build dependencies:
+
 ```
-sudo add-apt-repository ppa:siqad/ppa
-sudo apt-get update
-sudo apt-get install siqad
+# 22.04 LTS
+sudo apt install cmake pkg-config python3-pip python3-tk python3-venv make gcc g++ qt6-base-dev qt6-tools-dev libqt6charts6-dev libqt6uitools6 libqt6svg6-dev libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-random-dev libxkbcommon-dev
+
+# 24.04 LTS
+sudo apt install cmake pkg-config python3-pip python3-tk python3-venv make gcc g++ qt6-base-dev qt6-tools-dev qt6-svg-dev qt6-charts-dev libqt6charts6 libqt6uitools6 libqt6svg6 libboost-dev libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-random-dev
 ```
-You may then invoke SiQAD through the command line: `siqad`. Users of other Linux distributions would have to build from source.
 
-For now, macOS binaries are not distributed and requires compilation from source.
+2. Run the build script from project root
+
+```
+./make_everything_dev release
+```
+
+Or substitute `release` with `debug` if so desired.
+
+3. Run the compiled binary
+
+```
+./build/release/siqad
+```
+
+Substitute `release` with `debug` if you used the `debug` flag in the previous step.
 
 
-## Building from source on Linux
+Note that PoisSolver currently might not work with Ubuntu 22.04 and 24.04.
 
-The compilation documentation has been moved to the [Installation guide](https://siqad.readthedocs.io/en/latest/getting-started/installation.html#linux) on our official documentation.
+
+### macOS
+
+Once you have installed Xcode and other required dependencies, steps 2 and 3 from the Ubuntu compilation section should work for you. An easy way to get the required packages is through [Homebrew](https://brew.sh/). The following packages are needed:
+
+* CMake
+* Boost
+* Qt6
+
+
+### Windows
+
+You can refer to our [Windows binary build workflow](/.github/workflows/build-windows.yml) to get a sense of the required packages and build workflow.
 
 
 ## Licensing

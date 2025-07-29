@@ -36,23 +36,8 @@ jobs:
     strategy:
       matrix:
         os: [ macos-13, macos-14, macos-15 ]
-        compiler: [ g++-13, g++-14, clang++ ]
-        include:
-          - compiler: clang++
-            ccompiler: clang
-          - compiler: g++-13
-            ccompiler: gcc-13
-          - compiler: g++-14
-            ccompiler: gcc-14
-        exclude:
-          - os: macos-14
-            compiler: g++-13
-          - os: macos-14
-            compiler: g++-14
-          - os: macos-15
-            compiler: g++-13
-          - os: macos-15
-            compiler: g++-14
+        compiler: [ clang++ ]
+        ccompiler: [ clang ]
 
     name: 🍎 ${{matrix.os}} with ${{matrix.compiler}}
     runs-on: ${{matrix.os}}
@@ -71,9 +56,9 @@ jobs:
       - name: Install Homebrew Dependencies
         run: |
           brew update
-          brew install boost qt@5
-          # Ensure Qt5 is available in PATH
-          echo "/opt/homebrew/opt/qt@5/bin" >> $GITHUB_PATH
+          brew install boost qt@6
+          # Ensure Qt6 is available in PATH
+          echo "/opt/homebrew/opt/qt@6/bin" >> $GITHUB_PATH
 
       - if: matrix.os == 'macos-13'
         name: Setup XCode version

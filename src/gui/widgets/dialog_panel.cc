@@ -42,7 +42,7 @@ gui::DialogPanel::DialogPanel(QWidget *parent)
       } else {
         qWarning()
           << tr("Failed to create log file directory at %1").arg(log_dir.absolutePath())
-          << endl << "This SiQAD session will not be logged on file.";
+          << Qt::endl << "This SiQAD session will not be logged on file.";
         return;
       }
     }
@@ -62,7 +62,7 @@ gui::DialogPanel::DialogPanel(QWidget *parent)
       return;
     }
 
-    QTextStream(file) << "Beginning SiQAD log." << endl;
+    QTextStream(file) << "Beginning SiQAD log." << Qt::endl;
   }
 
   purgeOldLogs();

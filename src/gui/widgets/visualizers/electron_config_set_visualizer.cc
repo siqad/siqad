@@ -91,6 +91,16 @@ ECSVisualizer::ChargeConfigSetVisualizer(prim::Lattice *lattice, QWidget *parent
   };
 
   // update net charge filter state
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+  connect(cb_net_charge_filter, &QCheckBox::checkStateChanged,
+          [this, updateNetChargeFilterState, netChargeSliderPositionOfValue]()
+          {
+            updateGUIFilterStateChange();
+            s_net_charge_filter->setValue(
+                netChargeSliderPositionOfValue(curr_charge_config.netNegCharge()));
+            updateNetChargeFilterState();
+          });
+#else
   connect(cb_net_charge_filter, &QCheckBox::stateChanged,
           [this, updateNetChargeFilterState, netChargeSliderPositionOfValue]()
           {
@@ -99,6 +109,7 @@ ECSVisualizer::ChargeConfigSetVisualizer(prim::Lattice *lattice, QWidget *parent
                 netChargeSliderPositionOfValue(curr_charge_config.netNegCharge()));
             updateNetChargeFilterState();
           });
+#endif
   w_net_charge_slider_complex->setEnabled(cb_net_charge_filter->checkState() == Qt::Checked);
 
   // link net charge filter slider to filter action
@@ -121,8 +132,13 @@ ECSVisualizer::ChargeConfigSetVisualizer(prim::Lattice *lattice, QWidget *parent
           });
 
   // physically valid state filter
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+  connect(cb_phys_valid_filter, &QCheckBox::checkStateChanged,
+          updateNetChargeFilterState);
+#else
   connect(cb_phys_valid_filter, &QCheckBox::stateChanged,
           updateNetChargeFilterState);
+#endif
 
   // whole layout
   QLabel *help_text = new QLabel("<a href=\"https://siqad.readthedocs.io/en/latest/details/gs-finders.html#interpreting-results\">Interpreting the results</a>");
@@ -314,7 +330,6 @@ void ECSVisualizer::clearChargeConfigResult()
 
 QWidget *ECSVisualizer::scatterPlotChargeConfigSet()
 {
-  using namespace QtCharts;
   QScatterSeries *series = new QScatterSeries();
   series->setMarkerShape(QScatterSeries::MarkerShapeCircle);
   series->setMarkerSize(15.0);

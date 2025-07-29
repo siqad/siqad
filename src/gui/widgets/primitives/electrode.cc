@@ -54,25 +54,26 @@ prim::Electrode::Electrode(QXmlStreamReader *ls, QGraphicsScene *scene, int lay_
   qreal angle_in;
   QColor color;
   while(ls->readNextStartElement()) {
-    if (ls->name() == "layer_id") {
+    QString elem_name = ls->name().toString();
+    if (elem_name == "layer_id") {
       qDebug() << QObject::tr("The layer_id tag in designs are no longer used in loading. Using the lay_id supplied to the constructor instead.");
       ls->skipCurrentElement();
-    } else if (ls->name() == "color") {
+    } else if (elem_name == "color") {
       color = QColor(ls->readElementText());
-    } else if (ls->name() == "angle") {
+    } else if (elem_name == "angle") {
       angle_in = ls->readElementText().toFloat();
-    } else if (ls->name() == "dim") {
+    } else if (elem_name == "dim") {
       ld_point1.setX(ls->attributes().value("x1").toFloat()*scale_factor); //convert from angstrom to pixel
       ld_point1.setY(ls->attributes().value("y1").toFloat()*scale_factor);
       ld_point2.setX(ls->attributes().value("x2").toFloat()*scale_factor);
       ld_point2.setY(ls->attributes().value("y2").toFloat()*scale_factor);
       ls->skipCurrentElement();
-    } else if (ls->name() == "property_map") {
+    } else if (elem_name == "property_map") {
       propMapFromXml(ls);
     }
     // TODO the rest of the variables
     else{
-      qDebug() << QObject::tr("Electrode: invalid element encountered on line %1 - %2").arg(ls->lineNumber()).arg(ls->name().toString());
+      qDebug() << QObject::tr("Electrode: invalid element encountered on line %1 - %2").arg(ls->lineNumber()).arg(elem_name);
       ls->skipCurrentElement();
     }
   }
