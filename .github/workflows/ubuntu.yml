@@ -101,7 +101,7 @@ jobs:
       #     ls /usr/lib/$(uname -m)-linux-gnu/cmake/Qt5UiTools/Qt5UiToolsConfig.cmake || echo "Qt5UiToolsConfig.cmake not found"
 
       - name: Clone Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
