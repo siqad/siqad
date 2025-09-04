@@ -44,7 +44,7 @@ jobs:
         cache: 'pip' # caching pip dependencies
 
     - name: Install CMake
-      uses: lukka/get-cmake@v3.29.3
+      uses: lukka/get-cmake@v4.1.1
 
     # Go to this website if the Qt version config needs to be updated:
     # https://ddalcino.github.io/aqt-list-server/
