@@ -10,13 +10,17 @@
 #include "settings/settings.h"
 
 #include <algorithm>
+#include <cmath>
 #include <QApplication>
 #include <QClipboard>
+#include <QGesture>
+#include <QGestureEvent>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QMimeData>
+#include <QPinchGesture>
 
 namespace {
 
@@ -352,6 +356,10 @@ void gui::DesignPanel::initDesignPanel(QString lattice_file_path, bool init_laye
   scene = new QGraphicsScene(this);
   setScene(scene);
   setMouseTracking(true);
+  pan_scroll_residual = QPointF(0.0, 0.0);
+  viewport()->setAttribute(Qt::WA_AcceptTouchEvents, true);
+  setAttribute(Qt::WA_AcceptTouchEvents, true);
+  viewport()->grabGesture(Qt::PinchGesture);
 
   setAcceptDrops(true);
 
@@ -1515,27 +1523,56 @@ void gui::DesignPanel::mouseDoubleClickEvent(QMouseEvent *e)
   QGraphicsView::mouseDoubleClickEvent(e);
 }
 
+bool gui::DesignPanel::viewportEvent(QEvent *event)
+{
+  if (event->type() == QEvent::Gesture) {
+    auto *gesture_event = static_cast<QGestureEvent*>(event);
+    if (QGesture *pinch = gesture_event->gesture(Qt::PinchGesture)) {
+      handlePinchGesture(static_cast<QPinchGesture*>(pinch));
+      gesture_event->accept(pinch);
+      return true;
+    }
+  }
+  return QGraphicsView::viewportEvent(event);
+}
+
 
 void gui::DesignPanel::wheelEvent(QWheelEvent *e)
 {
-  // allow for different scroll types. Note both x and y scrolling
-  QPoint pix_del = e->pixelDelta();
-  QPoint deg_del = e->angleDelta();
+  const QPoint pixel_delta = e->pixelDelta();
+  const QPoint angle_delta = e->angleDelta();
+  const Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
+  const bool ctrl_zoom = keymods.testFlag(Qt::ControlModifier);
+  const bool shift_scroll = keymods.testFlag(Qt::ShiftModifier);
+  const bool boost = keymods.testFlag(Qt::AltModifier);
 
-  // accumulate scroll value
-  if(!pix_del.isNull())
-    wheel_deg += pix_del;
-  else if(!deg_del.isNull())
-    wheel_deg += deg_del;
-
-  // if enough scroll achieved, act and reset wheel_deg
-  if(qMax(qAbs(wheel_deg.x()),qAbs(wheel_deg.y())) >= 15) {
-    Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
-    if(keymods & Qt::ControlModifier)
-      wheelZoom(e, keymods & Qt::AltModifier);
-    else
-      wheelPan(keymods & Qt::ShiftModifier, keymods & Qt::AltModifier);
+  if (!pixel_delta.isNull()) {
+    if (ctrl_zoom) {
+      qreal delta_value = pixel_delta.y();
+      if (qFuzzyIsNull(delta_value) && pixel_delta.x() != 0)
+        delta_value = pixel_delta.x();
+      wheelZoomFromDelta(delta_value, e, boost);
+    } else {
+      handleWheelPan(pixel_delta, shift_scroll, boost, true);
+    }
+    e->accept();
+    return;
   }
+
+  if (!angle_delta.isNull()) {
+    if (ctrl_zoom) {
+      qreal delta_value = angle_delta.y();
+      if (qFuzzyIsNull(delta_value) && angle_delta.x() != 0)
+        delta_value = angle_delta.x();
+      wheelZoomFromDelta(delta_value, e, boost);
+    } else {
+      handleWheelPan(angle_delta, shift_scroll, boost, false);
+    }
+    e->accept();
+    return;
+  }
+
+  QGraphicsView::wheelEvent(e);
 }
 
 
@@ -1658,21 +1695,19 @@ void gui::DesignPanel::duplicateSelection()
   }
 }
 
-void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
+void gui::DesignPanel::wheelZoomFromDelta(qreal delta, QWheelEvent *e, bool boost)
 {
+  if (qFuzzyIsNull(delta))
+    return;
+
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  qreal normalized = delta / 120.0;
+  if (boost)
+    normalized *= gui_settings->get<qreal>("view/zoom_boost");
 
-  // base zoom factor
-  qreal ds = (wheel_deg.y()>0 ? 1 : -1) * gui_settings->get<qreal>("view/zoom_factor");
-  // apply boost
-  if(boost)
-    ds *= gui_settings->get<qreal>("view/zoom_boost");
-
-  applyZoom(ds, e);
-
-  // reset both scrolls (avoid repeat from |x|>=120)
-  wheel_deg.setX(0);
-  wheel_deg.setY(0);
+  const qreal ds = normalized * gui_settings->get<qreal>("view/zoom_factor");
+  if (!qFuzzyIsNull(ds))
+    applyZoom(ds, e);
 }
 
 void gui::DesignPanel::stepZoom(const bool &zoom_in)
@@ -1682,7 +1717,7 @@ void gui::DesignPanel::stepZoom(const bool &zoom_in)
   applyZoom(ds);
 }
 
-void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e)
+void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e, const QPointF *viewport_anchor)
 {
   // assert scale limitations
   boundZoom(ds);
@@ -1693,7 +1728,9 @@ void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e)
   if(ds!=0){
     // zoom under mouse, should be indep of transformationAnchor
     QPointF old_pos, new_pos;
-    if (e != nullptr) {
+    if (viewport_anchor != nullptr) {
+      old_pos = mapToScene(viewport_anchor->toPoint());
+    } else if (e != nullptr) {
       old_pos = mapToScene(e->position().toPoint());
     } else {
       old_pos = mapToScene(mapFromParent(rect().center()));
@@ -1714,7 +1751,9 @@ void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e)
     scale(1+ds,1+ds);
 
     // move to anchor
-    if (e != nullptr) {
+    if (viewport_anchor != nullptr) {
+      new_pos = mapToScene(viewport_anchor->toPoint());
+    } else if (e != nullptr) {
       new_pos = mapToScene(e->position().toPoint());
     } else {
       new_pos = mapToScene(mapFromParent(rect().center()));
@@ -1737,54 +1776,100 @@ void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e)
 }
 
 
-void gui::DesignPanel::wheelPan(bool shift_scroll, bool boost)
+void gui::DesignPanel::handleWheelPan(const QPointF &delta, bool shift_scroll, bool boost, bool pixel_based)
 {
+  if (delta.isNull())
+    return;
+
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  QPointF pan_delta = delta;
 
-  qreal dx=0, dy=0;
-
-  // y scrolling
-  if(wheel_deg.y()>0)
-    dy -= gui_settings->get<qreal>("view/wheel_pan_step");
-  else if(wheel_deg.y()<0)
-    dy += gui_settings->get<qreal>("view/wheel_pan_step");
-  wheel_deg.setY(0);
-
-  // x scrolling
-  if(wheel_deg.x()>0)
-    dx -= gui_settings->get<qreal>("view/wheel_pan_step");
-  else if(wheel_deg.x()<0)
-    dx += gui_settings->get<qreal>("view/wheel_pan_step");
-  wheel_deg.setX(0);
-
-  // apply boost
-  if(boost){
-    qreal boost_fact = gui_settings->get<qreal>("view/wheel_pan_boost");
-    dx *= boost_fact;
-    dy *= boost_fact;
+  const qreal base_step = gui_settings->get<qreal>("view/wheel_pan_step");
+  if (pixel_based) {
+    const qreal pixel_scale = base_step / 15.0;
+    pan_delta *= pixel_scale;
+  } else {
+    const qreal step_scale = base_step / 120.0;
+    pan_delta.setX(pan_delta.x() * step_scale);
+    pan_delta.setY(pan_delta.y() * step_scale);
   }
 
-  // flip x and y appropriately if shift is pressed
+  if (boost) {
+    const qreal boost_fact = gui_settings->get<qreal>("view/wheel_pan_boost");
+    pan_delta *= boost_fact;
+  }
+
   if (shift_scroll) {
-    qreal temp = dx;
-    dx = dy;
-    dy = temp;
+    std::swap(pan_delta.rx(), pan_delta.ry());
   }
 
-  // if scrolling past the current max / min, extend the scrolling area
-  qreal xf = horizontalScrollBar()->value() + dx;
-  qreal yf = verticalScrollBar()->value() + dy;
-  if (xf > horizontalScrollBar()->maximum())
-    horizontalScrollBar()->setMaximum(xf);
-  else if (xf < horizontalScrollBar()->minimum())
-    horizontalScrollBar()->setMinimum(xf);
-  else if (yf > verticalScrollBar()->maximum())
-    verticalScrollBar()->setMaximum(yf);
-  else if (yf < verticalScrollBar()->minimum())
-    verticalScrollBar()->setMinimum(yf);
+  const QString scroll_dir = gui_settings->get<QString>("view/scroll_direction");
+  if (scroll_dir == QLatin1String("invert_x") || scroll_dir == QLatin1String("invert_xy"))
+    pan_delta.rx() *= -1;
+  if (scroll_dir == QLatin1String("invert_y") || scroll_dir == QLatin1String("invert_xy"))
+    pan_delta.ry() *= -1;
 
-  horizontalScrollBar()->setValue(horizontalScrollBar()->value()+ dx);
-  verticalScrollBar()->setValue(verticalScrollBar()->value() + dy);
+  applyPanDelta(pan_delta);
+}
+
+void gui::DesignPanel::applyPanDelta(const QPointF &delta)
+{
+  if (delta.isNull())
+    return;
+
+  pan_scroll_residual += delta;
+
+  const int dx = static_cast<int>(std::trunc(pan_scroll_residual.x()));
+  const int dy = static_cast<int>(std::trunc(pan_scroll_residual.y()));
+
+  pan_scroll_residual.rx() -= dx;
+  pan_scroll_residual.ry() -= dy;
+
+  QScrollBar *hbar = horizontalScrollBar();
+  QScrollBar *vbar = verticalScrollBar();
+
+  if (dx != 0) {
+    const int target_h = hbar->value() - dx;
+    if (target_h > hbar->maximum())
+      hbar->setMaximum(target_h);
+    else if (target_h < hbar->minimum())
+      hbar->setMinimum(target_h);
+    hbar->setValue(target_h);
+  }
+
+  if (dy != 0) {
+    const int target_v = vbar->value() - dy;
+    if (target_v > vbar->maximum())
+      vbar->setMaximum(target_v);
+    else if (target_v < vbar->minimum())
+      vbar->setMinimum(target_v);
+    vbar->setValue(target_v);
+  }
+}
+
+void gui::DesignPanel::handlePinchGesture(QPinchGesture *gesture)
+{
+  if (gesture == nullptr)
+    return;
+
+  if (!(gesture->changeFlags() & QPinchGesture::ScaleFactorChanged))
+    return;
+
+  const qreal scale_delta = gesture->scaleFactor();
+  if (qFuzzyIsNull(scale_delta - 1.0))
+    return;
+
+  QPointF anchor = gesture->centerPoint();
+  QPointF viewport_anchor = anchor;
+  if (!viewport()->rect().contains(viewport_anchor.toPoint())) {
+    viewport_anchor = viewport()->mapFromGlobal(anchor.toPoint());
+  }
+
+  if (!viewport()->rect().contains(viewport_anchor.toPoint())) {
+    viewport_anchor = QPointF(viewport()->width() / 2.0, viewport()->height() / 2.0);
+  }
+
+  applyZoom(scale_delta - 1.0, nullptr, &viewport_anchor);
 }
 
 

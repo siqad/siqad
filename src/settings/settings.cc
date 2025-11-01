@@ -192,6 +192,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("view/zoom_max", 1);                // maximum zoom factor
   S->setValue("view/wheel_pan_step", 20);         // screen pan per wheel tick
   S->setValue("view/wheel_pan_boost", 5);         // shift-boost factor
+  S->setValue("view/scroll_direction", QStringLiteral("default")); // scroll direction override
   S->setValue("view/padding", .1);                // additional space around draw region
 
   // dangling bond parameters
