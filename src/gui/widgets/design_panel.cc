@@ -21,6 +21,7 @@
 #include <QJsonParseError>
 #include <QMimeData>
 #include <QPinchGesture>
+#include <QScopedValueRollback>
 
 namespace {
 
@@ -357,9 +358,6 @@ void gui::DesignPanel::initDesignPanel(QString lattice_file_path, bool init_laye
   setScene(scene);
   setMouseTracking(true);
   pan_scroll_residual = QPointF(0.0, 0.0);
-  viewport()->setAttribute(Qt::WA_AcceptTouchEvents, true);
-  setAttribute(Qt::WA_AcceptTouchEvents, true);
-  viewport()->grabGesture(Qt::PinchGesture);
 
   setAcceptDrops(true);
 
@@ -453,6 +451,8 @@ void gui::DesignPanel::initDesignPanel(QString lattice_file_path, bool init_laye
 
   // initialize scene rect for the current viewport
   updateSceneRect();
+
+  setTouchInteractionEnabled(true);
 }
 
 void gui::DesignPanel::deselectAll()
@@ -464,6 +464,9 @@ void gui::DesignPanel::deselectAll()
 // clear design panel
 void gui::DesignPanel::clearDesignPanel(bool reset)
 {
+  setTouchInteractionEnabled(false);
+  pan_scroll_residual = QPointF(0.0, 0.0);
+
   // destroy DB previews
   destroyDBPreviews();
 
@@ -910,6 +913,12 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs, bool is_sim_result)
   QList<int> layer_order_id;
   QRectF visrect;
 
+  QScopedValueRollback<bool> loading_guard(loading_design);
+  loading_design = true;
+  const bool restore_touch = touch_interactions_enabled;
+  if (restore_touch)
+    setTouchInteractionEnabled(false);
+
   // read from xml stream and hand nodes off to appropriate functions
   while (rs->readNextStartElement()) {
     QString elem_name = rs->name().toString();
@@ -969,6 +978,9 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs, bool is_sim_result)
   if (!is_sim_result) {
     layman->populateLayerTable();
   }
+
+  if (restore_touch)
+    setTouchInteractionEnabled(true);
 }
 
 
@@ -1539,6 +1551,11 @@ bool gui::DesignPanel::viewportEvent(QEvent *event)
 
 void gui::DesignPanel::wheelEvent(QWheelEvent *e)
 {
+  if (loading_design) {
+    e->ignore();
+    return;
+  }
+
   const QPoint pixel_delta = e->pixelDelta();
   const QPoint angle_delta = e->angleDelta();
   const Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
@@ -1697,7 +1714,7 @@ void gui::DesignPanel::duplicateSelection()
 
 void gui::DesignPanel::wheelZoomFromDelta(qreal delta, QWheelEvent *e, bool boost)
 {
-  if (qFuzzyIsNull(delta))
+  if (loading_design || qFuzzyIsNull(delta))
     return;
 
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
@@ -1719,6 +1736,9 @@ void gui::DesignPanel::stepZoom(const bool &zoom_in)
 
 void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e, const QPointF *viewport_anchor)
 {
+  if (loading_design)
+    return;
+
   // assert scale limitations
   boundZoom(ds);
 
@@ -1778,7 +1798,7 @@ void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e, const QPointF *viewpo
 
 void gui::DesignPanel::handleWheelPan(const QPointF &delta, bool shift_scroll, bool boost, bool pixel_based)
 {
-  if (delta.isNull())
+  if (loading_design || delta.isNull())
     return;
 
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
@@ -1814,7 +1834,7 @@ void gui::DesignPanel::handleWheelPan(const QPointF &delta, bool shift_scroll, b
 
 void gui::DesignPanel::applyPanDelta(const QPointF &delta)
 {
-  if (delta.isNull())
+  if (loading_design || delta.isNull())
     return;
 
   pan_scroll_residual += delta;
@@ -1849,7 +1869,7 @@ void gui::DesignPanel::applyPanDelta(const QPointF &delta)
 
 void gui::DesignPanel::handlePinchGesture(QPinchGesture *gesture)
 {
-  if (gesture == nullptr)
+  if (gesture == nullptr || !touch_interactions_enabled || loading_design)
     return;
 
   if (!(gesture->changeFlags() & QPinchGesture::ScaleFactorChanged))
@@ -1870,6 +1890,27 @@ void gui::DesignPanel::handlePinchGesture(QPinchGesture *gesture)
   }
 
   applyZoom(scale_delta - 1.0, nullptr, &viewport_anchor);
+}
+
+void gui::DesignPanel::setTouchInteractionEnabled(bool enable)
+{
+  if (touch_interactions_enabled == enable)
+    return;
+
+  QWidget *vp = viewport();
+  if (vp != nullptr) {
+    vp->setAttribute(Qt::WA_AcceptTouchEvents, enable);
+    if (enable)
+      vp->grabGesture(Qt::PinchGesture);
+    else
+      vp->ungrabGesture(Qt::PinchGesture);
+  }
+
+  setAttribute(Qt::WA_AcceptTouchEvents, enable);
+  if (!enable)
+    pan_scroll_residual = QPointF(0.0, 0.0);
+
+  touch_interactions_enabled = enable;
 }
 
 

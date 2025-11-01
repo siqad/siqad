@@ -398,6 +398,8 @@ namespace gui{
     QPoint press_scene_pos;   // mouse position on click (view coord)
     QPoint prev_pan_pos;      // mouse position on last panning update (view coord)
     QPointF pan_scroll_residual; // accumulates fractional scroll deltas for smooth pan
+    bool loading_design = false;
+    bool touch_interactions_enabled = false;
 
     // sim visualization
     QList<prim::Item*> sim_results_items;  // holding temporary items
@@ -425,6 +427,7 @@ namespace gui{
     void handleWheelPan(const QPointF &delta, bool shift_scroll, bool boost, bool pixel_based);
     void applyPanDelta(const QPointF &delta);
     void handlePinchGesture(QPinchGesture *gesture);
+    void setTouchInteractionEnabled(bool enable);
 
     // assert bounds on zooming
     void boundZoom(qreal &ds);
