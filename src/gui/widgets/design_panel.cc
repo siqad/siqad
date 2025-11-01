@@ -10,6 +10,271 @@
 #include "settings/settings.h"
 
 #include <algorithm>
+#include <QApplication>
+#include <QClipboard>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonParseError>
+#include <QMimeData>
+
+namespace {
+
+constexpr auto kSiqadClipboardMimeType = "application/x-siqad-sidb-selection";
+constexpr auto kSiqadClipboardFormatTag = "siqad-sidb-selection";
+constexpr int kSiqadClipboardFormatVersion = 1;
+
+QJsonObject pointToJson(const QPointF &pt)
+{
+  QJsonObject obj;
+  obj.insert(QStringLiteral("x"), pt.x());
+  obj.insert(QStringLiteral("y"), pt.y());
+  return obj;
+}
+
+bool pointFromJson(const QJsonObject &obj, QPointF &pt)
+{
+  if (!obj.contains(QStringLiteral("x")) || !obj.contains(QStringLiteral("y")))
+    return false;
+
+  const QJsonValue x_val = obj.value(QStringLiteral("x"));
+  const QJsonValue y_val = obj.value(QStringLiteral("y"));
+  if (!x_val.isDouble() || !y_val.isDouble())
+    return false;
+
+  pt.setX(x_val.toDouble());
+  pt.setY(y_val.toDouble());
+  return true;
+}
+
+QJsonObject latticeCoordToJson(const prim::LatticeCoord &coord)
+{
+  QJsonObject obj;
+  obj.insert(QStringLiteral("n"), coord.n);
+  obj.insert(QStringLiteral("m"), coord.m);
+  obj.insert(QStringLiteral("l"), coord.l);
+  return obj;
+}
+
+bool latticeCoordFromJson(const QJsonObject &obj, prim::LatticeCoord &coord)
+
+{
+  if (!obj.contains(QStringLiteral("n")) || !obj.contains(QStringLiteral("m")) ||
+      !obj.contains(QStringLiteral("l"))) {
+    return false;
+  }
+
+  const QJsonValue n_val = obj.value(QStringLiteral("n"));
+  const QJsonValue m_val = obj.value(QStringLiteral("m"));
+  const QJsonValue l_val = obj.value(QStringLiteral("l"));
+  if (!n_val.isDouble() || !m_val.isDouble() || !l_val.isDouble())
+    return false;
+
+  coord = prim::LatticeCoord(n_val.toInt(), m_val.toInt(), l_val.toInt());
+  return true;
+}
+
+bool itemSupportedForCrossInstance(const prim::Item *item);
+
+bool serializeItem(const prim::Item *item, QJsonObject &out)
+{
+  if (item == nullptr)
+    return false;
+
+  switch (item->item_type) {
+    case prim::Item::DBDot: {
+      const prim::DBDot *db = static_cast<const prim::DBDot*>(item);
+      prim::LatticeCoord coord = const_cast<prim::DBDot*>(db)->latticeCoord();
+      out.insert(QStringLiteral("type"), QStringLiteral("db"));
+      out.insert(QStringLiteral("layer"), db->layer_id);
+      out.insert(QStringLiteral("pos"), pointToJson(db->pos()));
+      out.insert(QStringLiteral("lat"), latticeCoordToJson(coord));
+      return true;
+    }
+    case prim::Item::Aggregate: {
+      const prim::Aggregate *agg = static_cast<const prim::Aggregate*>(item);
+      QJsonArray children;
+      QStack<prim::Item*> &child_stack = const_cast<prim::Aggregate*>(agg)->getChildren();
+      for (prim::Item *child : child_stack) {
+        QJsonObject child_obj;
+        if (!serializeItem(child, child_obj))
+          return false;
+        children.append(child_obj);
+      }
+      out.insert(QStringLiteral("type"), QStringLiteral("aggregate"));
+      out.insert(QStringLiteral("layer"), agg->layer_id);
+      out.insert(QStringLiteral("pos"), pointToJson(agg->pos()));
+      out.insert(QStringLiteral("children"), children);
+      return true;
+    }
+    default:
+      return false;
+  }
+}
+
+bool itemSupportedForCrossInstance(const prim::Item *item)
+{
+  if (item == nullptr)
+    return false;
+
+  if (item->item_type == prim::Item::DBDot)
+    return true;
+
+  if (item->item_type == prim::Item::Aggregate) {
+    const prim::Aggregate *agg = static_cast<const prim::Aggregate*>(item);
+    QStack<prim::Item*> &children = const_cast<prim::Aggregate*>(agg)->getChildren();
+    for (prim::Item *child : children) {
+      if (!itemSupportedForCrossInstance(child))
+        return false;
+    }
+    return true;
+  }
+
+  return false;
+}
+
+prim::Item *deserializeItem(const QJsonObject &obj, bool &ok)
+{
+  const QString type = obj.value(QStringLiteral("type")).toString();
+  if (type == QStringLiteral("db")) {
+    prim::LatticeCoord coord;
+    if (!latticeCoordFromJson(obj.value(QStringLiteral("lat")).toObject(), coord)) {
+      ok = false;
+      return nullptr;
+    }
+
+    const int layer_id = obj.value(QStringLiteral("layer")).toInt(-1);
+    if (layer_id == -1) {
+      ok = false;
+      return nullptr;
+    }
+
+    QPointF pos;
+    if (!pointFromJson(obj.value(QStringLiteral("pos")).toObject(), pos)) {
+      ok = false;
+      return nullptr;
+    }
+
+    auto *db = new prim::DBDot(coord, layer_id, true);
+    db->setPos(pos);
+    ok = true;
+    return db;
+  }
+
+  if (type == QStringLiteral("aggregate")) {
+    const int layer_id = obj.value(QStringLiteral("layer")).toInt(-1);
+    if (layer_id == -1) {
+      ok = false;
+      return nullptr;
+    }
+
+    const QJsonArray children_array = obj.value(QStringLiteral("children")).toArray();
+    QStack<prim::Item*> children_stack;
+    QList<prim::Item*> owned_children;
+    owned_children.reserve(children_array.size());
+
+    for (const QJsonValue &child_value : children_array) {
+      if (!child_value.isObject()) {
+        ok = false;
+        qDeleteAll(owned_children);
+        return nullptr;
+      }
+      bool child_ok = false;
+      prim::Item *child_item = deserializeItem(child_value.toObject(), child_ok);
+      if (!child_ok || child_item == nullptr) {
+        ok = false;
+        qDeleteAll(owned_children);
+        delete child_item;
+        return nullptr;
+      }
+
+      children_stack.append(child_item);
+      owned_children.append(child_item);
+    }
+
+    auto *agg = new prim::Aggregate(layer_id, children_stack, nullptr);
+    QPointF pos;
+    if (!pointFromJson(obj.value(QStringLiteral("pos")).toObject(), pos)) {
+      ok = false;
+      delete agg;
+      return nullptr;
+    }
+
+    agg->setPos(pos);
+    ok = true;
+    return agg;
+  }
+
+  ok = false;
+  return nullptr;
+}
+
+QByteArray serializeClipboardItems(const QList<prim::Item*> &items, bool &ok)
+{
+  QJsonObject root;
+  root.insert(QStringLiteral("format"), QString::fromLatin1(kSiqadClipboardFormatTag));
+  root.insert(QStringLiteral("version"), kSiqadClipboardFormatVersion);
+
+  QJsonArray array;
+  for (const prim::Item *item : items) {
+    QJsonObject obj;
+    if (!serializeItem(item, obj)) {
+      ok = false;
+      return QByteArray();
+    }
+    array.append(obj);
+  }
+  root.insert(QStringLiteral("items"), array);
+
+  ok = true;
+  QJsonDocument doc(root);
+  return doc.toJson(QJsonDocument::Compact);
+}
+
+bool deserializeClipboardItems(const QByteArray &payload, QList<prim::Item*> &items_out)
+{
+  if (payload.isEmpty())
+    return false;
+
+  QJsonParseError parse_error;
+  QJsonDocument doc = QJsonDocument::fromJson(payload, &parse_error);
+  if (parse_error.error != QJsonParseError::NoError || !doc.isObject())
+    return false;
+
+  const QJsonObject root = doc.object();
+  if (root.value(QStringLiteral("format")).toString() != QString::fromLatin1(kSiqadClipboardFormatTag))
+    return false;
+
+  const int version = root.value(QStringLiteral("version")).toInt(-1);
+  if (version != kSiqadClipboardFormatVersion)
+    return false;
+
+  const QJsonArray array = root.value(QStringLiteral("items")).toArray();
+  QList<prim::Item*> items;
+  items.reserve(array.size());
+
+  for (const QJsonValue &value : array) {
+    if (!value.isObject()) {
+      qDeleteAll(items);
+      return false;
+    }
+
+    bool ok = false;
+    prim::Item *item = deserializeItem(value.toObject(), ok);
+    if (!ok || item == nullptr) {
+      qDeleteAll(items);
+      delete item;
+      return false;
+    }
+
+    items.append(item);
+  }
+
+  items_out = items;
+  return true;
+}
+
+} // namespace
 
 QColor gui::DesignPanel::background_col;
 QColor gui::DesignPanel::background_col_publish;
@@ -1546,7 +1811,7 @@ void gui::DesignPanel::scrollDelta(QPointF delta)
 
 void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
 {
-  if (!clipboard.isEmpty()) { //not empty, enable pasting
+  if (!clipboard.isEmpty() || systemClipboardHasSiQADSelection()) { // enable pasting when data is available
     action_paste->setEnabled(true);
   } else {
     action_paste->setEnabled(false);
@@ -1615,8 +1880,14 @@ void gui::DesignPanel::copyAction()
 
 void gui::DesignPanel::pasteAction()
 {
-    if(!clipboard.isEmpty() && display_mode == DesignMode)
-      createGhost(true);
+  if (display_mode != DesignMode)
+    return;
+
+  if (systemClipboardHasSiQADSelection())
+    importClipboardFromSystem();
+
+  if (!clipboard.isEmpty())
+    createGhost(true);
 }
 
 void gui::DesignPanel::deleteAction()
@@ -1880,6 +2151,74 @@ void gui::DesignPanel::setLatticeSiteOccupancy(prim::Item *item, bool flag)
   }
 }
 
+bool gui::DesignPanel::isItemSupportedForCrossInstance(const prim::Item *item)
+{
+  return ::itemSupportedForCrossInstance(item);
+}
+
+void gui::DesignPanel::exportClipboardToSystem()
+{
+  QClipboard *sys_clipboard = QApplication::clipboard();
+  if (sys_clipboard == nullptr)
+    return;
+
+  auto *mime_data = new QMimeData();
+
+  const bool can_export = !clipboard.isEmpty() &&
+      std::all_of(clipboard.cbegin(), clipboard.cend(),
+                  [](const prim::Item *it){ return ::itemSupportedForCrossInstance(it); });
+
+  if (can_export) {
+    bool ok = false;
+    QByteArray payload = serializeClipboardItems(clipboard, ok);
+    if (ok && !payload.isEmpty())
+      mime_data->setData(kSiqadClipboardMimeType, payload);
+  }
+
+  const int count = clipboard.count();
+  const QString description = count == 0
+      ? tr("SiQAD: empty selection")
+      : tr("SiQAD selection (%1 item%2)")
+          .arg(count)
+          .arg(count == 1 ? QString() : QStringLiteral("s"));
+  mime_data->setText(description);
+
+  sys_clipboard->setMimeData(mime_data);
+}
+
+bool gui::DesignPanel::importClipboardFromSystem()
+{
+  const QClipboard *sys_clipboard = QApplication::clipboard();
+  if (sys_clipboard == nullptr)
+    return false;
+
+  const QMimeData *mime_data = sys_clipboard->mimeData();
+  if (mime_data == nullptr || !mime_data->hasFormat(kSiqadClipboardMimeType))
+    return false;
+
+  const QByteArray payload = mime_data->data(kSiqadClipboardMimeType);
+  QList<prim::Item*> items;
+  if (!deserializeClipboardItems(payload, items))
+    return false;
+
+  qDeleteAll(clipboard);
+  clipboard = items;
+  return true;
+}
+
+bool gui::DesignPanel::systemClipboardHasSiQADSelection() const
+{
+  const QClipboard *sys_clipboard = QApplication::clipboard();
+  if (sys_clipboard == nullptr)
+    return false;
+
+  const QMimeData *mime_data = sys_clipboard->mimeData();
+  if (mime_data == nullptr || !mime_data->hasFormat(kSiqadClipboardMimeType))
+    return false;
+
+  return !mime_data->data(kSiqadClipboardMimeType).isEmpty();
+}
+
 
 void gui::DesignPanel::copySelection()
 {
@@ -1895,6 +2234,7 @@ void gui::DesignPanel::copySelection()
   for (prim::Item *item : selection)
     clipboard.append(item->deepCopy());
 
+  exportClipboardToSystem();
   qDebug() << tr("Added to clipboard: %1 items").arg(clipboard.count());
 }
 

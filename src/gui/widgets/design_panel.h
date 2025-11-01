@@ -471,6 +471,12 @@ namespace gui{
     // deep copy the current selection to the clipboard
     void copySelection();
 
+    // synchronize local clipboard with the system clipboard
+    void exportClipboardToSystem();
+    bool importClipboardFromSystem();
+    bool systemClipboardHasSiQADSelection() const;
+    static bool isItemSupportedForCrossInstance(const prim::Item *item);
+
     //! Create graphical previews for provided DB coordinates (always destroys
     //! existing previews).
     void createDBPreviews(QList<prim::LatticeCoord> coords);
