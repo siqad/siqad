@@ -60,7 +60,7 @@ jobs:
         modules: 'qtcharts'
     
     - name: Install boost
-      uses: MarkusJx/install-boost@v2.5.0
+      uses: MarkusJx/install-boost@v2.5.1
       id: install-boost
       with:
         boost_version: 1.84.0
@@ -93,4 +93,3 @@ jobs:
         # name: siqad-package-${{ matrix.runs-on }}
         path: ${{ github.workspace }}/install/**
         retention-days: 5  # Optional: adjust as necessary
-
