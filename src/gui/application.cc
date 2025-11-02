@@ -408,9 +408,11 @@ void gui::ApplicationGUI::initMenuBar()
   action_sim_visualize = sim_visualize_dock->toggleViewAction();
   action_layer_sel = layer_dock->toggleViewAction();
   action_item_manager = item_dock->toggleViewAction();
+  action_info_panel = info_dock->toggleViewAction();
   action_dialog_dock_visibility = dialog_dock->toggleViewAction();
   action_sim_visualize->setIcon(QIcon(":/ico/simvis.svg"));
   action_layer_sel->setIcon(QIcon(":/ico/layer.svg"));
+  action_info_panel->setIcon(QIcon::fromTheme("dialog-information"));
   action_dialog_dock_visibility->setIcon(QIcon(":/ico/term.svg"));
   QAction *zoom_in = new QAction(
       QIcon::fromTheme("zoom-in", QIcon(":/ico/fb/zoom-in.svg")),
@@ -429,6 +431,7 @@ void gui::ApplicationGUI::initMenuBar()
       tr("Rotate 90 deg CCW"), this);
   view->addAction(action_sim_visualize);
   view->addAction(action_layer_sel);
+  view->addAction(action_info_panel);
   view->addAction(action_item_manager);
   view->addAction(action_dialog_dock_visibility);
   view->addSeparator();
@@ -795,8 +798,8 @@ void gui::ApplicationGUI::initItemDock()
   item_dock->setMinimumWidth(gui_settings->get<int>("ITEMDOCK/mw"));
 
   item_dock->setWidget(design_pan->itemManagerWidget());
-  item_dock->show();
   addDockWidget(area, item_dock);
+  item_dock->hide();
 }
 
 
@@ -814,8 +817,12 @@ void gui::ApplicationGUI::initInfoDock()
   info_dock->setMinimumWidth(gui_settings->get<int>("INFODOCK/mw"));
 
   info_dock->setWidget(info_pan);
-  info_dock->show();
   addDockWidget(area, info_dock);
+
+  if (area == Qt::RightDockWidgetArea && layer_dock != nullptr)
+    splitDockWidget(info_dock, layer_dock, Qt::Vertical);
+
+  info_dock->show();
 }
 
 void gui::ApplicationGUI::initCommander()

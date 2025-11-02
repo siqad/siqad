@@ -99,7 +99,7 @@ QSettings *settings::AppSettings::m_defs()
 
 
   // overwrites existing default values with same keys... no check
-  S->setValue("log/override", true);
+  S->setValue("log/override", false);
   S->setValue("log/tofile", true);
   S->setValue("log/logdir", QString("<SYSTMP>/log/"));
   S->setValue("log/keepcount", 10);
@@ -173,7 +173,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("ITEMDOCK/mw", 120);  // item dock minimum width
   S->setValue("ITEMDOCK/loc", 2);   // item dock default to right
   S->setValue("INFODOCK/mw", 120);  // item dock minimum width
-  S->setValue("INFODOCK/loc", 8);   // info dock default to bottom
+  S->setValue("INFODOCK/loc", 2);   // info dock default to right
   S->setValue("Panel/logw", 400);
 
   S->setValue("SIMMAN/mw", 100);     // simulation manager minimum width
