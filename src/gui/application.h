@@ -69,6 +69,7 @@ namespace gui{
     void setToolDBGen();
     void setToolElectrode();
     void setToolScreenshotArea();
+    void setToolLatticeClipArea();
     void setToolScaleBarAnchor();
     void setToolLabel();
 

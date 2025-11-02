@@ -13,13 +13,86 @@
 
 // Qt includes
 #include <QtSvg>
+#include <QtXml/QDomDocument>
 #include <iostream>
+#include <QFile>
 #include <QMessageBox>
+#include <QSaveFile>
+#include <QTextStream>
 
 // gui includes
 #include "application.h"
 #include "settings/settings.h"
 
+
+namespace {
+
+bool nodeHasMeaningfulContent(const QDomNode &node)
+{
+  QDomNode child = node.firstChild();
+  while (!child.isNull()) {
+    if (child.isElement())
+      return true;
+    if (child.isText() && !child.nodeValue().trimmed().isEmpty())
+      return true;
+    if (child.isComment())
+      return true;
+    child = child.nextSibling();
+  }
+  return false;
+}
+
+void pruneEmptyGroups(QDomNode node)
+{
+  QDomNode child = node.firstChild();
+  while (!child.isNull()) {
+    QDomNode next = child.nextSibling();
+    pruneEmptyGroups(child);
+    child = next;
+  }
+
+  if (node.isText() && node.nodeValue().trimmed().isEmpty()) {
+    QDomNode parent = node.parentNode();
+    if (!parent.isNull())
+      parent.removeChild(node);
+    return;
+  }
+
+  if (node.isElement()) {
+    QDomElement elem = node.toElement();
+    if (elem.tagName() == QLatin1String("g") && !nodeHasMeaningfulContent(elem)) {
+      QDomNode parent = elem.parentNode();
+      if (!parent.isNull())
+        parent.removeChild(elem);
+    }
+  }
+}
+
+void stripEmptySvgGroups(const QString &file_path)
+{
+  QFile file(file_path);
+  if (!file.open(QIODevice::ReadOnly))
+    return;
+
+  QDomDocument doc;
+  if (!doc.setContent(&file)) {
+    file.close();
+    return;
+  }
+  file.close();
+
+  pruneEmptyGroups(doc.documentElement());
+
+  QSaveFile out(file_path);
+  if (!out.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    return;
+
+  QTextStream stream(&out);
+  doc.save(stream, 2);
+  out.commit();
+}
+
+} // namespace
 
 // init the DialogPanel to NULL until build in constructor
 gui::DialogPanel *gui::ApplicationGUI::dialog_pan = 0;
@@ -901,6 +974,9 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
       action_screenshot_area_tool->setChecked(true);
       setToolScreenshotArea();
       break;
+    case gui::ToolType::LatticeClipAreaTool:
+      setToolLatticeClipArea();
+      break;
     case gui::ToolType::ScaleBarAnchorTool:
       action_scale_bar_anchor_tool->setChecked(true);
       setToolScaleBarAnchor();
@@ -952,6 +1028,12 @@ void gui::ApplicationGUI::setToolScreenshotArea()
 {
   qDebug() << tr("selecting screenshot area tool");
   design_pan->setTool(gui::ToolType::ScreenshotAreaTool);
+}
+
+void gui::ApplicationGUI::setToolLatticeClipArea()
+{
+  qDebug() << tr("selecting lattice clip area tool");
+  design_pan->setTool(gui::ToolType::LatticeClipAreaTool);
 }
 
 void gui::ApplicationGUI::setToolScaleBarAnchor()
@@ -1201,6 +1283,8 @@ void gui::ApplicationGUI::designScreenshot(const QString &target_img_path, QRect
   design_pan->screenshot(&painter, rect, svgrect);
 
   painter.end();
+
+  stripEmptySvgGroups(target_img_path);
 
   //endScreenshotMode();
 }

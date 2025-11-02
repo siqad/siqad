@@ -409,7 +409,7 @@ void gui::DesignPanel::initDesignPanel(QString lattice_file_path, bool init_laye
 
   // initialize widgets which depend on other things to be initialized first
   
-  screenman = new ScreenshotManager(layman->indexOf(layman->getLayer("Screenshot Overlay")), this);
+  screenman = new ScreenshotManager(layman->indexOf(layman->getLayer("Screenshot Overlay")), layman, this);
 
   // ScreenshotManager signals
   connect(screenman, &gui::ScreenshotManager::sig_takeScreenshot,
@@ -419,6 +419,8 @@ void gui::DesignPanel::initDesignPanel(QString lattice_file_path, bool init_laye
       );
   connect(screenman, &gui::ScreenshotManager::sig_clipSelectionTool,
       [this]() {emit sig_toolChangeRequest(gui::ScreenshotAreaTool);});
+  connect(screenman, &gui::ScreenshotManager::sig_latticeClipSelectionTool,
+      [this]() {emit sig_toolChangeRequest(gui::LatticeClipAreaTool);});
   connect(screenman, &gui::ScreenshotManager::sig_addVisualAidToDP,
       [this](prim::Item *t_item) {
         addItem(t_item, layman->getLayer("Screenshot Overlay")->layerID());
@@ -784,6 +786,10 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
       setInteractive(true);
       screenman->setClipVisibility(true, true);
       break;
+    case gui::ToolType::LatticeClipAreaTool:
+      setInteractive(true);
+      screenman->setLatticeClipVisibility(true, true);
+      break;
     case gui::ToolType::ScaleBarAnchorTool:
       setInteractive(true);
       screenman->setScaleBarVisibility(true, true);
@@ -814,26 +820,48 @@ void gui::DesignPanel::setFills(float *fills)
 
 void gui::DesignPanel::screenshot(QPainter *painter, const QRectF &region, const QRectF &outrect)
 {
-  // add lattice dot previews (vector graphics) instead of using the bitmap
-  // include lattice background if layer is not hidden
   QList<prim::LatticeDotPreview*> latdot_previews;
   prim::Lattice *lat = static_cast<prim::Lattice*>(layman->getLayer(0, !layman->isSimLayerMode()));
-  if (lat->isVisible()) {
-    QList<prim::LatticeCoord> coords = lat->enclosedSites(region);
-    for (prim::LatticeCoord coord : coords) {
-      if (lat->isOccupied(coord))
-        continue;
-      prim::LatticeDotPreview *ldp = new prim::LatticeDotPreview(coord);
-      ldp->setPos(lat->latticeCoord2ScenePos(coord));
-      ldp->setZValue(INT_MIN);
-      latdot_previews.append(ldp);
-      scene->addItem(ldp);
-    }
-  }
+  const bool lattice_initially_visible = lat != nullptr && lat->isVisible();
+  const QRectF lattice_clip_rect = screenman->latticeClipArea().normalized();
+  const bool lattice_clip_active = lattice_initially_visible
+      && lattice_clip_rect.isValid() && !lattice_clip_rect.isNull();
 
   bool clip_reactivate = screenman->clipVisible();
   if (clip_reactivate)
     screenman->setClipVisibility(false, false);
+
+  bool lattice_clip_reactivate = screenman->latticeClipVisible();
+  if (lattice_clip_reactivate)
+    screenman->setLatticeClipVisibility(false, false);
+
+  QBrush original_background;
+  if (lattice_clip_active && lat != nullptr) {
+    original_background = scene->backgroundBrush();
+    const QColor base_color =
+        (display_mode == gui::ScreenshotMode) ? background_col_publish : background_col;
+    scene->setBackgroundBrush(QBrush(base_color));
+    lat->setVisible(false);
+  }
+
+  if (lattice_initially_visible && lat != nullptr) {
+    QRectF lattice_query_rect = region.normalized();
+    if (lattice_clip_active)
+      lattice_query_rect = lattice_clip_rect.intersected(lattice_query_rect);
+
+    if (!lattice_query_rect.isNull()) {
+      QList<prim::LatticeCoord> coords = lat->enclosedSites(lattice_query_rect);
+      for (const prim::LatticeCoord &coord : coords) {
+        if (lat->isOccupied(coord))
+          continue;
+        prim::LatticeDotPreview *ldp = new prim::LatticeDotPreview(coord);
+        ldp->setPos(lat->latticeCoord2ScenePos(coord));
+        ldp->setZValue(INT_MIN);
+        latdot_previews.append(ldp);
+        scene->addItem(ldp);
+      }
+    }
+  }
 
   // render scene onto painter
   scene->render(painter, outrect, region);
@@ -847,6 +875,13 @@ void gui::DesignPanel::screenshot(QPainter *painter, const QRectF &region, const
     scene->removeItem(ldp);
     delete ldp;
   }
+
+  if (lattice_clip_active && lat != nullptr) {
+    lat->setVisible(true);
+    scene->setBackgroundBrush(original_background);
+  }
+  if (lattice_clip_reactivate)
+    screenman->setLatticeClipVisibility(true, false);
 }
 
 
@@ -1341,7 +1376,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
     case Qt::LeftButton:
       if (tool_type == ScaleBarAnchorTool) {
         screenman->setScaleBarAnchor(mapToScene(e->pos()));
-      } else if (tool_type == ScreenshotAreaTool) {
+      } else if (tool_type == ScreenshotAreaTool || tool_type == LatticeClipAreaTool) {
         // use rubberband to select screenshot area
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
@@ -1413,7 +1448,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     switch(e->buttons()){
       case Qt::LeftButton:
         if (tool_type == SelectTool || tool_type == ElectrodeTool ||
-            tool_type == ScreenshotAreaTool || tool_type == LabelTool) {
+            tool_type == ScreenshotAreaTool || tool_type == LatticeClipAreaTool || tool_type == LabelTool) {
           rubberBandUpdate(e->pos());
         } else if (tool_type == DBGenTool) {
           createDBPreviews(lattice->enclosedSites(coord_start, lattice->nearestSite(mapToScene(e->pos()), true)));
@@ -1496,6 +1531,11 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
           {
             // set the screenshot clip area in the screenshot manager
             screenman->setClipArea(rb_scene_rect);
+            break;
+          }
+          case gui::ToolType::LatticeClipAreaTool:
+          {
+            screenman->setLatticeClipArea(rb_scene_rect);
             break;
           }
           case gui::ToolType::LabelTool:
