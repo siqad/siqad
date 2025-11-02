@@ -13,13 +13,86 @@
 
 // Qt includes
 #include <QtSvg>
+#include <QtXml/QDomDocument>
 #include <iostream>
+#include <QFile>
 #include <QMessageBox>
+#include <QSaveFile>
+#include <QTextStream>
 
 // gui includes
 #include "application.h"
 #include "settings/settings.h"
 
+
+namespace {
+
+bool nodeHasMeaningfulContent(const QDomNode &node)
+{
+  QDomNode child = node.firstChild();
+  while (!child.isNull()) {
+    if (child.isElement())
+      return true;
+    if (child.isText() && !child.nodeValue().trimmed().isEmpty())
+      return true;
+    if (child.isComment())
+      return true;
+    child = child.nextSibling();
+  }
+  return false;
+}
+
+void pruneEmptyGroups(QDomNode node)
+{
+  QDomNode child = node.firstChild();
+  while (!child.isNull()) {
+    QDomNode next = child.nextSibling();
+    pruneEmptyGroups(child);
+    child = next;
+  }
+
+  if (node.isText() && node.nodeValue().trimmed().isEmpty()) {
+    QDomNode parent = node.parentNode();
+    if (!parent.isNull())
+      parent.removeChild(node);
+    return;
+  }
+
+  if (node.isElement()) {
+    QDomElement elem = node.toElement();
+    if (elem.tagName() == QLatin1String("g") && !nodeHasMeaningfulContent(elem)) {
+      QDomNode parent = elem.parentNode();
+      if (!parent.isNull())
+        parent.removeChild(elem);
+    }
+  }
+}
+
+void stripEmptySvgGroups(const QString &file_path)
+{
+  QFile file(file_path);
+  if (!file.open(QIODevice::ReadOnly))
+    return;
+
+  QDomDocument doc;
+  if (!doc.setContent(&file)) {
+    file.close();
+    return;
+  }
+  file.close();
+
+  pruneEmptyGroups(doc.documentElement());
+
+  QSaveFile out(file_path);
+  if (!out.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    return;
+
+  QTextStream stream(&out);
+  doc.save(stream, 2);
+  out.commit();
+}
+
+} // namespace
 
 // init the DialogPanel to NULL until build in constructor
 gui::DialogPanel *gui::ApplicationGUI::dialog_pan = 0;
@@ -335,9 +408,11 @@ void gui::ApplicationGUI::initMenuBar()
   action_sim_visualize = sim_visualize_dock->toggleViewAction();
   action_layer_sel = layer_dock->toggleViewAction();
   action_item_manager = item_dock->toggleViewAction();
+  action_info_panel = info_dock->toggleViewAction();
   action_dialog_dock_visibility = dialog_dock->toggleViewAction();
   action_sim_visualize->setIcon(QIcon(":/ico/simvis.svg"));
   action_layer_sel->setIcon(QIcon(":/ico/layer.svg"));
+  action_info_panel->setIcon(QIcon::fromTheme("dialog-information"));
   action_dialog_dock_visibility->setIcon(QIcon(":/ico/term.svg"));
   QAction *zoom_in = new QAction(
       QIcon::fromTheme("zoom-in", QIcon(":/ico/fb/zoom-in.svg")),
@@ -356,6 +431,7 @@ void gui::ApplicationGUI::initMenuBar()
       tr("Rotate 90 deg CCW"), this);
   view->addAction(action_sim_visualize);
   view->addAction(action_layer_sel);
+  view->addAction(action_info_panel);
   view->addAction(action_item_manager);
   view->addAction(action_dialog_dock_visibility);
   view->addSeparator();
@@ -722,8 +798,8 @@ void gui::ApplicationGUI::initItemDock()
   item_dock->setMinimumWidth(gui_settings->get<int>("ITEMDOCK/mw"));
 
   item_dock->setWidget(design_pan->itemManagerWidget());
-  item_dock->show();
   addDockWidget(area, item_dock);
+  item_dock->hide();
 }
 
 
@@ -741,8 +817,12 @@ void gui::ApplicationGUI::initInfoDock()
   info_dock->setMinimumWidth(gui_settings->get<int>("INFODOCK/mw"));
 
   info_dock->setWidget(info_pan);
-  info_dock->show();
   addDockWidget(area, info_dock);
+
+  if (area == Qt::RightDockWidgetArea && layer_dock != nullptr)
+    splitDockWidget(info_dock, layer_dock, Qt::Vertical);
+
+  info_dock->show();
 }
 
 void gui::ApplicationGUI::initCommander()
@@ -861,21 +941,25 @@ void gui::ApplicationGUI::saveSettings()
 
 void gui::ApplicationGUI::updateWindowTitle()
 {
-  if (!is_closing){
-    QString title_name;
+  if (is_closing)
+    return;
 
-    // prefix the title by an asterisk to the name if the file has been edited
-    if (design_pan->stateChanged())
-      title_name += "*";
+  const bool modified = design_pan->stateChanged();
+  setWindowModified(modified);
 
+  QString base_title;
+  if (working_path.isEmpty()) {
+    base_title = tr("Untitled");
+    setWindowFilePath(QString());
+  } else {
     QFileInfo w_path_info(working_path);
-    title_name += (working_path.isEmpty()) ? "Untitled" : w_path_info.fileName();
-
-    setWindowTitle(tr("%1 - %2")
-      .arg(title_name)
-      .arg(QCoreApplication::applicationName())
-    );
+    base_title = w_path_info.fileName();
+    setWindowFilePath(w_path_info.absoluteFilePath());
   }
+
+  setWindowTitle(tr("%1[*] - %2")
+    .arg(base_title, QCoreApplication::applicationName())
+  );
 }
 
 void gui::ApplicationGUI::setTool(gui::ToolType tool)
@@ -900,6 +984,9 @@ void gui::ApplicationGUI::setTool(gui::ToolType tool)
     case gui::ToolType::ScreenshotAreaTool:
       action_screenshot_area_tool->setChecked(true);
       setToolScreenshotArea();
+      break;
+    case gui::ToolType::LatticeClipAreaTool:
+      setToolLatticeClipArea();
       break;
     case gui::ToolType::ScaleBarAnchorTool:
       action_scale_bar_anchor_tool->setChecked(true);
@@ -952,6 +1039,12 @@ void gui::ApplicationGUI::setToolScreenshotArea()
 {
   qDebug() << tr("selecting screenshot area tool");
   design_pan->setTool(gui::ToolType::ScreenshotAreaTool);
+}
+
+void gui::ApplicationGUI::setToolLatticeClipArea()
+{
+  qDebug() << tr("selecting lattice clip area tool");
+  design_pan->setTool(gui::ToolType::LatticeClipAreaTool);
 }
 
 void gui::ApplicationGUI::setToolScaleBarAnchor()
@@ -1201,6 +1294,8 @@ void gui::ApplicationGUI::designScreenshot(const QString &target_img_path, QRect
   design_pan->screenshot(&painter, rect, svgrect);
 
   painter.end();
+
+  stripEmptySvgGroups(target_img_path);
 
   //endScreenshotMode();
 }

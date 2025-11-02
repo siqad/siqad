@@ -10,6 +10,276 @@
 #include "settings/settings.h"
 
 #include <algorithm>
+#include <cmath>
+#include <QApplication>
+#include <QClipboard>
+#include <QGesture>
+#include <QGestureEvent>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonParseError>
+#include <QMimeData>
+#include <QPinchGesture>
+#include <QScopedValueRollback>
+
+namespace {
+
+constexpr auto kSiqadClipboardMimeType = "application/x-siqad-sidb-selection";
+constexpr auto kSiqadClipboardFormatTag = "siqad-sidb-selection";
+constexpr int kSiqadClipboardFormatVersion = 1;
+
+QJsonObject pointToJson(const QPointF &pt)
+{
+  QJsonObject obj;
+  obj.insert(QStringLiteral("x"), pt.x());
+  obj.insert(QStringLiteral("y"), pt.y());
+  return obj;
+}
+
+bool pointFromJson(const QJsonObject &obj, QPointF &pt)
+{
+  if (!obj.contains(QStringLiteral("x")) || !obj.contains(QStringLiteral("y")))
+    return false;
+
+  const QJsonValue x_val = obj.value(QStringLiteral("x"));
+  const QJsonValue y_val = obj.value(QStringLiteral("y"));
+  if (!x_val.isDouble() || !y_val.isDouble())
+    return false;
+
+  pt.setX(x_val.toDouble());
+  pt.setY(y_val.toDouble());
+  return true;
+}
+
+QJsonObject latticeCoordToJson(const prim::LatticeCoord &coord)
+{
+  QJsonObject obj;
+  obj.insert(QStringLiteral("n"), coord.n);
+  obj.insert(QStringLiteral("m"), coord.m);
+  obj.insert(QStringLiteral("l"), coord.l);
+  return obj;
+}
+
+bool latticeCoordFromJson(const QJsonObject &obj, prim::LatticeCoord &coord)
+
+{
+  if (!obj.contains(QStringLiteral("n")) || !obj.contains(QStringLiteral("m")) ||
+      !obj.contains(QStringLiteral("l"))) {
+    return false;
+  }
+
+  const QJsonValue n_val = obj.value(QStringLiteral("n"));
+  const QJsonValue m_val = obj.value(QStringLiteral("m"));
+  const QJsonValue l_val = obj.value(QStringLiteral("l"));
+  if (!n_val.isDouble() || !m_val.isDouble() || !l_val.isDouble())
+    return false;
+
+  coord = prim::LatticeCoord(n_val.toInt(), m_val.toInt(), l_val.toInt());
+  return true;
+}
+
+bool itemSupportedForCrossInstance(const prim::Item *item);
+
+bool serializeItem(const prim::Item *item, QJsonObject &out)
+{
+  if (item == nullptr)
+    return false;
+
+  switch (item->item_type) {
+    case prim::Item::DBDot: {
+      const prim::DBDot *db = static_cast<const prim::DBDot*>(item);
+      prim::LatticeCoord coord = const_cast<prim::DBDot*>(db)->latticeCoord();
+      out.insert(QStringLiteral("type"), QStringLiteral("db"));
+      out.insert(QStringLiteral("layer"), db->layer_id);
+      out.insert(QStringLiteral("pos"), pointToJson(db->pos()));
+      out.insert(QStringLiteral("lat"), latticeCoordToJson(coord));
+      return true;
+    }
+    case prim::Item::Aggregate: {
+      const prim::Aggregate *agg = static_cast<const prim::Aggregate*>(item);
+      QJsonArray children;
+      QStack<prim::Item*> &child_stack = const_cast<prim::Aggregate*>(agg)->getChildren();
+      for (prim::Item *child : child_stack) {
+        QJsonObject child_obj;
+        if (!serializeItem(child, child_obj))
+          return false;
+        children.append(child_obj);
+      }
+      out.insert(QStringLiteral("type"), QStringLiteral("aggregate"));
+      out.insert(QStringLiteral("layer"), agg->layer_id);
+      out.insert(QStringLiteral("pos"), pointToJson(agg->pos()));
+      out.insert(QStringLiteral("children"), children);
+      return true;
+    }
+    default:
+      return false;
+  }
+}
+
+bool itemSupportedForCrossInstance(const prim::Item *item)
+{
+  if (item == nullptr)
+    return false;
+
+  if (item->item_type == prim::Item::DBDot)
+    return true;
+
+  if (item->item_type == prim::Item::Aggregate) {
+    const prim::Aggregate *agg = static_cast<const prim::Aggregate*>(item);
+    QStack<prim::Item*> &children = const_cast<prim::Aggregate*>(agg)->getChildren();
+    for (prim::Item *child : children) {
+      if (!itemSupportedForCrossInstance(child))
+        return false;
+    }
+    return true;
+  }
+
+  return false;
+}
+
+prim::Item *deserializeItem(const QJsonObject &obj, bool &ok)
+{
+  const QString type = obj.value(QStringLiteral("type")).toString();
+  if (type == QStringLiteral("db")) {
+    prim::LatticeCoord coord;
+    if (!latticeCoordFromJson(obj.value(QStringLiteral("lat")).toObject(), coord)) {
+      ok = false;
+      return nullptr;
+    }
+
+    const int layer_id = obj.value(QStringLiteral("layer")).toInt(-1);
+    if (layer_id == -1) {
+      ok = false;
+      return nullptr;
+    }
+
+    QPointF pos;
+    if (!pointFromJson(obj.value(QStringLiteral("pos")).toObject(), pos)) {
+      ok = false;
+      return nullptr;
+    }
+
+    auto *db = new prim::DBDot(coord, layer_id, true);
+    db->setPos(pos);
+    ok = true;
+    return db;
+  }
+
+  if (type == QStringLiteral("aggregate")) {
+    const int layer_id = obj.value(QStringLiteral("layer")).toInt(-1);
+    if (layer_id == -1) {
+      ok = false;
+      return nullptr;
+    }
+
+    const QJsonArray children_array = obj.value(QStringLiteral("children")).toArray();
+    QStack<prim::Item*> children_stack;
+    QList<prim::Item*> owned_children;
+    owned_children.reserve(children_array.size());
+
+    for (const QJsonValue &child_value : children_array) {
+      if (!child_value.isObject()) {
+        ok = false;
+        qDeleteAll(owned_children);
+        return nullptr;
+      }
+      bool child_ok = false;
+      prim::Item *child_item = deserializeItem(child_value.toObject(), child_ok);
+      if (!child_ok || child_item == nullptr) {
+        ok = false;
+        qDeleteAll(owned_children);
+        delete child_item;
+        return nullptr;
+      }
+
+      children_stack.append(child_item);
+      owned_children.append(child_item);
+    }
+
+    auto *agg = new prim::Aggregate(layer_id, children_stack, nullptr);
+    QPointF pos;
+    if (!pointFromJson(obj.value(QStringLiteral("pos")).toObject(), pos)) {
+      ok = false;
+      delete agg;
+      return nullptr;
+    }
+
+    agg->setPos(pos);
+    ok = true;
+    return agg;
+  }
+
+  ok = false;
+  return nullptr;
+}
+
+QByteArray serializeClipboardItems(const QList<prim::Item*> &items, bool &ok)
+{
+  QJsonObject root;
+  root.insert(QStringLiteral("format"), QString::fromLatin1(kSiqadClipboardFormatTag));
+  root.insert(QStringLiteral("version"), kSiqadClipboardFormatVersion);
+
+  QJsonArray array;
+  for (const prim::Item *item : items) {
+    QJsonObject obj;
+    if (!serializeItem(item, obj)) {
+      ok = false;
+      return QByteArray();
+    }
+    array.append(obj);
+  }
+  root.insert(QStringLiteral("items"), array);
+
+  ok = true;
+  QJsonDocument doc(root);
+  return doc.toJson(QJsonDocument::Compact);
+}
+
+bool deserializeClipboardItems(const QByteArray &payload, QList<prim::Item*> &items_out)
+{
+  if (payload.isEmpty())
+    return false;
+
+  QJsonParseError parse_error;
+  QJsonDocument doc = QJsonDocument::fromJson(payload, &parse_error);
+  if (parse_error.error != QJsonParseError::NoError || !doc.isObject())
+    return false;
+
+  const QJsonObject root = doc.object();
+  if (root.value(QStringLiteral("format")).toString() != QString::fromLatin1(kSiqadClipboardFormatTag))
+    return false;
+
+  const int version = root.value(QStringLiteral("version")).toInt(-1);
+  if (version != kSiqadClipboardFormatVersion)
+    return false;
+
+  const QJsonArray array = root.value(QStringLiteral("items")).toArray();
+  QList<prim::Item*> items;
+  items.reserve(array.size());
+
+  for (const QJsonValue &value : array) {
+    if (!value.isObject()) {
+      qDeleteAll(items);
+      return false;
+    }
+
+    bool ok = false;
+    prim::Item *item = deserializeItem(value.toObject(), ok);
+    if (!ok || item == nullptr) {
+      qDeleteAll(items);
+      delete item;
+      return false;
+    }
+
+    items.append(item);
+  }
+
+  items_out = items;
+  return true;
+}
+
+} // namespace
 
 QColor gui::DesignPanel::background_col;
 QColor gui::DesignPanel::background_col_publish;
@@ -87,6 +357,7 @@ void gui::DesignPanel::initDesignPanel(QString lattice_file_path, bool init_laye
   scene = new QGraphicsScene(this);
   setScene(scene);
   setMouseTracking(true);
+  pan_scroll_residual = QPointF(0.0, 0.0);
 
   setAcceptDrops(true);
 
@@ -138,7 +409,7 @@ void gui::DesignPanel::initDesignPanel(QString lattice_file_path, bool init_laye
 
   // initialize widgets which depend on other things to be initialized first
   
-  screenman = new ScreenshotManager(layman->indexOf(layman->getLayer("Screenshot Overlay")), this);
+  screenman = new ScreenshotManager(layman->indexOf(layman->getLayer("Screenshot Overlay")), layman, this);
 
   // ScreenshotManager signals
   connect(screenman, &gui::ScreenshotManager::sig_takeScreenshot,
@@ -148,6 +419,8 @@ void gui::DesignPanel::initDesignPanel(QString lattice_file_path, bool init_laye
       );
   connect(screenman, &gui::ScreenshotManager::sig_clipSelectionTool,
       [this]() {emit sig_toolChangeRequest(gui::ScreenshotAreaTool);});
+  connect(screenman, &gui::ScreenshotManager::sig_latticeClipSelectionTool,
+      [this]() {emit sig_toolChangeRequest(gui::LatticeClipAreaTool);});
   connect(screenman, &gui::ScreenshotManager::sig_addVisualAidToDP,
       [this](prim::Item *t_item) {
         addItem(t_item, layman->getLayer("Screenshot Overlay")->layerID());
@@ -180,6 +453,8 @@ void gui::DesignPanel::initDesignPanel(QString lattice_file_path, bool init_laye
 
   // initialize scene rect for the current viewport
   updateSceneRect();
+
+  setTouchInteractionEnabled(true);
 }
 
 void gui::DesignPanel::deselectAll()
@@ -191,6 +466,9 @@ void gui::DesignPanel::deselectAll()
 // clear design panel
 void gui::DesignPanel::clearDesignPanel(bool reset)
 {
+  setTouchInteractionEnabled(false);
+  pan_scroll_residual = QPointF(0.0, 0.0);
+
   // destroy DB previews
   destroyDBPreviews();
 
@@ -508,6 +786,10 @@ void gui::DesignPanel::setTool(gui::ToolType tool)
       setInteractive(true);
       screenman->setClipVisibility(true, true);
       break;
+    case gui::ToolType::LatticeClipAreaTool:
+      setInteractive(true);
+      screenman->setLatticeClipVisibility(true, true);
+      break;
     case gui::ToolType::ScaleBarAnchorTool:
       setInteractive(true);
       screenman->setScaleBarVisibility(true, true);
@@ -538,26 +820,48 @@ void gui::DesignPanel::setFills(float *fills)
 
 void gui::DesignPanel::screenshot(QPainter *painter, const QRectF &region, const QRectF &outrect)
 {
-  // add lattice dot previews (vector graphics) instead of using the bitmap
-  // include lattice background if layer is not hidden
   QList<prim::LatticeDotPreview*> latdot_previews;
   prim::Lattice *lat = static_cast<prim::Lattice*>(layman->getLayer(0, !layman->isSimLayerMode()));
-  if (lat->isVisible()) {
-    QList<prim::LatticeCoord> coords = lat->enclosedSites(region);
-    for (prim::LatticeCoord coord : coords) {
-      if (lat->isOccupied(coord))
-        continue;
-      prim::LatticeDotPreview *ldp = new prim::LatticeDotPreview(coord);
-      ldp->setPos(lat->latticeCoord2ScenePos(coord));
-      ldp->setZValue(INT_MIN);
-      latdot_previews.append(ldp);
-      scene->addItem(ldp);
-    }
-  }
+  const bool lattice_initially_visible = lat != nullptr && lat->isVisible();
+  const QRectF lattice_clip_rect = screenman->latticeClipArea().normalized();
+  const bool lattice_clip_active = lattice_initially_visible
+      && lattice_clip_rect.isValid() && !lattice_clip_rect.isNull();
 
   bool clip_reactivate = screenman->clipVisible();
   if (clip_reactivate)
     screenman->setClipVisibility(false, false);
+
+  bool lattice_clip_reactivate = screenman->latticeClipVisible();
+  if (lattice_clip_reactivate)
+    screenman->setLatticeClipVisibility(false, false);
+
+  QBrush original_background;
+  if (lattice_clip_active && lat != nullptr) {
+    original_background = scene->backgroundBrush();
+    const QColor base_color =
+        (display_mode == gui::ScreenshotMode) ? background_col_publish : background_col;
+    scene->setBackgroundBrush(QBrush(base_color));
+    lat->setVisible(false);
+  }
+
+  if (lattice_initially_visible && lat != nullptr) {
+    QRectF lattice_query_rect = region.normalized();
+    if (lattice_clip_active)
+      lattice_query_rect = lattice_clip_rect.intersected(lattice_query_rect);
+
+    if (!lattice_query_rect.isNull()) {
+      QList<prim::LatticeCoord> coords = lat->enclosedSites(lattice_query_rect);
+      for (const prim::LatticeCoord &coord : coords) {
+        if (lat->isOccupied(coord))
+          continue;
+        prim::LatticeDotPreview *ldp = new prim::LatticeDotPreview(coord);
+        ldp->setPos(lat->latticeCoord2ScenePos(coord));
+        ldp->setZValue(INT_MIN);
+        latdot_previews.append(ldp);
+        scene->addItem(ldp);
+      }
+    }
+  }
 
   // render scene onto painter
   scene->render(painter, outrect, region);
@@ -571,6 +875,13 @@ void gui::DesignPanel::screenshot(QPainter *painter, const QRectF &region, const
     scene->removeItem(ldp);
     delete ldp;
   }
+
+  if (lattice_clip_active && lat != nullptr) {
+    lat->setVisible(true);
+    scene->setBackgroundBrush(original_background);
+  }
+  if (lattice_clip_reactivate)
+    screenman->setLatticeClipVisibility(true, false);
 }
 
 
@@ -637,6 +948,12 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs, bool is_sim_result)
   QList<int> layer_order_id;
   QRectF visrect;
 
+  QScopedValueRollback<bool> loading_guard(loading_design);
+  loading_design = true;
+  const bool restore_touch = touch_interactions_enabled;
+  if (restore_touch)
+    setTouchInteractionEnabled(false);
+
   // read from xml stream and hand nodes off to appropriate functions
   while (rs->readNextStartElement()) {
     QString elem_name = rs->name().toString();
@@ -696,6 +1013,9 @@ void gui::DesignPanel::loadFromFile(QXmlStreamReader *rs, bool is_sim_result)
   if (!is_sim_result) {
     layman->populateLayerTable();
   }
+
+  if (restore_touch)
+    setTouchInteractionEnabled(true);
 }
 
 
@@ -1056,7 +1376,7 @@ void gui::DesignPanel::mousePressEvent(QMouseEvent *e)
     case Qt::LeftButton:
       if (tool_type == ScaleBarAnchorTool) {
         screenman->setScaleBarAnchor(mapToScene(e->pos()));
-      } else if (tool_type == ScreenshotAreaTool) {
+      } else if (tool_type == ScreenshotAreaTool || tool_type == LatticeClipAreaTool) {
         // use rubberband to select screenshot area
         rb_start = mapToScene(e->pos()).toPoint();
         rb_cache = e->pos();
@@ -1128,7 +1448,7 @@ void gui::DesignPanel::mouseMoveEvent(QMouseEvent *e)
     switch(e->buttons()){
       case Qt::LeftButton:
         if (tool_type == SelectTool || tool_type == ElectrodeTool ||
-            tool_type == ScreenshotAreaTool || tool_type == LabelTool) {
+            tool_type == ScreenshotAreaTool || tool_type == LatticeClipAreaTool || tool_type == LabelTool) {
           rubberBandUpdate(e->pos());
         } else if (tool_type == DBGenTool) {
           createDBPreviews(lattice->enclosedSites(coord_start, lattice->nearestSite(mapToScene(e->pos()), true)));
@@ -1213,6 +1533,11 @@ void gui::DesignPanel::mouseReleaseEvent(QMouseEvent *e)
             screenman->setClipArea(rb_scene_rect);
             break;
           }
+          case gui::ToolType::LatticeClipAreaTool:
+          {
+            screenman->setLatticeClipArea(rb_scene_rect);
+            break;
+          }
           case gui::ToolType::LabelTool:
             // create a label with the rubberband area
             createTextLabel(rb_scene_rect);
@@ -1250,27 +1575,61 @@ void gui::DesignPanel::mouseDoubleClickEvent(QMouseEvent *e)
   QGraphicsView::mouseDoubleClickEvent(e);
 }
 
+bool gui::DesignPanel::viewportEvent(QEvent *event)
+{
+  if (event->type() == QEvent::Gesture) {
+    auto *gesture_event = static_cast<QGestureEvent*>(event);
+    if (QGesture *pinch = gesture_event->gesture(Qt::PinchGesture)) {
+      handlePinchGesture(static_cast<QPinchGesture*>(pinch));
+      gesture_event->accept(pinch);
+      return true;
+    }
+  }
+  return QGraphicsView::viewportEvent(event);
+}
+
 
 void gui::DesignPanel::wheelEvent(QWheelEvent *e)
 {
-  // allow for different scroll types. Note both x and y scrolling
-  QPoint pix_del = e->pixelDelta();
-  QPoint deg_del = e->angleDelta();
-
-  // accumulate scroll value
-  if(!pix_del.isNull())
-    wheel_deg += pix_del;
-  else if(!deg_del.isNull())
-    wheel_deg += deg_del;
-
-  // if enough scroll achieved, act and reset wheel_deg
-  if(qMax(qAbs(wheel_deg.x()),qAbs(wheel_deg.y())) >= 15) {
-    Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
-    if(keymods & Qt::ControlModifier)
-      wheelZoom(e, keymods & Qt::AltModifier);
-    else
-      wheelPan(keymods & Qt::ShiftModifier, keymods & Qt::AltModifier);
+  if (loading_design) {
+    e->ignore();
+    return;
   }
+
+  const QPoint pixel_delta = e->pixelDelta();
+  const QPoint angle_delta = e->angleDelta();
+  const Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
+  const bool ctrl_zoom = keymods.testFlag(Qt::ControlModifier);
+  const bool shift_scroll = keymods.testFlag(Qt::ShiftModifier);
+  const bool boost = keymods.testFlag(Qt::AltModifier);
+
+  if (!pixel_delta.isNull()) {
+    if (ctrl_zoom) {
+      qreal delta_value = pixel_delta.y();
+      if (qFuzzyIsNull(delta_value) && pixel_delta.x() != 0)
+        delta_value = pixel_delta.x();
+      wheelZoomFromDelta(delta_value, e, boost);
+    } else {
+      handleWheelPan(pixel_delta, shift_scroll, boost, true);
+    }
+    e->accept();
+    return;
+  }
+
+  if (!angle_delta.isNull()) {
+    if (ctrl_zoom) {
+      qreal delta_value = angle_delta.y();
+      if (qFuzzyIsNull(delta_value) && angle_delta.x() != 0)
+        delta_value = angle_delta.x();
+      wheelZoomFromDelta(delta_value, e, boost);
+    } else {
+      handleWheelPan(angle_delta, shift_scroll, boost, false);
+    }
+    e->accept();
+    return;
+  }
+
+  QGraphicsView::wheelEvent(e);
 }
 
 
@@ -1393,21 +1752,19 @@ void gui::DesignPanel::duplicateSelection()
   }
 }
 
-void gui::DesignPanel::wheelZoom(QWheelEvent *e, bool boost)
+void gui::DesignPanel::wheelZoomFromDelta(qreal delta, QWheelEvent *e, bool boost)
 {
+  if (loading_design || qFuzzyIsNull(delta))
+    return;
+
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  qreal normalized = delta / 120.0;
+  if (boost)
+    normalized *= gui_settings->get<qreal>("view/zoom_boost");
 
-  // base zoom factor
-  qreal ds = (wheel_deg.y()>0 ? 1 : -1) * gui_settings->get<qreal>("view/zoom_factor");
-  // apply boost
-  if(boost)
-    ds *= gui_settings->get<qreal>("view/zoom_boost");
-
-  applyZoom(ds, e);
-
-  // reset both scrolls (avoid repeat from |x|>=120)
-  wheel_deg.setX(0);
-  wheel_deg.setY(0);
+  const qreal ds = normalized * gui_settings->get<qreal>("view/zoom_factor");
+  if (!qFuzzyIsNull(ds))
+    applyZoom(ds, e);
 }
 
 void gui::DesignPanel::stepZoom(const bool &zoom_in)
@@ -1417,8 +1774,11 @@ void gui::DesignPanel::stepZoom(const bool &zoom_in)
   applyZoom(ds);
 }
 
-void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e)
+void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e, const QPointF *viewport_anchor)
 {
+  if (loading_design)
+    return;
+
   // assert scale limitations
   boundZoom(ds);
 
@@ -1428,7 +1788,9 @@ void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e)
   if(ds!=0){
     // zoom under mouse, should be indep of transformationAnchor
     QPointF old_pos, new_pos;
-    if (e != nullptr) {
+    if (viewport_anchor != nullptr) {
+      old_pos = mapToScene(viewport_anchor->toPoint());
+    } else if (e != nullptr) {
       old_pos = mapToScene(e->position().toPoint());
     } else {
       old_pos = mapToScene(mapFromParent(rect().center()));
@@ -1449,7 +1811,9 @@ void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e)
     scale(1+ds,1+ds);
 
     // move to anchor
-    if (e != nullptr) {
+    if (viewport_anchor != nullptr) {
+      new_pos = mapToScene(viewport_anchor->toPoint());
+    } else if (e != nullptr) {
       new_pos = mapToScene(e->position().toPoint());
     } else {
       new_pos = mapToScene(mapFromParent(rect().center()));
@@ -1472,54 +1836,121 @@ void gui::DesignPanel::applyZoom(qreal ds, QWheelEvent *e)
 }
 
 
-void gui::DesignPanel::wheelPan(bool shift_scroll, bool boost)
+void gui::DesignPanel::handleWheelPan(const QPointF &delta, bool shift_scroll, bool boost, bool pixel_based)
 {
+  if (loading_design || delta.isNull())
+    return;
+
   settings::GUISettings *gui_settings = settings::GUISettings::instance();
+  QPointF pan_delta = delta;
 
-  qreal dx=0, dy=0;
-
-  // y scrolling
-  if(wheel_deg.y()>0)
-    dy -= gui_settings->get<qreal>("view/wheel_pan_step");
-  else if(wheel_deg.y()<0)
-    dy += gui_settings->get<qreal>("view/wheel_pan_step");
-  wheel_deg.setY(0);
-
-  // x scrolling
-  if(wheel_deg.x()>0)
-    dx -= gui_settings->get<qreal>("view/wheel_pan_step");
-  else if(wheel_deg.x()<0)
-    dx += gui_settings->get<qreal>("view/wheel_pan_step");
-  wheel_deg.setX(0);
-
-  // apply boost
-  if(boost){
-    qreal boost_fact = gui_settings->get<qreal>("view/wheel_pan_boost");
-    dx *= boost_fact;
-    dy *= boost_fact;
+  const qreal base_step = gui_settings->get<qreal>("view/wheel_pan_step");
+  if (pixel_based) {
+    const qreal pixel_scale = base_step / 15.0;
+    pan_delta *= pixel_scale;
+  } else {
+    const qreal step_scale = base_step / 120.0;
+    pan_delta.setX(pan_delta.x() * step_scale);
+    pan_delta.setY(pan_delta.y() * step_scale);
   }
 
-  // flip x and y appropriately if shift is pressed
+  if (boost) {
+    const qreal boost_fact = gui_settings->get<qreal>("view/wheel_pan_boost");
+    pan_delta *= boost_fact;
+  }
+
   if (shift_scroll) {
-    qreal temp = dx;
-    dx = dy;
-    dy = temp;
+    std::swap(pan_delta.rx(), pan_delta.ry());
   }
 
-  // if scrolling past the current max / min, extend the scrolling area
-  qreal xf = horizontalScrollBar()->value() + dx;
-  qreal yf = verticalScrollBar()->value() + dy;
-  if (xf > horizontalScrollBar()->maximum())
-    horizontalScrollBar()->setMaximum(xf);
-  else if (xf < horizontalScrollBar()->minimum())
-    horizontalScrollBar()->setMinimum(xf);
-  else if (yf > verticalScrollBar()->maximum())
-    verticalScrollBar()->setMaximum(yf);
-  else if (yf < verticalScrollBar()->minimum())
-    verticalScrollBar()->setMinimum(yf);
+  const QString scroll_dir = gui_settings->get<QString>("view/scroll_direction");
+  if (scroll_dir == QLatin1String("invert_x") || scroll_dir == QLatin1String("invert_xy"))
+    pan_delta.rx() *= -1;
+  if (scroll_dir == QLatin1String("invert_y") || scroll_dir == QLatin1String("invert_xy"))
+    pan_delta.ry() *= -1;
 
-  horizontalScrollBar()->setValue(horizontalScrollBar()->value()+ dx);
-  verticalScrollBar()->setValue(verticalScrollBar()->value() + dy);
+  applyPanDelta(pan_delta);
+}
+
+void gui::DesignPanel::applyPanDelta(const QPointF &delta)
+{
+  if (loading_design || delta.isNull())
+    return;
+
+  pan_scroll_residual += delta;
+
+  const int dx = static_cast<int>(std::trunc(pan_scroll_residual.x()));
+  const int dy = static_cast<int>(std::trunc(pan_scroll_residual.y()));
+
+  pan_scroll_residual.rx() -= dx;
+  pan_scroll_residual.ry() -= dy;
+
+  QScrollBar *hbar = horizontalScrollBar();
+  QScrollBar *vbar = verticalScrollBar();
+
+  if (dx != 0) {
+    const int target_h = hbar->value() - dx;
+    if (target_h > hbar->maximum())
+      hbar->setMaximum(target_h);
+    else if (target_h < hbar->minimum())
+      hbar->setMinimum(target_h);
+    hbar->setValue(target_h);
+  }
+
+  if (dy != 0) {
+    const int target_v = vbar->value() - dy;
+    if (target_v > vbar->maximum())
+      vbar->setMaximum(target_v);
+    else if (target_v < vbar->minimum())
+      vbar->setMinimum(target_v);
+    vbar->setValue(target_v);
+  }
+}
+
+void gui::DesignPanel::handlePinchGesture(QPinchGesture *gesture)
+{
+  if (gesture == nullptr || !touch_interactions_enabled || loading_design)
+    return;
+
+  if (!(gesture->changeFlags() & QPinchGesture::ScaleFactorChanged))
+    return;
+
+  const qreal scale_delta = gesture->scaleFactor();
+  if (qFuzzyIsNull(scale_delta - 1.0))
+    return;
+
+  QPointF anchor = gesture->centerPoint();
+  QPointF viewport_anchor = anchor;
+  if (!viewport()->rect().contains(viewport_anchor.toPoint())) {
+    viewport_anchor = viewport()->mapFromGlobal(anchor.toPoint());
+  }
+
+  if (!viewport()->rect().contains(viewport_anchor.toPoint())) {
+    viewport_anchor = QPointF(viewport()->width() / 2.0, viewport()->height() / 2.0);
+  }
+
+  applyZoom(scale_delta - 1.0, nullptr, &viewport_anchor);
+}
+
+void gui::DesignPanel::setTouchInteractionEnabled(bool enable)
+{
+  if (touch_interactions_enabled == enable)
+    return;
+
+  QWidget *vp = viewport();
+  if (vp != nullptr) {
+    vp->setAttribute(Qt::WA_AcceptTouchEvents, enable);
+    if (enable)
+      vp->grabGesture(Qt::PinchGesture);
+    else
+      vp->ungrabGesture(Qt::PinchGesture);
+  }
+
+  setAttribute(Qt::WA_AcceptTouchEvents, enable);
+  if (!enable)
+    pan_scroll_residual = QPointF(0.0, 0.0);
+
+  touch_interactions_enabled = enable;
 }
 
 
@@ -1546,7 +1977,7 @@ void gui::DesignPanel::scrollDelta(QPointF delta)
 
 void gui::DesignPanel::contextMenuEvent(QContextMenuEvent *e)
 {
-  if (!clipboard.isEmpty()) { //not empty, enable pasting
+  if (!clipboard.isEmpty() || systemClipboardHasSiQADSelection()) { // enable pasting when data is available
     action_paste->setEnabled(true);
   } else {
     action_paste->setEnabled(false);
@@ -1615,8 +2046,14 @@ void gui::DesignPanel::copyAction()
 
 void gui::DesignPanel::pasteAction()
 {
-    if(!clipboard.isEmpty() && display_mode == DesignMode)
-      createGhost(true);
+  if (display_mode != DesignMode)
+    return;
+
+  if (systemClipboardHasSiQADSelection())
+    importClipboardFromSystem();
+
+  if (!clipboard.isEmpty())
+    createGhost(true);
 }
 
 void gui::DesignPanel::deleteAction()
@@ -1880,6 +2317,74 @@ void gui::DesignPanel::setLatticeSiteOccupancy(prim::Item *item, bool flag)
   }
 }
 
+bool gui::DesignPanel::isItemSupportedForCrossInstance(const prim::Item *item)
+{
+  return ::itemSupportedForCrossInstance(item);
+}
+
+void gui::DesignPanel::exportClipboardToSystem()
+{
+  QClipboard *sys_clipboard = QApplication::clipboard();
+  if (sys_clipboard == nullptr)
+    return;
+
+  auto *mime_data = new QMimeData();
+
+  const bool can_export = !clipboard.isEmpty() &&
+      std::all_of(clipboard.cbegin(), clipboard.cend(),
+                  [](const prim::Item *it){ return ::itemSupportedForCrossInstance(it); });
+
+  if (can_export) {
+    bool ok = false;
+    QByteArray payload = serializeClipboardItems(clipboard, ok);
+    if (ok && !payload.isEmpty())
+      mime_data->setData(kSiqadClipboardMimeType, payload);
+  }
+
+  const int count = clipboard.count();
+  const QString description = count == 0
+      ? tr("SiQAD: empty selection")
+      : tr("SiQAD selection (%1 item%2)")
+          .arg(count)
+          .arg(count == 1 ? QString() : QStringLiteral("s"));
+  mime_data->setText(description);
+
+  sys_clipboard->setMimeData(mime_data);
+}
+
+bool gui::DesignPanel::importClipboardFromSystem()
+{
+  const QClipboard *sys_clipboard = QApplication::clipboard();
+  if (sys_clipboard == nullptr)
+    return false;
+
+  const QMimeData *mime_data = sys_clipboard->mimeData();
+  if (mime_data == nullptr || !mime_data->hasFormat(kSiqadClipboardMimeType))
+    return false;
+
+  const QByteArray payload = mime_data->data(kSiqadClipboardMimeType);
+  QList<prim::Item*> items;
+  if (!deserializeClipboardItems(payload, items))
+    return false;
+
+  qDeleteAll(clipboard);
+  clipboard = items;
+  return true;
+}
+
+bool gui::DesignPanel::systemClipboardHasSiQADSelection() const
+{
+  const QClipboard *sys_clipboard = QApplication::clipboard();
+  if (sys_clipboard == nullptr)
+    return false;
+
+  const QMimeData *mime_data = sys_clipboard->mimeData();
+  if (mime_data == nullptr || !mime_data->hasFormat(kSiqadClipboardMimeType))
+    return false;
+
+  return !mime_data->data(kSiqadClipboardMimeType).isEmpty();
+}
+
 
 void gui::DesignPanel::copySelection()
 {
@@ -1895,6 +2400,7 @@ void gui::DesignPanel::copySelection()
   for (prim::Item *item : selection)
     clipboard.append(item->deepCopy());
 
+  exportClipboardToSystem();
   qDebug() << tr("Added to clipboard: %1 items").arg(clipboard.count());
 }
 
