@@ -23,6 +23,17 @@ project(siqad_suite)
 #  Configurations  #
 ####################
 
+# Homebrew's BoostConfig lacks per-component config files; keep CMP0167 OLD so FindBoost still works.
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 OLD)
+endif()
+
+# TODO: Drop these toggles once the macOS toolchain provides Boost::<component> configs (or we vendor Boost).
+# Force FindBoost "Module" mode instead of Boost's Config packages
+set(Boost_NO_BOOST_CMAKE ON CACHE BOOL "Prefer FindBoost module over BoostConfig")
+set(Boost_USE_MULTITHREADED ON CACHE BOOL "Use multithreaded Boost libraries")
+set(Boost_USE_STATIC_LIBS OFF CACHE BOOL "Link against shared Boost libraries by default")
+
 # Set FORCE_CMAKE_SIQAD_GUI to TRUE if you want to force compile the GUI 
 # through CMAKE on Windows, which I have tested to work through Visual Studio 
 # 2017 + Qt 5.14.0. You'll need to add a few environmental variables to make 
