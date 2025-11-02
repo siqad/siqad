@@ -243,6 +243,8 @@ namespace gui{
       QTableWidgetItem *zheight;    // layer z-height
       QPushButton *bt_visibility;   // layer visibility
       QPushButton *bt_editability;  // layer editability (layer isActive)
+      QMetaObject::Connection visibility_connection;
+      QMetaObject::Connection editability_connection;
     };
 
     void initLayerManager();
