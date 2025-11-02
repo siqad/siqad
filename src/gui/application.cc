@@ -941,21 +941,25 @@ void gui::ApplicationGUI::saveSettings()
 
 void gui::ApplicationGUI::updateWindowTitle()
 {
-  if (!is_closing){
-    QString title_name;
+  if (is_closing)
+    return;
 
-    // prefix the title by an asterisk to the name if the file has been edited
-    if (design_pan->stateChanged())
-      title_name += "*";
+  const bool modified = design_pan->stateChanged();
+  setWindowModified(modified);
 
+  QString base_title;
+  if (working_path.isEmpty()) {
+    base_title = tr("Untitled");
+    setWindowFilePath(QString());
+  } else {
     QFileInfo w_path_info(working_path);
-    title_name += (working_path.isEmpty()) ? "Untitled" : w_path_info.fileName();
-
-    setWindowTitle(tr("%1 - %2")
-      .arg(title_name)
-      .arg(QCoreApplication::applicationName())
-    );
+    base_title = w_path_info.fileName();
+    setWindowFilePath(w_path_info.absoluteFilePath());
   }
+
+  setWindowTitle(tr("%1[*] - %2")
+    .arg(base_title, QCoreApplication::applicationName())
+  );
 }
 
 void gui::ApplicationGUI::setTool(gui::ToolType tool)
