@@ -6,7 +6,8 @@ cmake_minimum_required(VERSION 3.10)
 
 # Exhaustive GS (implements ground state model of SimAnneal and searches 
 # for the ground state charge configuration exhaustively)
-add_subdirectory(exhaustive-gs)
+# Removing this in favor of MNT's QuickExact
+# add_subdirectory(exhaustive-gs)
 
 # HoppingDynamics
 add_subdirectory(afm-sim)

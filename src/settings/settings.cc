@@ -99,7 +99,7 @@ QSettings *settings::AppSettings::m_defs()
 
 
   // overwrites existing default values with same keys... no check
-  S->setValue("log/override", true);
+  S->setValue("log/override", false);
   S->setValue("log/tofile", true);
   S->setValue("log/logdir", QString("<SYSTMP>/log/"));
   S->setValue("log/keepcount", 10);
@@ -173,7 +173,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("ITEMDOCK/mw", 120);  // item dock minimum width
   S->setValue("ITEMDOCK/loc", 2);   // item dock default to right
   S->setValue("INFODOCK/mw", 120);  // item dock minimum width
-  S->setValue("INFODOCK/loc", 8);   // info dock default to bottom
+  S->setValue("INFODOCK/loc", 2);   // info dock default to right
   S->setValue("Panel/logw", 400);
 
   S->setValue("SIMMAN/mw", 100);     // simulation manager minimum width
@@ -192,6 +192,7 @@ QSettings* settings::GUISettings::m_defs()
   S->setValue("view/zoom_max", 1);                // maximum zoom factor
   S->setValue("view/wheel_pan_step", 20);         // screen pan per wheel tick
   S->setValue("view/wheel_pan_boost", 5);         // shift-boost factor
+  S->setValue("view/scroll_direction", QStringLiteral("default")); // scroll direction override
   S->setValue("view/padding", .1);                // additional space around draw region
 
   // dangling bond parameters

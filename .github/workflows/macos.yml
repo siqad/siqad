@@ -35,7 +35,7 @@ jobs:
   build_and_test:
     strategy:
       matrix:
-        os: [ macos-13, macos-14, macos-15 ]
+        os: [ macos-14, macos-15, macos-26 ]
         compiler: [ clang++ ]
         ccompiler: [ clang ]
 
@@ -47,6 +47,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      # Install modern CMake before configuring; remove once macOS runners ship CMake >= 3.31 by default.
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: '4.1.2'
 
       # Remove existing 2to3 binary
       - name: Remove existing 2to3 binary
@@ -60,12 +66,6 @@ jobs:
           # Ensure Qt6 is available in PATH
           echo "/opt/homebrew/opt/qt@6/bin" >> $GITHUB_PATH
 
-      - if: matrix.os == 'macos-13'
-        name: Setup XCode version
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: "^14.2"
-
       - name: Setup ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -77,12 +77,17 @@ jobs:
       - name: Create Build Environment (Debug)
         run: cmake -E make_directory ${{github.workspace}}/build_debug
 
+      # Boost 1.89 from Homebrew lacks component configs on Action runners; drop these once images ship them or we vendor Boost:
+      # -DCMAKE_FIND_PACKAGE_PREFER_CONFIG, -DBoost_NO_BOOST_CMAKE, DCMAKE_POLICY_DEFAULT_CMP0167
       - name: Configure CMake (Debug)
         working-directory: ${{github.workspace}}/build_debug
         run: >
           cmake ${{github.workspace}}
           -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
           -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=OFF
+          -DBoost_NO_BOOST_CMAKE=ON
+          -DCMAKE_POLICY_DEFAULT_CMP0167=OLD
 
       - name: Build and test (Debug)
         working-directory: ${{github.workspace}}/build_debug
@@ -91,12 +96,17 @@ jobs:
       - name: Create Build Environment (Release)
         run: cmake -E make_directory ${{github.workspace}}/build_release
 
+      # Boost 1.89 from Homebrew lacks component configs on Action runners; drop these once images ship them or we vendor Boost:
+      # -DCMAKE_FIND_PACKAGE_PREFER_CONFIG, -DBoost_NO_BOOST_CMAKE, DCMAKE_POLICY_DEFAULT_CMP0167
       - name: Configure CMake (Release)
         working-directory: ${{github.workspace}}/build_release
         run: >
           cmake ${{github.workspace}}
           -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
           -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=OFF
+          -DBoost_NO_BOOST_CMAKE=ON
+          -DCMAKE_POLICY_DEFAULT_CMP0167=OLD
 
       - name: Build and test (Release)
         working-directory: ${{github.workspace}}/build_release

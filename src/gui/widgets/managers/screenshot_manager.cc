@@ -7,13 +7,21 @@
 // @desc:     Implementation of screenshot manager.
 
 #include "screenshot_manager.h"
+#include "layer_manager.h"
 
 
 namespace gui{
 
-ScreenshotManager::ScreenshotManager(int misc_layer_id, QWidget *parent)
-  : QWidget(parent, Qt::Dialog), misc_layer_id(misc_layer_id)
+ScreenshotManager::ScreenshotManager(int misc_layer_id, LayerManager *layer_manager, QWidget *parent)
+  : QWidget(parent, Qt::Dialog), misc_layer_id(misc_layer_id), layer_manager(layer_manager)
 {
+  if (layer_manager != nullptr) {
+    lattice_layer = layer_manager->getLattice(true);
+    if (lattice_layer != nullptr) {
+      connect(lattice_layer, &prim::Layer::sig_visibilityChanged,
+              this, &ScreenshotManager::updateLatticeClipControls);
+    }
+  }
   initScreenshotManager();
 }
 
@@ -23,6 +31,12 @@ ScreenshotManager::~ScreenshotManager()
   if (clip_area->scene() != 0) 
     emit sig_removeVisualAidFromDP(clip_area);
   delete clip_area;
+
+  if (lattice_clip_area != nullptr) {
+    if (lattice_clip_area->scene() != 0)
+      emit sig_removeVisualAidFromDP(lattice_clip_area);
+    delete lattice_clip_area;
+  }
 
   if (scale_bar->scene() != 0) 
     emit sig_removeVisualAidFromDP(scale_bar);
@@ -34,27 +48,110 @@ void ScreenshotManager::prepareScreenshotMode(bool entering)
   setVisible(entering);
   setClipVisibility(cb_preview_clip->isChecked() && entering);
   setScaleBarVisibility(cb_scale_bar->isChecked() && entering);
+  if (cb_preview_lattice_clip != nullptr)
+    setLatticeClipVisibility(cb_preview_lattice_clip->isChecked() && entering);
 }
 
 void ScreenshotManager::setClipArea(QRectF area)
 {
+  area = area.normalized();
   clip_area->setSceneRect(area);
-  if (area.isValid() && clip_area->scene() == 0) {
-    // add clip area to scene if it isn't already in one
-    emit sig_addVisualAidToDP(clip_area);
-  } else if(area.isNull() && clip_area->scene() !=0) {
-    // remove clip area from scene if it's in one
-    emit sig_removeVisualAidFromDP(clip_area);
+
+  const bool has_clip = area.isValid() && !area.isNull();
+  if (has_clip) {
+    if (clip_area->scene() == nullptr) {
+      // add clip area to scene if it isn't already in one
+      emit sig_addVisualAidToDP(clip_area);
+    }
+    clip_area->setVisible(cb_preview_clip->isChecked());
+  } else {
+    if (clip_area->scene() != nullptr) {
+      // remove clip area from scene if it's in one
+      emit sig_removeVisualAidFromDP(clip_area);
+    }
+    clip_area->setVisible(false);
   }
 }
 
 void ScreenshotManager::setClipVisibility(const bool &visible, const bool &cb_update)
 {
-  if (visible && !clip_area->scene())
+  const bool has_clip = clip_area->sceneRect().isValid() && !clip_area->sceneRect().isNull();
+  if (visible && has_clip && !clip_area->scene())
     emit sig_addVisualAidToDP(clip_area);
   clip_area->setVisible(visible);
   if (cb_update)
     cb_preview_clip->setChecked(visible);
+}
+
+void ScreenshotManager::setLatticeClipArea(QRectF area)
+{
+  if (lattice_clip_area == nullptr)
+    return;
+
+  area = area.normalized();
+  lattice_clip_area->setSceneRect(area);
+
+  const bool has_clip = area.isValid() && !area.isNull();
+  if (has_clip && lattice_clip_area->scene() == nullptr) {
+    if (lattice_layer != nullptr && lattice_layer->isVisible())
+      emit sig_addVisualAidToDP(lattice_clip_area);
+  } else if (!has_clip && lattice_clip_area->scene() != nullptr) {
+    emit sig_removeVisualAidFromDP(lattice_clip_area);
+  }
+
+  if (!has_clip) {
+    lattice_clip_preview_requested = false;
+    lattice_clip_area->setVisible(false);
+    if (cb_preview_lattice_clip != nullptr)
+      cb_preview_lattice_clip->setChecked(false);
+  } else if (cb_preview_lattice_clip != nullptr && cb_preview_lattice_clip->isChecked()
+             && lattice_layer != nullptr && lattice_layer->isVisible()) {
+    lattice_clip_area->setVisible(true);
+  }
+}
+
+void ScreenshotManager::setLatticeClipVisibility(const bool &visible, const bool &cb_update)
+{
+  if (lattice_clip_area == nullptr)
+    return;
+
+  const bool has_clip = lattice_clip_area->sceneRect().isValid() && !lattice_clip_area->sceneRect().isNull();
+  const bool lattice_visible = lattice_layer != nullptr && lattice_layer->isVisible();
+
+  if (visible && has_clip && lattice_visible && !lattice_clip_area->scene())
+    emit sig_addVisualAidToDP(lattice_clip_area);
+
+  lattice_clip_area->setVisible(visible && has_clip && lattice_visible);
+
+  if (cb_update && cb_preview_lattice_clip != nullptr)
+    cb_preview_lattice_clip->setChecked(visible && has_clip && lattice_visible);
+}
+
+void ScreenshotManager::updateLatticeClipControls(bool visible)
+{
+  const bool enable = lattice_layer != nullptr && visible;
+
+  if (cb_preview_lattice_clip != nullptr) {
+    if (!enable) {
+      lattice_clip_preview_requested = cb_preview_lattice_clip->isChecked() || lattice_clip_preview_requested;
+      cb_preview_lattice_clip->setChecked(false);
+    } else if (lattice_clip_preview_requested) {
+      cb_preview_lattice_clip->setChecked(true);
+      lattice_clip_preview_requested = false;
+    }
+    cb_preview_lattice_clip->setEnabled(enable);
+  }
+
+  if (pb_set_lattice_clip != nullptr)
+    pb_set_lattice_clip->setEnabled(enable);
+  if (pb_reset_lattice_clip != nullptr)
+    pb_reset_lattice_clip->setEnabled(enable);
+
+  if (!enable && lattice_clip_area != nullptr) {
+    lattice_clip_area->setVisible(false);
+  } else if (enable && cb_preview_lattice_clip != nullptr && cb_preview_lattice_clip->isChecked()) {
+    setLatticeClipVisibility(true, false);
+  }
 }
 
 void ScreenshotManager::setScaleBar(float t_length, Unit::DistanceUnit unit)
@@ -86,6 +183,7 @@ void ScreenshotManager::setScaleBarVisibility(const bool &visible, const bool &c
 void ScreenshotManager::initScreenshotManager()
 {
   clip_area = new prim::ScreenshotClipArea(misc_layer_id);
+  lattice_clip_area = new prim::ScreenshotClipArea(misc_layer_id);
   scale_bar = new prim::ScaleBar(misc_layer_id);
 
   // init GUI
@@ -159,6 +257,10 @@ void ScreenshotManager::initScreenshotManager()
   QPushButton *pb_reset_clip = new QPushButton(tr("Reset"));
   cb_preview_clip = new QCheckBox(tr("Preview Clip Area"));
 
+  pb_set_lattice_clip = new QPushButton(tr("Set Lattice Clip Area"));
+  pb_reset_lattice_clip = new QPushButton(tr("Reset"));
+  cb_preview_lattice_clip = new QCheckBox(tr("Preview Lattice Clip Area"));
+
   connect(pb_set_clip, &QAbstractButton::clicked,
           [this]() {
             cb_preview_clip->setChecked(true);
@@ -184,10 +286,58 @@ void ScreenshotManager::initScreenshotManager()
 #endif
   setClipVisibility(cb_preview_clip->isChecked(), false);  // init to check state
 
-  QFormLayout *fl_clip = new QFormLayout();
-  fl_clip->addRow(pb_set_clip, pb_reset_clip);
-  fl_clip->addRow(cb_preview_clip);
-  group_clip->setLayout(fl_clip);
+  connect(pb_set_lattice_clip, &QAbstractButton::clicked,
+          [this]() {
+            if (lattice_layer == nullptr || !lattice_layer->isVisible())
+              return;
+            lattice_clip_preview_requested = true;
+            cb_preview_lattice_clip->setChecked(true);
+            emit sig_latticeClipSelectionTool();
+          }
+  );
+  connect(pb_reset_lattice_clip, &QAbstractButton::clicked,
+          [this]() {
+            lattice_clip_preview_requested = false;
+            cb_preview_lattice_clip->setChecked(false);
+            setLatticeClipArea();
+          }
+  );
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+  connect(cb_preview_lattice_clip, &QCheckBox::checkStateChanged,
+          [this](bool state) {
+            setLatticeClipVisibility(state, false);
+          });
+#else
+  connect(cb_preview_lattice_clip, &QCheckBox::stateChanged,
+          [this](bool state) {
+            setLatticeClipVisibility(state, false);
+          });
+#endif
+  setLatticeClipVisibility(cb_preview_lattice_clip->isChecked(), false);
+
+  QGroupBox *group_main_clip = new QGroupBox(tr("Screenshot Clip Area"));
+  QGridLayout *grid_main_clip = new QGridLayout();
+  grid_main_clip->addWidget(pb_set_clip, 0, 0);
+  grid_main_clip->addWidget(pb_reset_clip, 0, 1);
+  grid_main_clip->addWidget(cb_preview_clip, 1, 0, 1, 2);
+  grid_main_clip->setColumnStretch(0, 1);
+  grid_main_clip->setColumnStretch(1, 1);
+  group_main_clip->setLayout(grid_main_clip);
+
+  QGroupBox *group_lattice_clip = new QGroupBox(tr("Lattice Clip Area"));
+  QGridLayout *grid_lattice_clip = new QGridLayout();
+  grid_lattice_clip->addWidget(pb_set_lattice_clip, 0, 0);
+  grid_lattice_clip->addWidget(pb_reset_lattice_clip, 0, 1);
+  grid_lattice_clip->addWidget(cb_preview_lattice_clip, 1, 0, 1, 2);
+  grid_lattice_clip->setColumnStretch(0, 1);
+  grid_lattice_clip->setColumnStretch(1, 1);
+  group_lattice_clip->setLayout(grid_lattice_clip);
+
+  QVBoxLayout *vl_clip = new QVBoxLayout();
+  vl_clip->addWidget(group_main_clip);
+  vl_clip->addWidget(group_lattice_clip);
+  group_clip->setLayout(vl_clip);
+  updateLatticeClipControls(lattice_layer != nullptr && lattice_layer->isVisible());
         
 
   // TODO Toggle publish style button (while at it, probably want to revamp the whole simulation mode and publish style mode thing to status flags since multiple things can be enabled concurrently. Additional flags can be added to enable preset colorschemes)
@@ -240,7 +390,24 @@ void ScreenshotManager::initScreenshotManager()
   connect(pb_screenshot, &QAbstractButton::clicked,
       [this]() {
         QString fpath = QDir(le_save_dir->text()).absoluteFilePath(le_name->text());
-        emit sig_takeScreenshot(fpath, clip_area->sceneRect(), cb_overwrite->isChecked());
+        QRectF clip_rect = clip_area->sceneRect().normalized();
+        QRectF lattice_rect = lattice_clip_area != nullptr ? lattice_clip_area->sceneRect().normalized() : QRectF();
+        const bool lattice_visible = lattice_layer != nullptr && lattice_layer->isVisible();
+        const bool lattice_clip_set = lattice_clip_area != nullptr && lattice_rect.isValid() && !lattice_rect.isNull();
+        const bool clip_set = clip_rect.isValid() && !clip_rect.isNull();
+
+        if (lattice_visible && lattice_clip_set && clip_set && !clip_rect.intersects(lattice_rect)) {
+          QMessageBox::StandardButton reply = QMessageBox::warning(
+              this,
+              tr("No Lattice In Screenshot"),
+              tr("The lattice clip area does not overlap with the screenshot clip area. "
+                 "The screenshot will not include any lattice sites. Do you want to continue?"),
+              QMessageBox::Ok | QMessageBox::Cancel);
+          if (reply == QMessageBox::Cancel)
+            return;
+        }
+
+        emit sig_takeScreenshot(fpath, clip_rect, cb_overwrite->isChecked());
       }
   );
 
