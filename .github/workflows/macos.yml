@@ -10,6 +10,7 @@ on:
       - '**/*.cmake'
       - '**/CMakeLists.txt'
       - 'libs/**'
+      - 'plugins/**'
       - '.github/workflows/macos.yml'
   pull_request:
     branches: ["master"]
@@ -19,7 +20,7 @@ on:
       - '**/*.cc'
       - '**/*.cmake'
       - '**/CMakeLists.txt'
-      - 'libs/**'
+      - 'plugins/**'
       - '.github/workflows/macos.yml'
   merge_group:
 
