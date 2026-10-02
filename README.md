@@ -77,6 +77,10 @@ The existing `CMAKE_FLAGS` environment variable still accepts
 whitespace-separated options. `notest` disables test targets for that run;
 omitting it enables them again even when reusing the build directory.
 
+Tests run explicitly before the script installs the build. See the
+[testing guide](docs/development/testing.rst) for GUI-only builds, labels,
+native clipboard tests and CI evidence. CMake 3.20 or newer is required.
+
 
 ### Windows
 

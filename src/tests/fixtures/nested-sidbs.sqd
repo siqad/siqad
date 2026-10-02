@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='utf-8'?>
+<siqad>
+  <gui>
+    <displayed_region x1="-15" y1="-10" x2="30" y2="25" />
+  </gui>
+  <layers>
+    <layer_prop>
+      <name>Lattice</name>
+      <type>Lattice</type>
+      <role>Design</role>
+      <zoffset>0</zoffset>
+      <zheight>0</zheight>
+      <visible>1</visible>
+      <active>1</active>
+      <lat_vec>
+        <name>Si(100) 2x1</name>
+        <N>2</N>
+        <a1 x="3.84" y="0.00" />
+        <a2 x="0.00" y="7.68" />
+        <b1 x="0.00" y="0.00" />
+        <b2 x="0.00" y="2.25" />
+      </lat_vec>
+    </layer_prop>
+    <layer_prop>
+      <name>Surface</name>
+      <type>DB</type>
+      <role>Design</role>
+      <zoffset>0</zoffset>
+      <zheight>0</zheight>
+      <visible>1</visible>
+      <active>1</active>
+    </layer_prop>
+    <layer_prop>
+      <name>Metal</name>
+      <type>Electrode</type>
+      <role>Design</role>
+      <zoffset>0</zoffset>
+      <zheight>0</zheight>
+      <visible>1</visible>
+      <active>1</active>
+    </layer_prop>
+  </layers>
+  <design>
+    <layer type="Lattice" />
+    <layer type="DB">
+      <aggregate>
+        <dbdot>
+          <latcoord n="0" m="0" l="0" />
+          <color>#ff555555</color>
+        </dbdot>
+        <aggregate>
+          <dbdot>
+            <latcoord n="3" m="0" l="1" />
+            <color>#ff555555</color>
+          </dbdot>
+          <dbdot>
+            <latcoord n="4" m="2" l="0" />
+            <color>#ff555555</color>
+          </dbdot>
+        </aggregate>
+      </aggregate>
+    </layer>
+    <layer type="Electrode" />
+  </design>
+</siqad>

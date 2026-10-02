@@ -138,6 +138,8 @@ namespace prim{
       return occ_latdots.contains(l_coord);
     }
 
+    int basisSize() const { return b.size(); }
+
     //! Return whether the given lattice coordinate is a valid coordinate.
     bool isValid(const prim::LatticeCoord &l_coord) const {
       return (l_coord.l >= 0 && l_coord.l < b.length());

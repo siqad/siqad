@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<charge_configurations>
+  <dist energy="-0.25" count="3" physically_valid="1" state_count="3">-0+</dist>
+  <dist energy="0.1" count="2" physically_valid="0" state_count="3">000</dist>
+</charge_configurations>

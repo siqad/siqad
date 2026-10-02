@@ -128,6 +128,9 @@ protected:
 private:
   static void constructPathMap()
   {
+    // An alternate profile isolates preferences, autosaves and plugin state.
+    // Set before constructing any settings object; ordinary launches are unchanged.
+    const QString profile = qEnvironmentVariable("SIQAD_PROFILE_ROOT");
     if (!QCoreApplication::startingUp()){
       // WARNING <BINPATH> can only be accessed after the core application has
       // been instantiated in main!
@@ -138,6 +141,11 @@ private:
     path_map["<ROOT>"] = QDir::rootPath();
     path_map["<SYSTMP>"] = QDir::tempPath() + "/siqad_" + QDir::home().dirName();
     path_map["<CONFIG>"] = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/siqad";
+    if (!profile.isEmpty()) {
+      path_map["<CONFIG>"] = QDir(profile).absoluteFilePath("config");
+      path_map["<APPLOCALDATA>"] = QDir(profile).absoluteFilePath("data");
+      path_map["<SYSTMP>"] = QDir(profile).absoluteFilePath("tmp");
+    }
   }
 
   static QStringList standardLocations(const QString &type)

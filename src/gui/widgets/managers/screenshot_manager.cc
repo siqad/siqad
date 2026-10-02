@@ -189,10 +189,12 @@ void ScreenshotManager::initScreenshotManager()
   //cb_sim_result_style = new QCheckBox(tr("Simulation Result Style"));
   //cb_publish_style = new QCheckBox(tr("Publish Style"));
   cb_scale_bar = new QCheckBox(tr("Show Scale Bar"));
+  cb_scale_bar->setObjectName("scaleBarVisible");
   QLabel *label_scale_bar_length = new QLabel(tr("Length"));
   QLineEdit *le_scale_bar_length = new QLineEdit("1");
   QComboBox *cbb_scale_bar_unit = new QComboBox();
   QPushButton *pb_set_scale_bar_anchor = new QPushButton(tr("Set Scale Bar Anchor"));
+  pb_set_scale_bar_anchor->setObjectName("setScaleBarAnchor");
   
   // populate scale bar length unit dropdown menu
   cbb_scale_bar_unit->addItems(Unit::distanceUnitStringList(Unit::pm,Unit::m));
@@ -249,12 +251,18 @@ void ScreenshotManager::initScreenshotManager()
   // Clip Setting Group
   QGroupBox *group_clip = new QGroupBox(tr("Clipping"));
   QPushButton *pb_set_clip = new QPushButton(tr("Set Clip Area"));
+  pb_set_clip->setObjectName("setClip");
   QPushButton *pb_reset_clip = new QPushButton(tr("Reset"));
+  pb_reset_clip->setObjectName("resetClip");
   cb_preview_clip = new QCheckBox(tr("Preview Clip Area"));
+  cb_preview_clip->setObjectName("clipPreview");
 
   pb_set_lattice_clip = new QPushButton(tr("Set Lattice Clip Area"));
+  pb_set_lattice_clip->setObjectName("setLatticeClip");
   pb_reset_lattice_clip = new QPushButton(tr("Reset"));
+  pb_reset_lattice_clip->setObjectName("resetLatticeClip");
   cb_preview_lattice_clip = new QCheckBox(tr("Preview Lattice Clip Area"));
+  cb_preview_lattice_clip->setObjectName("latticeClipPreview");
 
   connect(pb_set_clip, &QAbstractButton::clicked,
           [this]() {
@@ -347,7 +355,9 @@ void ScreenshotManager::initScreenshotManager()
   cb_overwrite = new QCheckBox(tr("Overwrite without asking"));
   QCheckBox *cb_always_ask_name = new QCheckBox(tr("Browse for file path every time"));
   QPushButton *pb_screenshot = new QPushButton(tr("Take Screenshot"));
+  pb_screenshot->setObjectName("takeScreenshot");
   QPushButton *pb_close = new QPushButton(tr("Close"));
+  pb_close->setObjectName("closeScreenshot");
   QDialogButtonBox *dbb_ss_buttons = new QDialogButtonBox();
   dbb_ss_buttons->addButton(pb_screenshot, QDialogButtonBox::AcceptRole);
   dbb_ss_buttons->addButton(pb_close, QDialogButtonBox::RejectRole);

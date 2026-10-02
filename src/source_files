@@ -34,6 +34,7 @@ gui/widgets/components/job_results/electron_config_set.cc
 gui/widgets/components/job_results/potential_landscape.cc
 gui/widgets/components/job_results/sqcommands.cc
 
+gui/clipboard_codec.cc
 gui/application.cc
 gui/commander.cc
 gui/property_map.cc
