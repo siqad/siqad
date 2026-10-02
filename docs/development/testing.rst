@@ -73,6 +73,10 @@ Enable explicitly on a disposable desktop/display::
     cmake --build build-native --parallel 4
     ctest --test-dir build-native -L native --output-on-failure --no-tests=error
 
+Native actors keep their windows hidden. On macOS they also disable Qt's
+foreground-application transformation so tests do not activate SiQAD or steal
+focus. They still use Cocoa and the real system clipboard.
+
 On Linux install Xvfb/xauth and prefix CTest with ``xvfb-run -a``. Tests reject
 offscreen/minimal backends, run serially, use independent profiles and atomic
 request/response files, and bound startup/commands/shutdown. Children are killed

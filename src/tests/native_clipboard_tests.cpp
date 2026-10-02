@@ -20,7 +20,8 @@ bool writeJson(const QString &path, const QJsonObject &object) {
 }
 
 int actorMain(const QString &mailbox) {
-  test_support::Scene panel;
+  // Clipboard transport needs the native platform, not a visible/focused window.
+  test_support::Scene panel(false);
   QTimer timer;
   int previousId = 0;
   QPointF lastPlacement;
@@ -47,7 +48,6 @@ int actorMain(const QString &mailbox) {
       auto *layer = panel.layerManager()->addDBLayer(panel.getLattice(true), "Clipboard target");
       panel.layerManager()->setActiveLayer(layer);
     } else if (op == "paste" || op == "pasteAgain") {
-      panel.activateWindow();
       QCoreApplication::processEvents();
       ok = QMetaObject::invokeMethod(&panel, "pasteAction", Qt::DirectConnection);
       imported = prim::Ghost::instance()->getSources().size();
@@ -93,7 +93,8 @@ int actorMain(const QString &mailbox) {
         {"clipboardBytes", mime ? mime->data(gui::clipboard_codec::mimeType).size() : 0},
         {"siqadMime", mime && mime->hasFormat(gui::clipboard_codec::mimeType)}});
   });
-  writeJson(mailbox + "/response.json", {{"id", 0}, {"ready", true}});
+  writeJson(mailbox + "/response.json", {{"id", 0}, {"ready", true},
+      {"visible", panel.isVisible()}, {"activeWindow", QApplication::activeWindow() != nullptr}});
   timer.start(10);
   return qApp->exec();
 }
@@ -113,7 +114,9 @@ public:
     if (!process.waitForStarted(5000)) return false;
     QElapsedTimer time; time.start();
     while (time.elapsed() < 5000 && process.state() != QProcess::NotRunning) {
-      if (readJson(mailbox.path() + "/response.json")["ready"].toBool()) return true;
+      const auto state = readJson(mailbox.path() + "/response.json");
+      if (state["ready"].toBool())
+        return !state["visible"].toBool() && !state["activeWindow"].toBool();
       QTest::qWait(10);
     }
     return false;
@@ -220,6 +223,11 @@ private slots:
 };
 
 int main(int argc, char **argv) {
+#ifdef Q_OS_MACOS
+  // Keep Cocoa clipboard access without transforming these helpers into
+  // foreground applications (which can take focus even with hidden widgets).
+  qputenv("QT_MAC_DISABLE_FOREGROUND_APPLICATION_TRANSFORM", "1");
+#endif
   test_support::Profile profile;
   QApplication app(argc, argv);
   if (argc == 3 && QString::fromLocal8Bit(argv[1]) == "--actor") return actorMain(QString::fromLocal8Bit(argv[2]));

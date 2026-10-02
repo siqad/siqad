@@ -16,7 +16,12 @@ inline QString artifact(const QString &name) {
 // Emitter are application singletons. Reset layer IDs only after panel teardown.
 class Scene : public gui::DesignPanel {
 public:
-  Scene() { resize(640, 480); show(); QCoreApplication::processEvents(); }
+  explicit Scene(bool showWindow = true) {
+    resize(640, 480);
+    if (showWindow) show();
+    else ensurePolished();
+    QCoreApplication::processEvents();
+  }
   QList<prim::DBDot*> dbs() {
     // The existing getAllDBs accessor returns only top-level DBs. Walk the
     // public item hierarchy independently when checking aggregate contents.
