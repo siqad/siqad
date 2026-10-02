@@ -55,6 +55,7 @@ void InfoPanel::updateSelItemCount(QList<prim::Item*> items)
   if (items.size() == 1 && items.first()->item_type == prim::Item::DBDot) {
     prim::DBDot *db_dot = static_cast<prim::DBDot*>(items.first());
     prim::LatticeCoord coord = db_dot->latticeCoord();
+    // n and m may be negative; only a negative basis index marks this invalid.
     if (coord.l >= 0) {
       lattice_coord_text = tr("(%1, %2, %3)")
         .arg(coord.n)

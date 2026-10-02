@@ -1,5 +1,5 @@
 Testing follow-up from cross-instance-copy
-*****************************************
+******************************************
 
 This note records tests wanted during the ``cross-instance-copy`` review and
 validation on 2026-10-01. The testing infrastructure work is deferred until

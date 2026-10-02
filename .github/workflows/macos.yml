@@ -37,7 +37,7 @@ jobs:
   build_and_test:
     strategy:
       matrix:
-        os: [ macos-14, macos-15, macos-26 ]
+        os: [ macos-15, macos-26 ]
         compiler: [ clang++ ]
         ccompiler: [ clang ]
 
