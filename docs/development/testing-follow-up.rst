@@ -106,6 +106,18 @@ steps in CI with timeouts and uploaded failure logs, skipped-case reports and
 export artifacts. Keep GUI-only validation available independently of simulator
 plugin builds. Add sanitizer runs once fixtures have reliable lifetime cleanup.
 
+Developer build-script recovery
+-------------------------------
+
+Automate SDK/cache recovery and debug/release install-root transitions for
+``make_everything_dev``. Also cover ``notest`` re-enabling, invocation outside
+the checkout, custom prefixes containing spaces, and supported build generators.
+SDK recovery, mode/test transitions, custom prefixes and invocation from another
+directory were exercised manually on macOS with Unix Makefiles while fixing the
+script; other generators and operating systems remain unverified. There is no
+established build-script integration harness. Future coverage should separate
+portable argument/error checks from real SDK and dependency builds on each OS.
+
 Acceptance for the later infrastructure work
 ============================================
 
