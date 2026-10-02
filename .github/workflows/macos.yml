@@ -7,6 +7,7 @@ on:
       - "**/*.py"
       - '**/*.h'
       - '**/*.cc'
+      - '**/*.cpp'
       - '**/*.cmake'
       - '**/CMakeLists.txt'
       - 'libs/**'
@@ -17,6 +18,7 @@ on:
       - "**/*.py"
       - '**/*.h'
       - '**/*.cc'
+      - '**/*.cpp'
       - '**/*.cmake'
       - '**/CMakeLists.txt'
       - 'libs/**'
