@@ -21,6 +21,22 @@ target_link_libraries(gui_workflow_tests PRIVATE Qt6::Test ${BIN_LINKS})
 siqad_test(gui_workflow_tests "gui;integration")
 set_tests_properties(gui_workflow_tests PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
 
+# A compiled QtCore helper avoids shell/interpreter differences across platforms.
+add_executable(fake_simulator fake_simulator.cpp)
+target_link_libraries(fake_simulator PRIVATE Qt6::Core)
+add_executable(sim_job_workflow_tests sim_job_workflow_tests.cpp)
+target_link_libraries(sim_job_workflow_tests PRIVATE Qt6::Test ${BIN_LINKS})
+target_compile_definitions(sim_job_workflow_tests PRIVATE
+    SIQAD_FAKE_SIMULATOR="$<TARGET_FILE:fake_simulator>")
+add_dependencies(sim_job_workflow_tests fake_simulator)
+siqad_test(sim_job_workflow_tests "gui;integration")
+set_tests_properties(sim_job_workflow_tests PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
+add_executable(document_export_tests document_export_tests.cpp)
+target_link_libraries(document_export_tests PRIVATE Qt6::Test ${BIN_LINKS})
+siqad_test(document_export_tests "gui;integration")
+set_tests_properties(document_export_tests PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
 if(SIQAD_NATIVE_TESTS)
     add_executable(native_clipboard_tests native_clipboard_tests.cpp)
     target_link_libraries(native_clipboard_tests PRIVATE Qt6::Test ${BIN_LINKS})

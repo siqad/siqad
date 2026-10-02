@@ -37,6 +37,7 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *, int lay_id)
 {
   prim::LatticeCoord read_coord(0,0,-1);
   QPointF loc;
+  bool has_physloc = false;
   QColor color;
   while (rs->readNextStartElement()) {
     QString elem_name = rs->name().toString();
@@ -53,8 +54,10 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *, int lay_id)
       qDebug() << QObject::tr("Read latcoord of DB: (%1, %2, %3)").arg(read_coord.n).arg(read_coord.m).arg(read_coord.l);
       rs->skipCurrentElement();
     } else if (elem_name == "physloc") {
-      loc.setX(rs->attributes().value("x").toFloat());
-      loc.setY(rs->attributes().value("y").toFloat());
+      bool valid_x = false, valid_y = false;
+      loc.setX(rs->attributes().value("x").toFloat(&valid_x));
+      loc.setY(rs->attributes().value("y").toFloat(&valid_y));
+      has_physloc = valid_x && valid_y && qIsFinite(loc.x()) && qIsFinite(loc.y());
       qDebug() << QObject::tr("Read physloc of DB: (%1, %2)").arg(loc.x()).arg(loc.y());
       rs->skipCurrentElement();
     } else {
@@ -69,7 +72,7 @@ prim::DBDot::DBDot(QXmlStreamReader *rs, QGraphicsScene *, int lay_id)
 
   // if lattice coord not available (legacy saves), use the physloc
   if (read_coord.l == -1) {
-    if (!loc.isNull()) {
+    if (has_physloc) {
       int n,m,l;
       prim::Emitter::instance()->physLoc2LatticeCoord(loc, n, m, l);
       read_coord = prim::LatticeCoord(n,m,l); // TODO magic function

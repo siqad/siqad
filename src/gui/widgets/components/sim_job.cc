@@ -59,6 +59,7 @@ JobStep::~JobStep()
 {
   if (process != nullptr)
     delete process;
+  qDeleteAll(job_results);
 }
 
 void JobStep::writeManifest(QXmlStreamWriter *ws)
@@ -117,18 +118,21 @@ bool JobStep::invokeBinary()
   if (placement == -1) {
     qWarning() << "Job step execution order placement not initialized, stopping \
       invocation.";
+    job_step_state = FinishedWithError;
     return false;
   }
 
   // check if problem file exists
   if (!QFileInfo(problem_path).exists()) {
     qDebug() << tr("SimJob: problem file '%1' doesn't exist.").arg(problem_path);
+    job_step_state = FinishedWithError;
     return false;
   }
 
   // check if binary path of simulation engine exists
   if (!QFileInfo(engine->binaryPath()).exists()) {
     qDebug() << tr("SimJob: engine binary/script '%1' doesn't exist.").arg(engine->binaryPath());
+    job_step_state = FinishedWithError;
     return false;
   }
 
@@ -152,6 +156,8 @@ bool JobStep::invokeBinary()
   qDebug() << tr("Waiting for process start success signal...");
   if (!process->waitForStarted()) {
     qCritical() << tr("Failed to start plugin process.");
+    job_step_state = FinishedWithError;
+    end_time = QDateTime::currentDateTime();
     return false;
   } else {
     qDebug() << "Job step process started successfully.";
@@ -262,7 +268,10 @@ bool JobStep::readResults(bool attempt_import_logs)
   // TODO remove line scans support from SiQADConn
 
   if(rs.hasError()){
-    qCritical() << tr("Failed to read results, XML error - ") << rs.errorString().data();
+    qCritical() << tr("Failed to read results, XML error - ") << rs.errorString();
+    // A partial parse must never be exposed as usable job results.
+    qDeleteAll(job_results);
+    job_results.clear();
     return false;
   }
 
@@ -310,6 +319,9 @@ void JobStep::exportTerminalOutputs(QString std_out_path, QString std_err_path)
 
 void JobStep::terminateJobStep()
 {
+  if (process == nullptr || process->state() == QProcess::NotRunning)
+    return;
+  termination_requested = true;
 #ifdef _WIN32
   process->kill();
 #else
@@ -325,9 +337,11 @@ void JobStep::processJobStepCompletion(int t_exit_code, QProcess::ExitStatus t_e
     .arg(placement).arg(exit_code).arg(str_exit_status);
   end_time = QDateTime::currentDateTime();
 
-  bool successful = (exit_code == 0) && (exit_status == QProcess::NormalExit);
+  bool successful = !termination_requested && (exit_code == 0)
+    && (exit_status == QProcess::NormalExit);
   if (successful)
-    readResults();
+    successful = readResults();
+  job_step_state = successful ? FinishedNormally : FinishedWithError;
 
   // inform the parent of the success state.
   emit sig_jobStepFinishState(placement, successful);
@@ -596,7 +610,10 @@ bool SimJob::beginJob()
   qDebug() << "Beginning job step invocation.";
   job_state = Running;
   curr_step = job_steps.at(0);
-  return job_steps.at(0)->invokeBinary();
+  const bool started = curr_step->invokeBinary();
+  if (!started)
+    jobFinishActions(FinishedWithError);
+  return started;
 }
 
 void SimJob::continueJob(int prev_step_ind, bool prev_step_successful)
@@ -618,8 +635,9 @@ void SimJob::continueJob(int prev_step_ind, bool prev_step_successful)
   int i = prev_step_ind + 1;
   if (i < job_steps.length()) {
     // invoke next step if any
-    job_steps.at(i)->invokeBinary();
     curr_step = job_steps.at(i);
+    if (!curr_step->invokeBinary())
+      jobFinishActions(FinishedWithError);
   } else {
     // wrap up job if no more steps
     curr_step = nullptr;
@@ -651,7 +669,9 @@ void SimJob::jobFinishActions(JobState t_job_state)
     default:
       break;
   }
+  curr_step = nullptr;
   gui_ctrl_elems.pb_terminate->setDisabled(true);
+  writeManifest();
   emit sig_jobFinishState(this, job_state);
 }
 
