@@ -94,7 +94,7 @@ jobs:
 
     - name: Test summary
       if: always()
-      run: python src/tests/report_tests.py build/test-results --expect siqad_tests gui_workflow_tests clipboard_codec_tests developer_script_tests report_tests_tests
+      run: python src/tests/report_tests.py build/test-results --expect siqad_tests gui_workflow_tests sim_job_workflow_tests document_export_tests clipboard_codec_tests developer_script_tests report_tests_tests
 
     - name: Preserve test evidence
       if: always()

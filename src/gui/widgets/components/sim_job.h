@@ -138,6 +138,7 @@ namespace comp{
     JobStepState job_step_state=NotInvoked; // job step run state
     QStringList command;                    // the invocation command
     QProcess *process=nullptr;              // the program process
+    bool termination_requested=false;      // cancellation is failure even on exit code 0
     QString job_tmp_dir_path;               // temp directory shared among steps
     QString js_tmp_dir_path;                // temp directory dedicated to this job step
     QString problem_path;                   // problem file path

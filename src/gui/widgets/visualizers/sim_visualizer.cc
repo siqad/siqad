@@ -73,6 +73,7 @@ SimVisualizer::SimVisualizer(DesignPanel *design_pan, QWidget *parent)
   charge_config_set_visualizer = new ChargeConfigSetVisualizer(design_pan->getLattice(false));
   gb_charge_configs = new QGroupBox("Charge Configurations");
   cb_job_steps_charge_configs = new QComboBox();
+  cb_job_steps_charge_configs->setObjectName("chargeConfigJobStep");
   QToolButton *tb_refresh_job_steps_charge_configs = new QToolButton();
   tb_refresh_job_steps_charge_configs->setIcon(QIcon::fromTheme("view-refresh"));
   tb_refresh_job_steps_charge_configs->setText("Refresh");

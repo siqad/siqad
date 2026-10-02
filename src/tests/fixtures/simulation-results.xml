@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sim_out>
+  <eng_info><engine>Deterministic test engine</engine><version>1</version></eng_info>
+  <physloc><dbdot x="0" y="0"/><dbdot x="11.52" y="2.25"/><dbdot x="15.36" y="15.36"/></physloc>
+  <elec_dist>
+    <dist energy="-0.25" count="3" physically_valid="1" state_count="3">-0+</dist>
+    <dist energy="0.1" count="2" physically_valid="0" state_count="3">000</dist>
+  </elec_dist>
+</sim_out>

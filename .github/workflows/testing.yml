@@ -56,7 +56,7 @@ jobs:
         run: ctest --test-dir build -L gui --output-on-failure --no-tests=error
       - name: Report test cases and skips
         if: always()
-        run: python3 src/tests/report_tests.py build/test-results --expect siqad_tests gui_workflow_tests clipboard_codec_tests developer_script_tests report_tests_tests ${{ matrix.mode == 'native' && 'native_clipboard_tests' || '' }}
+        run: python3 src/tests/report_tests.py build/test-results --expect siqad_tests gui_workflow_tests sim_job_workflow_tests document_export_tests clipboard_codec_tests developer_script_tests report_tests_tests ${{ matrix.mode == 'native' && 'native_clipboard_tests' || '' }}
       - name: Preserve test evidence
         if: always()
         uses: actions/upload-artifact@v4

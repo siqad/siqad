@@ -64,6 +64,27 @@ Limits are 1 MiB serialized, 10,000 total nodes and 64 levels (top-level items
 are level 1). Invalid decode leaves output intact; invalid encode returns empty.
 Source layers are metadata; placement uses the target's active DB layer.
 
+Job, historical document and scale-bar workflows
+================================================
+
+``sim_job_workflow_tests`` discovers a compiled fake engine through the real
+PluginManager and executes multi-step jobs through JobManager, JobStep/QProcess
+and SimVisualizer. Problem export and result-layer loading use isolated files.
+Tests check result discovery, charge overlays, step selection, clearing back to
+the design, nonzero exits, missing/malformed results, first/later startup failures
+and cancellation before queued steps. On Unix the cancellation actor deliberately
+returns exit code zero after SIGTERM; cancellation must still fail the step.
+Windows uses the production process-kill path. Manifests and subprocess logs are
+retained per case/data row. The fake engine qualifies orchestration, not physics.
+
+``document_export_tests`` loads three reconstructed historical serializer formats,
+checks sites/occupancy/colors/layers/nested aggregates, and saves/reloads current
+SQD. The fixture README records source commits and the exact coverage boundary.
+Physical-only legacy data includes the valid origin. SVG scale-bar tests measure
+physical length, square-cap extents, metric units, anchor movement, view-transform
+independence, visibility and cropping. A narrow raster scan checks crop boundaries;
+there are no font-dependent pixel goldens.
+
 Native clipboard tests
 ======================
 
@@ -100,7 +121,7 @@ output. Scene failures save viewport PNGs; exported SVGs, saved documents and
 native actor logs/transcripts remain there. CTest logs are in
 ``Testing/Temporary``. Summarize expected evidence with::
 
-    python3 src/tests/report_tests.py build-tests/test-results --expect siqad_tests gui_workflow_tests clipboard_codec_tests developer_script_tests report_tests_tests
+    python3 src/tests/report_tests.py build-tests/test-results --expect siqad_tests gui_workflow_tests sim_job_workflow_tests document_export_tests clipboard_codec_tests developer_script_tests report_tests_tests
 
 The reporter fails missing, empty, malformed or failed evidence and lists skip
 reasons separately. CI uploads evidence even on failure. Existing platform jobs
@@ -126,8 +147,8 @@ process-lifetime allocations; address errors and undefined behavior remain
 fatal. Full GUI leak qualification requires singleton ownership cleanup.
 
 Native Windows/macOS CI jobs and physical input automation remain additional
-coverage. The Xvfb clipboard-manager lifetime variant, full simulation job
-discovery/external engines, historical design migration, scale-bar geometry,
-and portable touch recognizer cancellation also need dedicated environments or
-fixtures. Prefer observable behavior checks over implementation mirrors or
-font-dependent pixel goldens.
+coverage. The Xvfb clipboard-manager lifetime variant, external engines,
+historical item types beyond the represented fixtures, and portable touch
+recognizer cancellation also need dedicated environments or fixtures. Prefer
+observable behavior checks over implementation mirrors or font-dependent pixel
+goldens.
