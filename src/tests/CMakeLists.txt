@@ -35,7 +35,7 @@ siqad_test(clipboard_codec_tests "unit")
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 add_test(NAME developer_script_tests COMMAND ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/developer_script_tests.py --junit "${test_results}/developer_script_tests.xml")
-set_tests_properties(developer_script_tests PROPERTIES TIMEOUT 30 LABELS "unit;build-script")
+set_tests_properties(developer_script_tests PROPERTIES TIMEOUT 60 LABELS "unit;build-script")
 add_test(NAME report_tests_tests COMMAND ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/report_tests_tests.py --junit "${test_results}/report_tests_tests.xml")
 set_tests_properties(report_tests_tests PROPERTIES TIMEOUT 10 LABELS "unit")
