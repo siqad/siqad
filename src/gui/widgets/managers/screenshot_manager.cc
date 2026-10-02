@@ -16,10 +16,11 @@ ScreenshotManager::ScreenshotManager(int misc_layer_id, LayerManager *layer_mana
   : QWidget(parent, Qt::Dialog), misc_layer_id(misc_layer_id), layer_manager(layer_manager)
 {
   if (layer_manager != nullptr) {
-    lattice_layer = layer_manager->getLattice(true);
-    if (lattice_layer != nullptr) {
-      connect(lattice_layer, &prim::Layer::sig_visibilityChanged,
-              this, &ScreenshotManager::updateLatticeClipControls);
+    for (bool design_role : {true, false}) {
+      if (prim::Layer *lattice = layer_manager->getLattice(design_role)) {
+        connect(lattice, &prim::Layer::sig_visibilityChanged,
+                this, &ScreenshotManager::updateLatticeClipControls);
+      }
     }
   }
   initScreenshotManager();
@@ -46,6 +47,7 @@ ScreenshotManager::~ScreenshotManager()
 void ScreenshotManager::prepareScreenshotMode(bool entering)
 {
   setVisible(entering);
+  updateLatticeClipControls();
   setClipVisibility(cb_preview_clip->isChecked() && entering);
   setScaleBarVisibility(cb_scale_bar->isChecked() && entering);
   if (cb_preview_lattice_clip != nullptr)
@@ -92,21 +94,16 @@ void ScreenshotManager::setLatticeClipArea(QRectF area)
   lattice_clip_area->setSceneRect(area);
 
   const bool has_clip = area.isValid() && !area.isNull();
-  if (has_clip && lattice_clip_area->scene() == nullptr) {
-    if (lattice_layer != nullptr && lattice_layer->isVisible())
-      emit sig_addVisualAidToDP(lattice_clip_area);
-  } else if (!has_clip && lattice_clip_area->scene() != nullptr) {
+  if (!has_clip && lattice_clip_area->scene() != nullptr) {
     emit sig_removeVisualAidFromDP(lattice_clip_area);
   }
 
   if (!has_clip) {
-    lattice_clip_preview_requested = false;
     lattice_clip_area->setVisible(false);
     if (cb_preview_lattice_clip != nullptr)
       cb_preview_lattice_clip->setChecked(false);
-  } else if (cb_preview_lattice_clip != nullptr && cb_preview_lattice_clip->isChecked()
-             && lattice_layer != nullptr && lattice_layer->isVisible()) {
-    lattice_clip_area->setVisible(true);
+  } else if (cb_preview_lattice_clip != nullptr) {
+    setLatticeClipVisibility(cb_preview_lattice_clip->isChecked() && isVisible());
   }
 }
 
@@ -116,42 +113,40 @@ void ScreenshotManager::setLatticeClipVisibility(const bool &visible, const bool
     return;
 
   const bool has_clip = lattice_clip_area->sceneRect().isValid() && !lattice_clip_area->sceneRect().isNull();
-  const bool lattice_visible = lattice_layer != nullptr && lattice_layer->isVisible();
+  const prim::Layer *lattice = activeLattice();
+  const bool lattice_visible = lattice != nullptr && lattice->isVisible();
+
+  // The checkbox records user intent even while the first area is being drawn.
+  if (cb_update && cb_preview_lattice_clip != nullptr)
+    cb_preview_lattice_clip->setChecked(visible);
 
   if (visible && has_clip && lattice_visible && !lattice_clip_area->scene())
     emit sig_addVisualAidToDP(lattice_clip_area);
 
   lattice_clip_area->setVisible(visible && has_clip && lattice_visible);
-
-  if (cb_update && cb_preview_lattice_clip != nullptr)
-    cb_preview_lattice_clip->setChecked(visible && has_clip && lattice_visible);
 }
 
-void ScreenshotManager::updateLatticeClipControls(bool visible)
+prim::Layer *ScreenshotManager::activeLattice() const
 {
-  const bool enable = lattice_layer != nullptr && visible;
+  return layer_manager == nullptr ? nullptr
+      : layer_manager->getLattice(!layer_manager->isSimLayerMode());
+}
 
-  if (cb_preview_lattice_clip != nullptr) {
-    if (!enable) {
-      lattice_clip_preview_requested = cb_preview_lattice_clip->isChecked() || lattice_clip_preview_requested;
-      cb_preview_lattice_clip->setChecked(false);
-    } else if (lattice_clip_preview_requested) {
-      cb_preview_lattice_clip->setChecked(true);
-      lattice_clip_preview_requested = false;
-    }
+void ScreenshotManager::updateLatticeClipControls()
+{
+  const prim::Layer *lattice = activeLattice();
+  const bool enable = lattice != nullptr && lattice->isVisible();
+
+  if (cb_preview_lattice_clip != nullptr)
     cb_preview_lattice_clip->setEnabled(enable);
-  }
 
   if (pb_set_lattice_clip != nullptr)
     pb_set_lattice_clip->setEnabled(enable);
   if (pb_reset_lattice_clip != nullptr)
     pb_reset_lattice_clip->setEnabled(enable);
 
-  if (!enable && lattice_clip_area != nullptr) {
-    lattice_clip_area->setVisible(false);
-  } else if (enable && cb_preview_lattice_clip != nullptr && cb_preview_lattice_clip->isChecked()) {
-    setLatticeClipVisibility(true, false);
-  }
+  if (cb_preview_lattice_clip != nullptr)
+    setLatticeClipVisibility(enable && isVisible() && cb_preview_lattice_clip->isChecked());
 }
 
 void ScreenshotManager::setScaleBar(float t_length, Unit::DistanceUnit unit)
@@ -288,16 +283,15 @@ void ScreenshotManager::initScreenshotManager()
 
   connect(pb_set_lattice_clip, &QAbstractButton::clicked,
           [this]() {
-            if (lattice_layer == nullptr || !lattice_layer->isVisible())
+            const prim::Layer *lattice = activeLattice();
+            if (lattice == nullptr || !lattice->isVisible())
               return;
-            lattice_clip_preview_requested = true;
             cb_preview_lattice_clip->setChecked(true);
             emit sig_latticeClipSelectionTool();
           }
   );
   connect(pb_reset_lattice_clip, &QAbstractButton::clicked,
           [this]() {
-            lattice_clip_preview_requested = false;
             cb_preview_lattice_clip->setChecked(false);
             setLatticeClipArea();
           }
@@ -337,7 +331,7 @@ void ScreenshotManager::initScreenshotManager()
   vl_clip->addWidget(group_main_clip);
   vl_clip->addWidget(group_lattice_clip);
   group_clip->setLayout(vl_clip);
-  updateLatticeClipControls(lattice_layer != nullptr && lattice_layer->isVisible());
+  updateLatticeClipControls();
         
 
   // TODO Toggle publish style button (while at it, probably want to revamp the whole simulation mode and publish style mode thing to status flags since multiple things can be enabled concurrently. Additional flags can be added to enable preset colorschemes)
@@ -392,7 +386,8 @@ void ScreenshotManager::initScreenshotManager()
         QString fpath = QDir(le_save_dir->text()).absoluteFilePath(le_name->text());
         QRectF clip_rect = clip_area->sceneRect().normalized();
         QRectF lattice_rect = lattice_clip_area != nullptr ? lattice_clip_area->sceneRect().normalized() : QRectF();
-        const bool lattice_visible = lattice_layer != nullptr && lattice_layer->isVisible();
+        const prim::Layer *lattice = activeLattice();
+        const bool lattice_visible = lattice != nullptr && lattice->isVisible();
         const bool lattice_clip_set = lattice_clip_area != nullptr && lattice_rect.isValid() && !lattice_rect.isNull();
         const bool clip_set = clip_rect.isValid() && !clip_rect.isNull();
 

@@ -125,13 +125,15 @@ namespace gui{
       void closeEvent(QCloseEvent *bar);
 
       //! Update lattice clip area related controls when lattice visibility changes.
-      void updateLatticeClipControls(bool visible);
+      void updateLatticeClipControls();
+
+      //! Resolve the lattice for the current design or simulation display.
+      prim::Layer *activeLattice() const;
 
       // Variables
       int misc_layer_id=-1;                         //! layer id of the misc layer
 
       LayerManager *layer_manager=nullptr;          //! pointer to layer manager
-      prim::Layer *lattice_layer=nullptr;           //! tracked lattice layer
 
       prim::ScreenshotClipArea *clip_area=nullptr;  //! Clip area for region screenshot.
       prim::ScreenshotClipArea *lattice_clip_area=nullptr; //! Clip area for lattice rendering
@@ -147,7 +149,6 @@ namespace gui{
       QCheckBox *cb_preview_lattice_clip=nullptr;   //! Checkbox for showing lattice clip preview
       QPushButton *pb_set_lattice_clip=nullptr;     //! Button for setting lattice clip area
       QPushButton *pb_reset_lattice_clip=nullptr;   //! Button for resetting lattice clip area
-      bool lattice_clip_preview_requested=false;    //! Track whether lattice preview was requested before disabling
       // TODO pointer to scale bar item
   };
 

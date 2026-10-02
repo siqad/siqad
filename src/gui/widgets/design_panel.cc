@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <QApplication>
 #include <QClipboard>
 #include <QGesture>
@@ -46,6 +47,8 @@ bool pointFromJson(const QJsonObject &obj, QPointF &pt)
   const QJsonValue y_val = obj.value(QStringLiteral("y"));
   if (!x_val.isDouble() || !y_val.isDouble())
     return false;
+  if (!std::isfinite(x_val.toDouble()) || !std::isfinite(y_val.toDouble()))
+    return false;
 
   pt.setX(x_val.toDouble());
   pt.setY(y_val.toDouble());
@@ -61,22 +64,29 @@ QJsonObject latticeCoordToJson(const prim::LatticeCoord &coord)
   return obj;
 }
 
-bool latticeCoordFromJson(const QJsonObject &obj, prim::LatticeCoord &coord)
+bool integerFromJson(const QJsonValue &value, int &out)
+{
+  if (!value.isDouble())
+    return false;
+  const double number = value.toDouble();
+  if (!std::isfinite(number) || std::trunc(number) != number
+      || number < std::numeric_limits<int>::min()
+      || number > std::numeric_limits<int>::max())
+    return false;
+  out = static_cast<int>(number);
+  return true;
+}
 
+bool latticeCoordFromJson(const QJsonObject &obj, prim::LatticeCoord &coord)
 {
   if (!obj.contains(QStringLiteral("n")) || !obj.contains(QStringLiteral("m")) ||
       !obj.contains(QStringLiteral("l"))) {
     return false;
   }
 
-  const QJsonValue n_val = obj.value(QStringLiteral("n"));
-  const QJsonValue m_val = obj.value(QStringLiteral("m"));
-  const QJsonValue l_val = obj.value(QStringLiteral("l"));
-  if (!n_val.isDouble() || !m_val.isDouble() || !l_val.isDouble())
-    return false;
-
-  coord = prim::LatticeCoord(n_val.toInt(), m_val.toInt(), l_val.toInt());
-  return true;
+  return integerFromJson(obj.value(QStringLiteral("n")), coord.n)
+      && integerFromJson(obj.value(QStringLiteral("m")), coord.m)
+      && integerFromJson(obj.value(QStringLiteral("l")), coord.l);
 }
 
 bool itemSupportedForCrossInstance(const prim::Item *item);
@@ -138,18 +148,20 @@ bool itemSupportedForCrossInstance(const prim::Item *item)
   return false;
 }
 
-prim::Item *deserializeItem(const QJsonObject &obj, bool &ok)
+prim::Item *deserializeItem(const QJsonObject &obj, bool &ok,
+                            QSet<prim::LatticeCoord> &sites, const prim::Lattice *lattice)
 {
   const QString type = obj.value(QStringLiteral("type")).toString();
   if (type == QStringLiteral("db")) {
     prim::LatticeCoord coord;
-    if (!latticeCoordFromJson(obj.value(QStringLiteral("lat")).toObject(), coord)) {
+    if (!latticeCoordFromJson(obj.value(QStringLiteral("lat")).toObject(), coord)
+        || !lattice->isValid(coord) || sites.contains(coord)) {
       ok = false;
       return nullptr;
     }
 
-    const int layer_id = obj.value(QStringLiteral("layer")).toInt(-1);
-    if (layer_id == -1) {
+    int layer_id;
+    if (!integerFromJson(obj.value(QStringLiteral("layer")), layer_id) || layer_id < 0) {
       ok = false;
       return nullptr;
     }
@@ -162,18 +174,24 @@ prim::Item *deserializeItem(const QJsonObject &obj, bool &ok)
 
     auto *db = new prim::DBDot(coord, layer_id, true);
     db->setPos(pos);
+    sites.insert(coord);
     ok = true;
     return db;
   }
 
   if (type == QStringLiteral("aggregate")) {
-    const int layer_id = obj.value(QStringLiteral("layer")).toInt(-1);
-    if (layer_id == -1) {
+    int layer_id;
+    if (!integerFromJson(obj.value(QStringLiteral("layer")), layer_id) || layer_id < 0) {
       ok = false;
       return nullptr;
     }
 
-    const QJsonArray children_array = obj.value(QStringLiteral("children")).toArray();
+    const QJsonValue children_value = obj.value(QStringLiteral("children"));
+    const QJsonArray children_array = children_value.toArray();
+    if (!children_value.isArray() || children_array.isEmpty()) {
+      ok = false;
+      return nullptr;
+    }
     QStack<prim::Item*> children_stack;
     QList<prim::Item*> owned_children;
     owned_children.reserve(children_array.size());
@@ -185,7 +203,7 @@ prim::Item *deserializeItem(const QJsonObject &obj, bool &ok)
         return nullptr;
       }
       bool child_ok = false;
-      prim::Item *child_item = deserializeItem(child_value.toObject(), child_ok);
+      prim::Item *child_item = deserializeItem(child_value.toObject(), child_ok, sites, lattice);
       if (!child_ok || child_item == nullptr) {
         ok = false;
         qDeleteAll(owned_children);
@@ -236,9 +254,10 @@ QByteArray serializeClipboardItems(const QList<prim::Item*> &items, bool &ok)
   return doc.toJson(QJsonDocument::Compact);
 }
 
-bool deserializeClipboardItems(const QByteArray &payload, QList<prim::Item*> &items_out)
+bool deserializeClipboardItems(const QByteArray &payload, QList<prim::Item*> &items_out,
+                               const prim::Lattice *lattice)
 {
-  if (payload.isEmpty())
+  if (payload.isEmpty() || lattice == nullptr)
     return false;
 
   QJsonParseError parse_error;
@@ -254,7 +273,11 @@ bool deserializeClipboardItems(const QByteArray &payload, QList<prim::Item*> &it
   if (version != kSiqadClipboardFormatVersion)
     return false;
 
-  const QJsonArray array = root.value(QStringLiteral("items")).toArray();
+  const QJsonValue items_value = root.value(QStringLiteral("items"));
+  const QJsonArray array = items_value.toArray();
+  if (!items_value.isArray() || array.isEmpty())
+    return false;
+  QSet<prim::LatticeCoord> sites;
   QList<prim::Item*> items;
   items.reserve(array.size());
 
@@ -265,7 +288,7 @@ bool deserializeClipboardItems(const QByteArray &payload, QList<prim::Item*> &it
     }
 
     bool ok = false;
-    prim::Item *item = deserializeItem(value.toObject(), ok);
+    prim::Item *item = deserializeItem(value.toObject(), ok, sites, lattice);
     if (!ok || item == nullptr) {
       qDeleteAll(items);
       delete item;
@@ -852,10 +875,11 @@ void gui::DesignPanel::screenshot(QPainter *painter, const QRectF &region, const
     if (!lattice_query_rect.isNull()) {
       QList<prim::LatticeCoord> coords = lat->enclosedSites(lattice_query_rect);
       for (const prim::LatticeCoord &coord : coords) {
-        if (lat->isOccupied(coord))
+        const QPointF site_pos = lat->latticeCoord2ScenePos(coord);
+        if (lat->isOccupied(coord) || !lattice_query_rect.contains(site_pos))
           continue;
         prim::LatticeDotPreview *ldp = new prim::LatticeDotPreview(coord);
-        ldp->setPos(lat->latticeCoord2ScenePos(coord));
+        ldp->setPos(site_pos);
         ldp->setZValue(INT_MIN);
         latdot_previews.append(ldp);
         scene->addItem(ldp);
@@ -1911,6 +1935,8 @@ void gui::DesignPanel::handlePinchGesture(QPinchGesture *gesture)
 {
   if (gesture == nullptr || !touch_interactions_enabled || loading_design)
     return;
+  if (gesture->state() != Qt::GestureStarted && gesture->state() != Qt::GestureUpdated)
+    return;
 
   if (!(gesture->changeFlags() & QPinchGesture::ScaleFactorChanged))
     return;
@@ -2049,8 +2075,8 @@ void gui::DesignPanel::pasteAction()
   if (display_mode != DesignMode)
     return;
 
-  if (systemClipboardHasSiQADSelection())
-    importClipboardFromSystem();
+  if (systemClipboardHasSiQADSelection() && !importClipboardFromSystem())
+    return;
 
   if (!clipboard.isEmpty())
     createGhost(true);
@@ -2145,13 +2171,11 @@ void gui::DesignPanel::rubberBandUpdate(QPoint pos){
   if (rb == nullptr) {
     // make rubber band
     rb = new QRubberBand(QRubberBand::Rectangle, this);
-    rb->setGeometry(QRect(mapFromScene(rb_start), QSize()));
     rb->show();
-  } else {
-    // update rubberband rectangle
-    rb->setGeometry(QRect(mapFromScene(rb_start), pos).normalized());
-    rb_scene_rect = QRect(rb_start, mapToScene(pos).toPoint()).normalized();
   }
+  // The first move may be the only move before release.
+  rb->setGeometry(QRect(mapFromScene(rb_start), pos).normalized());
+  rb_scene_rect = QRect(rb_start, mapToScene(pos).toPoint()).normalized();
 }
 
 
@@ -2364,7 +2388,7 @@ bool gui::DesignPanel::importClipboardFromSystem()
 
   const QByteArray payload = mime_data->data(kSiqadClipboardMimeType);
   QList<prim::Item*> items;
-  if (!deserializeClipboardItems(payload, items))
+  if (!deserializeClipboardItems(payload, items, lattice))
     return false;
 
   qDeleteAll(clipboard);

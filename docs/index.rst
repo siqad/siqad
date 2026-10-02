@@ -33,6 +33,7 @@ SiQAD (**Si**\ licon **Q**\ uantum **A**\ tomic **D**\ esigner) is a CAD tool th
    :caption: Development:
 
    development/coming-soon.rst
+   development/testing-follow-up.rst
 
 .. toctree::
    :caption: Resources:

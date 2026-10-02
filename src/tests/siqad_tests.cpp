@@ -1,57 +1,260 @@
 #include <QtTest/QtTest>
+#include <QClipboard>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QMimeData>
+#include <QNativeGestureEvent>
+#include <QPointingDevice>
 
-#include "gui/widgets/managers/layer_manager.h"
-#include "gui/widgets/primitives/lattice.h"
+#include "gui/widgets/design_panel.h"
 
-class SiQADTests: public QObject
+namespace {
+QJsonObject db(int n = 0, int m = 0, int l = 0)
+{
+  return {{"type", "db"}, {"layer", 2},
+          {"pos", QJsonObject{{"x", n * 384.0}, {"y", m * 768.0 + l * 225.0}}},
+          {"lat", QJsonObject{{"n", n}, {"m", m}, {"l", l}}}};
+}
+
+QJsonObject aggregate(const QJsonArray &children)
+{
+  return {{"type", "aggregate"}, {"layer", 2},
+          {"pos", QJsonObject{{"x", 0}, {"y", 0}}}, {"children", children}};
+}
+
+void setClipboard(const QJsonArray &items)
+{
+  const QJsonObject root{{"format", "siqad-sidb-selection"}, {"version", 1}, {"items", items}};
+  auto *mime = new QMimeData;
+  mime->setData("application/x-siqad-sidb-selection", QJsonDocument(root).toJson());
+  QApplication::clipboard()->setMimeData(mime);
+}
+
+template<class T>
+T *control(gui::ScreenshotManager *manager, const QString &text)
+{
+  for (T *widget : manager->findChildren<T*>()) {
+    if (widget->text() == text)
+      return widget;
+  }
+  return nullptr;
+}
+} // namespace
+
+class SiQADTests : public QObject
 {
   Q_OBJECT
 
-// functions in these slots are automatically called
 private slots:
-  
-  // void testLayerManager()
-  // {
-  //   gui::LayerManager *layman = new gui::LayerManager(nullptr);
+  void initTestCase()
+  {
+    QStandardPaths::setTestModeEnabled(true);
+  }
 
-  //   // Add default basic layers
-  //   prim::Lattice *lat = new prim::Lattice();
-  //   prim::Lattice *latr = new prim::Lattice();
-  //   layman->addLattice(lat);                        // Design lattice
-  //   layman->addLattice(latr, prim::Layer::Result);  // Sim Result lattice
-  //   layman->addDBLayer(lat, "Surface");             // DB surface
-  //   layman->addLayer("Metal", prim::Layer::Electrode, prim::Layer::Design, 1000, 100);  // Metal layer
-  //   QCOMPARE(layman->layerCount(), 3);              // Sim Result lattice doesn't count here
-  //   QCOMPARE(layman->getLayer(0)->getName(), QString("Lattice"));
-  //   QCOMPARE(layman->getLayer(0)->role(), prim::Layer::Design);
-  //   QCOMPARE(layman->getLayer(0, false)->getName(), QString("Lattice"));
-  //   QCOMPARE(layman->getLayer(0, false)->role(), prim::Layer::Result);
-  //   QCOMPARE(layman->getLayer(1)->getName(), QString("Surface"));
-  //   QCOMPARE(layman->getLayer(1)->role(), prim::Layer::Design);
-  //   QCOMPARE(layman->getLayer(2)->getName(), QString("Metal"));
-  //   QCOMPARE(layman->getLayer(2)->role(), prim::Layer::Design);
+  void cleanup()
+  {
+    QApplication::clipboard()->clear();
+    prim::Layer::resetLayers();
+  }
 
-  //   // Add layer with conflicting name, which should be refused
-  //   prim::Layer *lay = layman->addLayer("Metal", prim::Layer::Electrode, prim::Layer::Design, 1, 10);
-  //   QCOMPARE(lay, nullptr);
-  //   QCOMPARE(layman->layerCount(), 3);
-  //   QCOMPARE(layman->getLayer("Metal")->zOffset(), (float) 1000);
-  //   QCOMPARE(layman->getLayer("Metal")->zHeight(), (float) 100);
+  void rejectsInvalidClipboard_data()
+  {
+    QTest::addColumn<QJsonArray>("items");
+    QTest::newRow("duplicate-sites") << QJsonArray{db(), db()};
+    QTest::newRow("duplicate-across-nested-groups")
+        << QJsonArray{db(), aggregate({aggregate({db()})})};
+    QTest::newRow("empty-aggregate") << QJsonArray{db(), aggregate({})};
+    QTest::newRow("empty-selection") << QJsonArray{};
+    QTest::newRow("invalid-basis") << QJsonArray{db(0, 0, 2)};
+    QTest::newRow("negative-basis") << QJsonArray{db(0, 0, -1)};
+    QJsonObject fractional = db();
+    fractional["lat"] = QJsonObject{{"n", 0.5}, {"m", 0}, {"l", 0}};
+    QTest::newRow("fractional-coordinate") << QJsonArray{fractional};
+    QJsonObject overflow = db();
+    overflow["lat"] = QJsonObject{{"n", 1e30}, {"m", 0}, {"l", 0}};
+    QTest::newRow("coordinate-overflow") << QJsonArray{overflow};
+    QJsonObject invalid_layer = db();
+    invalid_layer["layer"] = -2;
+    QTest::newRow("negative-layer") << QJsonArray{invalid_layer};
+    QJsonObject invalid_children = aggregate({db()});
+    invalid_children["children"] = "invalid";
+    QTest::newRow("wrong-children-type") << QJsonArray{invalid_children};
+  }
 
-  //   // Add layer and check that the indices between LayerManager and the Layer do match
-  //   lay = layman->addLayer("Metal 2", prim::Layer::Electrode, prim::Layer::Design, 1, 10);
-  //   QVERIFY(lay != nullptr);
-  //   QCOMPARE(lay->layerID(), layman->indexOf(lay));
+  void rejectsInvalidClipboard()
+  {
+    QFETCH(QJsonArray, items);
+    gui::DesignPanel panel;
+    setClipboard(items);
+    QVERIFY(QMetaObject::invokeMethod(&panel, "pasteAction", Qt::DirectConnection));
+    QVERIFY(!prim::Ghost::instance()->isVisible());
+    QVERIFY(prim::Ghost::instance()->getSources().isEmpty());
+    QVERIFY(panel.getAllDBs().isEmpty());
+  }
 
-  //   // TODO add checks for setActiveLayer and getMRULayer
+  void acceptsNestedClipboardAndSignedCoordinates()
+  {
+    gui::DesignPanel panel;
+    setClipboard({aggregate({db(-3, -2, 0), aggregate({db(-2, -2, 1)})})});
+    QVERIFY(QMetaObject::invokeMethod(&panel, "pasteAction", Qt::DirectConnection));
+    auto *ghost = prim::Ghost::instance();
+    QVERIFY(ghost->isVisible());
+    QCOMPARE(ghost->getSources().size(), 2);
+    QCOMPARE(ghost->getTopItems().size(), 1);
+    auto *first = static_cast<prim::DBDot*>(ghost->getSources().first());
+    QCOMPARE(first->latticeCoord().n, -3);
+    QCOMPARE(first->latticeCoord().m, -2);
+  }
 
-  //   // Remove all layers and check count
-  //   layman->removeAllLayers();
-  //   QCOMPARE(layman->layerCount(), 0);
-  // }
+  void invalidImportDoesNotPasteStaleSelection()
+  {
+    gui::DesignPanel panel;
+    QVERIFY(panel.commandCreateItem("DBDot", "auto", {"2", "3", "0"}));
+    panel.getAllDBs().first()->setSelected(true);
+    QVERIFY(QMetaObject::invokeMethod(&panel, "copyAction", Qt::DirectConnection));
+    setClipboard({db(), db()});
+    QVERIFY(QMetaObject::invokeMethod(&panel, "pasteAction", Qt::DirectConnection));
+    QVERIFY(!prim::Ghost::instance()->isVisible());
+    QCOMPARE(panel.getAllDBs().size(), 1);
+  }
 
+  void firstLatticeClipRetainsPreview()
+  {
+    gui::DesignPanel panel;
+    auto *manager = panel.findChild<gui::ScreenshotManager*>();
+    QVERIFY(manager);
+    panel.setDisplayMode(gui::ScreenshotMode);
+    auto *preview = control<QCheckBox>(manager, "Preview Lattice Clip Area");
+    auto *set_clip = control<QPushButton>(manager, "Set Lattice Clip Area");
+    QVERIFY(preview && set_clip);
+    connect(&panel, &gui::DesignPanel::sig_toolChangeRequest, &panel, &gui::DesignPanel::setTool);
+    set_clip->click();
+    QVERIFY(preview->isChecked());
+    QVERIFY(!manager->latticeClipVisible());
+    manager->setLatticeClipArea(QRectF(0, 0, 1000, 1000));
+    QVERIFY(preview->isChecked());
+    QVERIFY(manager->latticeClipVisible());
+    manager->setLatticeClipArea();
+    QVERIFY(!preview->isChecked());
+    QVERIFY(!manager->latticeClipVisible());
+  }
+
+  void singleMoveDragSelectsItems()
+  {
+    gui::DesignPanel panel;
+    panel.resize(640, 480);
+    panel.show();
+    QCoreApplication::processEvents();
+    QVERIFY(panel.commandCreateItem("DBDot", "auto", {"0", "0", "0"}));
+    panel.setTool(gui::SelectTool);
+    const QPoint center = panel.mapFromScene(panel.getAllDBs().first()->pos());
+    const QPoint start = center - QPoint(60, 60);
+    const QPoint end = center + QPoint(60, 60);
+    QTest::mousePress(panel.viewport(), Qt::LeftButton, Qt::NoModifier, start);
+    QMouseEvent move(QEvent::MouseMove, end, panel.viewport()->mapToGlobal(end),
+                     Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(panel.viewport(), &move);
+    QTest::mouseRelease(panel.viewport(), Qt::LeftButton, Qt::NoModifier, end);
+    QVERIFY(panel.getAllDBs().first()->isSelected());
+  }
+
+  void latticeClipTracksSimulationVisibility()
+  {
+    gui::DesignPanel panel;
+    auto *manager = panel.findChild<gui::ScreenshotManager*>();
+    QVERIFY(manager);
+    panel.setDisplayMode(gui::ScreenshotMode);
+    auto *set_clip = control<QPushButton>(manager, "Set Lattice Clip Area");
+    auto *preview = control<QCheckBox>(manager, "Preview Lattice Clip Area");
+    QVERIFY(set_clip && preview);
+    manager->setLatticeClipArea(QRectF(0, 0, 1000, 1000));
+    manager->setLatticeClipVisibility(true, true);
+    panel.enableSimVis();
+    QVERIFY(!panel.getLattice(true)->isVisible());
+    QVERIFY(panel.getLattice(false)->isVisible());
+    QVERIFY(set_clip->isEnabled());
+    QVERIFY(preview->isChecked());
+    QVERIFY(manager->latticeClipVisible());
+    panel.getLattice(false)->setVisible(false);
+    QVERIFY(!set_clip->isEnabled());
+    QVERIFY(!manager->latticeClipVisible());
+    QVERIFY(preview->isChecked());
+    panel.getLattice(false)->setVisible(true);
+    QVERIFY(set_clip->isEnabled());
+    QVERIFY(manager->latticeClipVisible());
+    panel.layerManager()->setSimVisualizeMode(false);
+    QVERIFY(set_clip->isEnabled());
+    QVERIFY(manager->latticeClipVisible());
+  }
+
+  void latticeClipDoesNotRoundOutward()
+  {
+    gui::DesignPanel panel;
+    auto *manager = panel.findChild<gui::ScreenshotManager*>();
+    QVERIFY(manager);
+    panel.setDisplayMode(gui::ScreenshotMode);
+    const qreal cell_width = panel.getLattice(true)->sceneLatticeVector(0).x();
+    const qreal cell_height = panel.getLattice(true)->sceneLatticeVector(1).y();
+    const QRectF between_sites(cell_width * 0.3, cell_height * 0.1,
+                               cell_width * 0.4, cell_height * 0.05);
+    manager->setLatticeClipArea(between_sites);
+    manager->setLatticeClipVisibility(false, true);
+    manager->setScaleBarVisibility(false, true);
+    const QColor background = settings::GUISettings::instance()->get<QColor>("view/bg_col_pb");
+    QImage image(240, 240, QImage::Format_ARGB32);
+    image.fill(background);
+    QPainter painter(&image);
+    panel.screenshot(&painter, QRectF(-cell_width, -cell_height,
+                                     cell_width * 3, cell_height * 3), image.rect());
+    painter.end();
+    for (int y = 0; y < image.height(); ++y)
+      for (int x = 0; x < image.width(); ++x)
+        QCOMPARE(image.pixelColor(x, y), background);
+    QVERIFY(panel.getLattice(true)->isVisible());
+    QVERIFY(!manager->latticeClipVisible());
+
+    // A clip containing an actual site must still draw lattice graphics.
+    manager->setLatticeClipArea(QRectF(-cell_width * 0.2, -cell_height * 0.1,
+                                      cell_width * 0.4, cell_height * 0.2));
+    image.fill(background);
+    QPainter site_painter(&image);
+    panel.screenshot(&site_painter, QRectF(-cell_width, -cell_height,
+                                          cell_width * 3, cell_height * 3), image.rect());
+    site_painter.end();
+    bool site_drawn = false;
+    for (int y = 0; y < image.height(); ++y)
+      for (int x = 0; x < image.width(); ++x)
+        site_drawn = site_drawn || image.pixelColor(x, y) != background;
+    QVERIFY(site_drawn);
+  }
+
+  void pinchFinishDoesNotRepeatZoom()
+  {
+#if defined(Q_OS_MACOS) && QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+    gui::DesignPanel panel;
+    panel.resize(640, 480);
+    panel.show();
+    QCoreApplication::processEvents();
+    const QPointF anchor(150, 150);
+    auto send = [&](Qt::NativeGestureType type, qreal value) {
+      QNativeGestureEvent event(type, QPointingDevice::primaryPointingDevice(), 2,
+          anchor, anchor, panel.viewport()->mapToGlobal(anchor.toPoint()), value, QPointF(), 1);
+      QApplication::sendEvent(panel.viewport(), &event);
+      QCoreApplication::processEvents();
+    };
+    const qreal before = panel.transform().m11();
+    send(Qt::BeginNativeGesture, 0);
+    send(Qt::ZoomNativeGesture, 0.1);
+    const qreal zoomed = panel.transform().m11();
+    QVERIFY(zoomed > before);
+    send(Qt::EndNativeGesture, 0);
+    QCOMPARE(panel.transform().m11(), zoomed);
+#else
+    QSKIP("Native macOS gesture regression requires Qt >= 6.2 on macOS");
+#endif
+  }
 };
 
 QTEST_MAIN(SiQADTests)
-#include "siqad_tests.moc"  // generated at compile time
-
+#include "siqad_tests.moc"
