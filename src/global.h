@@ -25,7 +25,7 @@ namespace gui{
 
   //! Application tool type
   enum ToolType{NoneTool, SelectTool, DragTool, DBGenTool, MeasureTool, ElectrodeTool,
-                AFMAreaTool, AFMPathTool, ScreenshotAreaTool, ScaleBarAnchorTool,
+                AFMAreaTool, AFMPathTool, ScreenshotAreaTool, LatticeClipAreaTool, ScaleBarAnchorTool,
                 LabelTool};
 
   //! Design Panel display mode

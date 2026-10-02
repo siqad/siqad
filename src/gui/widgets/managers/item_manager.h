@@ -38,6 +38,7 @@ namespace gui{
       QTableWidgetItem *layer_id;
       QTableWidgetItem *index;
       QPushButton *bt_show_properties;
+      QMetaObject::Connection show_properties_connection;
     };
 
   signals:

@@ -8,6 +8,8 @@
 
 #include "layer_manager.h"
 
+#include <QSignalBlocker>
+
 using namespace gui;
 
 // constructor
@@ -511,12 +513,14 @@ void LayerManager::clearLayerTable()
 {
   // Delete layer rows and disconnect all signals within the table.
   // Called by destructor on exit or by design panel when loading new file.
+  QSignalBlocker table_blocker(layer_table);
   while (!table_row_contents.isEmpty()) {
     LayerTableRowContent *row_content = table_row_contents.takeLast();
-    row_content->bt_visibility->disconnect();
-    row_content->bt_editability->disconnect();
+    QObject::disconnect(row_content->visibility_connection);
+    QObject::disconnect(row_content->editability_connection);
     delete row_content;
   }
+  layer_table->clearContents();
   layer_table->setRowCount(0);  // delete all rows from layer table
 }
 
@@ -569,7 +573,7 @@ void LayerManager::addLayerRow()
 // update widget
 void LayerManager::addLayerRow(prim::Layer *layer)
 {
-  LayerTableRowContent *curr_row_content = new LayerTableRowContent;
+  LayerTableRowContent *curr_row_content = new LayerTableRowContent{};
   curr_row_content->layer = layer;
 
   //qDebug() << tr("Constructing layer row GUI elements for layer %1").arg(layer->getName());
@@ -583,10 +587,10 @@ void LayerManager::addLayerRow(prim::Layer *layer)
   curr_row_content->bt_editability->setCheckable(true);
   curr_row_content->bt_editability->setChecked(layer->isActive());
 
-  connect(curr_row_content->bt_visibility, &QAbstractButton::toggled,
-          layer, &prim::Layer::setVisible);
-  connect(curr_row_content->bt_editability, &QAbstractButton::toggled,
-          layer, &prim::Layer::setActive);
+  curr_row_content->visibility_connection = connect(curr_row_content->bt_visibility, &QAbstractButton::toggled,
+                                                    layer, &prim::Layer::setVisible);
+  curr_row_content->editability_connection = connect(curr_row_content->bt_editability, &QAbstractButton::toggled,
+                                                     layer, &prim::Layer::setActive);
 
   // other items
   curr_row_content->type = new QTableWidgetItem(layer->contentTypeString());

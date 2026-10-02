@@ -69,6 +69,7 @@ namespace gui{
     void setToolDBGen();
     void setToolElectrode();
     void setToolScreenshotArea();
+    void setToolLatticeClipArea();
     void setToolScaleBarAnchor();
     void setToolLabel();
 
@@ -229,6 +230,7 @@ namespace gui{
     QAction *action_sim_visualize=nullptr;        // show the sim visualize dock which allows simulation visualization
     QAction *action_layer_sel=nullptr;
     QAction *action_item_manager=nullptr;
+    QAction *action_info_panel=nullptr;
     QAction *action_circuit_lib=nullptr;
     QAction *action_dialog_dock_visibility=nullptr;
     QAction *action_screenshot_mode=nullptr;      // toggle screenshot mode

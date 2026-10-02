@@ -33,6 +33,8 @@
 #include "primitives/emitter.h"
 #include "components/sim_job.h"
 
+class QPinchGesture;
+
 namespace gui{
 
   //! Highest level of the design window visualization. Contains all
@@ -308,6 +310,7 @@ namespace gui{
 
   protected:
 
+    bool viewportEvent(QEvent *event) override;
     void contextMenuEvent(QContextMenuEvent *e) override;
 
     // interrupts
@@ -394,7 +397,9 @@ namespace gui{
     QPoint prev_db_preview_pos;
     QPoint press_scene_pos;   // mouse position on click (view coord)
     QPoint prev_pan_pos;      // mouse position on last panning update (view coord)
-    QPoint wheel_deg;         // accumulated degrees of "rotation" for mouse scrolls
+    QPointF pan_scroll_residual; // accumulates fractional scroll deltas for smooth pan
+    bool loading_design = false;
+    bool touch_interactions_enabled = false;
 
     // sim visualization
     QList<prim::Item*> sim_results_items;  // holding temporary items
@@ -411,15 +416,18 @@ namespace gui{
     void duplicateSelection();
 
     // perform scene zoom based on wheel rotation
-    void wheelZoom(QWheelEvent *e, bool boost);
+    void wheelZoomFromDelta(qreal delta, QWheelEvent *e, bool boost);
 
     //! Apply scene zoom from parameters.
     //! @ds zoom factor, usually taken from settings.
     //! @anchor point which should stay consistent on scene.
-    void applyZoom(qreal ds, QWheelEvent *e=nullptr);
+    void applyZoom(qreal ds, QWheelEvent *e=nullptr, const QPointF *viewport_anchor=nullptr);
 
     // perform scene pan based on wheel rotation, swap x and y if shift is pressed
-    void wheelPan(bool shift_scroll, bool boost);
+    void handleWheelPan(const QPointF &delta, bool shift_scroll, bool boost, bool pixel_based);
+    void applyPanDelta(const QPointF &delta);
+    void handlePinchGesture(QPinchGesture *gesture);
+    void setTouchInteractionEnabled(bool enable);
 
     // assert bounds on zooming
     void boundZoom(qreal &ds);
@@ -470,6 +478,12 @@ namespace gui{
 
     // deep copy the current selection to the clipboard
     void copySelection();
+
+    // synchronize local clipboard with the system clipboard
+    void exportClipboardToSystem();
+    bool importClipboardFromSystem();
+    bool systemClipboardHasSiQADSelection() const;
+    static bool isItemSupportedForCrossInstance(const prim::Item *item);
 
     //! Create graphical previews for provided DB coordinates (always destroys
     //! existing previews).

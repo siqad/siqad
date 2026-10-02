@@ -2,21 +2,23 @@ name: 🍎 • CI
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
     paths:
       - "**/*.py"
       - '**/*.h'
       - '**/*.cc'
+      - '**/*.cpp'
       - '**/*.cmake'
       - '**/CMakeLists.txt'
       - 'libs/**'
       - '.github/workflows/macos.yml'
   pull_request:
-    branches: ["master"]
+    branches: ["main"]
     paths:
       - "**/*.py"
       - '**/*.h'
       - '**/*.cc'
+      - '**/*.cpp'
       - '**/*.cmake'
       - '**/CMakeLists.txt'
       - 'libs/**'
@@ -35,7 +37,7 @@ jobs:
   build_and_test:
     strategy:
       matrix:
-        os: [ macos-13, macos-14, macos-15 ]
+        os: [ macos-15, macos-26 ]
         compiler: [ clang++ ]
         ccompiler: [ clang ]
 
@@ -52,19 +54,13 @@ jobs:
       - name: Remove existing 2to3 binary
         run: sudo rm /usr/local/bin/2to3 || true
 
-      # Install Homebrew dependencies (Boost and Qt5)
+      # Install Homebrew dependencies (Boost and Qt6)
       - name: Install Homebrew Dependencies
         run: |
           brew update
           brew install boost qt@6
           # Ensure Qt6 is available in PATH
-          echo "/opt/homebrew/opt/qt@6/bin" >> $GITHUB_PATH
-
-      - if: matrix.os == 'macos-13'
-        name: Setup XCode version
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: "^14.2"
+          echo "/opt/homebrew/opt/qt@6/bin" >> "$GITHUB_PATH"
 
       - name: Setup ccache
         uses: hendrikmuhs/ccache-action@v1.2

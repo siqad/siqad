@@ -32,4 +32,20 @@
             <key>view/screenshot_px_per_ang</key>
         </meta>
     </screenshot_px_per_ang>
+    <scroll_direction>
+        <T>string</T>
+        <val>default</val>
+        <label>Scroll direction</label>
+        <tip>Choose how touchpad and mouse wheel scrolling moves the view. Default follows the operating system preference.</tip>
+        <value_selection type="ComboBox">
+            <default>Default</default>
+            <invert_x>Inverse X</invert_x>
+            <invert_y>Inverse Y</invert_y>
+            <invert_xy>Inverse X &amp; Y</invert_xy>
+        </value_selection>
+        <meta>
+            <category>GUI</category>
+            <key>view/scroll_direction</key>
+        </meta>
+    </scroll_direction>
 </properties>

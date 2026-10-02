@@ -2,21 +2,23 @@ name: 🐧 • CI
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
     paths:
       - "**/*.py"
       - '**/*.h'
       - '**/*.cc'
+      - '**/*.cpp'
       - '**/*.cmake'
       - '**/CMakeLists.txt'
       - 'libs/**'
       - '.github/workflows/ubuntu.yml'
   pull_request:
-    branches: ["master"]
+    branches: ["main"]
     paths:
       - "**/*.py"
       - '**/*.h'
       - '**/*.cc'
+      - '**/*.cpp'
       - '**/*.cmake'
       - '**/CMakeLists.txt'
       - 'libs/**'

@@ -61,6 +61,22 @@ Once you have installed Xcode and other required dependencies, steps 2 and 3 fro
 * Boost
 * Qt6
 
+The script selects the active macOS SDK through `xcrun` (or `SDKROOT` when set)
+and refreshes cached SDK dependency paths, so switching between Command Line
+Tools and Xcode does not mix their headers. It builds the GUI and bundled
+plugins, then installs them under `build/debug` or `build/release`.
+
+Use `JOBS=6 ./make_everything_dev debug` to limit parallel compilation. To pass
+additional CMake options, use `--` so values containing spaces remain intact:
+
+```bash
+./make_everything_dev debug -- -DCMAKE_PREFIX_PATH=/opt/homebrew/opt/qt
+```
+
+The existing `CMAKE_FLAGS` environment variable still accepts
+whitespace-separated options. `notest` disables test targets for that run;
+omitting it enables them again even when reusing the build directory.
+
 
 ### Windows
 

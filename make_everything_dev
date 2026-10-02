@@ -15,6 +15,7 @@
 #                   version. This is ignored when building for WIN32, in that 
 #                   case 'release' is always used.
 # notest:           optional, skip SiQAD unit tests
+# -- [CMake args]:  optional, pass additional arguments without shell splitting
 
 # Accepted ENV variables:
 # FOR_OS:           win64 or win32 for cross compilation
@@ -26,37 +27,55 @@
 #                   APPEND_TO_PATH if it exists.. Set an empty APPEND_TO_PATH 
 #                   that is not desired.
 # CMAKE_FLAGS:      cmake flags
+# JOBS:             optional, positive number of parallel build jobs
 
 
-set -e
+set -eo pipefail
 
 #swig=false
 build_type="Debug"
 install_prefix="debug"
 skip_tests=false
+cmake_args=()
 for arg in "$@"; do
     case "$arg" in
         #("--swig")  swig=true ;;
         ("release") build_type="Release"; install_prefix="release" ;;
         ("debug")   build_type="Debug"; install_prefix="debug" ;;
         ("notest")  skip_tests=true ;;
+        ("--") break ;;
+        ("-h"|"--help")
+            echo "Usage: $0 [debug|release] [notest] [-- CMake arguments...]"
+            exit 0 ;;
+        (*) echo "Unknown argument: $arg" >&2; exit 2 ;;
     esac
+    shift
 done
+if [[ ${1:-} == -- ]]; then
+    shift
+    cmake_args=("$@")
+fi
 
 # Determine number of physical cores to use for compilation
 cpu_cores=1
-if [[ $(uname) == "Darwin" ]]; then
+host_os=$(uname)
+if [[ $host_os == "Darwin" ]]; then
     cpu_cores=$(sysctl -n hw.logicalcpu)
-elif [[ $(uname) == "Linux" ]]; then
-    cpu_cores=$(grep "^core id" /proc/cpuinfo | sort -u | wc -l)
+elif [[ $host_os == "Linux" ]]; then
+    cpu_cores=$(getconf _NPROCESSORS_ONLN)
 fi
-multicore_compile="-j $cpu_cores"
+cpu_cores=${JOBS:-$cpu_cores}
+if [[ ! $cpu_cores =~ ^[1-9][0-9]*$ ]]; then
+    echo "JOBS must be a positive integer." >&2
+    exit 2
+fi
 
-proj_root=$(cd `dirname $0` && pwd)
+proj_root=$(cd "$(dirname "$0")" && pwd)
+target_os=${FOR_OS:-}
 
-if [ "$FOR_OS" == "win64" ]; then
+if [ "$target_os" == "win64" ]; then
     build_dir="${proj_root}/build-x64"
-elif [ "$FOR_OS" == "win32" ]; then
+elif [ "$target_os" == "win32" ]; then
     build_dir="${proj_root}/build-i686"
 else
     build_dir="${proj_root}/build"
@@ -66,9 +85,11 @@ fi
 # An example is to clone https://github.com/KDE/breeze-icons and point the following variable to the icons directory.
 #qt_theme_path=$HOME/global/siqad-cross-compilation-resources/breeze-icons/icons
 
-if [ ! -z ${APPEND_TO_PATH} ]; then
-    export PATH="$PATH:$APPEND_TO_PATH"
-elif [[ "$FOR_OS" == "win64" ]] || [[ "$FOR_OS" == "win32" ]]; then
+if [[ -n ${APPEND_TO_PATH+x} ]]; then
+    if [[ -n $APPEND_TO_PATH ]]; then
+        export PATH="$PATH:$APPEND_TO_PATH"
+    fi
+elif [[ "$target_os" == "win64" ]] || [[ "$target_os" == "win32" ]]; then
     MXE_PATH=/opt/mxe/usr/bin
     if [ -d "${MXE_PATH}" ]; then
         export PATH="$PATH:$MXE_PATH"
@@ -76,45 +97,44 @@ elif [[ "$FOR_OS" == "win64" ]] || [[ "$FOR_OS" == "win32" ]]; then
 fi
 
 
-if [ "$FOR_OS" == "win64" ]; then
-    if [ -z ${QMAKE_COMMAND} ]; then
-        QMAKE_COMMAND=/opt/mxe/usr/bin/x86_64-w64-mingw32.static-qmake-qt5
+cmake_command=${CMAKE_COMMAND:-cmake}
+platform_args=()
+if [[ $target_os == win64 || $target_os == win32 ]]; then
+    build_type=Release
+    install_prefix=release
+    if [[ $target_os == win64 ]]; then
+        mxe_triplet=x86_64-w64-mingw32.static
+    else
+        mxe_triplet=i686-w64-mingw32.static
     fi
-    if [ -z ${CMAKE_COMMAND} ]; then
-        CMAKE_COMMAND=/opt/mxe/usr/bin/x86_64-w64-mingw32.static-cmake
-    fi
-    if [ -z ${CMAKE_FLAGS} ]; then
-        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -DWIN32_QMAKE_BIN=${QMAKE_COMMAND} -DWIN32_MAKE_BIN=make"
-    fi
-elif [ "$FOR_OS" == "win32" ]; then
-    if [ -z ${QMAKE_COMMAND} ]; then
-        QMAKE_COMMAND=/opt/mxe/usr/bin/i686-w64-mingw32.static-qmake-qt5
-    fi
-    if [ -z ${CMAKE_COMMAND} ]; then
-        CMAKE_COMMAND=/opt/mxe/usr/bin/i686-w64-mingw32.static-cmake
-    fi
-    if [ -z ${CMAKE_FLAGS} ]; then
-        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=release -DWIN32_QMAKE_BIN=${QMAKE_COMMAND} -DWIN32_MAKE_BIN=make"
-    fi
-else
-    if [ -z ${CMAKE_COMMAND} ]; then
-        CMAKE_COMMAND=cmake
-    fi
-    if [ -z ${CMAKE_FLAGS} ]; then
-        CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=$build_type -DCMAKE_INSTALL_PREFIX=$install_prefix"
-    fi
+    cmake_command=${CMAKE_COMMAND:-/opt/mxe/usr/bin/$mxe_triplet-cmake}
+    platform_args+=("-DWIN32_QMAKE_BIN=${QMAKE_COMMAND:-/opt/mxe/usr/bin/$mxe_triplet-qmake-qt5}"
+                    "-DWIN32_MAKE_BIN=make")
+elif [[ $host_os == Darwin ]]; then
+    # Keep CMake's dependency search and Clang on the same selected Apple SDK.
+    # Rediscover SDK-dependent cache entries after Xcode/CLT changes.
+    macos_sdk=${SDKROOT:-$(xcrun --sdk macosx --show-sdk-path)}
+    platform_args+=("-DCMAKE_OSX_SYSROOT=$macos_sdk" "-UCUPS_*" "-UOPENGL_*")
 fi
 
-if [ $skip_tests == true ]; then
-    echo "Skip SiQAD tests."
-    CMAKE_FLAGS+=" -DBUILD_TEST=OFF"
+# Retain the legacy whitespace-separated environment flags. For values with
+# spaces, use arguments after -- instead; no eval or command substitution.
+extra_flags=()
+if [[ -n ${CMAKE_FLAGS:-} ]]; then
+    while IFS= read -r flag_line || [[ -n $flag_line ]]; do
+        read -r -a line_flags <<< "$flag_line"
+        extra_flags+=("${line_flags[@]}")
+    done <<< "$CMAKE_FLAGS"
+fi
+if [[ $skip_tests == true ]]; then
+    cmake_args+=("-DBUILD_TEST=OFF")
 fi
 
 echo "Project root:"
-echo ${proj_root}
+echo "$proj_root"
 
 echo "CMake directory:"
-echo ${build_dir}
+echo "$build_dir"
 
 # Make and install SiQADConn via scikit and SWIG
 # NOTE this is now integrated into the normal CMake routine
@@ -125,12 +145,15 @@ echo ${build_dir}
 #fi
 
 # use cmake to create Makefiles for the project
-mkdir -p "${build_dir}"
-cd "${build_dir}"
 echo "Running cmake..."
-${CMAKE_COMMAND} ${CMAKE_FLAGS} ..
+# Recompute derived install roots when debug/release or the prefix changes.
+# Explicit overrides in CMAKE_FLAGS or arguments after -- still take precedence.
+"$cmake_command" -S "$proj_root" -B "$build_dir" \
+    -U SIQAD_INSTALL_ROOT -U SIQAD_PLUGINS_ROOT -U SIQAD_LIBS_ROOT -U SIQADCONN_ROOT \
+    "-DCMAKE_BUILD_TYPE=$build_type" "-DCMAKE_INSTALL_PREFIX=$build_dir/$install_prefix" \
+    -DBUILD_TEST=ON "${platform_args[@]}" "${extra_flags[@]}" "${cmake_args[@]}"
 
 # compile
 echo "Building everything..."
-make $multicore_compile
-make install
+"$cmake_command" --build "$build_dir" --config "$build_type" --parallel "$cpu_cores"
+"$cmake_command" --install "$build_dir" --config "$build_type"

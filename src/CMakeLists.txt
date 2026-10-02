@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(QT_VERSION_REQ "6.0")
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Svg PrintSupport UiTools Charts)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Svg PrintSupport UiTools Charts Xml)
 if(COMMAND qt_standard_project_setup)
   # Qt >= 6.3
   qt_standard_project_setup()
@@ -28,6 +28,7 @@ set(LIB_LINKS
     Qt6::PrintSupport
     Qt6::UiTools
     Qt6::Charts
+    Qt6::Xml
 )
 
 # QtTest related:

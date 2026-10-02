@@ -8,6 +8,8 @@
 
 #include "item_manager.h"
 
+#include <QSignalBlocker>
+
 namespace gui{
 
 ItemManager::ItemManager(QWidget *parent, LayerManager* layman_in)
@@ -57,9 +59,10 @@ void ItemManager::deleteItemSelection()
 
 void ItemManager::clearItemTable()
 {
+  QSignalBlocker table_blocker(item_table);
   while (!table_row_contents.isEmpty()) {
     ItemTableRowContent *row_content = table_row_contents.takeLast();
-    row_content->bt_show_properties->disconnect();
+    QObject::disconnect(row_content->show_properties_connection);
     delete row_content;
   }
   item_table->setRowCount(0);  // delete all rows from layer table
@@ -126,7 +129,8 @@ void ItemManager::addItemRow(prim::Item *item)
   new_content->index = new QTableWidgetItem(QString::number(layman->getLayer(item->layer_id)->getItemIndex(item)));
   //the QString in buttons must be exactly "Show properties" in order to trigger showProps() from items
   new_content->bt_show_properties = new QPushButton(QString("Show properties"), this);
-  connect(new_content->bt_show_properties, &QAbstractButton::clicked, this, &ItemManager::showProperties);
+  new_content->show_properties_connection = connect(new_content->bt_show_properties, &QAbstractButton::clicked,
+                                                    this, &ItemManager::showProperties);
 
   table_row_contents.append(new_content);
   int curr_row = item_table->rowCount();
@@ -157,7 +161,7 @@ void ItemManager::updateTableRemove(prim::Item *item)
     if (row_content->item == item) {
       table_row_contents.removeAt(table_row_contents.indexOf(row_content));
       item_table->removeRow(item_table->row(row_content->type));
-      row_content->bt_show_properties->disconnect();
+      QObject::disconnect(row_content->show_properties_connection);
       return;
     }
   }
