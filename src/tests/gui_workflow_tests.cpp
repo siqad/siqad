@@ -5,6 +5,7 @@
 #include <QDomDocument>
 #include <QNativeGestureEvent>
 #include <QWheelEvent>
+#include <functional>
 using test_support::Scene;
 
 class FailingOutput : public QIODevice {

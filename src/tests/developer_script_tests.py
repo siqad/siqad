@@ -131,7 +131,7 @@ class DeveloperScriptTests(unittest.TestCase):
             build = self.root / ("policy-" + str(index))
             subprocess.run(["cmake", "-S", str(self.root), "-B", str(build), *flags],
                            capture_output=True, check=True, timeout=10)
-            result = subprocess.run(["ctest", "--test-dir", str(build), "--no-tests=error"],
+            result = subprocess.run(["ctest", "--test-dir", str(build), "-C", "Debug", "--no-tests=error"],
                                     capture_output=True, timeout=10)
             self.assertEqual(result.returncode == 0, enabled, result.stdout + result.stderr)
 
