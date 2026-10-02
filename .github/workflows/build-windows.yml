@@ -2,7 +2,7 @@ name: Build and Package on Windows
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
     paths:
       - "**/*.py"
       - '**/*.h'
@@ -12,7 +12,7 @@ on:
       - 'libs/**'
       - '.github/workflows/macos.yml'
   pull_request:
-    branches: ["master"]
+    branches: ["main"]
     paths:
       - "**/*.py"
       - '**/*.h'
