@@ -5,6 +5,11 @@ This note records tests wanted during the ``cross-instance-copy`` review and
 validation on 2026-10-01. The testing infrastructure work is deferred until
 after this PR merges.
 
+This is the historical gap list for the merged PR. Subsequent infrastructure
+work adds explicit CTest, isolated fixtures, reports/artifacts, cross-process
+clipboard tests, SVG/result tests, developer build smoke jobs and sanitizers.
+See :doc:`testing` for current commands, contracts and remaining coverage.
+
 What this PR establishes
 ========================
 

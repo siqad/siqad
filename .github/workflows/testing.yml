@@ -1,0 +1,96 @@
+name: Testing infrastructure
+
+on:
+  pull_request:
+    branches: [main]
+    paths: ['src/**', 'cmake/**', 'CMakeLists.txt', 'make_everything_dev', '.github/workflows/testing.yml']
+  push:
+    branches: [main]
+    paths: ['src/**', 'cmake/**', 'CMakeLists.txt', 'make_everything_dev', '.github/workflows/testing.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: testing-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  linux-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - mode: native
+            native: 'ON'
+            sanitize: 'OFF'
+          - mode: sanitizers
+            native: 'OFF'
+            sanitize: 'ON'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build python3 qt6-base-dev qt6-tools-dev qt6-svg-dev qt6-charts-dev libgl1-mesa-dev xvfb xauth
+      - name: Configure GUI tests
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DSIQAD_BUILD_PLUGINS=OFF -DSIQAD_NATIVE_TESTS=${{ matrix.native }} -DSIQAD_SANITIZERS=${{ matrix.sanitize }}
+      - name: Build
+        run: cmake --build build --parallel 4
+      - name: Native display and clipboard tests
+        if: matrix.mode == 'native'
+        run: xvfb-run -a ctest --test-dir build --output-on-failure --no-tests=error
+      - name: Unit tests with leak detection
+        if: matrix.mode == 'sanitizers'
+        env:
+          ASAN_OPTIONS: detect_leaks=1
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+        run: ctest --test-dir build -L unit --output-on-failure --no-tests=error
+      - name: GUI tests with address and undefined-behavior checks
+        if: matrix.mode == 'sanitizers'
+        env:
+          # Qt and existing application singletons have process-lifetime allocations.
+          # Do not suppress invalid accesses or undefined behavior to account for them.
+          ASAN_OPTIONS: detect_leaks=0
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+        run: ctest --test-dir build -L gui --output-on-failure --no-tests=error
+      - name: Report test cases and skips
+        if: always()
+        run: python3 src/tests/report_tests.py build/test-results --expect siqad_tests gui_workflow_tests clipboard_codec_tests developer_script_tests report_tests_tests ${{ matrix.mode == 'native' && 'native_clipboard_tests' || '' }}
+      - name: Preserve test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-${{ matrix.mode }}
+          path: |
+            build/test-results/
+            build/Testing/Temporary/
+          if-no-files-found: error
+
+  developer-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+        generator: [Ninja, Unix Makefiles]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build python3 qt6-base-dev qt6-tools-dev qt6-svg-dev qt6-charts-dev libgl1-mesa-dev
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: brew install cmake ninja qt@6
+      - name: Developer script transitions and cache recovery
+        run: python3 src/tests/developer_build_smoke.py --generator '${{ matrix.generator }}' --artifacts smoke-results
+      - name: Preserve build and test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-script-${{ matrix.os }}-${{ matrix.generator }}
+          path: smoke-results/
+          if-no-files-found: error

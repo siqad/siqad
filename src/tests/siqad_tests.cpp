@@ -8,20 +8,12 @@
 #include <QPointingDevice>
 
 #include "gui/widgets/design_panel.h"
+#include "scene_fixture.h"
+#include "test_data.h"
 
 namespace {
-QJsonObject db(int n = 0, int m = 0, int l = 0)
-{
-  return {{"type", "db"}, {"layer", 2},
-          {"pos", QJsonObject{{"x", n * 384.0}, {"y", m * 768.0 + l * 225.0}}},
-          {"lat", QJsonObject{{"n", n}, {"m", m}, {"l", l}}}};
-}
-
-QJsonObject aggregate(const QJsonArray &children)
-{
-  return {{"type", "aggregate"}, {"layer", 2},
-          {"pos", QJsonObject{{"x", 0}, {"y", 0}}}, {"children", children}};
-}
+using test_data::db;
+using test_data::aggregate;
 
 void setClipboard(const QJsonArray &items)
 {
@@ -32,13 +24,9 @@ void setClipboard(const QJsonArray &items)
 }
 
 template<class T>
-T *control(gui::ScreenshotManager *manager, const QString &text)
+T *control(gui::ScreenshotManager *manager, const QString &name)
 {
-  for (T *widget : manager->findChildren<T*>()) {
-    if (widget->text() == text)
-      return widget;
-  }
-  return nullptr;
+  return manager->findChild<T*>(name);
 }
 } // namespace
 
@@ -54,8 +42,7 @@ private slots:
 
   void cleanup()
   {
-    QApplication::clipboard()->clear();
-    prim::Layer::resetLayers();
+    test_support::resetCase();
   }
 
   void rejectsInvalidClipboard_data()
@@ -85,7 +72,7 @@ private slots:
   void rejectsInvalidClipboard()
   {
     QFETCH(QJsonArray, items);
-    gui::DesignPanel panel;
+    test_support::Scene panel;
     setClipboard(items);
     QVERIFY(QMetaObject::invokeMethod(&panel, "pasteAction", Qt::DirectConnection));
     QVERIFY(!prim::Ghost::instance()->isVisible());
@@ -95,7 +82,7 @@ private slots:
 
   void acceptsNestedClipboardAndSignedCoordinates()
   {
-    gui::DesignPanel panel;
+    test_support::Scene panel;
     setClipboard({aggregate({db(-3, -2, 0), aggregate({db(-2, -2, 1)})})});
     QVERIFY(QMetaObject::invokeMethod(&panel, "pasteAction", Qt::DirectConnection));
     auto *ghost = prim::Ghost::instance();
@@ -109,7 +96,7 @@ private slots:
 
   void invalidImportDoesNotPasteStaleSelection()
   {
-    gui::DesignPanel panel;
+    test_support::Scene panel;
     QVERIFY(panel.commandCreateItem("DBDot", "auto", {"2", "3", "0"}));
     panel.getAllDBs().first()->setSelected(true);
     QVERIFY(QMetaObject::invokeMethod(&panel, "copyAction", Qt::DirectConnection));
@@ -121,12 +108,12 @@ private slots:
 
   void firstLatticeClipRetainsPreview()
   {
-    gui::DesignPanel panel;
+    test_support::Scene panel;
     auto *manager = panel.findChild<gui::ScreenshotManager*>();
     QVERIFY(manager);
     panel.setDisplayMode(gui::ScreenshotMode);
-    auto *preview = control<QCheckBox>(manager, "Preview Lattice Clip Area");
-    auto *set_clip = control<QPushButton>(manager, "Set Lattice Clip Area");
+    auto *preview = control<QCheckBox>(manager, "latticeClipPreview");
+    auto *set_clip = control<QPushButton>(manager, "setLatticeClip");
     QVERIFY(preview && set_clip);
     connect(&panel, &gui::DesignPanel::sig_toolChangeRequest, &panel, &gui::DesignPanel::setTool);
     set_clip->click();
@@ -142,7 +129,7 @@ private slots:
 
   void singleMoveDragSelectsItems()
   {
-    gui::DesignPanel panel;
+    test_support::Scene panel;
     panel.resize(640, 480);
     panel.show();
     QCoreApplication::processEvents();
@@ -161,12 +148,12 @@ private slots:
 
   void latticeClipTracksSimulationVisibility()
   {
-    gui::DesignPanel panel;
+    test_support::Scene panel;
     auto *manager = panel.findChild<gui::ScreenshotManager*>();
     QVERIFY(manager);
     panel.setDisplayMode(gui::ScreenshotMode);
-    auto *set_clip = control<QPushButton>(manager, "Set Lattice Clip Area");
-    auto *preview = control<QCheckBox>(manager, "Preview Lattice Clip Area");
+    auto *set_clip = control<QPushButton>(manager, "setLatticeClip");
+    auto *preview = control<QCheckBox>(manager, "latticeClipPreview");
     QVERIFY(set_clip && preview);
     manager->setLatticeClipArea(QRectF(0, 0, 1000, 1000));
     manager->setLatticeClipVisibility(true, true);
@@ -190,7 +177,7 @@ private slots:
 
   void latticeClipDoesNotRoundOutward()
   {
-    gui::DesignPanel panel;
+    test_support::Scene panel;
     auto *manager = panel.findChild<gui::ScreenshotManager*>();
     QVERIFY(manager);
     panel.setDisplayMode(gui::ScreenshotMode);
@@ -232,7 +219,7 @@ private slots:
   void pinchFinishDoesNotRepeatZoom()
   {
 #if defined(Q_OS_MACOS) && QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
-    gui::DesignPanel panel;
+    test_support::Scene panel;
     panel.resize(640, 480);
     panel.show();
     QCoreApplication::processEvents();
@@ -256,5 +243,5 @@ private slots:
   }
 };
 
-QTEST_MAIN(SiQADTests)
+SIQAD_TEST_MAIN(SiQADTests)
 #include "siqad_tests.moc"

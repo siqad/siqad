@@ -8,6 +8,7 @@
 
 #include "design_panel.h"
 #include "settings/settings.h"
+#include "gui/clipboard_codec.h"
 
 #include <algorithm>
 #include <cmath>
@@ -26,9 +27,7 @@
 
 namespace {
 
-constexpr auto kSiqadClipboardMimeType = "application/x-siqad-sidb-selection";
-constexpr auto kSiqadClipboardFormatTag = "siqad-sidb-selection";
-constexpr int kSiqadClipboardFormatVersion = 1;
+constexpr auto kSiqadClipboardMimeType = gui::clipboard_codec::mimeType;
 
 QJsonObject pointToJson(const QPointF &pt)
 {
@@ -234,10 +233,6 @@ prim::Item *deserializeItem(const QJsonObject &obj, bool &ok,
 
 QByteArray serializeClipboardItems(const QList<prim::Item*> &items, bool &ok)
 {
-  QJsonObject root;
-  root.insert(QStringLiteral("format"), QString::fromLatin1(kSiqadClipboardFormatTag));
-  root.insert(QStringLiteral("version"), kSiqadClipboardFormatVersion);
-
   QJsonArray array;
   for (const prim::Item *item : items) {
     QJsonObject obj;
@@ -247,36 +242,17 @@ QByteArray serializeClipboardItems(const QList<prim::Item*> &items, bool &ok)
     }
     array.append(obj);
   }
-  root.insert(QStringLiteral("items"), array);
-
-  ok = true;
-  QJsonDocument doc(root);
-  return doc.toJson(QJsonDocument::Compact);
+  const auto payload = gui::clipboard_codec::encode(array);
+  ok = !payload.isEmpty();
+  return payload;
 }
 
 bool deserializeClipboardItems(const QByteArray &payload, QList<prim::Item*> &items_out,
                                const prim::Lattice *lattice)
 {
-  if (payload.isEmpty() || lattice == nullptr)
-    return false;
-
-  QJsonParseError parse_error;
-  QJsonDocument doc = QJsonDocument::fromJson(payload, &parse_error);
-  if (parse_error.error != QJsonParseError::NoError || !doc.isObject())
-    return false;
-
-  const QJsonObject root = doc.object();
-  if (root.value(QStringLiteral("format")).toString() != QString::fromLatin1(kSiqadClipboardFormatTag))
-    return false;
-
-  const int version = root.value(QStringLiteral("version")).toInt(-1);
-  if (version != kSiqadClipboardFormatVersion)
-    return false;
-
-  const QJsonValue items_value = root.value(QStringLiteral("items"));
-  const QJsonArray array = items_value.toArray();
-  if (!items_value.isArray() || array.isEmpty())
-    return false;
+  if (lattice == nullptr) return false;
+  QJsonArray array;
+  if (!gui::clipboard_codec::decode(payload, lattice->basisSize(), array)) return false;
   QSet<prim::LatticeCoord> sites;
   QList<prim::Item*> items;
   items.reserve(array.size());
@@ -1622,7 +1598,8 @@ void gui::DesignPanel::wheelEvent(QWheelEvent *e)
 
   const QPoint pixel_delta = e->pixelDelta();
   const QPoint angle_delta = e->angleDelta();
-  const Qt::KeyboardModifiers keymods = QApplication::keyboardModifiers();
+  // Use the state captured with this event, including queued/synthetic input.
+  const Qt::KeyboardModifiers keymods = e->modifiers();
   const bool ctrl_zoom = keymods.testFlag(Qt::ControlModifier);
   const bool shift_scroll = keymods.testFlag(Qt::ShiftModifier);
   const bool boost = keymods.testFlag(Qt::AltModifier);

@@ -1,8 +1,9 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.20)
 
 # for release builds, add flag "-DCMAKE_BUILD_TYPE=Release" (without quotes) when running cmake.
 
 project(siqad VERSION 0.3.3)
+include(${CMAKE_CURRENT_LIST_DIR}/../cmake/Testing.cmake)
 # TODO add way to push version number into source code
 
 set(CMAKE_CXX_STANDARD 17)
@@ -32,8 +33,7 @@ set(LIB_LINKS
 )
 
 # QtTest related:
-if(NOT SKIP_SIQAD_TESTS)
-    enable_testing()
+if(BUILD_TESTING)
     find_package(Qt6 COMPONENTS Test REQUIRED)
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
@@ -93,16 +93,9 @@ set_target_properties(siqad PROPERTIES
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${BIN_LINKS})
 
-# SiQAD unit tests:
-option(BUILD_TEST "Build the test program." ON)
-if(BUILD_TEST)
-    add_executable(siqad_tests tests/siqad_tests.cpp ${BIN_SOURCES} ${BIN_HEADERS} ${BIN_CUSTOM_RSC})
-    target_link_libraries(siqad_tests PUBLIC Qt6::Test ${BIN_LINKS})
-    add_test(NAME siqad_tests COMMAND siqad_tests)
-    set_tests_properties(siqad_tests PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
-    add_custom_command(TARGET siqad_tests
-        POST_BUILD
-        COMMAND ctest -C $<CONFIGURATION> --output-on-failure)
+# Tests run explicitly through CTest, including on unchanged builds.
+if(BUILD_TESTING)
+    add_subdirectory(tests)
 endif()
 
 # Installation

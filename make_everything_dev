@@ -56,15 +56,17 @@ if [[ ${1:-} == -- ]]; then
     cmake_args=("$@")
 fi
 
-# Determine number of physical cores to use for compilation
-cpu_cores=1
+# Determine number of logical cores to use for compilation
+cpu_cores=${JOBS:-}
 host_os=$(uname)
-if [[ $host_os == "Darwin" ]]; then
-    cpu_cores=$(sysctl -n hw.logicalcpu)
-elif [[ $host_os == "Linux" ]]; then
-    cpu_cores=$(getconf _NPROCESSORS_ONLN)
+if [[ -z $cpu_cores ]]; then
+    cpu_cores=1
+    if [[ $host_os == "Darwin" ]]; then
+        cpu_cores=$(sysctl -n hw.logicalcpu)
+    elif [[ $host_os == "Linux" ]]; then
+        cpu_cores=$(getconf _NPROCESSORS_ONLN)
+    fi
 fi
-cpu_cores=${JOBS:-$cpu_cores}
 if [[ ! $cpu_cores =~ ^[1-9][0-9]*$ ]]; then
     echo "JOBS must be a positive integer." >&2
     exit 2
@@ -127,8 +129,36 @@ if [[ -n ${CMAKE_FLAGS:-} ]]; then
     done <<< "$CMAKE_FLAGS"
 fi
 if [[ $skip_tests == true ]]; then
-    cmake_args+=("-DBUILD_TEST=OFF")
+    cmake_args+=("-DBUILD_TESTING=OFF")
 fi
+
+# Normalize legacy flags and detect the effective test option in argument order.
+for flag_set in extra_flags cmake_args; do
+    # Bash 3.2 has no namerefs; keep parsing explicit and avoid eval.
+    normalized=()
+    if [[ $flag_set == extra_flags ]]; then
+        flags=("${extra_flags[@]}")
+    else
+        flags=("${cmake_args[@]}")
+    fi
+    for flag in "${flags[@]}"; do
+        case "$flag" in
+            -DBUILD_TEST=*|-DBUILD_TEST:BOOL=*) flag="-DBUILD_TESTING=${flag#*=}" ;;
+            -DSKIP_SIQAD_TESTS=*|-DSKIP_SIQAD_TESTS:BOOL=*)
+                case "${flag#*=}" in
+                    [Oo][Nn]|[Tt][Rr][Uu][Ee]|1|[Yy][Ee][Ss]|[Yy]) flag=-DBUILD_TESTING=OFF ;;
+                    [Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee]|0|[Nn][Oo]|[Nn]|[Ii][Gg][Nn][Oo][Rr][Ee]|[Nn][Oo][Tt][Ff][Oo][Uu][Nn][Dd]|*-NOTFOUND|"") flag=-DBUILD_TESTING=ON ;;
+                    (*) flag=-DBUILD_TESTING=OFF ;;
+                esac ;;
+        esac
+        normalized+=("$flag")
+    done
+    if [[ $flag_set == extra_flags ]]; then
+        extra_flags=("${normalized[@]}")
+    else
+        cmake_args=("${normalized[@]}")
+    fi
+done
 
 echo "Project root:"
 echo "$proj_root"
@@ -151,9 +181,14 @@ echo "Running cmake..."
 "$cmake_command" -S "$proj_root" -B "$build_dir" \
     -U SIQAD_INSTALL_ROOT -U SIQAD_PLUGINS_ROOT -U SIQAD_LIBS_ROOT -U SIQADCONN_ROOT \
     "-DCMAKE_BUILD_TYPE=$build_type" "-DCMAKE_INSTALL_PREFIX=$build_dir/$install_prefix" \
-    -DBUILD_TEST=ON "${platform_args[@]}" "${extra_flags[@]}" "${cmake_args[@]}"
+    -U BUILD_TEST -U SKIP_SIQAD_TESTS \
+    -DBUILD_TESTING=ON "${platform_args[@]}" "${extra_flags[@]}" "${cmake_args[@]}"
 
 # compile
 echo "Building everything..."
 "$cmake_command" --build "$build_dir" --config "$build_type" --parallel "$cpu_cores"
+# Read the effective option from CMake, including typed and command-line overrides.
+if /usr/bin/grep -Eiq '^BUILD_TESTING:[^=]+=(ON|TRUE|1|YES|Y)$' "$build_dir/CMakeCache.txt"; then
+    "${CTEST_COMMAND:-ctest}" --test-dir "$build_dir" -C "$build_type" --output-on-failure --no-tests=error
+fi
 "$cmake_command" --install "$build_dir" --config "$build_type"

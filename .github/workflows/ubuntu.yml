@@ -12,6 +12,9 @@ on:
       - '**/CMakeLists.txt'
       - 'libs/**'
       - '.github/workflows/ubuntu.yml'
+      - 'cmake/**'
+      - 'src/tests/**'
+      - 'make_everything_dev'
   pull_request:
     branches: ["main"]
     paths:
@@ -23,6 +26,9 @@ on:
       - '**/CMakeLists.txt'
       - 'libs/**'
       - '.github/workflows/ubuntu.yml'
+      - 'cmake/**'
+      - 'src/tests/**'
+      - 'make_everything_dev'
   merge_group:
 
 defaults:
@@ -127,9 +133,16 @@ jobs:
             -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_VERBOSE_MAKEFILE=ON
 
-      - name: Build and test (Debug)
+      - name: Build (Debug)
         working-directory: ${{github.workspace}}/build_debug
         run: cmake --build . --config Debug -j4
+
+      - name: Test (Debug)
+        run: ctest --test-dir build_debug -C Debug --output-on-failure --no-tests=error
+
+      - name: Test summary (Debug)
+        if: always()
+        run: python3 src/tests/report_tests.py build_debug/test-results --expect siqad_tests gui_workflow_tests clipboard_codec_tests developer_script_tests report_tests_tests
 
       - name: Create Build Environment (Release)
         run: cmake -E make_directory ${{github.workspace}}/build_release
@@ -142,6 +155,25 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_VERBOSE_MAKEFILE=ON
 
-      - name: Build and test (Release)
+      - name: Build (Release)
         working-directory: ${{github.workspace}}/build_release
         run: cmake --build . --config Release -j4
+
+      - name: Test (Release)
+        run: ctest --test-dir build_release -C Release --output-on-failure --no-tests=error
+
+      - name: Test summary (Release)
+        if: always()
+        run: python3 src/tests/report_tests.py build_release/test-results --expect siqad_tests gui_workflow_tests clipboard_codec_tests developer_script_tests report_tests_tests
+
+      - name: Preserve test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-${{ matrix.os }}-${{ matrix.compiler }}
+          path: |
+            build_debug/test-results/
+            build_debug/Testing/Temporary/
+            build_release/test-results/
+            build_release/Testing/Temporary/
+          if-no-files-found: error

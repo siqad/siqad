@@ -12,6 +12,9 @@ on:
       - '**/CMakeLists.txt'
       - 'libs/**'
       - '.github/workflows/build-windows.yml'
+      - 'cmake/**'
+      - 'src/tests/**'
+      - 'make_everything_dev'
   pull_request:
     branches: ["main"]
     paths:
@@ -23,6 +26,9 @@ on:
       - '**/CMakeLists.txt'
       - 'libs/**'
       - '.github/workflows/build-windows.yml'
+      - 'cmake/**'
+      - 'src/tests/**'
+      - 'make_everything_dev'
 
   workflow_dispatch:
 
@@ -82,6 +88,23 @@ jobs:
     - name: Build
       working-directory: ./build
       run: ninja -f build.ninja
+
+    - name: Test
+      run: ctest --test-dir build -C Release --output-on-failure --no-tests=error
+
+    - name: Test summary
+      if: always()
+      run: python src/tests/report_tests.py build/test-results --expect siqad_tests gui_workflow_tests clipboard_codec_tests developer_script_tests report_tests_tests
+
+    - name: Preserve test evidence
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: tests-windows
+        path: |
+          build/test-results/
+          build/Testing/Temporary/
+        if-no-files-found: error
 
     - name: Install
       working-directory: ./build

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
 
 # Only set the CMAKE_CXX_STANDARD if it is not set by someone else
 if(NOT DEFINED CMAKE_CXX_STANDARD)
@@ -16,6 +16,8 @@ endif()
 # ${SIQAD_PLUGINS_ROOT}     : Default plugin installation root, ${SIQAD_INSTALL_ROOT}/plugins
 
 project(siqad_suite)
+include(cmake/Testing.cmake)
+option(SIQAD_BUILD_PLUGINS "Build bundled simulator plugins" ON)
 
 
 
@@ -88,7 +90,9 @@ add_subdirectory(src)
 #  Officially included plugins  #
 #################################
 
-add_subdirectory(plugins)
+if(SIQAD_BUILD_PLUGINS)
+    add_subdirectory(plugins)
+endif()
 
 
 ##############

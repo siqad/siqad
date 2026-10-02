@@ -22,9 +22,9 @@
 QMap<QString, QString> settings::Settings::path_map = QMap<QString, QString>();
 
 // initialize default settings
-QSettings *settings::AppSettings::defs = settings::AppSettings::m_defs();
-QSettings *settings::GUISettings::defs = settings::GUISettings::m_defs();
-QSettings *settings::LatticeSettings::defs = settings::LatticeSettings::m_defs();
+QSettings *settings::AppSettings::defs = nullptr;
+QSettings *settings::GUISettings::defs = nullptr;
+QSettings *settings::LatticeSettings::defs = nullptr;
 
 // set static singleton pointers to NULL
 settings::AppSettings* settings::AppSettings::inst = 0;
@@ -37,6 +37,8 @@ settings::LatticeSettings* settings::LatticeSettings::inst = 0;
 settings::AppSettings *settings::AppSettings::instance()
 {
   // if no instance has been created, initialize
+  if(!defs)
+    defs = m_defs();
   if(!inst)
     inst = new settings::AppSettings();
   return inst;
@@ -48,6 +50,8 @@ settings::AppSettings *settings::AppSettings::instance()
 settings::GUISettings *settings::GUISettings::instance()
 {
   // if no instance has been created, initialize
+  if(!defs)
+    defs = m_defs();
   if(!inst)
     inst = new settings::GUISettings();
   return inst;
@@ -59,6 +63,8 @@ settings::GUISettings *settings::GUISettings::instance()
 settings::LatticeSettings *settings::LatticeSettings::instance()
 {
   // if no instance has been created, initialize
+  if(!defs)
+    defs = m_defs();
   if(!inst)
     inst = new settings::LatticeSettings();
   return inst;
@@ -73,6 +79,7 @@ void settings::LatticeSettings::updateLattice(const QString &fname)
   }
 
   // reconstruct defaults
+  delete defs;
   defs = settings::LatticeSettings::m_defs();
 
   // create new instance of lattice settings
