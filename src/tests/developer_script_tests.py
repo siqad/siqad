@@ -37,12 +37,17 @@ class DeveloperScriptTests(unittest.TestCase):
     def test_dependency_install_preserves_path_and_blocks_trust_downgrades(self):
         from unittest.mock import patch
         installer = self.dependency_installer()
-        with patch("sys.version_info", (3, 10)), patch("subprocess.check_call") as call:
+        aliases = dict(REQUESTS_CA_BUNDLE="stale.pem", CURL_CA_BUNDLE="stale.pem", PIP_CERT="stale.pem")
+        with patch("sys.version_info", (3, 10)), patch.dict(os.environ, aliases), \
+                patch("subprocess.check_output", return_value="patched.pem\n"), \
+                patch("subprocess.check_call") as call:
             installer["install"]("requirements with spaces.txt")
         self.assertEqual(call.call_count, 2)
         args = call.call_args.args[0]
         self.assertIn("pip>=26.2.2", args)
         self.assertIn("--use-deprecated=legacy-certs", args)
+        self.assertEqual(args[args.index("--cert") + 1], "patched.pem")
+        self.assertFalse(set(aliases) & set(call.call_args.kwargs["env"]))
         self.assertIn("certifi>=2026.10.19", args)
         self.assertEqual(args[-2:], ["-r", "requirements with spaces.txt"])
 

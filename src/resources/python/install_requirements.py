@@ -21,9 +21,14 @@ def install(requirements):
     subprocess.check_call(pip + ["install", "--no-deps", "--upgrade", PIP_WHEEL])
     # Native roots can reintroduce the compromised trust even after pip is patched.
     env = dict(os.environ, PIP_USE_DEPRECATED="legacy-certs")
+    for alias in ("REQUESTS_CA_BUNDLE", "CURL_CA_BUNDLE", "PIP_CERT"):
+        env.pop(alias, None)
+    bundle = subprocess.check_output([
+        sys.executable, "-c", "from pip._vendor import certifi; print(certifi.where())",
+    ], text=True).strip()
     # Explicit requirements prevent a plugin from downgrading either trust bundle.
     subprocess.check_call(pip + [
-        "install", "--use-deprecated=legacy-certs",
+        "install", "--use-deprecated=legacy-certs", "--cert", bundle,
         "pip>=26.2.2", "certifi>=2026.10.19", "-r", requirements,
     ], env=env)
 
