@@ -185,6 +185,8 @@ void PluginEngine::prepareVirtualenv()
     return;
   }
 
+  ready_to_use = false;
+  venv_init_success = false;
   venv_status_str = "Initializing venv";
   l_venv_status->setText(venv_status_str);
 
@@ -203,18 +205,21 @@ void PluginEngine::prepareVirtualenv()
     venv_status_str = "Downloading pip packages";
     l_venv_status->setText(venv_status_str);
 
-    // install pip dependencies
-    QProcess *dep_process = new QProcess;
+    QFile installer(":/python/install_requirements.py");
+    if (!installer.open(QIODevice::ReadOnly)) {
+      venv_status_str = "Dependency installer unavailable";
+      l_venv_status->setText(venv_status_str);
+      return;
+    }
+
+    QProcess *dep_process = new QProcess(this);
     dep_process->setProcessChannelMode(QProcess::MergedChannels);
     dep_process->setProgram(pythonBin());
     dep_process->setArguments(QStringList({
-          "-m",
-          "pip",
-          "install",
-          "-r",
+          "-c",
+          QString::fromUtf8(installer.readAll()),
           QDir(pluginRootPath()).filePath("requirements.txt")
           }));
-    dep_process->start();
     qDebug() << tr("(This may take some time) installing pip dependencies for venv %1...").arg(virtualenvPath());
 
     connect(dep_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
@@ -235,6 +240,14 @@ void PluginEngine::prepareVirtualenv()
         });
 
     term_out(dep_process);
+    connect(dep_process, &QProcess::errorOccurred, this,
+        [this](QProcess::ProcessError error) {
+          if (error == QProcess::FailedToStart) {
+            venv_status_str = "Dependency installer failed to start";
+            l_venv_status->setText(venv_status_str);
+          }
+        });
+    dep_process->start();
   };
 
   if (gui::python_path.isEmpty()) {
@@ -245,7 +258,7 @@ void PluginEngine::prepareVirtualenv()
     return;
   }
   
-  QProcess *venv_process = new QProcess();
+  QProcess *venv_process = new QProcess(this);
   venv_process->setProcessChannelMode(QProcess::MergedChannels);
   venv_process->setProgram(gui::python_path); 
   QStringList venv_args = {
@@ -257,7 +270,6 @@ void PluginEngine::prepareVirtualenv()
     venv_args << "--system-site-packages";
   }
   venv_process->setArguments(venv_args);
-  venv_process->start();
   qDebug() << tr("Creating Python venv at %1...").arg(virtualenvPath());
 
   connect(venv_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
@@ -281,6 +293,7 @@ void PluginEngine::prepareVirtualenv()
       });
 
   term_out(venv_process);
+  venv_process->start();
 }
 
 QString PluginEngine::pluginStatusStr()

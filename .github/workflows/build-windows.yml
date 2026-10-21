@@ -51,6 +51,14 @@ jobs:
         python-version: '3.12'
         cache: 'pip' # caching pip dependencies
 
+    - name: Bootstrap patched Python certificate tooling
+      run: |
+        python -m pip --disable-pip-version-check install --no-deps --upgrade "https://files.pythonhosted.org/packages/3f/06/3e4420302363fbb71be3c7f35ce042f54bfca330e3e66b3a2e3c4cca579f/pip-26.2.2-py3-none-any.whl#sha256=fd7f4dfa8190e014013b9f08f3e973f4e4c26ffd179a204895533a7254813a70"
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        python -m pip --disable-pip-version-check install --use-deprecated=legacy-certs "certifi>=2026.10.19"
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        "PIP_USE_DEPRECATED=legacy-certs" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
     - name: Install CMake
       uses: lukka/get-cmake@v3.29.3
 
@@ -60,6 +68,7 @@ jobs:
       uses: jurplel/install-qt-action@v3
       id: install-qt
       with:
+        setup-python: false
         aqtversion: '==3.1.*'
         version: '6.7.0'
         host: 'windows'

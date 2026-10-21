@@ -18,6 +18,42 @@ def write_tool(path, contents):
 
 
 class DeveloperScriptTests(unittest.TestCase):
+    def dependency_installer(self):
+        import runpy
+        return runpy.run_path(str(SOURCE.parent / "src/resources/python/install_requirements.py"))
+
+    def test_dependency_bootstrap_failure_blocks_requirements(self):
+        from unittest.mock import patch
+        installer = self.dependency_installer()
+        with patch("sys.version_info", (3, 10)), patch("subprocess.check_call", side_effect=subprocess.CalledProcessError(1, "pip")) as call:
+            with self.assertRaises(subprocess.CalledProcessError):
+                installer["install"]("requirements with spaces.txt")
+        self.assertEqual(call.call_count, 1)
+        args = call.call_args.args[0]
+        self.assertIn("--no-deps", args)
+        self.assertIn("--disable-pip-version-check", args)
+        self.assertTrue(args[-1].endswith("#sha256=fd7f4dfa8190e014013b9f08f3e973f4e4c26ffd179a204895533a7254813a70"))
+
+    def test_dependency_install_preserves_path_and_blocks_trust_downgrades(self):
+        from unittest.mock import patch
+        installer = self.dependency_installer()
+        with patch("sys.version_info", (3, 10)), patch("subprocess.check_call") as call:
+            installer["install"]("requirements with spaces.txt")
+        self.assertEqual(call.call_count, 2)
+        args = call.call_args.args[0]
+        self.assertIn("pip>=26.2.2", args)
+        self.assertIn("--use-deprecated=legacy-certs", args)
+        self.assertIn("certifi>=2026.10.19", args)
+        self.assertEqual(args[-2:], ["-r", "requirements with spaces.txt"])
+
+    def test_dependency_installer_rejects_legacy_python_before_network(self):
+        from unittest.mock import patch
+        installer = self.dependency_installer()
+        with patch("sys.version_info", (3, 9)), patch("subprocess.check_call") as call:
+            with self.assertRaisesRegex(RuntimeError, "Python 3.10"):
+                installer["install"]("requirements.txt")
+        call.assert_not_called()
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(prefix="siqad-script-")
         self.addCleanup(self.tmp.cleanup)

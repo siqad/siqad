@@ -2,6 +2,7 @@
 <qresource>
     <file>blank_save.xml</file>
     <file>plugin_services.xml</file>
+    <file>python/install_requirements.py</file>
 
     <!--lattice unit cells-->
     <file>lattices/si_100_2x1.xml</file>

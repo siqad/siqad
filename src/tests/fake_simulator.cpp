@@ -1,6 +1,7 @@
 // A deterministic subprocess exercising the real plugin/job protocol, not physics.
 #include <QCoreApplication>
 #include <QFile>
+#include <QDir>
 #include <QSaveFile>
 #include <QTimer>
 #include <QXmlStreamReader>
@@ -15,6 +16,28 @@ static void requestStop(int) { stopRequested = 1; }
 int main(int argc, char **argv) {
   QCoreApplication app(argc, argv);
   const auto args = app.arguments();
+  // Exercise the GUI's Python process boundary without downloading packages.
+  if (args.size() >= 4 && args[1] == "-m" && args[2] == "venv") {
+#ifdef Q_OS_WIN
+    const auto bin = QDir(args[3]).filePath("Scripts");
+#else
+    const auto bin = QDir(args[3]).filePath("bin");
+#endif
+    if (!QDir().mkpath(bin)) return 72;
+#ifdef Q_OS_WIN
+    const auto python = QDir(bin).filePath("python.exe");
+#else
+    const auto python = QDir(bin).filePath("python3");
+#endif
+    if (QFile::exists(python)) return 0; // Existing environment.
+    return QFile::copy(QCoreApplication::applicationFilePath(), python) ? 0 : 73;
+  }
+  if (args.size() == 4 && args[1] == "-c") {
+    QFile requirements(args[3]);
+    if (!requirements.open(QIODevice::ReadOnly)) return 74;
+    if (!args[2].contains("def install(requirements)")) return 75;
+    return requirements.readAll().contains("fail") ? 27 : 0;
+  }
   if (args.size() != 5) return 64;
   const QString mode = args[1];
   QFile problem(args[2]);

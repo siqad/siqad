@@ -78,6 +78,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -yq \
+            ca-certificates \
             cmake \
             pkg-config \
             python3-dev \
