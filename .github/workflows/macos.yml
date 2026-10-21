@@ -64,6 +64,8 @@ jobs:
       - name: Install Homebrew Dependencies
         run: |
           brew update
+          brew install ca-certificates
+          brew upgrade ca-certificates
           brew install boost qt@6
           # Ensure Qt6 is available in PATH
           echo "/opt/homebrew/opt/qt@6/bin" >> "$GITHUB_PATH"

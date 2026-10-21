@@ -26,7 +26,16 @@ Pre-compiled binaries are available for Windows 10. They can be downloaded on th
 
 See the note at the top of the page regarding the lack of PoisSolver support in the pre-compiled binaries as well as possible remedies.
 
-Some of the bundled simulators require a Python interpreter (`official download page <https://www.python.org/downloads/>`_). Supported versions include Python 3.5 to 3.8. **Python 3.7 acquired from Windows Store doesn't seem to work** for us, but 3.8 seems to work. For now, we recommend sticking with acquiring Python from the official website.
+Automatic plugin dependency installation requires Python 3.10 or newer
+(`official download page <https://www.python.org/downloads/>`_).
+SiQAD installs a hash-verified pip 26.2.2 wheel before downloading dependencies.
+It also requires certifi 2026.10.19 or newer to remove trust affected by the
+eMudhra certificate-authority compromise. Update your operating system's
+certificate store as well. A patched Python bundle does not replace system
+certificate updates.
+For these installs, SiQAD uses pip's patched Mozilla certificate bundle rather
+than system roots, which can retain compromised trust. System-only private
+certificate authorities are therefore not included automatically.
 
 Additional packages that are needed by Python-based plugins are acquired automatically through ``pip`` and installed into virtual environments via ``venv`` such that they do not interfere with system Python packages. Both ``pip`` and ``venv`` come with a standard Python installation.
 

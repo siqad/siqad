@@ -120,6 +120,34 @@ class SimJobWorkflowTests : public QObject {
 private slots:
   void cleanup() { test_support::resetCase(); gui::python_path.clear(); }
 
+  void pythonDependencyPreparationAndFailedRetry() {
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    QFile requirements(QDir(dir.path()).filePath("requirements.txt"));
+    QVERIFY(requirements.open(QIODevice::WriteOnly));
+    requirements.write("local-test-package\n");
+    requirements.close();
+    QFile description(QDir(dir.path()).filePath("python.physeng"));
+    QVERIFY(description.open(QIODevice::WriteOnly));
+    description.write("<physeng><name>Python trust test</name>"
+                      "<py_use_virtualenv>1</py_use_virtualenv>"
+                      "<venv_use_system_site_packages>1</venv_use_system_site_packages>"
+                      "</physeng>");
+    description.close();
+    gui::python_path = QString::fromUtf8(SIQAD_FAKE_SIMULATOR);
+    comp::PluginEngine engine(description.fileName());
+    QTRY_VERIFY_WITH_TIMEOUT(engine.readyToUse(), 10000);
+    QCOMPARE(engine.pluginStatusStr(), QString("Ready"));
+
+    QVERIFY(requirements.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    requirements.write("fail\n");
+    requirements.close();
+    engine.prepareVirtualenv();
+    QVERIFY(!engine.readyToUse());
+    QTRY_COMPARE_WITH_TIMEOUT(engine.pluginStatusStr(), QString("Pip download failed"), 10000);
+    QVERIFY(!engine.readyToUse());
+  }
+
   void successDiscoveryVisualizationAndClear() {
     Workflow flow; QVERIFY(flow.init());
     auto *job = flow.job({"success", "success"});
